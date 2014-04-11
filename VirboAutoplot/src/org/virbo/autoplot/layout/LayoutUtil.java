@@ -61,6 +61,8 @@ public class LayoutUtil {
         return true;
     }
 
+    private static int count=0;
+    
     /**
      * resets the layout on the canvas so that labels are not clipped (somewhat).
      * Child row and columns are inspected as well, and it's assumed that adjusting
@@ -85,11 +87,16 @@ public class LayoutUtil {
 
         if ( canvas.getWidth()==0 ) return;
 
+        count++;
+        
         Rectangle bounds;
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
             if (cc.getColumn() == c && cc.isVisible()) {
                 bounds = cc.getBounds();
+                
                 if ( bounds.width>0 ) {
+                    logger.fine( String.format( "%d %d %d %s", count, bounds.x, bounds.width, cc.toString() ) );
+                
                     xmin = Math.min(xmin, bounds.x);
                     xmax = Math.max(xmax, bounds.x + bounds.width);
                 }
@@ -126,6 +133,8 @@ public class LayoutUtil {
             ymax = Math.max(ymax, bounds.y + bounds.height);
         }
 
+        logger.fine( String.format( "%d %d %d %s", count, xmin, xmax-xmin, "all_together" ) );
+        
         double MARGIN_LEFT_RIGHT_EM = 1;
 
         boolean changed = false;
@@ -202,10 +211,13 @@ public class LayoutUtil {
         Rectangle rect = null;
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
             if (cc.getColumn().getParentDevicePosition() == col && cc.isVisible()) {
-                if (rect == null) {
-                    rect = cc.getBounds();
-                } else {
-                    rect.add(cc.getBounds());
+                Rectangle b= cc.getBounds();
+                if ( b.height>0 && b.width>0 ) {
+                    if (rect == null) {
+                        rect = cc.getBounds();
+                    } else {
+                        rect.add(cc.getBounds());
+                    }
                 }
             }
         }
@@ -222,10 +234,13 @@ public class LayoutUtil {
         Rectangle rect = null;
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
             if (cc.getRow().getParentDevicePosition() == row && cc.isVisible()) {
-                if (rect == null) {
-                    rect = cc.getBounds();
-                } else {
-                    rect.add(cc.getBounds());
+                Rectangle b= cc.getBounds();
+                if ( b.height>0 && b.width>0 ) {
+                    if (rect == null) {
+                        rect = b;
+                    } else {
+                        rect.add( b );
+                    }
                 }
             }
         }
