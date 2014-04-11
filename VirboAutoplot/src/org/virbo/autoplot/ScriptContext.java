@@ -534,12 +534,12 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void writeToPng( String filename, int width, int height ) throws InterruptedException, IOException {
         
-        Image image = model.canvas.getImage( width, height );
+        BufferedImage image = model.canvas.getImage( width, height );
         
         Map<String,String> meta= new LinkedHashMap<String, String>();
         meta.put( DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
         meta.put( DasPNGConstants.KEYWORD_PLOT_INFO, model.canvas.getImageMetadata() );
-        writeToPng( (BufferedImage)image, filename, meta );
+        writeToPng( image, filename, meta );
     }
 
     /**
