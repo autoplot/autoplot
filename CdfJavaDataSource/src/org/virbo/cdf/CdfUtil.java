@@ -8,7 +8,6 @@
  */
 package org.virbo.cdf;
 
-import gov.nasa.gsfc.voyager.cdf.Attribute;
 import gov.nasa.gsfc.voyager.cdf.CDF;
 import gov.nasa.gsfc.voyager.cdf.Variable;
 import gov.nasa.gsfc.voyager.cdf.VariableDataLocator;
@@ -20,7 +19,6 @@ import java.lang.reflect.Array;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -268,7 +266,15 @@ public class CdfUtil {
         int[] dimSizes = variable.getDimensions();
         boolean[] dimVaries= variable.getVarys();
 
-        if ( getEffectiveRank(variable.getVarys()) != dimSizes.length ) { // vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
+        int dims;
+        if (dimSizes == null) {
+            dims = 0;
+            dimSizes= new int[0]; // to simplify code
+        } else {
+            dims = dimSizes.length;
+        }
+
+        if ( getEffectiveRank(dimVaries) != dimSizes.length ) { // vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
             int[] dimSizes1= new int[ variable.getEffectiveRank() ];
             boolean[] varies= variable.getVarys();
             int[] dimensions= variable.getDimensions();
@@ -281,14 +287,7 @@ public class CdfUtil {
             }
             dimSizes= dimSizes1;
         }
-
-        int dims;
-        if (dimSizes == null) {
-            dims = 0;
-        } else {
-            dims = dimSizes.length;
-        }
-
+        
         if (dims > 3 ) {
             if (recCount != -1) {
                 throw new IllegalArgumentException("rank 5 not implemented");
@@ -307,7 +306,6 @@ public class CdfUtil {
 
         long rc= recCount;
         if ( rc==-1 ) rc= 1;  // -1 is used as a flag for a slice, we still really read one record.
-
 
         logger.log( Level.FINEST, "size of {0}: {1}MB  type: {2}", new Object[]{variable.getName(), sizeOf(dims, dimSizes, varType, rc) / 1024. / 1024., varType});
 
@@ -367,8 +365,6 @@ public class CdfUtil {
         }
 
         MutablePropertyDataSet result;
-
-        if ( dims==0 ) dimSizes= new int[0]; // to simplify code
 
         //kludge: in library, where majority has no effect on dimSizes.  See
         if ( ! variable.rowMajority()  ) {
@@ -757,13 +753,7 @@ public class CdfUtil {
         String[] v = cdf.getVariableNames();
         logger.log(Level.FINE, "got {0} variables", v.length);
 
-        Attribute virtual= null;
-
         logger.fine("getting CDF attributes");
-        try {
-            virtual= (Attribute) cdf.getAttribute("VIRTUAL");
-        } catch (Exception e) {
-        }
 
         int skipCount=0;
         for (int i=0; i<v.length; i++ ) {
@@ -828,173 +818,166 @@ public class CdfUtil {
             }
 
             boolean isVirtual= false;
-            
-            if ( false ) {
-                result.put(var.getName(), null);
-            } else {
 
-                if ( dataOnly ) {
-                    Object varType= getAttribute( cdf, var.getName(), "VAR_TYPE" );
-                    if ( varType==null || !varType.equals("data") ) {
-                        continue;
-                    }
+            if ( dataOnly ) {
+                Object varType= getAttribute( cdf, var.getName(), "VAR_TYPE" );
+                if ( varType==null || !varType.equals("data") ) {
+                    continue;
                 }
-
-                Variable xDependVariable = null;
-                long xMaxRec = -1;
-
-                String scatDesc = null;
-                String svarNotes = null;
-                try {
-                    if ( true || virtual!=null ) {
-                        Object att= getAttribute( cdf, var.getName(), "VIRTUAL" );
-                        if ( att!=null ) {
-                            logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", var.getName());
-                            if ( String.valueOf(att).toUpperCase().equals("TRUE") ) {
-                                String funct= (String)getAttribute( cdf, var.getName(), "FUNCTION" );
-                                if ( funct==null ) funct= (String) getAttribute( cdf, var.getName(), "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
-                                if ( !CdfVirtualVars.isSupported(funct) ) {
-                                    if ( !funct.startsWith("comp_themis") ) {
-                                        logger.fine("virtual function not supported: "+funct );
-                                    }
-                                    continue;
-                                } else {
-                                    vdescr= new StringBuilder(funct);
-                                    vdescr.append( "( " );
-                                    int icomp=0;
-                                    String comp= (String)getAttribute( cdf, var.getName(), "COMPONENT_"+icomp );
-                                    if ( comp!=null ) {
-                                        vdescr.append( comp );
-                                        icomp++;
-                                    }
-                                    for ( ; icomp<5; icomp++ ) {
-                                        comp= (String)getAttribute( cdf, var.getName(), "COMPONENT_"+icomp );
-                                        if ( comp!=null ) {
-                                            vdescr.append(", ").append(comp);
-                                        } else {
-                                            break;
-                                        }
-                                    }
-                                    vdescr.append(" )");
-                                }
-                                isVirtual= true;
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    //e.printStackTrace();
-                }
-                try {
-                    if ( hasAttribute( cdf, var.getName(), "DEPEND_0" )) {  // check for metadata for DEPEND_0
-                        Object att= getAttribute( cdf, var.getName(), "DEPEND_0" );
-                        if ( att!=null ) {
-                            logger.log(Level.FINE, "get attribute DEPEND_0 entry for {0}", var.getName());
-                            xDependVariable = cdf.getVariable(String.valueOf(att));
-                            if ( xDependVariable==null ) throw new Exception("No such variable: "+String.valueOf(att));
-                            xMaxRec = xDependVariable.getNumberOfValues();
-                            if ( xMaxRec!=maxRec && vdescr==null && var.recordVariance() ) {
-                                if ( maxRec==-1 ) maxRec+=1; //why?
-                                if ( maxRec==0 ) {
-                                    warn.add("data contains no records" );
-                                } else {
-                                    warn.add("depend0 length is inconsistent with length ("+(maxRec)+")" );
-                                }
-                                //TODO: warnings are incorrect for Themis data.
-                            }
-                        } else {
-                            if ( dataOnly ) {
-                                continue; // vap+cdaweb:ds=GE_K0_PWI&id=freq_b&timerange=2012-06-12
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    warn.add( "problem with DEPEND_0: " + e.getMessage() );//e.printStackTrace();
-                }
-
-                if ( var.getName().equals("FEDU" ) ) {
-                    logger.fine("Here FEDU");
-                }
-                DepDesc dep1desc= getDepDesc( cdf, var, rank, dims, 1, warn );
-
-                DepDesc dep2desc= getDepDesc( cdf, var, rank, dims, 2, warn );
-
-                DepDesc dep3desc= getDepDesc( cdf, var, rank, dims, 3, warn );
-
-                if (deep) {
-                    Object o= (Object) getAttribute( cdf, var.getName(), "CATDESC" );
-                    if ( o != null && o instanceof String ) {
-                        logger.log(Level.FINE, "get attribute CATDESC entry for {0}", var.getName());
-                        scatDesc = (String)o ;
-                    }
-                    o=  getAttribute( cdf, var.getName(), "VAR_NOTES" );
-                    if ( o!=null  && o instanceof String ) {
-                        logger.log(Level.FINE, "get attribute VAR_NOTES entry for {0}", var.getName());
-                        svarNotes = (String)o ;
-                    }
-                }
-
-                String desc = var.getName();
-                if (xDependVariable != null) {
-                    desc += "(" + xDependVariable.getName();
-                    if ( xMaxRec>0 || !isMaster ) { // small kludge for CDAWeb, where we expect masters to be empty.
-                         desc+= "=" + (xMaxRec);
-                    }
-                    if ( dep1desc.dep != null) {
-                        desc += "," + dep1desc.dep.getName() + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
-                        if ( dep2desc.dep != null) {
-                            desc += "," + dep2desc.dep.getName() + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
-                            if (dep3desc.dep != null) {
-                                desc += "," + dep3desc.dep.getName() + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
-                            }
-                        }
-                    } else if ( rank>1 ) {
-                        desc += ","+DataSourceUtil.strjoin( dims, ",");
-                    }
-                    desc += ")";
-                }
-
-                if (deep) {
-                    StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
-
-                    String recDesc= ""+ CdfUtil.getStringDataType(var.getType());
-                    if ( dims!=null ) {
-                        recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
-                    }
-                    if (maxRec != xMaxRec)
-                        if ( isVirtual ) {
-                            descbuf.append("").append("(virtual function ").append(vdescr).append( ")<br>");
-                        } else {
-                            descbuf.append("").append( recCount ).append(" records of ").append(recDesc).append("<br>");
-                        }
-                    if (scatDesc != null)
-                        descbuf.append("").append(scatDesc).append("<br>");
-                    if (svarNotes !=null ) {
-                        descbuf.append("<br><p><small>").append(svarNotes).append("<small></p>");
-                    }
-
-                    for ( String s: warn ) {
-                        if ( s.startsWith("NOTE") ) {
-                            descbuf.append("<br>").append(s);
-                        } else {
-                            descbuf.append("<br>WARNING: ").append(s);
-                        }
-                    }
-                    
-                    descbuf.append("</html>");
-                    if ( xDependVariable!=null ) {
-                        dependent.put(var.getName(), descbuf.toString());
-                    } else {
-                        result.put(var.getName(), descbuf.toString());
-                    }
-                } else {
-                    if ( xDependVariable!=null ) {
-                        dependent.put(var.getName(), desc);
-                    } else {
-                        result.put(var.getName(), desc);
-                    }
-                }
-
             }
+
+            Variable xDependVariable = null;
+            long xMaxRec = -1;
+
+            String scatDesc = null;
+            String svarNotes = null;
+            try {
+                Object att= getAttribute( cdf, var.getName(), "VIRTUAL" );
+                if ( att!=null ) {
+                    logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", var.getName());
+                    if ( String.valueOf(att).toUpperCase().equals("TRUE") ) {
+                        String funct= (String)getAttribute( cdf, var.getName(), "FUNCTION" );
+                        if ( funct==null ) funct= (String) getAttribute( cdf, var.getName(), "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
+                        if ( !CdfVirtualVars.isSupported(funct) ) {
+                            if ( !funct.startsWith("comp_themis") ) {
+                                logger.log(Level.FINE, "virtual function not supported: {0}", funct);
+                            }
+                            continue;
+                        } else {
+                            vdescr= new StringBuilder(funct);
+                            vdescr.append( "( " );
+                            int icomp=0;
+                            String comp= (String)getAttribute( cdf, var.getName(), "COMPONENT_"+icomp );
+                            if ( comp!=null ) {
+                                vdescr.append( comp );
+                                icomp++;
+                            }
+                            for ( ; icomp<5; icomp++ ) {
+                                comp= (String)getAttribute( cdf, var.getName(), "COMPONENT_"+icomp );
+                                if ( comp!=null ) {
+                                    vdescr.append(", ").append(comp);
+                                } else {
+                                    break;
+                                }
+                            }
+                            vdescr.append(" )");
+                        }
+                        isVirtual= true;
+                    }
+                }
+            } catch (Exception e) {
+                //e.printStackTrace();
+            }
+            try {
+                if ( hasAttribute( cdf, var.getName(), "DEPEND_0" )) {  // check for metadata for DEPEND_0
+                    Object att= getAttribute( cdf, var.getName(), "DEPEND_0" );
+                    if ( att!=null ) {
+                        logger.log(Level.FINE, "get attribute DEPEND_0 entry for {0}", var.getName());
+                        xDependVariable = cdf.getVariable(String.valueOf(att));
+                        if ( xDependVariable==null ) throw new Exception("No such variable: "+String.valueOf(att));
+                        xMaxRec = xDependVariable.getNumberOfValues();
+                        if ( xMaxRec!=maxRec && vdescr==null && var.recordVariance() ) {
+                            if ( maxRec==-1 ) maxRec+=1; //why?
+                            if ( maxRec==0 ) {
+                                warn.add("data contains no records" );
+                            } else {
+                                warn.add("depend0 length is inconsistent with length ("+(maxRec)+")" );
+                            }
+                            //TODO: warnings are incorrect for Themis data.
+                        }
+                    } else {
+                        if ( dataOnly ) {
+                            continue; // vap+cdaweb:ds=GE_K0_PWI&id=freq_b&timerange=2012-06-12
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                warn.add( "problem with DEPEND_0: " + e.getMessage() );//e.printStackTrace();
+            }
+
+            if ( var.getName().equals("FEDU" ) ) {
+                logger.fine("Here FEDU");
+            }
+            DepDesc dep1desc= getDepDesc( cdf, var, rank, dims, 1, warn );
+
+            DepDesc dep2desc= getDepDesc( cdf, var, rank, dims, 2, warn );
+
+            DepDesc dep3desc= getDepDesc( cdf, var, rank, dims, 3, warn );
+
+            if (deep) {
+                Object o= (Object) getAttribute( cdf, var.getName(), "CATDESC" );
+                if ( o != null && o instanceof String ) {
+                    logger.log(Level.FINE, "get attribute CATDESC entry for {0}", var.getName());
+                    scatDesc = (String)o ;
+                }
+                o=  getAttribute( cdf, var.getName(), "VAR_NOTES" );
+                if ( o!=null  && o instanceof String ) {
+                    logger.log(Level.FINE, "get attribute VAR_NOTES entry for {0}", var.getName());
+                    svarNotes = (String)o ;
+                }
+            }
+
+            String desc = var.getName();
+            if (xDependVariable != null) {
+                desc += "(" + xDependVariable.getName();
+                if ( xMaxRec>0 || !isMaster ) { // small kludge for CDAWeb, where we expect masters to be empty.
+                     desc+= "=" + (xMaxRec);
+                }
+                if ( dep1desc.dep != null) {
+                    desc += "," + dep1desc.dep.getName() + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
+                    if ( dep2desc.dep != null) {
+                        desc += "," + dep2desc.dep.getName() + "=" + dep2desc.nrec + ( dep2desc.rank2 ? "*": "" );
+                        if (dep3desc.dep != null) {
+                            desc += "," + dep3desc.dep.getName() + "=" + dep3desc.nrec + ( dep3desc.rank2 ? "*": "" );
+                        }
+                    }
+                } else if ( rank>1 ) {
+                    desc += ","+DataSourceUtil.strjoin( dims, ",");
+                }
+                desc += ")";
+            }
+
+            if (deep) {
+                StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
+
+                String recDesc= ""+ CdfUtil.getStringDataType(var.getType());
+                if ( dims!=null ) {
+                    recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
+                }
+                if (maxRec != xMaxRec)
+                    if ( isVirtual ) {
+                        descbuf.append("").append("(virtual function ").append(vdescr).append( ")<br>");
+                    } else {
+                        descbuf.append("").append( recCount ).append(" records of ").append(recDesc).append("<br>");
+                    }
+                if (scatDesc != null)
+                    descbuf.append("").append(scatDesc).append("<br>");
+                if (svarNotes !=null ) {
+                    descbuf.append("<br><p><small>").append(svarNotes).append("<small></p>");
+                }
+
+                for ( String s: warn ) {
+                    if ( s.startsWith("NOTE") ) {
+                        descbuf.append("<br>").append(s);
+                    } else {
+                        descbuf.append("<br>WARNING: ").append(s);
+                    }
+                }
+
+                descbuf.append("</html>");
+                if ( xDependVariable!=null ) {
+                    dependent.put(var.getName(), descbuf.toString());
+                } else {
+                    result.put(var.getName(), descbuf.toString());
+                }
+            } else {
+                if ( xDependVariable!=null ) {
+                    dependent.put(var.getName(), desc);
+                } else {
+                    result.put(var.getName(), desc);
+                }
+            }
+
         } // for
 
         logger.fine("done, get plottable ");
