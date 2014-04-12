@@ -1581,7 +1581,9 @@ public class DataSetURI {
                 if ( scomp.startsWith(prefix) ) {
                     int ie= 0;
                     while ( ie<surl.length() && ie<sagg.length() && surl.charAt(ie)==sagg.charAt(ie) ) ie++;
-                    completions.add( new DataSetURI.CompletionResult( sagg, sagg.substring(ie), "Use aggregation ("+tr+" available)", null, true ) );
+                    int islash= sagg.lastIndexOf("/",ie);
+                    islash= islash+1;
+                    completions.add( new DataSetURI.CompletionResult( sagg, sagg.substring(islash), "Use aggregation ("+tr+" available)", null, true ) );
                 }
             }
         }
