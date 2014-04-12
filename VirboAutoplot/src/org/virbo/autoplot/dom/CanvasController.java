@@ -36,7 +36,6 @@ import org.das2.graph.GraphUtil;
 import org.das2.graph.Painter;
 import org.das2.graph.Renderer;
 import org.das2.graph.SelectionUtil;
-import org.das2.system.EventQueueBlocker_1;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import static org.virbo.autoplot.dom.DomNodeController.logger;
 import org.virbo.autoplot.layout.LayoutConstants;
@@ -755,23 +754,26 @@ public class CanvasController extends DomNodeController {
         final long t1= System.currentTimeMillis();
         logger.log(Level.FINEST, "create painter {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
         
-        SwingUtilities.invokeLater(  new Runnable() {
-            @Override
-            public void run() {
-                logger.log(Level.FINEST, "add decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
-                dasCanvas.addTopDecorator( p );
-                Timer clearSelectionTimer= new Timer( 300, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        logger.log(Level.FINEST, "rm decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
-                        dasCanvas.removeTopDecorator( p );
-                        currentSelectionItems= null;
-                    }
-                });
-                clearSelectionTimer.setRepeats(false);
-                clearSelectionTimer.restart();
-            }
-        } );
+        boolean doDecorate= true;
+        if ( doDecorate ) {
+            SwingUtilities.invokeLater(  new Runnable() {
+                @Override
+                public void run() {
+                    logger.log(Level.FINEST, "add decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
+                    dasCanvas.addTopDecorator( p );
+                    Timer clearSelectionTimer= new Timer( 300, new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            logger.log(Level.FINEST, "rm decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
+                            dasCanvas.removeTopDecorator( p );
+                            currentSelectionItems= null;
+                        }
+                    });
+                    clearSelectionTimer.setRepeats(false);
+                    clearSelectionTimer.restart();
+                }
+            } );
+        }
         
         logger.log(Level.FINE, "highlite selection in {0}ms", (System.currentTimeMillis()-t0));
 
