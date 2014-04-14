@@ -6,14 +6,11 @@ package test.endtoend;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
-import org.das2.graph.SpectrogramRenderer;
-import org.das2.graph.util.GraphicalLogHandler;
+import org.das2.graph.DasPlot;
 import org.das2.system.DasLogger;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.PlotElement;
@@ -247,7 +244,8 @@ public class Test018 {
     public static void main(String[] args) {
 
         boolean exit= true;
-        //DasLogger.getLogger(DasLogger.GRAPHICS_LOG).setLevel(Level.ALL);
+        
+        DasLogger.setUpHandler("mini");
         
         try {
 
@@ -259,7 +257,7 @@ public class Test018 {
             getDocumentModel().getOptions().setAutolayout(false);
             
             // screen size must be default or image is too large and compare hangs.
-            //test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
+            test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
             
             setCanvasSize(600, 600);
 
@@ -269,6 +267,7 @@ public class Test018 {
 
             test1( testId );
             //no test2, to straighten out the numbering
+            DasPlot.testSentinal="break";
             test3( testId );
             test4( testId );
             test5( testId );
