@@ -79,11 +79,17 @@ public class Test018 {
 
         xaxis.setRange( DatumRangeUtil.rescale( xaxis.getRange(), 0.2, 0.5 ) );
 
+        System.err.println( "Before writeToPng:" );
         System.err.println( "xaxis.getRange()="+xaxis.getRange() );
         System.err.println( "cacheImageValid="+domPlot.getController().getDasPlot().isCacheImageValid() );
         System.err.println( "canvas isPendingChanges="+domPlot.getController().getDasPlot().getCanvas().isPendingChanges() );
         System.err.println( "canvas isDirty="+domPlot.getController().getDasPlot().getCanvas().isDirty() );
         writeToPng(testId + "_003.png");
+        System.err.println( "After writeToPng:" );
+        System.err.println( "xaxis.getRange()="+xaxis.getRange() );
+        System.err.println( "cacheImageValid="+domPlot.getController().getDasPlot().isCacheImageValid() );
+        System.err.println( "canvas isPendingChanges="+domPlot.getController().getDasPlot().getCanvas().isPendingChanges() );
+        System.err.println( "canvas isDirty="+domPlot.getController().getDasPlot().getCanvas().isDirty() );
         
         //logger.setLevel( Level.INFO );
         
@@ -253,7 +259,7 @@ public class Test018 {
             getDocumentModel().getOptions().setAutolayout(false);
             
             // screen size must be default or image is too large and compare hangs.
-            test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
+            //test7_bindings( testId ); // verify bindings logic described in http://autoplot.org/developer.timerangeBinding(?)
             
             setCanvasSize(600, 600);
 
