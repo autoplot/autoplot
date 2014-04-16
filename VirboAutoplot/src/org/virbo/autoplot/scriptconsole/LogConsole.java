@@ -79,7 +79,8 @@ public class LogConsole extends javax.swing.JPanel {
     boolean showLoggerId = false;
     boolean showTimeStamps = false;
     boolean showLevel = false;
-
+    boolean showThreads = false;
+    
     NumberFormat nf = new DecimalFormat("00.000");
     private Timer timer2;
     PrintStream oldStdOut;
@@ -220,6 +221,10 @@ public class LogConsole extends javax.swing.JPanel {
         this.level= level;
     }
 
+    public void setShowThreads(boolean selected) {
+        this.showThreads= selected;
+    }
+    
     protected Map<String, Object> scriptContext = null;
     public static final String PROP_SCRIPTCONTEXT = "scriptContext";
 
@@ -385,6 +390,7 @@ public class LogConsole extends javax.swing.JPanel {
             long t = n == 0 ? 0 : lrecords.get(n - 1).getMillis();
             boolean timeStamps = showTimeStamps;
             boolean logLevels = showLevel;
+            boolean threads= showThreads;
             String st = searchText;
             if (st != null && st.length() == 0) st = null;
             Pattern p = searchTextPattern;
@@ -427,9 +433,13 @@ public class LogConsole extends javax.swing.JPanel {
                     if (logLevels) {
                         prefix += rec.getLevel() + " ";
                     }
-                    if (rec.getThreadID() == eventThreadId) {
-                        prefix += "(GUI) ";
-                    }
+                    if (threads) {
+                        if (rec.getThreadID() == eventThreadId) { 
+                            prefix += "(GUI) ";
+                        } else {
+                            prefix += rec.getThreadID();
+                        }
+                    } 
                     if (!prefix.equals("")) {
                         recMsg = prefix.trim() + ": " + recMsg;
                     }
@@ -526,7 +536,7 @@ public class LogConsole extends javax.swing.JPanel {
 
         jLabel2.setText("AP>");
 
-        commandLineTextPane1.setToolTipText("enter jython commands here to control the application, for example \"plot([1,2,3])\"");
+        commandLineTextPane1.setToolTipText("enter jython commands here to control the application, for example \"plot(dataset([1,2,3]))\"");
         commandLineTextPane1.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 commandLineTextPane1FocusGained(evt);
@@ -548,19 +558,19 @@ public class LogConsole extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
-            .add(layout.createSequentialGroup()
-                .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 83, Short.MAX_VALUE)
-                .add(jButton1)
-                .addContainerGap())
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jLabel2)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
-                .addContainerGap())
             .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 560, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 83, Short.MAX_VALUE)
+                        .add(jButton1))
+                    .add(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(jLabel2)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -670,4 +680,5 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private javax.swing.JTextPane logTextArea;
     private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
+
 }

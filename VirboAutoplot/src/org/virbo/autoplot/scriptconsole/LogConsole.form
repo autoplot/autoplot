@@ -124,7 +124,7 @@
       <SubComponents>
         <Component class="org.virbo.autoplot.scriptconsole.CommandLineTextPane" name="commandLineTextPane1">
           <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="enter jython commands here to control the application, for example &quot;plot([1,2,3])&quot;"/>
+            <Property name="toolTipText" type="java.lang.String" value="enter jython commands here to control the application, for example &quot;plot(dataset([1,2,3]))&quot;"/>
           </Properties>
           <Events>
             <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="commandLineTextPane1FocusGained"/>
