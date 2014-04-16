@@ -399,7 +399,7 @@ public class DomOps {
             if ( dsf.uri.startsWith("vap+internal:") ) continue;
             String agg= DataSourceUtil.makeAggregation( dsf.uri );
             if ( agg!=null ) {
-                dsf.uri= agg;
+                dsf.setUri(agg);
             }
         }
         dom.setDataSourceFilters(dsfs);
