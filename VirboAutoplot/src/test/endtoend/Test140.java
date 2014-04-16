@@ -155,6 +155,7 @@ public class Test140 {
             id= id.replaceAll("%3F","_");
             id= id.replaceAll("%3D","=");
             id= id.replaceAll("%26","_");
+            id= id.replaceAll("%7E","_"); // twiddle
             if ( id.length()>150 ) { // ext4 filename length limits...
                 id= id.substring(0,150) + "..." + String.format( "%016d", id.hashCode() );
             }
