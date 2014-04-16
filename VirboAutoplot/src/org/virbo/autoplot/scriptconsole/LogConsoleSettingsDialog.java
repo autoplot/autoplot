@@ -220,6 +220,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         verbosityPanel = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
+        threadsCB = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -275,6 +276,13 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
         });
 
+        threadsCB.setText("threads");
+        threadsCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                threadsCBActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -285,19 +293,24 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(12, 12, 12)
                         .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE))
-                    .add(jLabel1)
-                    .add(layout.createSequentialGroup()
-                        .add(loggerIDCheckBox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(timeStampsCheckBox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(logLevelCheckBox))
                     .add(layout.createSequentialGroup()
                         .add(jLabel2)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 172, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 113, Short.MAX_VALUE)
-                        .add(jButton1)))
+                        .add(jButton1))
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel1)
+                            .add(layout.createSequentialGroup()
+                                .add(loggerIDCheckBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(timeStampsCheckBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(logLevelCheckBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(threadsCB)))
+                        .add(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -311,7 +324,8 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(timeStampsCheckBox)
                     .add(logLevelCheckBox)
-                    .add(loggerIDCheckBox))
+                    .add(loggerIDCheckBox)
+                    .add(threadsCB))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
@@ -355,6 +369,12 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         this.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void threadsCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_threadsCBActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+        console.setShowThreads( threadsCB.isSelected() );
+        console.update();
+    }//GEN-LAST:event_threadsCBActionPerformed
+
     /**
     * @param args the command line arguments
     */
@@ -381,6 +401,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox logLevelCheckBox;
     private javax.swing.JCheckBox loggerIDCheckBox;
     private javax.swing.JTextField searchForTextField;
+    private javax.swing.JCheckBox threadsCB;
     private javax.swing.JCheckBox timeStampsCheckBox;
     private javax.swing.JPanel verbosityPanel;
     // End of variables declaration//GEN-END:variables
