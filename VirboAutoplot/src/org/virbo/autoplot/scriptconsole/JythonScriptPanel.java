@@ -436,6 +436,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 
             }
         }
+        System.err.println("== Executing Script ==");
         support.executeScript( evt.getModifiers() );
     }//GEN-LAST:event_executeButtonActionPerformed
 
