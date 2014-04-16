@@ -243,6 +243,12 @@ public class CanvasLayoutPanel extends JLabel {
         return newSelect;
     }
     
+    private Rectangle rectangleSelect=null;
+    
+    public void setRectangleSelect( Rectangle r ) {
+        this.rectangleSelect=r;
+    }
+    
     /**
      * set the primary selected component.
      * @param component null or the selected component.
@@ -401,6 +407,12 @@ public class CanvasLayoutPanel extends JLabel {
                 }
             }
         }
+        //TODO: draw selection box.
+        if ( rectangleSelect!=null ) {
+            g.setColor( Color.GRAY );
+            g.draw(rectangleSelect);
+        }
+        
     }
     
     transient ComponentListener componentListener = new ComponentListener() {
