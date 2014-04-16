@@ -174,6 +174,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                     canvasLayoutPanel1.setSelectedComponents( rect );
                     dragInitialClick= null;
                 }
+                canvasLayoutPanel1.setRectangleSelect(null);
                 
             }
         };
