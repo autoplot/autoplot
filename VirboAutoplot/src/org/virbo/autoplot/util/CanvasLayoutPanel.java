@@ -37,6 +37,7 @@ import javax.swing.Timer;
 import org.autoplot.pngwalk.ImageResize;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
+import org.das2.graph.GraphUtil;
 import org.das2.graph.Renderer;
 import org.das2.util.ClassMap;
 
@@ -235,7 +236,8 @@ public class CanvasLayoutPanel extends JLabel {
             Component c= target.getComponent(i);
             Color color = types.get(c.getClass());
             if ( color!=null ) {
-                if ( r.contains(c.getBounds()) ) {
+                Rectangle b= GraphUtil.shrinkRectangle(c.getBounds(),80);
+                if ( r.contains( b ) ) {
                     newSelect.add(c);
                 }
             }
