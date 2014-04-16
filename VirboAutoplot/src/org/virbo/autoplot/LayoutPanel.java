@@ -113,11 +113,13 @@ public class LayoutPanel extends javax.swing.JPanel {
                         dragInitialClick= e.getPoint();
                         app.getController().setStatus("select plots by drawing a box." );
                     }
+                    canvasLayoutPanel1.setRectangleSelect(null);
                 } else if ( dragInitialClick!=null ) {
                     dragLocation= e.getPoint();
                     Rectangle rect= new Rectangle( dragInitialClick );
                     rect.add( e.getPoint() );
                     canvasLayoutPanel1.setSelectedComponents( rect );
+                    canvasLayoutPanel1.setRectangleSelect(rect);
                 }
             }
 
@@ -143,6 +145,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                         menu.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }
+                canvasLayoutPanel1.setRectangleSelect(null);
             }
 
             @Override
@@ -742,7 +745,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
         );
 
         jSplitPane1.setRightComponent(jPanel2);
@@ -752,7 +755,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         jSplitPane2.setResizeWeight(0.5);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plots [?]"));
-        jPanel1.setToolTipText("Layout of plots on the canvas");
+        jPanel1.setToolTipText("<html>Layout of plots on the canvas<br>Click for help");
         jPanel1.setMinimumSize(new java.awt.Dimension(230, 230));
 
         canvasLayoutPanel1.setText("canvasLayoutPanel1");
@@ -800,7 +803,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(tallerButton)
@@ -829,7 +832,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
         );
 
         jSplitPane2.setRightComponent(jPanel3);
