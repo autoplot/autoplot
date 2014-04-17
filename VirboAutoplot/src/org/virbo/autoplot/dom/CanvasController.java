@@ -493,8 +493,8 @@ public class CanvasController extends DomNodeController {
 
     /**
      * insert the column into the other columns by shrinking them to make room.
-     * @param tcolumn column to position above or below, or null if we don't care.
-     * @param position LayoutConstants.ABOVE, LayoutConstants.BELOW
+     * @param tcolumn column to position right or left, or null if we don't care.
+     * @param position LayoutConstants.RIGHT, LayoutConstants.LEFT
      */
     protected Column addInsertColumn(Column tcolumn, Object position) {
         final Column column = new Column();
@@ -514,7 +514,7 @@ public class CanvasController extends DomNodeController {
 
             int ipos = columns.size();
             if (tcolumn != null) {
-                if (position == LayoutConstants.BELOW) {
+                if (position == LayoutConstants.RIGHT) {
                     ipos = columns.indexOf(tcolumn) + 1;
                 } else {
                     ipos = columns.indexOf(tcolumn);
