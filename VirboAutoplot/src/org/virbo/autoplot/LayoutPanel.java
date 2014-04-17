@@ -548,9 +548,9 @@ public class LayoutPanel extends javax.swing.JPanel {
     /**
      * return a list of the selected plots, with the primary selection the first
      * item.
-     * @return
+     * @return the selected plots.
      */
-    private List<Plot> getSelectedPlots( ) {
+    public List<Plot> getSelectedPlots( ) {
         List<Object> os= canvasLayoutPanel1.getSelectedComponents();
         List<Plot> result= new ArrayList();
 
