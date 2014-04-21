@@ -236,6 +236,7 @@ if ! ${JAVA6_HOME}bin/javac -cp ../temp-volatile-classes:../AutoplotStable.jar:.
 if ! ${JAVA6_HOME}bin/javac -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/ScreenshotsTool.java; then hasErrors=1; fi
 if ! ${JAVA6_HOME}bin/javac -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/wgetfs/WGetFileSystemFactory.java; then hasErrors=1; fi
 if ! ${JAVA6_HOME}bin/javac -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/fsm/FileStorageModelNew.java; then hasErrors=1; fi  # some scripts use this old name.
+if ! ${JAVA6_HOME}bin/javac -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/math/filter/*.java; then hasErrors=1; fi  # some scripts use this old name.
 
 # this can be removed soon:
 if ! ${JAVA6_HOME}bin/javac -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/dataset/SparseDataSetBuilder.java; then hasErrors=1; fi
