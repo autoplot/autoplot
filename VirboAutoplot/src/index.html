@@ -23,7 +23,7 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-04-04):</p>
+        <p>Bugfixes (2014-04-21):</p>
         <ul>
             <li>1129: experiments with rendering after we would still see occasional failures.</li>
             <li>lanlNNRebinner supports time-varying Y tags.</li>
@@ -68,7 +68,10 @@
             <li>clean up monitors, after seeing axis ephemeris / das2server would sometimes leave monitor hanging</li>
         </ul>
         <p>Features:</p>
-        <ul>           
+        <ul>      
+            <li>introduce butterworth filter</li>
+            <li>introduce indexOfBundledDataSet</li>
+            <li>draw a box on the layout tab to hint at multiple selections, make the handle easier to grab</li>
             <li>EventQueueBlocker_1 renamed to EventQueueBlocker.  FileStorageModelNew renamed to FileStorageModel.</li>
             <li>EnumerationUnits are always backed by a String context, was the class.</li>
             <li>enumerationUnit entries can be defined within the qstream as they occur.</li>
