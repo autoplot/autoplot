@@ -11,7 +11,6 @@ package org.virbo.netCDF;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
@@ -39,7 +38,7 @@ import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.ncml.NcMLReader;
 
 /**
- *
+ * Factory for NetCDF and HDF5 data sources.
  * @author jbf
  */
 public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
@@ -54,7 +53,7 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
         return new NetCDFDataSource( uri );
     }
     
-    
+    @Override
     public List<CompletionContext> getCompletions( CompletionContext cc ,org.das2.util.monitor.ProgressMonitor mon ) throws IOException {
         List<CompletionContext> result= new ArrayList<CompletionContext>();
         
@@ -129,6 +128,7 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
     }
     
     
+    @Override
     public boolean reject( String surl, List<String> problems, ProgressMonitor mon ) {
         try {
             URISplit split = URISplit.parse( surl );
@@ -182,6 +182,7 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
         }
     }
 
+    @Override
     public <T> T getCapability(Class<T> clazz) {
         return null;
     }
