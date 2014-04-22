@@ -277,6 +277,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         });
 
         threadsCB.setText("threads");
+        threadsCB.setToolTipText("Show unique number for each execution thread.  The GUI event thread is labelled \"GUI.\"");
         threadsCB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 threadsCBActionPerformed(evt);

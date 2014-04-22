@@ -152,6 +152,7 @@
     <Component class="javax.swing.JCheckBox" name="threadsCB">
       <Properties>
         <Property name="text" type="java.lang.String" value="threads"/>
+        <Property name="toolTipText" type="java.lang.String" value="Show unique number for each execution thread.  The GUI event thread is labelled &quot;GUI.&quot;"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="threadsCBActionPerformed"/>
