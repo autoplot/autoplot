@@ -13,7 +13,6 @@ import org.python.core.PyException;
 import org.python.core.PyObject;
 import org.python.core.PyReflectedFunction;
 import org.python.util.InteractiveInterpreter;
-import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
@@ -140,7 +139,7 @@ public class Test029 {
         QDataSet t1= DataSetUtil.asDataSet( TimeUtil.toDatum( new int[] { 2014,1,1,0,0,0,0 } ) );
         QDataSet r0_2014= DataSetUtil.asDataSet( 2014 );
         QDataSet r0_2014_s= DataSetUtil.asDataSet( 2014, Units.seconds );
-        QDataSet tr1= DataSetUtil.asDataSet( DatumRangeUtil.parseISO8601Range("2014-01-01T00:00/2014-01-04T00:00") );
+        QDataSet tr1= DataSetUtil.asDataSet( DatumRangeUtil.parseValidISO8601Range("2014-01-01T00:00/2014-01-04T00:00") );
         
         int r;
         
