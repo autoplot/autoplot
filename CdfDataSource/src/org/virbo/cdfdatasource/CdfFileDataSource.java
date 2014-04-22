@@ -579,7 +579,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         int[] qubeDims= DataSetUtil.qubeDims(result);
         if ( depend ) {
             for (int idep = 0; idep < QDataSet.MAX_RANK; idep++) {
-                int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
+                int sidep= ( slice || slice1>-1 ) ? (idep+1) : idep; // idep taking slice into account.
                 Map dep = (Map) thisAttributes.get( "DEPEND_" + sidep );
                 if ( dep != null && qubeDims.length<=idep ) {
                     logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
