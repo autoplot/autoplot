@@ -650,7 +650,7 @@ public class DataSourceController extends DomNodeController {
                     if (intTsb == null) {
                         intTsb = new InternalTimeSeriesBrowse(DataSourceController.this.dsf.getUri());
                     }
-                    logger.log( Level.WARNING, "adding to internal tsb: {0}", parentTsb);
+                    logger.log( Level.FINE, "adding to internal tsb: {0}", parentTsb);
                     intTsb.addTimeSeriesBrowse(parentTsb);
                 }
             } else {
