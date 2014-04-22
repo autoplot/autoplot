@@ -11,6 +11,7 @@ package org.virbo.netCDF;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
@@ -177,7 +178,7 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
         } catch ( HtmlResponseIOException e ) {
             return false;
         } catch ( IOException e ) {
-            throw new RuntimeException(e);
+            return false;
         }
     }
 
