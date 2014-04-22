@@ -25,12 +25,16 @@
         to resolve old numbers.
         <p>Bugfixes (2014-04-21):</p>
         <ul>
+            <li>rte 0948397190: runtime error in HDF5 reader when file is not found.</li>
             <li>1129: experiments with rendering after we would still see occasional failures.</li>
             <li>lanlNNRebinner supports time-varying Y tags.</li>
             <li>FUNCT or FUNCTION in C-implementation of CDF reader</li>
             <li>improve feedback with errors from VOTable reader.</li>
             <li>FileStorageModel had an bug where getFiles would return multiple references to the same file, since 2014/3/14</li>
             <li>FileStorageModel was missing getField to make clean way to get the version ($v)</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>rte 1178734273: occasional NullPointer on Windows fixed in file dialog.</li>
             <li>rte 1677040602: NullPointerException caused by thread issue.</li>
             <li>extraneous messages about can't serialize Level fixed.</li>
@@ -43,30 +47,6 @@
             <li>USER_PROPERTIES from Ascii reader caused crash when FFTPower was looking for Translation property.  Thanks Scott for pointing this out!</li>            
             <li>FileStorageModelNew renamed to FileStorageModel after 7 years...</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>experiment with Jython setOutputParam where output parameters can be better documented.</li>
-            <li>1163: CDF editor should show hidden support variable when re-entering the dialog.</li>
-            <li>JNLP clean up to avoid extra dialog.  Thanks Andy!</li>
-            <li>in the das2server data source, there was still icon loading off on the event thread, which I could see with my slow server.</li>
-            <li>when the aggregating data source detects there are no files, use a monitor when getting the representative file.</li>
-            <li>2-channel .wav output fixed.</li>
-            <li>index out-of-bounds warning on SubsetDataSet was mis-coded, issuing false warnings to logger.</li>
-            <li>export of bundle dataset to multi-channel (stereo) .wav file didn't increment correctly and created half-empty mono file.</li>
-            <li>clean up tooltips on documentation popup for Jython editor.</li>
-            <li>Bob pointed out case where error bars would be left on the Series renderer display.</li>
-            <li>more findbugs cleanup (down to 80)</li>
-            <li>continue to remove synchronized code that could cause hangs</li>
-            <li>add busy feedback to dataSetSelector web activity, since this can get hung up and the user has no indication of what's going on.</li>
-            <li>periodic keyword for time parsing properly triggers TSB</li>
-            <li>contour always had extra point (0,0) in result.</li>
-            <li>clean up example in vap+inline GUI which was incorrect</li>
-            <li>minor cleanup of wget-based file system.</li>
-            <li>completions based on local cache folded case improperly.</li>
-            <li>support EMFISIS hourly files when suggesting aggregations</li>
-            <li>rte_0263418513: NetCDF spaces were not handled properly.</li>
-            <li>clean up monitors, after seeing axis ephemeris / das2server would sometimes leave monitor hanging</li>
-        </ul>
         <p>Features:</p>
         <ul>      
             <li>introduce butterworth filter</li>
@@ -77,22 +57,14 @@
             <li>enumerationUnit entries can be defined within the qstream as they occur.</li>
             <li>FileStorageModel has getFilesFor( String[] ref )</li>
             <li>FileStorageModel has getField("v") to retrieve version and other custom fields.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>replaceFile dialog improved with pickfile button.</li>
             <li>allowEmbedData system property added to support maturing this feature.</li>
             <li>AP_WGET, AP_CURL, allowEmbedData added to autoplot_data/config/system.properties</li>
             <li>autoplot.jar launch script allows relative URIs, so "autoplot myfile.cdf" now works from command line.</li>
             <li>autoplot.jar launch script looks for JRE arguments (-J-Xmx4G) and introduces --headless</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>DataSetBuilder checks rank and argument count in one,two,and three argument constructors.</li>
-            <li>DataSetBuilder can now take rank 0 datasets and Datums instead of doubles, setUnits added and improved support for bundles.</li>
-            <li>open local data file shows .vap files as well.</li>
-            <li>SemanticOps.xtagsDataset supports bundles</li>
-            <li>DataSourceFactorysupports discovery to a non-GUI element to avoid having to create a GUI just to see if discovery is possible
-            <li>export CDF data allows the cdf variable name to be set explicitly</li>
-            <li>step/scan button hidden on axis ends now scans to next available data</li>
-            <li>time range tool shows all orbits, not just those around the current time.</li>
         </ul>
 
         <p>Known issues:</p>
