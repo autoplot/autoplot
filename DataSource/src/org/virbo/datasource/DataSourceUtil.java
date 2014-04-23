@@ -376,6 +376,10 @@ public class DataSourceUtil {
      * instead of the explicit filename.
      * For example, file:/tmp/20091102.dat -> file:/tmp/$Y$m$d.dat?timerange=20091102
      * Also, look for version numbers.  If multiple periods are found, then use $(v,sep) otherwise use numeric $v.
+     *<blockquote><pre><small>{@code
+     *y= makeAggregation("file:/tmp/20091102.dat")       // file:/tmp/$Y$m$d.dat?timerange=2009-11-02
+     *x= makeAggregation("file:/tmp/20091102T02.dat");   // file:/tmp/$Y$m$dT$H.dat?timerange=2009-11-02 2:00 to 3:00
+     *}</small></pre></blockquote>
      * @param surl
      * @return the string with aggregations ($Y.dat) instead of filename (1999.dat)
      */
@@ -413,7 +417,7 @@ public class DataSourceUtil {
         int hour= TimeUtil.HOUR;
 
         List<String> search= new ArrayList( Arrays.asList( yyyymmdd_HH, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm_dd, yyyy ) );
-        List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d-\\$H", "\\$Y$2\\$j", "\\$Y\\$m\\$d","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d","/\\$Y/" ) );
+        List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$3\\$H", "\\$Y$2\\$j", "\\$Y\\$m\\$d","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d","/\\$Y/" ) );
         List<Integer> resol= new ArrayList( Arrays.asList( hour, day, day, day, month, day, year ) );
         String s= replaceLast( result, 
                 search,
