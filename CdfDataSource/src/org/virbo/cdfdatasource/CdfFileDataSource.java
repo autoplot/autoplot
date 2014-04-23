@@ -565,7 +565,9 @@ public class CdfFileDataSource extends AbstractDataSource {
                         logger.log(Level.WARNING, "DELTA_MINUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
                     }
                 } else {
-                    if ( result.length()==delta.length() ) {
+                    if ( !UnitsUtil.isRatioMeasurement(deltaUnits) ) {
+                        logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not ratio measurements having a meaningful zero: {0}", new Object[] { deltaUnits } );
+                    } else if ( result.length()!=delta.length() ) {
                         logger.log(Level.WARNING, "DELTA_PLUS_VAR length ({0})!= data length ({0})", new Object[] { delta.length(), result.length() } );
                     } else {
                         logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
