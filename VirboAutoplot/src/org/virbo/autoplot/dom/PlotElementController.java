@@ -2086,17 +2086,7 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
                 peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
             }       
-        } else if ( spec==RenderType.hugeScatter ) {
-            QDataSet qube= ImageVectorDataSetRenderer.doAutorange( fillDs );
-            if ( qube==null ) {
-                // nothing
-            } else {
-                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
-                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
-                peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
-            }
-
-        } else {
+        } else { // spec==RenderType.SERIES and spec==RenderType.HUGE_SCATTER
 
             AutoplotUtil.AutoRangeDescriptor ydesc; //TODO: QDataSet can model AutoRangeDescriptors, it should be used instead.
             
