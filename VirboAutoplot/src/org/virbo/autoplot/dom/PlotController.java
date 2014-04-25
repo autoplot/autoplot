@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.InconvertibleUnitsException;
@@ -272,6 +273,10 @@ public class PlotController extends DomNodeController {
                     if ( ds1==null || ds1.length()==0 ) {
                         dr= dr.next();
                     } else {
+                        QDataSet box= SemanticOps.bounds(ds1);
+                        Datum min= DataSetUtil.asDatum( box.slice(0).slice(0) );
+                        dr= DatumRangeUtil.union( min, min.add(dr.width()) );
+                        dr= DatumRangeUtil.rescale( dr, -0.05, 0.95 );
                         break;
                     }
                 }
@@ -302,6 +307,10 @@ public class PlotController extends DomNodeController {
                     if ( ds1==null || ds1.length()==0 ) {
                         dr= dr.previous();
                     } else {
+                        QDataSet box= SemanticOps.bounds(ds1);
+                        Datum max= DataSetUtil.asDatum( box.slice(0).slice(1) );
+                        dr= DatumRangeUtil.union( max.subtract(dr.width()), max );
+                        dr= DatumRangeUtil.rescale( dr, 0.05, 1.05 );
                         break;
                     }
                 }
