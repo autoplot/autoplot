@@ -34,7 +34,7 @@
           <Group type="102" alignment="0" attributes="1">
               <Component id="xAxisPanel" min="-2" max="-2" attributes="1"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="yAxisPanel" max="32767" attributes="1"/>
+              <Component id="yAxisPanel" min="-2" max="-2" attributes="1"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
               <Component id="jPanel1" min="-2" max="-2" attributes="1"/>
