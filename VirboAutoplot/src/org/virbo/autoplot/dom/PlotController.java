@@ -273,10 +273,10 @@ public class PlotController extends DomNodeController {
                     if ( ds1==null || ds1.length()==0 ) {
                         dr= dr.next();
                     } else {
-                        QDataSet box= SemanticOps.bounds(ds1);
-                        Datum min= DataSetUtil.asDatum( box.slice(0).slice(0) );
-                        dr= DatumRangeUtil.union( min, min.add(dr.width()) );
-                        dr= DatumRangeUtil.rescale( dr, -0.05, 0.95 );
+                        //QDataSet box= SemanticOps.bounds(ds1);
+                        //Datum min= DataSetUtil.asDatum( box.slice(0).slice(0) );
+                        //dr= DatumRangeUtil.union( min, min.add(dr.width()) );
+                        //dr= DatumRangeUtil.rescale( dr, -0.05, 0.95 );
                         break;
                     }
                 }
@@ -307,10 +307,12 @@ public class PlotController extends DomNodeController {
                     if ( ds1==null || ds1.length()==0 ) {
                         dr= dr.previous();
                     } else {
-                        QDataSet box= SemanticOps.bounds(ds1);
-                        Datum max= DataSetUtil.asDatum( box.slice(0).slice(1) );
-                        dr= DatumRangeUtil.union( max.subtract(dr.width()), max );
-                        dr= DatumRangeUtil.rescale( dr, 0.05, 1.05 );
+                        //There's a bug with this where scan is the previous instead of step, and this makes scan quite different than step, since it's non-integer
+                        
+                        //QDataSet box= SemanticOps.bounds(ds1);
+                        //Datum max= DataSetUtil.asDatum( box.slice(0).slice(1) );
+                        //dr= DatumRangeUtil.union( max.subtract(dr.width()), max );
+                        //dr= DatumRangeUtil.rescale( dr, 0.05, 1.05 );
                         break;
                     }
                 }
