@@ -267,7 +267,7 @@ public class Test018 {
 
             test1( testId );
             //no test2, to straighten out the numbering
-            DasPlot.testSentinal="break";
+            //DasPlot.testSentinal="break";
             test3( testId );
             test4( testId );
             test5( testId );
