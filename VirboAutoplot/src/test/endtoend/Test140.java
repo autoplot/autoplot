@@ -151,13 +151,13 @@ public class Test140 {
             String id= URLEncoder.encode( uri, "US-ASCII" );
             id= id.replaceAll("%3A", "" );
             id= id.replaceAll("%2F%2F", "_" );
-            id= id.replaceAll("%2F","_");
-            id= id.replaceAll("%3F","_");
-            id= id.replaceAll("%3D","=");
-            id= id.replaceAll("%26","_");
-            id= id.replaceAll("%7E","_"); // twiddle
-            id= id.replaceAll("%2B","_"); // colon
-            id= id.replaceAll("=","_");
+            id= id.replaceAll("%[0-9A-F][0-9A-F]","_");
+            //id= id.replaceAll("%2F","_");
+            //id= id.replaceAll("%3F","_");
+            //id= id.replaceAll("%26","_");
+            //id= id.replaceAll("%7E","_"); // twiddle
+            //id= id.replaceAll("%2B","_"); // colon
+            //id= id.replaceAll("=","_");
             if ( id.length()>150 ) { // ext4 filename length limits...
                 id= id.substring(0,150) + "..." + String.format( "%016d", id.hashCode() );
             }
