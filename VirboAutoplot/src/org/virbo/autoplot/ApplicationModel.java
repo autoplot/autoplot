@@ -778,6 +778,8 @@ public class ApplicationModel {
             }
         } catch ( IOException ex ) {
             logger.log(Level.SEVERE,ex.getMessage(),ex);
+            
+        } finally {
             if ( reader!=null ) try {
                 reader.close();
             } catch (IOException ex1) {
