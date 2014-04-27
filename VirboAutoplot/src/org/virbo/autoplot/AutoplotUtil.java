@@ -1275,16 +1275,20 @@ public class AutoplotUtil {
                 result.range = new DatumRange( div.rangeContaining(min).min(), div.rangeContaining(max).max() );
             } else if ( UnitsUtil.isTimeLocation(u) ) {
                 if ( result.range.min().doubleValue( Units.us2000 ) > -6.3113480E15 ) {  //TODO: Julian has yr1800 limit.
-                    DomainDivider div= DomainDividerUtil.getDomainDivider( result.range.min(), result.range.max() );
-                    while ( div.boundaryCount( result.range.min(), result.range.max() ) > 40 ) {
-                        div= div.coarserDivider(false);
+                    if ( result.range.width().value()==0. ) {
+                        result.range = new DatumRange( result.range.min(), result.range.min().add( Units.seconds.createDatum(1) ) );
+                    } else {
+                        DomainDivider div= DomainDividerUtil.getDomainDivider( result.range.min(), result.range.max() );
+                        while ( div.boundaryCount( result.range.min(), result.range.max() ) > 40 ) {
+                            div= div.coarserDivider(false);
+                        }
+                        while ( div.boundaryCount( result.range.min(), result.range.max() ) < 20 ) {
+                            div= div.finerDivider(true);
+                        }
+                        result.range = new DatumRange(
+                                div.rangeContaining(result.range.min()).min(),
+                                div.rangeContaining(result.range.max()).max() );
                     }
-                    while ( div.boundaryCount( result.range.min(), result.range.max() ) < 20 ) {
-                        div= div.finerDivider(true);
-                    }
-                    result.range = new DatumRange(
-                            div.rangeContaining(result.range.min()).min(),
-                            div.rangeContaining(result.range.max()).max() );
                 }
 
             } else {
