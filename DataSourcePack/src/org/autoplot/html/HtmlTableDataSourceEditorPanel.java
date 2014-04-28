@@ -378,24 +378,23 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
         }
 
         String uri= getURI();
-        URISplit split= URISplit.parse(uri);
-        Map<String,String> params= URISplit.parseParams(split.params);
+        URISplit lsplit= URISplit.parse(uri);
+        Map<String,String> lparams= URISplit.parseParams(lsplit.params);
 
-        QDataSet tds;
         HtmlTableParser parser;
         try {
             parser=  new HtmlTableParser(DataSetURI.getURIValid(uri));
 
             tableComboBox.setModel( new DefaultComboBoxModel( parser.getTables().toArray( )) );
-            String table= params.get("table");
-            if ( table!=null ) {
-                tableComboBox.setSelectedItem(table);
+            String ltable= lparams.get("table");
+            if ( ltable!=null ) {
+                tableComboBox.setSelectedItem(ltable);
             } else {
                 tableComboBox.setSelectedIndex(0);
                 params.put( "table", String.valueOf( tableComboBox.getSelectedItem() ) );
             }
         } catch ( Exception ex ) {
-            ex.printStackTrace();
+            logger.log( Level.WARNING, ex.toString(), ex );
         }
     }
 
@@ -406,8 +405,8 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
 
         String uri= getURI();
 
-        URISplit split= URISplit.parse(uri);
-        Map<String,String> params= URISplit.parseParams(split.params);
+        URISplit lsplit= URISplit.parse(uri);
+        Map<String,String> lparams= URISplit.parseParams(lsplit.params);
 
         QDataSet tds;
         HtmlTableParser parser;
@@ -431,8 +430,8 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
             } else {
                 columnsComboBox.setModel( new DefaultComboBoxModel( new String[] { "(no records found)" } ) );
             }
-            String column= params.get("column");
-            if ( column!=null ) this.columnsComboBox.setSelectedItem(params.get("column"));
+            String column= lparams.get("column");
+            if ( column!=null ) this.columnsComboBox.setSelectedItem(lparams.get("column"));
 
         } catch (Exception ex) {
             columnsComboBox.setModel( new DefaultComboBoxModel( new String[] { "(no records found)" } ) );
@@ -440,15 +439,15 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
             dtm.setValueAt( "no records found", 0, 0 );
             this.jTable1.setModel( dtm );
 
-            ex.printStackTrace();
+            logger.log( Level.WARNING, ex.toString(), ex );
         }
 
     }
 
 private void tableComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_tableComboBoxItemStateChanged
-    final String table = (String) tableComboBox.getSelectedItem();
-    params.put(PROP_TABLE, table);
-    setTable(table);
+    final String ltable = (String) tableComboBox.getSelectedItem();
+    params.put(PROP_TABLE, ltable);
+    setTable(ltable);
 }//GEN-LAST:event_tableComboBoxItemStateChanged
 
 private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dep0ColumnsItemStateChanged
