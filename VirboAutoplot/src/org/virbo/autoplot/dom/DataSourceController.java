@@ -250,7 +250,8 @@ public class DataSourceController extends DomNodeController {
     private void doDimensionNames() {
 
         QDataSet ds = getDataSet();
-
+        if ( ds==null ) return; // while debugging Bill's bug, I hit this condition... 
+        
         String[] depNames = new String[ds.rank()];
         for (int i = 0; i < ds.rank(); i++) {
             depNames[i] = "dim" + i;
