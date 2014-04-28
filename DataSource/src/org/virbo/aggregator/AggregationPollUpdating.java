@@ -26,12 +26,12 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.capability.Updating;
 
 /**
- *
+ * Aggregation polling checks for updates of the set, for a given timerange. 
  * @author jbf
  */
 public class AggregationPollUpdating implements Updating {
 
-    private static final Logger logger= Logger.getLogger("apdss.agg");
+    private static final Logger logger= Logger.getLogger("apdss.agg.updating");
 
     FileStorageModel fsm;
     DatumRange dr;
@@ -40,21 +40,21 @@ public class AggregationPollUpdating implements Updating {
     boolean dirty= false; //true indicates the hash has changed and we need to clean.
     boolean polling= false; //true indicates we are polling.
 
-    private final static int LIMIT_SHORT_CYCLE_PERIOD= 1;
-    private final static int LIMIT_SHORT_REMOTE_CYCLE_PERIOD= 10;
+    private final static int LIMIT_SHORT_CYCLE_PERIOD_SECONDS= 1;
+    private final static int LIMIT_SHORT_REMOTE_CYCLE_PERIOD_SECONDS= 10;
 
     public AggregationPollUpdating( FileStorageModel fsm, DatumRange dr, long pollCyclePeriodSeconds ) {
         this.fsm= fsm;
         this.dr= dr;
         if ( fsm.getFileSystem() instanceof LocalFileSystem ) {
-            if ( pollCyclePeriodSeconds<LIMIT_SHORT_CYCLE_PERIOD ) {
-                logger.log(Level.FINE, "pollCyclePeriodSeconds too low, for local files it must be at least {0} seconds", LIMIT_SHORT_CYCLE_PERIOD);
-                pollCyclePeriodSeconds= LIMIT_SHORT_CYCLE_PERIOD;
+            if ( pollCyclePeriodSeconds<LIMIT_SHORT_CYCLE_PERIOD_SECONDS ) {
+                logger.log(Level.FINE, "pollCyclePeriodSeconds too low, for local files it must be at least {0} seconds", LIMIT_SHORT_CYCLE_PERIOD_SECONDS);
+                pollCyclePeriodSeconds= LIMIT_SHORT_CYCLE_PERIOD_SECONDS;
             }
         } else {
-            if ( pollCyclePeriodSeconds<LIMIT_SHORT_REMOTE_CYCLE_PERIOD ) {
-                logger.log(Level.FINE, "pollCyclePeriodSeconds too low, for remote files it must be at least {0} seconds", LIMIT_SHORT_REMOTE_CYCLE_PERIOD);
-                pollCyclePeriodSeconds= LIMIT_SHORT_REMOTE_CYCLE_PERIOD;
+            if ( pollCyclePeriodSeconds<LIMIT_SHORT_REMOTE_CYCLE_PERIOD_SECONDS ) {
+                logger.log(Level.FINE, "pollCyclePeriodSeconds too low, for remote files it must be at least {0} seconds", LIMIT_SHORT_REMOTE_CYCLE_PERIOD_SECONDS);
+                pollCyclePeriodSeconds= LIMIT_SHORT_REMOTE_CYCLE_PERIOD_SECONDS;
             }
         }
         this.pollCyclePeriodSeconds= pollCyclePeriodSeconds;
@@ -62,6 +62,7 @@ public class AggregationPollUpdating implements Updating {
 
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
+    @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
         try {
@@ -71,6 +72,7 @@ public class AggregationPollUpdating implements Updating {
         }
     }
 
+    @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(listener);
         if ( ! pcs.hasListeners(null) ) {
@@ -78,16 +80,16 @@ public class AggregationPollUpdating implements Updating {
         }
     }
 
-    long dirHash( DatumRange datumRange ) throws IOException {
+    private long dirHash( DatumRange datumRange ) throws IOException {
         String[] ss= fsm.getBestNamesFor( datumRange, new NullProgressMonitor() );
 
         long hash= 1;
         for ( int i=0; i<ss.length; i++ ) {
             FileObject fo= fsm.getFileSystem().getFileObject(ss[i]);
-            //Date lm= fo.lastModified(); //HTML FS doesn't give good dates.
+            Date lm= fo.lastModified(); //HTML FS doesn't give good dates.
             long sz= fo.getSize();
-            //hash= hash + 17 * lm.hashCode() + 31 * sz + 31 * ss[i].hashCode();
-            hash= hash + 31 * sz + 31 * ss[i].hashCode();
+            hash= hash + 17 * lm.hashCode() + 31 * sz + 31 * ss[i].hashCode();
+            //hash= hash + 31 * sz + 31 * ss[i].hashCode();
         }
 
         return hash;
@@ -95,15 +97,16 @@ public class AggregationPollUpdating implements Updating {
     }
     public void startPolling( ) throws IOException {
 
-        //logger.fine("start polling");
+        logger.fine("start polling");
         if ( dirHash!=0 || polling ) {
             return;
         }
         dirHash= dirHash( this.dr );
-        //logger.fine("start polling "+this.fsm+ " in " + this.dr);
+        logger.log(Level.FINE, "start polling {0} in {1}", new Object[]{this.fsm, this.dr});
         Runnable run= new Runnable() {
             public void run() {
                 while ( dirHash!=0 ) {
+                    logger.log(Level.FINER, "polling {0} in {1}", new Object[]{AggregationPollUpdating.this.fsm, AggregationPollUpdating.this.dr});
                     try {
                         Thread.sleep( pollCyclePeriodSeconds*1000 );
                     } catch (InterruptedException ex) {
@@ -131,8 +134,11 @@ public class AggregationPollUpdating implements Updating {
         new Thread( run, "FilePollUpdating_" + dirHash ).start();
     }
 
+    /**
+     * stop the polling.
+     */
     public void stopPolling() {
-        //logger.fine("stop polling "+this.fsm+ " in " + this.dr);
+        logger.log(Level.FINE, "stop polling {0} in {1}", new Object[]{this.fsm, this.dr});
         dirHash=0;
         polling= false;
     }
@@ -145,12 +151,14 @@ public class AggregationPollUpdating implements Updating {
         FileStorageModel fsm= FileStorageModel.create( FileSystem.create( new URI("file:/home/jbf/eg/data/agg/") ), "hk_h0_mag_$Y$m$d_v02.cdf" );
         AggregationPollUpdating a= new AggregationPollUpdating( fsm, null, 1 );
         a.addPropertyChangeListener( new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 logger.fine( evt.toString() );
             } 
         });
 
         a.addPropertyChangeListener( new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 logger.log( Level.FINE, "{0}  {1}", new Object[]{evt.getNewValue(), Thread.currentThread().getName()});
             }
@@ -158,6 +166,7 @@ public class AggregationPollUpdating implements Updating {
 
         Thread.sleep(6000);
         a.addPropertyChangeListener( new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 logger.log( Level.FINE, "{0}  {1}  *** ", new Object[]{evt.getNewValue(), Thread.currentThread().getName()});
             }
