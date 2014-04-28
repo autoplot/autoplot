@@ -7,9 +7,7 @@ package org.autoplot.html;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import org.das2.datum.EnumerationUnits;
@@ -17,6 +15,7 @@ import org.das2.datum.Units;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SparseDataSetBuilder;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
 
@@ -31,29 +30,59 @@ public class AsciiTableMaker {
     List<Units> units = null;
     List<String> labels = null;
     List<String> names = null;
-    EnumerationUnits enumeration = EnumerationUnits.create("html");
+    List<String> format= null;
+    EnumerationUnits enumeration = EnumerationUnits.create("default");
+    
     NumberFormat nf = DecimalFormat.getInstance(Locale.US); // sorry, rest of world.
     int fieldCount= -1;
+    boolean initializedFields= false;
+    
+    SparseDataSetBuilder dsb;
 
+    private void setUnitsAndFormat( List<String> values ) {
+        for (int i = 0; i < fieldCount; i++) {
+            String field = values.get(i).trim();
+            if ( field.contains("$") ) {
+                units.add(i,Units.dollars);
+                format.add(i,"%.2f");
+            } else if ( field.contains("/") ) {
+                units.add(i,Units.us2000);
+                format.add(i,null);
+            } else {
+                try {
+                    Integer.parseInt(field);
+                    units.add(i,Units.dimensionless);
+                    format.add(i,"%d");
+                } catch ( NumberFormatException ex ) {
+                    try {
+                        Double.parseDouble(field);
+                        units.add(i,Units.dimensionless);
+                        format.add(i,null);
+                    } catch ( NumberFormatException ex2 ) {
+                        units.add( i, EnumerationUnits.create("default") );
+                        format.add(i,null);
+                    }
+                }
+            }
+        }
+    }
+    
     void addRecord(List<String> values) {
         if ( fieldCount==-1 ) return;
+        if ( initializedFields==false ) {
+            setUnitsAndFormat(values);
+        }
         for (int i = 0; i < fieldCount; i++) {
-            String field = values.get(i);
+            String field = values.get(i).trim();
             if ( field.trim().length()==0 ) {
                 builder.putValue(-1, i, builder.getFillValue() );
             } else {
                 try {
-                    double d = nf.parse(field).doubleValue();
+                    Units u= units.get(i);
+                    double d= u.parse( field ).doubleValue( u );
                     builder.putValue(-1, i, d);
                 } catch (ParseException ex) {
-                    try {
-                        Date d = SimpleDateFormat.getDateInstance().parse(field);
-                        builder.putValue(-1, i, d.getTime());
-                        units.set(i, Units.t1970);
-                    } catch (ParseException ex2) {
-                        builder.putValue(-1, i, enumeration.createDatum(field).doubleValue(enumeration));
-                        units.set(i, enumeration);
-                    }
+                    builder.putValue(-1,i, builder.getFillValue() );
                 }
             }
         }
@@ -68,12 +97,18 @@ public class AsciiTableMaker {
         for (int i = 0; i < fieldCount; i++) {
             units.add(i, Units.dimensionless);
         }
+        format= new ArrayList<String>(fieldCount);
+        
+        dsb= new SparseDataSetBuilder(2);
+        
         labels = new ArrayList<String>(fieldCount);
         names = new ArrayList<String>(fieldCount);
-        if (labels.size() == 0) {
+        if (labels.isEmpty()) {
             for (int i = 0; i < fieldCount; i++) {
                 labels.add(i, values.get(i));
                 names.add(i, Ops.safeName(values.get(i)));
+                dsb.putProperty( QDataSet.LABEL, i, labels.get(i) );
+                dsb.putProperty( QDataSet.NAME, i, names.get(i) );
             }
         }
 
@@ -104,6 +139,8 @@ public class AsciiTableMaker {
                     return labels.get(i);
                 } else if ( name.equals(QDataSet.NAME ) ) {
                     return names.get(i);
+                } else if ( name.equals(QDataSet.FORMAT ) ) {
+                    return format.get(i);
                 } else if ( name.equals(QDataSet.UNITS ) ) {
                     return units.get(i);
                 }
