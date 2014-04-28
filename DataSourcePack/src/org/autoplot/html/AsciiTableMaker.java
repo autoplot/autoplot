@@ -37,8 +37,6 @@ public class AsciiTableMaker {
     int fieldCount= -1;
     boolean initializedFields= false;
     
-    SparseDataSetBuilder dsb;
-
     private void setUnitsAndFormat( List<String> values ) {
         for (int i = 0; i < fieldCount; i++) {
             String field = values.get(i).trim();
@@ -99,16 +97,12 @@ public class AsciiTableMaker {
         }
         format= new ArrayList<String>(fieldCount);
         
-        dsb= new SparseDataSetBuilder(2);
-        
         labels = new ArrayList<String>(fieldCount);
         names = new ArrayList<String>(fieldCount);
         if (labels.isEmpty()) {
             for (int i = 0; i < fieldCount; i++) {
                 labels.add(i, values.get(i));
                 names.add(i, Ops.safeName(values.get(i)));
-                dsb.putProperty( QDataSet.LABEL, i, labels.get(i) );
-                dsb.putProperty( QDataSet.NAME, i, names.get(i) );
             }
         }
 
