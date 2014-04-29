@@ -66,7 +66,7 @@ public class FileSystemUtil {
      * true indicates that the resource does exist.
      *
      * @param suri URI, such as http://server.org/data/asciitable.dat
-     * @return
+     * @return true of the resource exists and can be downloaded.
      */
     public static boolean resourceExists( String suri ) throws FileSystemOfflineException, UnknownHostException, URISyntaxException {
         URISplit split= URISplit.parse(suri);
@@ -77,6 +77,8 @@ public class FileSystemUtil {
             } else {
                 return false;
             }
+        } catch ( IllegalArgumentException ex ) {
+            return false;
         } catch ( FileNotFoundException ex ) {
             return false;
         }
