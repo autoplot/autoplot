@@ -139,8 +139,9 @@ public abstract class AbstractDataSource implements DataSource {
     protected File getFile(URI uri, ProgressMonitor mon) throws IOException {
         File f = DataSetURI.getFile(uri, mon);
          if (params.containsKey("filePollUpdates")) {
-            pollingUpdater= new FilePollUpdating();
-            pollingUpdater.startPolling( f,(long)(1000*Double.parseDouble(params.get("filePollUpdates")) ) );
+            int poll= (int)(Double.parseDouble(params.get("filePollUpdates")) );
+            pollingUpdater= new FilePollUpdating(uri,poll);
+            pollingUpdater.startPolling();
             capabilities.put(Updating.class,pollingUpdater );
         }
         return f;
@@ -153,9 +154,14 @@ public abstract class AbstractDataSource implements DataSource {
     protected File getFile( URL url, ProgressMonitor mon ) throws IOException {
         File f = DataSetURI.getFile( url, mon );
         if (params.containsKey("filePollUpdates")) {
-            pollingUpdater= new FilePollUpdating();
-            pollingUpdater.startPolling( f,(long)(1000*Double.parseDouble(params.get("filePollUpdates")) ) );
-            capabilities.put(Updating.class,pollingUpdater );
+            try {
+                int poll= (int)(Double.parseDouble(params.get("filePollUpdates")) );
+                pollingUpdater= new FilePollUpdating(url.toURI(),poll);
+                pollingUpdater.startPolling();
+                capabilities.put(Updating.class,pollingUpdater );
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(AbstractDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return f;
     }
@@ -170,9 +176,14 @@ public abstract class AbstractDataSource implements DataSource {
     protected File getHtmlFile( URL url, ProgressMonitor mon ) throws IOException {
         File f = DataSetURI.getHtmlFile( url, mon );
         if (params.containsKey("filePollUpdates")) {
-            pollingUpdater= new FilePollUpdating();
-            pollingUpdater.startPolling( f,(long)(1000*Double.parseDouble(params.get("filePollUpdates")) ) );
-            capabilities.put(Updating.class,pollingUpdater );
+            try {
+                int poll= (int)(Double.parseDouble(params.get("filePollUpdates")) );
+                pollingUpdater= new FilePollUpdating(url.toURI(),poll);
+                pollingUpdater.startPolling();
+                capabilities.put(Updating.class,pollingUpdater );
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(AbstractDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return f;
     }
