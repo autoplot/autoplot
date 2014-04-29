@@ -23,8 +23,12 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-04-21):</p>
+        <p>Bugfixes (2014-04-29):</p>
         <ul>
+            <li>imax (index of the maximum value) was incorrectly coded to use MIN_VALUE (1e-308) instead of NEGATIVE_INFINITY</li>
+	    <li>Rob R pointed out RTE when ftp:// is entered and inspect button pressed.</li>
+            <li>440: any FileFilter needs to check for null from file.toString().  The DataPointRecorder didn't do this, Bill pointed out.</li>
+            <li>don't print a warning when EnumerationUnits have the same ID.  This happens with "default" and is harmless.</li>
             <li>1180: use autoranging consistent with Series for Scatter</li>
             <li>Craig pointed out where makeAggregation was converting 20130402T00 to $Y$m$d-$H (T to -).</li>
             <li>rte 0948397190: runtime error in HDF5 reader when file is not found.</li>
@@ -51,6 +55,7 @@
         </ul>
         <p>Features:</p>
         <ul>      
+            <li>In makePngWalk script, setting batchUri parameter in main method sets useBatchUri to true.  This mode is in tests now.</li>
             <li>DataPointRecorderNew supports events lists, will replace DataPointRecorder</li>
             <li>rank 0 DDataSet.putValue checks rank because it's easy to forget the index</li>
             <li>SparseDataSetBuilder checks that setLength was called.</li>
