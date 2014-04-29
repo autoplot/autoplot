@@ -4,11 +4,19 @@
  */
 package org.virbo.datasource;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URI;
+import java.net.UnknownHostException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.util.filesystem.FileObject;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.LocalFileSystem;
 import org.virbo.datasource.capability.Updating;
 
 /**
@@ -18,10 +26,37 @@ import org.virbo.datasource.capability.Updating;
 public class FilePollUpdating implements Updating {
 
     private static final Logger logger= Logger.getLogger(LogNames.APDSS_UPDATING);
-    File pollFile;
+    URI pollURI;
+    FileSystem fs; // remote source of the file
+    FileObject fo; // remote FileObject.
     long pollMtime;
     long pollMsize;
+    long dirHash;
+    long pollCyclePeriodSeconds;
+    private final static int LIMIT_SHORT_CYCLE_PERIOD_SECONDS= 1;
+    private final static int LIMIT_SHORT_REMOTE_CYCLE_PERIOD_SECONDS= 10; 
+    boolean dirty= false; //true indicates the hash has changed and we need to clean.
+    boolean polling= false; //true indicates we are polling.    
+    
+    public FilePollUpdating( URI uri, long pollCyclePeriodSeconds ) throws FileSystem.FileSystemOfflineException, UnknownHostException, FileNotFoundException {
+        URISplit split= URISplit.parse(uri);
+        fs= FileSystem.create(split.path);
+        fo= fs.getFileObject(split.file.substring(split.path.length()));
 
+        if ( fs instanceof LocalFileSystem ) {
+            if ( pollCyclePeriodSeconds<LIMIT_SHORT_CYCLE_PERIOD_SECONDS ) {
+                logger.log(Level.FINE, "pollCyclePeriodSeconds too low, for local files it must be at least {0} seconds", LIMIT_SHORT_CYCLE_PERIOD_SECONDS);
+                pollCyclePeriodSeconds= LIMIT_SHORT_CYCLE_PERIOD_SECONDS;
+            }
+        } else {
+            if ( pollCyclePeriodSeconds<LIMIT_SHORT_REMOTE_CYCLE_PERIOD_SECONDS ) {
+                logger.log(Level.FINE, "pollCyclePeriodSeconds too low, for remote files it must be at least {0} seconds", LIMIT_SHORT_REMOTE_CYCLE_PERIOD_SECONDS);
+                pollCyclePeriodSeconds= LIMIT_SHORT_REMOTE_CYCLE_PERIOD_SECONDS;
+            }
+        }
+        this.pollCyclePeriodSeconds= pollCyclePeriodSeconds;        
+    }
+    
     PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -34,38 +69,79 @@ public class FilePollUpdating implements Updating {
             stopPolling();
         }
     }
+    
+    private long dirHash( ) {
+        Date lm= fo.lastModified(); // warning: HTML FS dates need to be verified.
+        long sz= fo.getSize();
 
-    public void startPolling( File file, final long pollCyclePeriodMillis ) {
-        pollMsize= file.length();
-        pollMtime= file.lastModified();
-        pollFile= file;
-        Runnable run= new Runnable() {
-            public void run() {
-                logger.log(Level.FINE, "start polling {0}", pollFile);
-                while ( pollFile!=null ) {
-                    File lpollFile= pollFile; // make a local copy instead of synchronized block
-                    if ( lpollFile==null ) continue;
-                    try {
-                        Thread.sleep(pollCyclePeriodMillis);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(FilePollUpdating.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
-                    }
-                    if ( lpollFile.exists() ) {
-                        if ( lpollFile.length()!=pollMsize || lpollFile.lastModified()!=pollMtime ) {
+        long hash= 1 + 17 * lm.hashCode() + 31 * sz;
+
+        return hash;
+
+    }    
+    
+    public void startPolling( ) throws FileSystem.FileSystemOfflineException {
+
+            pollMsize= fo.getSize();
+            pollMtime= fo.lastModified().getTime();
+            dirHash= dirHash();
+            
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    logger.log(Level.FINE, "start polling {0}", pollURI );
+                    while ( dirHash!=0 ) {
+                        try {
+                            Thread.sleep( pollCyclePeriodSeconds*1000 );
+                        } catch (InterruptedException ex) {
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
+                        }
+                        long dirHash1= dirHash();
+                        if ( dirHash!=0 && dirHash1!=dirHash ) {
+                            dirty= true;
+                            dirHash= dirHash1;
+                        }
+                        if ( dirty && dirHash==dirHash1 ) {
                             pcs.firePropertyChange( Updating.PROP_DATASET, null, null );
-                            pollMsize= lpollFile.length();
-                            pollMtime= lpollFile.lastModified();
+                            dirty= false;
                         }
                     }
                 }
-            }
-        };
-        new Thread( run, "FillPollUpdating" ).start();
+            };
+            new Thread( run, "FillPollUpdating" ).start();
+                
     }
-
+    
     public void stopPolling() {
-        logger.log(Level.FINE, "stop polling {0}", pollFile);
-        pollFile= null;
+        logger.log(Level.FINE, "stop polling {0}", pollURI );
+        dirHash= 0;
     }
 
+    
+    public static void main( String[] args ) throws Exception {
+        URI uri= URI.create("http://www-pw.physics.uiowa.edu/~jbf/autoplot/users/mark/filePollUpdate/foo.cdf");
+        
+        //URI uri= new File("/home/jbf/foo.vap").toURI();
+        
+        FilePollUpdating a= new FilePollUpdating( uri, 1 );
+        
+        a.startPolling();
+
+        a.addPropertyChangeListener( new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                logger.log( Level.WARNING, "{0}  {1}", new Object[]{evt.getNewValue(), Thread.currentThread().getName()});
+            }
+        });
+
+        Thread.sleep(6000);
+        a.addPropertyChangeListener( new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                logger.log( Level.WARNING, "{0}  {1}  *** ", new Object[]{evt.getNewValue(), Thread.currentThread().getName()});
+            }
+        });
+
+        
+    }
 }
