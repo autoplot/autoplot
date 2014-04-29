@@ -27,6 +27,7 @@ import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import org.das2.datum.TimeParser;
 import org.das2.datum.UnitsUtil;
+import org.das2.graph.EventsRenderer;
 import org.das2.util.ArgumentList;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.FileUtil;
@@ -67,7 +68,11 @@ public class CreatePngWalk {
         String[] times;
         if ( params.useBatchUri ) {
             try {
-                QDataSet timesds= org.virbo.jythonsupport.Util.getDataSet( params.batchUri );
+                String uri= params.batchUri;
+                if ( uri.endsWith(".dat") || uri.endsWith(".txt")) {
+                    uri += "?eventListColumn=field1";
+                }
+                QDataSet timesds= org.virbo.jythonsupport.Util.getDataSet( uri );
                 if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(timesds) ) ) {
                     if ( (QDataSet) timesds.property(QDataSet.DEPEND_0)!=null ) {
                         timesds= (QDataSet) timesds.property(QDataSet.DEPEND_0);
@@ -76,6 +81,9 @@ public class CreatePngWalk {
                     } else {
                         throw new IllegalArgumentException("expected [UTC,UTC] or [UTC,UTC,:]");
                     }
+                }
+                if ( timesds.rank()!=2 ) {
+                    timesds= Ops.createEvents( timesds );
                 }
                 if ( timesds.rank()!=2 ) {
                     throw new IllegalArgumentException("expected bins dataset for times");
@@ -596,6 +604,7 @@ public class CreatePngWalk {
         params.autorange= alm.getBooleanValue("autorange");
         params.update= alm.getBooleanValue("update");
         params.batchUri= alm.getValue("batchUri");
+        if ( params.batchUri!=null && params.batchUri.length()>0 ) params.useBatchUri= true;
         String vap= alm.getValue("vap");
         ScriptContext.plot(vap);
 
