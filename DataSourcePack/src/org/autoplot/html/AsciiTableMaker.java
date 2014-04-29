@@ -15,7 +15,6 @@ import org.das2.datum.Units;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SparseDataSetBuilder;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
 
@@ -33,7 +32,6 @@ public class AsciiTableMaker {
     List<String> format= null;
     EnumerationUnits enumeration = EnumerationUnits.create("default");
     
-    NumberFormat nf = DecimalFormat.getInstance(Locale.US); // sorry, rest of world.
     int fieldCount= -1;
     boolean initializedFields= false;
     
@@ -57,7 +55,7 @@ public class AsciiTableMaker {
                         units.add(i,Units.dimensionless);
                         format.add(i,null);
                     } catch ( NumberFormatException ex2 ) {
-                        units.add( i, EnumerationUnits.create("default") );
+                        units.add( i, enumeration );
                         format.add(i,null);
                     }
                 }
