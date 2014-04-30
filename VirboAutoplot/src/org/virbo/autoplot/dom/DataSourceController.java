@@ -184,20 +184,23 @@ public class DataSourceController extends DomNodeController {
                 if ( dom.controller.isValueAdjusting() ) return;
                 ChangesSupport.DomLock lock = dom.controller.mutatorLock();
                 lock.lock( "Changing dsf id" );
-                for ( BindingModel b: dom.getBindings() ) {
-                    if ( b.getSrcId().equals(evt.getOldValue() ) ) {
-                        b.srcId= (String)evt.getNewValue();
-                    } 
-                    if ( b.getDstId().equals(evt.getOldValue() ) ) {
-                        b.dstId= (String)evt.getNewValue();
+                try {
+                    for ( BindingModel b: dom.getBindings() ) {
+                        if ( b.getSrcId().equals(evt.getOldValue() ) ) {
+                            b.srcId= (String)evt.getNewValue();
+                        } 
+                        if ( b.getDstId().equals(evt.getOldValue() ) ) {
+                            b.dstId= (String)evt.getNewValue();
+                        }
                     }
-                }
-                for ( PlotElement pe: dom.plotElements ) {
-                    if ( pe.getDataSourceFilterId().equals(evt.getOldValue()) ) {
-                        pe.setDataSourceFilterId((String) evt.getNewValue());
+                    for ( PlotElement pe: dom.plotElements ) {
+                        if ( pe.getDataSourceFilterId().equals(evt.getOldValue()) ) {
+                            pe.setDataSourceFilterId((String) evt.getNewValue());
+                        }
                     }
+                } finally {
+                    lock.unlock();  
                 }
-                lock.unlock();
             }
         });
 

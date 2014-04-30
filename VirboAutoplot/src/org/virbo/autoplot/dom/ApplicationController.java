@@ -591,7 +591,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         int currentIdx = application.plotElements.indexOf(pelement);
         if (currentIdx == -1) {
             logger.warning("deletePlotElement but plot element isn't part of application, ignoring");
-            lock.unlock();
+            lock.unlock(); //TODO: review this, maybe try/finally...
             return;
         }
         try {
@@ -919,112 +919,115 @@ public class ApplicationController extends DomNodeController implements RunLater
         logger.fine("enter addPlot");
         DomLock lock= changesSupport.mutatorLock();
         lock.lock("Add Plot");
+        
         final Plot domPlot = new Plot();
+        try {
 
-        final Canvas c= getCanvas();
-        
-        CanvasController ccontroller=  ((CanvasController)c.controller);
-        Row domRow;
-        
-        if ( focus!=null && ccontroller.getRowFor(focus)==c.marginRow ) { 
-            String srcRow;
-            if ( c.getRows().length>0 ) {
-                srcRow= c.getRows(0).getId();
-            } else {
-                ccontroller.addRows(2);
-                srcRow= c.getRows(0).getId();
-            }
-            if ( c.getRows().length>1 ) {
-                domRow= c.getRows(1);
-            } else {
-                domRow = ccontroller.addInsertRow( ccontroller.getRowFor(focus), direction );
-            }
-            focus.setRowId(srcRow);
-        } else if ( c.getRows().length == 0 && ( direction==LayoutConstants.BELOW || direction==LayoutConstants.ABOVE ) ) {
-            domRow = ccontroller.addRow();
-        } else if ( direction==null || direction==LayoutConstants.LEFT || direction==LayoutConstants.RIGHT ) {
-            domRow= ccontroller.getRowFor(focus);
-        } else {
-            domRow = ccontroller.addInsertRow( ccontroller.getRowFor(focus), direction);
-        }
+            final Canvas c= getCanvas();
 
-        Column domColumn= c.getMarginColumn();
+            CanvasController ccontroller=  ((CanvasController)c.controller);
+            Row domRow;
 
-        // the logic for columns is different because we optimize the application for a stack of time
-        // series.
-        if ( direction==null || direction==LayoutConstants.ABOVE || direction==LayoutConstants.BELOW ) {
-            domColumn= c.marginColumn;
-        } else {
-            if ( focus!=null && ccontroller.getColumnFor(focus)==c.marginColumn ) {
-                String srcColumn;
-                if ( c.getColumns().length>0 ) {
-                    srcColumn= c.getColumns(0).getId();
+            if ( focus!=null && ccontroller.getRowFor(focus)==c.marginRow ) { 
+                String srcRow;
+                if ( c.getRows().length>0 ) {
+                    srcRow= c.getRows(0).getId();
                 } else {
-                    ccontroller.addColumns(2);
-                    srcColumn= c.getColumns(0).getId();
+                    ccontroller.addRows(2);
+                    srcRow= c.getRows(0).getId();
                 }
-                if ( c.getColumns().length>1 ) {
-                    domColumn= c.getColumns(1);
+                if ( c.getRows().length>1 ) {
+                    domRow= c.getRows(1);
                 } else {
-                    domColumn = ccontroller.addInsertColumn( ccontroller.getColumnFor(focus), direction );
+                    domRow = ccontroller.addInsertRow( ccontroller.getRowFor(focus), direction );
                 }
-                focus.setColumnId(srcColumn);
+                focus.setRowId(srcRow);
+            } else if ( c.getRows().length == 0 && ( direction==LayoutConstants.BELOW || direction==LayoutConstants.ABOVE ) ) {
+                domRow = ccontroller.addRow();
+            } else if ( direction==null || direction==LayoutConstants.LEFT || direction==LayoutConstants.RIGHT ) {
+                domRow= ccontroller.getRowFor(focus);
             } else {
-                domColumn = ccontroller.addInsertColumn( ccontroller.getColumnFor(focus), direction);
+                domRow = ccontroller.addInsertRow( ccontroller.getRowFor(focus), direction);
             }
-        }
 
-        assignId( domPlot );
+            Column domColumn= c.getMarginColumn();
 
-        final Column fcol= domColumn;
-        final Row frow= domRow;
-
-        Runnable run= new Runnable() { public void run() {
-            new PlotController(application, domPlot).createDasPeer(c, frow ,fcol );
-        } };
-        if ( SwingUtilities.isEventDispatchThread() ) {
-            run.run();
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(run);
-            } catch ( Exception ex ) {
-                logger.log( Level.WARNING, ex.getMessage(), ex );
+            // the logic for columns is different because we optimize the application for a stack of time
+            // series.
+            if ( direction==null || direction==LayoutConstants.ABOVE || direction==LayoutConstants.BELOW ) {
+                domColumn= c.marginColumn;
+            } else {
+                if ( focus!=null && ccontroller.getColumnFor(focus)==c.marginColumn ) {
+                    String srcColumn;
+                    if ( c.getColumns().length>0 ) {
+                        srcColumn= c.getColumns(0).getId();
+                    } else {
+                        ccontroller.addColumns(2);
+                        srcColumn= c.getColumns(0).getId();
+                    }
+                    if ( c.getColumns().length>1 ) {
+                        domColumn= c.getColumns(1);
+                    } else {
+                        domColumn = ccontroller.addInsertColumn( ccontroller.getColumnFor(focus), direction );
+                    }
+                    focus.setColumnId(srcColumn);
+                } else {
+                    domColumn = ccontroller.addInsertColumn( ccontroller.getColumnFor(focus), direction);
+                }
             }
-        }
 
-        domPlot.getXaxis().setAutoRange(true);
-        domPlot.getYaxis().setAutoRange(true);
-        domPlot.getZaxis().setAutoRange(true);
-        domPlot.getXaxis().setAutoLabel(true);
-        domPlot.getYaxis().setAutoLabel(true);
-        domPlot.getZaxis().setAutoLabel(true);
-        domPlot.setAutoLabel(true);
-        domPlot.setAutoBinding(true);
+            assignId( domPlot );
 
-        domPlot.getZaxis().setVisible(false);
-        
-        domPlot.setRowId( domRow.getId() );
-        domPlot.setColumnId( domColumn.getId() );
+            final Column fcol= domColumn;
+            final Row frow= domRow;
 
-        List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
-
-        if (focus != null) {
-            int idx = plots.indexOf(focus);
-            if ( direction==null || direction == LayoutConstants.BELOW) {
-                idx = idx + 1;
+            Runnable run= new Runnable() { public void run() {
+                new PlotController(application, domPlot).createDasPeer(c, frow ,fcol );
+            } };
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                run.run();
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(run);
+                } catch ( Exception ex ) {
+                    logger.log( Level.WARNING, ex.getMessage(), ex );
+                }
             }
-            plots.add(idx, domPlot);
-        } else {
-            plots.add(domPlot);
+
+            domPlot.getXaxis().setAutoRange(true);
+            domPlot.getYaxis().setAutoRange(true);
+            domPlot.getZaxis().setAutoRange(true);
+            domPlot.getXaxis().setAutoLabel(true);
+            domPlot.getYaxis().setAutoLabel(true);
+            domPlot.getZaxis().setAutoLabel(true);
+            domPlot.setAutoLabel(true);
+            domPlot.setAutoBinding(true);
+
+            domPlot.getZaxis().setVisible(false);
+
+            domPlot.setRowId( domRow.getId() );
+            domPlot.setColumnId( domColumn.getId() );
+
+            List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
+
+            if (focus != null) {
+                int idx = plots.indexOf(focus);
+                if ( direction==null || direction == LayoutConstants.BELOW) {
+                    idx = idx + 1;
+                }
+                plots.add(idx, domPlot);
+            } else {
+                plots.add(domPlot);
+            }
+
+            application.setPlots(plots.toArray(new Plot[plots.size()]));
+            if ( getPlot()==null ) setPlot(domPlot);
+
+            //domPlot.addPropertyChangeListener(application.childListener);
+            domPlot.addPropertyChangeListener(domListener);
+        } finally {
+            lock.unlock();
         }
-
-        application.setPlots(plots.toArray(new Plot[plots.size()]));
-        if ( getPlot()==null ) setPlot(domPlot);
-
-        //domPlot.addPropertyChangeListener(application.childListener);
-        domPlot.addPropertyChangeListener(domListener);
-
-        lock.unlock();
         return domPlot;
     }
 
@@ -1278,87 +1281,91 @@ public class ApplicationController extends DomNodeController implements RunLater
     public void deletePlot(Plot domPlot) {
         DomLock lock= changesSupport.mutatorLock();
         lock.lock("Delete Plot");
-        if (!application.plots.contains(domPlot)) {
-            throw new IllegalArgumentException("plot is not in this application");
-        }
-        if (application.plots.size() < 2) {
-            throw new IllegalArgumentException("last plot cannot be deleted");
-        }
-        List<PlotElement> elements = this.getPlotElementsFor(domPlot);
-        if (elements.size() > 0) { // transitional state
-            for ( PlotElement p: elements ) {
-                if ( application.plotElements.size()>1 ) deletePlotElement(p);
+        try {
+            if (!application.plots.contains(domPlot)) {
+                throw new IllegalArgumentException("plot is not in this application");
             }
-        }
-        for (Connector c : DomUtil.asArrayList(application.getConnectors())) {
-            if (c.getPlotA().equals(domPlot.getId()) || c.getPlotB().equals(domPlot.getId())) {
-                deleteConnector(c); // TODO: this has remove that occurs off the event thread.
+            if (application.plots.size() < 2) {
+                throw new IllegalArgumentException("last plot cannot be deleted");
             }
-        }
+            List<PlotElement> elements = this.getPlotElementsFor(domPlot);
+            if (elements.size() > 0) { // transitional state
+                for ( PlotElement p: elements ) {
+                    if ( application.plotElements.size()>1 ) deletePlotElement(p);
+                }
+            }
+            for (Connector c : DomUtil.asArrayList(application.getConnectors())) {
+                if (c.getPlotA().equals(domPlot.getId()) || c.getPlotB().equals(domPlot.getId())) {
+                    deleteConnector(c); // TODO: this has remove that occurs off the event thread.
+                }
+            }
 
-        Row deleteRow = null; // if non-null, delete this row.
-        Row row = (Row) DomUtil.getElementById(application, domPlot.getRowId());
-        List<DomNode> plotsUsingRow = DomUtil.rowUsages(application, row.getId());
-        plotsUsingRow.remove(domPlot);
-        if (plotsUsingRow.isEmpty()) {
-            deleteRow = row;
-        }
+            Row deleteRow = null; // if non-null, delete this row.
+            Row row = (Row) DomUtil.getElementById(application, domPlot.getRowId());
+            List<DomNode> plotsUsingRow = DomUtil.rowUsages(application, row.getId());
+            plotsUsingRow.remove(domPlot);
+            if (plotsUsingRow.isEmpty()) {
+                deleteRow = row;
+            }
 
-        //domPlot.removePropertyChangeListener(application.childListener);
-        domPlot.removePropertyChangeListener(domListener);
-        unbind(domPlot);
-        unbind(domPlot.getXaxis());
-        unbind(domPlot.getYaxis());
-        unbind(domPlot.getZaxis());
-        unbindImpl(domPlot); //TODO: I need to remind myself why there are two types of bindings...
-        unbindImpl(domPlot.getXaxis());
-        unbindImpl(domPlot.getYaxis());
-        unbindImpl(domPlot.getZaxis());
+            //domPlot.removePropertyChangeListener(application.childListener);
+            domPlot.removePropertyChangeListener(domListener);
+            unbind(domPlot);
+            unbind(domPlot.getXaxis());
+            unbind(domPlot.getYaxis());
+            unbind(domPlot.getZaxis());
+            unbindImpl(domPlot); //TODO: I need to remind myself why there are two types of bindings...
+            unbindImpl(domPlot.getXaxis());
+            unbindImpl(domPlot.getYaxis());
+            unbindImpl(domPlot.getZaxis());
 
-        if ( domPlot.controller==null ) {
-            logger.warning("domPlot.controller is null, this shouldn't happen");
-        } else {
-            final DasPlot p = domPlot.controller.getDasPlot();
-            final DasColorBar cb = domPlot.controller.getDasColorBar();
-            final DasCanvas lcanvas= this.getDasCanvas();
-            final ArrayList<Component> deleteKids= new ArrayList();
-            deleteKids.add( p );
-            deleteKids.add( cb );
-            deleteKids.add( domPlot.controller.getDasPlot().getXAxis() );
-            deleteKids.add( domPlot.controller.getDasPlot().getYAxis() );
-            SwingUtilities.invokeLater( new Runnable() { // see https://sourceforge.net/tracker/index.php?func=detail&aid=3471016&group_id=199733&atid=970682
-                @Override
-                public void run() {
-                    for ( Component c: deleteKids ) {
-                        lcanvas.remove(c);
+            if ( domPlot.controller==null ) {
+                logger.warning("domPlot.controller is null, this shouldn't happen");
+            } else {
+                final DasPlot p = domPlot.controller.getDasPlot();
+                final DasColorBar cb = domPlot.controller.getDasColorBar();
+                final DasCanvas lcanvas= this.getDasCanvas();
+                final ArrayList<Component> deleteKids= new ArrayList();
+                deleteKids.add( p );
+                deleteKids.add( cb );
+                deleteKids.add( domPlot.controller.getDasPlot().getXAxis() );
+                deleteKids.add( domPlot.controller.getDasPlot().getYAxis() );
+                SwingUtilities.invokeLater( new Runnable() { // see https://sourceforge.net/tracker/index.php?func=detail&aid=3471016&group_id=199733&atid=970682
+                    @Override
+                    public void run() {
+                        for ( Component c: deleteKids ) {
+                            lcanvas.remove(c);
+                        }
+                    }
+                } );
+            }
+
+            synchronized (this) {
+                List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
+                plots.remove(domPlot);
+
+                if (!plots.contains(getPlot())) {
+                    if (plots.isEmpty()) {
+                        setPlot(null);
+                    } else {
+                        setPlot(plots.get(0));
                     }
                 }
-            } );
-        }
+                application.setPlots(plots.toArray(new Plot[plots.size()]));
 
-        synchronized (this) {
-            List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
-            plots.remove(domPlot);
-
-            if (!plots.contains(getPlot())) {
-                if (plots.isEmpty()) {
-                    setPlot(null);
-                } else {
-                    setPlot(plots.get(0));
+                if (deleteRow != null) {
+                    CanvasController cc = row.controller.getCanvas().controller;
+                    cc.deleteRow(deleteRow);
+                    cc.removeGaps();
                 }
             }
-            application.setPlots(plots.toArray(new Plot[plots.size()]));
 
-            if (deleteRow != null) {
-                CanvasController cc = row.controller.getCanvas().controller;
-                cc.deleteRow(deleteRow);
-                cc.removeGaps();
+            if ( domPlot.controller==null ) {
+                domPlot.getController().getDasPlot().releaseAll();
             }
+        } finally {
+            lock.unlock();
         }
-        
-        domPlot.getController().getDasPlot().releaseAll();
-        
-        lock.unlock();
 
     }
 

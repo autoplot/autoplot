@@ -2340,8 +2340,11 @@ public class PlotElementController extends DomNodeController {
         Plot p;
         DomLock lock= this.mutatorLock();
         lock.lock("getDasPlot");
-        p= dom.controller.getPlotFor(plotElement);
-        lock.unlock();
+        try {
+            p= dom.controller.getPlotFor(plotElement);
+        } finally {
+            lock.unlock();
+        }
         if ( p==null ) {
             return null;
         }
@@ -2352,8 +2355,11 @@ public class PlotElementController extends DomNodeController {
         Plot p;
         DomLock lock= this.mutatorLock();
         lock.lock("getColorbar");
-        p= dom.controller.getPlotFor(plotElement);
-        lock.unlock();
+        try {
+            p= dom.controller.getPlotFor(plotElement);
+        } finally {
+            lock.unlock();
+        }
         if ( p==null ) {
             throw new IllegalArgumentException("no plot found for element ("+plotElement+","+plotElement.getPlotId()+")");
         }

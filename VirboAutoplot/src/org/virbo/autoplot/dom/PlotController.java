@@ -102,20 +102,23 @@ public class PlotController extends DomNodeController {
                 if ( dom.controller.isValueAdjusting() ) return;
                 DomLock lock = dom.controller.mutatorLock();
                 lock.lock( "Changing plot id" );
-                for ( BindingModel b: dom.getBindings() ) {
-                    if ( b.getSrcId().equals(evt.getOldValue() ) ) {
-                        b.srcId= (String)evt.getNewValue();
+                try {
+                    for ( BindingModel b: dom.getBindings() ) {
+                        if ( b.getSrcId().equals(evt.getOldValue() ) ) {
+                            b.srcId= (String)evt.getNewValue();
+                        } 
+                        if ( b.getDstId().equals(evt.getOldValue() ) ) {
+                            b.dstId= (String)evt.getNewValue();
+                        }
+                    }
+                    for ( PlotElement pe: dom.plotElements ) {
+                        if ( pe.getPlotId().equals(evt.getOldValue()) ) {
+                            pe.setPlotId((String) evt.getNewValue());
+                        }
                     } 
-                    if ( b.getDstId().equals(evt.getOldValue() ) ) {
-                        b.dstId= (String)evt.getNewValue();
-                    }
+                } finally {
+                    lock.unlock();
                 }
-                for ( PlotElement pe: dom.plotElements ) {
-                    if ( pe.getPlotId().equals(evt.getOldValue()) ) {
-                        pe.setPlotId((String) evt.getNewValue());
-                    }
-                }
-                lock.unlock();
             }
         });
         dom.options.addPropertyChangeListener( Options.PROP_DAY_OF_YEAR, new PropertyChangeListener() {
@@ -1088,35 +1091,39 @@ public class PlotController extends DomNodeController {
     public Plot contextOverview( ) {
         DomLock lock= changesSupport.mutatorLock();
         lock.lock("Context Overview");
-        Plot domPlot= this.plot;
-        ApplicationController controller= dom.getController();
-        Plot that = controller.copyPlotAndPlotElements(domPlot, null, false, false);
-        that.setTitle( "" );
-        controller.bind(domPlot.getYaxis(), Axis.PROP_LOG, that.getYaxis(), Axis.PROP_LOG);
-        controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
-        controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
-        controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);
-        controller.addConnector(domPlot, that);
+        Plot that;
+        try {
+            Plot domPlot= this.plot;
+            ApplicationController controller= dom.getController();
+            that = controller.copyPlotAndPlotElements(domPlot, null, false, false);
+            that.setTitle( "" );
+            controller.bind(domPlot.getYaxis(), Axis.PROP_LOG, that.getYaxis(), Axis.PROP_LOG);
+            controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
+            controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
+            controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);
+            controller.addConnector(domPlot, that);
 
-        controller.setPlot(that);
-        AutoplotUtil.resetZoomY(dom);
+            controller.setPlot(that);
+            AutoplotUtil.resetZoomY(dom);
 
-        double nmin,nmax;
-        if ( domPlot.getYaxis().isLog() ) {
-            nmin= DatumRangeUtil.normalizeLog( that.getYaxis().getRange(), domPlot.getYaxis().getRange().min() );
-            nmax= DatumRangeUtil.normalizeLog( that.getYaxis().getRange(), domPlot.getYaxis().getRange().max() );
-        } else {
-            nmin= DatumRangeUtil.normalize( that.getYaxis().getRange(), domPlot.getYaxis().getRange().min() );
-            nmax= DatumRangeUtil.normalize( that.getYaxis().getRange(), domPlot.getYaxis().getRange().max() );
+            double nmin,nmax;
+            if ( domPlot.getYaxis().isLog() ) {
+                nmin= DatumRangeUtil.normalizeLog( that.getYaxis().getRange(), domPlot.getYaxis().getRange().min() );
+                nmax= DatumRangeUtil.normalizeLog( that.getYaxis().getRange(), domPlot.getYaxis().getRange().max() );
+            } else {
+                nmin= DatumRangeUtil.normalize( that.getYaxis().getRange(), domPlot.getYaxis().getRange().min() );
+                nmax= DatumRangeUtil.normalize( that.getYaxis().getRange(), domPlot.getYaxis().getRange().max() );
+            }
+            if ( nmax-nmin > 0.9 ) {
+                that.getYaxis().setRange( domPlot.getYaxis().getRange() );
+            }
+
+            AutoplotUtil.resetZoomX(dom);
+
+            //that.getController().resetZoom(true, true, false);
+        } finally {
+            lock.unlock();
         }
-        if ( nmax-nmin > 0.9 ) {
-            that.getYaxis().setRange( domPlot.getYaxis().getRange() );
-        }
-        
-        AutoplotUtil.resetZoomX(dom);
-
-        //that.getController().resetZoom(true, true, false);
-        lock.unlock();
         return that;
     }
 
