@@ -262,6 +262,9 @@
                             <StringItem index="0" value=" "/>
                           </StringArray>
                         </Property>
+                        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                          <Dimension value="[100, 32767]"/>
+                        </Property>
                       </Properties>
                       <BindingProperties>
                         <BindingProperty name="enabled" source="whereCB" sourcePath="${selected}" target="whereParamList" targetPath="enabled" updateStrategy="0" immediately="false"/>

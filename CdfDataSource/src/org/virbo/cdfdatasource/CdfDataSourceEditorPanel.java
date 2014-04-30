@@ -53,10 +53,13 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     private static final int MAX_SLICE1_OFFER = 32;
 
     private final static Logger logger= Logger.getLogger( "apdss.cdfn" );
+    
+    private boolean isValidCDF= false;
 
     /** Creates new form AggregatingDataSourceEditorPanel */
     public CdfDataSourceEditorPanel() {
         initComponents();
+        jPanel3.setVisible(false);
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "cdf_main");
     }
 
@@ -151,6 +154,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         bindingGroup.addBinding(binding);
 
         whereParamList.setModel(new javax.swing.DefaultComboBoxModel(new String[] { " " }));
+        whereParamList.setMaximumSize(new java.awt.Dimension(100, 32767));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereParamList, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -255,8 +259,10 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
     private void parameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTreeValueChanged
         TreePath tp= evt.getPath();
-        parameter= String.valueOf(tp.getPathComponent(1));
-        updateMetadata();
+        if ( isValidCDF ) {
+            parameter= String.valueOf(tp.getPathComponent(1));
+            updateMetadata();
+        }
     }//GEN-LAST:event_parameterTreeValueChanged
 
     private void updateMetadata() {
@@ -413,6 +419,10 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 parameterInfo= dataParameterInfo;
                 label= "Select CDF Variable (%d data, %d support not shown):";
             }
+            
+            this.isValidCDF= true;
+            jPanel3.setVisible(true);
+            
             int numData= dataParameterInfo.size();
             int numSupport= allParameterInfo.size() - numData;
 
@@ -420,9 +430,11 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             this.selectVariableLabel.setToolTipText("ISTP metadata marks parameters as data or support_data");
 
             String param= params.get("arg_0");
+            String subset= null;
             if ( param!=null ) {
                 int i= param.indexOf("[");
                 if ( i!=-1 ) {
+                    subset= param.substring(i);
                     param= param.substring(0,i);
                 }
             }
@@ -499,39 +511,41 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             slice= "["+slice+"]";
         }
 
-        TreePath treePath= parameterTree.getSelectionPath();
-        if ( treePath==null ) {
-            logger.fine("param was null");
-        } else if ( treePath.getPathCount()==3 ) {
-            String p= String.valueOf( treePath.getPathComponent(1) );
-            p= p.replaceAll("=", "%3D");
-            params.put( "arg_0", p + ( slice==null ? "" : slice ) );
-            String val=  String.valueOf( treePath.getPathComponent(2) );
-            int idx= val.indexOf(":");
-            params.put( "slice1", val.substring(0,idx).trim() );
-        } else {
-            String p= String.valueOf( treePath.getPathComponent(1) );
-            p= p.replaceAll("=", "%3D");
-            params.put( "arg_0", p + ( slice==null ? "" : slice ) );
-        }
-            
-        if ( noDep.isSelected() ) {
-            params.put("doDep","no");
-        } else {
-            params.remove("doDep");
-        }
-        if ( noInterpMeta.isSelected() ) {
-            params.put("interpMeta", "no");
-        } else {
-            params.remove("interpMeta");
-        }
+        if ( isValidCDF ) {
+            TreePath treePath= parameterTree.getSelectionPath();
+            if ( treePath==null ) {
+                logger.fine("param was null");
+            } else if ( treePath.getPathCount()==3 ) {
+                String p= String.valueOf( treePath.getPathComponent(1) );
+                p= p.replaceAll("=", "%3D");
+                params.put( "arg_0", p + ( slice==null ? "" : slice ) );
+                String val=  String.valueOf( treePath.getPathComponent(2) );
+                int idx= val.indexOf(":");
+                params.put( "slice1", val.substring(0,idx).trim() );
+            } else {
+                String p= String.valueOf( treePath.getPathComponent(1) );
+                p= p.replaceAll("=", "%3D");
+                params.put( "arg_0", p + ( slice==null ? "" : slice ) );
+            }
 
-        if ( whereCB.isSelected() ) {
-            params.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText() ) );
-        } else {
-            params.remove("where");
-        }
+            if ( noDep.isSelected() ) {
+                params.put("doDep","no");
+            } else {
+                params.remove("doDep");
+            }
+            if ( noInterpMeta.isSelected() ) {
+                params.put("interpMeta", "no");
+            } else {
+                params.remove("interpMeta");
+            }
 
+            if ( whereCB.isSelected() ) {
+                params.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText() ) );
+            } else {
+                params.remove("where");
+            }
+        }
+        
         split.params= URISplit.formatParams(params);
         return URISplit.format(split);
     }

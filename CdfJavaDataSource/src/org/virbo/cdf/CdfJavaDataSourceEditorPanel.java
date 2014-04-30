@@ -54,9 +54,12 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
     private final static Logger logger= Logger.getLogger( "apdss.cdfj" );
 
+    private boolean isValidCDF= false;
+
     /** Creates new form AggregatingDataSourceEditorPanel */
     public CdfJavaDataSourceEditorPanel() {
         initComponents();
+        jPanel3.setVisible(false);
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "cdf_main");
     }
 
@@ -260,8 +263,10 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
     private void parameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTreeValueChanged
         TreePath tp= evt.getPath();
-        parameter= String.valueOf(tp.getPathComponent(1));
-        updateMetadata();
+        if ( isValidCDF ) {
+            parameter= String.valueOf(tp.getPathComponent(1));
+            updateMetadata();
+        }
     }//GEN-LAST:event_parameterTreeValueChanged
 
     private void updateMetadata() {
@@ -366,6 +371,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         logger.log(Level.FINE, "opening cdf file {0}", cdfFile.toString());
         try {
             cdf = CdfJavaDataSource.getCdfFile(cdfFile.toString());
+            if ( cdf==null ) {
+                throw new IllegalArgumentException("file is not a CDF file");
+            }
             cdfException= null;
         } catch ( Exception ex ) {
             cdfException= ex;
@@ -398,7 +406,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             if ( cdfException!=null ) {
                 this.selectVariableLabel.setText( " " );
                 this.parameterTree.setModel( new DefaultTreeModel( new DefaultMutableTreeNode("Error") ) );
-                this.paramInfo.setText( "\nUnable to read cdf file." );
+                this.paramInfo.setText( "\nUnable to read CDF file." );
                 return;
             }
             
@@ -407,7 +415,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             boolean isMaster= fileName.contains("MASTERS");
             parameterDescriptions= CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false, false );
             if ( parameterDescriptions.isEmpty() ) {
-                throw new IllegalArgumentException("no plottable parameters in cdf file!");
+                throw new IllegalArgumentException("no plottable parameters in CDF file!");
             }
             
             Map<String,String> allParameterInfo= CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, true, isMaster );
@@ -422,6 +430,10 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 parameterInfo= dataParameterInfo;
                 label= "Select CDF Variable (%d data, %d support not shown):";
             }
+            
+            this.isValidCDF= true;
+            jPanel3.setVisible(true);
+            
             int numData= dataParameterInfo.size();
             int numSupport= allParameterInfo.size() - numData;
 
@@ -509,37 +521,39 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             slice= "["+slice+"]";
         }
 
-        TreePath treePath= parameterTree.getSelectionPath();
-        if ( treePath==null ) {
-            logger.fine("param was null");
-        } else if ( treePath.getPathCount()==3 ) {
-            String p= String.valueOf( treePath.getPathComponent(1) );
-            p= p.replaceAll("=", "%3D");
-            params.put( "arg_0", p + ( slice==null ? "" : slice ) );
-            String val=  String.valueOf( treePath.getPathComponent(2) );
-            int idx= val.indexOf(":");
-            params.put( "slice1", val.substring(0,idx).trim() );
-        } else {
-            String p= String.valueOf( treePath.getPathComponent(1) );
-            p= p.replaceAll("=", "%3D");
-            params.put( "arg_0", p + ( slice==null ? "" : slice ) );
-        }
+        if ( isValidCDF ) {
+            TreePath treePath= parameterTree.getSelectionPath();
+            if ( treePath==null ) {
+                logger.fine("param was null");
+            } else if ( treePath.getPathCount()==3 ) {
+                String p= String.valueOf( treePath.getPathComponent(1) );
+                p= p.replaceAll("=", "%3D");
+                params.put( "arg_0", p + ( slice==null ? "" : slice ) );
+                String val=  String.valueOf( treePath.getPathComponent(2) );
+                int idx= val.indexOf(":");
+                params.put( "slice1", val.substring(0,idx).trim() );
+            } else {
+                String p= String.valueOf( treePath.getPathComponent(1) );
+                p= p.replaceAll("=", "%3D");
+                params.put( "arg_0", p + ( slice==null ? "" : slice ) );
+            }
 
-        if ( noDep.isSelected() ) {
-            params.put("doDep","no");
-        } else {
-            params.remove("doDep");
-        }
-        if ( noInterpMeta.isSelected() ) {
-            params.put("interpMeta", "no");
-        } else {
-            params.remove("interpMeta");
-        }
-        
-        if ( whereCB.isSelected() ) {
-            params.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText() ) );
-        } else {
-            params.remove("where");
+            if ( noDep.isSelected() ) {
+                params.put("doDep","no");
+            } else {
+                params.remove("doDep");
+            }
+            if ( noInterpMeta.isSelected() ) {
+                params.put("interpMeta", "no");
+            } else {
+                params.remove("interpMeta");
+            }
+
+            if ( whereCB.isSelected() ) {
+                params.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText() ) );
+            } else {
+                params.remove("where");
+            }
         }
 
         split.params= URISplit.formatParams(params);
