@@ -29,14 +29,14 @@ public class FilePollUpdating implements Updating {
     URI pollURI;
     FileSystem fs; // remote source of the file
     FileObject fo; // remote FileObject.
-    long pollMtime;
-    long pollMsize;
+    //long pollMtime;
+    //long pollMsize;
     long dirHash;
     long pollCyclePeriodSeconds;
     private final static int LIMIT_SHORT_CYCLE_PERIOD_SECONDS= 1;
     private final static int LIMIT_SHORT_REMOTE_CYCLE_PERIOD_SECONDS= 10; 
     boolean dirty= false; //true indicates the hash has changed and we need to clean.
-    boolean polling= false; //true indicates we are polling.    
+    //boolean polling= false; //true indicates we are polling.    
     
     public FilePollUpdating( URI uri, long pollCyclePeriodSeconds ) throws FileSystem.FileSystemOfflineException, UnknownHostException, FileNotFoundException {
         URISplit split= URISplit.parse(uri);
@@ -82,8 +82,8 @@ public class FilePollUpdating implements Updating {
     
     public void startPolling( ) throws FileSystem.FileSystemOfflineException {
 
-            pollMsize= fo.getSize();
-            pollMtime= fo.lastModified().getTime();
+            //pollMsize= fo.getSize();
+            //pollMtime= fo.lastModified().getTime();
             dirHash= dirHash();
             
             Runnable run= new Runnable() {
