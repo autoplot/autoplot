@@ -178,6 +178,13 @@ public class JythonCompletionTask implements CompletionTask {
                         Method m = new PyReflectedFunctionPeeker((PyReflectedFunction) po).getMethod(0);
                         signature = methodSignature(m);
                         args = methodArgs(m);
+                    } else if ( po instanceof PyString ) {
+                        Class c= new PyClassPeeker((PyJavaClass) context).getJavaClass();
+                        try {
+                            Field f = c.getField(po.toString());
+                            signature= fieldSignature(f);
+                        } catch ( NoSuchFieldException ex ) {   
+                        }
                     }
                 } else if ( context instanceof PyJavaPackage ) {
                     if (po instanceof PyJavaClass) {
