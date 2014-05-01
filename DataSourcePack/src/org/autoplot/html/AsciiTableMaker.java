@@ -38,8 +38,10 @@ public class AsciiTableMaker {
             String field = values.get(i).trim();
             boolean isTime= false;
             try {
-                Units.us2000.parse(field);
-                isTime= true;
+                if ( field.contains("T") ) { // allow ISO8601 times.
+                    Units.us2000.parse(field);
+                    isTime= true;
+                }
             } catch (ParseException ex) {
                 Logger.getLogger(AsciiTableMaker.class.getName()).log(Level.SEVERE, null, ex);
             }
