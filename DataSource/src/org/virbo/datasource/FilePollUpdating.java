@@ -39,6 +39,7 @@ public class FilePollUpdating implements Updating {
     //boolean polling= false; //true indicates we are polling.    
     
     public FilePollUpdating( URI uri, long pollCyclePeriodSeconds ) throws FileSystem.FileSystemOfflineException, UnknownHostException, FileNotFoundException {
+        this.pollURI= uri;
         URISplit split= URISplit.parse(uri);
         fs= FileSystem.create(split.path);
         fo= fs.getFileObject(split.file.substring(split.path.length()));
@@ -91,6 +92,7 @@ public class FilePollUpdating implements Updating {
                 public void run() {
                     logger.log(Level.FINE, "start polling {0}", pollURI );
                     while ( dirHash!=0 ) {
+                        logger.log(Level.FINEST, "polling..." );
                         try {
                             Thread.sleep( pollCyclePeriodSeconds*1000 );
                         } catch (InterruptedException ex) {
