@@ -12,6 +12,7 @@
 package org.virbo.datasource;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 
@@ -73,8 +74,11 @@ public class SourceTypesBrowser extends javax.swing.JPanel {
             if ( !desc.equals("") ) {
                 label= label+": "+desc;
             }
-            model.insertElementAt(label,i);
             types.add(i,label );
+        }
+        Collections.sort(types);
+        for ( int i=0; i<types.size(); i++ ) {
+            model.insertElementAt(types.get(i),i);
         }
         this.sourceTypesComboBox.setModel(model);
 
