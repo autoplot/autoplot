@@ -1,3 +1,4 @@
 org.virbo.ascii.AsciiTableDataSourceFormat dat txt
 org.virbo.das2Stream.Das2StreamDataSourceFormat d2s qds
 org.autoplot.csv.CsvDataSourceFormat csv
+org.autoplot.html.HtmlTableFormat htm
