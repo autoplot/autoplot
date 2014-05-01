@@ -4,12 +4,11 @@
  */
 package org.autoplot.html;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.virbo.dataset.AbstractDataSet;
@@ -30,7 +29,6 @@ public class AsciiTableMaker {
     List<String> labels = null;
     List<String> names = null;
     List<String> format= null;
-    EnumerationUnits enumeration = EnumerationUnits.create("default");
     
     int fieldCount= -1;
     boolean initializedFields= false;
@@ -38,25 +36,32 @@ public class AsciiTableMaker {
     private void setUnitsAndFormat( List<String> values ) {
         for (int i = 0; i < fieldCount; i++) {
             String field = values.get(i).trim();
+            boolean isTime= false;
+            try {
+                Units.us2000.parse(field);
+                isTime= true;
+            } catch (ParseException ex) {
+                Logger.getLogger(AsciiTableMaker.class.getName()).log(Level.SEVERE, null, ex);
+            }
             if ( field.contains("$") ) {
-                units.add(i,Units.dollars);
-                format.add(i,"%.2f");
-            } else if ( field.contains("/") ) {
-                units.add(i,Units.us2000);
-                format.add(i,null);
+                units.set(i,Units.dollars);
+                format.set(i,"%.2f");
+            } else if ( isTime ) {
+                units.set(i,Units.us2000);
+                format.set(i,null);
             } else {
                 try {
                     Integer.parseInt(field);
-                    units.add(i,Units.dimensionless);
-                    format.add(i,"%d");
+                    units.set(i,Units.dimensionless);
+                    format.set(i,"%d");
                 } catch ( NumberFormatException ex ) {
                     try {
                         Double.parseDouble(field);
-                        units.add(i,Units.dimensionless);
-                        format.add(i,null);
+                        units.set(i,Units.dimensionless);
+                        format.set(i,null);
                     } catch ( NumberFormatException ex2 ) {
-                        units.add( i, enumeration );
-                        format.add(i,null);
+                        units.set( i, new EnumerationUnits("default") );
+                        format.set(i,null);
                     }
                 }
             }
@@ -67,6 +72,7 @@ public class AsciiTableMaker {
         if ( fieldCount==-1 ) return;
         if ( initializedFields==false ) {
             setUnitsAndFormat(values);
+            initializedFields= true;
         }
         for (int i = 0; i < fieldCount; i++) {
             String field = values.get(i).trim();
@@ -75,10 +81,15 @@ public class AsciiTableMaker {
             } else {
                 try {
                     Units u= units.get(i);
-                    double d= u.parse( field ).doubleValue( u );
+                    double d;
+                    if ( u instanceof EnumerationUnits ) {
+                        d= ((EnumerationUnits)u).createDatum(field).doubleValue(u);
+                    } else {
+                        d= u.parse( field ).doubleValue( u );
+                    }
                     builder.putValue(-1, i, d);
                 } catch (ParseException ex) {
-                    builder.putValue(-1,i, builder.getFillValue() );
+                    builder.putValue(-1, i, builder.getFillValue() );
                 }
             }
         }
@@ -101,6 +112,7 @@ public class AsciiTableMaker {
             for (int i = 0; i < fieldCount; i++) {
                 labels.add(i, values.get(i));
                 names.add(i, Ops.safeName(values.get(i)));
+                format.add("");
             }
         }
 
