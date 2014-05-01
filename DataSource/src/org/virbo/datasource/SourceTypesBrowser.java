@@ -56,7 +56,7 @@ public class SourceTypesBrowser extends javax.swing.JPanel {
         } else if ( ext.equals("inline") ) {
             return "Array literals and Jython code defining datasets";
         } else if ( ext.equals("htm") ) {
-            return "Tables with HTML files";
+            return "Tables within HTML files";
         } else {
             return "";
         }
