@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Interesting features seen by Emfisis instruments on RBSP.</small></p>
+        <p><small>A scaling bug in butterworth filter is corrected.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,10 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-04-29):</p>
+        <p>Bugfixes (2014-05-01):</p>
         <ul>
+            <li>Butterworth high-pass filter scale factor corrected.</li>
+            <li>Survey places where locking is done without a try/finally block, which can hang the application.</li>
             <li>imax (index of the maximum value) was incorrectly coded to use MIN_VALUE (1e-308) instead of NEGATIVE_INFINITY</li>
 	    <li>Rob R pointed out RTE when ftp:// is entered and inspect button pressed.</li>
             <li>440: any FileFilter needs to check for null from file.toString().  The DataPointRecorder didn't do this, Bill pointed out.</li>
@@ -55,6 +57,9 @@
         </ul>
         <p>Features:</p>
         <ul>      
+            <li>Minor cleanup of html table reader</li>
+            <li>completions suggest $Y$m$dT$H$M now</li>
+            <li>FillPollUpdating works with http for single files</li>
             <li>In makePngWalk script, setting batchUri parameter in main method sets useBatchUri to true.  This mode is in tests now.</li>
             <li>DataPointRecorderNew supports events lists, will replace DataPointRecorder</li>
             <li>rank 0 DDataSet.putValue checks rank because it's easy to forget the index</li>
