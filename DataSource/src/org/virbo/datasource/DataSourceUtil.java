@@ -197,7 +197,7 @@ public class DataSourceUtil {
                 accountedFor.add(surl);
             }
 
-            DatumRange dr = null;
+            DatumRange dr;
             // remove parameter
             sagg = URISplit.removeParam(sagg, "timerange");
             TimeParser tp;
@@ -212,8 +212,6 @@ public class DataSourceUtil {
             }
             dr = tp.getTimeRange();
             DatumRange dr1= dr; // keep track of the first one to measure continuity.
-
-            boolean okay= true;
 
             List<String> moveUs= new ArrayList();
 
@@ -267,6 +265,8 @@ public class DataSourceUtil {
             }
 
         }
+        
+        logger.log(Level.FINER, "found {0}.", nonAgg.size());
 
         if ( remove ) {
             files.removeAll(accountedFor);
@@ -392,13 +392,14 @@ public class DataSourceUtil {
         String yyyy_mm_dd= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{2}\\2\\d{2}(?!\\d)";
         String yyyy_jjj= "(?<!\\d)(19|20)\\d{2}([\\-_/])\\d{3}(?!\\d)";
         String yyyymmdd_HH= "(?<!\\d)(19|20)(\\d{6})(\\D)\\d{2}(?!\\d)"; //"(\\d{8})"; 20140204T15
+        String yyyymmdd_HHMM= "(?<!\\d)(19|20)(\\d{6})(\\D)\\d{2}\\d{2}(?!\\d)"; //"(\\d{8})"; 20140204T1515
 
         String version= "([Vv])\\d{2}";                // $v
         String vsep= "([Vv])(\\d+\\.\\d+(\\.\\d+)+)";  // $(v,sep)
 
         String result= surl;
 
-        String[] abs= new String[] { yyyymmdd_HH, yyyy_mm_dd, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm };
+        String[] abs= new String[] { yyyymmdd_HHMM, yyyymmdd_HH, yyyy_mm_dd, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm };
 
         String timeRange=null;
         for ( int i= 0; i<abs.length; i++ ) {
@@ -415,10 +416,11 @@ public class DataSourceUtil {
         int year= TimeUtil.YEAR;
         int month= TimeUtil.MONTH;
         int hour= TimeUtil.HOUR;
+        int minute= TimeUtil.MINUTE;
 
-        List<String> search= new ArrayList( Arrays.asList( yyyymmdd_HH, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm_dd, yyyy ) );
-        List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$3\\$H", "\\$Y$2\\$j", "\\$Y\\$m\\$d","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d","/\\$Y/" ) );
-        List<Integer> resol= new ArrayList( Arrays.asList( hour, day, day, day, month, day, year ) );
+        List<String> search= new ArrayList( Arrays.asList( yyyymmdd_HHMM, yyyymmdd_HH, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm_dd, yyyy ) );
+        List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$3\\$H\\$M", "\\$Y\\$m\\$d$3\\$H", "\\$Y$2\\$j", "\\$Y\\$m\\$d","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d","/\\$Y/" ) );
+        List<Integer> resol= new ArrayList( Arrays.asList( minute, hour, day, day, day, month, day, year ) );
         String s= replaceLast( result, 
                 search,
                 replac,
