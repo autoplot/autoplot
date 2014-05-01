@@ -48,6 +48,9 @@ public class AsciiTableMaker {
             if ( field.contains("$") ) {
                 units.set(i,Units.dollars);
                 format.set(i,"%.2f");
+            } else if ( field.endsWith("%") ) {
+                units.set(i,Units.percent);
+                format.set(i,null);
             } else if ( isTime ) {
                 units.set(i,Units.us2000);
                 format.set(i,null);
