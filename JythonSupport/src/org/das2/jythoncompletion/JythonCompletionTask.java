@@ -628,11 +628,14 @@ public class JythonCompletionTask implements CompletionTask {
                 } else {
                     logger.fine("");
                 }
+                
                 String link = null;
                 if (signature != null) {
                     String autoplotDoc= "http://autoplot.org/developer.scripting#";
-                    //link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
                     link = autoplotDoc + ss;
+                }
+                if ( ss.equals("dom") ) {
+                    link= "http://autoplot.org/developer.scripting#DOM";
                 }
                 result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link) );
             }
