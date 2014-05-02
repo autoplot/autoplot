@@ -42,6 +42,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
     }    
     
     public DataSource getDataSource(URI uri) throws Exception {
+        //return new org.autoplot.cdf.CdfDataSource( uri );
         return new CdfJavaDataSource( uri );
     }
     
