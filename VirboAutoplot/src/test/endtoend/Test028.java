@@ -5,6 +5,8 @@
 package test.endtoend;
 
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import org.virbo.autoplot.ScriptContext;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
@@ -51,7 +53,10 @@ public class Test028 {
     }
     
     public static void main(String[] args)  {
+        //org.das2.util.LoggerManager.getLogger("autoplot.layout").setLevel(Level.ALL);
         try {
+            
+           // ScriptContext.createGui();
 
             setCanvasSize(640,480);
             getDocumentModel().getOptions().setAutolayout(false);

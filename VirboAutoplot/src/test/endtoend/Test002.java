@@ -5,6 +5,7 @@
 package test.endtoend;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.ScriptContext;

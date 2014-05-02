@@ -19,7 +19,7 @@
 #  -Jxxx            pass argument xxx to JRE (e.g. -J-Xmx4G to get 4 Gig of RAM)
 #
 #  For example:
-#    autoplot -J-Xmx4G
+#    ./autoplot.jar -J-Xmx4G
 
 JAVA_ARGS=""
 AP_ARGS=""
