@@ -575,29 +575,35 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             boolean doComponents= lablPtr1!=null && v.getDimSizes().length==1 && v.getDimSizes()[0]<=MAX_SLICE1_OFFER;
             if ( doComponents ) {
                 String s= (String) lablPtr1.getData();
-                Variable labl= cdf.getVariable(s);
-                DefaultMutableTreeNode node= new DefaultMutableTreeNode( e.getKey() );
-                Object oo= labl.getRecord(0);
-                if ( !oo.getClass().isArray() || !( String.class.isAssignableFrom( oo.getClass().getComponentType() ) ) ) {
-                    logger.fine("Expected string array in element: "+s);
-                    continue;
-                }
-                String[] rec= (String[]) labl.getRecord(0);
-                for ( int i=0; i<rec.length; i++ ) {
-                    String snode=  String.format("%d: %s", i, rec[i] ) ;
-                    DefaultMutableTreeNode child= new DefaultMutableTreeNode( snode );
-                    node.add( child );
-                    if ( e.getKey().equals(param) ) {
-                        if ( slice1!=null ) {
-                            if ( String.valueOf(i).equals(slice1) ) {
-                                selection= new TreePath( new Object[] { root, node, child } );
+                try {
+                    Variable labl= cdf.getVariable(s);
+                    DefaultMutableTreeNode node= new DefaultMutableTreeNode( e.getKey() );
+                    Object oo= labl.getRecord(0);
+                    if ( !oo.getClass().isArray() || !( String.class.isAssignableFrom( oo.getClass().getComponentType() ) ) ) {
+                        logger.fine("Expected string array in element: "+s);
+                        continue;
+                    }
+                    String[] rec= (String[]) labl.getRecord(0);
+                    for ( int i=0; i<rec.length; i++ ) {
+                        String snode=  String.format("%d: %s", i, rec[i] ) ;
+                        DefaultMutableTreeNode child= new DefaultMutableTreeNode( snode );
+                        node.add( child );
+                        if ( e.getKey().equals(param) ) {
+                            if ( slice1!=null ) {
+                                if ( String.valueOf(i).equals(slice1) ) {
+                                    selection= new TreePath( new Object[] { root, node, child } );
+                                }
+                            } else {
+                                selection= new TreePath( new Object[] { root, node } );
                             }
-                        } else {
-                            selection= new TreePath( new Object[] { root, node } );
                         }
                     }
+                    root.add( node );
+                } catch ( CDFException ex ) {
+                    logger.log(Level.WARNING,"parameter name found: "+s+" referred to by " +e.getKey(),ex);
+                    DefaultMutableTreeNode node= new DefaultMutableTreeNode( e.getKey() );
+                    root.add( node );
                 }
-                root.add( node );
 
             } else {
                 DefaultMutableTreeNode node=  new DefaultMutableTreeNode( e.getKey() );
