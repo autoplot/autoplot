@@ -25,10 +25,12 @@
         to resolve old numbers.
         <p>Bugfixes (2014-05-01):</p>
         <ul>
+            <li>putProperty checks isImmutable flag and copies dataset if it is not mutable.</li>
+            <li>1182: CDF missing component labels resulted in editor failure</li>
             <li>Butterworth high-pass filter scale factor corrected.</li>
             <li>Survey places where locking is done without a try/finally block, which can hang the application.</li>
             <li>imax (index of the maximum value) was incorrectly coded to use MIN_VALUE (1e-308) instead of NEGATIVE_INFINITY</li>
-	    <li>Rob R pointed out RTE when ftp:// is entered and inspect button pressed.</li>
+	        <li>Rob R pointed out RTE when ftp:// is entered and inspect button pressed.</li>
             <li>440: any FileFilter needs to check for null from file.toString().  The DataPointRecorder didn't do this, Bill pointed out.</li>
             <li>don't print a warning when EnumerationUnits have the same ID.  This happens with "default" and is harmless.</li>
             <li>1180: use autoranging consistent with Series for Scatter</li>
