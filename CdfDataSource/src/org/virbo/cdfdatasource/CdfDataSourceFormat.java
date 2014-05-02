@@ -11,6 +11,7 @@ import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import gsfc.nssdc.cdf.Attribute;
 import gsfc.nssdc.cdf.CDF;
+import gsfc.nssdc.cdf.CDFConstants;
 import gsfc.nssdc.cdf.CDFException;
 import gsfc.nssdc.cdf.Entry;
 import gsfc.nssdc.cdf.Variable;
@@ -42,7 +43,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
     CDF cdf;
     Attribute depend_0, depend_1, depend_2;
-    Attribute unitsAttr, lablAxisAttr, catdescAttr, validmaxAttr, validminAttr, fillvalAttr, scalemaxAttr, scaleminAttr;
+    Attribute unitsAttr, lablAxisAttr, catdescAttr, validmaxAttr, validminAttr, fillvalAttr, scalemaxAttr, scaleminAttr, lablAttr;
     Attribute formatAttr, displayTypeAttr;
 
     Map<QDataSet,String> names;
@@ -118,6 +119,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             scalemaxAttr= Attribute.create( cdf, "SCALEMAX", VARIABLE_SCOPE );
             scaleminAttr= Attribute.create( cdf, "SCALEMIN", VARIABLE_SCOPE );
             formatAttr=  Attribute.create( cdf, "FORMAT", VARIABLE_SCOPE );
+            lablAttr= Attribute.create(cdf,"LABL_PTR_1", VARIABLE_SCOPE );
 
         } else {
             if ( file.exists() ) {
@@ -133,7 +135,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 scalemaxAttr= cdf.getAttribute( "SCALEMAX" );
                 scaleminAttr= cdf.getAttribute( "SCALEMIN" );
                 formatAttr=  cdf.getAttribute( "FORMAT" );
-                
+                lablAttr=  cdf.getAttribute( "LABL_PTR_1" );
             } else {
                 cdf = CDF.create( file.toString() );
                 unitsAttr= Attribute.create( cdf, "UNITS", VARIABLE_SCOPE );
@@ -146,6 +148,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 scalemaxAttr= Attribute.create( cdf, "SCALEMAX", VARIABLE_SCOPE );
                 scaleminAttr= Attribute.create( cdf, "SCALEMIN", VARIABLE_SCOPE );
                 formatAttr=  Attribute.create( cdf, "FORMAT", VARIABLE_SCOPE );
+                lablAttr= Attribute.create(cdf,"LABL_PTR_1", VARIABLE_SCOPE );
 
             }
         }
@@ -520,6 +523,28 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
         } else {
             throw new IllegalArgumentException("rank limit");
+        }
+        
+        if ( ds.rank()==2 ) {
+            QDataSet bds= (QDataSet) ds.property(QDataSet.BUNDLE_1);
+            if ( bds!=null ) {
+                
+                String[] arr= new String[bds.length()];
+                
+                long len= 0;
+                for ( int i=0; i<bds.length(); i++ ) {
+                    String label= (String) bds.property(QDataSet.NAME,i);
+                    if ( label==null ) label= "ch_"+i;
+                    len= Math.max( len, label.length() );
+                    arr[i]= label;
+                }
+                Variable lvar = Variable.create(cdf, name+"_LABELS", CDFConstants.CDF_CHAR,
+                    len, 1L, new long[]{bds.length()}, VARY, new long[]{VARY});
+                
+                lvar.putRecord(0,arr);
+                                            
+                var.putEntry( lablAttr, CDF_CHAR, name+"_LABELS" );
+            }
         }
         copyMetadata(units, var, ds);
         return var;
