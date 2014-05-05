@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -29,7 +30,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Text;
 
 /**
  *
@@ -49,8 +49,17 @@ public class CdawebVapServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        response.setContentType("text/x-autoplot-vap+xml;charset=UTF-8");
+        response.setHeader("Content-Disposition","inline; filename=\"x.vap\"" );
+        
         PrintWriter out = response.getWriter();
+        
+        Map<String,String> uris= new LinkedHashMap();
+        uris.put("data_1","vap+inline:timegen('2014-01-17','60s',1440),ripples(1440)");
+        uris.put("data_2","vap+inline:timegen('2014-01-17','60s',1440),rand(1440)+ripples(1440)*100");
+
+        String timeRange= "2014-01-16 23:00 to 2014-01-18 01:00";
+        
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -58,14 +67,21 @@ public class CdawebVapServlet extends HttpServlet {
             Element vap= doc.createElement("vap");
             doc.appendChild(vap);            
             vap.setAttribute("appVersionTag","");
-            vap.setAttribute("domVersion","1.07");
+            vap.setAttribute("domVersion","1.08");
             
             Element app= doc.createElement("Application");
-            app.setAttribute("id","app_0");
+            app.setAttribute("id","app_1");
             
             vap.appendChild(app);
 
-            Element bindings= createArray( doc, "BindingModel", 0, "bindings" );
+            Element bindings= createArray( doc, "BindingModel", 2, "bindings" );
+            for ( int i=0; i<uris.size(); i++ ) {
+                Element b1= doc.createElement("property");
+                b1.setAttribute("default","null");
+                b1.setAttribute("type","propertyBinding");
+                b1.setAttribute("value","app_1.timeRange to xaxis_"+(i+1)+".range (app_1)");
+                bindings.appendChild(b1);
+            }
             app.appendChild(bindings);
             
             Element canvas= createCanvasAndLayout(doc);
@@ -74,30 +90,38 @@ public class CdawebVapServlet extends HttpServlet {
             Element connectorClass= createArray( doc, "Connector", 0, "connectors" );
             app.appendChild(connectorClass);
                         
-            Map<String,String> uris= new HashMap();
-            uris.put("data_0","vap+inline:ripples(20)");
-            uris.put("data_1","vap+inline:ripples(20,20)");
             Element dss= createDataSourceFilters(doc,uris);
             app.appendChild(dss);
 
-            Map<String,PlotDescriptor> plotDescriptors= new HashMap<String, PlotDescriptor>();
-            plotDescriptors.put("plot_0",new PlotDescriptor());
-            plotDescriptors.put("plot_1",new PlotDescriptor());            
+            Map<String,PlotDescriptor> plotDescriptors= new LinkedHashMap<String, PlotDescriptor>();
+            plotDescriptors.put("plot_1",new PlotDescriptor());
+            plotDescriptors.put("plot_2",new PlotDescriptor());            
             Element plots= createPlots(doc,plotDescriptors);
             app.appendChild(plots);
             
-            Map<String,Map<String,String>> plotss= new HashMap<String,Map<String,String>>();
+            Map<String,Map<String,String>> plotss= new LinkedHashMap<String,Map<String,String>>();
             Map<String,String> aplot;
-            aplot= new HashMap<String,String>();
-            aplot.put("dataSourceFilterId","data_0");
-            aplot.put("plotId","plot_0");
-            plotss.put( "plotElement_0", aplot );
             aplot= new HashMap<String,String>();
             aplot.put("dataSourceFilterId","data_1");
             aplot.put("plotId","plot_1");
             plotss.put( "plotElement_1", aplot );
+            aplot= new HashMap<String,String>();
+            aplot.put("dataSourceFilterId","data_2");
+            aplot.put("plotId","plot_2");
+            plotss.put( "plotElement_2", aplot );
+
             Element plotElements= createPlotElements(doc,plotss);
             app.appendChild(plotElements);
+            
+            // add the timeRange to the file.
+            Element trp= doc.createElement( "property" );
+            trp.setAttribute("name", "timeRange");
+            trp.setAttribute("type", "datumRange");
+            Element tr= doc.createElement("datumRange");
+            tr.setAttribute("units","us2000");
+            tr.setAttribute("value",timeRange );
+            trp.appendChild(tr);
+            app.appendChild(trp);
             
             //write the content into xml file
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -134,16 +158,21 @@ public class CdawebVapServlet extends HttpServlet {
         Element plots;
         plots= createArray(doc, "PlotElement", 2, "plotElements" );
         for ( Entry<String,Map<String,String>> aplotss: pplotss.entrySet()  ) {
-            plots.appendChild( createPlotElement( doc, aplotss.getValue() ) );
+            plots.appendChild( createPlotElement( doc, aplotss.getKey(), aplotss.getValue() ) );
         }
         return plots;
     }
     
-     private Element createPlotElement( Document doc, Map<String,String> pe ) {
+     private Element createPlotElement( Document doc, String id, Map<String,String> pe ) {
         Element plotElement= doc.createElement("PlotElement");
+                        
+        addProperty( doc, plotElement, "autoComponent", "Boolean", "true" );
+        addProperty( doc, plotElement, "autoLabel", "Boolean", "true" );
+        addProperty( doc, plotElement, "autoRenderType", "Boolean", "true" );
         addProperty( doc, plotElement, "plotId", "String", pe.get("plotId") );
         addProperty( doc, plotElement, "dataSourceFilterId", "String", pe.get("dataSourceFilterId") );
-        //plotElement.setAttribute("id", id );
+        addProperty( doc, plotElement, "renderType", "enum:org.virbo.autoplot.RenderType", "series" );
+        plotElement.setAttribute("id", id );
         return plotElement;
     }
      
@@ -155,25 +184,34 @@ public class CdawebVapServlet extends HttpServlet {
         String xlabel, ylabel, zlabel;
     }
     
+    /**
+     * 
+     * @param doc
+     * @param plotDescriptors map of plot_INT to properties.
+     * @return 
+     */
     private Element createPlots( Document doc, Map<String,PlotDescriptor> plotDescriptors ) {
         Element plots;
         plots= createArray(doc, "Plot", 2, "plots" );
         for ( Entry<String,PlotDescriptor> plot: plotDescriptors.entrySet()  ) {
-            plots.appendChild( createPlot( doc, plot.getKey(), plot.getValue() ) );
+            int i= plot.getKey().indexOf("_");
+            int iid= Integer.valueOf(plot.getKey().substring(i+1));
+            Element plotE= createPlot( doc, plot.getKey(), iid, plot.getValue() );
+            plots.appendChild( plotE );
         }
         return plots;
     }
     
-    private Element createPlot( Document doc, String id, PlotDescriptor pd ) {
+    private Element createPlot( Document doc, String id, int iid, PlotDescriptor pd ) {
         Element plot= doc.createElement("Plot");
-        addProperty( doc, plot, "xaxis", "Axis", createAxis( doc, pd.xmin, pd.xmax, pd.xlog, pd.xlabel ) );
-        addProperty( doc, plot, "yaxis", "Axis", createAxis( doc, pd.ymin, pd.ymax, pd.ylog, pd.ylabel ) );
-        addProperty( doc, plot, "zaxis", "Axis", createAxis( doc, pd.zmin, pd.zmax, pd.zlog, pd.zlabel ) );
+        addProperty( doc, plot, "xaxis", "DomNode", createAxis( doc, "xaxis_"+iid, iid, pd.xmin, pd.xmax, pd.xlog, pd.xlabel ) ); //TODO: Why not Axis instead of DomNode
+        addProperty( doc, plot, "yaxis", "DomNode", createAxis( doc, "yaxis_"+iid, iid, pd.ymin, pd.ymax, pd.ylog, pd.ylabel ) );
+        addProperty( doc, plot, "zaxis", "DomNode", createAxis( doc, "zaxis_"+iid, iid, pd.zmin, pd.zmax, pd.zlog, pd.zlabel ) );
         plot.setAttribute("id", id );
         return plot;
     }
     
-    private Element createAxis( Document doc, String min, String max, boolean log, String label ) {
+    private Element createAxis( Document doc, String id, int iid, String min, String max, boolean log, String label ) {
         Element axis= doc.createElement("Axis");
         if ( min==null ) {
             addProperty( doc, axis, "autoRange", "Boolean", "true" );
@@ -187,6 +225,7 @@ public class CdawebVapServlet extends HttpServlet {
             addProperty( doc, axis, "log", "Boolean", String.valueOf(log) );
             addProperty( doc, axis, "label", "String", label );
         }
+        axis.setAttribute( "id", id );
         return axis;
     }
     
