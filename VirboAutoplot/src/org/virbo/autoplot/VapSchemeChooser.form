@@ -26,6 +26,8 @@
                   <Component id="v1_06CB" min="-2" max="-2" attributes="0"/>
                   <Component id="currentVersionCB" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="embedDataCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="v1_07CB" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="v1_08CB" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -37,10 +39,14 @@
               <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
               <Component id="currentVersionCB" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="v1_08CB" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="v1_07CB" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="v1_06CB" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="embedDataCheckBox" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="68" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -59,13 +65,25 @@
         <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
           <ComponentRef name="buttonGroup1"/>
         </Property>
-        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Save as current version"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="embedDataCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" value="Embed data within .vap file"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JRadioButton" name="v1_07CB">
+      <Properties>
+        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+          <ComponentRef name="buttonGroup1"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="v1.07 (Autoplot 2013)"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JRadioButton" name="v1_08CB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="v1.08 (Autoplot 2014)"/>
       </Properties>
     </Component>
   </SubComponents>
