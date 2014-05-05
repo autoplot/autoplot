@@ -74,7 +74,7 @@ public class StatePersistence {
      * @return
      */
     public static AbstractVapScheme currentScheme() {
-        return new Vap1_07Scheme();
+        return new Vap1_08Scheme();
     }
 
     public static void saveState( File f, Object state ) throws IOException {
@@ -131,6 +131,10 @@ public class StatePersistence {
 
         VapScheme scheme;
         if ( sscheme.equals("") ) {
+            scheme= new Vap1_07Scheme();
+        } else if ( sscheme.equals("1.08") ) {
+            scheme= new Vap1_08Scheme();
+        } else if ( sscheme.equals("1.07") ) {
             scheme= new Vap1_07Scheme();
         } else if ( sscheme.equals("1.06") ) {
             scheme= new Vap1_06Scheme();
@@ -432,7 +436,7 @@ public class StatePersistence {
                 }
 
                 Element dom= getChildElement( root, "Application" );
-                state= (Application) SerializeUtil.getDomNode( dom, new Vap1_07Scheme() ); //TODO: I don't think this is used any more.
+                state= (Application) SerializeUtil.getDomNode( dom, new Vap1_08Scheme() ); //TODO: I don't think this is used any more.
 
             }
 
