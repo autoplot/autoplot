@@ -101,6 +101,7 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.bookmarks.BookmarksException;
+import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.CanvasController;
 import org.virbo.datasource.HtmlResponseIOException;
@@ -1074,8 +1075,13 @@ public class ApplicationModel {
                 continue; // findbugs NP_NULL_ON_SOME_PATH
             }
             if ( !srcVal.equals(dstVal) ) {
-                System.err.println( "fixing inconsistent vap where bound values were not equal: "
-                        +m.getSrcId()+"."+m.getSrcProperty() +"!="+m.getDstId()+"."+m.getDstProperty() );
+                if ( dst instanceof Axis && m.getDstProperty().equals("range") && ((Axis)dst).isAutoRange() ) {
+                    logger.log( Level.FINE, "fixing inconsistent vap where bound values were not equal: {0}.{1}!={2}.{3}", 
+                            new Object[]{m.getSrcId(), m.getSrcProperty(), m.getDstId(), m.getDstProperty()});
+                } else {
+                    logger.log( Level.WARNING, "fixing inconsistent vap where bound values were not equal: {0}.{1}!={2}.{3}", 
+                            new Object[]{m.getSrcId(), m.getSrcProperty(), m.getDstId(), m.getDstProperty()});
+                }
                 BeanProperty.create(m.getDstProperty()).setValue(dst,srcVal);
             }
         }
