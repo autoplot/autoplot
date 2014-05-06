@@ -651,9 +651,9 @@ public class ApplicationModel {
     }
 
     /**
-     * suppress repeats of the same URI.
+     * suppress repeats of the same URI.  https://sourceforge.net/p/autoplot/bugs/1184/
      */
-    String lastRecent= "";
+    String lastRecent= ""; 
     long lastRecentTime= 0;
     long lastRecentCount= 1; // number of times we used this uri.
     
