@@ -823,7 +823,11 @@ public class PlotElementController extends DomNodeController {
             Exception renderException= null;
             if (fillDs != null) {
                 final String comp= plotElement.getComponent().trim();
-                logger.log(Level.FINE, "updateDataSetImmediately: {0} {1} {2}", new Object[]{plotElement, plotElement.getRenderType(), resetPlotElement});
+                logger.log(Level.FINE, "updateDataSetImmediately: {0} {1}", new Object[]{plotElement, plotElement.getRenderType() });
+                logger.log(Level.FINE, "  resetPlotElement: {0}", resetPlotElement );
+                logger.log(Level.FINE, "  resetRanges: {0}", resetRanges);
+                logger.log(Level.FINE, "  resetRenderType: {0}", resetRenderType );
+                
                 if (resetPlotElement) {
                     if ( getRenderer()!=null ) getRenderer().setDataSet(null); //bug1065
                     if (comp.equals("")) {
@@ -2596,8 +2600,7 @@ public class PlotElementController extends DomNodeController {
         Renderer oldRenderer= getRenderer();
         maybeCreateDasPeer();
         if ( getRenderer()!=null && getRenderer()!=oldRenderer ) {
-            QDataSet oldDs= oldRenderer==null ? null : oldRenderer.getDataSet();
-            //QDataSet oldDs= getDataSet();  // TODO: what about sprocess?
+            QDataSet oldDs= getDataSet(); // TODO: this needs review.  There was a comment about slices, but this works fine.  Old code 
             if ( oldDs!=null ) {
                 getRenderer().setDataSet(oldDs);
             }
