@@ -424,12 +424,12 @@ public class DataSourceController extends DomNodeController {
                         if ( node1!=dom ) {
                             dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
                         }
-                        update( );
+                        update(true);
                     } else {
                         logger.fine("unable to use timerange as guide");
                         if ( p!=null ) p.setContext( getTsb().getTimeRange() );
                         timeSeriesBrowseController.setupGen( node1, propertyName );
-                        update( );
+                        update(true);
                     }
                 } else {
                     logger.log(Level.FINE, "using plot context for TSB: {0}", this.dsf.getUri());
@@ -442,11 +442,11 @@ public class DataSourceController extends DomNodeController {
                             if ( bm!=null ) dom.controller.deleteBinding(bm);
                         }
                     }
-                    update( );
+                    update(true);
                 }
 
             } else {
-                update( );
+                update(true);
             }
         }
         }
@@ -1256,11 +1256,20 @@ public class DataSourceController extends DomNodeController {
     }
 
     /**
-     * update the model and view using the new DataSource to create a new dataset,
-     * then inspecting the dataset to decide on axis settings.
-     *
+     * update the model and view using the new DataSource to create a new dataset.
+     * This calls update(false), indicating this was not triggered in response to a
+     * human event.
      */
     public void update() {
+        update(false);
+    } 
+    
+    /**
+     * update the model and view using the new DataSource to create a new dataset.
+     * @param user true if this is in response to a user action (e.g. not FilePollUpdates)
+     */
+    public void update( final boolean user) {
+        
         synchronized ( dscLock ) {
         changesSupport.registerPendingChange(this, PENDING_UPDATE);
         changesSupport.performingChange(this, PENDING_UPDATE);
