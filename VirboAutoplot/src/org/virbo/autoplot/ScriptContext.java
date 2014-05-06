@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import javax.swing.JComponent;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
 import org.das2.util.awt.PdfGraphicsOutput;
@@ -437,7 +438,7 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * add a tab to the running application.  A new tab will be added with the
-     * label.
+     * label, with the component added within a scroll pane.
      * @param label the label for the component.
      * @param c the component to add.
      */
@@ -453,7 +454,9 @@ public class ScriptContext extends PyJavaInstance {
                         break;
                     }
                 }
-                view.getTabs().add(label,c);        
+                JScrollPane jsp= new JScrollPane();
+                jsp.getViewport().add(c);
+                view.getTabs().add(label,jsp);        
             }
         };
         if ( SwingUtilities.isEventDispatchThread() ) {
