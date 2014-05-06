@@ -651,6 +651,13 @@ public class ApplicationModel {
     }
 
     /**
+     * suppress repeats of the same URI.
+     */
+    String lastRecent= "";
+    long lastRecentTime= 0;
+    long lastRecentCount= 1; // number of times we used this uri.
+    
+    /**
      * add the URI to the recently used list, and to the user's
      * autoplot_data/bookmarks/history.txt.  No interpretation is done
      * as of June 2011, and pngwalk: and script: uris are acceptable.
@@ -689,47 +696,62 @@ public class ApplicationModel {
             newValue.remove(0);
         }
 
-        String nodeName= "recent";
 
-        File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
-        if ( !f2.exists() ) {
-            boolean ok= f2.mkdirs();
-            if ( !ok ) {
-                throw new RuntimeException("unable to create folder "+ f2 );
+        if ( surl.equals(lastRecent) ) { // suppress repeats until the surl changes.
+            lastRecentTime= System.currentTimeMillis();
+            lastRecentCount++;
+            
+        } else {        
+            String nodeName= "recent";
+
+            File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
+            if ( !f2.exists() ) {
+                boolean ok= f2.mkdirs();
+                if ( !ok ) {
+                    throw new RuntimeException("unable to create folder "+ f2 );
+                }
             }
-        }
 
-        final File f = new File( f2, nodeName + ".xml");
+            final File f = new File( f2, nodeName + ".xml");
 
-        OutputStream out= null;
-        try {
-            out= new FileOutputStream(f);
-            Bookmark.formatBooks(out,newValue);
-        } catch ( IOException ex ) {
-            logger.log(Level.SEVERE,ex.getMessage(),ex);
-        } finally {
+            OutputStream out= null;
             try {
-                if ( out!=null ) out.close();
+                out= new FileOutputStream(f);
+                Bookmark.formatBooks(out,newValue);
             } catch ( IOException ex ) {
                 logger.log(Level.SEVERE,ex.getMessage(),ex);
+            } finally {
+                try {
+                    if ( out!=null ) out.close();
+                } catch ( IOException ex ) {
+                    logger.log(Level.SEVERE,ex.getMessage(),ex);
+                }
             }
-        }
-
-        // always tack on the URI to history.dat file
-        final File f3 = new File( f2, "history.txt");
-        FileWriter out3=null;
-        try {
-            out3 = new FileWriter( f3, true );
-            TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
-            Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
-            out3.append( tp.format( now, null) + "\t" + surl + "\n" );
-            out3.close();
-        } catch ( IOException ex ) {
-            logger.log(Level.SEVERE,ex.getMessage(),ex);
-            if ( out3!=null ) try {
+        
+            // always tack on the URI to history.dat file
+            final File f3 = new File( f2, "history.txt");
+            FileWriter out3=null;
+            try {
+                out3 = new FileWriter( f3, true );                
+                TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+                long lnow= System.currentTimeMillis();
+                if ( lastRecent!=null && lastRecentCount>1 ) {
+                    Datum then= Units.t1970.createDatum(lastRecentTime/1000.);
+                    out3.append( tp.format( then ) + "\t" + lastRecent + "\n" ); 
+                } 
+                lastRecent= surl;
+                lastRecentTime= lnow;
+                lastRecentCount= 1;
+                Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
+                out3.append( tp.format( now, null) + "\t" + surl + "\n" );
                 out3.close();
-            } catch (IOException ex1) {
-                logger.log(Level.SEVERE, ex1.getMessage(), ex1);
+            } catch ( IOException ex ) {
+                logger.log(Level.SEVERE,ex.getMessage(),ex);
+                if ( out3!=null ) try {
+                    out3.close();
+                } catch (IOException ex1) {
+                    logger.log(Level.SEVERE, ex1.getMessage(), ex1);
+                }
             }
         }
 
