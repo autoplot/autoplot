@@ -2338,7 +2338,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         for (PlotElement p : application.getPlotElements()) {  // kludge to avoid reset range
             p.controller.setResetPlotElement(false);  // see https://sourceforge.net/tracker/index.php?func=detail&aid=2985891&group_id=199733&atid=970682
             p.controller.setResetComponent(false);
-            p.controller.setResetRanges(false);
+            //p.controller.setResetRanges(false);
             //p.controller.doResetRenderType( p.getRenderType() );
             p.controller.setResetRenderType(false);
             p.controller.setDsfReset(true); // dataSourcesShould be resolved.
