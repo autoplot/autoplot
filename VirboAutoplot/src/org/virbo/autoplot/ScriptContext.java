@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
@@ -434,6 +435,23 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void setStatus( String message ) {
         dom.getController().setStatus(message);
+    }
+    
+    /**
+     * show a popup that you know the user will see.  Note HTML code will
+     * work.
+     * @param message 
+     */
+    public static void alert( String message ) {
+        String m= message;
+        int messageType= JOptionPane.INFORMATION_MESSAGE;
+        if ( m.startsWith("warning:") ){
+            m= m.substring(8).trim();
+            messageType= JOptionPane.WARNING_MESSAGE;
+        }
+        
+        JOptionPane.showMessageDialog( view, m, "Message", messageType );
+        dom.getController().setStatus("warning: "+m);
     }
 
     /**
