@@ -1653,7 +1653,8 @@ public class PlotElementController extends DomNodeController {
                 try {
                     fillDs = processDataSet(comp, fillDs);
                 } catch (Exception ex) {
-                    throw new RuntimeException(ex);
+                    logger.log( Level.WARNING, null, ex );
+                    return;
                 }
                 props= processProperties( comp, props ); //TODO: support components
                 if ( props.isEmpty() ) { // many of the filters drop the properties
