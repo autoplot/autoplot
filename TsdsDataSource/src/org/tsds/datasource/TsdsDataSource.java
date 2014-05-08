@@ -325,10 +325,10 @@ class TsdsDataSource extends AbstractDataSource {
         return new TimeSeriesBrowse() {
 
             public void setTimeRange(DatumRange dr) {
-                System.out.println(dr);
+                logger.log(Level.FINE, "{0}", dr);
                 timeRange = quantizeTimeRange(dr);
-                System.out.println(timeRange);
-                System.out.println(timeRange.width());
+                logger.log(Level.FINE, "{0}",timeRange);
+                logger.log(Level.FINE, "{0}",timeRange.width());
             }
 
             public void setTimeResolution(Datum d) {

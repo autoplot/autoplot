@@ -7,12 +7,14 @@ package org.tsds.datasource;
 
 import java.text.ParseException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
+import org.das2.datum.LoggerManager;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
@@ -22,6 +24,8 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 public class TsdsTimeSeriesBrowse implements TimeSeriesBrowse {
 
+    private static final Logger logger = LoggerManager.getLogger("apdss.tsds");
+    
     /**
      * current timeRange, which will be quantized to granule boundaries.
      */
@@ -50,7 +54,7 @@ public class TsdsTimeSeriesBrowse implements TimeSeriesBrowse {
         }
         double resdays = resolution.doubleValue(Units.days);
         double dppd = 1 / resdays;
-        int ppd = ppds[ppds.length - 1];
+        int ppd;
         for (int i = 0; i < ppds.length && ppds[i] <= parameterPpd; i++) {
             if (ppds[i] > dppd) {
                 ppd = ppds[i];
@@ -62,10 +66,10 @@ public class TsdsTimeSeriesBrowse implements TimeSeriesBrowse {
 
 
     public void setTimeRange(DatumRange dr) {
-        System.out.println(dr);
+        logger.log(Level.FINE, "{0}", dr);
         timeRange = quantizeTimeRange(dr);
-        System.out.println(timeRange);
-        System.out.println(timeRange.width());
+        logger.log(Level.FINE, "{0}",timeRange);
+        logger.log(Level.FINE, "{0}",timeRange.width());        
     }
 
     public void setTimeResolution(Datum d) {
