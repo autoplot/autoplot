@@ -963,6 +963,14 @@ public class CdfFileDataSource extends AbstractDataSource {
                 }
                 Variable variable = cdf.getVariable(svariable);
                 attributes= readAttributes(cdf, variable, 0);
+                if ("no".equals(map.get("interpMeta") )) {
+                    attributes.remove("DEPEND_0");
+                    attributes.remove("DEPEND_1");
+                    attributes.remove("DEPEND_2");
+                    attributes.remove("DEPEND_3");
+                    attributes.remove("DEPEND_4");
+                }
+        
                 CdfFileDataSourceFactory.closeCDF(cdf);
                 return attributes; // transient state
             } catch (CDFException ex) {
