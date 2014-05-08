@@ -526,7 +526,8 @@ public class ScriptContext extends PyJavaInstance {
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
         writeToPng( filename, width, height );
-        setStatus("wrote to "+filename);
+        File f= new File(filename);
+        setStatus("wrote to "+f.getAbsolutePath());
     }
 
     private static void maybeMakeParent( String filename ) throws IOException {
