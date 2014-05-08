@@ -16,6 +16,9 @@ import org.das2.util.monitor.ProgressMonitor;
  */
 public class DiskUsageModel {
 
+    /**
+     * File to number of kilobytes.
+     */
     Map<File, Long> dirUsage = new HashMap<File, Long>();
 
     private boolean notLink(File f) {
@@ -98,6 +101,11 @@ public class DiskUsageModel {
 
     }
 
+    /**
+     * return the number of kilobytes used under the directory.
+     * @param f the directory.
+     * @return the number of kilobytes.s
+     */
     public Long usage(File f) {
         try {
             File nf= f.getCanonicalFile();
