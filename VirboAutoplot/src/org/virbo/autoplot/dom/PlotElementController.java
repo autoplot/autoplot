@@ -2161,14 +2161,17 @@ public class PlotElementController extends DomNodeController {
 
             //TODO: this cheesy old code needs to be addressed sometime, perhaps introducing more nodes under plot defaults
             if (fillDs.length() > LARGE_DATASET_COUNT) {
+                logger.fine("dataset has many points, turning off connector");
                 peleCopy.getStyle().setSymbolConnector(PsymConnector.NONE);
                 peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
                 peleCopy.getStyle().setSymbolSize(1.0);
             } else {
                 peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
                 if (fillDs.length() > SYMSIZE_DATAPOINT_COUNT) {
+                    logger.fine("dataset has a more than few points, using small symbols");
                     peleCopy.getStyle().setSymbolSize(1.0);
                 } else {
+                    logger.fine("dataset has few points, using small large symbols");
                     peleCopy.getStyle().setSymbolSize(3.0);
                 }
 
