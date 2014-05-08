@@ -27,7 +27,8 @@ import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Variable;
 
 /**
- *
+ * Format HDF5 files using the NetCDF library.  These files do not work with Matlab.
+ * 
  * @author jbf
  */
 public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
