@@ -574,7 +574,11 @@ public class CdfFileDataSource extends AbstractDataSource {
                     }
                 }
             } else {
-                logger.log(Level.WARNING, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );
+                if ( UnitsUtil.isTimeLocation(units) ) {
+                    logger.log(Level.FINE, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );                    
+                } else {
+                    logger.log(Level.WARNING, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );
+                }
             }
         }
 
