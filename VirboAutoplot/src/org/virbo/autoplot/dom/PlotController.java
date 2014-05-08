@@ -335,19 +335,44 @@ public class PlotController extends DomNodeController {
             @Override
             public void run() {
                 if ( scanNextRange.min().equals(dr0.max()) ) {
-                    getPlot().getXaxis().getController().getDasAxis().setNextActionLabel("step >>","<html>step to next interval<br>"+scanNextRange);
+                    getPlot().getXaxis().getController().getDasAxis()
+                            .setNextActionLabel("step >>","<html>step to next interval<br>"+scanNextRange);
                 } else {
-                    getPlot().getXaxis().getController().getDasAxis().setNextActionLabel("scan >>","<html>scan to <br>"+scanNextRange);
+                    getPlot().getXaxis().getController().getDasAxis()
+                            .setNextActionLabel("scan >>","<html>scan to <br>"+scanNextRange);
                 }
                 if ( scanPrevRange.max().equals(dr0.min()) ) {
-                    getPlot().getXaxis().getController().getDasAxis().setPreviousActionLabel("<< step","<html>step to previous interval<br>"+scanPrevRange);
+                    getPlot().getXaxis().getController().getDasAxis()
+                            .setPreviousActionLabel("<< step","<html>step to previous interval<br>"+scanPrevRange);
                 } else {
-                    getPlot().getXaxis().getController().getDasAxis().setPreviousActionLabel("<< scan","<html>scan to <br>"+scanPrevRange);
+                    getPlot().getXaxis().getController().getDasAxis()
+                            .setPreviousActionLabel("<< scan","<html>scan to <br>"+scanPrevRange);
                 }
             }
         };
         SwingUtilities.invokeLater(run);
         
+    }
+    
+    /**
+     * fancy class for the purpose of restoring the feedback from elsewhere in 
+     * the system once the mouse action is complete.
+     */
+    private class MyFeedback implements DasMouseInputAdapter.Feedback {
+        String myLastMessage="";
+        String otherLastMessage="";
+        @Override
+        public void setMessage(String message) {
+            if ( message.equals("") ) {
+                if ( getApplication().getController().getStatus().equals(myLastMessage) ) {
+                    getApplication().getController().setStatus(otherLastMessage);
+                }
+            } else {
+                otherLastMessage= getApplication().getController().getStatus();
+                getApplication().getController().setStatus(message);
+            }
+            myLastMessage= message;
+        }
     }
     
     /**
@@ -479,12 +504,7 @@ public class PlotController extends DomNodeController {
         }
         if ( mm!=null ) dasPlot1.getDasMouseInputAdapter().setPrimaryModule(mm);
 
-        DasMouseInputAdapter.Feedback feedback= new DasMouseInputAdapter.Feedback() {
-            @Override
-            public void setMessage(String message) {
-                getApplication().getController().setStatus(message);
-            }
-        };
+        DasMouseInputAdapter.Feedback feedback= new MyFeedback();
         dasPlot1.getDasMouseInputAdapter().setFeedback( feedback );
         
         dasCanvas.add(colorbar, dasPlot1.getRow(), DasColorBar.getColorBarColumn(dasPlot1.getColumn()));
