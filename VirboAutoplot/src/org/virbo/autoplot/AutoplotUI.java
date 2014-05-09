@@ -66,6 +66,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.TooManyListenersException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -2757,7 +2758,8 @@ APSplash.checkTime("init 52.9");
             buffy.append("<h2>Build Information:</h2>");
             buffy.append("<ul>");
             buffy.append("<li>release tag: ").append(AboutUtil.getReleaseTag()).append("</li>");
-
+            buffy.append("<li>build url: ").append(AboutUtil.getJenkinsURL()).append("</li>");
+            
             List<String> bi = Util.getBuildInfos();
             for (String ss : bi) {
                 buffy.append("    <li>").append(ss);
