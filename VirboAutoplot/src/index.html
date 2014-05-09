@@ -13,7 +13,7 @@
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
         </p>
 
-        <p>This is the Autoplot2013b branch.  This is an update to the production version containing bugfixes and minor new features.
+        <p>This is the Autoplot2014a branch.  This is an update to the production version containing bugfixes and minor new features.
             Java 6 is now required.
         </p>
 
@@ -23,9 +23,14 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-05-01):</p>
+        <p>Bugfixes (2014-05-09):</p>
         <ul>
+            <li>doResetRanges no longer throws RuntimeError when component process string fails, allowing ECT file with missing channel to load.</li>
+            <li>MouseModule messages don't clobber Autoplot messages like "plotElement_1 selected"</li>
+            <li>autoRanging was always turned off when loading in vaps, making it more difficult to produce vap files dynamically. v1.08 introduced.</li>
             <li>1184: reduce use of history.txt for repeat URIs motivated by filePollUpdating.</li>
+            <li>1183: clean up old code that was mis-managing transition from stack of series plots to spectrogram fails (Akebono MCA)</li>
+            <li>addTab adds the component in a scroll pane, to protect the rest of the GUI from scripts. (Sebastian's digitizer was huge.)</li>
             <li>putProperty checks isImmutable flag and copies dataset if it is not mutable.</li>
             <li>1182: CDF missing component labels resulted in editor failure</li>
             <li>Butterworth high-pass filter scale factor corrected.</li>
@@ -60,6 +65,8 @@
         </ul>
         <p>Features:</p>
         <ul>      
+            <li>DataPointRecorderNew allows the columns to be pre-set with defaults and old files merged in.</li>
+            <li>cull repeat entries to history.txt to just first and last, filePollUpdates was adding an entry each cycle.</li>
             <li>export to CDF formats labels for rank 2 bundles</li>
             <li>Minor cleanup of html table reader</li>
             <li>completions suggest $Y$m$dT$H$M now</li>
