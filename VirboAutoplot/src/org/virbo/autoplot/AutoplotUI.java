@@ -92,6 +92,8 @@ import javax.swing.JSeparator;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.text.DefaultEditorKit;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.autoplot.pngwalk.CreatePngWalk;
@@ -2764,7 +2766,8 @@ APSplash.checkTime("init 52.9");
 
             buffy.append( "<h2>Open Source Components:</h2>");
             buffy.append( "Autoplot uses many open-source components, such as: <br>");
-            buffy.append( "jsyntaxpane, Jython, Netbeans (Jython completion), OpenDAP, CDF, FITS, NetCDF, POI HSSF (Excel), Batik (SVG), iText (PDF), JSON, JavaCSV, JPG Metadata Extractor, das2, JDiskHog");        
+            buffy.append( "jsyntaxpane, Jython, Netbeans (Jython completion), OpenDAP, CDF, FITS, NetCDF, " 
+                    + "POI HSSF (Excel), Batik (SVG), iText (PDF), JSON, JavaCSV, JPG Metadata Extractor, das2, JDiskHog");        
             
             buffy.append("<h2>Runtime Information:</h2>");
 
@@ -2793,6 +2796,14 @@ APSplash.checkTime("init 52.9");
             jtp.read(new StringReader(buffy.toString()), null);
             jtp.setEditable(false);
 
+            jtp.addHyperlinkListener( new HyperlinkListener() {
+                @Override
+                public void hyperlinkUpdate(HyperlinkEvent e) {
+                    if ( e.getEventType()==HyperlinkEvent.EventType.ACTIVATED ) {
+                        AutoplotUtil.openBrowser( e.getURL().toString() );
+                    }
+                }
+            } );
             final JPopupMenu menu= new JPopupMenu();
             JMenuItem copyItem = menu.add(new DefaultEditorKit.CopyAction());
             copyItem.setText("Copy");
@@ -2818,7 +2829,7 @@ APSplash.checkTime("init 52.9");
             //JLabel label= new JLabel(buffy.toString());
             JScrollPane pane= new JScrollPane(jtp,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
             pane.getVerticalScrollBar().setUnitIncrement( 12 );
-            pane.setPreferredSize(new java.awt.Dimension(jtp.getPreferredSize().width + 50,480));
+            pane.setPreferredSize(new java.awt.Dimension( 640 + 50,480));
 
             AutoplotUtil.showMessageDialog(this, pane, "About Autoplot "+AboutUtil.getReleaseTag(), JOptionPane.INFORMATION_MESSAGE );
 
