@@ -26,6 +26,7 @@ import javax.swing.text.Utilities;
  */
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
+import org.das2.util.LoggerManager;
 import org.python.core.PyClass;
 import org.python.core.PyException;
 import org.python.core.PyJavaClass;
@@ -129,7 +130,7 @@ public class JythonCompletionTask implements CompletionTask {
             eval = eval + "  pass\n";
         }
 
-        Logger logger = Logger.getLogger(JythonCompletionTask.class.getName());
+        Logger logger = LoggerManager.getLogger("jython.editor.completion");
 
         try {
             interp.exec(eval);
@@ -157,6 +158,7 @@ public class JythonCompletionTask implements CompletionTask {
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
+            logger.log(Level.FINEST, "does {0} start {1}", new Object[] { cc.completable, ss } );
             if (ss.startsWith(cc.completable)) {
                 boolean notAlreadyAdded= true;
                 PyObject po;
