@@ -58,6 +58,10 @@ for i in ../../APLibs/lib/commons/*.jar; do
    jar xf $i
 done
 
+if [ "" = "$RSYNC" ]; then
+    RSYNC=rsync
+fi
+
 cd ..
 echo "done copy jar file classes."
 
@@ -153,8 +157,8 @@ for i in \
   FitsDataSource OpenDapDataSource \
   VirboAutoplot; do
     if [ -d ../${i}/javahelp/ ]; then
-        echo rsync -av --exclude .svn ../${i}/javahelp/ temp-classes/
-        rsync -av --exclude .svn ../${i}/javahelp/ temp-classes/
+        echo ${RSYNC} -av --exclude .svn ../${i}/javahelp/ temp-classes/
+        ${RSYNC} -av --exclude .svn ../${i}/javahelp/ temp-classes/
     fi
 done
 
