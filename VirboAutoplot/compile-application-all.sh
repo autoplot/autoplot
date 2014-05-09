@@ -114,6 +114,7 @@ rm temp-classes/META-INF/*.DSA
 rm temp-classes/META-INF/*.SF
 
 cat src/META-INF/build.txt | sed "s/build.tag\:/build.tag\: $TAG/" > temp-classes/META-INF/build.txt
+echo "build.jenkinsURL: $BUILD_URL" >> temp-classes/META-INF/build.txt
 
 export TIMESTAMP=`date -u +%Y-%m-%dT%H:%MZ`
 echo $TIMESTAMP > temp-classes/buildTime.txt
