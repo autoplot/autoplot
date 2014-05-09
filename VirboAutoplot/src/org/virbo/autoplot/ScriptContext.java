@@ -472,9 +472,13 @@ public class ScriptContext extends PyJavaInstance {
                         break;
                     }
                 }
-                JScrollPane jsp= new JScrollPane();
-                jsp.getViewport().add(c);
-                view.getTabs().add(label,jsp);        
+                if ( c instanceof JScrollPane ) {
+                    view.getTabs().add(label,c);
+                } else {
+                    JScrollPane jsp= new JScrollPane();
+                    jsp.getViewport().add(c);
+                    view.getTabs().add(label,jsp);        
+                }
             }
         };
         if ( SwingUtilities.isEventDispatchThread() ) {
