@@ -1980,7 +1980,7 @@ public class AutoplotUtil {
             });        
         }
         
-        JOptionPane.showMessageDialog( parentComponent, message, title, messageType );
+        JOptionPane.showMessageDialog( parentComponent, message, title, messageType, new ImageIcon( AutoplotUtil.getAutoplotIcon() ) );
 
     }
     
