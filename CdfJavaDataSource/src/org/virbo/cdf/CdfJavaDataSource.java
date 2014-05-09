@@ -773,8 +773,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
         Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
         Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
         if ( doPlusMinus 
-                && ( deltaPlus!=null && deltaPlus instanceof String && !deltaPlus.equals(svariable) ) 
-                && (  deltaMinus!=null && deltaMinus instanceof String ) && !deltaPlus.equals(svariable) ) {
+                && ( deltaPlus!=null && deltaPlus instanceof String && ((String)deltaPlus).trim().length()>0 && !deltaPlus.equals(svariable) ) 
+                && (  deltaMinus!=null && deltaMinus instanceof String ) && ((String)deltaPlus).trim().length()>0 && !deltaPlus.equals(svariable) ) {
             Variable var= cdf.getVariable((String)deltaPlus);
             if ( var!=null ) {
                 QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !var.recordVariance(), false, null ); //TODO: slice1
