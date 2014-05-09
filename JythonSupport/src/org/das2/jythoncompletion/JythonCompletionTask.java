@@ -52,7 +52,7 @@ import org.virbo.jythonsupport.JythonUtil;
  */
 public class JythonCompletionTask implements CompletionTask {
 
-    private static final Logger logger= Logger.getLogger("jython.editor");
+    private static final Logger logger= Logger.getLogger("jython.editor.completion");
     
     public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
     JTextComponent editor;
@@ -130,8 +130,6 @@ public class JythonCompletionTask implements CompletionTask {
             eval = eval + "  pass\n";
         }
 
-        Logger logger = LoggerManager.getLogger("jython.editor.completion");
-
         try {
             interp.exec(eval);
         } catch ( PyException ex ) {
@@ -139,9 +137,9 @@ public class JythonCompletionTask implements CompletionTask {
             return;
         }
 
-        PyObject context;
+        PyObject lcontext;
         try {
-            context = interp.eval(cc.contextString);
+            lcontext = interp.eval(cc.contextString);
         } catch (PyException ex) {
             rs.addItem(new MessageCompletionItem("Eval error: " + cc.contextString, ex.toString()));
             return;
@@ -149,7 +147,7 @@ public class JythonCompletionTask implements CompletionTask {
 
         PyList po2;
         try {
-            po2= (PyList) context.__dir__();
+            po2= (PyList) lcontext.__dir__();
         } catch ( PyException e ) {
             logger.log( Level.SEVERE, e.getMessage(), e );
             return;
@@ -163,7 +161,7 @@ public class JythonCompletionTask implements CompletionTask {
                 boolean notAlreadyAdded= true;
                 PyObject po;
                 try {
-                    po = context.__getattr__(s);
+                    po = lcontext.__getattr__(s);
                 } catch (PyException e) {
                     logger.log(Level.FINE, "PyException from \"{0}\":", ss);
                     logger.log( Level.SEVERE, e.getMessage(), e );
@@ -175,20 +173,20 @@ public class JythonCompletionTask implements CompletionTask {
                 String label = ss;
                 String signature = null;
                 String args = "";
-                if (context instanceof PyJavaClass) {
+                if (lcontext instanceof PyJavaClass) {
                     if (po instanceof PyReflectedFunction) {
                         Method m = new PyReflectedFunctionPeeker((PyReflectedFunction) po).getMethod(0);
                         signature = methodSignature(m);
                         args = methodArgs(m);
                     } else if ( po instanceof PyString || po instanceof PyJavaInstance) {
-                        Class c= new PyClassPeeker((PyJavaClass) context).getJavaClass();
+                        Class c= new PyClassPeeker((PyJavaClass) lcontext).getJavaClass();
                         try {
                             Field f = c.getField(ss);
                             signature= fieldSignature(f);
                         } catch ( NoSuchFieldException ex ) {   
                         }
                     }
-                } else if ( context instanceof PyJavaPackage ) {
+                } else if ( lcontext instanceof PyJavaPackage ) {
                     if (po instanceof PyJavaClass) {
                         Class dc = new PyJavaClassPeeker((PyJavaClass)po).getProxyClass();
                         if ( dc.getConstructors().length>0 ) {
@@ -207,8 +205,8 @@ public class JythonCompletionTask implements CompletionTask {
                         //signature = methodSignature(m);
                         //args = methodArgs(m);
                     }
-                } else if (context instanceof PyClass) {
-                    PyClassPeeker peek = new PyClassPeeker((PyClass) context);
+                } else if (lcontext instanceof PyClass) {
+                    PyClassPeeker peek = new PyClassPeeker((PyClass) lcontext);
                     Class dc = peek.getJavaClass();
                     Field f = null;
                     try {
@@ -220,7 +218,7 @@ public class JythonCompletionTask implements CompletionTask {
                         continue;
                     }
                     signature = fieldSignature(f);
-                } else if (context instanceof PyJavaInstance) {
+                } else if (lcontext instanceof PyJavaInstance) {
                     if (po instanceof PyMethod) {
                         PyMethod m = (PyMethod) po;
                         Method jm;
@@ -239,9 +237,9 @@ public class JythonCompletionTask implements CompletionTask {
                             continue;
                         }
                     } else {
-                        PyJavaInstancePeeker peek = new PyJavaInstancePeeker((PyJavaInstance) context);
+                        PyJavaInstancePeeker peek = new PyJavaInstancePeeker((PyJavaInstance) lcontext);
                         Class dc = peek.getInstanceClass();
-                        Method propReadMethod = getReadMethod(context, po, dc, label);
+                        Method propReadMethod = getReadMethod(lcontext, po, dc, label);
                         if (propReadMethod != null) {
                             signature = methodSignature(propReadMethod);
                             args = "";
@@ -262,8 +260,8 @@ public class JythonCompletionTask implements CompletionTask {
                             label = ss;
                         }
                     }
-                } else if ( context instanceof PyObject ) {
-                    PyObject o= context.__dir__();
+                } else if ( lcontext instanceof PyObject ) {
+                    //PyObject o= context.__dir__();
                     label= ss;
                     signature= null;
                     //String link = "http://docs.python.org/library/"; //TODO: this could probably be done
@@ -271,9 +269,9 @@ public class JythonCompletionTask implements CompletionTask {
                     if (po instanceof PyReflectedFunction) {
                         label = ss + "() STATIC JAVA";
                     } else if (po.isCallable()) {
-                        label = ss + "() " + (context instanceof PyJavaInstance ? "JAVA" : "");
+                        label = ss + "() " + (lcontext instanceof PyJavaInstance ? "JAVA" : "");
                         PyMethod m = (PyMethod) po;
-                        Method jm = getJavaMethod(m, 0);
+                        //Method jm = getJavaMethod(m, 0);
                         signature = methodSignature(getJavaMethod(m, 0));
                     } else {
                         logger.fine("");
