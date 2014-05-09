@@ -344,8 +344,8 @@ echo "=== modify jar files for this particular release"
 cd temp-volatile-src
 $JAVAC -d ../temp-volatile-classes external/FileSearchReplace.java
 cd ..
-${JAVA6_HOME}bin/java -target 1.6 -source 1.6 -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
-${JAVA6_HOME}bin/java -target 1.6 -source 1.6 -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
+${JAVA6_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
+${JAVA6_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
 
 # if these are needed.
 # These are needed for the single-jar build.
