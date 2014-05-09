@@ -151,7 +151,6 @@ rm -f temp-volatile-classes/META-INF/*.RSA
 rm -f temp-volatile-classes/META-INF/*.DSA
 rm -f temp-volatile-classes/META-INF/*.SF
 
-export TIMESTAMP=`date +%Y%m%d_%H%M%S`
 cat src/META-INF/build.txt | sed "s/build.tag\:/build.tag\: $TAG/" > temp-volatile-classes/META-INF/build.txt
 echo "build.jenkinsURL: $BUILD_URL" >> temp-volatile-classes/META-INF/build.txt
 
