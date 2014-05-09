@@ -207,7 +207,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                     if ( ex.getMessage().equals("noSuchDataSet") ) {
                         throw new StreamException("noSuchDataSet: "+dataset );
                     } else {
-                        throw ex;
+                        throw new StreamException(ex.getMessage()+"\ndsdf request was\n"+url3);
                     }
                 } finally {
                     channel.close();
@@ -271,7 +271,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                 if ( QDataSetStreamHandler.isFlattenableJoin(result1) ) {
                     result1= eh.flattenJoin(result1);
                 }
-
+                
             } catch ( org.virbo.qstream.StreamException ex ) {
                 Throwable cause= ex.getCause();
                 mon.finished();
@@ -284,8 +284,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                 } else if ( ex.getMessage().contains("Empty response from reader")  ) {
                     throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage());
                 } else {
-                    ex.printStackTrace();
-                    throw ex;
+                    throw new StreamException( ex.getMessage()+ "\ndataset request was\n"+url2 );
                 }
             }
             
