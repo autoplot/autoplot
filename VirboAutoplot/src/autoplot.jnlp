@@ -15,7 +15,7 @@
     href="autoplot.jnlp">
    
     <information> 
-        <title>Autoplot (v2013b)</title>
+        <title>Autoplot (v2014a)</title>
         <vendor>http://virbo.org/</vendor>
 	<homepage href="http://autoplot.org/" />
         <description>plots data from various sources, such as opendap, cdf, and netcdf using das2</description> 
@@ -46,7 +46,7 @@
         <jar href="AutoplotVolatile.jar" />
         <jar href="AutoplotStable.jar" />
         <!--
-        <jar href="../lib/AutoplotStable.jar" />
+        <jar href="../lib/AutoplotStable.20140510.jar" />
         -->
 
         <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-latest.jnlp" />
