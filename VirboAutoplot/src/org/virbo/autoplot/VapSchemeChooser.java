@@ -42,7 +42,7 @@ public class VapSchemeChooser extends javax.swing.JPanel {
             return "1.06";
         } else {
             new Exception("Selected version not implemented").printStackTrace();
-            return "1.06";
+            return "1.08";
         }
     }
 
