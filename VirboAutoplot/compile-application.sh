@@ -83,14 +83,18 @@ mkdir temp-volatile-classes
 echo "copy jar file classes using wget -q..."
 echo "pwd=" `pwd`
 if [ "" = "$AUTOPLOT_STABLE_DIR" ]; then 
+   echo ${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar 
    ${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar # 2>&1 | head -100
+   echo ${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz 
    ${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz # 2>&1 | head -100
    if [ $? -ne 0 ]; then
       echo "wget fails: $WGET -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar"
       exit -1
    fi
 else
+   echo cp ${AUTOPLOT_STABLE_DIR}/AutoplotStable.jar .
    cp ${AUTOPLOT_STABLE_DIR}/AutoplotStable.jar .
+   echo cp ${AUTOPLOT_STABLE_DIR}/AutoplotStable.jar.pack.gz  .
    cp ${AUTOPLOT_STABLE_DIR}/AutoplotStable.jar.pack.gz  .
 fi
 
