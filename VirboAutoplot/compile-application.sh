@@ -80,9 +80,9 @@ mkdir temp-volatile-src/
 rm -r -f temp-volatile-classes/
 mkdir temp-volatile-classes
 
-echo "copy jar file classes using wget -q..."
 echo "pwd=" `pwd`
 if [ "" = "$AUTOPLOT_STABLE_DIR" ]; then 
+   echo "copy jar file classes using wget -q..."
    echo ${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar 
    ${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar # 2>&1 | head -100
    echo ${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz 
@@ -92,6 +92,7 @@ if [ "" = "$AUTOPLOT_STABLE_DIR" ]; then
       exit -1
    fi
 else
+   echo "copy jar file classes using cp..."
    echo cp ${AUTOPLOT_STABLE_DIR}/AutoplotStable.jar .
    cp ${AUTOPLOT_STABLE_DIR}/AutoplotStable.jar .
    echo cp ${AUTOPLOT_STABLE_DIR}/AutoplotStable.jar.pack.gz  .
