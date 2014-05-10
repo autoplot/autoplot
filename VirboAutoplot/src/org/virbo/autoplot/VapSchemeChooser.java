@@ -75,14 +75,19 @@ public class VapSchemeChooser extends javax.swing.JPanel {
         v1_06CB.setText("v1.06 (Autoplot 2010)");
 
         buttonGroup1.add(currentVersionCB);
+        currentVersionCB.setSelected(true);
         currentVersionCB.setText("Save as current version");
+        currentVersionCB.setToolTipText("Save as v1.07 by default.");
 
         embedDataCheckBox.setText("Embed data within .vap file");
+        embedDataCheckBox.setToolTipText("Create zip file containing dom configuration in default.vap, as well as file resources used.");
 
         buttonGroup1.add(v1_07CB);
         v1_07CB.setText("v1.07 (Autoplot 2013)");
+        v1_07CB.setToolTipText("Autoranging disabled");
 
         v1_08CB.setText("v1.08 (Autoplot 2014)");
+        v1_08CB.setToolTipText("v1.08 restores autorange flag within the vap file, to support servers and timerange modifier.");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);

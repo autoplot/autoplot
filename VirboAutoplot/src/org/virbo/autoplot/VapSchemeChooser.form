@@ -65,12 +65,15 @@
         <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
           <ComponentRef name="buttonGroup1"/>
         </Property>
+        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Save as current version"/>
+        <Property name="toolTipText" type="java.lang.String" value="Save as v1.07 by default."/>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="embedDataCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" value="Embed data within .vap file"/>
+        <Property name="toolTipText" type="java.lang.String" value="Create zip file containing dom configuration in default.vap, as well as file resources used."/>
       </Properties>
     </Component>
     <Component class="javax.swing.JRadioButton" name="v1_07CB">
@@ -79,11 +82,13 @@
           <ComponentRef name="buttonGroup1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="v1.07 (Autoplot 2013)"/>
+        <Property name="toolTipText" type="java.lang.String" value="Autoranging disabled"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JRadioButton" name="v1_08CB">
       <Properties>
         <Property name="text" type="java.lang.String" value="v1.08 (Autoplot 2014)"/>
+        <Property name="toolTipText" type="java.lang.String" value="v1.08 restores autorange flag within the vap file, to support servers and timerange modifier."/>
       </Properties>
     </Component>
   </SubComponents>
