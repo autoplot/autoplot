@@ -81,6 +81,7 @@ rm -r -f temp-volatile-classes/
 mkdir temp-volatile-classes
 
 echo "copy jar file classes using wget -q..."
+echo "pwd=" `pwd`
 if [ "" = "$AUTOPLOT_STABLE_DIR" ]; then 
    ${WGET} -q -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar # 2>&1 | head -100
    ${WGET} -q -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz # 2>&1 | head -100
@@ -188,6 +189,7 @@ for i in $( find orbits -type f ); do               # copy in orbits files
 done
 
 cd ..
+echo "pwd=" `pwd`
 echo "done copy resources."
 
 echo "=== copy help files..."
@@ -213,7 +215,7 @@ hasErrors=0
 # compile key java classes.
 echo "=== compile sources..."
 cd temp-volatile-src
-echo `pwd`
+echo "pwd=" `pwd`
 if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then echo "****"; hasErrors=1; fi
