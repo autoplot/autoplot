@@ -162,7 +162,7 @@ public class FilterChainPanel extends JPanel {
         p.setPreferredSize(v);
         
         p.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS );
-
+        p.getVerticalScrollBar().setUnitIncrement(optionsPanel.getFont().getSize());
        int r= AutoplotUtil.showConfirmDialog( this, p, "Add Filter", JOptionPane.OK_CANCEL_OPTION );
        if ( r==JOptionPane.OK_OPTION ) {
            String ss=null;
