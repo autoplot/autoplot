@@ -653,9 +653,11 @@ public class JythonCompletionTask implements CompletionTask {
     }
 
     /**
-     * return a link to the documentation for a java signature
-     * @param signature
-     * @return 
+     * return a link to the documentation for a java signature.  For standard library
+     * things, this goes to Oracle's website.  For other things, this goes
+     * to the Autoplot/Das2 javadocs.
+     * @param signature signature like javax.swing.JCheckBox#paramString()
+     * @return the link, like http://docs.oracle.com/javase/6/docs/api/javax/swing/JCheckBox#paramString()
      */
     private static String getLinkForJavaSignature(String signature) {
         String link = null;
