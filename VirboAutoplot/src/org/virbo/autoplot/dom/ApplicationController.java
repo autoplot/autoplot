@@ -385,6 +385,44 @@ public class ApplicationController extends DomNodeController implements RunLater
         });
         editPlotMenu.add(item);
 
+        item = new JMenuItem(new AbstractAction("Break into Stack of Plots") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
+                List<PlotElement> peles = getPlotElementsFor(domPlot);
+                for (PlotElement pele : peles) {
+                    if ( pele.isActive()==false ) {
+                        ApplicationController.this.deletePlotElement(pele);
+                    }
+                }
+                peles = getPlotElementsFor(domPlot);
+
+                if ( peles.size()<2 ) {
+                    setStatus("Only one plot element...");
+                } else if ( peles.size()>12 ) {
+                    setStatus("Too many plots...");
+                } else {
+                    //TODO: lock me try finally
+                    peles = getPlotElementsFor(domPlot);
+                    PlotElement lastPE= peles.get(peles.size()-1);
+                    for (PlotElement pele : peles) {
+                        PlotElement pelement = pele;
+                        Plot dstPlot = ApplicationController.this.addPlot(LayoutConstants.ABOVE);
+                        if ( pele==lastPE ) {
+                            dstPlot.getXaxis().setDrawTickLabels(true);                            
+                        } else {
+                            dstPlot.getXaxis().setDrawTickLabels(false);
+                        }
+                        pelement.setPlotId(dstPlot.getId());
+                    }
+                    ApplicationController.this.deletePlot(domPlot);
+                    org.virbo.autoplot.dom.DomOps.newCanvasLayout(ApplicationController.this.getApplication());
+                }
+            }
+        });
+        item.setToolTipText("Replace the focus plot with stack of plots.");
+        editPlotMenu.add(item);
+        
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
             @Override
             public void actionPerformed(ActionEvent e) {
