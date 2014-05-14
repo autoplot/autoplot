@@ -43,6 +43,7 @@ import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
 import org.das2.graph.Renderer;
 import org.das2.system.MonitorFactory;
+import org.das2.system.RequestProcessor;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
@@ -94,6 +95,8 @@ public class ApplicationController extends DomNodeController implements RunLater
     
     ActionListener eventListener;
 
+    private static final String PENDING_BREAK_APART = "breakApart";
+    
     public ApplicationController(ApplicationModel model, Application application) {
         super( application );
 
@@ -356,6 +359,60 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         }
     };
+    
+    /**
+     * convert domPlot into a stack of plots that are bound by the x-axis and have
+     * the labels turned off.
+     * @param domPlot the plot to break up.
+     */
+    private void breakIntoStackPlot( Plot domPlot ) {
+        DomLock lock = mutatorLock();
+        lock.lock("Break into Stack of Plots");
+        Lock clock= canvas.controller.dasCanvas.mutatorLock();
+        clock.lock();
+        try {
+            List<PlotElement> peles = getPlotElementsFor(domPlot);
+            for (PlotElement pele : peles) {
+                if ( pele.isActive()==false ) {
+                    ApplicationController.this.deletePlotElement(pele);
+                }
+            }
+            peles = getPlotElementsFor(domPlot);
+
+            if ( peles.size()<2 ) {
+                setStatus("Only one plot element...");
+            } else if ( peles.size()>12 ) {
+                setStatus("Too many plots...");
+            } else {
+                Application dom= ApplicationController.this.getApplication();
+                peles = getPlotElementsFor(domPlot);
+                PlotElement firstPE= peles.get(0);
+                PlotElement lastPE= peles.get(peles.size()-1);
+                for (PlotElement pele : peles) {
+                    PlotElement pelement = pele;
+                    Plot dstPlot = ApplicationController.this.addPlot(LayoutConstants.ABOVE);
+                    pelement.setPlotId(dstPlot.getId());
+                    if ( pele==lastPE ) {
+                        dstPlot.getXaxis().setDrawTickLabels(true);                            
+                    } else {
+                        dstPlot.getXaxis().setDrawTickLabels(false);
+                    }
+                    if ( pele==firstPE ) {
+                        dstPlot.setDisplayTitle(true);                            
+                    } else {
+                        dstPlot.setDisplayTitle(false);                            
+                    }
+                    dstPlot.getXaxis().setLog(false);
+                    bind( dstPlot.getXaxis(), Axis.PROP_RANGE, dom, Application.PROP_TIMERANGE );
+                }
+                ApplicationController.this.deletePlot(domPlot);
+                org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+            }
+        } finally {
+            lock.unlock();
+            clock.unlock();
+        }
+    }
 
     public void fillEditPlotMenu(JMenu editPlotMenu, final Plot domPlot) {
         JMenuItem item;
@@ -389,36 +446,18 @@ public class ApplicationController extends DomNodeController implements RunLater
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);
-                List<PlotElement> peles = getPlotElementsFor(domPlot);
-                for (PlotElement pele : peles) {
-                    if ( pele.isActive()==false ) {
-                        ApplicationController.this.deletePlotElement(pele);
+                registerPendingChange( ApplicationController.this, PENDING_BREAK_APART );
+                Runnable run= new Runnable() {
+                    public void run() {
+                        performingChange(ApplicationController.this, PENDING_BREAK_APART);
+                        breakIntoStackPlot(domPlot);
+                        changePerformed(ApplicationController.this, PENDING_BREAK_APART);
+                        
                     }
-                }
-                peles = getPlotElementsFor(domPlot);
-
-                if ( peles.size()<2 ) {
-                    setStatus("Only one plot element...");
-                } else if ( peles.size()>12 ) {
-                    setStatus("Too many plots...");
-                } else {
-                    //TODO: lock me try finally
-                    peles = getPlotElementsFor(domPlot);
-                    PlotElement lastPE= peles.get(peles.size()-1);
-                    for (PlotElement pele : peles) {
-                        PlotElement pelement = pele;
-                        Plot dstPlot = ApplicationController.this.addPlot(LayoutConstants.ABOVE);
-                        if ( pele==lastPE ) {
-                            dstPlot.getXaxis().setDrawTickLabels(true);                            
-                        } else {
-                            dstPlot.getXaxis().setDrawTickLabels(false);
-                        }
-                        pelement.setPlotId(dstPlot.getId());
-                    }
-                    ApplicationController.this.deletePlot(domPlot);
-                    org.virbo.autoplot.dom.DomOps.newCanvasLayout(ApplicationController.this.getApplication());
-                }
+                };
+                RequestProcessor.invokeLater(run);
             }
+
         });
         item.setToolTipText("Replace the focus plot with stack of plots.");
         editPlotMenu.add(item);
@@ -2031,7 +2070,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 if ( best==null ) {
                     best= p1;
                 } else {
-                    if ( p1.rowId.equals( p.getRowId() ) ) {
+                    if ( p1.getRowId().equals( p.getRowId() ) ) {
                         best= p1;
                     }
                 }
@@ -2053,7 +2092,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 if ( best==null ) {
                     best= p1;
                 } else {
-                    if ( p1.columnId.equals( p.getColumnId() ) ) {
+                    if ( p1.getColumnId().equals( p.getColumnId() ) ) {
                         best= p1;
                     }
                 }
