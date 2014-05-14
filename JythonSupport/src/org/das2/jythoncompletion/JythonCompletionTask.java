@@ -618,6 +618,10 @@ public class JythonCompletionTask implements CompletionTask {
                 } else if (po.isNumberType()) {
                     if ( po.getType().getFullName().equals("javaclass")  ) {
                         label = ss;
+                        PyJavaClassPeeker peek= new PyJavaClassPeeker((PyJavaClass)po);
+                        Class jclass= peek.getProxyClass();
+                        String n= jclass.getCanonicalName();
+                        signature=  join( n.split("\\."), "/") + ".html#"+ jclass.getSimpleName() + "()";
                     } else if ( po.getType().getFullName().equals("javapackage")  ) {
                         label = ss;
                     } else { //TODO: check for PyFloat, etc.
@@ -628,14 +632,15 @@ public class JythonCompletionTask implements CompletionTask {
                             label = ss + " = " + sss;
                         }
                     }
+                } else if ( po instanceof PyJavaClass ) {
+                    
                 } else {
                     logger.fine("");
                 }
                 
                 String link = null;
                 if (signature != null) {
-                    String autoplotDoc= "http://autoplot.org/developer.scripting#";
-                    link = autoplotDoc + ss;
+                    link= getLinkForJavaSignature(signature);
                 }
                 if ( ss.equals("dom") ) {
                     link= "http://autoplot.org/developer.scripting#DOM";
@@ -652,7 +657,7 @@ public class JythonCompletionTask implements CompletionTask {
      * @param signature
      * @return 
      */
-    private String getLinkForJavaSignature(String signature) {
+    private static String getLinkForJavaSignature(String signature) {
         String link = null;
         if ( signature != null) {
             if ( signature.startsWith("javax") || signature.startsWith("java") || signature.startsWith("org.w3c.dom") || signature.startsWith("org.xml.sax") ) {
