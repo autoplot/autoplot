@@ -1543,6 +1543,31 @@ public class GuiSupport {
         panelMenu.add(item);
         expertMenuItems.add(panelMenu);
 
+        item = new JMenuItem(new AbstractAction("Insert New Plot Above") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                PlotElement pelement = controller.getPlotElement();
+                Plot dstPlot = controller.addPlot(LayoutConstants.ABOVE);
+                pelement.setPlotId(dstPlot.getId());
+            }
+        });
+        panelMenu.add(item);
+        expertMenuItems.add(panelMenu);
+        
+        item = new JMenuItem(new AbstractAction("Insert New Plot Below") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                PlotElement pelement = controller.getPlotElement();
+                Plot dstPlot = controller.addPlot(LayoutConstants.BELOW);
+                pelement.setPlotId(dstPlot.getId());
+            }
+        });
+        panelMenu.add(item);
+        expertMenuItems.add(panelMenu);
+        
+
         item = new JMenuItem(new AbstractAction("Move to Plot Below") {
             @Override
             public void actionPerformed(ActionEvent e) {
