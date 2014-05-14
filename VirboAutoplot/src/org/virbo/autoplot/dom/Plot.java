@@ -56,7 +56,7 @@ public class Plot extends DomNode {
         this.zaxis = zaxis;
         propertyChangeSupport.firePropertyChange(PROP_ZAXIS, oldZaxis, zaxis);
     }
-    protected String title = "";
+    private String title = "";
     /**
      * title for the plot. 
      */
@@ -75,7 +75,7 @@ public class Plot extends DomNode {
     /**
      * do display the title.  Turning this off has the same effect as setting the title to ""
      */
-    protected boolean displayTitle = true;
+    private boolean displayTitle = true;
     public static final String PROP_DISPLAYTITLE = "displayTitle";
 
     public boolean isDisplayTitle() {
@@ -88,7 +88,7 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_DISPLAYTITLE, oldDisplayTitle, displayTitle);
     }
 
-    protected LegendPosition legendPosition = LegendPosition.NE;
+    private LegendPosition legendPosition = LegendPosition.NE;
     public static final String PROP_LEGENDPOSITION = "legendPosition";
 
     public LegendPosition getLegendPosition() {
@@ -118,7 +118,7 @@ public class Plot extends DomNode {
      * indicates that the label was set by a machine, not a human, and can be
      * updated automatically.
      */
-    protected boolean autoLabel = false;
+    private boolean autoLabel = false;
     public static final String PROP_AUTOLABEL = "autoLabel";
 
     public boolean isAutoLabel() {
@@ -136,7 +136,7 @@ public class Plot extends DomNode {
      * be drawn.
      */
     public static final String PROP_VISIBLE = "visible";
-    protected boolean visible = true;
+    private boolean visible = true;
 
     public boolean isVisible() {
         return visible;
@@ -165,7 +165,7 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_AUTOBINDING, oldAutoBinding, autoBinding);
     }
 
-    protected boolean isotropic = false;
+    private boolean isotropic = false;
     public static final String PROP_ISOTROPIC = "isotropic";
 
     public boolean isIsotropic() {
@@ -192,7 +192,7 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange( PROP_COLORTABLE, oldVal, this.colortable );
     }
 
-    protected String rowId="";
+    private String rowId="";
     public static final String PROP_ROWID = "rowId";
 
     public String getRowId() {
@@ -204,7 +204,8 @@ public class Plot extends DomNode {
         this.rowId = rowId;
         propertyChangeSupport.firePropertyChange(PROP_ROWID, oldRowId, rowId);
     }
-    protected String columnId="";
+    
+    private String columnId="";
     public static final String PROP_COLUMNID = "columnId";
 
     public String getColumnId() {
