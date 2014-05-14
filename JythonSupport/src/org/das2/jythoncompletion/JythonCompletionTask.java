@@ -1,7 +1,6 @@
 package org.das2.jythoncompletion;
 
 import java.io.BufferedReader;
-import org.python.core.PyClassPeeker;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -19,16 +18,13 @@ import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
-
-/*
- * This is the engine that does the Jython completions.  We figure out the
- * context and the completable, then query a interpreter.
- */
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
 import org.das2.util.LoggerManager;
 import org.python.core.PyClass;
+import org.python.core.PyClassPeeker;
 import org.python.core.PyException;
+import org.python.core.PyInteger;
 import org.python.core.PyJavaClass;
 import org.python.core.PyJavaClassPeeker;
 import org.python.core.PyJavaInstance;
@@ -52,12 +48,12 @@ import org.virbo.jythonsupport.JythonUtil;
  */
 public class JythonCompletionTask implements CompletionTask {
 
-    private static final Logger logger= Logger.getLogger("jython.editor.completion");
+    private static final Logger logger= LoggerManager.getLogger("jython.editor.completion");
     
     public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
     JTextComponent editor;
     String context;
-    private JythonInterpreterProvider jythonInterpreterProvider;
+    private final JythonInterpreterProvider jythonInterpreterProvider;
 
     public JythonCompletionTask(JTextComponent t) {
         this.editor = t;
@@ -70,6 +66,17 @@ public class JythonCompletionTask implements CompletionTask {
             Method m = dc.getMethod(methodName);
             return m;
         } catch (NoSuchMethodException ex) {
+            if ( po instanceof PyInteger ) {
+                String methodName = "is" + propName.substring(0,1).toUpperCase() + propName.substring(1);
+                try {
+                    Method m = dc.getMethod(methodName);
+                    return m;
+                } catch ( NoSuchMethodException ex2 ) {
+                    return null;
+                } catch ( SecurityException ex2 ) {
+                    return null;
+                }
+            }
             return null;
         } catch (SecurityException ex) {
             return null;
@@ -120,7 +127,8 @@ public class JythonCompletionTask implements CompletionTask {
 
         String eval;
         if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
-            eval= sanitizeLeaveImports( editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition())) );
+            eval = editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
+            eval = JythonUtil.removeSideEffects( eval );
         } else {
             eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
         }
@@ -442,12 +450,7 @@ public class JythonCompletionTask implements CompletionTask {
         PythonInterpreter interp = getInterpreter();
 
         String eval;
-        if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
-            eval= sanitizeLeaveImports( editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition())) );
-        } else {
-            eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
-        }
-
+        eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
         eval = JythonUtil.removeSideEffects( eval );
 
         String ss2= "def getDataSet( st, mon ):\n   return findgen(100)\n\ndef getDataSet( st ):\n   return findgen(100)\n\n";
