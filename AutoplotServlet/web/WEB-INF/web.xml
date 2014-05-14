@@ -22,6 +22,10 @@
         <servlet-name>SecureScriptServlet</servlet-name>
         <servlet-class>org.virbo.autoplot.SecureScriptServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CdawebVapServlet</servlet-name>
+        <servlet-class>org.virbo.autoplot.CdawebVapServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SimpleServlet</servlet-name>
         <url-pattern>/SimpleServlet</url-pattern>
@@ -37,6 +41,10 @@
     <servlet-mapping>
         <servlet-name>SecureScriptServlet</servlet-name>
         <url-pattern>/SecureScriptServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CdawebVapServlet</servlet-name>
+        <url-pattern>/CdawebVapServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
