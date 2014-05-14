@@ -308,7 +308,13 @@ public class JythonCompletionTask implements CompletionTask {
                 "list.append('*')\n" +
                 "list";
 
-        interp.exec(eval);
+        try {
+            interp.exec(eval);
+        } catch ( PyException ex ) {
+            rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
+            return;
+        }
+        
         PyList po2 = (PyList) interp.eval("list");
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
@@ -339,13 +345,13 @@ public class JythonCompletionTask implements CompletionTask {
                 "list\n";
         PyList po2;
 
-        //try {    // this is handled at a higher level now.
-        interp.exec(eval);
-//        } catch ( PyException e ) {  // "no module called c" when c<TAB>
-//            // empty list
-//            e.printStackTrace();
-//            return;
-//        }
+        try {
+            interp.exec(eval);
+        } catch ( PyException ex ) {
+            rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
+            return;
+        }
+
         po2 = (PyList) interp.eval("list");
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
@@ -457,7 +463,13 @@ public class JythonCompletionTask implements CompletionTask {
         logger.fine(ss2);
         interp.exec( ss2  );
         
-        interp.exec(eval);
+        try {
+            interp.exec(eval);
+        } catch ( PyException ex ) {
+            rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
+            return;
+        }
+        
         getLocalsCompletions( interp, cc, rs);
     }
 
