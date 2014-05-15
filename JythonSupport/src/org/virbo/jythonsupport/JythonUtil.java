@@ -1051,6 +1051,8 @@ public class JythonUtil {
                 
                 boolean sideEffect= true;
 
+                
+                
                 if ( inDef==false ) {
                     Matcher defm= defPattern.matcher(s);
                     if ( defm.matches() ) {
@@ -1058,8 +1060,13 @@ public class JythonUtil {
                         sideEffect= false;
                     }
                 } else {
+                    Matcher defm= defPattern.matcher(s);
+                    if ( defm.matches() ) {
+                        if ( sideEffect ) {
+                            result.append("  pass\n");
+                        }
+                    }                    
                     if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
-                        Matcher defm= defPattern.matcher(s);
                         inDef=  defm.matches();
                         if ( inDef ) sideEffect= false; //TODO: what about blank line, this isn't an "END"
                     }
@@ -1084,6 +1091,9 @@ public class JythonUtil {
                 }
 
                 s = reader.readLine();
+            }
+            if ( inDef ) {
+                result.append("  pass\n");
             }
         } catch ( IOException ex ) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
