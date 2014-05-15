@@ -1096,7 +1096,11 @@ public class CdfUtil {
             Variable var = (Variable) v.get(i);
             
             // reject variables that are ordinal data that do not have DEPEND_0.
-            Attribute dep0= cdf.getAttribute("DEPEND_0");
+            Attribute dep0= null;
+            try {
+                dep0= cdf.getAttribute("DEPEND_0");
+            } catch ( CDFException ex ) {
+            }
             boolean hasDep0= false;
             try {
                 if ( dep0!=null && dep0.getEntry(var)!=null ) {
