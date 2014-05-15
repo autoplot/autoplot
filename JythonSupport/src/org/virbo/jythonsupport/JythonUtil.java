@@ -882,9 +882,9 @@ public class JythonUtil {
      * </ul>
      * </p>
      * 
-     * @param reader A reader that has an open Jython file.  This will close the reader!
+     * @param script A string containing the entire Jython program.
      * @return list of parameter descriptions, in the order they were encountered in the file.
-     * @throws IOException
+     * @throws PyException
      */
      public static List<Param> getGetParams( String script ) throws PyException {
          return getGetParams(script,new HashMap<String, String>());
@@ -976,8 +976,8 @@ public class JythonUtil {
 
     /**
      * scrape script for local variables, looking for assignments.
-     * @param script
-     * @return
+     * @param reader the source for the script.  It is closed when the code executes properly.
+     * @return a map of the local variable name to the line containing it.
      */
     public static Map getLocals( BufferedReader reader ) throws IOException {
         
