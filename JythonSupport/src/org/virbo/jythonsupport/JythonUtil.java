@@ -1026,7 +1026,7 @@ public class JythonUtil {
      * return python code that is equivalent, except it has no side-effects like plotting.
      * This code is not exact, for example (a,b)= (1,2) is not supported.  This 
      * code is run to support completions.
-     * @param reader input to read.
+     * @param eval string containing the entire program.
      * @return the script as a string, with side-effects removed.
      */
     public static String removeSideEffects( String eval ) {
