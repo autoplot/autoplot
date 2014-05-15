@@ -82,6 +82,7 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
             System.err.println("Boo, sleep because testing server isn't stopping properly."); //TODO: fix this!
             Thread.sleep(2000);
             
+            System.err.println( "5: "+xaxis.getDatumRange() );
             System.err.println("current directory: "+new File(".").getAbsoluteFile().toString());
             
             ScriptContext.writeToPng( "Test_3pt4_TimeSeriesBrowse.001.png");
