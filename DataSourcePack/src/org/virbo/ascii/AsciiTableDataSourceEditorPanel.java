@@ -277,6 +277,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
             currentTool = Tool.NONE;
             currentToolButton.setSelected(false);
             currentToolButton = null;
+            timesStatusLabel.setText("");
+            headerLabel.setText("");
         }
     }
 
@@ -298,6 +300,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jToggleButton1 = new javax.swing.JToggleButton();
         jLabel5 = new javax.swing.JLabel();
         commentComboBox = new javax.swing.JComboBox();
+        headerLabel = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         timeFormatTextField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -305,6 +308,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         timeFormatToggleButton = new javax.swing.JToggleButton();
         jLabel9 = new javax.swing.JLabel();
         guessTimeFormatToggleButton = new javax.swing.JToggleButton();
+        timesStatusLabel = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -323,6 +327,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         guessFillButton = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         bundleCheckBox = new javax.swing.JCheckBox();
+        dataStatusLabel = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -352,6 +357,11 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jToggleButton1.setAction(createToolAction( "skiplines", Tool.SKIPLINES ));
         jToggleButton1.setText("Select");
         jToggleButton1.setToolTipText("Select the first row to parse as data or column headers.");
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton1ActionPerformed(evt);
+            }
+        });
 
         jLabel5.setText("Comment Prefix:");
         jLabel5.setToolTipText("Select a character that is the beginning of records that can be ignored.  \n");
@@ -375,25 +385,30 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 47, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(18, 18, 18)
-                        .add(jToggleButton1))
+                        .add(jToggleButton1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(headerLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel5)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(commentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 109, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(546, Short.MAX_VALUE))
+                        .add(commentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 109, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(0, 534, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jToggleButton1)
-                    .add(jLabel1))
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(headerLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(jToggleButton1)
+                        .add(jLabel1)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(commentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel5))
-                .addContainerGap(13, Short.MAX_VALUE))
+                .add(25, 25, 25))
         );
 
         jTabbedPane1.addTab("header", jPanel2);
@@ -412,6 +427,11 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         timeFormatToggleButton.setAction(createToolAction( "timeFormat", Tool.TIMEFORMAT ));
         timeFormatToggleButton.setText("Select");
         timeFormatToggleButton.setToolTipText("Select column or range of columns which contain the times.  These column values will be copied into the time format and you will have to create a template.");
+        timeFormatToggleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                timeFormatToggleButtonActionPerformed(evt);
+            }
+        });
 
         jLabel9.setText("<html><em>Specify time format (e.g. $Y$m+$d) when times are not iso8601 or span multiple fields.</em></html>");
 
@@ -423,6 +443,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                 guessTimeFormatToggleButtonActionPerformed(evt);
             }
         });
+
+        timesStatusLabel.setText(" ");
 
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -442,7 +464,11 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(timeFormatToggleButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(guessTimeFormatToggleButton)))
-                .addContainerGap(163, Short.MAX_VALUE))
+                .addContainerGap(167, Short.MAX_VALUE))
+            .add(jPanel3Layout.createSequentialGroup()
+                .add(24, 24, 24)
+                .add(timesStatusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -456,7 +482,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(timeFormatToggleButton)
                     .add(jLabel2)
                     .add(guessTimeFormatToggleButton))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 8, Short.MAX_VALUE)
+                .add(timesStatusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 15, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
         jTabbedPane1.addTab("times", jPanel3);
@@ -552,46 +579,50 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(jLabel3)
-                    .add(jLabel4))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(dep0Columns, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(columnsComboBox, 0, 166, Short.MAX_VALUE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(bundleCheckBox)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(jLabel3)
+                            .add(jLabel4))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jToggleButton2))
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(dep0timeCheckBox)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(dep0Columns, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(columnsComboBox, 0, 166, Short.MAX_VALUE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jToggleButton3)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(4, 4, 4)
-                        .add(jLabel6)
-                        .add(18, 18, 18)
-                        .add(fillValueTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 69, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(5, 5, 5)
-                        .add(jLabel7)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jPanel1Layout.createSequentialGroup()
+                                .add(bundleCheckBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jToggleButton2))
+                            .add(jPanel1Layout.createSequentialGroup()
+                                .add(dep0timeCheckBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jToggleButton3)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(validMinTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(jLabel8)
+                        .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jPanel1Layout.createSequentialGroup()
+                                .add(4, 4, 4)
+                                .add(jLabel6)
+                                .add(18, 18, 18)
+                                .add(fillValueTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 69, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(jPanel1Layout.createSequentialGroup()
+                                .add(5, 5, 5)
+                                .add(jLabel7)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(validMinTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 69, Short.MAX_VALUE)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(validMaxTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 68, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(jToggleButton4)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(guessFillButton)))
+                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jPanel1Layout.createSequentialGroup()
+                                .add(jLabel8)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(validMaxTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 68, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(jPanel1Layout.createSequentialGroup()
+                                .add(jToggleButton4)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(guessFillButton)))
+                        .add(0, 50, Short.MAX_VALUE))
+                    .add(dataStatusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -632,7 +663,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                             .add(dep0timeCheckBox)
                             .add(jToggleButton3))))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(dataStatusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 16, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("data", jPanel1);
@@ -674,7 +706,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jLabel12)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(unitsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 73, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(182, Short.MAX_VALUE))
+                .addContainerGap(184, Short.MAX_VALUE))
         );
 
         jPanel4Layout.linkSize(new java.awt.Component[] {depend0unitsTF, unitsTF}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
@@ -696,7 +728,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                         .add(jLabel13)
                         .add(depend0unitsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("labels", jPanel4);
@@ -713,9 +745,10 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 112, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 118, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE))
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -968,8 +1001,38 @@ private void fillValueTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-F
 }//GEN-LAST:event_fillValueTextFieldFocusLost
 
 private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guessTimeFormatToggleButtonActionPerformed
-    // TODO add your handling code here:
+    if ( jTable1.getSelectedColumn()==-1 ) {
+        timesStatusLabel.setText("select time columns, and the time format is guessed (4 digits implies $Y, 3 implies $j, etc)");
+    }   else { 
+        int[] jj= jTable1.getSelectedColumns();
+        int imin= Integer.MAX_VALUE;
+        int imax= Integer.MIN_VALUE;
+        for ( int j: jj ) {
+            if ( j<imin ) imin=j;
+            if ( j>imax ) imax=j;
+        }
+        timesStatusLabel.setText("selected time columns ("+imin+" though "+imax+") were used to infer time");
+    }
 }//GEN-LAST:event_guessTimeFormatToggleButtonActionPerformed
+
+    private void timeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeFormatToggleButtonActionPerformed
+        if ( jTable1.getSelectedColumn()==-1 ) {
+            timesStatusLabel.setText("select by dragging the data columns that together form the time");
+        }   else { 
+            int[] jj= jTable1.getSelectedColumns();
+            int imin= Integer.MAX_VALUE;
+            int imax= Integer.MIN_VALUE;
+            for ( int j: jj ) {
+                if ( j<imin ) imin=j;
+                if ( j>imax ) imax=j;
+            }
+            timesStatusLabel.setText("selected time columns ("+imin+" though "+imax+") were copied to format");
+        }
+    }//GEN-LAST:event_timeFormatToggleButtonActionPerformed
+
+    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        headerLabel.setText("select the first column of data or column headings");
+    }//GEN-LAST:event_jToggleButton1ActionPerformed
 
     URISplit split = null;
     Map<String,String> params;
@@ -1222,12 +1285,14 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public javax.swing.JCheckBox bundleCheckBox;
     public javax.swing.JComboBox columnsComboBox;
     public javax.swing.JComboBox commentComboBox;
+    public javax.swing.JLabel dataStatusLabel;
     public javax.swing.JComboBox dep0Columns;
     public javax.swing.JCheckBox dep0timeCheckBox;
     public javax.swing.JTextField depend0unitsTF;
     public javax.swing.JTextField fillValueTextField;
     public javax.swing.JButton guessFillButton;
     public javax.swing.JToggleButton guessTimeFormatToggleButton;
+    public javax.swing.JLabel headerLabel;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel10;
     public javax.swing.JLabel jLabel11;
@@ -1258,6 +1323,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public javax.swing.JComboBox timeFormatFieldsComboBox;
     public javax.swing.JTextField timeFormatTextField;
     public javax.swing.JToggleButton timeFormatToggleButton;
+    public javax.swing.JLabel timesStatusLabel;
     public javax.swing.JTextField titleTextField;
     public javax.swing.JTextField unitsTF;
     public javax.swing.JTextField validMaxTextField;
