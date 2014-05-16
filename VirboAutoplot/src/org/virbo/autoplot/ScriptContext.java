@@ -12,7 +12,6 @@ import org.das2.dataset.VectorDataSet;
 import org.das2.graph.DasCanvas;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
-import java.awt.Image;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -22,7 +21,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.net.URL;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -250,7 +248,7 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * bring up the autoplot with the specified URL.
+     * bring up the plot with the specified URI.
      * @param chNum the data source number to reset the URI.
      * @param label for the plot.
      * @param surl a URI to use
@@ -462,6 +460,7 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void addTab( final String label, final JComponent c  ) {
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 maybeInitView();
                 int n= view.getTabs().getComponentCount();
@@ -510,6 +509,21 @@ public class ScriptContext extends PyJavaInstance {
         out.write(o.toString().getBytes());
     }
 
+    /**
+     * return the local filename from the string which can start with file://.
+     * @param filename like "file://tmp/data/autoplot.png"
+     * @return  "/tmp/data/autoplot.png"
+     * @throws IllegalArgumentException if the filename reference is not a local reference.
+     */
+    private static String getLocalFilename( String filename ) {
+        URISplit split= URISplit.parse(filename);
+        if ( !split.scheme.equals("file") ) {
+            throw new IllegalArgumentException("cannot write to "+filename);
+        }
+        filename= split.file.substring(split.scheme.length()+1); //TODO: this is sloppy.
+        if ( filename.startsWith("///" ) ) filename= filename.substring(2);
+        return filename;
+    }
     
     /**
      * write out the current canvas to a png file.
@@ -526,6 +540,7 @@ public class ScriptContext extends PyJavaInstance {
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
             filename= filename + ".png";
         }
+        filename= getLocalFilename(filename);
         waitUntilIdle();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
@@ -535,6 +550,7 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     private static void maybeMakeParent( String filename ) throws IOException {
+        filename= getLocalFilename(filename);
         File file= new File(filename);
         if ( file.getParentFile()!=null ) { // relative filenames are okay.
             if ( !file.getParentFile().exists() ) {
@@ -559,6 +575,7 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.io.IOException
      */
     public static void writeToPng( String filename, int width, int height ) throws InterruptedException, IOException {
+        filename= getLocalFilename(filename);
         
         BufferedImage image = model.canvas.getImage( width, height );
         
@@ -581,6 +598,8 @@ public class ScriptContext extends PyJavaInstance {
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
             filename= filename + ".png";
         }
+
+        filename= getLocalFilename(filename);
 
         waitUntilIdle();
         
@@ -644,6 +663,8 @@ public class ScriptContext extends PyJavaInstance {
         if ( !( filename.endsWith(".pdf") || filename.endsWith(".PDF") ) ) {
             filename= filename + ".pdf";
         }
+        filename= getLocalFilename(filename);
+        
         waitUntilIdle();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
@@ -761,6 +782,8 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.lang.Exception
      */
     public static void formatDataSet(QDataSet ds, String file) throws Exception {
+        file= getLocalFilename(file);
+
         if (!file.contains(":/")) {
             file = new File(file).getCanonicalFile().toString();
         }
@@ -829,7 +852,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
      * @param dstProp a property name such as "label"
      */
-    public static void bind(Object src, String srcProp, Object dst, String dstProp) {
+    public static void bind( Object src, String srcProp, Object dst, String dstProp ) {
         if ( DasApplication.hasAllPermission() ) {
             BeanProperty srcbp= BeanProperty.create(srcProp);
             Object value= srcbp.getValue(src);
@@ -919,9 +942,9 @@ public class ScriptContext extends PyJavaInstance {
      * @param ascii use ascii transfer types.
      */
     public static void dumpToDas2Stream(QDataSet ds, String file, boolean ascii) throws IOException {
-        if (file.startsWith("file:/")) {
-            file = new URL(file).getPath();
-        }
+
+        file= getLocalFilename(file);
+
         OutputStream bufout = new FileOutputStream(file);
         DataSet lds = DataSetAdapter.createLegacyDataSet(ds);
         if (ascii) {
@@ -944,24 +967,19 @@ public class ScriptContext extends PyJavaInstance {
      * @param dir
      */
     public static void mkdir( String dir ) {
-        URISplit split= URISplit.parse(dir);
-        if ( !split.file.endsWith("/") ) {
+        
+        dir= getLocalFilename(dir);
+
+        if ( !dir.endsWith("/") ) {
             throw new IllegalArgumentException("folder name must end in /");
         }
-        String s= split.file;
-        
-        if ( !s.startsWith("file://") ) {
-            throw new IllegalArgumentException("must start with file://: "+dir);
-        } else {
-            s= s.substring(7);
-        }
-        File f= new File(s);
+
+        File f= new File(dir);
         if ( !f.exists() ) {
             if ( !f.mkdirs() ) {
                 throw new IllegalArgumentException("unable to make directory: "+f );
             }
         }
-        return;
     }
 
     /**
@@ -1009,17 +1027,13 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void save( String filename ) throws IOException {
         maybeInitModel();
+        
+        filename= getLocalFilename(filename);
+        
         if ( ! filename.endsWith(".vap") )
             throw new IllegalArgumentException("filename must end in vap");
-        if ( !( filename.startsWith("file:") ) ) {
-            filename= DataSetURI.fromFile(new File(filename));
-        }
-        URISplit split= URISplit.parse(filename);
-        String uri= DataSetURI.fromUri(split.resourceUri);
-        if ( !uri.startsWith("file:/") )
-            throw new IllegalArgumentException("save only supported to files, got "+split.resourceUri);
-        String f= uri.startsWith("file:///") ?  split.file.substring(7) : split.file.substring(5);
-        model.doSave( new File( f ) );
+
+        model.doSave( new File( filename ) );
     }
 
     /**
@@ -1044,7 +1058,7 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * load the .vap file.  This is implemented by calling plot on the URI.
-     * @param filename
+     * @param filename local or remote filename like http://autoplot.org/data/autoplot.vap
      * @throws java.io.IOException
      */
     public static void load( String filename ) throws IOException {
