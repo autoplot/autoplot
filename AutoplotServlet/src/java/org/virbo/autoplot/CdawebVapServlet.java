@@ -50,7 +50,7 @@ public class CdawebVapServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/x-autoplot-vap+xml;charset=UTF-8");
-        response.setHeader("Content-Disposition","inline; filename=\"x.vap\"" );
+        response.setHeader("Content-Disposition","inline; filename=\"default.vap\"" );
         
         PrintWriter out = response.getWriter();
         
