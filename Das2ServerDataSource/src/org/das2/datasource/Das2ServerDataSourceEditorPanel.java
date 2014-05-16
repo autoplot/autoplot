@@ -981,9 +981,15 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         readerParamsTextArea.setText(paramsStr.toString());
 
         updateDas2ServersImmediately(); // this will set serverUrl to the last used server if nothing is specified.
-        this.das2ServerComboBox.setSelectedItem(serverURL);
 
-        jTree1.setModel( waitTreeModel() );
+        Runnable run = new Runnable() {
+            public void run() {
+                das2ServerComboBox.setSelectedItem(serverURL);
+                jTree1.setModel( waitTreeModel() );
+            }
+        };
+        SwingUtilities.invokeLater(run);
+        
         RequestProcessor.invokeLater( getDataSetsRunnable() );
 
     }
