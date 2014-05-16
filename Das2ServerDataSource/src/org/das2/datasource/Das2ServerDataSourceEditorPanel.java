@@ -1103,10 +1103,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 } else {
                     params.append( URLEncoder.encode(ss3[0].trim())).append("=").append( URLEncoder.encode(ss3[1].trim() ));
                 }
-                params.append("%20");  //TODO: I don't think this is correct...  See https://sourceforge.net/p/autoplot/bugs/1103/
+                if ( i<ss.length-1 || j<ss2.length-1 ) {
+                    params.append("%20");  //TODO: I don't think this is correct...  See https://sourceforge.net/p/autoplot/bugs/1103/
+                }
             }
         }
-
+        
         StringBuilder result= new StringBuilder("vap+das2server:");
         result.append(serverURL).append("?").append("dataset=").append(ldataSetId.toString());
         if ( timeRange!=null ) {
@@ -1120,7 +1122,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             result.append("&item=").append(tcaItem.getText().trim());
         }
         
-        if ( params.length()>0 ) result.append("&").append(params.substring(0,params.length()-3));
+        if ( params.length()>0 ) result.append("&").append(params.toString());
         
         
         return result.toString();
