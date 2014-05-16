@@ -105,6 +105,10 @@ public class Das2StreamDataSource extends AbstractDataSource {
                             throw new HtmlResponseIOException( "Expected das2Stream but got html: "+resp, DataSetURI.getWebURL(uri) );
                         } 
                     }
+                } else if ( se.getMessage().equals("NoDataInInterval") ) {
+                    throw new NoDataInIntervalException(se.getMessage());
+                } else if ( se.getCause()!=null && se.getCause() instanceof NoDataInIntervalException ) {
+                    throw (NoDataInIntervalException)se.getCause();
                 }
                 throw se; //TODO: check for HTML response
             }
