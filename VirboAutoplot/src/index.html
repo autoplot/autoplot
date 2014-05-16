@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The PNGWalk Tool is used to verify output of nightly test 2.</small></p>
+        <p><small>"Break into Stack of Plots" action added.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,14 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-05-10):</p>
+        <p>Bugfixes (2014-05-16):</p>
         <ul>
+            <li>current das2server is set on the event thread after Chris showed where sloppy code would occasionally fail.</li>
+            <li>newer Axis scan/step code could get stuck in a infinite loop when invalid bounds were returned (Cindy's data showed this)</li>
+            <li>ascii table editor wasn't resizing with the GUI.</li>
+            <li>EFW produced a CDF file with no depend 0, this should work instead of RTE.<li>
+            <li>boolean properties failed in completions because of "isProp" instead of "getProp"</li>
+            <li>set unit increment on filters list scroll bar on Filters panel.</li>
             <li>default vap version v1.07 was not set properly, and vap files v1.06 by default.</li>
             <li>doResetRanges no longer throws RuntimeError when component process string fails, allowing ECT file with missing channel to load.</li>
             <li>MouseModule messages don't clobber Autoplot messages like "plotElement_1 selected"</li>
@@ -66,6 +72,13 @@
         </ul>
         <p>Features:</p>
         <ul>      
+            <li>add insert new plot above</li>
+            <li>add break into stack of plots</li>
+            <li>Ctrl-F is bound to Fix-Layout feature</li>
+            <li>writeToPng allows "file:///tmp/png/foo.png" because it's easy to assume "file:" would be okay (Takahiro)</li>
+            <li>add showYPosition(false) to the connector between two plots (Kristoff).</li>
+            <li>363: improvements to completions in Jython editor, including JOptionPane.s&lt;C&gt;</li>
+            <li>About Autoplot dialog shows build server location.</li>
             <li>add support for export to CDF use pure-java CDF library.</li>
             <li>"about autoplot" reports the Hudson/Jenkins URL where the code was built.</li>
             <li>356: allow DELTA_PLUS and DELTA_MINUS in CDF to be empty string, so that master file can override incorrect value.</li>
