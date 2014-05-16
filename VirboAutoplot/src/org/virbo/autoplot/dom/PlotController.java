@@ -248,6 +248,20 @@ public class PlotController extends DomNodeController {
     };
 
     /**
+     * 
+     * @param bounds rank 1, two-element bounds
+     * @return true if the bounds are valid.
+     */
+    private static boolean validBounds( QDataSet bounds ) {
+        QDataSet wds= DataSetUtil.weightsDataSet(bounds);
+        if ( wds.value(0)==0 || wds.value(1)==0 ) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    /**
      * A new dataset has been loaded or the axis is focused on a new range.
      * @param dr0 the new range for the axis.
      * @param ds the dataset to find next or previous focus.
@@ -265,22 +279,26 @@ public class PlotController extends DomNodeController {
         if ( ds!=null &&  ds.rank()>0 ) {
             try {
                 QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-                DatumRange limit= DataSetUtil.asDatumRange(bounds);
-                if ( !DatumRangeUtil.isAcceptable(limit,false) ) {
-                    throw new IllegalArgumentException("limit is not acceptable"); // see 10 lines down
-                }
-                limit= DatumRangeUtil.union( limit, dr0 );
-                dr= dr.next();
-                while ( dr.intersects(limit) ) {
-                    QDataSet ds1= SemanticOps.trim( ds, dr, null);
-                    if ( ds1==null || ds1.length()==0 ) {
-                        dr= dr.next();
-                    } else {
-                        //QDataSet box= SemanticOps.bounds(ds1);
-                        //Datum min= DataSetUtil.asDatum( box.slice(0).slice(0) );
-                        //dr= DatumRangeUtil.union( min, min.add(dr.width()) );
-                        //dr= DatumRangeUtil.rescale( dr, -0.05, 0.95 );
-                        break;
+                if ( !validBounds(bounds) ) {
+                    dr= dr.next();
+                } else {
+                    DatumRange limit= DataSetUtil.asDatumRange(bounds);
+                    if ( !DatumRangeUtil.isAcceptable(limit,false) ) {
+                        throw new IllegalArgumentException("limit is not acceptable"); // see 10 lines down
+                    }
+                    limit= DatumRangeUtil.union( limit, dr0 );
+                    dr= dr.next();
+                    while ( dr.intersects(limit) ) {
+                        QDataSet ds1= SemanticOps.trim( ds, dr, null);
+                        if ( ds1==null || ds1.length()==0 ) {
+                            dr= dr.next();
+                        } else {
+                            //QDataSet box= SemanticOps.bounds(ds1);
+                            //Datum min= DataSetUtil.asDatum( box.slice(0).slice(0) );
+                            //dr= DatumRangeUtil.union( min, min.add(dr.width()) );
+                            //dr= DatumRangeUtil.rescale( dr, -0.05, 0.95 );
+                            break;
+                        }
                     }
                 }
             } catch ( InconvertibleUnitsException ex ) {
@@ -299,24 +317,28 @@ public class PlotController extends DomNodeController {
         if ( ds!=null &&  ds.rank()>0 ) {
             try {
                 QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-                DatumRange limit= DataSetUtil.asDatumRange(bounds);
-                if ( !DatumRangeUtil.isAcceptable(limit,false) ) {
-                    throw new IllegalArgumentException("limit is not acceptable"); // see 10 lines down
-                }
-                limit= DatumRangeUtil.union( limit, dr0 );
-                dr= dr.previous();
-                while ( dr.intersects(limit) ) {
-                    QDataSet ds1= SemanticOps.trim( ds, dr, null);
-                    if ( ds1==null || ds1.length()==0 ) {
-                        dr= dr.previous();
-                    } else {
-                        //There's a bug with this where scan is the previous instead of step, and this makes scan quite different than step, since it's non-integer
-                        
-                        //QDataSet box= SemanticOps.bounds(ds1);
-                        //Datum max= DataSetUtil.asDatum( box.slice(0).slice(1) );
-                        //dr= DatumRangeUtil.union( max.subtract(dr.width()), max );
-                        //dr= DatumRangeUtil.rescale( dr, 0.05, 1.05 );
-                        break;
+                if ( !validBounds(bounds) ) {
+                    dr= dr.next();
+                } else {
+                    DatumRange limit= DataSetUtil.asDatumRange(bounds);
+                    if ( !DatumRangeUtil.isAcceptable(limit,false) ) {
+                        throw new IllegalArgumentException("limit is not acceptable"); // see 10 lines down
+                    }
+                    limit= DatumRangeUtil.union( limit, dr0 );
+                    dr= dr.previous();
+                    while ( dr.intersects(limit) ) {
+                        QDataSet ds1= SemanticOps.trim( ds, dr, null);
+                        if ( ds1==null || ds1.length()==0 ) {
+                            dr= dr.previous();
+                        } else {
+                            //There's a bug with this where scan is the previous instead of step, and this makes scan quite different than step, since it's non-integer
+
+                            //QDataSet box= SemanticOps.bounds(ds1);
+                            //Datum max= DataSetUtil.asDatum( box.slice(0).slice(1) );
+                            //dr= DatumRangeUtil.union( max.subtract(dr.width()), max );
+                            //dr= DatumRangeUtil.rescale( dr, 0.05, 1.05 );
+                            break;
+                        }
                     }
                 }
             } catch ( InconvertibleUnitsException ex ) {
