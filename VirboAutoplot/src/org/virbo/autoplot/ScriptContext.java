@@ -511,18 +511,30 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * return the local filename from the string which can start with file://.
+     **<blockquote><pre><small>{@code
+     *    in: file://tmp/data/autoplot.png
+     *   out: /tmp/data/autoplot.png
+     *    in: test016_006.png
+     *   out: test016_006.png
+     *    in: http://autoplot.org/data/
+     *    throws IllegalArgumentException
+     *}</small></pre></blockquote>
      * @param filename like "file://tmp/data/autoplot.png"
      * @return  "/tmp/data/autoplot.png"
      * @throws IllegalArgumentException if the filename reference is not a local reference.
      */
     private static String getLocalFilename( String filename ) {
-        URISplit split= URISplit.parse(filename);
-        if ( !split.scheme.equals("file") ) {
-            throw new IllegalArgumentException("cannot write to "+filename);
+        if ( filename.contains("/") || filename.contains("\\") ) {
+            URISplit split= URISplit.parse(filename);
+            if ( !split.scheme.equals("file") ) {
+                throw new IllegalArgumentException("cannot write to "+filename);
+            }
+            filename= split.file.substring(split.scheme.length()+1); //TODO: this is sloppy.
+            if ( filename.startsWith("///" ) ) filename= filename.substring(2);
+            return filename;
+        } else {
+            return filename;
         }
-        filename= split.file.substring(split.scheme.length()+1); //TODO: this is sloppy.
-        if ( filename.startsWith("///" ) ) filename= filename.substring(2);
-        return filename;
     }
     
     /**
