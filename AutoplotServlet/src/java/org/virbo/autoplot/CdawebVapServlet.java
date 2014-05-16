@@ -37,12 +37,21 @@ import org.w3c.dom.Element;
  */
 public class CdawebVapServlet extends HttpServlet {
 
+    private String getUriParam( HttpServletRequest request, String p ) {
+        String uri= request.getParameter( p );
+        if ( uri==null ) return null;
+        if ( uri.startsWith("vap " ) ) { // vap+inline URI encoding
+            throw new IllegalArgumentException("Escape the pluses: "+uri);
+        }
+        return uri;
+    }
+    
     /**
      * Given a list of URIs, return a vap.
      * <code>GET</code> and
      * <code>POST</code> methods.
      *
-     * @param request servlet request, containing list of URI-encoded, ampersand delimited, URIs.
+     * @param request servlet request, containing list of URI-encoded, ampersand delimited, URIs. data0=, data1=, etc. and timeRange=iso8601
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
@@ -55,10 +64,31 @@ public class CdawebVapServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         
         Map<String,String> uris= new LinkedHashMap();
-        uris.put("data_1","vap+inline:timegen('2014-01-17','60s',1440),ripples(1440)");
-        uris.put("data_2","vap+inline:timegen('2014-01-17','60s',1440),rand(1440)+ripples(1440)*100");
+        int first= 0;
+        String uri= getUriParam( request,"data"+first );
+        if ( uri==null ) { // allow data1 to be the first one.
+            first= 1;
+            uri= getUriParam( request,"data"+first );
+        }
+        while ( uri!=null ) {
+            uris.put( "data_"+first, uri );
+            first++;
+            uri= getUriParam( request,"data"+first );
+        }
+        
+        //uris.put("data_1","vap+inline:timegen('2014-01-17','60s',1440),ripples(1440)");
+        //uris.put("data_2","vap+inline:timegen('2014-01-17','60s',1440),rand(1440)+ripples(1440)*100");
 
-        String timeRange= "2014-01-16 23:00 to 2014-01-18 01:00";
+        if ( uris.isEmpty() ) {
+            throw new IllegalArgumentException("at least data0 must be specified");
+        }
+        
+        //String timeRange= "2014-01-16 23:00 to 2014-01-18 01:00";
+        String timeRange= request.getParameter("timeRange");
+        
+        if ( timeRange==null ) {
+            timeRange="2014-01-01/2014-01-02";
+        }
         
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
