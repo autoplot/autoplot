@@ -41,7 +41,7 @@ public class CdawebVapServlet extends HttpServlet {
         String uri= request.getParameter( p );
         if ( uri==null ) return null;
         if ( uri.startsWith("vap " ) ) { // vap+inline URI encoding
-            throw new IllegalArgumentException("Escape the pluses: "+uri);
+            throw new IllegalArgumentException("Escape the pluses with %2B: "+uri);
         }
         return uri;
     }
