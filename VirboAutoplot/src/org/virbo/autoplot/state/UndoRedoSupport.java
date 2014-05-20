@@ -241,6 +241,7 @@ public class UndoRedoSupport {
      * @return
      */
     private static List<Diff> removeTimeRangeBindings( Application dom, List<Diff> diffs ) {
+        dom= (Application) dom.copy();
         diffs= new ArrayList( diffs );
         List<Diff> timeRangeBound= new ArrayList();
         for (Diff s : diffs) {
