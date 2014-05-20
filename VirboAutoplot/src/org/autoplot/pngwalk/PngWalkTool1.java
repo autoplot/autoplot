@@ -116,6 +116,8 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     
     transient WalkImageSequence seq;
     
+    JMenu navMenu;
+    
     Pattern actionMatch=null;
     String actionCommand=null;
 
@@ -564,6 +566,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_RIGHT, 0 ));
 
         result.add( navMenu );
+        tool.navMenu= navMenu;
+        
+        navMenu.setEnabled(tool.seq!=null);
         
         final JMenu optionsMenu= new JMenu( "Options" );
         JCheckBoxMenuItem persMi= new JCheckBoxMenuItem("Use Perspective");
@@ -751,7 +756,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         }
 
         String show= alm.getValue("goto");
-        if ( !show.equals("") ) {
+        if ( !show.equals("") && seq!=null ) {
             try {      
                 if ( seq.getTimeSpan()!=null ) {
                     seq.gotoSubrange(DatumRangeUtil.parseTimeRange(show));
@@ -761,6 +766,8 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             } catch ( ParseException ex ) {
                 throw new RuntimeException(ex);
             }
+        } else {
+            logger.fine("show was empty or seq was null");
         }
     }
 
@@ -769,6 +776,10 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
      */
     private transient PropertyChangeListener indexListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
+            if ( seq==null ) {
+                logger.fine("seq was null");
+                return;
+            }
             String item= seq.currentImage().getUri().toString();
 
             for ( int i=0; i<actionEnablers.size(); i++ ) {
@@ -798,6 +809,10 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
      */
     private transient PropertyChangeListener qcStatusListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
+            if ( seq==null ) {
+                logger.fine("seq was null");
+                return;
+            }
             if ( seq.getQualityControlSequence()!=null ) {
                 int n[] = seq.getQualityControlSequence().getQCTotals();
                 qcPanel.setStatus(n[0], n[1], n[2], n[3]);
@@ -837,9 +852,11 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         try {
             seq= new WalkImageSequence( surl );
             setNavButtonsEnabled(true);
+            if ( navMenu!=null ) navMenu.setEnabled(true);
         } catch ( Exception ex ) {
             seq= null;
             setNavButtonsEnabled(false);
+            if ( navMenu!=null ) navMenu.setEnabled(false);
             ex.printStackTrace();
         }
 
