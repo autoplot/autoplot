@@ -1588,7 +1588,7 @@ public class PlotController extends DomNodeController {
 //        ac.unbind( this.plot, Plot.PROP_ISOTROPIC, p, DasPlot.PROP_ISOTROPIC );
 //        ac.unbind( this.plot, Plot.PROP_DISPLAYTITLE, p, DasPlot.PROP_DISPLAYTITLE );
 //        ac.unbind( this.plot, Plot.PROP_DISPLAYLEGEND, p, DasPlot.PROP_DISPLAYLEGEND );
-        int i= dom.options.boundCount();
+        //int i= dom.options.boundCount();
         ac.unbind(dom.options, Options.PROP_DRAWGRID, p, "drawGrid");
         ac.unbind(dom.options, Options.PROP_DRAWMINORGRID, p, "drawMinorGrid");
         ac.unbind(dom.options, Options.PROP_FLIPCOLORBARLABEL, this.plot.getZaxis().getController().dasAxis, "flipLabel");
@@ -1601,7 +1601,7 @@ public class PlotController extends DomNodeController {
         ac.unbind( dom.options, Options.PROP_OVERRENDERING, p, DasPlot.PROP_OVERSIZE );
         dom.options.removePropertyChangeListener( Options.PROP_DAY_OF_YEAR, dayOfYearListener );
         dom.options.removePropertyChangeListener( Options.PROP_MOUSEMODULE, mouseModuleListener );
-        System.err.println("removeBindings "+i+" -> "+dom.options.boundCount() );
+        //System.err.println("removeBindings "+i+" -> "+dom.options.boundCount() );
     }
     
     public BindingModel[] getBindings() {
