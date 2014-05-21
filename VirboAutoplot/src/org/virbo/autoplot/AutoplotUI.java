@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.net.URI;
@@ -3282,12 +3283,36 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
     }
 };
 
+private static String getProcessId(final String fallback) {
+    // Note: may fail in some JVM implementations
+    // therefore fallback has to be provided
+
+    // something like '<pid>@<hostname>', at least in SUN / Oracle JVMs
+    final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+    final int index = jvmName.indexOf('@');
+
+    if (index < 1) {
+        // part before '@' empty (index = 0) / '@' not found (index = -1)
+        return fallback;
+    }
+
+    try {
+        return Long.toString(Long.parseLong(jvmName.substring(0, index)));
+    } catch (NumberFormatException e) {
+        // ignore
+    }
+    return fallback;
+}
+
 private void updateFrameTitle() {
      final String suri= applicationModel.getVapFile();
 
     String v= APSplash.getVersion();
     if ( v.equals("untagged_version") ) {
         v= "(dev)";
+    }
+    if ( v.equals("(dev)") ) {
+        v= "(dev"+getProcessId("")+")";
     }
     final String title0= "Autoplot "+v;
     final String isoffline= FileSystem.settings().isOffline() ? " (offline)" : "";
