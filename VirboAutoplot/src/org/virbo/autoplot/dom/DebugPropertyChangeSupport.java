@@ -69,4 +69,12 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
         return result.toString();
     }
     
+    /**
+     * return a list of the explicit properties we are listening to.
+     * @return 
+     */
+    public synchronized String[] getPropNames() {
+        return propNames.toArray( new String[propNames.size()] );
+    }
+    
 }
