@@ -187,7 +187,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 if ( data.rank()==1 ) {
                     addVariableRank1NoVary(dep1, name, new HashMap<String,String>(), new NullProgressMonitor() );
                 } else {
-                    addVariableRankN(data, name, new HashMap<String,String>(), mon );
+                    addVariableRankN( dep1, name, new HashMap<String,String>(), mon );
                 }
             }
             try {
