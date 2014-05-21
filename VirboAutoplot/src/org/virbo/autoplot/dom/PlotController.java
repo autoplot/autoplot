@@ -1588,9 +1588,17 @@ public class PlotController extends DomNodeController {
 //        ac.unbind( this.plot, Plot.PROP_ISOTROPIC, p, DasPlot.PROP_ISOTROPIC );
 //        ac.unbind( this.plot, Plot.PROP_DISPLAYTITLE, p, DasPlot.PROP_DISPLAYTITLE );
 //        ac.unbind( this.plot, Plot.PROP_DISPLAYLEGEND, p, DasPlot.PROP_DISPLAYLEGEND );
-        int i= dom.options.getBoundCount();
-        ac.unbind( dom.options  );
-        System.err.println("removeBindings "+i+" -> "+dom.options.getBoundCount() );
+        int i= dom.options.boundCount();
+        ac.unbind(dom.options, Options.PROP_DRAWGRID, p, "drawGrid");
+        ac.unbind(dom.options, Options.PROP_DRAWMINORGRID, p, "drawMinorGrid");
+        ac.unbind(dom.options, Options.PROP_FLIPCOLORBARLABEL, this.plot.getZaxis().getController().dasAxis, "flipLabel");
+        ac.unbind(dom.options, Options.PROP_TICKLEN, p.getXAxis(), "tickLength");
+        ac.unbind(dom.options, Options.PROP_TICKLEN, p.getYAxis(), "tickLength");
+        ac.unbind(dom.options, Options.PROP_TICKLEN, this.dasColorBar, "tickLength");
+        ac.unbind( dom.options, Options.PROP_PRINTINGLOGLEVEL, p, DasPlot.PROP_PRINTINGLOGLEVEL );
+        ac.unbind( dom.options, Options.PROP_DISPLAYLOGLEVEL, p, DasPlot.PROP_LOG_LEVEL );
+        ac.unbind( dom.options, Options.PROP_LOGMESSAGETIMEOUTSEC, p, DasPlot.PROP_LOG_TIMEOUT_SEC );
+        System.err.println("removeBindings "+i+" -> "+dom.options.boundCount() );
     }
     
     public BindingModel[] getBindings() {
