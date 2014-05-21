@@ -248,11 +248,15 @@ public class UndoRedoSupport {
             Pattern pattern= Pattern.compile("plots\\[(\\d+)\\].xaxis.range");
             Matcher m= pattern.matcher(s.propertyName());
             if ( m.matches() ) {
-                Plot p= dom.getPlots( Integer.parseInt(m.group(1) ) );
-                BindingModel bm= DomUtil.findBinding( dom, p.getXaxis(), "range", dom, "timeRange" );
-                //BindingModel bm= dom.getController().findBinding( p.getXaxis(), "range", dom, "timeRange" );
-                if ( bm!=null ) {
-                    timeRangeBound.add(s);
+                try {
+                    Plot p= dom.getPlots( Integer.parseInt(m.group(1) ) );
+                    BindingModel bm= DomUtil.findBinding( dom, p.getXaxis(), "range", dom, "timeRange" );
+                    //BindingModel bm= dom.getController().findBinding( p.getXaxis(), "range", dom, "timeRange" );
+                    if ( bm!=null ) {
+                        timeRangeBound.add(s);
+                    }
+                } catch ( IndexOutOfBoundsException ex ) {
+                    logger.severe("IndexOutOfBounds error that needs to be fixed because needs synchronization");
                 }
             }
         }
