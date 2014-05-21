@@ -96,58 +96,9 @@ public class PlotController extends DomNodeController {
         this.plot = plot;
         this.plot.addPropertyChangeListener( Plot.PROP_TITLE, labelListener );
         this.plot.addPropertyChangeListener( Plot.PROP_TICKS_URI, ticksURIListener );
-        this.plot.addPropertyChangeListener( Plot.PROP_ID, new PropertyChangeListener() {
-            @Override
-            public void propertyChange( PropertyChangeEvent evt ) {
-                if ( dom.controller.isValueAdjusting() ) return;
-                DomLock lock = dom.controller.mutatorLock();
-                lock.lock( "Changing plot id" );
-                try {
-                    for ( BindingModel b: dom.getBindings() ) {
-                        if ( b.getSrcId().equals(evt.getOldValue() ) ) {
-                            b.srcId= (String)evt.getNewValue();
-                        } 
-                        if ( b.getDstId().equals(evt.getOldValue() ) ) {
-                            b.dstId= (String)evt.getNewValue();
-                        }
-                    }
-                    for ( PlotElement pe: dom.plotElements ) {
-                        if ( pe.getPlotId().equals(evt.getOldValue()) ) {
-                            pe.setPlotId((String) evt.getNewValue());
-                        }
-                    } 
-                } finally {
-                    lock.unlock();
-                }
-            }
-        });
-        dom.options.addPropertyChangeListener( Options.PROP_DAY_OF_YEAR, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                final DasAxis update= PlotController.this.plot.getXaxis().controller.dasAxis;
-                updateAxisFormatter(update);
-            }
-        });
-        dom.options.addPropertyChangeListener( Options.PROP_MOUSEMODULE, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                DasPlot p= dasPlot;
-                MouseModuleType mm= (MouseModuleType) evt.getNewValue();
-                MouseModule m= null;
-                if ( mm==MouseModuleType.boxZoom ) {
-                    m= p.getDasMouseInputAdapter().getModuleByLabel("Box Zoom");
-                } else if ( mm==MouseModuleType.crosshairDigitizer ) {
-                    m= p.getDasMouseInputAdapter().getModuleByLabel("Crosshair Digitizer");
-                } else if ( mm==MouseModuleType.zoomX ) {
-                    m= p.getDasMouseInputAdapter().getModuleByLabel("Zoom X");
-                }
-                if ( m!=null ) {
-                    p.getDasMouseInputAdapter().setPrimaryModule( m );
-                } else {
-                    logger.log( Level.WARNING, "logger note recognized: {0}", mm);
-                }
-            }
-        });
+        this.plot.addPropertyChangeListener( Plot.PROP_ID, idListener );
+        dom.options.addPropertyChangeListener( Options.PROP_DAY_OF_YEAR, dayOfYearListener );
+        dom.options.addPropertyChangeListener( Options.PROP_MOUSEMODULE, mouseModuleListener );
         plot.controller= this;
     }
 
@@ -246,7 +197,62 @@ public class PlotController extends DomNodeController {
             }
          }
     };
+    
+    private PropertyChangeListener idListener=new PropertyChangeListener() {
+        @Override
+        public void propertyChange( PropertyChangeEvent evt ) {
+            if ( dom.controller.isValueAdjusting() ) return;
+            DomLock lock = dom.controller.mutatorLock();
+            lock.lock( "Changing plot id" );
+            try {
+                for ( BindingModel b: dom.getBindings() ) {
+                    if ( b.getSrcId().equals(evt.getOldValue() ) ) {
+                        b.srcId= (String)evt.getNewValue();
+                    } 
+                    if ( b.getDstId().equals(evt.getOldValue() ) ) {
+                        b.dstId= (String)evt.getNewValue();
+                    }
+                }
+                for ( PlotElement pe: dom.plotElements ) {
+                    if ( pe.getPlotId().equals(evt.getOldValue()) ) {
+                        pe.setPlotId((String) evt.getNewValue());
+                    }
+                } 
+            } finally {
+                lock.unlock();
+            }
+        }
+    };
+    
+    private PropertyChangeListener dayOfYearListener= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            final DasAxis update= PlotController.this.plot.getXaxis().controller.dasAxis;
+            updateAxisFormatter(update);
+        }
+     };
 
+    private PropertyChangeListener mouseModuleListener= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            DasPlot p= dasPlot;
+            MouseModuleType mm= (MouseModuleType) evt.getNewValue();
+            MouseModule m= null;
+            if ( mm==MouseModuleType.boxZoom ) {
+                m= p.getDasMouseInputAdapter().getModuleByLabel("Box Zoom");
+            } else if ( mm==MouseModuleType.crosshairDigitizer ) {
+                m= p.getDasMouseInputAdapter().getModuleByLabel("Crosshair Digitizer");
+            } else if ( mm==MouseModuleType.zoomX ) {
+                m= p.getDasMouseInputAdapter().getModuleByLabel("Zoom X");
+            }
+            if ( m!=null ) {
+                p.getDasMouseInputAdapter().setPrimaryModule( m );
+            } else {
+                logger.log( Level.WARNING, "logger note recognized: {0}", mm);
+            }
+        }
+    };
+    
     /**
      * 
      * @param bounds rank 1, two-element bounds
@@ -1169,7 +1175,7 @@ public class PlotController extends DomNodeController {
         return that;
     }
 
-    void removeBindingsPEToColorbar( PlotElement pe ) {
+    private void removeBindingsPEToColorbar( PlotElement pe ) {
         this.dom.controller.unbind( pe.style, PlotElementStyle.PROP_COLORTABLE, this.plot, Plot.PROP_COLORTABLE );
     }
 
@@ -1570,6 +1576,23 @@ public class PlotController extends DomNodeController {
         ac.bind( dom.options, Options.PROP_LOGMESSAGETIMEOUTSEC, p, DasPlot.PROP_LOG_TIMEOUT_SEC );
     }
 
+    /**
+     * remove the bindings created in bindTo.
+     */
+    protected void removeBindings() {
+        ApplicationController ac= dom.controller;
+        DasPlot p= this.dasPlot;
+        // these were unbound already.
+//        ac.unbind( this.plot, Plot.PROP_TITLE, p, DasPlot.PROP_TITLE );
+//        ac.unbind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT );
+//        ac.unbind( this.plot, Plot.PROP_ISOTROPIC, p, DasPlot.PROP_ISOTROPIC );
+//        ac.unbind( this.plot, Plot.PROP_DISPLAYTITLE, p, DasPlot.PROP_DISPLAYTITLE );
+//        ac.unbind( this.plot, Plot.PROP_DISPLAYLEGEND, p, DasPlot.PROP_DISPLAYLEGEND );
+        int i= dom.options.getBoundCount();
+        ac.unbind( dom.options  );
+        System.err.println("removeBindings "+i+" -> "+dom.options.getBoundCount() );
+    }
+    
     public BindingModel[] getBindings() {
         return dom.controller.getBindingsFor(plot);
     }
