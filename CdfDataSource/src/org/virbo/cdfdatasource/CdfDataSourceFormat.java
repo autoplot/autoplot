@@ -4,32 +4,33 @@
  */
 package org.virbo.cdfdatasource;
 
-import java.lang.reflect.Array;
-import org.virbo.datasource.DataSourceUtil;
-import org.das2.datum.Units;
-import org.das2.datum.UnitsConverter;
-import org.das2.datum.UnitsUtil;
 import gsfc.nssdc.cdf.Attribute;
 import gsfc.nssdc.cdf.CDF;
 import gsfc.nssdc.cdf.CDFConstants;
+import static gsfc.nssdc.cdf.CDFConstants.*;
 import gsfc.nssdc.cdf.CDFException;
 import gsfc.nssdc.cdf.Entry;
 import gsfc.nssdc.cdf.Variable;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsConverter;
+import org.das2.datum.UnitsUtil;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
-import org.virbo.datasource.URISplit;
-import org.virbo.datasource.DataSourceFormat;
-import static gsfc.nssdc.cdf.CDFConstants.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.das2.util.LoggerManager;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.DataSourceFormat;
+import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
 
 /**
@@ -183,7 +184,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if (dep1 != null) {
             if ( !append ) {
                 String name= nameFor(dep1);
-                addVariableRank1NoVary(dep1, name, new HashMap<String,String>(), new NullProgressMonitor() );
+                if ( data.rank()==1 ) {
+                    addVariableRank1NoVary(dep1, name, new HashMap<String,String>(), new NullProgressMonitor() );
+                } else {
+                    addVariableRankN(data, name, new HashMap<String,String>(), mon );
+                }
             }
             try {
                 depend_1 = Attribute.create(cdf, "DEPEND_1", VARIABLE_SCOPE);
