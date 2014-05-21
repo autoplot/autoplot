@@ -1806,18 +1806,18 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
 
-        BeanProperty dstBeanProp= BeanProperty.create(dstProp);
-        
-        // double check for binding that already exists.  TODO: shouldn't the code above catch this?
-        for ( Binding b: bc.getBindings() ) {
-            if ( b.getTargetObject().equals(dst) ) {
-                if ( b.getTargetProperty().toString().equals(dstBeanProp.toString()) ) {
-                    logger.log(Level.FINE, "binding already exists: {0}", String.format( "bind {0}.{1} to {2}.{3}", new Object[]{src, srcProp, dst, dstProp}));
-                    return;
-                }
-            }
-        }
-        
+//        BeanProperty dstBeanProp= BeanProperty.create(dstProp);
+//        
+//        // double check for binding that already exists.  TODO: shouldn't the code above catch this?
+//        for ( Binding b: bc.getBindings() ) {
+//            if ( b.getTargetObject().equals(dst) ) {
+//                if ( b.getTargetProperty().toString().equals(dstBeanProp.toString()) ) {
+//                    logger.log(Level.FINE, "binding already exists: {0}", String.format( "bind {0}.{1} to {2}.{3}", new Object[]{src, srcProp, dst, dstProp}));
+//                    return;
+//                }
+//            }
+//        }
+//        
         if (!dstId.equals("???") && !dstId.startsWith("das2:")) {
             Binding binding;
 
@@ -1900,8 +1900,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         synchronized (bindingContexts) {
             for ( Entry<Object,BindingGroup> e: bindingContexts.entrySet() ) {
                 List<Binding> bs= e.getValue().getBindings();
-                System.err.println(e.getKey()+" -> "+ e.getValue() + " (size="+bs.size()+")");
-                if ( bs.size()>7 ) {
+                System.err.println( "== " +e.getKey()+" -> "+ e.getValue() + " (size="+bs.size()+")");
+                if ( bs.size()>0 ) {
                     for ( Binding b: bs ) {
                         System.err.println( 
                                 String.format( " %s.%s->%s.%s", 
