@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
@@ -52,6 +53,7 @@ import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.jdesktop.beansbinding.Converter;
+import org.jdesktop.beansbinding.Property;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.LayoutListener;
@@ -1741,12 +1743,13 @@ public class ApplicationController extends DomNodeController implements RunLater
      * and dst should be a view.  The properties must fire property
      * change events for the binding mechanism to work.
      *
-     * BeansBinding library is appearently not thread-safe.
+     * BeansBinding library is apparently not thread-safe.
      * 
      * Example:
+     *<blockquote><pre><small>{@code
      * model= getApplicationModel()
      * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
-     * 
+     *}</small></pre></blockquote> 
      * @param src java bean such as model.getPlotDefaults()
      * @param srcProp a property name such as "title"
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
@@ -1767,7 +1770,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
         BindingModel bindingModel = new BindingModel(srcId, srcId, srcProp, dstId, dstProp);
-
+        
         if ( application.bindings.contains(bindingModel) ) {
             if ( application.controller.isValueAdjusting() ) {
                 logger.finest("binding already exists, ignoring");
@@ -1803,6 +1806,18 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
 
+        BeanProperty dstBeanProp= BeanProperty.create(dstProp);
+        
+        // double check for binding that already exists.  TODO: shouldn't the code above catch this?
+        for ( Binding b: bc.getBindings() ) {
+            if ( b.getTargetObject().equals(dst) ) {
+                if ( b.getTargetProperty().toString().equals(dstBeanProp.toString()) ) {
+                    logger.log(Level.FINE, "binding already exists: {0}", String.format( "bind {0}.{1} to {2}.{3}", new Object[]{src, srcProp, dst, dstProp}));
+                    return;
+                }
+            }
+        }
+        
         if (!dstId.equals("???") && !dstId.startsWith("das2:")) {
             Binding binding;
 
@@ -1867,6 +1882,39 @@ public class ApplicationController extends DomNodeController implements RunLater
             bindingSupport.unbind( src, srcProp, dst, dstProp );
         }
     }
+    
+    private static String propname( Property p ) {
+        String srcProp= p.toString();
+        int i1= srcProp.indexOf("[");
+        int i2= srcProp.indexOf("]",i1);
+        if ( i1>-1 && i2>i1 ) {
+            srcProp= srcProp.substring(i1+1,i2);
+        }
+        return srcProp;
+    }
+    
+    /**
+     * show the bindings, for debugging purposes.
+     */
+    public void showBindings() {
+        synchronized (bindingContexts) {
+            for ( Entry<Object,BindingGroup> e: bindingContexts.entrySet() ) {
+                List<Binding> bs= e.getValue().getBindings();
+                System.err.println(e.getKey()+" -> "+ e.getValue() + " (size="+bs.size()+")");
+                if ( bs.size()>7 ) {
+                    for ( Binding b: bs ) {
+                        System.err.println( 
+                                String.format( " %s.%s->%s.%s", 
+                                b.getSourceObject(), propname( b.getSourceProperty() ), 
+                                b.getTargetObject(), propname( b.getTargetProperty() ) ) );
+                    }
+                    System.err.println("");
+                }
+                
+            }
+        }
+    }
+    
     /**
      * unbind the object, removing any binding to this node.  For example, when the object is about to be deleted.
      * @param src
@@ -1919,6 +1967,18 @@ public class ApplicationController extends DomNodeController implements RunLater
                     application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
                 }
 
+            }
+            for ( Entry<Object,BindingGroup> e: bindingContexts.entrySet() ) { // app_0.timeRange->plot_0.context
+                BindingGroup bg= e.getValue();
+                List<Binding> remove = new ArrayList<Binding>();
+                for ( Binding b: bg.getBindings() ) {
+                    if ( b.getTargetObject().equals(src) ) {
+                        remove.add(b);
+                    }
+                }
+                for ( Binding b:remove ) {
+                    bg.removeBinding(b);
+                }
             }
         }
         
