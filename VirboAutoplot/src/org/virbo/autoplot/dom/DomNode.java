@@ -146,12 +146,29 @@ public abstract class DomNode implements Cloneable {
 
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+        if ( propertyChangeSupport.getPropertyChangeListeners().length>15000 ) {
+            System.err.println(" propertyChangeSupport.getPropertyChangeListeners().length="+ propertyChangeSupport.getPropertyChangeListeners().length);
+            String [] props= ((DebugPropertyChangeSupport)propertyChangeSupport).getPropNames();
+            for ( String s: props ) {
+                System.err.println("  "+s );
+            }
+        }
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
+        if ( propertyChangeSupport.getPropertyChangeListeners().length>15000 ) {
+            System.err.println(" propertyChangeSupport.getPropertyChangeListeners().length="+ propertyChangeSupport.getPropertyChangeListeners().length);
+        }
     }
 
     protected PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
 
+    /**
+     * try and find the leaks caused by binding...
+     * @return 
+     */
+    public int getBoundCount() {
+        return propertyChangeSupport.getPropertyChangeListeners().length;
+    }
 }
