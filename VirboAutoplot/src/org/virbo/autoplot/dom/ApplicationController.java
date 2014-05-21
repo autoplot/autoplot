@@ -1393,7 +1393,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             unbind(domPlot.getXaxis());
             unbind(domPlot.getYaxis());
             unbind(domPlot.getZaxis());
-            unbindImpl(domPlot); //TODO: I need to remind myself why there are two types of bindings...
+            unbindImpl(domPlot); //These are the bindings between the DOM Object and the Das2 DasPlot implementation.
             unbindImpl(domPlot.getXaxis());
             unbindImpl(domPlot.getYaxis());
             unbindImpl(domPlot.getZaxis());
@@ -1401,6 +1401,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             if ( domPlot.controller==null ) {
                 logger.warning("domPlot.controller is null, this shouldn't happen");
             } else {
+                domPlot.controller.removeBindings();
                 final DasPlot p = domPlot.controller.getDasPlot();
                 final DasColorBar cb = domPlot.controller.getDasColorBar();
                 final DasCanvas lcanvas= this.getDasCanvas();
