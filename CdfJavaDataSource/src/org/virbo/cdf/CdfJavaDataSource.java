@@ -717,7 +717,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                             double s1= s.value(0);
                             for ( int i=1; i<s.length(); i++ ) {
                                 if ( s.value(i)!=s1 ) {
-                                    logger.log( Level.INFO, null, "units are not all the same, unable to use: "+svar );
+                                    logger.log( Level.INFO, "units are not all the same, unable to use: {0}", svar );
                                     okay= false;
                                 }
                             }
