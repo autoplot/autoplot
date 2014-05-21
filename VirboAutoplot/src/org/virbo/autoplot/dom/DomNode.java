@@ -168,7 +168,7 @@ public abstract class DomNode implements Cloneable {
      * try and find the leaks caused by binding...
      * @return 
      */
-    public int getBoundCount() {
+    public int boundCount() {
         return propertyChangeSupport.getPropertyChangeListeners().length;
     }
 }
