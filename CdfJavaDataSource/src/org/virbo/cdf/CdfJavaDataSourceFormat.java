@@ -36,9 +36,9 @@ import org.virbo.dataset.SemanticOps;
 public class CdfJavaDataSourceFormat implements DataSourceFormat {
 
     CDFWriter cdf;
-    Object depend_0, depend_1, depend_2;
-    Object unitsAttr, lablAxisAttr, catdescAttr, validmaxAttr, validminAttr, fillvalAttr, scalemaxAttr, scaleminAttr;
-    Object formatAttr, displayTypeAttr;
+    //Object depend_0, depend_1, depend_2;
+    //Object unitsAttr, lablAxisAttr, catdescAttr, validmaxAttr, validminAttr, fillvalAttr, scalemaxAttr, scaleminAttr;
+    //Object formatAttr, displayTypeAttr;
 
     Map<QDataSet,String> names;
     Map<String,QDataSet> seman;
