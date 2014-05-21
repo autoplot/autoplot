@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 
@@ -181,7 +183,18 @@ public class Application extends DomNode {
     public void setBindings(BindingModel[] bindings) {
         BindingModel[] oldBindings = getBindings();
         this.bindings = Arrays.asList(bindings);
-        propertyChangeSupport.firePropertyChange(PROP_BINDINGS, oldBindings, bindings);
+        try {
+            propertyChangeSupport.firePropertyChange(PROP_BINDINGS, oldBindings, bindings);
+        } catch ( NullPointerException ex ) {
+            try {
+                logger.fine("strange case where script creates NullPointerException");
+                Thread.sleep(100);
+            } catch (InterruptedException ex1) {
+                Logger.getLogger(Application.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+            propertyChangeSupport.firePropertyChange(PROP_BINDINGS, oldBindings, bindings); // thread safety, presumably.  Kludge around this...
+            logger.log(Level.WARNING, null, ex );
+        }
     }
     
     public BindingModel getBindings(int index) {
