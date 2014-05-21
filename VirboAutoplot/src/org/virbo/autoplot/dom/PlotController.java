@@ -1598,6 +1598,9 @@ public class PlotController extends DomNodeController {
         ac.unbind( dom.options, Options.PROP_PRINTINGLOGLEVEL, p, DasPlot.PROP_PRINTINGLOGLEVEL );
         ac.unbind( dom.options, Options.PROP_DISPLAYLOGLEVEL, p, DasPlot.PROP_LOG_LEVEL );
         ac.unbind( dom.options, Options.PROP_LOGMESSAGETIMEOUTSEC, p, DasPlot.PROP_LOG_TIMEOUT_SEC );
+        ac.unbind( dom.options, Options.PROP_OVERRENDERING, p, DasPlot.PROP_OVERSIZE );
+        dom.options.removePropertyChangeListener( Options.PROP_DAY_OF_YEAR, dayOfYearListener );
+        dom.options.removePropertyChangeListener( Options.PROP_MOUSEMODULE, mouseModuleListener );
         System.err.println("removeBindings "+i+" -> "+dom.options.boundCount() );
     }
     
