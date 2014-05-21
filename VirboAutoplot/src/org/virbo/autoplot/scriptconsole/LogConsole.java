@@ -266,7 +266,11 @@ public class LogConsole extends javax.swing.JPanel {
                     if ( parms==null || parms.length==0 ) {
                         recMsg = rec.getMessage();
                     } else {
-                        recMsg = MessageFormat.format( rec.getMessage(), parms );
+                        try {
+                            recMsg = MessageFormat.format( rec.getMessage(), parms );
+                        } catch ( NullPointerException ex ) {
+                            recMsg= String.valueOf( rec.getMessage() ); //TODO: fix this log message! bug https://sourceforge.net/p/autoplot/bugs/1194/
+                        }
                     }
                     if ( ( recMsg==null || recMsg.length()==0 ) && rec.getThrown()!=null ) {
                         recMsg= rec.getThrown().toString();
