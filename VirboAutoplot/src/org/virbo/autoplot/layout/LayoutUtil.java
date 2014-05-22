@@ -99,6 +99,11 @@ public class LayoutUtil {
                 
                     xmin = Math.min(xmin, bounds.x);
                     xmax = Math.max(xmax, bounds.x + bounds.width);
+                    
+                    if ( Math.abs(xmin)>9999 ) {
+                        logger.finer("component messes up bounds: "+cc);
+                        bounds = cc.getBounds();
+                    }
                 }
             }
             if (cc.getRow() == r && cc.isVisible()) {
@@ -140,7 +145,7 @@ public class LayoutUtil {
         boolean changed = false;
 
         if ( Math.abs(xmin)>9999 || Math.abs(xmax)>9999 || Math.abs(ymin)>9999 || Math.abs(ymax)>9999  ) {
-            logger.warning("invalid bounds returned, returning.");
+            logger.fine("invalid bounds returned, returning.");
             return;
         }
         int old;
