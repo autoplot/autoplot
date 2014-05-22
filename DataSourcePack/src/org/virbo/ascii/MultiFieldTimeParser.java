@@ -42,7 +42,7 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
     }
 
     private boolean isNumber( String spec ) {
-        if ( spec.equals("$(ignore)") ) {
+        if ( spec.equals("$(ignore)") || spec.equals("$x") || spec.equals("$X") ) {
             return false;
         } else if ( spec.equals("$b") ) { //TODO: $-1{b}, etc.
             return false;
