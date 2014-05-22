@@ -11,6 +11,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -58,6 +60,7 @@ public class MetadataPanel extends javax.swing.JPanel {
     PlotElement bindToPlotElement =null;
     private QDataSet dsTreeDs;
     private QDataSet componentDs;
+    private NameValueTreeModel statsTree;
 
     /** Creates new form MetadataPanel */
     public MetadataPanel(ApplicationModel applicationModel) {
@@ -403,7 +406,8 @@ public class MetadataPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     private synchronized void updateStatisticsImmediately() {
         assert EventQueue.isDispatchThread() == false;
-
+        final TreeModel unmount= statsTree;
+        
         DataSourceFilter dsf = dom.getController().getDataSourceFilter();
         final LinkedHashMap map = new LinkedHashMap();
 
@@ -477,10 +481,15 @@ public class MetadataPanel extends javax.swing.JPanel {
 
         }
 
+        statsTree= NameValueTreeModel.create("Statistics", map);
+        
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                tree.mountTree(NameValueTreeModel.create("Statistics", map), 20);
+                if (unmount != null) {
+                    tree.unmountTree(unmount);
+                }
+                tree.mountTree(statsTree, 20);
             }
         });
 
