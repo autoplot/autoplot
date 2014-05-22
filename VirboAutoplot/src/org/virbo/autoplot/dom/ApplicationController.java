@@ -76,7 +76,15 @@ public class ApplicationController extends DomNodeController implements RunLater
     DasColumn outerColumn;
     LayoutListener layoutListener;
     boolean headless;
+    
+    /**
+     * binding contexts store each set of bindings as a group.  For example, 
+     * bind( src, srcprop, dst, dstprop ) stores the binding in the context of the src
+     * object, and unbind(src) will remove all of that context's bindings.  
+     * TODO: this all needs review.  I'm not sure what is what...
+     */
     final Map<Object, BindingGroup> bindingContexts;
+    
     //final Map<Object, BindingGroup> implBindingContexts; // these are for controllers to use.
     protected BindingSupport bindingSupport= new BindingSupport();
 
@@ -1675,6 +1683,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                 dsf.getController().fillDataSet=null;
                 dsf.getController().histogram=null;
             }
+            
+            BindingGroup bc= bindingContexts.get(application);
+            bc.unbind();
 
             // reset das2 stuff which may be in a bad state.  This must be done on the event thread.
             Runnable run= new Runnable() {
@@ -1820,17 +1831,21 @@ public class ApplicationController extends DomNodeController implements RunLater
 //        }
 //        
         if (!dstId.equals("???") && !dstId.startsWith("das2:")) {
-            Binding binding;
+            Binding binding= hasBinding( src, srcProp, dst, dstProp );
 
-            binding = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
-            if ( converter!=null ) binding.setConverter( converter );
+            if ( binding!=null ) {
+                logger.fine("binding already exists...");
+            } else {
+                binding = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
+                if ( converter!=null ) binding.setConverter( converter );
 
-            List<BindingModel> bindings = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
-            bindings.add(bindingModel);
-            application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
-            bc.addBinding(binding);
-            binding.bind();
-            this.bindingImpls.put(bindingModel, binding);
+                List<BindingModel> bindings = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
+                bindings.add(bindingModel);
+                application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
+                bc.addBinding(binding);
+                binding.bind();
+                this.bindingImpls.put(bindingModel, binding);
+            }
             
         } else {
             // these are bindings used to implement the application, such as from an Axis to DasAxis.
@@ -1914,6 +1929,27 @@ public class ApplicationController extends DomNodeController implements RunLater
                 
             }
         }
+    }
+    
+    /**
+     * return the binding if the binding exists already.  See also findBindings, which uses different logic.
+     * @param s the source.
+     * @param sp the source property
+     * @param t the targer
+     * @param tp the target property.
+     * @return the binding if it exists already.
+     */
+    private Binding hasBinding( Object s, String sp, Object t, String tp ) {
+        BindingGroup bc= bindingContexts.get(s);
+        List<Binding> bs= bc.getBindings();
+        String lookfor= String.format( "%s.%s->%s.%s", s, sp, t, tp );
+        for ( Binding b: bs ) {
+            String test= String.format( "%s.%s->%s.%s", 
+                    b.getSourceObject(), propname( b.getSourceProperty() ), 
+                    b.getTargetObject(), propname( b.getTargetProperty() ) );
+            if ( test.equals(lookfor ) ) return b;
+        }
+        return null;
     }
     
     /**
