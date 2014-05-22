@@ -558,7 +558,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if ( ",".equals(delim) && !timeFormat.contains(",") ) { 
                 timeFormat= timeFormat.replaceAll("\\+",",");
             }
-            if ( timeFormat.indexOf(" ")==-1 ) {
+            if ( !timeFormat.contains(" ") ) {
                 timeFormat = timeFormat.replaceAll("\\+", " ");
             }
             timeFormat = timeFormat.replaceAll("\\%", "\\$");
