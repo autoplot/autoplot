@@ -23,8 +23,13 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-05-16):</p>
+        <p>Bugfixes (2014-05-21):</p>
         <ul>
+            <li>bug 1195:  Akebono MCA data script shows memory leaks. </li>
+            <li>null pointer exception in logging because of misuse of logger.log( level, template, parms )</li>
+            <li>fix occasional index-out-of-bounds seen when scripting by making defensive copy of application state.</li>
+            <li>rte_1786254278: disable the pngwalk navigate menu when there is no sequence loaded.  Thanks mariahelgacosentino!</li>
+            <li>das2Stream "no data found" exception handled properly</li>
             <li>current das2server is set on the event thread after Chris showed where sloppy code would occasionally fail.</li>
             <li>newer Axis scan/step code could get stuck in a infinite loop when invalid bounds were returned (Cindy's data showed this)</li>
             <li>ascii table editor wasn't resizing with the GUI.</li>
@@ -72,6 +77,9 @@
         </ul>
         <p>Features:</p>
         <ul>      
+            <li>rfe 364: propogate timetags through findex and interpolate.<li>
+            <li>support rank 2 DEPEND_1 in CDF export</li>
+            <li>allow "file:" prefix in writeToPng</li>
             <li>add insert new plot above</li>
             <li>add break into stack of plots</li>
             <li>Ctrl-F is bound to Fix-Layout feature</li>
