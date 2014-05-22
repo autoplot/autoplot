@@ -427,16 +427,18 @@ public class PlotController extends DomNodeController {
         xaxis.addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
-                final DatumRange dr= (DatumRange)evt.getNewValue();
-                final QDataSet ds= pele.size()> 0 ? pele.get(0).getController().getDataSet() : null;
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        updateNextPrevious(dr,ds);
-                    }
-                };
-                new Thread( run, "nextprev" ).start();
+                if ( dom.getOptions().isScanEnabled() ) {
+                    List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
+                    final DatumRange dr= (DatumRange)evt.getNewValue();
+                    final QDataSet ds= pele.size()> 0 ? pele.get(0).getController().getDataSet() : null;
+                    Runnable run= new Runnable() {
+                        @Override
+                        public void run() {
+                            updateNextPrevious(dr,ds);
+                        }
+                    };
+                    new Thread( run, "nextprev" ).start();
+                }
             }
         });
         
