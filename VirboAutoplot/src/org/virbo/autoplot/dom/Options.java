@@ -520,6 +520,22 @@ public class Options extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_LOGMESSAGETIMEOUTSEC, oldLogMessageTimeoutSec, logMessageTimeoutSec);
     }
 
+    /**
+     * scan the data for the next available chunk, instead of stepping to next interval
+     */
+    protected boolean scanEnabled = true;
+    public static final String PROP_SCANENABLED = "scanEnabled";
+
+    public boolean isScanEnabled() {
+        return scanEnabled;
+    }
+
+    public void setScanEnabled(boolean scanEnabled) {
+        boolean oldScanEnabled = this.scanEnabled;
+        this.scanEnabled = scanEnabled;
+        propertyChangeSupport.firePropertyChange(PROP_SCANENABLED, oldScanEnabled, scanEnabled );
+    }
+
 
 
     // Note these are weird: I'm not sure if I've just forgotten items or this was intentional.
@@ -538,6 +554,7 @@ public class Options extends DomNode {
         if ( !exclude.contains(PROP_USE_TIME_RANGE_EDITOR) ) this.setUseTimeRangeEditor(that.isUseTimeRangeEditor());
         if ( !exclude.contains(PROP_FLIPCOLORBARLABEL) ) this.setFlipColorbarLabel(that.isFlipColorbarLabel());
         if ( !exclude.contains(PROP_TICKLEN) ) this.setTicklen( that.getTicklen() );
+        if ( !exclude.contains(PROP_SCANENABLED) ) this.setScanEnabled( that.isScanEnabled() );
     }
 
     @Override
@@ -569,6 +586,8 @@ public class Options extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_FLIPCOLORBARLABEL, that.isFlipColorbarLabel(), this.isFlipColorbarLabel() ));
         b = that.getTicklen().equals(this.getTicklen() );
         if (!b) result.add(new PropertyChangeDiff(PROP_TICKLEN, that.getTicklen(), this.getTicklen()));
+        b = that.isScanEnabled()== this.isScanEnabled();
+        if (!b) result.add(new PropertyChangeDiff(PROP_SCANENABLED, that.isScanEnabled(), this.isScanEnabled() ));
         return result;
     }
 
@@ -583,8 +602,8 @@ public class Options extends DomNode {
         that.setUseTimeRangeEditor( this.isUseTimeRangeEditor() );
         that.setFlipColorbarLabel( this.isFlipColorbarLabel() );
         that.setTicklen( this.getTicklen() );
+        that.setScanEnabled( this.isScanEnabled() );
         return that;
     }
-
 
 }
