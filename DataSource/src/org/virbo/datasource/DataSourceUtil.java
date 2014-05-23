@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
@@ -43,8 +44,10 @@ import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.TimeParser;
 import org.das2.datum.UnitsUtil;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import static org.virbo.datasource.DataSetSelector.logger;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 //import org.virbo.qstream.SimpleStreamFormatter;
@@ -756,6 +759,38 @@ public class DataSourceUtil {
     }
 
     /**
+     * With the URI, establish if it has time series browse and set the timerange
+     * to the given timerange if it does.  For example, modify the bookmark so that the
+     * timerange is the current axis timerange before using it.
+     * @param uri An Autoplot URI, which must resolve to a DataSource.
+     * @param timerange the timerange to use.  If this is null or a non-timerange, then the URI is returned unchanged.
+     * @return A URI that would yield data from the same dataset but for a different time.
+     */
+    public static String setTimeRange( String uri, DatumRange timeRange, ProgressMonitor mon ) throws URISyntaxException, IOException, ParseException {
+        if ( timeRange==null ) {
+            logger.fine("timeRange is null");
+            return uri;
+        }
+        if ( !UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
+            logger.fine("timeRange is not UTC time range");
+            return uri;
+        }
+        DataSourceFactory f = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), mon );
+        TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
+        if ( tsb!=null ) {
+            tsb.setURI(uri);
+            tsb.setTimeRange(timeRange);
+            uri= tsb.getURI();
+            logger.log( Level.FINER, "resetting timerange to {0}: {1}", new Object[]{timeRange, uri});
+        } else {
+            logger.finer("uri is not a TimeSeriesBrowse");
+        }
+
+        return uri;
+    }
+    
+    
+    /**
      * returns a variable name generated from the URI.  This was written for Jython scripting.  A future
      * version of this might attempt to load the resource, and use the name from the result.
      * @param uri
@@ -813,7 +848,7 @@ public class DataSourceUtil {
     }
 
     /**
-     * this will make the exception available.
+     * this will make the exception available.  (Someday. TODO: where is this used?)
      * @param parent
      * @param msg
      * @param title
