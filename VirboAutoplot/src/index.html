@@ -25,6 +25,8 @@
         to resolve old numbers.
         <p>Bugfixes (2014-05-21):</p>
         <ul>
+            <li>rfe 337: Reset timerange when using URIs from bookmarks</li>
+            <li>support $x in timeFormat.</li>
             <li>bug 1195:  Akebono MCA data script shows memory leaks. </li>
             <li>null pointer exception in logging because of misuse of logger.log( level, template, parms )</li>
             <li>fix occasional index-out-of-bounds seen when scripting by making defensive copy of application state.</li>
@@ -36,6 +38,9 @@
             <li>EFW produced a CDF file with no depend 0, this should work instead of RTE.</li>
             <li>boolean properties failed in completions because of "isProp" instead of "getProp"</li>
             <li>set unit increment on filters list scroll bar on Filters panel.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>default vap version v1.07 was not set properly, and vap files v1.06 by default.</li>
             <li>doResetRanges no longer throws RuntimeError when component process string fails, allowing ECT file with missing channel to load.</li>
             <li>MouseModule messages don't clobber Autoplot messages like "plotElement_1 selected"</li>
@@ -61,22 +66,14 @@
             <li>FileStorageModel had an bug where getFiles would return multiple references to the same file, since 2014/3/14</li>
             <li>FileStorageModel was missing getField to make clean way to get the version ($v)</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>rte 1178734273: occasional NullPointer on Windows fixed in file dialog.</li>
-            <li>rte 1677040602: NullPointerException caused by thread issue.</li>
-            <li>extraneous messages about can't serialize Level fixed.</li>
-            <li>embed data didn't work properly with local files, because of double slashes that matter in zip files.</li>
-            <li>improve handling of ephemeris ticks (TCA) when TCA data has gaps by limiting interpolation gaps.</li>
-            <li>getPropertyType had Number as the type of SCALE_TYPE, not String.</li>
-            <li>fix layout looks for rows with the same ID and unused rows.</li>
-            <li>rte1171026815: runtime error during transitions due to unplottable bundle stored in series renderer.</li>
-            <li>#03B1&semi; prints "xxx" so that its more clear that it should have been #x03B1&semi;
-            <li>USER_PROPERTIES from Ascii reader caused crash when FFTPower was looking for Translation property.  Thanks Scott for pointing this out!</li>            
-            <li>FileStorageModelNew renamed to FileStorageModel after 7 years...</li>
-        </ul>
         <p>Features:</p>
         <ul>      
+            <li>keep track of reason why filesystem is offline.</li>
+            <li>add option to disable scan (instead of step), which can cause problems with batch processing</li>
+            <li>add monitor use to example codes in Jython editor.</li>
+            <li>when zoomX is selected, mouse wheel will also only zoom in X.</li>
+            <li>make it less likely to select a long, narrow box, which messes up ranges.</li>
+            <li>rfe 363: improvements to completions in the editor.</li>
             <li>rfe 364: propogate timetags through findex and interpolate.<li>
             <li>support rank 2 DEPEND_1 in CDF export</li>
             <li>allow "file:" prefix in writeToPng</li>
@@ -87,6 +84,9 @@
             <li>add showYPosition(false) to the connector between two plots (Kristoff).</li>
             <li>363: improvements to completions in Jython editor, including JOptionPane.s&lt;C&gt;</li>
             <li>About Autoplot dialog shows build server location.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>add support for export to CDF use pure-java CDF library.</li>
             <li>"about autoplot" reports the Hudson/Jenkins URL where the code was built.</li>
             <li>356: allow DELTA_PLUS and DELTA_MINUS in CDF to be empty string, so that master file can override incorrect value.</li>
@@ -110,14 +110,6 @@
             <li>enumerationUnit entries can be defined within the qstream as they occur.</li>
             <li>FileStorageModel has getFilesFor( String[] ref )</li>
             <li>FileStorageModel has getField("v") to retrieve version and other custom fields.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>replaceFile dialog improved with pickfile button.</li>
-            <li>allowEmbedData system property added to support maturing this feature.</li>
-            <li>AP_WGET, AP_CURL, allowEmbedData added to autoplot_data/config/system.properties</li>
-            <li>autoplot.jar launch script allows relative URIs, so "autoplot myfile.cdf" now works from command line.</li>
-            <li>autoplot.jar launch script looks for JRE arguments (-J-Xmx4G) and introduces --headless</li>
         </ul>
 
         <p>Known issues:</p>
