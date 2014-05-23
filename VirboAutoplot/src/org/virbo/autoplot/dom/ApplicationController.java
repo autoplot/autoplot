@@ -1684,8 +1684,10 @@ public class ApplicationController extends DomNodeController implements RunLater
                 dsf.getController().histogram=null;
             }
             
-            BindingGroup bc= bindingContexts.get(application);
-            bc.unbind();
+            unbind( application );
+            //BindingGroup bc= bindingContexts.get(application);
+            //bc.unbind();
+            bind( application, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
 
             // reset das2 stuff which may be in a bad state.  This must be done on the event thread.
             Runnable run= new Runnable() {
