@@ -138,6 +138,8 @@ public class JythonCompletionTask implements CompletionTask {
             eval = eval + "  pass\n";
         }
 
+        putInGetDataSetStub( interp );
+        
         try {
             interp.exec(eval);
         } catch ( PyException ex ) {
@@ -444,8 +446,18 @@ public class JythonCompletionTask implements CompletionTask {
         return buf.toString();
     }
 
+    /**
+     * put in function that is trivial to evaluate so we can still do completions on datasets.
+     * @param interp 
+     */
+    private void putInGetDataSetStub( PythonInterpreter interp ) {
+        String ss2= "def getDataSet( st, tr=None, mon=None ):\n   return findgen(100)\n\n";
+        logger.fine(ss2);
+        interp.exec( ss2  );
+    }
+    
     private void queryNames(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
-
+    
         String[] keywords = new String[]{"assert", "def", "elif", "except", "from", "for", "finally", "import", "while", "print", "raise"}; //TODO: not complete
         for (String kw : keywords) {
             if (kw.startsWith(cc.completable)) {
@@ -459,9 +471,7 @@ public class JythonCompletionTask implements CompletionTask {
         eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
         eval = JythonUtil.removeSideEffects( eval );
 
-        String ss2= "def getDataSet( st, tr=None, mon=None ):\n   return findgen(100)\n\n";
-        logger.fine(ss2);
-        interp.exec( ss2  );
+        putInGetDataSetStub( interp );
         
         try {
             interp.exec(eval);
