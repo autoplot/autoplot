@@ -58,6 +58,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -142,6 +143,8 @@ import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.SourceTypesBrowser;
@@ -4551,10 +4554,10 @@ APSplash.checkTime("init 240");
      * The user has selected the URI via the bookmarks and we will show it to
      * them before using it.
      * (rfe336)
-     * @param uri 
-     * @param modifiers 
+     * @param uri the URI from the bookmarks or history.
+     * @param modifiers key modifiers like KeyEvent.CTRL_MASK for plot below.
      */
-    public void reviewBookmark( final String uri, final int modifiers ) {
+    public void reviewBookmark( String uri, final int modifiers ) {
         final DataSetSelector sel= this.dataSetSelector;
         if ( uri.contains(".vap" ) ) {
             // ask the user if they want to use the .vap
@@ -4568,14 +4571,25 @@ APSplash.checkTime("init 240");
             sel.setValue(uri);
             sel.maybePlot(modifiers);
         } else {
+            ProgressMonitor mon= DasProgressPanel.createFramed( this,"reset timerange");
+            try {
+                uri= DataSourceUtil.setTimeRange(uri,dom.getTimeRange(),mon);
+            } catch (URISyntaxException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            } catch (ParseException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+            final String furi= uri;
             Runnable run= new Runnable() { 
                 @Override
                 public void run() {
                     // see if the uri would be rejected, and show the editor.
-                    sel.setValue(uri);
+                    sel.setValue(furi);
                     DataSourceFactory factory=null;
                     try {
-                        factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), new NullProgressMonitor() );
+                        factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(furi), new NullProgressMonitor() );
                     } catch (IOException ex) {
                         Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (IllegalArgumentException ex) {
@@ -4586,11 +4600,11 @@ APSplash.checkTime("init 240");
 
                     if ( factory==null ) {
                         logger.fine("unable to find factory when I expected to see uri");
-                        sel.setValue(uri);
+                        sel.setValue(furi);
                         sel.maybePlot(modifiers); // have the user deal with the bad uri, and support plugins.
                     } else {
                         List<String> problems= new ArrayList<String>();
-                        if ( factory.reject( uri, problems, new NullProgressMonitor() )) {
+                        if ( factory.reject( furi, problems, new NullProgressMonitor() )) {
                             sel.maybePlot( KeyEvent.ALT_MASK ); // this should enter the editor as before
                         } else {
                             enterAddPlotElementDialog(); // fall back, make the user deal with bad uri
