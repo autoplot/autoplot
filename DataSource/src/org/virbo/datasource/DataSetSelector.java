@@ -383,7 +383,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     String surl1 = surl;
                     ProgressMonitor mon= getMonitor();
                     List<String> problems= new ArrayList();
-                    if (f.reject(surl1, problems,mon)) {
+                    if (f.reject(surl1, problems,mon)) { // This is the often-seen code that replaces the timerange in a URI. +#+#+
                         TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
                         if ( tsb!=null ) {
                             if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
@@ -437,6 +437,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                                     }
                                 }
                             }
+                        } else {
+                            logger.fine("bug1098 switch turned off, otherwise we would reset the timerange");
                         }
                         setMessage("resolving uri to data set as " + DataSourceRegistry.getInstance().getExtensionFor(f));
                         firePlotDataSetURL();
