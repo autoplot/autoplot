@@ -459,7 +459,7 @@ public class JythonCompletionTask implements CompletionTask {
         eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
         eval = JythonUtil.removeSideEffects( eval );
 
-        String ss2= "def getDataSet( st, mon ):\n   return findgen(100)\n\ndef getDataSet( st ):\n   return findgen(100)\n\n";
+        String ss2= "def getDataSet( st, tr=None, mon=None ):\n   return findgen(100)\n\n";
         logger.fine(ss2);
         interp.exec( ss2  );
         
