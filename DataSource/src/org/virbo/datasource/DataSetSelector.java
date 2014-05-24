@@ -431,7 +431,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                 if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
                                     try {
                                         tsb.setURI(surl1);
-                                        if ( !timeRange.equals(tsb.getTimeRange() ) ) {
+                                        if ( tsb.getTimeRange()!=null && !timeRange.equals(tsb.getTimeRange() ) ) {
                                             timeRange= pickTimeRange( timeRange, tsb.getTimeRange() );
                                             tsb.setTimeRange(timeRange);
                                         }
