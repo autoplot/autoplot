@@ -469,9 +469,10 @@ public class JythonCompletionTask implements CompletionTask {
 
         String eval;
         eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
-        eval = JythonUtil.removeSideEffects( eval );
-
-        putInGetDataSetStub( interp );
+        
+        if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
+            eval= sanitizeLeaveImports( eval );
+        } 
         
         try {
             interp.exec(eval);
