@@ -438,6 +438,16 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
     private void formatBuildInfos( Document doc, Element parent, List<String> bis ) {
         Element pp= doc.createElement("buildInfos");
+        try {
+            Element tag= doc.createElement("releaseTag");
+            tag.appendChild( doc.createTextNode(AboutUtil.getReleaseTag()) );
+            pp.appendChild(tag);
+        } catch ( IOException ex ) { logger.log(Level.WARNING,"",ex); }
+        try {
+            Element url= doc.createElement("buildUrl");
+            url.appendChild( doc.createTextNode(AboutUtil.getJenkinsURL() ) );
+            pp.appendChild(url);
+        } catch ( IOException ex ) { logger.log(Level.WARNING,"",ex); }
         for ( String s: bis ) {
             Element jar= doc.createElement("jar");
             jar.appendChild( doc.createTextNode(s) );
