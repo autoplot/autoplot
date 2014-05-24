@@ -2106,6 +2106,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      * @return the timerange selected.
      */
     private DatumRange pickTimeRange(DatumRange timeRange, DatumRange timeRange0) {
+        if ( timeRange0==null ) return timeRange;
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
         p.add( new JLabel("<html>The URI contains a time different than the application<br>time range.  Which should be used?</html>") );
