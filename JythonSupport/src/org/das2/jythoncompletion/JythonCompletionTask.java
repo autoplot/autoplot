@@ -143,8 +143,18 @@ public class JythonCompletionTask implements CompletionTask {
         try {
             interp.exec(eval);
         } catch ( PyException ex ) {
-            rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
-            return;
+            eval = editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
+            eval = JythonUtil.removeSideEffects( eval );
+            if (eval.endsWith(":\n")) {
+               eval = eval + "  pass\n";
+            }
+            try {
+                eval= sanitizeLeaveImports(eval);
+                interp.exec(eval);
+            } catch (PyException ex2 ) {            
+                rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex2.toString()));
+                return;
+            }
         }
 
         PyObject lcontext;
@@ -429,7 +439,11 @@ public class JythonCompletionTask implements CompletionTask {
                     } else if ( safeArg.startsWith("\"") && safeArg.endsWith("\"") ) {
                         // do nothing, it's already a string.
                     } else {
-                        safeArg= "'" + safeArg.replaceAll("'","\"") + "'";
+                        if ( safeArg.startsWith("getDataSet") ) {
+                            safeArg= "fltarr(100)";
+                        } else {
+                            safeArg= "'" + safeArg.replaceAll("'","\"") + "'";
+                        }
                     }
                     buf.append(m.group(1)).append("=").append(safeArg).append("\n");
                 }
