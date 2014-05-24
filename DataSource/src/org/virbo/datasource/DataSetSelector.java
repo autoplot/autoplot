@@ -51,11 +51,14 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BoundedRangeModel;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -65,6 +68,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -420,14 +424,17 @@ public class DataSetSelector extends javax.swing.JPanel {
                             setMessage("download cancelled");
                             return;
                         }
-                        boolean bug1098= false; // hold this change until next release.
+                        boolean bug1098= true; // hold this change until next release.
                         if ( bug1098 ) {
                             TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
                             if ( tsb!=null ) {
                                 if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
                                     try {
                                         tsb.setURI(surl1);
-                                        tsb.setTimeRange(timeRange);
+                                        if ( !timeRange.equals(tsb.getTimeRange() ) ) {
+                                            timeRange= pickTimeRange( timeRange, tsb.getTimeRange() );
+                                            tsb.setTimeRange(timeRange);
+                                        }
                                         String suri= tsb.getURI();
                                         //String suri= tsb.blurURI(); // this causes 1970-01-01 to pop up again...
                                         logger.log( Level.FINE, "resetting timerange to {0}", timeRange);
@@ -2090,6 +2097,32 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         plotItButton.setEnabled(enabled);
         inspectButton.setEnabled(enabled);
         super.setEnabled(enabled); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    /**
+     * allow the user to pick one of two times, when it is ambiguous what they want.
+     * @param timeRange
+     * @param timeRange0
+     * @return the timerange selected.
+     */
+    private DatumRange pickTimeRange(DatumRange timeRange, DatumRange timeRange0) {
+        JPanel p= new JPanel();
+        p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
+        p.add( new JLabel("<html>The URI contains a time different than the application<br>time range.  Which should be used?</html>") );
+        ButtonGroup bg= new ButtonGroup();
+        JRadioButton b1= new JRadioButton( timeRange.toString() );
+        p.add(b1);
+        bg.add(b1);
+        bg.setSelected(b1.getModel(),true);
+        JRadioButton b2= new JRadioButton( timeRange0.toString() );
+        p.add(b2);
+        bg.add(b2);
+        JOptionPane.showMessageDialog( this, p, "Which range", JOptionPane.QUESTION_MESSAGE );
+        if ( b1.isSelected() ) {
+            return timeRange;
+        } else {
+            return timeRange0;
+        }
     }
     
 }
