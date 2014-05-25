@@ -395,11 +395,18 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * plot the dataset in the specified  dataSource node.
+     **<blockquote><pre><small>{@code
+     *plot( 0, 'label', findgen(20), ripples(20), ripples(20), 'digital' )
+     *from org.virbo.autoplot import RenderType
+     *plot( 0, 'label', findgen(20), ripples(20), ripples(20), RenderType.digital.toString() )
+     *}</small></pre></blockquote>
+     *
      * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param label the label for the dependent parameter
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
+     * @param renderType hint at the render type to use, such as "nnSpectrogram" or "digital", 
      * @throws java.lang.InterruptedException
      */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType ) throws InterruptedException {
