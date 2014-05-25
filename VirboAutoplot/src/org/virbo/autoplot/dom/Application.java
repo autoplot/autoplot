@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
+import org.virbo.datasource.DataSetSelector;
 
 /**
  * Represents a state of the application as a whole, with its one canvas and
@@ -21,7 +21,7 @@ import org.das2.datum.DatumRangeUtil;
  */
 public class Application extends DomNode {
 
-    public static final DatumRange DEFAULT_TIME_RANGE= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
+    public static final DatumRange DEFAULT_TIME_RANGE= DataSetSelector.DEFAULT_TIME_RANGE;
 
     public Application() {
     }
