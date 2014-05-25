@@ -40,6 +40,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -88,6 +89,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
+import org.virbo.autoplot.bookmarks.DelayMenu;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
@@ -114,6 +116,7 @@ import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.xml.sax.SAXException;
 
 /**
@@ -304,6 +307,79 @@ public class GuiSupport {
         handleAddElementDialog(dia, dom, applicationModel);
 
     }
+    
+    /**
+     * same as addPlotElement, but a future version may allow the timerange to be set, combining things into one
+     * GUI.
+     * @param title title for the popup.
+     * @param furi the URI.
+     */
+    void addPlotElementFromBookmark( String title, String furi ) {
+        DataSourceFactory factory=null;
+        try {
+            factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(furi), new NullProgressMonitor() );
+        } catch (IOException ex) {
+            Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        assert factory!=null; // we checked this earlier.
+        TimeSeriesBrowse tsb= factory.getCapability( TimeSeriesBrowse.class );
+        DatumRange uriRange= null;
+        if ( tsb!=null ) {
+            try {
+                tsb.setURI(furi);
+                uriRange= tsb.getTimeRange();
+            } catch (ParseException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        Application dom= parent.getDocumentModel();
+        DatumRange dr= DataSetSelector.pickTimeRange( parent, dom.getTimeRange(), uriRange );
+        String uri= furi;
+        if ( dr!=uriRange ) {
+            try {
+                uri= DataSourceUtil.setTimeRange(uri,dom.getTimeRange(),new NullProgressMonitor());
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParseException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        ApplicationModel applicationModel = parent.applicationModel;
+
+        AddPlotElementDialog dia = new AddPlotElementDialog( parent, true);
+        dia.getPrimaryDataSetSelector().setTimeRange(dom.getTimeRange());
+        dia.getSecondaryDataSetSelector().setTimeRange(dom.getTimeRange());
+        dia.getTertiaryDataSetSelector().setTimeRange(dom.getTimeRange());
+
+        String val= uri;
+        if ( val.startsWith("vap+internal:") ) {
+            setAddPlotElementUris( applicationModel, dom, dia, val );
+        } else {
+            dia.getPrimaryDataSetSelector().setValue(val);
+            dia.getSecondaryDataSetSelector().setValue(val);
+            dia.getTertiaryDataSetSelector().setValue(val);
+            dia.getPrimaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+            dia.getSecondaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+            dia.getTertiaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+        }
+
+        if ( title==null ) {
+            title= "Adding Plot Element";
+        }
+        dia.setTitle( title );
+        dia.setVisible(true);
+        if (dia.isCancelled()) {
+            return;
+        }
+        handleAddElementDialog(dia, dom, applicationModel);
+
+    }    
 
     /**
      * dump the data using the DataSourceFormat object.
