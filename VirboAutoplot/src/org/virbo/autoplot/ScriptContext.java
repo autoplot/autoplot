@@ -888,9 +888,9 @@ public class ScriptContext extends PyJavaInstance {
      * useful for moving datasets.
      *
      * <p><blockquote><pre>
-     * ds= getDataSet('http://autoplot.org/data/somedata.cdf?BGSEc')
-     * from java.lang import System
-     * dumpToQStream( ds, System.out, True )
+     *ds= getDataSet('http://autoplot.org/data/somedata.cdf?BGSEc')
+     *from java.lang import System
+     *dumpToQStream( ds, System.out, True )
      * </pre></blockquote></p>
      *
      * @param ds The dataset to stream.  Note all schemes should be streamable, but
