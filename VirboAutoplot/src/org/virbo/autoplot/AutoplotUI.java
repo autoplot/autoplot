@@ -150,6 +150,7 @@ import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.SourceTypesBrowser;
 import org.virbo.datasource.TimeRangeEditor;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -4571,16 +4572,6 @@ APSplash.checkTime("init 240");
             sel.setValue(uri);
             sel.maybePlot(modifiers);
         } else {
-            ProgressMonitor mon= DasProgressPanel.createFramed( this,"reset timerange");
-            try {
-                uri= DataSourceUtil.setTimeRange(uri,dom.getTimeRange(),mon);
-            } catch (URISyntaxException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            } catch (ParseException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
             final String furi= uri;
             Runnable run= new Runnable() { 
                 @Override
@@ -4607,7 +4598,9 @@ APSplash.checkTime("init 240");
                         if ( factory.reject( furi, problems, new NullProgressMonitor() )) {
                             sel.maybePlot( KeyEvent.ALT_MASK ); // this should enter the editor as before
                         } else {
-                            enterAddPlotElementDialog(); // fall back, make the user deal with bad uri
+                            support.addPlotElementFromBookmark( "Add Bookmarked URI", furi ); 
+                            //uri= DataSourceUtil.setTimeRange(uri,dom.getTimeRange(),mon);
+                            //enterAddPlotElementDialog(); // fall back, make the user deal with bad uri
                         }
 
                     }
