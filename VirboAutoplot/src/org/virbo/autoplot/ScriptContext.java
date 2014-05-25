@@ -394,7 +394,10 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * plot the dataset in the specified  dataSource node.
+     * plot the dataset in the specified dataSource node, using the render type
+     * specified.  The renderType parameter is a string identifier, and currently the following are
+     * used: digital spectrogram nnSpectrogram hugeScatter series scatter colorScatter stairSteps
+     * fillToZero digital image  pitchAngleDistribution eventsBar vectorPlot orbitPlot contour
      **<blockquote><pre><small>{@code
      *plot( 0, 'label', findgen(20), ripples(20), ripples(20), 'digital' )
      *from org.virbo.autoplot import RenderType
