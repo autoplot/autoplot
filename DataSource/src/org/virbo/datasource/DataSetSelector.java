@@ -437,7 +437,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                     try {
                                         tsb.setURI(surl1);
                                         if ( tsb.getTimeRange()!=null && !timeRange.equals(tsb.getTimeRange() ) ) {
-                                            timeRange= pickTimeRange( timeRange, tsb.getTimeRange() );
+                                            timeRange= pickTimeRange( this, timeRange, tsb.getTimeRange() );
                                             tsb.setTimeRange(timeRange);
                                         }
                                         String suri= tsb.getURI();
@@ -2106,11 +2106,12 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
 
     /**
      * allow the user to pick one of two times, when it is ambiguous what they want.
+     * @param parent null or the component to focus.
      * @param timeRange
      * @param timeRange0
      * @return the timerange selected.
      */
-    private DatumRange pickTimeRange(DatumRange timeRange, DatumRange timeRange0) {
+    public static DatumRange pickTimeRange( Component parent, DatumRange timeRange, DatumRange timeRange0) {
         if ( timeRange0==null ) return timeRange;
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
@@ -2123,7 +2124,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         JRadioButton b2= new JRadioButton( timeRange0.toString() );
         p.add(b2);
         bg.add(b2);
-        JOptionPane.showMessageDialog( this, p, "Which range", JOptionPane.QUESTION_MESSAGE );
+        JOptionPane.showMessageDialog( parent, p, "Which range", JOptionPane.QUESTION_MESSAGE );
         if ( b1.isSelected() ) {
             return timeRange;
         } else {
