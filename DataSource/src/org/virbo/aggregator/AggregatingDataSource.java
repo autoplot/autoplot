@@ -430,8 +430,10 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
                     } else {
                         if ( ds1 instanceof JoinDataSet ) {
+                            assert altResult!=null;
                             altResult.joinAll( (JoinDataSet)ds1 );
                         } else {
+                            assert result!=null;
                             ArrayDataSet ads1= ArrayDataSet.maybeCopy(result.getComponentType(),ds1);
                             try {
                                 if ( result.canAppend(ads1) ) {
