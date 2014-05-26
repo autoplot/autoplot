@@ -253,6 +253,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                             accum.grow(accum.length()*files.length*11/10);  //110%
                         }
                     } else {
+                        assert accum!=null; // because files.length>1.
                         ArrayDataSet ads1= ArrayDataSet.maybeCopy(accum.getComponentType(),ds1);
                         if ( accum.canAppend(ads1) ) {
                             accum.append( ads1 );
