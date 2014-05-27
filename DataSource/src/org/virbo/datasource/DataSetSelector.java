@@ -107,11 +107,6 @@ public class DataSetSelector extends javax.swing.JPanel {
     
     private Map<Object,Object> pendingChanges= new HashMap(); // lockObject->Client
     
-    /** 
-     * used in Autoplot's Application object.
-     */
-    public static DatumRange DEFAULT_TIME_RANGE= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
-    
     /**
      * the edit (inspect) button has been pressed.
      */
@@ -433,7 +428,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         if ( bug1098 ) {
                             TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
                             if ( tsb!=null ) {
-                                if ( timeRange!=null && !timeRange.equals(DEFAULT_TIME_RANGE) && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
+                                if ( timeRange!=null && !timeRange.equals(DataSourceUtil.DEFAULT_TIME_RANGE) && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
                                     try {
                                         tsb.setURI(surl1);
                                         if ( tsb.getTimeRange()!=null && !timeRange.equals(tsb.getTimeRange() ) ) {
