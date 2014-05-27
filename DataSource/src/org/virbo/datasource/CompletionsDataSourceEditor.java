@@ -379,7 +379,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     public String getURI() {
         StringBuilder base= new StringBuilder( this.suri );
         int j= base.indexOf("?");
-        if ( j==-1 ) {
+        if ( j==-1 || suriNoFile ) {
             int icolon= suri.indexOf(":");
             if ( suriNoFile && icolon>-1 && icolon<MAX_VAP_PREFIX ) {
                 base= new StringBuilder( base.substring(0,icolon+1) );
@@ -391,7 +391,9 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         boolean amp= false;
 
         if ( arg0Cbs!=null ) {
-            base.append( "?" );
+            if ( !suriNoFile ) {
+                base.append( "?" );
+            }
             String s= String.valueOf( arg0Cbs.getSelectedItem() );
             int i= s.indexOf(": ");
             if ( i>-1 ) s= s.substring(0,i);
@@ -415,13 +417,15 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                     paramValue= "????";
                 }
                 int icolon= paramValue.indexOf(":");
-                if ( icolon!=-1 ) {
+                if ( icolon!=-1 && !paramValue.substring(0,icolon).equals("orbit")) {
                     paramValue= paramValue.substring(0,icolon);
                 }
                 if ( amp ) {
                     base.append( "&" );
                 } else {
-                    base.append( "?" );
+                    if ( !suriNoFile ) {
+                        base.append( "?" );
+                    }
                     amp= true;
                 }
                 base.append( paramName ); //TODO: is there an equals here?
