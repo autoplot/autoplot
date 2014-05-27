@@ -17,6 +17,7 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -28,6 +29,7 @@ import javax.swing.SwingUtilities;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomOps;
+import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.ThreadManager;
 
@@ -201,25 +203,22 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
             .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(jPanel2Layout.createSequentialGroup()
                     .addContainerGap()
-                    .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                        .add(jPanel2Layout.createSequentialGroup()
-                            .add(addressBarUriButton)
-                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(addressBarUriButton)
                         .add(jLabel5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                     .add(previewDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 39, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                    .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                        .add(jPanel2Layout.createSequentialGroup()
-                            .add(allUrisButton)
-                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(allUrisButton)
                         .add(jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                     .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)
                     .addContainerGap()))
         );
 
         showWildcardsButton.setText("Show Wildcards");
+        showWildcardsButton.setToolTipText("Show wildcards in browser");
         showWildcardsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 showWildcardsButtonActionPerformed(evt);
@@ -268,10 +267,36 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addressBarUriButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addressBarUriButtonActionPerformed
-        String s = previewDataSetSelector.getEditor().getText();
-        dataSetSelector.setValue(s);
-        dataSetSelector.maybePlot(evt.getModifiers());
-        SwingUtilities.getWindowAncestor(this).setVisible(false);
+        final Application dom2= (Application)dom.copy();
+        DataSourceFilter dsf= dom.getController().getDataSourceFilter();
+        String newUri= previewDataSetSelector.getEditor().getText();
+        int f= -1;
+        DataSourceFilter[] dsfs= dom.getDataSourceFilters();
+        for ( int i=0; i<dsfs.length; i++ ){
+            if ( dsfs[i]==dsf ) {
+                f= i;
+            }
+        }
+        if ( f==-1 ) throw new IllegalArgumentException("bad state ..");
+        dom2.getDataSourceFilters(f).setUri(newUri);
+        Runnable run= new Runnable() {
+            public void run() {
+                dom.syncTo(dom2);
+                DataSourceFilter[] dsfs= dom.getDataSourceFilters();
+                for ( DataSourceFilter dsf: dsfs ) {
+                    dsf.getController().update();
+                }
+            }
+        };
+        if ( ! ThreadManager.getInstance().run( run, "aggregateUris" ) ) {
+            JOptionPane.showConfirmDialog( this, "Operation is currently busy.");
+        }
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                SwingUtilities.getWindowAncestor(AggregateUrisDialog.this).setVisible(false);
+            }
+        });
+
     }//GEN-LAST:event_addressBarUriButtonActionPerformed
 
     private void allUrisButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allUrisButtonActionPerformed
