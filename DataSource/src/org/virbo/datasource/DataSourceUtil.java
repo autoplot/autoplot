@@ -47,7 +47,6 @@ import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import static org.virbo.datasource.DataSetSelector.logger;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 //import org.virbo.qstream.SimpleStreamFormatter;
@@ -61,6 +60,11 @@ public class DataSourceUtil {
 
     private static final Logger logger= LoggerManager.getLogger("apdss.util");
 
+    /** 
+     * used in Autoplot's Application object and in the DataSetSelector.
+     */
+    public static DatumRange DEFAULT_TIME_RANGE= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
+        
     /**
      * remove escape sequences like %20 to create a human-editable string
      * This contains a kludge that looks for single spaces that are the result of
