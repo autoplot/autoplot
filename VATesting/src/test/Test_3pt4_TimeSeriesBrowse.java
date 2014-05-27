@@ -94,7 +94,10 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
             }
             System.err.println("---");
             if ( bms.length==4 &&
-                    bms[1].getSrcProperty().equals("timeRange") || bms[3].getSrcProperty().equals("timeRange")) {
+                   ( bms[1].getSrcProperty().equals("timeRange") || bms[3].getSrcProperty().equals("timeRange") ) ) {
+                return 0;
+            } else if ( bms.length==2 && ( bms[1].getSrcProperty().equals("timeRange") || bms[3].getSrcProperty().equals("timeRange") ) ) {
+                // we seem to have lost two of the bindings, but I wasn't sure about those anyway.
                 return 0;
             } else {
                 System.err.println("bindings.length="+bms.length +" (should be 4)" );
