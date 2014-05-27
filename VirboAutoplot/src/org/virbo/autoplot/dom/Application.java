@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
-import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.DataSourceUtil;
 
 /**
  * Represents a state of the application as a whole, with its one canvas and
@@ -21,10 +21,13 @@ import org.virbo.datasource.DataSetSelector;
  */
 public class Application extends DomNode {
 
-    public static final DatumRange DEFAULT_TIME_RANGE= DataSetSelector.DEFAULT_TIME_RANGE;
-
     public Application() {
     }
+
+    /**
+     * default time range indicates when the range is not being used.  This should never been seen by the user.
+     */
+    public static final DatumRange DEFAULT_TIME_RANGE= DataSourceUtil.DEFAULT_TIME_RANGE;
     
     protected List<DataSourceFilter> dataSourceFilters= Arrays.asList( new DataSourceFilter[0] );
     public static final String PROP_DATASOURCEFILTERS = "dataSourceFilters";
