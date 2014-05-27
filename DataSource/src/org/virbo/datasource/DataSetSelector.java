@@ -283,6 +283,23 @@ public class DataSetSelector extends javax.swing.JPanel {
         JOptionPane.showMessageDialog( this, msg, "Unrecognized address", JOptionPane.OK_OPTION );
 
     }
+    
+    /**
+     * check to see if any of the action triggers will handle the URI.
+     * @param surl the URI.
+     * @return  true if the URI was handled.
+     */
+    private boolean checkActionTriggers( String surl ) {
+        for (String actionTriggerRegex : actionTriggers.keySet()) {
+            if (Pattern.matches(actionTriggerRegex, surl)) {
+                logger.finest("matches action trigger");
+                Action action = actionTriggers.get(actionTriggerRegex);
+                action.actionPerformed(new ActionEvent(this, 123, "dataSetSelect"));
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * See if we can resolve a plottable URI from the selector by identifying
@@ -304,15 +321,10 @@ public class DataSetSelector extends javax.swing.JPanel {
             return;
         }
 
-        for (String actionTriggerRegex : actionTriggers.keySet()) {
-            if (Pattern.matches(actionTriggerRegex, surl)) {
-                logger.finest("matches action trigger");
-                Action action = actionTriggers.get(actionTriggerRegex);
-                action.actionPerformed(new ActionEvent(this, 123, "dataSetSelect"));
-                return;
-            }
+        if ( checkActionTriggers(surl) ) {
+            return;
         }
-
+        
         Pattern accept= acceptPattern==null ? null : Pattern.compile(acceptPattern);
 
         if ( !enableDataSource && ( accept==null || accept.matcher(surl).matches() ) ) { // just fire off an event, don't validate it or do completions.
@@ -438,7 +450,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                         String suri= tsb.getURI();
                                         //String suri= tsb.blurURI(); // this causes 1970-01-01 to pop up again...
                                         logger.log( Level.FINE, "resetting timerange to {0}", timeRange);
-                                        setValue(suri);
+                                        editor.setText(suri); // don't fire off event.
                                     } catch ( ParseException ex ) {
                                         logger.log( Level.SEVERE, ex.getMessage(), ex );
                                     }
