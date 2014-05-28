@@ -500,6 +500,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             
                 if ( serverURL.length()==0 ) {
                     serverURL= d2ss.get(0);
+                    RequestProcessor.invokeLater( getDataSetsRunnable() );
                 }
                 das2ServerComboBox.setSelectedItem(serverURL);
                 das2ServerComboBox.setRenderer(myListCellRenderer);
@@ -999,7 +1000,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         };
         SwingUtilities.invokeLater(run);
         
-        RequestProcessor.invokeLater( getDataSetsRunnable() );
+        if ( serverURL.length()>0 ) {
+            RequestProcessor.invokeLater( getDataSetsRunnable() );
+        }
 
     }
 
@@ -1017,10 +1020,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         Runnable run= new Runnable() {
             public void run() {
 
-                String ss= serverURL;
+                String ss1= serverURL;
 
                 try {
-                    DasServer server= DasServer.create( new URL( ss ) );
+                    DasServer server= DasServer.create( new URL( ss1 ) );
                     final TreeModel model;
                     if ( discoveryCb.isSelected() ) {
                         model= server.getDataSetListWithDiscovery();
@@ -1038,12 +1041,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
 
-                    javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Error connecting to " + ss + ", \n" + ex );
+                    javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Error connecting to " + ss1 + ", \n" + ex );
                     jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
 
                 } catch (MalformedURLException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    DasApplication.getDefaultApplication().getExceptionHandler().handle(ex);
+                    javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Error connecting to " + ss1 + ", \n" + ex );
+                    jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+                    
                 }
 
             }
