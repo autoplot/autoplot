@@ -88,27 +88,42 @@ public class JythonCompletionTask implements CompletionTask {
             JythonCompletionProvider.getInstance().setMessage("busy: getting completions");
             CompletionContext cc = CompletionSupport.getCompletionContext(editor);
             if (cc == null) {
-                return;
+                logger.fine("no completion context");
+            } else {
+                doQuery( cc, arg0);
             }
-            if (cc.contextType == CompletionContext.MODULE_NAME) {
-                queryModules(cc, arg0);
-            } else if (cc.contextType == CompletionContext.PACKAGE_NAME) {
-                queryPackages(cc, arg0);
-            } else if (cc.contextType == CompletionContext.DEFAULT_NAME) {
-                queryNames(cc, arg0);
-            } else if (cc.contextType == CompletionContext.METHOD_NAME) {
-                queryMethods(cc, arg0);
-            } else if (cc.contextType == CompletionContext.STRING_LITERAL_ARGUMENT) {
-                queryStringLiteralArgument(cc, arg0);
-            }
-
-        } catch (BadLocationException ex) {
+        } catch ( BadLocationException ex ) {
+            logger.log( Level.WARNING, null, ex );
+            arg0.addItem( new MessageCompletionItem( ex.getMessage() ) );            
         } finally {
             JythonCompletionProvider.getInstance().setMessage("done getting completions");
             arg0.finish();
         }
     }
 
+    public int doQuery( CompletionContext cc, CompletionResultSet arg0 ) {
+        int c=0;
+        try {
+            if (cc.contextType.equals(CompletionContext.MODULE_NAME)) {
+                c= queryModules(cc, arg0);
+            } else if (cc.contextType.equals(CompletionContext.PACKAGE_NAME)) {
+                c= queryPackages(cc, arg0);
+            } else if (cc.contextType.equals(CompletionContext.DEFAULT_NAME)) {
+                c= queryNames(cc, arg0);
+            } else if (cc.contextType.equals(CompletionContext.METHOD_NAME)) {
+                c= queryMethods(cc, arg0);
+            } else if (cc.contextType.equals(CompletionContext.STRING_LITERAL_ARGUMENT)) {
+                c= queryStringLiteralArgument(cc, arg0);
+            }
+        } catch ( BadLocationException ex ) {
+            logger.log( Level.WARNING, null, ex );
+            arg0.addItem( new MessageCompletionItem( ex.getMessage() ) );
+        } finally {
+            
+        }
+        return c;
+    }
+    
     private Method getJavaMethod(PyMethod m, int i) {
         PyMethodPeeker mpeek = new PyMethodPeeker(m);
         //PyJavaInstancePeeker peek = new PyJavaInstancePeeker((PyJavaInstance) context);
@@ -120,7 +135,7 @@ public class JythonCompletionTask implements CompletionTask {
         return new PyReflectedFunctionPeeker(mpeek.getReflectedFunction()).getArgsCount();
     }
 
-    private void queryMethods(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
+    private int queryMethods(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
         PythonInterpreter interp;
 
         interp = getInterpreter();
@@ -153,7 +168,7 @@ public class JythonCompletionTask implements CompletionTask {
                 interp.exec(eval);
             } catch (PyException ex2 ) {            
                 rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex2.toString()));
-                return;
+                return 0;
             }
         }
 
@@ -162,7 +177,7 @@ public class JythonCompletionTask implements CompletionTask {
             lcontext = interp.eval(cc.contextString);
         } catch (PyException ex) {
             rs.addItem(new MessageCompletionItem("Eval error: " + cc.contextString, ex.toString()));
-            return;
+            return 0;
         }
 
         PyList po2;
@@ -170,9 +185,10 @@ public class JythonCompletionTask implements CompletionTask {
             po2= (PyList) lcontext.__dir__();
         } catch ( PyException e ) {
             logger.log( Level.SEVERE, e.getMessage(), e );
-            return;
+            return 0;
         }
         
+        int count=0;
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
@@ -250,6 +266,7 @@ public class JythonCompletionTask implements CompletionTask {
                                 label= ss + args;
                                 String link = getLinkForJavaSignature(signature);
                                 rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
+                                count++;
                                 notAlreadyAdded= false;
                             }
                         } catch ( RuntimeException ex ) {
@@ -300,12 +317,14 @@ public class JythonCompletionTask implements CompletionTask {
                 if ( notAlreadyAdded ) {
                     String link = getLinkForJavaSignature(signature);
                     rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
+                    count++;
                 }
             }
         }
+        return count;
     }
 
-    private void queryModules(CompletionContext cc, CompletionResultSet rs) {
+    private int queryModules(CompletionContext cc, CompletionResultSet rs) {
         PythonInterpreter interp = getInterpreter();
 
         String eval = "targetComponents = '" + cc.contextString + "'.split('.')\n" +
@@ -324,21 +343,23 @@ public class JythonCompletionTask implements CompletionTask {
             interp.exec(eval);
         } catch ( PyException ex ) {
             rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
-            return;
+            return 0;
         }
         
+        int count=0;
         PyList po2 = (PyList) interp.eval("list");
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
             if (ss.startsWith(cc.completable)) {
                 rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, null));
+                count++;
             }
         }
-
+        return count;
     }
 
-    private void queryPackages(CompletionContext cc, CompletionResultSet rs) {
+    private int queryPackages(CompletionContext cc, CompletionResultSet rs) {
         PythonInterpreter interp = getInterpreter();
 
         String eval = "import " + cc.contextString + "\n" +
@@ -361,18 +382,20 @@ public class JythonCompletionTask implements CompletionTask {
             interp.exec(eval);
         } catch ( PyException ex ) {
             rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
-            return;
+            return 0;
         }
-
+        
+        int count=0;
         po2 = (PyList) interp.eval("list");
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
             if (ss.startsWith(cc.completable)) {
                 rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, null));
+                count++;
             }
         }
-
+        return count;
     }
 
     private static String join(String[] list, String delim) {
@@ -470,12 +493,13 @@ public class JythonCompletionTask implements CompletionTask {
         interp.exec( ss2  );
     }
     
-    private void queryNames(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
-    
+    private int queryNames(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
+        int count=0;
         String[] keywords = new String[]{"assert", "def", "elif", "except", "from", "for", "finally", "import", "while", "print", "raise"}; //TODO: not complete
         for (String kw : keywords) {
             if (kw.startsWith(cc.completable)) {
                 rs.addItem(new DefaultCompletionItem(kw, cc.completable.length(), kw, kw, null, 0));
+                count++;
             }
         }
 
@@ -492,10 +516,10 @@ public class JythonCompletionTask implements CompletionTask {
             interp.exec(eval);
         } catch ( PyException ex ) {
             rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
-            return;
+            return 0;
         }
         
-        getLocalsCompletions( interp, cc, rs);
+        return count + getLocalsCompletions( interp, cc, rs);
     }
 
     private static String argsList( Class[] classes ) {
@@ -569,12 +593,13 @@ public class JythonCompletionTask implements CompletionTask {
         return sig.toString();
     }
 
-    private void queryStringLiteralArgument(CompletionContext cc, CompletionResultSet arg0) {
+    private int queryStringLiteralArgument(CompletionContext cc, CompletionResultSet arg0) {
         String method = cc.contextString;
         if (method.equals("getDataSet")) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
         }
+        return 0;
     }
 
     /**
@@ -612,12 +637,14 @@ public class JythonCompletionTask implements CompletionTask {
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public static void getLocalsCompletions(PythonInterpreter interp, CompletionContext cc, CompletionResultSet rs) {
+    public static int getLocalsCompletions(PythonInterpreter interp, CompletionContext cc, CompletionResultSet rs) {
+        int count= 0;
         List<DefaultCompletionItem> rr= getLocalsCompletions( interp, cc );
         for ( DefaultCompletionItem item: rr ) {
             rs.addItem( item );
+            count++;
         }
-        
+        return count;
     }
     
     public static List<DefaultCompletionItem> getLocalsCompletions(PythonInterpreter interp, CompletionContext cc) {
