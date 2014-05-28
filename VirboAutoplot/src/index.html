@@ -25,6 +25,10 @@
         to resolve old numbers.
         <p>Bugfixes (2014-05-21):</p>
         <ul>
+            <li>trim out indented blocks in removeSideEffects</li>
+            <li>aggregate one (just the address bar) no longer resets the range</li>
+            <li>vap+orbit: URIs work with Automatic data source editor GUI.</li>
+            <li>append( FDataSet, DDataSet ) would fail</li>
             <li>support $x in timeformat parameter of ascii parser.</li>
             <li>bug 1195:  Akebono MCA data script shows memory leaks. Thanks Takahiro!</li>
             <li>null pointer exception in logging because of misuse of logger.log( level, template, parms )</li>
@@ -66,8 +70,10 @@
             <li>FileStorageModel was missing getField to make clean way to get the version ($v)</li>
         </ul>
         <p>Features:</p>
-        <ul>      
+        <ul>
+            <li>put in filesystem completions when the method is "File" constructor</li>
             <li>rfe 337: Reset timerange when using URIs from bookmarks and recent history</li>            
+            <li>add code to get the PID to aid in debugging with JVisualVM</li>
             <li>keep track of reason why filesystem is offline.</li>
             <li>add option to disable scan (instead of step), which can cause problems with batch processing</li>
             <li>add monitor use to example codes in Jython editor.</li>
