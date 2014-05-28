@@ -337,17 +337,20 @@ public class GuiSupport {
             }
         }
         Application dom= parent.getDocumentModel();
-        DatumRange dr= DataSetSelector.pickTimeRange( parent, dom.getTimeRange(), uriRange );
         String uri= furi;
-        if ( dr!=uriRange ) {
-            try {
-                uri= DataSourceUtil.setTimeRange(uri,dom.getTimeRange(),new NullProgressMonitor());
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParseException ex) {
-                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+        DatumRange dr;
+        if ( !dom.getTimeRange().equals( uriRange ) ) {
+            dr= DataSetSelector.pickTimeRange( parent, dom.getTimeRange(), uriRange );
+            if ( dr!=uriRange ) {
+                try {
+                    uri= DataSourceUtil.setTimeRange(uri,dom.getTimeRange(),new NullProgressMonitor());
+                } catch (URISyntaxException ex) {
+                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ParseException ex) {
+                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         ApplicationModel applicationModel = parent.applicationModel;
