@@ -196,13 +196,17 @@ public class BindingSupport {
             }
             bi.dstSetter.invoke(dst, val);
         } catch (IllegalArgumentException ex) {
-            throw new RuntimeException(ex);
+            String msg= String.format( "failed to bind %s.%s to %s.%s", src, srcProp, dst, dstProp );
+            throw new RuntimeException(msg,ex);
         } catch (InvocationTargetException ex) {
-            throw new RuntimeException(ex);
+            String msg= String.format( "failed to bind %s.%s to %s.%s", src, srcProp, dst, dstProp );
+            throw new RuntimeException(msg,ex);
         } catch (IllegalAccessException ex) {
-            throw new RuntimeException(ex);
+            String msg= String.format( "failed to bind %s.%s to %s.%s", src, srcProp, dst, dstProp );
+            throw new RuntimeException(msg,ex);
         } catch (RuntimeException ex) {
-            throw ex;
+            String msg= String.format( "failed to bind %s.%s to %s.%s", src, srcProp, dst, dstProp );
+            throw new RuntimeException(msg,ex);
         }
 
         // add the listeners that bind.
