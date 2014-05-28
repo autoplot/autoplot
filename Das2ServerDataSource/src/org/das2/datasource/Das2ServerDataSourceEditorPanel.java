@@ -792,7 +792,16 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         org.das2.util.LoggerManager.logGuiEvent(evt);
         Object o= das2ServerComboBox.getSelectedItem();
         if ( o!=null ) {
-            setServerURL( String.valueOf( o ) );
+            try {
+                URL url= new URL(String.valueOf(o));
+                setServerURL( url.toString() );
+            } catch (MalformedURLException ex) {
+                if ( !String.valueOf(o).contains(":") ) {
+                    JOptionPane.showMessageDialog(this,"<html>Invalid URL (no http):<br>"+o);
+                } else {
+                    JOptionPane.showMessageDialog(this,"<html>Invalid URL:<br>"+o);
+                }
+            }
         }
     }//GEN-LAST:event_das2ServerComboBoxActionPerformed
 
