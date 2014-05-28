@@ -595,7 +595,15 @@ public class JythonCompletionTask implements CompletionTask {
 
     private int queryStringLiteralArgument(CompletionContext cc, CompletionResultSet arg0) {
         String method = cc.contextString;
+        int [] pos= new int[2];
+        String s= DataSetUrlCompletionTask.popString(editor,pos);
         if (method.equals("getDataSet")) {
+            DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
+            task.query(arg0);
+        } else if ( method.equals("File") ) {
+            DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
+            task.query(arg0);
+        } else if ( s.startsWith("/") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
         }
