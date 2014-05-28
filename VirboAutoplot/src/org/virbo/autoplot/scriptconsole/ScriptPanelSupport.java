@@ -337,6 +337,10 @@ public class ScriptPanelSupport {
                 otraceback= traceback.tb_next;
                 count++;
             }
+            if ( line<0 ) {
+                logger.warning("no trace information available for error "+ex.getMessage());
+                line=0;
+            }
             final int fline= line;
             final JEditorPane textArea= panel.getEditorPanel();
             SwingUtilities.invokeLater( new Runnable() { public void run() {
