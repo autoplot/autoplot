@@ -26,7 +26,7 @@ public class CompletionSupport {
      * @return
      */
     private static String join( List<Token> tokens, int offset, int end ) {
-        StringBuffer result= new StringBuffer( tokens.get(offset).image );
+        StringBuilder result= new StringBuilder( tokens.get(offset).image );
         for ( int i=1; i<(end-offset); i++ ) {
             result.append( tokens.get(offset+i).image );
         }
@@ -62,7 +62,7 @@ public class CompletionSupport {
      */
     private static String preProcess( String line, int pos ) {
         char squote= '\'';
-        int i=line.indexOf(squote);
+        int i;
         String[] ss= line.substring(0,pos).split("'",-2);
         boolean inQuote= ss.length % 2 == 0;
         if ( inQuote ) {
@@ -74,7 +74,6 @@ public class CompletionSupport {
             }
         } else {
             squote= '\"';
-            i=line.indexOf(squote);
             ss= line.substring(0,pos).split("\"",-2);
             inQuote= ss.length % 2 == 0;
             if ( inQuote ) {
@@ -125,7 +124,7 @@ public class CompletionSupport {
                 }
             }
 
-            boolean notdone= true;
+            boolean notdone;
             notdone= i>1 && tokens.get(i-1).kind==PythonGrammarConstants.DOT;
             while ( notdone ) {
                 if ( tokens.get(i-2).kind==PythonGrammarConstants.RBRACKET
@@ -190,7 +189,7 @@ public class CompletionSupport {
         
         CompletionContext result= null;
         
-        if ( tokens.size()==0 ) {
+        if ( tokens.isEmpty() ) {
             return new CompletionContext( CompletionContext.DEFAULT_NAME, null, "" );
         } else {
             if ( tokens.get(0).kind==PythonGrammarConstants.FROM ) {
@@ -207,7 +206,7 @@ public class CompletionSupport {
                     result= new CompletionContext( CompletionContext.PACKAGE_NAME, join(tokens,1,ti), completable );
                 }
             } else if ( tokens.get(0).kind==PythonGrammarConstants.IMPORT ) {
-                if ( completable.equals(".") ) completable="";
+                if ( completable==null || completable.equals(".") ) completable="";
                 if ( tokens.get(myTokenIndex-1).image.equals(".") ) myTokenIndex= myTokenIndex-1;
                 result= new CompletionContext( CompletionContext.PACKAGE_NAME, join(tokens,1,myTokenIndex), completable );
                 
