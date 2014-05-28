@@ -156,13 +156,17 @@ public class EditorAnnotationsSupport {
      * highlite the line by setting the background to color.  null clears the highlite.
      * @param line, the line number to highlite.  1 is the first line.
      * @param name, the name of the style, including "error" and "programCounter"
-     * @param text, annotation to display when hovering. Currently ignored.
+     * @param text, annotation to display when hovering.
      * @param interp, the interpretter to focus on.
      */
-    public void annotateLine( final int line, final String name, final String text, final PythonInterpreter interp ) {
-        if ( line<1 ) {
-            throw new IllegalArgumentException("no such line: "+line);
+    public void annotateLine( int lline, final String name, String ltext, final PythonInterpreter interp ) {
+        if ( lline<1 ) {
+            new IllegalArgumentException("no such line: "+lline).printStackTrace();
+            lline=1;
+            ltext= ltext+ "\n(line number was "+lline+", see stderr)";
         }
+        final int line= lline;
+        final String text= ltext;
         SwingUtilities.invokeLater( new Runnable() {
             public void run() {
                 Document doc = editorPanel.getDocument();
