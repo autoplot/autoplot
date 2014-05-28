@@ -600,7 +600,7 @@ public class JythonCompletionTask implements CompletionTask {
         if (method.equals("getDataSet")) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
-        } else if ( method.equals("File") ) {
+        } else if ( method.equals("File") && s.startsWith("/") ) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
         } else if ( s.startsWith("/") ) {
