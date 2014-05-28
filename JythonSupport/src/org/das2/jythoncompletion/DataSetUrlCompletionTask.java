@@ -34,7 +34,7 @@ class DataSetUrlCompletionTask implements CompletionTask {
 
     }
 
-    public void query( CompletionResultSet arg0 ) {
+    public static String popString( JTextComponent editor, int [] pos ) {
         try {
             int i0 = Utilities.getRowStart(editor, editor.getCaretPosition());
             int i1 = Utilities.getRowEnd(editor, editor.getCaretPosition())-1; // trim end of line
@@ -59,8 +59,24 @@ class DataSetUrlCompletionTask implements CompletionTask {
             if (i1 == -1) {
                 i1 = line.length();
             }
-            String surl1 = line.substring(i0, i1);
-            int carotPos = ipos - i0;
+            pos[0]= i0;
+            pos[1]= i1;
+            return line.substring(i0,i1);
+        } catch ( BadLocationException ex) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+        } catch (Exception ex) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        return null;
+    }
+    
+    public void query( CompletionResultSet arg0 ) {
+        try {
+            int i0 = Utilities.getRowStart(editor, editor.getCaretPosition());
+            int ipos = editor.getCaretPosition() - i0;
+            int[] pos= new int[2];
+            String surl1 = popString(editor, pos);
+            int carotPos = ipos - pos[0];
 
             List<CompletionResult> rs= DataSetURI.getCompletions( surl1, carotPos, new NullProgressMonitor() );
             
