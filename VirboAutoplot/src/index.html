@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>"Break into Stack of Plots" action added.</small></p>
+        <p><small>Completions on file names in the Jython editor.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -26,6 +26,7 @@
         <p>Bugfixes (2014-05-21):</p>
         <ul>
             <li>trim out indented blocks in removeSideEffects</li>
+            <li>check for invalid URLs in Das2DataSource editor panel.</li>
             <li>aggregate one (just the address bar) no longer resets the range</li>
             <li>vap+orbit: URIs work with Automatic data source editor GUI.</li>
             <li>append( FDataSet, DDataSet ) would fail</li>
