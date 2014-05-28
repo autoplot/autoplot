@@ -1043,7 +1043,7 @@ public class JythonUtil {
             boolean inDef= false;
 
             while (s != null) {
-
+                
                 int comment= s.indexOf("#");
                 if ( comment>-1 ) {
                     s= s.substring(0,comment);
@@ -1051,7 +1051,10 @@ public class JythonUtil {
                 
                 boolean sideEffect= true;
 
-                
+                if ( s.length()>1 && Character.isWhitespace( s.charAt(0) ) ) { // just skip over routines.
+                    s = reader.readLine();
+                    continue;
+                }
                 
                 if ( inDef==false ) {
                     Matcher defm= defPattern.matcher(s);
