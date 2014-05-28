@@ -202,7 +202,7 @@ public class CompletionSupport {
                     result= new CompletionContext( CompletionContext.MODULE_NAME, join(tokens,1,importTokenIndex), completable );
                 } else if ( myTokenIndex<importTokenIndex || importTokenIndex==-1 ) {
                     int ti= myTokenIndex;
-                    if ( tokens.get(ti-1).kind== PythonGrammarConstants.DOT ) ti--;
+                    if ( ti>0 && tokens.get(ti-1).kind== PythonGrammarConstants.DOT ) ti--;
                     if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.DOT ) completable= "";
                     result= new CompletionContext( CompletionContext.PACKAGE_NAME, join(tokens,1,ti), completable );
                 }
