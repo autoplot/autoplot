@@ -63,7 +63,7 @@ public class DataSourceUtil {
     /** 
      * used in Autoplot's Application object and in the DataSetSelector.
      */
-    public static DatumRange DEFAULT_TIME_RANGE= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
+    public static final DatumRange DEFAULT_TIME_RANGE= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
         
     /**
      * remove escape sequences like %20 to create a human-editable string
