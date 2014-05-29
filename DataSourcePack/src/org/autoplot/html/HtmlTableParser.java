@@ -8,6 +8,8 @@ package org.autoplot.html;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
 import javax.swing.text.html.parser.ParserDelegator;
@@ -33,23 +35,29 @@ public class HtmlTableParser extends AbstractDataSource {
         super(uri);
     }
 
-    public QDataSet getTable( ProgressMonitor mon ) throws Exception {
+    public QDataSet getTable( ProgressMonitor mon ) throws IOException  {
         File f= getHtmlFile(resourceURI.toURL(),mon);
 
         BufferedReader reader = new BufferedReader( new FileReader(f));
+        try {
 
-        HtmlParserCallback callback = new HtmlParserCallback(  );
+            HtmlParserCallback callback = new HtmlParserCallback(  );
 
-        String stable= (String)getParams().get( PARAM_TABLE );
-        if ( stable!=null ) callback.setTable( stable );
-        new ParserDelegator().parse( reader, callback, true );
+            String stable= (String)getParams().get( PARAM_TABLE );
+            if ( stable!=null ) callback.setTable( stable );
+            new ParserDelegator().parse( reader, callback, true );
 
-        QDataSet ds= callback.getDataSet();
+            QDataSet ds= callback.getDataSet();
 
-        return ds;
+            return ds;
+            
+        } finally {
+            reader.close();
+                   
+        }
     }
 
-    public QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
+    public QDataSet getDataSet( ProgressMonitor mon ) throws IOException {
         QDataSet ds = getTable( mon );
 
         String column=  (String) getParams().get(PARAM_COLUMN);
