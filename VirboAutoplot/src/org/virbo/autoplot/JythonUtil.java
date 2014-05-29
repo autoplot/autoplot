@@ -88,8 +88,11 @@ public class JythonUtil {
     protected static void runScript( ApplicationModel model, String script, String[] argv ) throws IOException {
         URL url= DataSetURI.getURL(script);
         InputStream in= url.openStream();
-        runScript( model, in, argv );
-        in.close();
+        try {
+            runScript( model, in, argv );
+        } finally {
+            in.close();
+        }
     }
 
     /**
