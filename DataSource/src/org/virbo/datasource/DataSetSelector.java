@@ -716,8 +716,40 @@ public class DataSetSelector extends javax.swing.JPanel {
             Runnable run= new Runnable() {
                 @Override
                 public void run() {
-                    String surl= fsurl;
-
+                   String surl= fsurl;
+                   if ( timeRange!=null && UnitsUtil.isTimeLocation(timeRange.getUnits()) ) {
+                        try {
+                            //For TSB capability, set the default value to the axis setting initially.  So here's the problem: to see if
+                            // something has TSB, I need to a valid URI.  But I don't have a URI, that's why we are entering the editor.
+                            // Let's kludge past this and add the capability to the editor...
+                            DataSourceFactory dsf = DataSetURI.getDataSourceFactory( DataSetURI.getURI(surl), new NullProgressMonitor());
+                            if ( dsf!=null ) {  //vap+internal:data_1,data_2
+                                TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
+                                if (tsb!=null && !timeRange.equals( DatumRangeUtil.parseTimeRangeValid("2010-01-01") ) ) { // TODO: nasty nasty kludge tries to avoid setting the time when it is arbitrary default time.
+                                    tsb.setURI(surl);
+                                    //DatumRange r= tsb.getTimeRange();
+                                    //TODO: quantize timerange, so we don't get ranges with excessive resolution.  "vap+cdaweb:ds=AC_K0_SWE&id=Vp&timerange=2012-04-19+12:01+to+2012-04-20+00:01"
+                                    //TODO: Chris pointed out this was causing him problems.  
+                                    DatumRange tr2;
+                                    if ( timeRange instanceof OrbitDatumRange ) {
+                                        tr2= timeRange;
+                                    } else {
+                                        tr2= quantizeTimeRange( timeRange );
+                                    }
+                                    tsb.setTimeRange(tr2);
+                                    surl= tsb.getURI();
+                                }
+                            }
+                        } catch (ParseException ex ){
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
+                        } catch (IOException ex) {
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
+                        } catch (IllegalArgumentException ex) {
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
+                        } catch (URISyntaxException ex) {
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
+                        }
+                    }
                     boolean proceed;
                     try {
                         proceed = fedit.prepare(surl, window, getMonitor("download file", "downloading file to preparing editor"));
