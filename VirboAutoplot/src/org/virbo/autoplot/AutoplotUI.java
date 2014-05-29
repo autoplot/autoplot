@@ -3799,8 +3799,9 @@ APSplash.checkTime("init 210");
                         public void uncaughtException(Thread t, Throwable e) {
     //                        logger.severe("runtime exception: " + e);
                             logger.log(Level.SEVERE, "runtime exception: " + e, e);
-
-                            app.setStatus(ERROR_ICON,"caught exception: " + e.toString());
+                            if ( app!=null ) { // headless mode
+                                app.setStatus(ERROR_ICON,"caught exception: " + e.toString());
+                            }
                             if (e instanceof InconvertibleUnitsException) {
                                 // do nothing!!!  this is associated with the state change
                                 return;
