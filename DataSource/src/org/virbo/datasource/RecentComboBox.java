@@ -72,10 +72,6 @@ public class RecentComboBox extends JComboBox {
         recentFile= new File( bookmarksFolder, "recent."+pref+".txt" );
         loadRecent();
     }
-
-    public interface InputVerifier {
-        public boolean verify( String value );
-    }
     
     InputVerifier verifier= null;
 
