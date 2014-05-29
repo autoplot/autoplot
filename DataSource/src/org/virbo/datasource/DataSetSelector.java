@@ -717,39 +717,6 @@ public class DataSetSelector extends javax.swing.JPanel {
                 @Override
                 public void run() {
                     String surl= fsurl;
-                    if ( timeRange!=null && UnitsUtil.isTimeLocation(timeRange.getUnits()) ) {
-                        try {
-                            //For TSB capability, set the default value to the axis setting initially.  So here's the problem: to see if
-                            // something has TSB, I need to a valid URI.  But I don't have a URI, that's why we are entering the editor.
-                            // Let's kludge past this and add the capability to the editor...
-                            DataSourceFactory dsf = DataSetURI.getDataSourceFactory( DataSetURI.getURI(surl), new NullProgressMonitor());
-                            if ( dsf!=null ) {  //vap+internal:data_1,data_2
-                                TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
-                                if (tsb!=null && !timeRange.equals( DatumRangeUtil.parseTimeRangeValid("2010-01-01") ) ) { // TODO: nasty nasty kludge tries to avoid setting the time when it is arbitrary default time.
-                                    tsb.setURI(surl);
-                                    //DatumRange r= tsb.getTimeRange();
-                                    //TODO: quantize timerange, so we don't get ranges with excessive resolution.  "vap+cdaweb:ds=AC_K0_SWE&id=Vp&timerange=2012-04-19+12:01+to+2012-04-20+00:01"
-                                    //TODO: Chris pointed out this was causing him problems.  
-                                    DatumRange tr2;
-                                    if ( timeRange instanceof OrbitDatumRange ) {
-                                        tr2= timeRange;
-                                    } else {
-                                        tr2= quantizeTimeRange( timeRange );
-                                    }
-                                    tsb.setTimeRange(tr2);
-                                    surl= tsb.getURI();
-                                }
-                            }
-                        } catch (ParseException ex ){
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        } catch (IOException ex) {
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        } catch (IllegalArgumentException ex) {
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        } catch (URISyntaxException ex) {
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        }
-                    }
 
                     boolean proceed;
                     try {
@@ -772,65 +739,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                     
                     final String fsurl= surl;
 
-                    Runnable run= new Runnable() {
-                        @Override
-                        public void run() {
-                            DataSourceEditorDialog dialog;
-
-                            String title = "Editing URI " + fsurl;
-                            if (window instanceof Frame) {
-                                dialog = new DataSourceEditorDialog((Frame) window, fedit.getPanel(), true);
-                            } else if (window instanceof Dialog) {  // TODO: Java 1.6 ModalityType.
-                                dialog = new DataSourceEditorDialog((Dialog) window, fedit.getPanel(), true);
-                            } else {
-                                throw new RuntimeException("parent windowAncestor type is not supported.");
-                            }
-                            dialog.setTitle(title);
-
-                            if ( actionListenerList==null || actionListenerList.isEmpty() ) {
-                                dialog.setPlayButton(false); // nothing is going to happen, so don't show play button.
-                            } else {
-                                dialog.setExpertMode(isExpertMode());
-                            }
-
-                            pendingChanges.put( PENDING_EDIT, DataSetSelector.this );
-                            dialog.setVisible(true);
-                            if (!dialog.isCancelled()) {
-                                String surl= fedit.getURI();                                
-                                logger.log( Level.FINE, "dataSetSelector.setSelectedItem(\"{0}\");", surl );
-                                dataSetSelector.setSelectedItem(surl);
-
-                                boolean bug1098= false; //TODO finish off this change.
-                                if ( bug1098 ) {
-                                    DataSourceFactory dsf;
-                                    try {
-                                        dsf = DataSetURI.getDataSourceFactory( DataSetURI.getURI(surl), new NullProgressMonitor());
-                                        TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
-                                        tsb.setURI(surl);
-                                        DatumRange timeRangeNew= tsb.getTimeRange();
-                                        if ( !timeRangeNew.equals(timeRange) ) {
-                                            logger.log(Level.FINE, "resetting timerange to {0}", timeRangeNew);
-                                            timeRange= timeRangeNew;
-                                        }
-                                    } catch (ParseException ex) {
-                                        logger.log( Level.SEVERE, ex.getMessage(), ex );
-                                    } catch (IOException ex) {
-                                        logger.log( Level.SEVERE, ex.getMessage(), ex );
-                                    } catch (IllegalArgumentException ex) {
-                                        logger.log( Level.SEVERE, ex.getMessage(), ex );
-                                    } catch (URISyntaxException ex) {
-                                        logger.log( Level.SEVERE, ex.getMessage(), ex );
-                                    }
-                                }
-                                keyModifiers = dialog.getModifiers();
-                                maybePlot(true);
-                                pendingChanges.remove( PENDING_EDIT );
-                            } else {
-                                setMessage("editor cancelled");
-                                pendingChanges.remove( PENDING_EDIT );
-                            }
-                        } };
-                        SwingUtilities.invokeLater(run);
+                    Runnable run= getURIReviewDialog( fsurl, fedit );
+                    
+                    SwingUtilities.invokeLater(run);
 
                 }
             };
@@ -857,6 +768,69 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
     }
 
+    private Runnable getURIReviewDialog( final String fsurl, final DataSourceEditorPanel fedit ) {
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                DataSourceEditorDialog dialog;
+                Window window= SwingUtilities.getWindowAncestor(DataSetSelector.this); 
+                String title = "Editing URI " + fsurl;
+                if (window instanceof Frame) {
+                    dialog = new DataSourceEditorDialog((Frame) window, fedit.getPanel(), true);
+                } else if (window instanceof Dialog) {  // TODO: Java 1.6 ModalityType.
+                    dialog = new DataSourceEditorDialog((Dialog) window, fedit.getPanel(), true);
+                } else {
+                    throw new RuntimeException("parent windowAncestor type is not supported.");
+                }
+                dialog.setTitle(title);
+
+                if ( actionListenerList==null || actionListenerList.isEmpty() ) {
+                    dialog.setPlayButton(false); // nothing is going to happen, so don't show play button.
+                } else {
+                    dialog.setExpertMode(isExpertMode());
+                }
+
+                pendingChanges.put( PENDING_EDIT, DataSetSelector.this );
+                dialog.setVisible(true);
+                if (!dialog.isCancelled()) {
+                    String surl= fedit.getURI();                                
+                    logger.log( Level.FINE, "dataSetSelector.setSelectedItem(\"{0}\");", surl );
+                    dataSetSelector.setSelectedItem(surl);
+
+                    boolean bug1098= false; //TODO finish off this change.
+                    if ( bug1098 ) {
+                        DataSourceFactory dsf;
+                        try {
+                            dsf = DataSetURI.getDataSourceFactory( DataSetURI.getURI(surl), new NullProgressMonitor());
+                            TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
+                            tsb.setURI(surl);
+                            DatumRange timeRangeNew= tsb.getTimeRange();
+                            if ( !timeRangeNew.equals(timeRange) ) {
+                                logger.log(Level.FINE, "resetting timerange to {0}", timeRangeNew);
+                                timeRange= timeRangeNew;
+                            }
+                        } catch (ParseException ex) {
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
+                        } catch (IOException ex) {
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
+                        } catch (IllegalArgumentException ex) {
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
+                        } catch (URISyntaxException ex) {
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
+                        }
+                    }
+                    keyModifiers = dialog.getModifiers();
+                    maybePlot(true);
+                    pendingChanges.remove( PENDING_EDIT );
+                } else {
+                    setMessage("editor cancelled");
+                    pendingChanges.remove( PENDING_EDIT );
+                }
+            }
+        };
+        return run;
+    }
+    
     public void showCompletions() {
         JTextField tf= ((JTextField) dataSetSelector.getEditor().getEditorComponent());
         final String surl = tf.getText();
