@@ -10,8 +10,13 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,6 +84,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 }
             }
         });
+        resetRecent();
     }
     
     public void setSelectedRange( String s ) {
@@ -165,6 +171,9 @@ public class TimeRangeTool extends javax.swing.JPanel {
             String s= (String)nrtComboBox.getSelectedItem();
             int i= s.indexOf(" ");
             return s.substring(0,i);
+        } else if ( idx==3 ) {
+            String s= (String)recentTimesList.getSelectedValue();
+            return s;
         } else {
             throw new IllegalArgumentException("not implemented");
         }
@@ -234,6 +243,59 @@ public class TimeRangeTool extends javax.swing.JPanel {
 
     }
     
+    InputVerifier verifier=null;
+        
+    private void resetRecent() {
+        int RECENT_SIZE=20;
+        
+        File bookmarksFolder= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
+        File recentFile= new File( bookmarksFolder, "recent.timerange.txt" );
+        List<String> items= new ArrayList( RECENT_SIZE+2 );
+        
+        try {
+            if ( recentFile.exists() ) {
+                BufferedReader r = new BufferedReader(new FileReader(recentFile));
+                try {
+                    String s= r.readLine();
+                    while ( s!=null ) {
+                        if ( verifier!=null ) {
+                            if ( !verifier.verify(s) ) {
+                                s= r.readLine();
+                                continue;
+                            }
+                        }
+                        items.add(s);
+                        s= r.readLine();
+                    }
+                } finally {
+                    r.close();
+                }
+            }
+
+            Collections.reverse(items);
+            
+            //remove repeat items
+            List nitems= new ArrayList( items.size() );
+            for ( int i=0; i<items.size(); i++ ) {
+                String item= items.get(i);
+                if ( !nitems.contains(item) ) nitems.add(item);
+            }
+            items= nitems;
+            
+            int n= items.size();
+            if ( n>RECENT_SIZE ) items= items.subList(0,RECENT_SIZE);
+
+            DefaultListModel dlm= new DefaultListModel();
+            for ( int i=0; i<items.size(); i++ ) {
+                dlm.add( i, items.get(i) );
+            }
+            recentTimesList.setModel( dlm );
+
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -266,6 +328,9 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         nrtComboBox = new javax.swing.JComboBox();
+        jPanel4 = new javax.swing.JPanel();
+        recentTimesListSP = new javax.swing.JScrollPane();
+        recentTimesList = new javax.swing.JList();
 
         jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -471,6 +536,31 @@ public class TimeRangeTool extends javax.swing.JPanel {
 
         jTabbedPane1.addTab("NRT", jPanel3);
 
+        recentTimesList.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        recentTimesList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                recentTimesListValueChanged(evt);
+            }
+        });
+        recentTimesListSP.setViewportView(recentTimesList);
+
+        org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(recentTimesListSP, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(recentTimesListSP, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Recent Times", jPanel4);
+
         jTabbedPane1.setSelectedIndex(1);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -531,6 +621,24 @@ public class TimeRangeTool extends javax.swing.JPanel {
            if ( pendingTimeRange!=null ) {
                resetSpacecraft( (String)scComboBox.getSelectedItem(), pendingTimeRange );
            }
+       } else if ( jTabbedPane1.getSelectedIndex()==3 ) {
+           if ( pendingTimeRange!=null ) {
+               ListModel m= recentTimesList.getModel();
+               for ( int i=0; i<m.getSize(); i++ ) {
+                   try {
+                       DatumRange tr= DatumRangeUtil.parseTimeRange((String)m.getElementAt(i));
+                       if ( tr.intersects(pendingTimeRange) ) {
+                           recentTimesList.setSelectedIndex(i);
+                           break;
+                       }
+                   } catch ( ParseException ex ) {
+                       logger.log(Level.WARNING,null,ex);
+                   }
+               }
+               if ( recentTimesList.getSelectedIndex()==-1 ) {
+                   recentTimesList.setSelectedIndex(0);
+               }
+           }
        }
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
@@ -542,6 +650,10 @@ public class TimeRangeTool extends javax.swing.JPanel {
             orbitFeedbackLabel.setText( "Any orbit number can be entered by editing the text." );            
         }
     }//GEN-LAST:event_orbitListValueChanged
+
+    private void recentTimesListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_recentTimesListValueChanged
+        
+    }//GEN-LAST:event_recentTimesListValueChanged
 
     /**
      * shows the orbit timerange, clipping off text past the first colon.
@@ -582,11 +694,14 @@ public class TimeRangeTool extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JComboBox nrtComboBox;
     private javax.swing.JLabel orbitFeedbackLabel;
     private javax.swing.JList orbitList;
+    private javax.swing.JList recentTimesList;
+    private javax.swing.JScrollPane recentTimesListSP;
     private javax.swing.JComboBox scComboBox;
     private javax.swing.JTextField scFeedbackTF;
     private javax.swing.JTextField startTextField;
