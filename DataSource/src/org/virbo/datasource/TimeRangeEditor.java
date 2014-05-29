@@ -82,19 +82,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
         });
 
-        recentComboBox.setVerifier( new RecentComboBox.InputVerifier() {
-            @Override
-            public boolean verify(String text) {
-                try {
-                    DatumRangeUtil.parseTimeRange(text);
-                    return true;
-                } catch ( IllegalArgumentException ex ) {
-                    return false;
-                } catch (ParseException e) {
-                    return false;
-                }
-            }
-        });
+        recentComboBox.setVerifier( new TimeRangeVerifier() );
 
         revalidate();
         addMousePopupListener();
