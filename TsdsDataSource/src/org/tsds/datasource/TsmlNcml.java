@@ -143,12 +143,12 @@ public class TsmlNcml {
     private Units lookupUnits(String sunits) {
         if (sunits.contains("since")) {
             try {
-                return SemanticOps.lookupTimeUnits(sunits);
+                return Units.lookupTimeUnits(sunits);
             } catch (ParseException ex) {
                 throw new RuntimeException(ex);
             }
         } else {
-            return SemanticOps.lookupUnits(sunits);
+            return Units.lookupUnits(sunits);
         }
     }
 

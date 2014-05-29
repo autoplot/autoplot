@@ -377,7 +377,7 @@ public class DodsAdapter {
                     if (sunits.contains("since")) {
                         Units u;
                         try {
-                            u = SemanticOps.lookupTimeUnits(sunits);
+                            u = Units.lookupTimeUnits(sunits);
                             dep0.putProperty(QDataSet.UNITS, u);
                         } catch (java.text.ParseException ex) {
                             logger.log(Level.SEVERE, null, ex);

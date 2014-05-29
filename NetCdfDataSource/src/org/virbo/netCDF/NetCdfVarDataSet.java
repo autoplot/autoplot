@@ -228,7 +228,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             if ( unitsString.contains(" since ") ) {
                 Units u;
                 try {
-                    u = SemanticOps.lookupTimeUnits(unitsString);
+                    u = Units.lookupTimeUnits(unitsString);
                 } catch (ParseException ex) {
                     throw new RuntimeException(ex);
                 }

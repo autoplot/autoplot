@@ -26,37 +26,7 @@ import org.w3c.dom.Node;
  * @author jbf
  */
 public class MetadataUtil {
-    /**
-     * lookupUnits canonical units object, or allocate one.
-     * @param units string identifier.
-     * @return canonical units object.
-     * @deprecated use SemanticOps instead
-     */
-    public static synchronized Units lookupUnits(String sunits) {
-        return SemanticOps.lookupUnits(sunits);
-    }
-    
-    /**
-     * return canonical das2 unit for colloquial time.
-     * @param string
-     * @return
-     * @deprecated use SemanticOps instead
-     */
-    public static Units lookupTimeLengthUnit(String s) throws ParseException {
-        return SemanticOps.lookupTimeLengthUnit(s);
-    }
-    
-    /**
-     * lookupUnits canonical units object, or allocate one.  If one is
-     * allocated, then parse for "<unit> since <datum>"
-     * @param timeUnits
-     * @return
-     * @deprecated use SemanticOps instead
-     */
-    public static synchronized Units lookupTimeUnits( String units ) throws ParseException {
-        return SemanticOps.lookupTimeUnits(units);
-    }
-    
+
     /**
      * converts tree model node into canonical Map<String,Object>.  Branch nodes
      * are HashMap<String,Object> as well.
