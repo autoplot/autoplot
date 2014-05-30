@@ -133,7 +133,11 @@ public class LogConsole extends javax.swing.JPanel {
         timer2 = new Timer(300, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                update();
+                if ( LogConsole.this.isShowing() ) {
+                    update();
+                } else {
+                    timer2.restart();
+                }
             }
         });
         timer2.setRepeats(false);
