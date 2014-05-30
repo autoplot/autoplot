@@ -150,7 +150,7 @@ else
    rm -rf temp-volatile-classes/JNLP-INF/
 fi
 
-printf "Main-Class: org.virbo.autoplot.AutoplotUI\nPermissions: all-permissions\nApplication-Name: Autoplot (v2013b)\n" > temp-volatile-src/MANIFEST.MF
+printf "Main-Class: org.virbo.autoplot.AutoplotUI\nPermissions: all-permissions\nApplication-Name: Autoplot\n" > temp-volatile-src/MANIFEST.MF
 
 # remove signatures
 rm -f temp-volatile-classes/META-INF/*.RSA
