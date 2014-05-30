@@ -11,8 +11,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -22,8 +22,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.autoplot.help.AutoplotHelpSystem;
@@ -59,9 +61,13 @@ public class MetadataPanel extends javax.swing.JPanel {
     DataSourceFilter bindToDataSourceFilter = null;  //TODO: these should be weak references or such.
     PlotElement bindToPlotElement =null;
     private QDataSet dsTreeDs;
-    private QDataSet componentDs;
     private NameValueTreeModel statsTree;
 
+    Thread updateComponentDataSetThread= null;
+    Thread updateStatisticsThread= null;
+    
+    private static final Logger logger= LoggerManager.getLogger("gui.metadata");
+    
     /** Creates new form MetadataPanel */
     public MetadataPanel(ApplicationModel applicationModel) {
         this.applicationModel = applicationModel;
@@ -102,6 +108,26 @@ public class MetadataPanel extends javax.swing.JPanel {
         metaDataTree.addMouseListener( popupTrigger );
         
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "metadataPanel");
+        
+        Timer t= new Timer( 1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if ( MetadataPanel.this.isShowing() ) {
+                    if ( updateComponentDataSetThread!=null ) {
+                        logger.fine("updating component");
+                        updateComponentDataSetThread.start();
+                        updateComponentDataSetThread= null; // let it run until there's another update.
+                    }
+                    if ( updateStatisticsThread!=null ) {
+                        logger.fine("updating statistics");
+                        updateStatisticsThread.start();
+                        updateStatisticsThread= null; // let it run until there's another update.
+                    }
+                }
+            }
+        } );
+        t.setRepeats(true);
+        t.start();
     }
 
     private MouseListener createPopupTrigger() {
@@ -253,8 +279,7 @@ public class MetadataPanel extends javax.swing.JPanel {
                 updateComponentDataSetPropertiesView();
             }
         };
-        new Thread(run,"updateComponentDataSet").start();
-        //RequestProcessor.invokeLater(run);
+        updateComponentDataSetThread= new Thread(run,"updateComponentDataSet");
     }
 
 //    private String format(double d) {
@@ -307,6 +332,9 @@ public class MetadataPanel extends javax.swing.JPanel {
 //        return s.toString();
 //    }
 
+    /**
+     * this will update the dataset and "processed dataset" nodes.
+     */
     private void updateStatistics() {
         statisticsDirty = true;
         Runnable run = new Runnable() {
@@ -319,7 +347,7 @@ public class MetadataPanel extends javax.swing.JPanel {
                 }
             }
         };
-        new Thread( run, "updateStats" ).start();
+        updateStatisticsThread= new Thread( run, "updateStats" );
     }
 
     private synchronized void updateDataSetPropertiesView() {
@@ -360,18 +388,15 @@ public class MetadataPanel extends javax.swing.JPanel {
         if ( pe==null ) {
             unmount = componentDataSetTree;
             componentDataSetTree= NameValueTreeModel.create("Processed Dataset", java.util.Collections.singletonMap("dataset", "(no dataset)") );
-            this.componentDs = null;
         } else {
             QDataSet ds= pe.getController().getDataSet();
             if ( ds == null) {
                 unmount = componentDataSetTree;
                 componentDataSetTree= NameValueTreeModel.create("Processed Dataset", java.util.Collections.singletonMap("dataset", "(no dataset)") );
-                this.componentDs = null;
             } else {
                 unmount = componentDataSetTree;
                 if ( ds!=this.dsTreeDs ) {
                     componentDataSetTree = new PropertiesTreeModel("Processed Dataset= ", ds, 20);
-                    this.componentDs = ds;
                 } else {
                     componentDataSetTree= NameValueTreeModel.create("Processed Dataset contains no additional processing", java.util.Collections.singletonMap("dataset", "(no additional processing)") );
                 }
