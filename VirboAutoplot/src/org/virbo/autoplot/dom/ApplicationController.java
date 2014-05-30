@@ -1918,7 +1918,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         synchronized (bindingContexts) {
             for ( Entry<Object,BindingGroup> e: bindingContexts.entrySet() ) {
                 List<Binding> bs= e.getValue().getBindings();
-                System.err.println( "== " +e.getKey()+" -> "+ e.getValue() + " (size="+bs.size()+")");
+                System.err.println( "=== " +e.getKey()+" -> "+ e.getValue() + " (size="+bs.size()+")");
                 if ( bs.size()>0 ) {
                     for ( Binding b: bs ) {
                         System.err.println( 
