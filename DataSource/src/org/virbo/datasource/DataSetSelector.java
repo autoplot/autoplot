@@ -2120,28 +2120,32 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     /**
      * allow the user to pick one of two times, when it is ambiguous what they want.
      * @param parent null or the component to focus.
-     * @param timeRange
-     * @param timeRange0
+     * @param timeRange1
+     * @param timeRange2 
      * @return the timerange selected.
      */
-    public static DatumRange pickTimeRange( Component parent, DatumRange timeRange, DatumRange timeRange0) {
-        if ( timeRange0==null ) return timeRange;
+    public static DatumRange pickTimeRange( Component parent, DatumRange timeRange1, DatumRange timeRange2 ) {
+        if ( timeRange2 ==null ) return timeRange1;
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
         p.add( new JLabel("<html>The URI contains a time different than the application<br>time range.  Which should be used?</html>") );
         ButtonGroup bg= new ButtonGroup();
-        JRadioButton b1= new JRadioButton( timeRange.toString() );
+        String s1= timeRange1.toString();
+        JRadioButton b1= new JRadioButton( s1 );
         p.add(b1);
         bg.add(b1);
         bg.setSelected(b1.getModel(),true);
-        JRadioButton b2= new JRadioButton( timeRange0.toString() );
+        String s2= timeRange2 .toString();
+        JRadioButton b2= new JRadioButton( s2 );
         p.add(b2);
         bg.add(b2);
         JOptionPane.showMessageDialog( parent, p, "Which range", JOptionPane.QUESTION_MESSAGE );
         if ( b1.isSelected() ) {
-            return timeRange;
+            LoggerManager.getLogger("gui").log(Level.FINE, "user picked first timerange {0}", s1);
+            return timeRange1;
         } else {
-            return timeRange0;
+            LoggerManager.getLogger("gui").log(Level.FINE, "user picked second timerange {0}", s2);
+            return timeRange2 ;
         }
     }
     
