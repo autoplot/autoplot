@@ -60,10 +60,15 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         jScrollPane1.getVerticalScrollBar().setUnitIncrement( getFont().getSize() );
     }
 
-    private boolean isNoFile( String surl1 ) {
+    /**
+     * return true if the surl is not a file (like with vap+cdaweb:...);
+     * @param surl1
+     * @return 
+     */
+    private boolean isNotFile( String surl1 ) {
         int icolon= surl1.indexOf(":");
         if ( icolon>-1 && icolon<MAX_VAP_PREFIX && surl1.length()>16 ) {
-            if ( surl1.charAt(icolon+1)!='/' || surl1.charAt(icolon+2)!='/' ) {
+            if ( surl1.charAt(icolon+1)!='/' ) {
                 return true;
             }
         }
@@ -356,7 +361,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     @Override
     public void setURI(String uri) {
         this.suri= uri;
-        this.suriNoFile=isNoFile(uri);
+        this.suriNoFile=isNotFile(uri);
         URISplit split= URISplit.parse(suri);
         Map<String,String> params= URISplit.parseParams( split.params );
         for ( Entry<String,String> e: params.entrySet() ) {
@@ -440,7 +445,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     @Override
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
         this.suri= uri;
-        this.suriNoFile=isNoFile(uri);        
+        this.suriNoFile=isNotFile(uri);        
         DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), mon);
         if ( dsf==null ) {
             throw new UnrecognizedDataSourceException(uri);
