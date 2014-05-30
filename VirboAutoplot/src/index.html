@@ -23,15 +23,19 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-05-21):</p>
+        <p>Bugfixes (2014-05-30):</p>
         <ul>
+            <li>bug in slicing would loose TCA metadata from das2server in d2s, loosing fill value.</li>
+            <li>dataVisible and layoutVisible flags were not set properly new window, so these tabs were not properly initialized.</li>
+            <li>isNotFile corrected to match "file:/home..." as a file in automatic completions-based editor.</li>
+            <li>rte_0829456451: file:/home/... instead of file:///home/... would result in null pointer exception with completions-based GUI.  Thanks Chris!</li>
+            <li>bug 1195:  Akebono MCA data script shows memory leaks. Thanks Takahiro!</li>
             <li>trim out indented blocks in removeSideEffects</li>
             <li>check for invalid URLs in Das2DataSource editor panel.</li>
             <li>aggregate one (just the address bar) no longer resets the range</li>
             <li>vap+orbit: URIs work with Automatic data source editor GUI.</li>
             <li>append( FDataSet, DDataSet ) would fail</li>
             <li>support $x in timeformat parameter of ascii parser.</li>
-            <li>bug 1195:  Akebono MCA data script shows memory leaks. Thanks Takahiro!</li>
             <li>null pointer exception in logging because of misuse of logger.log( level, template, parms )</li>
             <li>fix occasional index-out-of-bounds seen when scripting by making defensive copy of application state.</li>
             <li>rte_1786254278: disable the pngwalk navigate menu when there is no sequence loaded.  Thanks mariahelgacosentino!</li>
@@ -72,7 +76,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>move lookupUnits to Units class from SemanticOps, introduce lookupDatum to make standard spot for this logic</li>
+            <li>das2streams allow the monitor taskSize to be set in a comment.</li>
             <li>put in filesystem completions when the method is "File" constructor</li>
+            <li>rfe 361: give the user the option of resetting the main window when a script is run from a second window.</li>
             <li>rfe 337: Reset timerange when using URIs from bookmarks and recent history</li>            
             <li>add code to get the PID to aid in debugging with JVisualVM</li>
             <li>keep track of reason why filesystem is offline.</li>
