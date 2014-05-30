@@ -685,6 +685,7 @@ public class GuiSupport {
                 view.setVisible(true);
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferencesWithEvents();
+                view.setMessage("ready");
             }
         };
         try {
@@ -723,6 +724,7 @@ public class GuiSupport {
                 view.setVisible(true);
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferencesWithEvents();
+                view.setMessage("ready");
             }
         };
         try {
