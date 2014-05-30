@@ -67,7 +67,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
     DefaultTreeModel deftree= new DefaultTreeModel( new DefaultMutableTreeNode("") );
     MyTreeModel theModel=null;
 
-    private static final Logger logger= LoggerManager.getLogger("autoplot");
+    private static final Logger logger= LoggerManager.getLogger("autoplot.gui");
             
     /** Creates new form RecentUrisGUI */
     public RecentUrisGUI() {

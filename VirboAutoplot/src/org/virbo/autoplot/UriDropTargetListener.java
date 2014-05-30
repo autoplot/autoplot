@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
  */
 public class UriDropTargetListener implements DropTargetListener {
     
-    private static final Logger logger= LoggerManager.getLogger("autoplot");
+    private static final Logger logger= LoggerManager.getLogger("autoplot.gui");
     
     DataSetSelector dss;
     ApplicationModel model;
