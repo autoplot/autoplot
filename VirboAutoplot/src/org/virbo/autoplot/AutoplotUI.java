@@ -474,21 +474,32 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     applicationModel.addRecent(dataSetSelector.getValue());
                     runScript( dataSetSelector.getValue() );
                 } else {
-                    org.das2.util.LoggerManager.logGuiEvent(ev);                    
+                    org.das2.util.LoggerManager.logGuiEvent(ev);     
+                    if ( JOptionPane.YES_OPTION==
+                            JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
+                                    "Reset Main Window", JOptionPane.YES_NO_OPTION ) ) {
+                        ScriptContext.setApplicationModel(AutoplotUI.this.applicationModel);
+                        ScriptContext.setView(AutoplotUI.this);
+                    }
                     runScript( dataSetSelector.getValue() );
                 }
             }
         });
 
-        dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+        dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT ) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
                 if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
                     org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     runScript( dataSetSelector.getValue() );
                 } else {
-                    org.das2.util.LoggerManager.logGuiEvent(ev);                    
-                    applicationModel.showMessage( "scripts can only be run from the main window.", "Script error", JOptionPane.WARNING_MESSAGE );
+                    org.das2.util.LoggerManager.logGuiEvent(ev);  
+                    if ( JOptionPane.YES_OPTION==
+                            JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
+                                    "Reset Main Window", JOptionPane.YES_NO_OPTION ) ) {
+                        ScriptContext.setApplicationModel(AutoplotUI.this.applicationModel);
+                        ScriptContext.setView(AutoplotUI.this);
+                    }
                 }
             }
         });
