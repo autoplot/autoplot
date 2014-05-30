@@ -45,10 +45,22 @@ public class AppManager {
 
     public void closeApplication( Object app ) {
         if ( app instanceof AutoplotUI ) { // there's a bug here--we need to associate just with autoplot app.
+            boolean resetMain= false;
+            if ( ScriptContext.getViewWindow()==null ) {
+                resetMain= true;
+            }
             if ( requestQuit() ) {
                 this.apps.remove(app);
                 if ( this.apps.isEmpty() ) {
                     quit();
+                }
+            }
+            if ( resetMain ) {
+                for ( Object o: this.apps ) {
+                    if ( o instanceof AutoplotUI ) {
+                        ScriptContext.setView((AutoplotUI)o); //TODO: if there are running apps, this will cause problems...
+                        ScriptContext.setApplicationModel(((AutoplotUI)o).applicationModel);
+                    }
                 }
             }
         } else {
