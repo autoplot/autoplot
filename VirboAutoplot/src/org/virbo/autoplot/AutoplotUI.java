@@ -466,41 +466,32 @@ public final class AutoplotUI extends javax.swing.JFrame {
             }
         });
 
-        if ( ScriptContext.getViewWindow()==this ) {
-            dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
-                @Override
-                public void actionPerformed( ActionEvent ev ) {
+        dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+            @Override
+            public void actionPerformed( ActionEvent ev ) {
+                if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
                     org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     applicationModel.addRecent(dataSetSelector.getValue());
                     runScript( dataSetSelector.getValue() );
-                }
-            });
-
-            dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
-                @Override
-                public void actionPerformed( ActionEvent ev ) {
+                } else {
                     org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     runScript( dataSetSelector.getValue() );
                 }
-            });
-        } else {
-            dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
-                @Override
-                public void actionPerformed( ActionEvent ev ) {
-                    org.das2.util.LoggerManager.logGuiEvent(ev);                    
-                    applicationModel.showMessage( "scripts can only be run from the main window.", "Script error", JOptionPane.WARNING_MESSAGE );
-                }
-            });
+            }
+        });
 
-            dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
-                @Override
-                public void actionPerformed( ActionEvent ev ) {
+        dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+            @Override
+            public void actionPerformed( ActionEvent ev ) {
+                if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
+                    org.das2.util.LoggerManager.logGuiEvent(ev);                    
+                    runScript( dataSetSelector.getValue() );
+                } else {
                     org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     applicationModel.showMessage( "scripts can only be run from the main window.", "Script error", JOptionPane.WARNING_MESSAGE );
                 }
-            });
-            
-        }
+            }
+        });
 
         dataSetSelector.registerActionTrigger( "script:(.*)", new AbstractAction( TAB_SCRIPT) {
             @Override
