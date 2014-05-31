@@ -82,12 +82,6 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
             System.err.println("Boo, sleep because testing server isn't stopping properly."); //TODO: fix this!
             Thread.sleep(500);
             
-            DialogOperator diaFrame2 = new DialogOperator( new RegexComponentChooser( "Which range") );
-            new JButtonOperator( diaFrame2, "OK" ).clickMouse();
-
-            System.err.println("Boo, sleep because testing server isn't stopping properly."); //TODO: fix this!
-            Thread.sleep(500);
-            
             System.err.println( "5: "+xaxis.getDatumRange() );
             System.err.println("current directory: "+new File(".").getAbsoluteFile().toString());
             
