@@ -19,7 +19,8 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
- * Orbit data sources added for demonstration purposes, but it will also be useful.
+ * Orbit data sources added for demonstration purposes, but it will also be useful for showing
+ * reference orbits.  An example URI is "vap+orbit:rbspa-pp&timerange=2004"
  * @author jbf
  */
 public class OrbitDataSourceFactory extends AbstractDataSourceFactory {
