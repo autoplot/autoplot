@@ -19,7 +19,8 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 
 /**
- * read in orbits as events file.
+ * Read in orbits as events file.  This expects URIs like
+ * "vap+orbit:rbspa-pp&timerange=2014" 
  * @author jbf
  */
 class OrbitDataSource extends AbstractDataSource {
