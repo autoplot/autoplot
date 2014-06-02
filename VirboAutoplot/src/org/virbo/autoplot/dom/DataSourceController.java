@@ -1392,7 +1392,7 @@ public class DataSourceController extends DomNodeController {
      * @return the controller's current datasource.
      */
     public DataSource getDataSource() {
-        logger.log( Level.FINE, "accessing data source");
+        logger.log( Level.FINER, "accessing data source");
         
         // Since the dataSource is immutable, this needn't be synchronized.  
         // Synchronizing caused a hang:
