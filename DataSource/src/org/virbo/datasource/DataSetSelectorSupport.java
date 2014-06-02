@@ -98,7 +98,12 @@ public class DataSetSelectorSupport {
 
         JFileChooser chooser = new JFileChooser(currentDirectory);
 
-        final boolean isAutoplotApp= ((DataSetSelector)parent).actionTriggers.containsKey("vapfile:(.*)"); //TODO: kludgy
+        final boolean isAutoplotApp;
+        if ( parent instanceof DataSetSelector ) {
+            isAutoplotApp= ((DataSetSelector)parent).actionTriggers.containsKey("vapfile:(.*)"); //TODO: kludgy  
+        } else {
+            isAutoplotApp= true;
+        }
         
         FileFilter ff;
         ff = new FileFilter() {
