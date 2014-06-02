@@ -247,6 +247,8 @@ class Das2ServerDataSource extends AbstractDataSource {
         logger.fine( String.valueOf(url2) );
 
         boolean qds= "1".equals( dsdfParams.get("qstream") );
+        
+        new Exception().printStackTrace();
 
         logger.log( Level.FINE, "opening {0} {1}", new Object[]{ qds ? "as qstream" : "as das2stream", url2 });
         InputStream in = url2.openStream();
@@ -426,7 +428,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                 } else {
                     logger.fine("no resolution specified");
                 }
-                if ( dsParams!=null )  sparams+= "&" + dsParams;
+                if ( dsParams!=null && dsParams.trim().length()>0 )  sparams+= "&" + dsParams; //TODO: Double-load was caused by extra & at the end.  It's silly to have it so sensitive.
                 return "vap+das2Server:" + resourceURI + "?" + sparams;
             }
 
