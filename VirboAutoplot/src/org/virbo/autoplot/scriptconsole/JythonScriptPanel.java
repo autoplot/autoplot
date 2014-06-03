@@ -58,6 +58,11 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     static final int CONTEXT_DATA_SOURCE = 1;
     static final int CONTEXT_APPLICATION = 0;
     private int context = 0;
+    
+    /**
+     * true if the current file contains tabs.
+     */
+    boolean containsTabs= false;
 
     private transient DocumentListener dirtyListener; // this contains repeated code in ScriptPanelSupport  
 
@@ -261,11 +266,11 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     protected void updateStatus() {
         if ( filename==null ) {
-            fileNameTextField.setText( "" + ( dirty ? " *" : "" ));
+            fileNameTextField.setText( "" + ( dirty ? " *" : "" ) + ( containsTabs ? " TAB" : "" ) );
         } else {
             File lfile= new File(filename);
             getEditorPanel().setEditable(lfile.canWrite());
-            fileNameTextField.setText( filename + ( lfile.canWrite() ? "" : " (read only)" ) + ( dirty ? " *" : "" ) ) ;
+            fileNameTextField.setText( filename + ( lfile.canWrite() ? "" : " (read only)" ) + ( dirty ? " *" : "" ) + ( containsTabs ? " TAB" : "" ) ) ;
         }
     }
 
