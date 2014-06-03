@@ -252,11 +252,15 @@ public class ScriptPanelSupport {
 
     protected void loadInputStream( InputStream in ) throws IOException {
         BufferedReader r = null;
+        panel.containsTabs= false;
         try {
             StringBuilder buf = new StringBuilder();
             r = new BufferedReader(new InputStreamReader(in));
             String s = r.readLine();
             while (s != null) {
+                if ( s.contains("\t") ) {
+                    panel.containsTabs= true;
+                }
                 buf.append(s).append("\n");
                 s = r.readLine();
             }
