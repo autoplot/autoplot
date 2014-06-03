@@ -690,8 +690,9 @@ public class ScriptPanelSupport {
         JScrollPane scrollPane= new JScrollPane(p);
         //p.setPreferredSize( new Dimension(300,300) );
         //p.setMinimumSize( new Dimension(300,300) );
-        scrollPane.setPreferredSize( new Dimension(300,300) );
-        scrollPane.setMinimumSize( new Dimension(300,300) );
+        scrollPane.setPreferredSize( new Dimension(300,200) );
+        scrollPane.setMinimumSize( new Dimension(300,100) );
+        scrollPane.setMaximumSize( new Dimension(300,200) );       
         
         recentPanel.add( new JLabel("Recently used local files:"), BorderLayout.NORTH );
         recentPanel.add( scrollPane, BorderLayout.CENTER );
@@ -735,6 +736,7 @@ public class ScriptPanelSupport {
             } else {
                 chooser.setAccessory( getRecentAccessory("*.jyds", RECENT_FILES_COUNT,chooser) );
             }
+            chooser.revalidate();
             
             int r = chooser.showOpenDialog(panel);
             if (r == JFileChooser.APPROVE_OPTION) {
