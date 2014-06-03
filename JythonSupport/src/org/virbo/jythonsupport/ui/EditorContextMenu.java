@@ -13,6 +13,7 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -25,11 +26,17 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Element;
+import org.das2.jythoncompletion.CompletionContext;
 import org.das2.jythoncompletion.CompletionSettings;
+import org.das2.jythoncompletion.CompletionSupport;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
+import org.python.parser.SimpleNode;
+import org.python.parser.ast.Module;
+import org.python.parser.ast.stmtType;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.jythonsupport.JythonUtil;
 
 /**
  *
@@ -425,6 +432,7 @@ public class EditorContextMenu {
             } );
             mi.setToolTipText("comment the selected block of lines");
             actionsMenu.add( mi );
+            
             mi= new JMenuItem( new AbstractAction("uncomment block") {
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
@@ -445,6 +453,24 @@ public class EditorContextMenu {
             actionsMenu.add( mi );
 
             menu.add( actionsMenu );
+
+            mi= new JMenuItem( new AbstractAction("show usages") {
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);  
+                    String script= editor.getText();
+                    String var= editor.getSelectedText();
+                    if ( var==null || var.length()==0 ) {
+                        var= EditorAnnotationsSupport.getSymbolAt( editor );
+                    }
+                    editor.getEditorAnnotationsSupport().clearAnnotations();
+                    List<SimpleNode> usages= JythonUtil.showUsage( script,var );
+                    for ( SimpleNode n: usages ) {
+                        editor.getEditorAnnotationsSupport().annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
+                    }
+                }
+            } );
+            mi.setToolTipText( "highlite usages" );
+            actionsMenu.add( mi );
 
             JMenu settingsMenu= new JMenu("Settings");
             mi= new JMenuItem( new AbstractAction("Edit Settings") {

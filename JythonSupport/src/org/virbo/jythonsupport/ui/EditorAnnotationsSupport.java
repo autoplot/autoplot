@@ -45,6 +45,30 @@ public class EditorAnnotationsSupport {
      */
     public static final String ANNO_WARNING = "warning";
 
+    /**
+     * usage of a symbol in the code
+     */
+    public static final String ANNO_USAGE = "usage";
+
+    /**
+     * return the symbol at the current location, or ""
+     * @param editor
+     * @return the symbol (e.g. variable name) at the current location
+     */
+    public static String getSymbolAt( EditorTextPane editor ) {
+        int i= editor.getCaretPosition();
+        String s= editor.getText();
+        while ( i>=0 && Character.isJavaIdentifierPart(s.charAt(i)) ) {
+            i=i-1;
+        }
+        if ( !Character.isJavaIdentifierPart(s.charAt(i)) ) i=i+1;
+        int i0= i;
+        while ( i<s.length() && Character.isJavaIdentifierPart(s.charAt(i)) ) {
+            i=i+1;
+        }
+        return s.substring(i0,i);
+    }
+
     private JEditorPane editorPanel;
     PythonInterpreter interp;
 
@@ -94,6 +118,7 @@ public class EditorAnnotationsSupport {
 
     /**
      * remove all annotations at the position
+     * @param pos the position in character position within the document.
      */
     public void clearAnnotations(int pos) {
         final Annotation ann = annotationAt(pos);
@@ -138,9 +163,9 @@ public class EditorAnnotationsSupport {
 
     /**
      * highlite the line by setting the background to color.  null clears the highlite.
-     * @param line, the line number to highlite.  1 is the first line.
-     * @param name, the name of the style, including "error" and "programCounter"
-     * @param text, annotation to display when hovering. Currently ignored.
+     * @param line the line number to highlite.  1 is the first line.
+     * @param name the name of the style, including "error" and "programCounter"
+     * @param text annotation to display when hovering. Currently ignored.
      */
     public void annotateLine(int line, String name, String text) throws BadLocationException {
         annotateLine( line, name, text, null );
@@ -148,10 +173,10 @@ public class EditorAnnotationsSupport {
 
     /**
      * highlite the line by setting the background to color.  null clears the highlite.
-     * @param line, the line number to highlite.  1 is the first line.
-     * @param name, the name of the style, including "error" and "programCounter"
-     * @param text, annotation to display when hovering.
-     * @param interp, the interpretter to focus on.
+     * @param lline the line number to highlite.  1 is the first line.
+     * @param name the name of the style, including "error" and "programCounter"
+     * @param ltext annotation to display when hovering.
+     * @param interp the interpreter to focus on.
      */
     public void annotateLine( int lline, final String name, String ltext, final PythonInterpreter interp ) {
         if ( lline<1 ) {
@@ -189,6 +214,41 @@ public class EditorAnnotationsSupport {
     }
 
     /**
+     * annotate the characters on the line.  This was introduced to highlite the location of symbol names.
+     * @param line the line number, where 1 is the first line.
+     * @param i0 the column number, where 1 is the first column.
+     * @param i1 the last column number, exclusive.
+     * @param name annotation type, such as "usage" or "error" see constants.
+     * @param text the tooltip text.
+     * @param interp null or the interpreter.
+     */
+    public void annotateChars( final int line, final int i0, final int i1, final String name, final String text, final PythonInterpreter interp ) {
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                Document doc = editorPanel.getDocument();
+                Element root = editorPanel.getDocument().getDefaultRootElement();
+
+                if ( root.getElementCount()==1 ) { // transitional case where the document is cleared.
+                    return;
+                }
+                
+                if ( line>root.getElementCount()+1 ) {
+                    throw new IllegalArgumentException( "no such line: "+line );
+                }
+
+                int lineStart;
+
+                if ( line<=root.getElementCount() ) {
+                    lineStart = root.getElement(line - 1).getStartOffset();
+                } else {
+                    lineStart = Math.max(0, doc.getLength()-2 );
+                }
+                annotateChars( lineStart+i0-1, lineStart+i1-1, name, text, interp );
+            }
+        } );
+    }
+    
+    /**
      * 
      * @param i0 char offset for the beginning
      * @param i1 char offset for the end.
@@ -205,6 +265,8 @@ public class EditorAnnotationsSupport {
                 
                 if ( name.equals(ANNO_WARNING) ) {
                     mark= new SimpleMarker(Color.YELLOW);
+                } else if ( name.equals(ANNO_USAGE) ) {
+                    mark= new SimpleMarker(Color.YELLOW.brighter());
                 } else if ( name.equals(ANNO_ERROR) ) {
                     mark= new SimpleMarker(Color.PINK);
                 } else if ( name.equals(ANNO_PROGRAM_COUNTER) ){

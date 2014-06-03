@@ -795,6 +795,65 @@ public class JythonUtil {
          return result.toString();         
      }
      
+     
+     private static class VisitNamesVisitorBase<R> extends VisitorBase {
+         String name;
+         List<SimpleNode> names;
+         
+         VisitNamesVisitorBase( String name ) {
+             this.name= name;
+             names= new ArrayList();
+         }
+
+        @Override
+        public Object visitName(Name node) throws Exception {
+            if ( name.equals(node.id) ) {
+                names.add(node);
+            }
+            return super.visitName(node); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public Object visitCall(Call node) throws Exception {
+            return super.visitCall(node); //To change body of generated methods, choose Tools | Templates.
+        }
+        
+         @Override
+         protected Object unhandled_node(SimpleNode sn) throws Exception {
+             return sn;
+         }
+         @Override
+         public void traverse(SimpleNode sn) throws Exception {
+             sn.traverse(this);
+         }
+         /**
+          * return the nodes where the name is used.
+          * @return 
+          */
+         public List<SimpleNode> getNames() {
+             return names;
+         }
+     }
+     
+     /**
+      * get the nodes where the symbol is used.
+      * @param script the jython script which is parsed.
+      * @param symbol the symbol to look for.
+      * @return the AST nodes which contain location information.
+      */
+     public static List<SimpleNode> showUsage( String script, String symbol ) {
+         Module n= (Module)org.python.core.parser.parse( script, "exec" );
+         VisitNamesVisitorBase vb= new VisitNamesVisitorBase(symbol);
+         for ( stmtType st : n.body ) {
+            try {
+                st.traverse(vb);
+            } catch (Exception ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+         }
+         return vb.getNames();
+     }
+     
      /**
      * extracts the parts of the program that get parameters.  
      *
