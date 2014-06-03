@@ -328,10 +328,13 @@ public class DataSourceUtil {
     }
 
     /**
-     * return the replacement or null.  remove the used items.
-     * @param s
+     * return the replacement or null.  remove the used items.  This will not match anything 
+     * after the question mark, if there is one.
+     * @param s the URI.
      * @param search
-     * @return
+     * @param replaceWith 
+     * @param resolution 
+     * @return the string with 2014 replaced with $Y, etc.
      */
     private static String replaceLast( String s, List<String> search, List<String> replaceWith, List<Integer> resolution ) {
         Map<String,Integer> found= new HashMap();
@@ -341,13 +344,18 @@ public class DataSourceUtil {
         int best= -1;
         int n= search.size();
 
+        int limit= s.indexOf("?");
+        if ( limit==-1 ) limit=s.length();
+        
+        DatumRange dr= null;
+        
         while (true ) {
             for ( int i=0; i<n; i++ ) {
-                if ( search.get(i)==null ) continue; // search.get(i)==null means that search is no longer elagable.
+                if ( search.get(i)==null ) continue; // search.get(i)==null means that search is no longer eligible.
                 Matcher m= Pattern.compile(search.get(i)).matcher(s);
                 int idx= -1;
                 while ( m.find() ) idx= m.start();
-                if ( idx>-1 ) {
+                if ( idx>-1 && idx<limit ) {
                     found.put( search.get(i), idx );
                     if ( idx>last ) {
                         last= idx;
@@ -358,26 +366,45 @@ public class DataSourceUtil {
                 }
             }
             if ( best>-1 ) {
-                s= s.substring(0,last) + s.substring(last).replaceAll(flast, frepl);
-                int res= resolution.get(best);
-                int count=0;
-                for ( int i=0; i<n; i++ ) {
-                    if ( resolution.get(i)>res ) {
-                        count++;
-                        search.set(i,null);
-                    }
+                String date= s.substring(last);
+                String ch= date.substring(4,5); // get the $2 char.  Assumes all are $Y
+                String stp= frepl.replaceAll("\\\\",""); 
+                stp= stp.replaceAll("\\$2",ch);
+                stp= stp.replaceAll("\\$3",ch);
+                TimeParser tp= TimeParser.create( stp );
+                DatumRange dr1=null;
+                try {
+                    dr1= tp.parse(date).getTimeRange();
+                } catch ( ParseException ex ) {
+                    
                 }
-                if ( count==search.size() ) {
-                    return s;
+                
+                if ( dr1!=null && ( dr==null || dr1.intersects(dr) ) ) {
+                    dr= dr1;
+                    s= s.substring(0,last) + s.substring(last).replaceAll(flast, frepl);
+                    int res= resolution.get(best);
+                    int count=0;
+                    for ( int j=0; j<n; j++ ) {
+                        if ( resolution.get(j)>res ) {
+                            count++;
+                            search.set(j,null);
+                        }
+                    }
+                    if ( count==search.size() ) {
+                        return s;
+                    } else {
+                        best= -1;
+                        last= -1; //search for courser resolutions
+                    }
                 } else {
-                    best= -1;
-                    last= -1; //search for courser resolutions
+                    return s;
                 }
             } else {
                 return s;
             }
         }
     }
+        
     /**
      * attempt to create an equivalent URL that uses an aggregation template
      * instead of the explicit filename.
@@ -401,6 +428,8 @@ public class DataSourceUtil {
         String yyyymmdd_HH= "(?<!\\d)(19|20)(\\d{6})(\\D)\\d{2}(?!\\d)"; //"(\\d{8})"; 20140204T15
         String yyyymmdd_HHMM= "(?<!\\d)(19|20)(\\d{6})(\\D)\\d{2}\\d{2}(?!\\d)"; //"(\\d{8})"; 20140204T1515
 
+        //DANGER: code assumes starts with 4-digit year and then a delimiter, or no delimiter.  See replaceLast
+        
         String version= "([Vv])\\d{2}";                // $v
         String vsep= "([Vv])(\\d+\\.\\d+(\\.\\d+)+)";  // $(v,sep)
 
@@ -846,9 +875,10 @@ public class DataSourceUtil {
     }
 
     public static void main(String[] args ) {
-        String surl= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX";
+        String surl= "ftp://virbo.org/LANL/LANL1991/SOPA+ESP/H0/LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?L";
+        //String surl= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX";
         System.err.println( makeAggregation(surl) ); //logger okay
-                
+        System.err.println( makeAggregation(surl) ); //logger okay
     }
 
     /**
