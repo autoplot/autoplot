@@ -58,6 +58,9 @@ public class EditorAnnotationsSupport {
     public static String getSymbolAt( EditorTextPane editor ) {
         int i= editor.getCaretPosition();
         String s= editor.getText();
+        if ( i>=1 && !Character.isJavaIdentifierPart(s.charAt(i)) && Character.isJavaIdentifierPart(s.charAt(i-1)) ) {
+            i=i-1;
+        }
         while ( i>=0 && Character.isJavaIdentifierPart(s.charAt(i)) ) {
             i=i-1;
         }
