@@ -1366,16 +1366,10 @@ APSplash.checkTime("init 52.7");
         mi.setToolTipText("Save the application state to a file");
         mi.setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ));
         fileMenu.add(mi);
-//        fileMenu.add(new AbstractAction("Save With Data...") {
-//
-//            public void actionPerformed(ActionEvent e) {
-//                applicationModel.setUseEmbeddedDataSet(true);
-//                stateSupport.saveAs();
-//            }
-//        });
+
         fileMenu.addSeparator();
 APSplash.checkTime("init 52.8");
-        //TODO: decorate print action to set focus.
+        
         AbstractAction printAction= new AbstractAction( "Print...") {
             @Override
             public void actionPerformed(ActionEvent e) {
