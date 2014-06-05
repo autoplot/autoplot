@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Completions on file names in the Jython editor.</small></p>
+        <p><small>PNG Walk Tool is used to look at IDL-generated images.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,12 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-05-30):</p>
+        <p>Bugfixes (2014-06-04):</p>
         <ul>
+            <li>1205: aggregate all breaks with jyds script with timerange param </li>
+            <li>File->print is performed off the event thread because this can be slow or even hang on Linux.</li>
+            <li>421: double load of Das2Source caused by misformatted URI</li>
+            <li>"getting started" dialog had unused browseLocal branch that was broken</li>
             <li>bug in slicing would loose TCA metadata from das2server in d2s, loosing fill value.</li>
             <li>dataVisible and layoutVisible flags were not set properly new window, so these tabs were not properly initialized.</li>
             <li>isNotFile corrected to match "file:/home..." as a file in automatic completions-based editor.</li>
@@ -76,6 +80,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>jython "show usages" action added</li>
+            <li>jython script can be run from any Autoplot window, ask if switch context.</li>
             <li>move lookupUnits to Units class from SemanticOps, introduce lookupDatum to make standard spot for this logic</li>
             <li>das2streams allow the monitor taskSize to be set in a comment.</li>
             <li>put in filesystem completions when the method is "File" constructor</li>
