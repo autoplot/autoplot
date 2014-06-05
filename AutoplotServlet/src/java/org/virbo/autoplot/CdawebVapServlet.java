@@ -63,7 +63,7 @@ public class CdawebVapServlet extends HttpServlet {
         
         PrintWriter out = response.getWriter();
         
-        Map<String,String> uris= new LinkedHashMap();
+        LinkedHashMap<String,String> uris= new LinkedHashMap();
         int first= 0;
         String uri= getUriParam( request,"data"+first );
         if ( uri==null ) { // allow data1 to be the first one.
@@ -104,7 +104,7 @@ public class CdawebVapServlet extends HttpServlet {
             
             vap.appendChild(app);
 
-            Element bindings= createArray( doc, "BindingModel", 2, "bindings" );
+            Element bindings= createArray( doc, "BindingModel", uris.size(), "bindings" );
             for ( int i=0; i<uris.size(); i++ ) {
                 Element b1= doc.createElement("property");
                 b1.setAttribute("default","null");
@@ -124,21 +124,22 @@ public class CdawebVapServlet extends HttpServlet {
             app.appendChild(dss);
 
             Map<String,PlotDescriptor> plotDescriptors= new LinkedHashMap<String, PlotDescriptor>();
-            plotDescriptors.put("plot_1",new PlotDescriptor());
-            plotDescriptors.put("plot_2",new PlotDescriptor());            
+            for ( int i=0; i<uris.size(); i++ ) {
+                plotDescriptors.put("plot_"+(i+1),new PlotDescriptor());
+            }
             Element plots= createPlots(doc,plotDescriptors);
             app.appendChild(plots);
             
             Map<String,Map<String,String>> plotss= new LinkedHashMap<String,Map<String,String>>();
             Map<String,String> aplot;
-            aplot= new HashMap<String,String>();
-            aplot.put("dataSourceFilterId","data_1");
-            aplot.put("plotId","plot_1");
-            plotss.put( "plotElement_1", aplot );
-            aplot= new HashMap<String,String>();
-            aplot.put("dataSourceFilterId","data_2");
-            aplot.put("plotId","plot_2");
-            plotss.put( "plotElement_2", aplot );
+            int i=0;
+            for ( Entry<String,String> uriEntry: uris.entrySet() ) {
+                aplot= new HashMap<String,String>();
+                aplot.put("dataSourceFilterId", uriEntry.getKey() );
+                aplot.put("plotId","plot_"+(i+1));
+                plotss.put( "plotElement_"+(i+1), aplot );
+                i++;
+            }
 
             Element plotElements= createPlotElements(doc,plotss);
             app.appendChild(plotElements);
@@ -186,7 +187,7 @@ public class CdawebVapServlet extends HttpServlet {
     
     private Element createPlotElements( Document doc, Map<String,Map<String,String>> pplotss ) {
         Element plots;
-        plots= createArray(doc, "PlotElement", 2, "plotElements" );
+        plots= createArray(doc, "PlotElement", pplotss.size(), "plotElements" );
         for ( Entry<String,Map<String,String>> aplotss: pplotss.entrySet()  ) {
             plots.appendChild( createPlotElement( doc, aplotss.getKey(), aplotss.getValue() ) );
         }
@@ -222,7 +223,7 @@ public class CdawebVapServlet extends HttpServlet {
      */
     private Element createPlots( Document doc, Map<String,PlotDescriptor> plotDescriptors ) {
         Element plots;
-        plots= createArray(doc, "Plot", 2, "plots" );
+        plots= createArray(doc, "Plot", plotDescriptors.size(), "plots" ); // TODO: assumes one plot element for each plot.
         for ( Entry<String,PlotDescriptor> plot: plotDescriptors.entrySet()  ) {
             int i= plot.getKey().indexOf("_");
             int iid= Integer.valueOf(plot.getKey().substring(i+1));
