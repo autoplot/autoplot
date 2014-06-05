@@ -341,7 +341,10 @@ public class SerializeUtil {
                                 int ik=0;
                                 for ( int j=0; j<n; j++ ) { //DANGER
                                     Object c1;
-                                    while ( !( arraykids.item(ik) instanceof Element ) ) ik++;
+                                    while ( ik<arraykids.getLength() && !( arraykids.item(ik) instanceof Element ) ) ik++;
+                                    if ( ! ( arraykids.item(ik) instanceof Element ) ) {
+                                        throw new ParseException( "didn't find "+n+" elements under array item in "+e.getAttribute("name"), 0);
+                                    }
                                     c1 = getLeafNode( (Element) arraykids.item(ik));
                                     ik++;
                                     Array.set( arr, j, c1 );
