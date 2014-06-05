@@ -743,7 +743,11 @@ public class DataSetURI {
                         if ( split.path.endsWith("/tmp/") && url!=null ) { // try to download the file directly.
                            return downloadResourceAsTempFile(  url, mon);
                         }
-                        throw new FileNotFoundException("File not found: "+ split.resourceUri );
+                        if ( fs instanceof WebFileSystem && ((WebFileSystem)fs).isOffline() ) {
+                            throw new FileNotFoundException( "File not found in cache of offline filesystem: "+ split.resourceUri +"\n(Offline because of \""+ ((WebFileSystem)fs).getOfflineMessage() + "\")" );
+                        } else {
+                            throw new FileNotFoundException("File not found: "+ split.resourceUri );
+                        }
                     }
                 }
             }
