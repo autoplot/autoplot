@@ -74,6 +74,7 @@ import javax.swing.table.TableModel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -422,6 +423,7 @@ public class AutoplotUtil {
         p.setLayout( new GridBagLayout() );
         GridBagConstraints c= new GridBagConstraints();
         c.gridy=0;
+        c.fill = GridBagConstraints.HORIZONTAL;
         for ( FileSystem fs: fss ) {
             c.weightx= 0.8;
             c.gridx= 0;
@@ -441,11 +443,18 @@ public class AutoplotUtil {
             }
             c.gridy++;
         }
+        if ( fss.length==0 ) {
+            p.add( new JLabel( "(no active filesystems)" ), c );
+        }
+        
+        c.weighty= 1.;
+        p.add( new JLabel(" "), c );
+        
         JScrollPane pp=  new JScrollPane(p);
         pp.setPreferredSize( new Dimension(640,480) );
         
         pp.getVerticalScrollBar().setUnitIncrement( p.getFont().getSize() );
-        AutoplotUtil.showConfirmDialog2(parent, pp, "Active Filesystems", JOptionPane.OK_CANCEL_OPTION );
+        AutoplotUtil.showMessageDialog( parent, pp, "Active Filesystems", JOptionPane.OK_OPTION );
 
     }
 
