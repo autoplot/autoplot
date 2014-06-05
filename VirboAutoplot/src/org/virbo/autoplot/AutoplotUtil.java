@@ -439,7 +439,11 @@ public class AutoplotUtil {
             if ( fs instanceof LocalFileSystem ) {
                 p.add( new JLabel( "" ), c );
             } else if ( fs instanceof WebFileSystem ) {
-                p.add( new JLabel( ((WebFileSystem)fs).isOffline() ? "offline" : "ok" ), c );
+                String s= ((WebFileSystem)fs).isOffline() ? "offline" : "ok" ;
+                if (((WebFileSystem)fs).isOffline()) {
+                    s= "<html>"+s+"<br>"+((WebFileSystem)fs).getOfflineMessage();
+                }
+                p.add( new JLabel(s), c );
             }
             c.gridy++;
         }
