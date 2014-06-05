@@ -679,23 +679,28 @@ public class CanvasController extends DomNodeController {
     }
 
     private List<DomNode> currentSelectionItems;
+    private long currentSelectionBirthtime=0;
 
     public void indicateSelection( List<DomNode> selectedItems ) {
 
         if ( !dasCanvas.isShowing() ) return;
 
-        long t0= System.currentTimeMillis();
-                
         final List<Shape> sel= new ArrayList<Shape>();
         final List<Rectangle> clip= new ArrayList<Rectangle>();
 
+        final long t1= System.currentTimeMillis();
+
         synchronized (this) {
             if ( currentSelectionItems!=null ) {
-                if ( selectedItems.size()>0 && currentSelectionItems.size()>0 && selectedItems.get(0)==currentSelectionItems.get(0) ) {
-                    return;
-                }
+                return;
             } 
             currentSelectionItems= selectedItems;
+            
+            if ( t1-currentSelectionBirthtime > 3000 ) { // kludge where these are lost.
+                currentSelectionItems= selectedItems;
+            }
+            
+            currentSelectionBirthtime= t1;
         }
 
         for ( Object o: selectedItems ) {
@@ -747,19 +752,19 @@ public class CanvasController extends DomNodeController {
                         g.setStroke(stroke0);
                     }
                 }
-                logger.log(Level.FINE, "paint selection in {0} ms", (System.currentTimeMillis()-t0));
+                logger.log(Level.FINER, "paint decorator in {0} ms", (System.currentTimeMillis()-t0));
             }
         };
         
-        final long t1= System.currentTimeMillis();
-        logger.log(Level.FINEST, "create painter {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
-        
+        logger.log(Level.FINER, "set up decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
+            
         boolean doDecorate= true;
         if ( doDecorate ) {
+            logger.log(Level.FINER, "create decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
             SwingUtilities.invokeLater(  new Runnable() {
                 @Override
                 public void run() {
-                    logger.log(Level.FINEST, "add decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
+                    logger.log(Level.FINER, "add decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
                     dasCanvas.addTopDecorator( p );
                     Timer clearSelectionTimer= new Timer( 300, new ActionListener() {
                         @Override
@@ -773,10 +778,8 @@ public class CanvasController extends DomNodeController {
                     clearSelectionTimer.restart();
                 }
             } );
+            logger.log(Level.FINER, "highlite selection in {0}ms", (System.currentTimeMillis()-t1));
         }
-        
-        logger.log(Level.FINE, "highlite selection in {0}ms", (System.currentTimeMillis()-t0));
-
 
     }
 
