@@ -87,7 +87,7 @@ public class CdawebVapServlet extends HttpServlet {
         String timeRange= request.getParameter("timeRange");
         
         if ( timeRange==null ) {
-            timeRange="2014-01-01/2014-01-02";
+            throw new IllegalArgumentException("timeRange must be specified");
         }
         
         try {
