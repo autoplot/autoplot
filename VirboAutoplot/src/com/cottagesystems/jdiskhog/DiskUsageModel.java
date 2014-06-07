@@ -67,6 +67,9 @@ public class DiskUsageModel {
                     System.err.println("appears to be a link: "+kids[i]);
                 }
             }
+            if ( depth==0 ) {
+                propertyChangeSupport.firePropertyChange( "readyFolderCount", 0, i );
+            }
         }
 
         if (depth == 0) {

@@ -361,11 +361,17 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
      * scan the root recursively looking to get file usage.
      * @param root 
      */
-    public synchronized void scan(File root) {
-        DiskUsageModel dumodel = new DiskUsageModel();
-        DasProgressLabel monitor= new DasProgressLabel("Scanning disk usage");
+    public synchronized void scan( final File root) {
+        final DiskUsageModel dumodel = new DiskUsageModel();
+        final DasProgressLabel monitor= new DasProgressLabel("Scanning disk usage");
         monitor.setLabelComponent(progressLabel);
-        dumodel.search(root, 0, monitor );
+        
+        Runnable run= new Runnable() {
+            public void run() {
+                dumodel.search(root, 0, monitor );
+            }
+        };
+        new Thread( run, "diskUsage" ).start();
         
         final FSTreeModel model = new FSTreeModel(dumodel, root);
         if ( model.getComparator()==model.alphaComparator ) {
@@ -388,12 +394,12 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         return goPressed;
     }
     
-//    public static void main( String[] args ) {
-//        JDiskHogPanel p = new JDiskHogPanel(null);
-//        p.scan( new File("/home/jbf/temp/" ) );
-//        JOptionPane.showMessageDialog( null, p );
-//    }
-//    
+    public static void main( String[] args ) {
+        JDiskHogPanel p = new JDiskHogPanel(null);
+        p.scan( new File("/home/jbf/temp/autoplot/" ) );
+        JOptionPane.showMessageDialog( null, p );
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is

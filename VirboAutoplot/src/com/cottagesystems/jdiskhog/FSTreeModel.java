@@ -4,6 +4,8 @@
  */
 package com.cottagesystems.jdiskhog;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -74,7 +76,7 @@ public class FSTreeModel implements TreeModel {
                 if (f.exists()) {
                     Long usages = model.usage(f);
                     if (usages == null) {
-                        return getName() + " ??? MB";
+                        return getName() + " ";
                     } else {
                         return getName() + " " + nf.format(model.usage(f)/1000.) + " MB";
                     }
@@ -89,8 +91,37 @@ public class FSTreeModel implements TreeModel {
     Map<File, File[]> listings = new HashMap<File, File[]>();
     Comparator comparator;
 
+//    private Object getTreeNodeFor( int i ) {
+//        try {
+//            Object child= getChild( getRoot(), i );
+//            return child;
+//        } catch ( NullPointerException ex ) {
+//            return null;
+//        }
+//    }
+    
     FSTreeModel( DiskUsageModel model, File root ) {
         this.model = model;
+//        model.addPropertyChangeListener( new PropertyChangeListener() {
+//            @Override
+//            public void propertyChange(PropertyChangeEvent evt) {
+//                TreeModelEvent ev=null;
+//                if ( evt.getPropertyName().equals("readyFolderCount") ) {
+//                    System.err.println(evt);
+//                    Object child= getTreeNodeFor( (Integer)evt.getNewValue() );
+//                    if ( child!=null ) {
+//                        ev= new TreeModelEvent( FSTreeModel.this, new Object[] { child } ); 
+//                    }
+//                }
+//                
+//                if ( ev!=null ) {
+//                    for (TreeModelListener tml : listeners ) {
+//                        tml.treeNodesChanged( ev );
+//                    }
+//                }
+//            }
+//        });
+//        
         this.root = root;
         Preferences prefs= Preferences.userNodeForPackage( FSTreeModel.class );
         String sort= prefs.get( "fsTreeSort", "size" );
