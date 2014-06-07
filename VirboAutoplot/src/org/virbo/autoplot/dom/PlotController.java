@@ -280,8 +280,10 @@ public class PlotController extends DomNodeController {
             ds= SemanticOps.getDependentDataSet(ds);
             ds= Ops.link( xds, ds );
         }
-                
+                        
         DatumRange dr= dr0;
+        int count; // limits the number of steps we can take.
+        int STEP_LIMIT=10000;
         if ( ds!=null &&  ds.rank()>0 ) {
             try {
                 QDataSet bounds= SemanticOps.bounds(ds).slice(0);
@@ -294,7 +296,14 @@ public class PlotController extends DomNodeController {
                     }
                     limit= DatumRangeUtil.union( limit, dr0 );
                     dr= dr.next();
+                    count= 0;
                     while ( dr.intersects(limit) ) {
+                        count++;
+                        if ( count>STEP_LIMIT ) {
+                            logger.warning("step limit in nextprev https://sourceforge.net/p/autoplot/bugs/1209/");
+                            dr= dr0.next();
+                            break;
+                        }
                         QDataSet ds1= SemanticOps.trim( ds, dr, null);
                         if ( ds1==null || ds1.length()==0 ) {
                             dr= dr.next();
@@ -303,6 +312,7 @@ public class PlotController extends DomNodeController {
                             //Datum min= DataSetUtil.asDatum( box.slice(0).slice(0) );
                             //dr= DatumRangeUtil.union( min, min.add(dr.width()) );
                             //dr= DatumRangeUtil.rescale( dr, -0.05, 0.95 );
+                            logger.log(Level.FINE, "found next data after {0} steps", count);
                             break;
                         }
                     }
@@ -332,7 +342,14 @@ public class PlotController extends DomNodeController {
                     }
                     limit= DatumRangeUtil.union( limit, dr0 );
                     dr= dr.previous();
+                    count= 0;
                     while ( dr.intersects(limit) ) {
+                        count++;
+                        if ( count>STEP_LIMIT ) {
+                            logger.warning("step limit in nextprev https://sourceforge.net/p/autoplot/bugs/1209/");
+                            dr= dr0.previous();
+                            break;
+                        }
                         QDataSet ds1= SemanticOps.trim( ds, dr, null);
                         if ( ds1==null || ds1.length()==0 ) {
                             dr= dr.previous();
@@ -343,6 +360,7 @@ public class PlotController extends DomNodeController {
                             //Datum max= DataSetUtil.asDatum( box.slice(0).slice(1) );
                             //dr= DatumRangeUtil.union( max.subtract(dr.width()), max );
                             //dr= DatumRangeUtil.rescale( dr, 0.05, 1.05 );
+                            logger.log(Level.FINE, "found previous data after {0} steps", count);
                             break;
                         }
                     }
