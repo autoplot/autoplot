@@ -3632,9 +3632,9 @@ private void updateFrameTitle() {
             tag = AboutUtil.getReleaseTag(APSplash.class);
             if ( tag!=null ) {
                 welcome+=" ("+tag+")";
-                System.setProperty("http.agent", "Autoplot "+tag );
+                System.setProperty("http.agent", "Autoplot-"+tag );
             } else {
-                System.setProperty("http.agent", "Autoplot dev" );
+                System.setProperty("http.agent", "Autoplot-dev" );
             }
             
         } catch (IOException ex) {
