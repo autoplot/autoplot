@@ -4025,7 +4025,7 @@ APSplash.checkTime("init 240");
         final String fmessage= message;
         final Icon ficon= icon;
 
-        SwingUtilities.invokeLater( new Runnable() {  //TODO: we should be a little careful here, we don't want to post thousands of runnables to the event thread.
+        Runnable run= new Runnable() {  //TODO: we should be a little careful here, we don't want to post thousands of runnables to the event thread.
             @Override
             public void run() {
                 try {
@@ -4042,7 +4042,12 @@ APSplash.checkTime("init 240");
                     logger.log( Level.SEVERE, e.getMessage(), e ); // rte_0759798375_20121111_205149_*.xml
                 }
             }
-        });
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            SwingUtilities.invokeLater( run );
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
