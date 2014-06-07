@@ -3563,7 +3563,7 @@ private void updateFrameTitle() {
         //   (at java.util.TimSort.mergeHi(TimSort.java:895))
         //http://stackoverflow.com/questions/13575224/comparison-method-violates-its-general-contract-timsort-and-gridlayout 
         //https://sourceforge.net/p/autoplot/bugs/1159/
-        System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+        System.setProperty("java.util.Arrays.useLegacyMergeSort", "true"); // see also jnlp which sets the property.
         
         // A Mar 11, 2014 email in Jeremy's inbox describes why this is needed for secure jnlp files.
         if ( System.getProperty( "autoplot.default.bookmarks" )==null ) {

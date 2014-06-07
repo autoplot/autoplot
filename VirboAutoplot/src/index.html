@@ -25,6 +25,8 @@
         to resolve old numbers.
         <p>Bugfixes (2014-06-04):</p>
         <ul>
+            <li>1209: nextprev scan thread can spin in endless loop</li>
+            <li>1208: occasional hang that seems to be associated with TimSort bug 	</li>
             <li>1205: aggregate all breaks with jyds script with timerange param </li>
             <li>File->print is performed off the event thread because this can be slow or even hang on Linux.</li>
             <li>421: double load of Das2Source caused by misformatted URI</li>
