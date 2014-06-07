@@ -107,6 +107,27 @@ public class UriDropTargetListener implements DropTargetListener {
                 } catch (ClassNotFoundException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
+                try {
+                    df = new DataFlavor("application/x-java-file-list;class=java.util.List");
+                    if ( dtde.isDataFlavorSupported( df ) ) {
+                        dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                        List list= (List)dtde.getTransferable().getTransferData(df);
+                        if ( list.size()==1 ) {
+                            String data = list.get(0).toString();
+                            if (data.startsWith("file://localhost/")) {
+                                data= data.substring(16); // mac at least does this...
+                            }
+                            item= new Bookmark.Item( data );
+                        }
+                    } else {
+                        String sitem= getURILinux(dtde);
+                        if ( sitem!=null ) {
+                            item= new Bookmark.Item( sitem );
+                        }
+                    }
+                } catch (ClassNotFoundException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                }
             }
             
             String uri=null;
