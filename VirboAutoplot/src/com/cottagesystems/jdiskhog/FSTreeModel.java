@@ -69,17 +69,17 @@ public class FSTreeModel implements TreeModel {
 
         public String toString() {
             if (f.isFile()) {
-                return getName() + " " + nf.format(f.length() / 1000) + " KB";
+                return getName() + " " + nf.format(f.length() / 1000000.) + " MB";
             } else {
                 if (f.exists()) {
                     Long usages = model.usage(f);
                     if (usages == null) {
-                        return getName() + " ??? KB";
+                        return getName() + " ??? MB";
                     } else {
-                        return getName() + " " + nf.format(model.usage(f)) + " KB";
+                        return getName() + " " + nf.format(model.usage(f)/1000.) + " MB";
                     }
                 } else {
-                    return getName() + " 0 KB";
+                    return getName() + " 0 MB";
                 }
             }
         }
