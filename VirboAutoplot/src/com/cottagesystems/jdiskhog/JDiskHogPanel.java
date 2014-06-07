@@ -31,6 +31,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import org.das2.components.DasProgressLabel;
 import org.das2.components.DasProgressPanel;
 import org.das2.util.FileUtil;
 import org.das2.util.LoggerManager;
@@ -165,10 +166,12 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         if ( f==null ) return true;
         String sf = f.toString();
         String outsideName= outsideName( sf );
-        if ( outsideName!=null ) {
-            app.plotUri(outsideName);
-        } else {
-            app.plotUri(sf);
+        if ( app!=null ) {
+            if ( outsideName!=null ) {
+                app.plotUri(outsideName);
+            } else {
+                app.plotUri(sf);
+            }
         }
         return false;
     }
@@ -354,10 +357,16 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         };
     }
 
-
-    public void scan(File root) {
+    /**
+     * scan the root recursively looking to get file usage.
+     * @param root 
+     */
+    public synchronized void scan(File root) {
         DiskUsageModel dumodel = new DiskUsageModel();
-        dumodel.search(root, 0, new NullProgressMonitor());
+        DasProgressLabel monitor= new DasProgressLabel("Scanning disk usage");
+        monitor.setLabelComponent(progressLabel);
+        dumodel.search(root, 0, monitor );
+        
         final FSTreeModel model = new FSTreeModel(dumodel, root);
         if ( model.getComparator()==model.alphaComparator ) {
             sortCB.setSelectedIndex(1);
@@ -370,6 +379,7 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                     l= createMouseListener(jTree1);
                     jTree1.addMouseListener(l);
                 }
+                progressLabel.setText("");
             }
         } );
     }
@@ -378,6 +388,12 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         return goPressed;
     }
     
+//    public static void main( String[] args ) {
+//        JDiskHogPanel p = new JDiskHogPanel(null);
+//        p.scan( new File("/home/jbf/temp/" ) );
+//        JOptionPane.showMessageDialog( null, p );
+//    }
+//    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -393,6 +409,7 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         goButton = new javax.swing.JButton();
         sortCB = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
+        progressLabel = new javax.swing.JLabel();
 
         jScrollPane2.setViewportView(jTree1);
 
@@ -420,6 +437,8 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
 
         jLabel1.setText("Sort By:");
 
+        progressLabel.setText(" ");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -430,7 +449,9 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(sortCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 105, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 374, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 67, Short.MAX_VALUE)
+                .add(progressLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 295, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(goButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 79, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 52, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -444,7 +465,8 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                     .add(jButton1)
                     .add(goButton)
                     .add(jLabel1)
-                    .add(sortCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(sortCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(progressLabel)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -477,6 +499,7 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
     public javax.swing.JLabel jLabel1;
     public javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JTree jTree1;
+    public javax.swing.JLabel progressLabel;
     public javax.swing.JComboBox sortCB;
     // End of variables declaration//GEN-END:variables
 }

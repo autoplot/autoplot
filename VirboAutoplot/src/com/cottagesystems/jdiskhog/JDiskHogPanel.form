@@ -22,7 +22,9 @@
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="sortCB" min="-2" pref="105" max="-2" attributes="0"/>
-              <EmptySpace pref="374" max="32767" attributes="0"/>
+              <EmptySpace pref="67" max="32767" attributes="0"/>
+              <Component id="progressLabel" min="-2" pref="295" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="goButton" min="-2" pref="79" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jButton1" min="-2" pref="52" max="-2" attributes="0"/>
@@ -39,6 +41,7 @@
                   <Component id="goButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="sortCB" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="progressLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
       </Group>
@@ -91,6 +94,11 @@
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="text" type="java.lang.String" value="Sort By:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="progressLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value=" "/>
       </Properties>
     </Component>
   </SubComponents>
