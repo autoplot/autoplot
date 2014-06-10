@@ -656,6 +656,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
                 return DDataSet.maybeCopy(c0);
             } else {
+                // bug 1211: cdf virtual variable cannot be accessed by single record 
                 throw new NoDataInIntervalException("variable " + svariable + " contains no records!");
             }
         }
