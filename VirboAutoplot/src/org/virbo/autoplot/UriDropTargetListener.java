@@ -49,7 +49,7 @@ public class UriDropTargetListener implements DropTargetListener {
         try {
             DataFlavor nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
             if ( dtde.isDataFlavorSupported(nixFileDataFlavor) ) {
-                dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                // assume that we have already accepted the drop. dtde.acceptDrop(DnDConstants.ACTION_NONE);
                 String data = (String)dtde.getTransferable().getTransferData(nixFileDataFlavor);
                 return data;
             } else {
@@ -68,15 +68,20 @@ public class UriDropTargetListener implements DropTargetListener {
     }
     /**
      * I was hoping we could peek to see if it really was a URI...
+     * TODO: rewrite this.
      * @param dtde
      * @return
      */
     private String getURI( DropTargetDropEvent dtde ) {
         try {
+            boolean haveAcceptedDrop= false;
             Bookmark item = null;
             List<Bookmark> items = null;
             if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                if ( !haveAcceptedDrop ) {
+                    dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                    haveAcceptedDrop= true;
+                }
                 String data = ((String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor)).trim();
                 if (data.length() > 19 && data.startsWith("<bookmark-list")) {
                     items = Bookmark.parseBookmarks(data);
@@ -92,16 +97,22 @@ public class UriDropTargetListener implements DropTargetListener {
                 try {
                     df = new DataFlavor("application/x-java-url;class=java.net.URL");
                     if ( dtde.isDataFlavorSupported( df ) ) {
-                        dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                        if ( !haveAcceptedDrop ) {
+                            dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                            haveAcceptedDrop= true;
+                        }
                         String data = String.valueOf( dtde.getTransferable().getTransferData(df) );
                         if (data.startsWith("file://localhost/")) {
                             data= data.substring(16); // mac at least does this...
                         }
                         item= new Bookmark.Item( data );
                     } else {
-                        String sitem= getURILinux(dtde);
-                        if ( sitem!=null ) {
-                            item= new Bookmark.Item( sitem );
+                        DataFlavor nixFileDataFlavor = new DataFlavor("text/uri-list;class=java.lang.String");
+                        if ( dtde.isDataFlavorSupported(nixFileDataFlavor) ) {
+                            String data = (String)dtde.getTransferable().getTransferData(nixFileDataFlavor);
+                            if ( data!=null ) {
+                                item= new Bookmark.Item( data );
+                            }
                         }
                     }
                 } catch (ClassNotFoundException ex) {
@@ -110,7 +121,10 @@ public class UriDropTargetListener implements DropTargetListener {
                 try {
                     df = new DataFlavor("application/x-java-file-list;class=java.util.List");
                     if ( dtde.isDataFlavorSupported( df ) ) {
-                        dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                        if ( !haveAcceptedDrop ) {
+                            dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                            haveAcceptedDrop= true;
+                        }
                         List list= (List)dtde.getTransferable().getTransferData(df);
                         if ( list.size()==1 ) {
                             String data = list.get(0).toString();
@@ -119,12 +133,7 @@ public class UriDropTargetListener implements DropTargetListener {
                             }
                             item= new Bookmark.Item( data );
                         }
-                    } else {
-                        String sitem= getURILinux(dtde);
-                        if ( sitem!=null ) {
-                            item= new Bookmark.Item( sitem );
-                        }
-                    }
+                    } 
                 } catch (ClassNotFoundException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
@@ -145,16 +154,16 @@ public class UriDropTargetListener implements DropTargetListener {
             return uri;
 
         } catch (UnsupportedFlavorException ex) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
 
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, null, ex );
 
         } catch (SAXException ex) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, null, ex );
 
         } catch (BookmarksException ex) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, null, ex );
         }
         return null;
 
