@@ -36,7 +36,7 @@ public class ReferenceCache {
      * boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
      * </code>
      */
-    public static final String PROP_ENABLE_REFERENCE_CACHE= "enableReferenceCache";
+    public static final String PROP_ENABLE_REFERENCE_CACHE= Version.PROP_ENABLE_REFERENCE_CACHE;
 
     private static final Logger logger= LoggerManager.getLogger("apdss.refcache");
 
