@@ -51,6 +51,7 @@ import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.Version;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
 import org.virbo.dsops.Ops;
@@ -229,7 +230,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
             DatumRange lviewRange= viewRange;
             Datum lresolution= resolution;
 
-            String[] ss = getFsm().getBestNamesFor( lviewRange, new NullProgressMonitor() );
+            String[] ss = getFsm().getBestNamesFor( lviewRange, mon );
+            
+            if ( "true".equals( System.getProperty( Version.PROP_CLEAN_CACHE ) ) ) {
+                logger.fine("enableCleanCache is true");
+                getFsm().cacheCleanup();
+            }
             
             boolean avail= getParam( "avail", "F" ).equals("T");
             boolean reduce= getParam( "reduce", "F" ).equals("T");
