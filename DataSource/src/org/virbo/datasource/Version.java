@@ -20,6 +20,28 @@ public class Version {
      */
     public static final String version= "20070530.1" ;
     
+    /* configuration properties */
+    
+    /**
+     * System.getProperty(PROP_ENABLE_REFERENCE_CACHE)=
+     * "true" means the reference cache should be used. 
+     */
+    public static final String PROP_ENABLE_REFERENCE_CACHE= "enableReferenceCache";
+    
+    
+    /**
+     * System.getProperty(PROP_LOG_EXCEPTIONS)=
+     * "true" means runtime exceptions should be logged.
+     */
+    public static final String PROP_LOG_EXCEPTIONS="enableLogExceptions";
+    
+    /**
+     * System.getProperty(PROP_CLEAN_CACHE)=
+     * "true" means old files in the cache should be removed
+     */
+    public static final String PROP_CLEAN_CACHE="enableCleanCache";
+    
+    
     /** Creates a new instance of Version */
     private Version() {
     }
