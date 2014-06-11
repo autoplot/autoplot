@@ -105,6 +105,7 @@ import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.CanvasController;
 import org.virbo.datasource.HtmlResponseIOException;
+import org.virbo.datasource.Version;
 /**
  * Internal model of the application to separate model from view.
  * @author jbf
@@ -612,9 +613,11 @@ public class ApplicationModel {
             return;
         }
 
-        if ( !( "jbf".equals( System.getProperty("user.name") ) ) ) {
+        if ( !( "true".equals( System.getProperty(Version.PROP_LOG_EXCEPTIONS) ) ) ) {
             return;
         }
+        
+        logger.fine("logging exception because of experimental.features");
 
         File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
         if ( !f2.exists() ) {
