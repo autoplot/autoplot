@@ -3886,6 +3886,19 @@ APSplash.checkTime("init 240");
         } );
     }
 
+    Icon currentIcon; // the current icon on the status bar
+    String currentIconTooltip;  // the current tooltip on the status bar
+    
+    /**
+     * update the current icon and tooltip text on the event thread.
+     */
+    private Runnable updateIconRunnable= new Runnable() {
+        public void run() {
+            statusLabel.setToolTipText(currentIconTooltip);
+            statusLabel.setIcon(currentIcon);
+        }
+    };
+    
     /**
      * periodically scan the application for nodes that are busy, and indicate
      * with a busy swirl icon if the app is busy.
@@ -3900,7 +3913,7 @@ APSplash.checkTime("init 240");
                 // wait for setMessage to clear this.
             } else {
                 if ( changes.size()>0 ) {
-                    app.statusLabel.setIcon( BUSY_ICON );
+                    app.currentIcon= BUSY_ICON;
                     String chstr="";
                     for ( Entry<Object,Object> e: changes.entrySet() ) { 
                         String client= String.valueOf(e.getValue());
@@ -3915,10 +3928,23 @@ APSplash.checkTime("init 240");
                             chstr= chstr + "\n" + "* " + e.getKey() + " (" + client + ")";
                         }
                     }
-                    app.statusLabel.setToolTipText( chstr );
+                    app.currentIconTooltip= chstr;
                 } else {
-                    app.statusLabel.setIcon( IDLE_ICON );
-                    app.statusLabel.setToolTipText( null );
+                    app.currentIcon= IDLE_ICON;
+                    app.currentIconTooltip= null;
+                }
+                boolean update= false;
+                if ( app.currentIcon!=app.statusLabel.getIcon() ) update=true;
+                String currentStatusLabel= app.statusLabel.getToolTipText();
+                if ( app.currentIconTooltip!=currentStatusLabel || ( app.currentIconTooltip!=null && !app.currentIconTooltip.equals(currentStatusLabel) ) ) update= true;
+                if ( update ) {
+                    try {
+                        SwingUtilities.invokeAndWait(app.updateIconRunnable);
+                    } catch (InterruptedException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    } catch (InvocationTargetException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
                 }
             }
             try {
