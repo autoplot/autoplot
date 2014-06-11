@@ -248,8 +248,6 @@ class Das2ServerDataSource extends AbstractDataSource {
 
         boolean qds= "1".equals( dsdfParams.get("qstream") );
         
-        new Exception().printStackTrace();
-
         logger.log( Level.FINE, "opening {0} {1}", new Object[]{ qds ? "as qstream" : "as das2stream", url2 });
         InputStream in = url2.openStream();
 
