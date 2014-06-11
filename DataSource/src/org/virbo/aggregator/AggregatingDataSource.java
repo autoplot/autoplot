@@ -232,7 +232,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
             String[] ss = getFsm().getBestNamesFor( lviewRange, mon );
             
-            if ( "true".equals( System.getProperty( Version.PROP_CLEAN_CACHE ) ) ) {
+            if ( "true".equals( System.getProperty( Version.PROP_ENABLE_CLEAN_CACHE ) ) ) {
                 logger.fine("enableCleanCache is true");
                 getFsm().cacheCleanup();
             }
