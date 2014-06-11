@@ -23,8 +23,10 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-06-09):</p>
+        <p>Bugfixes (2014-06-11):</p>
         <ul>
+            <li>setStatus would often push extra event on to event queue.</li>
+            <li>clean up for drag and drop URIs to make things work on Mac and Windows.</li>
             <li>1210: http user agent was not indicated in web server logs.</li>
             <li>1209: nextprev scan thread can spin in endless loop</li>
             <li>1208: occasional hang that seems to be associated with TimSort bug</li>
@@ -68,7 +70,7 @@
             <li>Butterworth high-pass filter scale factor corrected.</li>
             <li>Survey places where locking is done without a try/finally block, which can hang the application.</li>
             <li>imax (index of the maximum value) was incorrectly coded to use MIN_VALUE (1e-308) instead of NEGATIVE_INFINITY</li>
-	    <li>Rob R pointed out RTE when ftp:// is entered and inspect button pressed.</li>
+	        <li>Rob R pointed out RTE when ftp:// is entered and inspect button pressed.</li>
             <li>440: any FileFilter needs to check for null from file.toString().  The DataPointRecorder didn't do this, Bill pointed out.</li>
             <li>don't print a warning when EnumerationUnits have the same ID.  This happens with "default" and is harmless.</li>
             <li>1180: use autoranging consistent with Series for Scatter</li>
@@ -83,6 +85,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>351: save previous entries to jython getParam forms.  Allow address bar trigger to contain parameter settings.</li>
             <li>add weights to output of rebinBundle.</li>
             <li>improve feedback while scanning local cache.</li>
             <li>add allow embed in vap file dialog.  This works well enough.</li>
