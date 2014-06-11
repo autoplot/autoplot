@@ -30,16 +30,16 @@ public class Version {
     
     
     /**
-     * System.getProperty(PROP_LOG_EXCEPTIONS)=
+     * System.getProperty(PROP_ENABLE_LOG_EXCEPTIONS)=
      * "true" means runtime exceptions should be logged.
      */
-    public static final String PROP_LOG_EXCEPTIONS="enableLogExceptions";
+    public static final String PROP_ENABLE_LOG_EXCEPTIONS="enableLogExceptions";
     
     /**
-     * System.getProperty(PROP_CLEAN_CACHE)=
+     * System.getProperty(PROP_ENABLE_CLEAN_CACHE)=
      * "true" means old files in the cache should be removed
      */
-    public static final String PROP_CLEAN_CACHE="enableCleanCache";
+    public static final String PROP_ENABLE_CLEAN_CACHE="enableCleanCache";
     
     
     /** Creates a new instance of Version */
