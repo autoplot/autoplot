@@ -613,7 +613,7 @@ public class ApplicationModel {
             return;
         }
 
-        if ( !( "true".equals( System.getProperty(Version.PROP_LOG_EXCEPTIONS) ) ) ) {
+        if ( !( "true".equals( System.getProperty(Version.PROP_ENABLE_LOG_EXCEPTIONS) ) ) ) {
             return;
         }
         
