@@ -466,7 +466,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
             }
         });
 
-        dataSetSelector.registerActionTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT) {
+        dataSetSelector.registerActionTrigger( "(.*)\\.jy(\\?.*)?", new AbstractAction( TAB_SCRIPT) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
                 if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
@@ -486,7 +486,10 @@ public final class AutoplotUI extends javax.swing.JFrame {
             }
         });
 
-        dataSetSelector.registerBrowseTrigger( "(.*)\\.jy", new AbstractAction( TAB_SCRIPT ) {
+        /**
+         * register the browse trigger to the same action, because we always browse.
+         */
+        dataSetSelector.registerBrowseTrigger( "(.*)\\.jy(\\?.*)?", new AbstractAction( TAB_SCRIPT ) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
                 if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
@@ -500,6 +503,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                         ScriptContext.setApplicationModel(AutoplotUI.this.applicationModel);
                         ScriptContext.setView(AutoplotUI.this);
                     }
+                    runScript( dataSetSelector.getValue() );
                 }
             }
         });
@@ -4544,6 +4548,7 @@ APSplash.checkTime("init 240");
             final URISplit split= URISplit.parse(script);
             final File ff = DataSetURI.getFile(DataSetURI.getURI(script), new DasProgressPanel("downloading script"));
             final RunScriptPanel pp = new RunScriptPanel();
+            final HashMap params= URISplit.parseParams(split.params);
             pp.loadFile(ff);
             Runnable run= new Runnable() {
                 @Override
@@ -4553,7 +4558,7 @@ APSplash.checkTime("init 240");
                         File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
                         boolean isTool= split.path.contains(tools.toString());
                         int res= JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
-                                new HashMap(), true, !isTool, mon );
+                                params, true, !isTool, mon );
                         if ( res==JOptionPane.OK_OPTION ) {
                             if ( scriptPanel!=null ) {
                                 if ( ! scriptPanel.isDirty() ) {
