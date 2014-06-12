@@ -294,6 +294,7 @@ public class CdawebVapServlet extends HttpServlet {
         Element columns= createArray( doc, "Column", 0, "columns" );
         canvas.appendChild( columns );
         addProperty( doc, canvas, "height", "Integer", "604" );
+        addProperty( doc, canvas, "width", "Integer", "722" );
         
         Element column= addColumn( doc, "marginColumn_0", "", "+7.0em", "100.00%-7.0em" );
         addProperty( doc, canvas, "marginColumn", "DomNode", column );
@@ -314,8 +315,6 @@ public class CdawebVapServlet extends HttpServlet {
         prop.appendChild(row2);
 
         canvas.appendChild(prop);
-
-        addProperty( doc, canvas, "width", "Integer", "722" );
         
         return canvases;
     }
