@@ -280,10 +280,55 @@ public class StatePersistence {
 
     }
 
+    private static Application readLegacyFile( Document document ) throws IOException {
+        Application state;
+        importLegacyVap(document.getDocumentElement());
+
+        ByteArrayOutputStream baos= new ByteArrayOutputStream(10000);
+
+        //throw new RuntimeException("It is no longer possible to convert old " +
+        //        "files at runtime.  Contact Autoplot group at Google groups " +
+        //        "for conversion help." );
+        logger.info("importing legacy vap file v0.99. ");
+        logger.info("These must be rewritten to new vap format, support will be dropped.");
+
+        DOMImplementation impl = document.getImplementation();
+        DOMImplementationLS ls = (DOMImplementationLS) impl.getFeature("LS", "3.0");
+        LSSerializer serializer = ls.createLSSerializer();
+        LSOutput output = ls.createLSOutput();
+        output.setEncoding("UTF-8");
+        output.setByteStream(baos);
+        serializer.write(document, output);
+        baos.close();
+
+        XMLDecoder decode= new XMLDecoder( new ByteArrayInputStream( baos.toByteArray() ) );
+
+        state= (Application) decode.readObject();
+
+        Application app= (Application)state;
+        for ( PlotElement p: app.getPlotElements() ) {
+            if ( p.getRenderType()==null ) {
+                p.setRenderTypeAutomatically( RenderType.series );
+            }
+        }
+
+        for ( Plot p: app.getPlots() ) {
+            p.getZaxis().setVisible(false);
+            List<PlotElement> pes= DomUtil.getPlotElementsFor(app, p);
+            for ( PlotElement pe: pes ) {
+                RenderType rt= pe.getRenderType();
+                if ( rt==RenderType.spectrogram || rt==RenderType.nnSpectrogram || rt==RenderType.colorScatter ) {
+                    p.getZaxis().setVisible(true);
+                }
+            }
+        }        
+        return state;
+    }
+    
     /**
-     * restore the XML on the inputStream, possibly promoting it.
+     * restore the XML on the inputStream, possibly promoting it to a modern version.
      * @param in, an input stream that starts with the xml.  This will be left open.  
-     * @return
+     * @return the Application object.
      * @throws IOException
      */
     public static Object restoreState( InputStream in )  throws IOException {
@@ -305,6 +350,14 @@ public class StatePersistence {
         Application state;
         String domVersion;
 
+        // add a direct reference to these guys for compile-all script.
+        new DatumRangePersistenceDelegate();
+        new UnitsPersistenceDelegate();
+        new DatumPersistenceDelegate() ;
+        new TypeSafeEnumPersistenceDelegate() ;
+        new BindingPersistenceDelegate() ;
+        new ConnectorPersistenceDelegate();
+        
         try {
             DocumentBuilder builder;
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -312,56 +365,9 @@ public class StatePersistence {
             Document document = builder.parse(source);
 
             if ( document.getDocumentElement().getNodeName().equals("java") ) { // legacy support
-
                 domVersion= "0.99";
-                importLegacyVap(document.getDocumentElement());
-
-                ByteArrayOutputStream baos= new ByteArrayOutputStream(10000);
+                state= readLegacyFile(document);
                 
-                //throw new RuntimeException("It is no longer possible to convert old " +
-                //        "files at runtime.  Contact Autoplot group at Google groups " +
-                //        "for conversion help." );
-                logger.info("importing legacy vap file v0.99. ");
-                logger.info("These must be rewritten to new vap format, support will be dropped.");
-
-                DOMImplementation impl = document.getImplementation();
-                DOMImplementationLS ls = (DOMImplementationLS) impl.getFeature("LS", "3.0");
-                LSSerializer serializer = ls.createLSSerializer();
-                LSOutput output = ls.createLSOutput();
-                output.setEncoding("UTF-8");
-                output.setByteStream(baos);
-                serializer.write(document, output);
-                baos.close();
-                
-                XMLDecoder decode= new XMLDecoder( new ByteArrayInputStream( baos.toByteArray() ) );
-
-                // add a direct reference to these guys for compile-all script.
-                new DatumRangePersistenceDelegate();
-                new UnitsPersistenceDelegate();
-                new DatumPersistenceDelegate() ;
-                new TypeSafeEnumPersistenceDelegate() ;
-                new BindingPersistenceDelegate() ;
-                new ConnectorPersistenceDelegate();
-
-                state= (Application) decode.readObject();
-
-                Application app= (Application)state;
-                for ( PlotElement p: app.getPlotElements() ) {
-                    if ( p.getRenderType()==null ) {
-                        p.setRenderTypeAutomatically( RenderType.series );
-                    }
-                }
-
-                for ( Plot p: app.getPlots() ) {
-                    p.getZaxis().setVisible(false);
-                    List<PlotElement> pes= DomUtil.getPlotElementsFor(app, p);
-                    for ( PlotElement pe: pes ) {
-                        RenderType rt= pe.getRenderType();
-                        if ( rt==RenderType.spectrogram || rt==RenderType.nnSpectrogram || rt==RenderType.colorScatter ) {
-                            p.getZaxis().setVisible(true);
-                        }
-                    }
-                }
             } else {
                 Element root= document.getDocumentElement();
                 if ( root.getNodeName().equals("exceptionReport") ) {
