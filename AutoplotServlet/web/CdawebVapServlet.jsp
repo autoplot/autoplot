@@ -20,9 +20,11 @@
             timeRange:
             <input size="24" type="text" name="timeRange" value="1983-02-17"><br>
             data0:
-            <input size="60" type="text" name="data0" value="vap+cdaweb:ds=DE2_DUCT16MS_RPA&id=ilat"><br>
+            <input size="60" type="text" name="data0" value="vap+cdaweb:ds=DE_VS_EICS&id=Geographic_position&slice1=2"><br>
             data1:
             <input size="60" type="text" name="data1" value="vap+cdaweb:ds=DE2_DUCT16MS_RPA&id=mlt"><br>
+            data2: 
+            <input size="60" type="text" name="data2" value="vap+cdaweb:ds=DE_VS_EICS&id=h_flux"><br>
             <input type="submit" value="Send .vap file">
         </form>
         
@@ -33,6 +35,6 @@
             <li>I haven't tested this recently for spectrograms.
         </ul>
                 
-            <small>version 20140612.1</small>
+            <small>version 20140612.2</small>
     </body>
 </html>
