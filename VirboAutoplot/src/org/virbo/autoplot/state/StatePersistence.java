@@ -370,7 +370,7 @@ public class StatePersistence {
                 
             } else {
                 Element root= document.getDocumentElement();
-                if ( root.getNodeName().equals("exceptionReport") ) {
+                if ( root.getNodeName().equals("exceptionReport") ) { // allow the exceptionReports to be loaded as vap files.
                     NodeList maybeVap= root.getElementsByTagName("vap");
                     if ( maybeVap.getLength()==1 ) {
                         root= (Element)maybeVap.item(0);
