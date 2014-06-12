@@ -39,6 +39,9 @@
             Autoplot's implementation of the URI templates (http://tsds.org/uri_templates).
         </p>
         
+        <p>The <a href="CdawebVapServlet.jsp">"CdawebVapServlet"</a> creates v1.08 vap files.
+        </p>
+
         <p><a href="thin/zoom/demo.html">"Thin"<a> shows how Autoplot is used to implement a thin-client that is usable on phones.            
         </p>
         
