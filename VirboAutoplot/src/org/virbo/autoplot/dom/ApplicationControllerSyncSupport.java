@@ -64,6 +64,7 @@ public class ApplicationControllerSyncSupport {
             application.plotElements.get(i).syncTo(elements[i], Arrays.asList(PlotElement.PROP_PLOTID, PlotElement.PROP_DATASOURCEFILTERID, PlotElement.PROP_RENDERTYPE, PlotElement.PROP_STYLE ) );
             application.plotElements.get(i).setPlotId(nameMap.get(elements[i].getPlotId())); //bug 2992903
             application.plotElements.get(i).setRenderType(elements[i].getRenderType()); // create das2 peers after setting the plotid.
+            application.plotElements.get(i).setAutoRenderType(elements[i].isAutoRenderType()); // we still might want to set this automatically.
             application.plotElements.get(i).getController().maybeCreateDasPeer();
             application.plotElements.get(i).getStyle().syncTo(elements[i].getStyle());
             //application.plotElements.get(i).getController().resetRenderType( plotElements[i].getRenderType() );
