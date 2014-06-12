@@ -207,7 +207,6 @@ public class CdawebVapServlet extends HttpServlet {
         addProperty( doc, plotElement, "autoRenderType", "Boolean", "true" );
         addProperty( doc, plotElement, "plotId", "String", pe.get("plotId") );
         addProperty( doc, plotElement, "dataSourceFilterId", "String", pe.get("dataSourceFilterId") );
-        addProperty( doc, plotElement, "renderType", "enum:org.virbo.autoplot.RenderType", "series" );
         plotElement.setAttribute("id", id );
         return plotElement;
     }
