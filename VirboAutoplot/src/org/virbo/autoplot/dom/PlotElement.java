@@ -75,15 +75,15 @@ public class PlotElement extends DomNode {
     public void setRenderType(RenderType renderType) {
         RenderType oldRenderType = this.renderType;
         this.renderType = renderType;
-        propertyChangeSupport.firePropertyChange(PROP_RENDERTYPE, oldRenderType, renderType);
         this.setAutoRenderType(false);
+        propertyChangeSupport.firePropertyChange(PROP_RENDERTYPE, oldRenderType, renderType);
     }
 
     public void setRenderTypeAutomatically( RenderType renderType ) {
         RenderType oldRenderType = this.renderType;
         this.renderType = renderType;
+        this.setAutoRenderType(true);        
         propertyChangeSupport.firePropertyChange(PROP_RENDERTYPE, oldRenderType, renderType);
-        this.setAutoRenderType(true);
     }
 
     /**
