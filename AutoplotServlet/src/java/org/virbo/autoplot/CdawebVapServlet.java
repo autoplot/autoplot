@@ -7,7 +7,9 @@ package org.virbo.autoplot;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,6 +30,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.das2.datum.DatumRangeUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -59,7 +62,9 @@ public class CdawebVapServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/x-autoplot-vap+xml;charset=UTF-8");
-        response.setHeader("Content-Disposition","inline; filename=\"default.vap\"" );
+        
+        String tt= new SimpleDateFormat("yyyyMMdd_HHmmss").format( new Date() );
+        response.setHeader("Content-Disposition","inline; filename=\"default_"+tt+".vap\"" );
         
         PrintWriter out = response.getWriter();
         
@@ -235,6 +240,7 @@ public class CdawebVapServlet extends HttpServlet {
     
     private Element createPlot( Document doc, String id, int iid, PlotDescriptor pd ) {
         Element plot= doc.createElement("Plot");
+        addProperty( doc, plot, "autoLabel", "Boolean", "true" );
         addProperty( doc, plot, "xaxis", "DomNode", createAxis( doc, "xaxis_"+iid, iid, pd.xmin, pd.xmax, pd.xlog, pd.xlabel ) ); //TODO: Why not Axis instead of DomNode
         addProperty( doc, plot, "yaxis", "DomNode", createAxis( doc, "yaxis_"+iid, iid, pd.ymin, pd.ymax, pd.ylog, pd.ylabel ) );
         addProperty( doc, plot, "zaxis", "DomNode", createAxis( doc, "zaxis_"+iid, iid, pd.zmin, pd.zmax, pd.zlog, pd.zlabel ) );
@@ -246,6 +252,7 @@ public class CdawebVapServlet extends HttpServlet {
         Element axis= doc.createElement("Axis");
         if ( min==null ) {
             addProperty( doc, axis, "autoRange", "Boolean", "true" );
+            addProperty( doc, axis, "autoLabel", "Boolean", "true" );
         } else {
             addProperty( doc, axis, "log", "Boolean", String.valueOf(log) );
             if ( min.contains("T") ) {
