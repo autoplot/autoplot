@@ -26,6 +26,7 @@
         <p>Bugfixes (2014-06-13):</p>
         <ul>
             <li>vapfile:http://server.gov/vapserver?data0=... works now</li>
+            <li>formatDataSet command accepts arguments like "foo.xls?sheet=Sheet1"</li>
             <li>more bugfixes to support v1.08 vap files (auto renderstyle)</li>
             <li>setStatus would often push extra event on to event queue.</li>
             <li>clean up for drag and drop URIs to make things work on Mac and Windows.</li>
@@ -87,6 +88,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>read description and valid min and valid max from VOTables.</li>
+            <li>add butterworth to the filters</li>
             <li>export to xls allows append and more ordinal data</li>
             <li>experimental secret clean cache feature introduced.</li>
             <li>351: save previous entries to jython getParam forms.  Allow address bar trigger to contain parameter settings.</li>
