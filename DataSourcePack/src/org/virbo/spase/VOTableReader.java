@@ -60,6 +60,11 @@ public class VOTableReader {
      * In record we are reading each of the fields.
      */
     private final String STATE_RECORD= "record";
+
+    /**
+     * expecting the characters within a description.
+     */
+    private final String STATE_DESCRIPTION= "description";
     
     /**
      * expecting the characters within a field.
@@ -72,6 +77,7 @@ public class VOTableReader {
     QDataSet bds;
     
     List<String> ids= new ArrayList<String>();
+    List<String> descriptions=  new ArrayList<String>(); // one-line describing the data.
     List<String> datatypes= new ArrayList<String>(); // we only support double and UTC then the ucd is time.epoch.
     List<Integer> arraysizes= new ArrayList<Integer>(); // support for 2-D arrays.  -1,0 or N  -2 means *, -1 means scalar, positive means 2-D array
     List<String> names= new ArrayList<String>();
@@ -207,10 +213,14 @@ public class VOTableReader {
                     } else {
                         units.add( SemanticOps.lookupUnits( sunit) );
                     }
+                    descriptions.add(null);
                     fillValues.add(null);
                     minValues.add(null);
                     maxValues.add(null);
                     stopEnumerations.add(Boolean.FALSE);
+                } else if ( localName.equals("DESCRIPTION") ) {
+                    state= STATE_DESCRIPTION;
+                    valueBuilder.delete( 0, valueBuilder.length() );
                 } else if ( localName.equals("VALUES") ) {
                     String fill= attributes.getValue("null");
                     if ( fill!=null ) {
@@ -316,13 +326,20 @@ public class VOTableReader {
                     index++; // counting up items.
                 } else if ( localName.equals("DATA") ) {
                     assert state.equals(STATE_HEADER);
-                } 
+                } else if ( localName.equals("DESCRIPTION" ) ) {
+                    assert state.equals(STATE_DESCRIPTION);
+                    state= STATE_HEADER;
+                    descriptions.set((index), valueBuilder.toString() );
+                    
+                }
             }
             
             
             @Override
             public void characters(char[] ch, int start, int length) throws SAXException {
                 if ( STATE_FIELD.equals(state) ) {
+                    valueBuilder.append( ch, start, length );
+                } else if ( STATE_DESCRIPTION.equals(state) ) {
                     valueBuilder.append( ch, start, length );
                 }
             }
@@ -393,6 +410,7 @@ public class VOTableReader {
                 head.putProperty( QDataSet.NAME, ielement, ids.get(ii) );
                 head.putProperty( QDataSet.LABEL, ielement, names.get(ii) ); 
                 head.putProperty( QDataSet.UNITS, ielement, units.get(ii) ); 
+                head.putProperty( QDataSet.TITLE, ielement, descriptions.get(ii) ); 
                 if ( fillValues.get(ii)!=null ) {
                    head.putProperty( QDataSet.FILL_VALUE, ielement, FILL_VALUE ); 
                 }
