@@ -244,8 +244,9 @@ if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStab
 if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/ScreenshotsTool.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/wgetfs/WGetFileSystemFactory.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/fsm/FileStorageModelNew.java; then echo "****"; hasErrors=1; fi  # some scripts use this old name.
-if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/math/filter/*.java; then echo "****"; hasErrors=1; fi  # some scripts use this old name.
-if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/components/DataPointRecorderNew.java; then echo "****"; hasErrors=1; fi  # some scripts use this old name.
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/math/filter/*.java; then echo "****"; hasErrors=1; fi  
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/components/DataPointRecorderNew.java; then echo "****"; hasErrors=1; fi  
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org.das2.graph/Auralizor.java; then echo "****"; hasErrors=1; fi  
 
 # this can be removed soon:
 if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/dataset/SparseDataSetBuilder.java; then echo "****"; hasErrors=1; fi
