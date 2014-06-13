@@ -446,7 +446,15 @@ public class DataSetURI {
         }
         return factory;
     }
-
+    
+    /**
+     * get the InputStream from the path part of the URI.  The stream must be closed by the client.
+     * 
+     * @param url URL like http://autoplot.org/data/autoplot.dat
+     * @param mon monitor that will monitor the stream as it is transmitted.
+     * @return the InputStream, which must be closed by the client. TODO: check usages...
+     * @throws IOException 
+     */
     public static InputStream getInputStream(URL url, ProgressMonitor mon) throws IOException {
         URISplit split = URISplit.parse(url.toString());
 
@@ -464,6 +472,14 @@ public class DataSetURI {
         }
     }
 
+    /**
+     * get the InputStream from the path part of the URI.  The stream must be closed by the client.
+     * 
+     * @param uri URI like vap+dat:http://autoplot.org/data/autoplot.dat 
+     * @param mon monitor that will monitor the stream as it is transmitted.
+     * @return the InputStream, which must be closed by the client. TODO: check usages...
+     * @throws IOException 
+     */
     public static InputStream getInputStream(URI uri, ProgressMonitor mon) throws IOException {
         URISplit split = URISplit.parse( uri );
         FileSystem fs;
