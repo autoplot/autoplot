@@ -11,6 +11,9 @@
 # CDF Support will be awkward because of the binaries.  Support this for the hudson platform.
 #
 # This should be run from the folder "VirboAutoplot"
+#
+# Used by: autoplot-release on Hudson.
+#
 
 # set JAVA_HOME
 if [ "" = "$JAVA_HOME" ]; then
