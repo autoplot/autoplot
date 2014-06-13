@@ -60,13 +60,19 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
                         String label= (String)bds.property(QDataSet.LABEL,i);
                         String name= (String)bds.property(QDataSet.NAME,i);
                         String title= (String)bds.property(QDataSet.TITLE,i);
-                        if ( Ops.safeName(label).equals(label) ) {
-                            CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, label, this, "arg_0", label+" ("+name+")", title, true );
-                            result.add( cc1 );
+                        String c= label;
+                        if ( !Ops.safeName(label).equals(label) ) {
+                            label= label+" ("+name+")";
                         } else {
-                            CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, name, this, "arg_0", label, title, true );
-                            result.add( cc1 );
+                            label= label+" ("+name+")";
                         }
+                        if ( title==null ) {
+                            title= label;
+                        }
+                        int lim= Math.max(20,120-label.length());
+                        if ( title.length()>lim ) title= title.substring(0,lim-3)+"...";
+                        CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, c, this, "arg_0", title, title, true );
+                        result.add( cc1 );  
                     }
                     return result;
                 } else {
