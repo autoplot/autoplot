@@ -528,6 +528,8 @@ public class ScriptContext extends PyJavaInstance {
      *   out: test016_006.png
      *    in: http://autoplot.org/data/
      *    throws IllegalArgumentException
+     *    in: file://tmp/data/autoplot.xls?sheet=sheet1
+     *   out: /tmp/data/autoplot.xls?sheet=sheet1
      *}</small></pre></blockquote>
      * @param filename like "file://tmp/data/autoplot.png"
      * @return  "/tmp/data/autoplot.png"
@@ -537,13 +539,17 @@ public class ScriptContext extends PyJavaInstance {
         if ( filename.contains("/") || filename.contains("\\") ) {
             URISplit split= URISplit.parse(filename);
             if ( !split.scheme.equals("file") ) {
-                throw new IllegalArgumentException("cannot write to "+filename);
+                throw new IllegalArgumentException("cannot write to "+filename+ " because it must be local file");
             }
             filename= split.file.substring(split.scheme.length()+1); //TODO: this is sloppy.
+            if ( split.params!=null ) {
+                filename= filename + "?"+ split.params;
+            }
             if ( filename.startsWith("///" ) ) filename= filename.substring(2);
             return filename;
         } else {
-            return filename;
+            String pwd= new File("").getAbsolutePath();
+            return pwd + File.separator + filename;
         }
     }
     
@@ -789,35 +795,35 @@ public class ScriptContext extends PyJavaInstance {
         return org.virbo.jythonsupport.Util.generateTimeRanges( spec, srange );
     }
     
-        /**
+    /**
      * Export the data into a format implied by the filename extension.  
      * See the export data dialog for additional parameters available for formatting.
      *
      * For example:
-     * <p><blockquote><pre>
+     *<blockquote><pre><small>{@code
      * ds= getDataSet('http://autoplot.org/data/somedata.cdf?BGSEc')
      * formatDataSet( ds, 'vap+dat:file:/home/jbf/temp/foo.dat?tformat=minutes&format=6.2f')
-     * </pre></blockquote></p>
+     *}</small></pre></blockquote>
      * 
      * @param ds
      * @param file local file name that is the target
      * @throws java.lang.Exception
      */
     public static void formatDataSet(QDataSet ds, String file) throws Exception {
+        
         file= getLocalFilename(file);
 
-        if (!file.contains(":/")) {
-            file = new File(file).getCanonicalFile().toString();
-        }
-        URI uri = DataSetURI.getURIValid(file);
-
+        URISplit split= URISplit.parse(file);
+        
+        URI uri = split.resourceUri; 
+        
         DataSourceFormat format = DataSetURI.getDataSourceFormat(uri);
         
         if (format == null) {
             throw new IllegalArgumentException("no format for extension: " + file);
         }
 
-        format.formatData( DataSetURI.fromUri(uri), ds, new NullProgressMonitor());
+        format.formatData( file, ds, new NullProgressMonitor());
 
     }
     
