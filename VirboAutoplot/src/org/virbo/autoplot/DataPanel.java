@@ -572,6 +572,7 @@ public class DataPanel extends javax.swing.JPanel {
         processMenu= new JPopupMenu();
         processMenu.add( createMenuItem( "|accum()", "running sum of the rank 1 data. (opposite of diff)." ) );
         processMenu.add( createMenuItem( "|add(1)", "add a scalar " ) );
+        processMenu.add( createMenuItem( "|butterworth(2,500,550,True)", "Butterworth notch filter" ) );
         processMenu.add( createMenuItem( "|collapse0()", "average over the zeroth dimension to reduce the dimensionality." ) );
         processMenu.add( createMenuItem( "|collapse1()", "average over the first dimension to reduce the dimensionality." ) );
         processMenu.add( createMenuItem( "|cos()", "cos of the data in radians. (No units check)" ) );
