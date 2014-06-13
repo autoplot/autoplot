@@ -5,6 +5,8 @@
 # This list is separate from the ant build script,
 # so the configuration needs to be kept in sync.
 #
+# Used by: autoplot-jar-stable on Hudson
+#
 
 if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.6.0_35/
