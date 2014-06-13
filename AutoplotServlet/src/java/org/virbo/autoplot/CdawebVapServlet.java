@@ -65,6 +65,8 @@ public class CdawebVapServlet extends HttpServlet {
         
         String tt= new SimpleDateFormat("yyyyMMdd_HHmmss").format( new Date() );
         response.setHeader("Content-Disposition","inline; filename=\"default_"+tt+".vap\"" );
+        response.setHeader("Access-Control-Allow-Origin","*");
+        response.setHeader("Access-Control-Allow-Methods","GET");
         
         PrintWriter out = response.getWriter();
         
