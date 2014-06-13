@@ -14,7 +14,7 @@
 # On OS 10.5.8, this worked:
 #  JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
 #
-# Used by: autoplot-release on Hudson.
+# Used by: autoplot-jar-all on http://papco.org:8080/hudson.  This is used for testing.
 #
 
 if [ "" = "$JAVA_HOME" ]; then
