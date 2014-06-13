@@ -11,7 +11,9 @@
 # CDF Support will be awkward because of the binaries.  Support this for the hudson platform.
 #
 # This should be run from the folder "VirboAutoplot"
-
+#
+# Used by: ???
+#
 # set JAVA_HOME and JAVA6_HOME
 if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.6.0_35/
@@ -187,6 +189,7 @@ if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotS
 if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/qstream/filter/*.java; then hasErrors=1; fi
 if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/ScreenshotsTool.java; then hasErrors=1; fi
 if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/wgetfs/WGetFileSystemFactory.java; then hasErrors=1; fi
+if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/components/DataPointRecorderNew.java; then hasErrors=1; fi  # some scripts use this old name.
 if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/components/DataPointRecorderNew.java; then hasErrors=1; fi  # some scripts use this old name.
 
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
