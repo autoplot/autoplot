@@ -10,6 +10,9 @@
 # CDF Support will be awkward because of the binaries.  Support this for the hudson platform.
 #
 # This should be run from the folder "VirboAutoplot"
+#
+# Used by: ???
+#
 
 # set JAVA_HOME and JAVA6_HOME
 if [ "" = "$JAVA_HOME" ]; then
