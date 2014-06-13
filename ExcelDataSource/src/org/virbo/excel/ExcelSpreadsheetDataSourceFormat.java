@@ -19,7 +19,6 @@ import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.das2.datum.EnumerationUnits;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -32,6 +31,19 @@ import org.virbo.datasource.DataSourceFormat;
  */
 public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
 
+    /**
+     * get a label for the dataset.  This is a human-readable string that can contain spaces.
+     * @param ds
+     * @param deft
+     * @return 
+     */
+    private String labelFor( QDataSet ds, String deft ) {
+        String l = (String) ds.property(QDataSet.LABEL);
+        if ( l==null ) l= (String) ds.property(QDataSet.NAME);
+        if ( l==null ) l= deft;
+        return l;
+    }
+    
     private void formatRank2( HSSFSheet sheet, QDataSet data, ProgressMonitor mon) throws IOException {
 
         int irow= 0;
@@ -54,9 +66,9 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
                 
         if (dep1 != null) {
             if (dep0 != null) {
-                String l = (String) dep0.property(QDataSet.LABEL);
+                String l = labelFor(dep0,"");
                 cell= row.createCell(icell++);
-                cell.setCellValue( (l == null ? "dep0" : l) );
+                cell.setCellValue( new HSSFRichTextString( l ) );
             }
             Units u = (Units) dep1.property(QDataSet.UNITS);
             if (u == null) {
@@ -65,14 +77,8 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             int i;
             for (  i = 0; i < dep1.length(); i++) {
                 cell= row.createCell(icell++);
-                
                 Datum d= u.createDatum(dep1.value(i));
-
-                if ( u instanceof EnumerationUnits ) {
-                    cell.setCellValue( d.toString() );
-                } else {
-                    setCellValue( cell, d);
-                }
+                setCellValue( cell, d );
             }
         }
 
@@ -100,6 +106,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             icell= 0;
             
             if (dep0 != null) {
+                assert u0!=null;
                 cell= row.createCell(icell++);
                 setCellValue( cell, u0.createDatum(dep0.value(i)) );
             }
@@ -124,15 +131,15 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
         short icell=0;
         
         if (dep0 != null) {
-            String l = (String) dep0.property(QDataSet.LABEL);
+            String label = labelFor( dep0, "" );
             cell= row.createCell(icell++);                    
-            cell.setCellValue( new HSSFRichTextString( (l == null ? "dep0" : l) ) );
+            cell.setCellValue( new HSSFRichTextString( label ) );
         }
 
         {
-            String l = (String) data.property(QDataSet.LABEL);
+            String label = labelFor( data, "" );
             cell= row.createCell(icell++);
-            cell.setCellValue( new HSSFRichTextString( (l == null ? "data" : l) ) );
+            cell.setCellValue( new HSSFRichTextString( (label == null ? "" : label) ) );
         }
 
         Units u0 = Units.dimensionless;
@@ -178,6 +185,8 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             c.setTimeInMillis( (long)( datum.doubleValue(Units.t1970) * 1000 ) );
             cell.setCellValue( c );
             cell.setCellStyle(dateCellStyle);
+        } else if ( UnitsUtil.isNominalMeasurement(u) ) {
+            cell.setCellValue( new HSSFRichTextString( datum.toString() ) );
         } else {
             cell.setCellValue( datum.doubleValue(u) );
         }
