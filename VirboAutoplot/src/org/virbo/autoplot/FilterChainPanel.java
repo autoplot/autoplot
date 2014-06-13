@@ -47,8 +47,8 @@ public class FilterChainPanel extends JPanel {
         StringBuilder result= new StringBuilder();
         if ( !component.equals("") ) result.append(component);
 
-        for ( int i=0; i<filters.size(); i++ ) {
-            result.append("|").append( filters.get(i));
+        for ( String filter : filters ) {
+            result.append("|").append(filter);
         }
         return result.toString();
     }
@@ -149,8 +149,8 @@ public class FilterChainPanel extends JPanel {
         "valid() replace data with 1 where valid, 0 where invalid",
         };
 
-        for ( int i=0; i<opts.length; i++ ) {
-            JRadioButton cb= new JRadioButton(opts[i]);
+        for ( String opt : opts ) {
+            JRadioButton cb = new JRadioButton(opt);
             group.add(cb);
             optionsPanel.add(cb);
         }
