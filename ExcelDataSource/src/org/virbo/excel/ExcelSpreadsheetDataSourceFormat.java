@@ -4,13 +4,12 @@
  */
 package org.virbo.excel;
 
-import org.das2.datum.Datum;
-import org.das2.datum.Units;
-import org.das2.datum.UnitsUtil;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Map;
 import java.util.TimeZone;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -19,11 +18,14 @@ import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.das2.datum.Datum;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
+import org.virbo.datasource.URISplit;
 
 /**
  * Format the QDataSet into Excel spreadsheets (1990s format).  
@@ -193,12 +195,34 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
     }
     
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
-	URISplit split= URISplit.parse(uri);
-
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> params= URISplit.parseParams(split.params);
+        
+        boolean append= "T".equals( params.get("append") );
+        String sheetName= params.get("sheet");
+        if ( sheetName==null ) sheetName= "sheet1";
+        
+        HSSFWorkbook wb;
+        if ( append ) {
+            FileInputStream in=null;
+            try {
+                in= new FileInputStream( new File( split.resourceUri ) );
+                wb= new HSSFWorkbook( in );
+            } finally {
+                if ( in!=null ) in.close();
+            }
+        } else {
+            wb= new HSSFWorkbook();
+        }
+        
         FileOutputStream out = new FileOutputStream( new File( split.resourceUri ) );
         try {
-            HSSFWorkbook wb= new HSSFWorkbook();
-            HSSFSheet sheet= wb.createSheet();
+            HSSFSheet sheet;
+            sheet= wb.getSheet(sheetName);
+            if ( sheet==null ) {
+                sheet= wb.createSheet();
+            }
+            
             dateCellStyle= wb.createCellStyle();
             dateCellStyle.setDataFormat( HSSFDataFormat.getBuiltinFormat("m/d/yy h:mm") );
 
