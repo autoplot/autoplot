@@ -220,7 +220,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             HSSFSheet sheet;
             sheet= wb.getSheet(sheetName);
             if ( sheet==null ) {
-                sheet= wb.createSheet();
+                sheet= wb.createSheet(sheetName);
             }
             
             dateCellStyle= wb.createCellStyle();
