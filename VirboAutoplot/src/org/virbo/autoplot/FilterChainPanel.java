@@ -114,6 +114,7 @@ public class FilterChainPanel extends JPanel {
         "abs() return the absolute value of the data.",
         "accum() running sum of the rank 1 data. (opposite of diff).",
         "add(1.) add a scalar",
+        "butterworth(2,500,550,True) Butterworth notch filter",
         "collapse0() average over the zeroth dimension to reduce the dimensionality. (See total)",
         "collapse1() average over the first dimension to reduce the dimensionality.",
         "cos() cos of the data in radians. (No units check)",
