@@ -13,6 +13,9 @@
 # On a Mac, you might have to set JAVA_HOME manually.
 # On OS 10.5.8, this worked:
 #  JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
+#
+# Used by: autoplot-release on Hudson.
+#
 
 if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.6.0_35/
@@ -190,6 +193,7 @@ if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xm
 if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/fsm/FileStorageModelNew.java; then echo "*****"; hasErrors=1; fi  # some scripts use this old name.
 if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/math/filter/*.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/components/DataPointRecorderNew.java; then echo "*****"; hasErrors=1; fi  
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org.das2.graph/Auralizor.java; then echo "*****"; hasErrors=1; fi  
 
 
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
