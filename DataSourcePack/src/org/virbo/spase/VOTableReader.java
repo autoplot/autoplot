@@ -4,10 +4,7 @@
  */
 package org.virbo.spase;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +26,7 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.SparseDataSetBuilder;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
-import org.virbo.qstream.BundleStreamFormatter;
-import org.virbo.qstream.StreamException;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
@@ -84,14 +78,16 @@ public class VOTableReader {
     List<String> sunits= new ArrayList<String>(); // Equal to UTC for time types.  Can be null.
     List<Units> units= new ArrayList<Units>();
     List<String> fillValues= new ArrayList<String>(); // the fill value representation
+    List<String> minValues=  new ArrayList<String>(); // the minimum value representation
+    List<String> maxValues=  new ArrayList<String>(); // the maximum value representation
     List<Boolean> stopEnumerations= new ArrayList<Boolean>();  // if true, don't attempt to preserve enumerations.
                     
     DataSetBuilder dataSetBuilder;
     
     /**
-     * the number of unique values allowed to be represented by an enumeration.
+     * the number of unique values allowed to be represented by an enumeration.  
      */
-    private static final int UNIQUE_ENUMERATION_VALUES_LIMIT = 200;
+    private static final int UNIQUE_ENUMERATION_VALUES_LIMIT = 20000;
 
     /**
      * the data index within each record.  This might not be the same as the number of fields.
@@ -212,13 +208,28 @@ public class VOTableReader {
                         units.add( SemanticOps.lookupUnits( sunit) );
                     }
                     fillValues.add(null);
+                    minValues.add(null);
+                    maxValues.add(null);
                     stopEnumerations.add(Boolean.FALSE);
                 } else if ( localName.equals("VALUES") ) {
                     String fill= attributes.getValue("null");
                     if ( fill!=null ) {
                         fillValues.set(index,fill);
                     }
-                    //TODO: there is MIN and MAX that could be interpretted, find a demo.
+                } else if ( localName.equals("MIN") ) { // assume we are within VALUES
+                    String x= attributes.getValue("value");
+                    if ( x==null ) {
+                        logger.info("MIN is missing value attribute");
+                    } else {
+                        minValues.set(index,x);
+                    }
+                } else if ( localName.equals("MAX") ) { // assume we are within VALUES
+                    String x= attributes.getValue("value");
+                    if ( x==null ) {
+                        logger.info("MAX is missing value attribute");
+                    } else {
+                        maxValues.set(index,x);
+                    }
                 } else if ( localName.equals("DATA") ) {
                     if ( justHeader ) {
                         throw new RuntimeException("we're all done reading the header and dont need the data.");
@@ -360,6 +371,21 @@ public class VOTableReader {
                     if ( fillValues.get(ii)!=null ) {
                         head.putProperty( QDataSet.FILL_VALUE, ielement, FILL_VALUE ); 
                     }
+                    if ( minValues.get(ii)!=null ) {
+                        try {
+                            head.putProperty( QDataSet.VALID_MIN, ielement, units.get(ii).parse(minValues.get(ii)).doubleValue(units.get(ii)) );
+                        } catch ( ParseException ex ) {
+                            logger.log( Level.INFO, "unable to parse MIN for {0}", ids.get(ii));
+                        }
+                    }
+                    if ( maxValues.get(ii)!=null ) {
+                        //TODO: I think there's an inclusive/exclusive property to look for.  VALID_MAX is inclusive.
+                        try {
+                            head.putProperty( QDataSet.VALID_MAX, ielement, units.get(ii).parse(maxValues.get(ii)).doubleValue(units.get(ii)) );
+                        } catch ( ParseException ex ) {
+                            logger.log( Level.INFO, "unable to parse MAX for {0}", ids.get(ii));
+                        }
+                    }
                     ielement++;
                 }
                 
@@ -370,6 +396,20 @@ public class VOTableReader {
                 if ( fillValues.get(ii)!=null ) {
                    head.putProperty( QDataSet.FILL_VALUE, ielement, FILL_VALUE ); 
                 }
+                if ( minValues.get(ii)!=null ) {
+                    try {
+                        head.putProperty( QDataSet.VALID_MIN, ielement, units.get(ii).parse(minValues.get(ii)).doubleValue(units.get(ii)) );
+                    } catch ( ParseException ex ) {
+                        logger.log( Level.INFO, "unable to parse MIN for {0}", ids.get(ii));
+                    }
+                }
+                if ( maxValues.get(ii)!=null ) {
+                    try {
+                        head.putProperty( QDataSet.VALID_MAX, ielement, units.get(ii).parse(maxValues.get(ii)).doubleValue(units.get(ii)) );
+                    } catch ( ParseException ex ) {
+                        logger.log( Level.INFO, "unable to parse MAX for {0}", ids.get(ii));
+                    }
+                }                
                 ielement++;
             }
             if ( ii>0 ) head.putProperty( QDataSet.DEPENDNAME_0, ielement, ids.get(0) );
