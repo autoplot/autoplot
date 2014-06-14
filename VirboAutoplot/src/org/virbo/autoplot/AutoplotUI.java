@@ -1599,25 +1599,7 @@ APSplash.checkTime("init 52.9");
             }
         } catch (RuntimeException ex) {
             if ( ex.getCause()!=null && ex.getCause() instanceof HtmlResponseIOException ) {
-                setStatus(ERROR_ICON,"Html response from URI: " + surl);
-                HtmlResponseIOException htmlEx= ((HtmlResponseIOException)ex.getCause());
-                if ( htmlEx.getURL()!=null ) {
-                    final String link= htmlEx.getURL().toString();
-                    JPanel p= new JPanel( new BorderLayout( ) );
-                    p.add( new JLabel(  "<html>Unable to open URI: <br>" + surl+"<br><br>"+ex.getCause().getMessage()+ "<br><a href=\""+link+"\">"+link+"</a><br>" ), BorderLayout.CENTER );
-                    JPanel p1= new JPanel( new BorderLayout() );
-                    p1.add( new JButton( new AbstractAction("View Page") {
-                        @Override
-                        public void actionPerformed( ActionEvent ev ) {
-                            org.das2.util.LoggerManager.logGuiEvent(ev);                
-                            AutoplotUtil.openBrowser(link);
-                        }
-                    }), BorderLayout.EAST );
-                    p.add( p1, BorderLayout.SOUTH );
-                    JOptionPane.showMessageDialog( this, p );
-                } else {
-                    JOptionPane.showMessageDialog( this, "<html>Unable to open URI: <br>" + surl+"<br><br>"+ex.getCause() );
-                }
+                handleHtmlResponse( surl, ex );
             } else if ( ex.getCause()!=null && ex.getCause() instanceof IOException ) {
                 setStatus(ERROR_ICON,"Unable to open URI: " + surl);
                 AutoplotUtil.showUserExceptionDialog( this, 
@@ -1631,6 +1613,39 @@ APSplash.checkTime("init 52.9");
             }
         }
         
+    }
+    
+    /**
+     * show the unexpected html response dialog, with a button to look at the HTML response.
+     * @param surl the URL 
+     * @param ex the exception
+     * @return 
+     */
+    private void handleHtmlResponse( String surl, Exception ex ) {
+        setStatus(ERROR_ICON,"HTML response from URI: " + surl);
+        HtmlResponseIOException htmlEx;
+        if ( ex instanceof HtmlResponseIOException ) {
+            htmlEx= (HtmlResponseIOException)ex;
+        } else {
+            htmlEx= ((HtmlResponseIOException)ex.getCause());
+        }
+        if ( htmlEx.getURL()!=null ) {
+            final String link= htmlEx.getURL().toString();
+            JPanel p= new JPanel( new BorderLayout( ) );
+            p.add( new JLabel(  "<html>Unable to open URI: <br>" + surl+"<br><br>"+htmlEx.getMessage()+ "<br><br>" ), BorderLayout.CENTER );
+            JPanel p1= new JPanel( new BorderLayout() );
+            p1.add( new JButton( new AbstractAction("View in Browser") {
+                @Override
+                public void actionPerformed( ActionEvent ev ) {
+                    org.das2.util.LoggerManager.logGuiEvent(ev);                
+                    AutoplotUtil.openBrowser(link);
+                }
+            }), BorderLayout.EAST );
+            p.add( p1, BorderLayout.SOUTH );
+            JOptionPane.showMessageDialog( this, p, "HTML response", JOptionPane.ERROR_MESSAGE );
+        } else {
+            JOptionPane.showMessageDialog( this, "<html>Unable to open URI: <br>" + surl+"<br><br>"+htmlEx, "HTML response", JOptionPane.ERROR_MESSAGE );
+        }
     }
     
     private void plotUrl( final String surl ) {
@@ -4589,6 +4604,8 @@ APSplash.checkTime("init 240");
         } catch (URISyntaxException ex) {
             setMessage(WARNING_ICON,ex.getMessage());
             logger.log(Level.SEVERE, ex.getMessage(), ex);
+        } catch (HtmlResponseIOException ex ) {
+            handleHtmlResponse(script, ex);
         } catch (IOException ex) {
             setMessage(WARNING_ICON,ex.getMessage());
             logger.log(Level.SEVERE, ex.getMessage(), ex);
