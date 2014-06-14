@@ -36,7 +36,6 @@ import org.das2.components.DasProgressPanel;
 import org.das2.util.FileUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.datasource.AutoplotSettings;
@@ -231,8 +230,8 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
     }
     
     static class CopyToAction extends AbstractAction {
-        private File f;
-        private JTree jtree;
+        private final File f;
+        private final JTree jtree;
         public CopyToAction( File f, JTree jtree ) {
             super( "Copy to..");
             this.f= f;
@@ -242,6 +241,7 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         public void actionPerformed(ActionEvent e) {
             LoggerManager.logGuiEvent(e);
             if ( f==null ) {
+                JOptionPane.showMessageDialog( jtree, "<html>Wait for scanning to complete.</html>" );
                 return;
             }
             JFileChooser chooser = new JFileChooser();
@@ -394,11 +394,11 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         return goPressed;
     }
     
-    public static void main( String[] args ) {
-        JDiskHogPanel p = new JDiskHogPanel(null);
-        p.scan( new File("/home/jbf/temp/autoplot/" ) );
-        JOptionPane.showMessageDialog( null, p );
-    }
+//    public static void main( String[] args ) {
+//        JDiskHogPanel p = new JDiskHogPanel(null);
+//        p.scan( new File("/home/jbf/" ) );
+//        JOptionPane.showMessageDialog( null, p );
+//    }
     
     /** This method is called from within the constructor to
      * initialize the form.
