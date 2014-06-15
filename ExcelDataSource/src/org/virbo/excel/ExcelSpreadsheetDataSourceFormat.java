@@ -46,15 +46,50 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
         return l;
     }
     
-    private void formatRank2( HSSFSheet sheet, QDataSet data, ProgressMonitor mon) throws IOException {
+    private void formatRank2( HSSFSheet sheet, String cellName, QDataSet data, ProgressMonitor mon) throws IOException {
 
-        int irow= 0;
-        short icell=0;
-        HSSFRow row= sheet.createRow(irow++);
+        int irow;
+        short icell;
+        HSSFRow row=null;
         HSSFCell cell;
         
         QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
+        
+        short icell0;
+        if ( dep0==null ) {
+            if ( cellName!=null ) {
+                icell0= (short)(cellName.charAt(0)-'A');
+            } else {
+                icell0= 0;
+            }
+        } else {
+            if ( cellName!=null ) {
+                icell0= (short)(cellName.charAt(0)-'A');
+            } else {
+                icell0= 1;
+            }
+        }
+        
+        icell= icell0;
+        
+        if ( dep1!=null ) {
+            if ( cellName!=null ) {
+                irow= (short) (Short.parseShort( cellName.substring(1) )- 1 );
+            } else {
+                irow= 0;
+            }
+        } else {
+            if ( cellName!=null ) {
+                irow= (short) (Short.parseShort( cellName.substring(1) )- 1 );
+            } else {
+                irow= 1;
+            }
+        }
+               
+        if ( irow>0 ) {
+            row= sheet.createRow(irow-1);
+        }
         
         boolean okay= DataSetUtil.checkQube(data); // some RBSP/ECT data has rank 2 DEPEND_1 when it is really a qube.
         
@@ -66,11 +101,13 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             dep1= dep1.slice(0);
         }
                 
-        if (dep1 != null) {
-            if (dep0 != null) {
+        if ( dep1 != null && row!=null ) {
+            if (dep0 != null && icell>0 ) {
                 String l = labelFor(dep0,"");
-                cell= row.createCell(icell++);
-                cell.setCellValue( new HSSFRichTextString( l ) );
+                if ( icell>0 ) {
+                    cell= row.createCell((short)(icell-1));
+                    cell.setCellValue( new HSSFRichTextString( l ) );
+                }
             }
             Units u = (Units) dep1.property(QDataSet.UNITS);
             if (u == null) {
@@ -105,11 +142,11 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             if ( mon.isCancelled() ) break;
             
             row= sheet.createRow(irow++);
-            icell= 0;
+            icell= icell0;
             
-            if (dep0 != null) {
+            if ( dep0 != null && icell>0 ) {
                 assert u0!=null;
-                cell= row.createCell(icell++);
+                cell= row.createCell((short)(icell-1));
                 setCellValue( cell, u0.createDatum(dep0.value(i)) );
             }
 
@@ -202,6 +239,8 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
         String sheetName= params.get("sheet");
         if ( sheetName==null ) sheetName= "sheet1";
         
+        String cellName= params.get("cell");
+         
         HSSFWorkbook wb;
         if ( append ) {
             FileInputStream in=null;
@@ -227,7 +266,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             dateCellStyle.setDataFormat( HSSFDataFormat.getBuiltinFormat("m/d/yy h:mm") );
 
             if (data.rank() == 2) {
-                formatRank2(sheet, data, mon);
+                formatRank2(sheet, cellName, data, mon);
             } else if (data.rank() == 1) {
                 formatRank1(sheet, data, mon);
             }
