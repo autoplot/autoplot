@@ -23,6 +23,7 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.DataSetWrapper;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.URISplit;
@@ -160,27 +161,53 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
         mon.finished();
     }
 
-    private void formatRank1( HSSFSheet sheet, QDataSet data, ProgressMonitor mon) throws IOException {
+    private void formatRank1( HSSFSheet sheet, String cellName, QDataSet data, ProgressMonitor mon) throws IOException {
                 
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
 
         int irow= 0;
-        HSSFRow row= sheet.createRow(irow++);
+        HSSFRow row;
         HSSFCell cell;
-        short icell=0;
+        short icell;
+
+        short icell0;
+        if ( dep0==null ) {
+            if ( cellName!=null ) {
+                icell0= (short)(cellName.charAt(0)-'A');
+            } else {
+                icell0= 0;
+            }
+        } else {
+            if ( cellName!=null ) {
+                icell0= (short)(cellName.charAt(0)-'A');
+            } else {
+                icell0= 1;
+            }
+        }
         
-        if (dep0 != null) {
-            String label = labelFor( dep0, "" );
-            cell= row.createCell(icell++);                    
-            cell.setCellValue( new HSSFRichTextString( label ) );
+        if ( cellName!=null ) {
+            irow= (short) (Short.parseShort( cellName.substring(1) )- 1 );
+        } else {
+            irow= 1;
         }
 
-        {
-            String label = labelFor( data, "" );
-            cell= row.createCell(icell++);
-            cell.setCellValue( new HSSFRichTextString( (label == null ? "" : label) ) );
-        }
+        icell= icell0;
+                   
+        if ( irow>0 ) {
+            row= sheet.createRow(irow-1);
+            if (dep0 != null) {
+                String label = labelFor( dep0, "" );
+                cell= row.createCell(icell++);                    
+                cell.setCellValue( new HSSFRichTextString( label ) );
+            }
 
+            {
+                String label = labelFor( data, "" );
+                cell= row.createCell(icell++);
+                cell.setCellValue( new HSSFRichTextString( (label == null ? "" : label) ) );
+            }
+        }
+        
         Units u0 = Units.dimensionless;
         if (dep0 != null) {
             u0 = (Units) dep0.property(QDataSet.UNITS);
@@ -199,7 +226,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             if ( mon.isCancelled() ) break;
             
             row= sheet.createRow(irow++);
-            icell= 0;
+            icell= icell0;
             
             if (dep0 != null) {
                 cell= row.createCell(icell++);
@@ -239,8 +266,14 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
         String sheetName= params.get("sheet");
         if ( sheetName==null ) sheetName= "sheet1";
         
-        String cellName= params.get("cell");
-         
+        String cellName= params.get("cell"); // note reader is column, firstRow.
+        String nodep= params.get("nodep");
+        if ( "T".equals(nodep) ) {
+            DataSetWrapper dsw= new DataSetWrapper(data);
+            dsw.putProperty( QDataSet.DEPEND_0, null );
+            dsw.putProperty( QDataSet.DEPEND_1, null );
+        }
+        
         HSSFWorkbook wb;
         if ( append ) {
             FileInputStream in=null;
@@ -268,7 +301,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             if (data.rank() == 2) {
                 formatRank2(sheet, cellName, data, mon);
             } else if (data.rank() == 1) {
-                formatRank1(sheet, data, mon);
+                formatRank1(sheet, cellName, data, mon);
             }
 
             wb.write(out);
