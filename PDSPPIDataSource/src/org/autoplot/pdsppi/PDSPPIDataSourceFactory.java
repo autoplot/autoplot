@@ -5,22 +5,32 @@
 
 package org.autoplot.pdsppi;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.URISplit;
+import org.virbo.spase.VOTableReader;
+import org.xml.sax.SAXException;
 
 /**
  * PDS/PPI node factory.  Examples include:
  * vap+pdsppi:id=pds://PPI/GOMW_5004/DATA/MAG/SATELLITES/EUROPA/ORB25_EUR_EPHIO
+ * vap+pdsppi:id=PPI/GO-J-MAG-3-RDR-HIGHRES-V1.0/DATA/SURVEY/HIGH_RES/ORB01_PSX_SYS3&ds=B-FIELD%20MAGNITUDE
  * @author jbf
  */
 public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
@@ -32,6 +42,27 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
         return new PDSPPIDataSource(uri);
     }
 
+    private List<CompletionContext> getDataSetCompletions( String id, ProgressMonitor mon  ) throws Exception { 
+        VOTableReader read;  
+        
+        String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
+        read= new VOTableReader();            
+        mon.setProgressMessage("downloading data");
+        File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon );
+        mon.setProgressMessage("reading data");
+        QDataSet ds= read.readHeader( f.toString(), mon );
+
+        List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
+        for ( int i=0; i<ds.length(); i++ ) {
+            String n= (String) ds.property( QDataSet.NAME, i );
+            String l= (String) ds.property( QDataSet.LABEL, i );
+            String t= (String) ds.property( QDataSet.TITLE, i );
+            CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, n, this, n, l, t, true );
+            ccresult.add(cc1);
+        }
+        return ccresult;
+    }
+    
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
@@ -42,11 +73,8 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String param= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
             if ( param.equals("ds") ) {
-                // parse label file.
-                List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
-                CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "dummy", this, null, "dummy", "dummy", true  );
-                ccresult.add(cc1);
-                return ccresult;
+                String id= "PPI/GO-J-MAG-3-RDR-HIGHRES-V1.0/DATA/SURVEY/HIGH_RES/ORB01_PSX_SYS3";
+                return getDataSetCompletions( id, mon );
             } else if ( param.equals("id") ) {
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                 ArrayList<String> keys= new ArrayList();
