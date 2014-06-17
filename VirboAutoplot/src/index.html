@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Butterworth filter verification.</small></p>
+        <p><small>Autoplot used to look at large amounts of data from a Das2Server.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,10 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-06-13):</p>
+        <p>Bugfixes (2014-06-17):</p>
         <ul>
+            <li>ds=&lt;C&gt; completions in PDSPPI source.</li>
+            <li>rte_1282463981: guard against data that was mismarked as monotonic in ArrayDataSet</li> 
             <li>vapfile:http://server.gov/vapserver?data0=... works now</li>
             <li>formatDataSet command accepts arguments like "foo.xls?sheet=Sheet1"</li>
             <li>more bugfixes to support v1.08 vap files (auto renderstyle)</li>
