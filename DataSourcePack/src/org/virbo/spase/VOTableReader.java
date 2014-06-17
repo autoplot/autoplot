@@ -435,6 +435,16 @@ public class VOTableReader {
         return head.getDataSet();
     }
     
+    /**
+     * return just the header for the data.  This is just the BUNDLE_1 property of the dataset 
+     * that would have been read for the readTable command.
+     * @param s String reference to a local file.
+     * @param monitor progress monitor for the read.
+     * @return the header.  For example h.property( QDataSet.LABEL, 1 ) 
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException 
+     */
     public QDataSet readHeader( String s, ProgressMonitor monitor ) throws IOException, SAXException, ParserConfigurationException {
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setNamespaceAware(true);
@@ -454,11 +464,11 @@ public class VOTableReader {
         }
         
         
-        QDataSet bds= formBundleDescriptor();
+        QDataSet lbds= formBundleDescriptor();
         
         monitor.finished();
         
-        return bds;
+        return lbds;
         
     }
     
