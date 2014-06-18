@@ -145,12 +145,15 @@ public abstract class QDataSetBridge {
     }
 
     /**
-     * initiates the read on a separate thread, so this does not block and should
-     * be used with caution.  See getProgressMonitor for use.
+     * This initiates the read on a separate thread, so this does not block and should
+     * be used with caution.  See getProgressMonitor for use.  Note this is 
+     * more advanced and is intended to support use in other software (e.g. PaPCO).
      *
      * Note because there is one exception that is stored, a QDataSetBridge object
      * is only able to load one dataset at a time.  Simultaneous loads should
      * be done with multiple QDataSetBridge objects.
+     * 
+     * @param mon progress monitor from getProgressMonitor()
      */
     public void doGetDataSet(final ProgressMonitor mon)  {
         this.exception= null;
