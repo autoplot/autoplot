@@ -2455,6 +2455,19 @@ public class PlotElementController extends DomNodeController {
             lock.unlock();
         }
     }
+    
+    /**
+     * reset the autoRebinner property.
+     */
+    PropertyChangeListener rebinnerListener= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ( !PlotElementController.this.isValueAdjusting() ) {
+                plotElement.setAutoRenderType(false); // https://sourceforge.net/p/autoplot/bugs/1217/
+            }
+        }
+    };
+    
     /**
      * create the peer that will actually do the painting.  This may be called from either the event thread or off the event thread,
      * but work will be done on the event thread in either case using SwingUtilities.invokeAndWait.
@@ -2478,6 +2491,11 @@ public class PlotElementController extends DomNodeController {
 
         if ( newRenderer!=oldRenderer && newRenderer instanceof SpectrogramRenderer ) {
             ((SpectrogramRenderer)newRenderer).setSliceRebinnedData( dom.getOptions().isSliceRebinnedData() );
+            newRenderer.addPropertyChangeListener( SpectrogramRenderer.PROP_REBINNER, rebinnerListener );
+        }
+        
+        if ( newRenderer!=oldRenderer && oldRenderer instanceof SpectrogramRenderer ) {
+            oldRenderer.addPropertyChangeListener( SpectrogramRenderer.PROP_REBINNER, rebinnerListener );
         }
 
         if ( cb!=null 
