@@ -1898,16 +1898,17 @@ public class PlotElementController extends DomNodeController {
     }
 
     /**
-     * this is the old updateFillSeries and updateFillSpectrogram code.  This calculates
+     * This is the old updateFillSeries and updateFillSpectrogram code.  This calculates
      * ranges and preferred symbol settings, and puts the values in peleCopy.plotDefaults.
      * The dom Plot containing this plotElement should be listening for changes in plotElement.plotDefaults,
      * and can then decide if it wants to use the autorange settings.
      *
      * This also sets the style node of the plotElement copy, so its values should be sync'ed as well.
      * 
-     * @param peleCopy
-     * @param props
-     * @param spec
+     * @param peleCopy the plot element.
+     * @param props metadata provided by the data source (TODO: verify this)
+     * @param fillDs the dataset
+     * @param ignoreDsProps 
      */
     public static void doAutoranging( PlotElement peleCopy, Map<String,Object> props, QDataSet fillDs, boolean ignoreDsProps ) {
 
@@ -2166,10 +2167,9 @@ public class PlotElementController extends DomNodeController {
 
             //TODO: this cheesy old code needs to be addressed sometime, perhaps introducing more nodes under plot defaults
             if (fillDs.length() > LARGE_DATASET_COUNT) {
-                logger.fine("dataset has many points, turning off connector");
-                peleCopy.getStyle().setSymbolConnector(PsymConnector.NONE);
-                peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
-                peleCopy.getStyle().setSymbolSize(1.0);
+                logger.fine("dataset has many points, turning off psym");
+                peleCopy.getStyle().setSymbolConnector(PsymConnector.SOLID);  // Interesting...  This was exactly the opposite of what I should do...
+                peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.NONE);   
             } else {
                 peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
                 if (fillDs.length() > SYMSIZE_DATAPOINT_COUNT) {
