@@ -1684,25 +1684,31 @@ public class PlotElementController extends DomNodeController {
             }
 
             if (dom.getOptions().isAutoranging()) { //this is pre-autorange property, but saves time if we know we won't be autoranging.
-
-                // See https://sourceforge.net/tracker/index.php?func=detail&aid=3405480&group_id=199733&atid=970682
-
-                //DatumRange xdr= peleCopy.getPlotDefaults().getXaxis().getRange();
-                //boolean log= peleCopy.getPlotDefaults().getXaxis().isLog();
-                //if ( dsf.getController().getTimeSeriesBrowseController()!=null && dsf.getController().getTimeSeriesBrowseController().isListeningToAxis() ) {
-                //    // this means we've already autoranged.
-                //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(false); // Why do we do this again?  Boy I wish I'd made some tests...
-                //}
-
+                
                 logger.fine("doAutoranging");
                 //long t0= System.currentTimeMillis();
 
-                doAutoranging( peleCopy,props,fillDs, false );
+                doAutoranging( peleCopy, props, fillDs, false );
+                
+                RenderType rt= peleCopy.getRenderType();
+                if ( rt==RenderType.series || rt==RenderType.colorScatter || rt==RenderType.hugeScatter ) {
+                    if (fillDs.length() > LARGE_DATASET_COUNT) {
+                        logger.fine("dataset has many points, turning off psym");
+                        peleCopy.getStyle().setSymbolConnector(PsymConnector.SOLID);  // Interesting...  This was exactly the opposite of what I should do...
+                        peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.NONE);   
+                    } else {
+                        peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
+                        if (fillDs.length() > SYMSIZE_DATAPOINT_COUNT) {
+                            logger.fine("dataset has a more than few points, using small symbols");
+                            peleCopy.getStyle().setSymbolSize(1.0);
+                        } else {
+                            logger.fine("dataset has few points, using small large symbols");
+                            peleCopy.getStyle().setSymbolSize(3.0);
+                        }
+                    }
+                }
+                
                 //logger.fine("  "+( System.currentTimeMillis()-t0 )+" ms spent autoranging "+fillDs );
-
-                //if ( dsf.getController().getTimeSeriesBrowseController()!=null ) {
-                //    peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // kludge again: since we actually set it, turn on the autorange flag again so that it can bind to dom.timerange property
-                //}
 
                 TimeSeriesBrowse tsb= getDataSourceFilter().getController().getTsb();
                 if ( tsb!=null ) {
@@ -1898,7 +1904,10 @@ public class PlotElementController extends DomNodeController {
     }
 
     /**
-     * This is the old updateFillSeries and updateFillSpectrogram code.  This calculates
+     * This is the old updateFillSeries and updateFillSpectrogram code.  
+     * 
+     * 
+     * This calculates
      * ranges and preferred symbol settings, and puts the values in peleCopy.plotDefaults.
      * The dom Plot containing this plotElement should be listening for changes in plotElement.plotDefaults,
      * and can then decide if it wants to use the autorange settings.
@@ -1906,7 +1915,7 @@ public class PlotElementController extends DomNodeController {
      * This also sets the style node of the plotElement copy, so its values should be sync'ed as well.
      * 
      * @param peleCopy the plot element.
-     * @param props metadata provided by the data source (TODO: verify this)
+     * @param props metadata provided by the data source, converted to uniform QDataSet scheme (e.g. get(DEPEND_0).get(TYPICAL_MIN) )
      * @param fillDs the dataset
      * @param ignoreDsProps 
      */
@@ -2163,23 +2172,6 @@ public class PlotElementController extends DomNodeController {
 
             } else {
                 peleCopy.getPlotDefaults().getZaxis().setAutoRange(false);
-            }
-
-            //TODO: this cheesy old code needs to be addressed sometime, perhaps introducing more nodes under plot defaults
-            if (fillDs.length() > LARGE_DATASET_COUNT) {
-                logger.fine("dataset has many points, turning off psym");
-                peleCopy.getStyle().setSymbolConnector(PsymConnector.SOLID);  // Interesting...  This was exactly the opposite of what I should do...
-                peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.NONE);   
-            } else {
-                peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
-                if (fillDs.length() > SYMSIZE_DATAPOINT_COUNT) {
-                    logger.fine("dataset has a more than few points, using small symbols");
-                    peleCopy.getStyle().setSymbolSize(1.0);
-                } else {
-                    logger.fine("dataset has few points, using small large symbols");
-                    peleCopy.getStyle().setSymbolSize(3.0);
-                }
-
             }
 
         }
