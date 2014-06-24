@@ -39,42 +39,42 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="lineStylePanel" linkSize="13" alignment="0" pref="125" max="32767" attributes="1"/>
-                                      <Component id="psymPanel" linkSize="13" alignment="0" pref="104" max="32767" attributes="1"/>
-                                      <Component id="colorPanel" linkSize="13" alignment="0" pref="130" max="32767" attributes="1"/>
-                                      <Component id="symSizeSpinner" linkSize="21" alignment="0" min="-2" pref="60" max="-2" attributes="1"/>
-                                      <Component id="lineThickSpinner" linkSize="21" alignment="0" min="-2" pref="61" max="-2" attributes="1"/>
-                                  </Group>
-                              </Group>
-                              <Component id="fillToReferenceCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="lineStylePanel" linkSize="13" alignment="0" pref="125" max="32767" attributes="1"/>
+                              <Component id="psymPanel" linkSize="13" alignment="0" pref="104" max="32767" attributes="1"/>
+                              <Component id="colorPanel" linkSize="13" alignment="0" pref="130" max="32767" attributes="1"/>
+                              <Component id="symSizeSpinner" linkSize="21" alignment="0" min="-2" pref="60" max="-2" attributes="1"/>
+                              <Component id="lineThickSpinner" linkSize="21" alignment="0" min="-2" pref="61" max="-2" attributes="1"/>
+                          </Group>
+                      </Group>
+                      <Component id="fillToReferenceCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
                                   <EmptySpace min="12" pref="12" max="12" attributes="0"/>
                                   <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" pref="63" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="referenceValuePanel" alignment="0" min="-2" pref="89" max="-2" attributes="1"/>
-                                      <Component id="fillColorPanel" alignment="0" min="-2" pref="104" max="-2" attributes="1"/>
-                                  </Group>
+                              </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
-                          <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="referenceValuePanel" alignment="0" min="-2" pref="89" max="-2" attributes="1"/>
+                              <Component id="fillColorPanel" alignment="0" min="-2" pref="104" max="-2" attributes="1"/>
+                          </Group>
                       </Group>
                   </Group>
                   <EmptySpace pref="22" max="32767" attributes="0"/>
@@ -114,7 +114,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <Component id="jLabel7" linkSize="6" min="-2" max="-2" attributes="1"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jLabel8" min="-2" max="-2" attributes="1"/>
                       </Group>
                       <Group type="102" attributes="0">
