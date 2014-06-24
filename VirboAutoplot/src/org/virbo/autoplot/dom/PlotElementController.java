@@ -1697,13 +1697,14 @@ public class PlotElementController extends DomNodeController {
                         peleCopy.getStyle().setSymbolConnector(PsymConnector.SOLID);  // Interesting...  This was exactly the opposite of what I should do...
                         peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.NONE);   
                     } else {
-                        peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
                         if (fillDs.length() > SYMSIZE_DATAPOINT_COUNT) {
                             logger.fine("dataset has a more than few points, using small symbols");
                             peleCopy.getStyle().setSymbolSize(1.0);
+                            peleCopy.getStyle().setPlotSymbol( DefaultPlotSymbol.NONE );
                         } else {
                             logger.fine("dataset has few points, using small large symbols");
                             peleCopy.getStyle().setSymbolSize(3.0);
+                            peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
                         }
                     }
                 }
@@ -2398,7 +2399,19 @@ public class PlotElementController extends DomNodeController {
             s.setFillToReference(false);
         } else if ( ele.getRenderType()==RenderType.series ) {
             s.setSymbolConnector(PsymConnector.SOLID);
-            s.setPlotSymbol(DefaultPlotSymbol.CIRCLES);
+            int size= 0;
+            if ( ele.controller!=null ) { // kludge to turn off plot symbols for large datasets.
+                if ( ele.controller.processDataSet!=null ) {
+                    size= ele.controller.processDataSet.length();   
+                } else if ( ele.controller.dataSet!=null ) {
+                    size= ele.controller.dataSet.length();   
+                }
+            }
+            if ( size>SYMSIZE_DATAPOINT_COUNT ) {
+                s.setPlotSymbol( DefaultPlotSymbol.NONE );
+            } else {
+                s.setPlotSymbol( DefaultPlotSymbol.CIRCLES );
+            }
             s.setFillToReference(false);
         } else if ( ele.getRenderType()==RenderType.scatter ) {
             s.setSymbolConnector(PsymConnector.NONE);
