@@ -23,8 +23,12 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-06-17):</p>
+        <p>Bugfixes (2014-06-25):</p>
         <ul>
+            <li>rich headers containing a value element will not be connected to the data column by implicit name (P1).</li>
+            <li>1216: series renderer misconfigured for large datasets rendering.</li>
+            <li>1217: Spectrogram rebinner reverts after change and TSB reload.</li>
+            <li>1215: occasional blips in SeriesRenderer http://www.sarahandjeremy.net:8080/hudson/job/autoplot-test140/lastSuccessfulBuild/artifact/diffs.test141_file__home_jbf_ct_autoplot_vap_bugs_pw_generalPathBlips_generalPathBlips.vap.png</li>
             <li>ds=&lt;C&gt; completions in PDSPPI source.</li>
             <li>rte_1282463981: guard against data that was mismarked as monotonic in ArrayDataSet</li> 
             <li>vapfile:http://server.gov/vapserver?data0=... works now</li>
@@ -90,6 +94,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>PDSPPI source allows completions based on the names in the VOTables</li>
             <li>read description and valid min and valid max from VOTables.</li>
             <li>add butterworth to the filters</li>
             <li>export to xls allows append and more ordinal data</li>
