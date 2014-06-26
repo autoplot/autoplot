@@ -1700,7 +1700,7 @@ public class PlotElementController extends DomNodeController {
                         if (fillDs.length() > SYMSIZE_DATAPOINT_COUNT) {
                             logger.fine("dataset has a more than few points, using small symbols");
                             peleCopy.getStyle().setSymbolSize(1.0);
-                            peleCopy.getStyle().setPlotSymbol( DefaultPlotSymbol.NONE );
+                            peleCopy.getStyle().setPlotSymbol( DefaultPlotSymbol.CIRCLES ); // 1215: make this NONE eventually
                         } else {
                             logger.fine("dataset has few points, using small large symbols");
                             peleCopy.getStyle().setSymbolSize(3.0);
