@@ -29,7 +29,7 @@ import org.xml.sax.SAXException;
 
 /**
  * PDS/PPI node factory.  Examples include:
- * vap+pdsppi:id=pds://PPI/GOMW_5004/DATA/MAG/SATELLITES/EUROPA/ORB25_EUR_EPHIO
+ * vap+pdsppi:id=PPI/GOMW_5004/DATA/MAG/SATELLITES/EUROPA/ORB25_EUR_EPHIO
  * vap+pdsppi:id=PPI/GO-J-MAG-3-RDR-HIGHRES-V1.0/DATA/SURVEY/HIGH_RES/ORB01_PSX_SYS3&ds=B-FIELD%20MAGNITUDE
  * @author jbf
  */
