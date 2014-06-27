@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -73,8 +74,14 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String param= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
             if ( param.equals("ds") ) {
-                String id= "PPI/GO-J-MAG-3-RDR-HIGHRES-V1.0/DATA/SURVEY/HIGH_RES/ORB01_PSX_SYS3";
-                return getDataSetCompletions( id, mon );
+                URISplit split= URISplit.parse(cc.surl);
+                Map<String,String> pp= URISplit.parseParams(split.params);
+                String id= pp.get("id");
+                if ( id==null ) {
+                    return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "", "", "(Select id first)" ) );
+                } else {
+                    return getDataSetCompletions( id, mon );
+                }
             } else if ( param.equals("id") ) {
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                 ArrayList<String> keys= new ArrayList();
