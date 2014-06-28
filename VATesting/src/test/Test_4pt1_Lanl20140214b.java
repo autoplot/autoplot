@@ -33,7 +33,7 @@ public class Test_4pt1_Lanl20140214b implements Scenario {
             //wait "Reloaded" footer
             waitUntilIdle();
 
-            new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("http://www.rbsp-ect.lanl.gov/data_pub/rbspa/rept/level3/rbspa_rel02_ect-rept-sci-L3_20130915_v4.0.0.cdf?FEDU");
+            new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("http://www.rbsp-ect.lanl.gov/data_pub/rbspa/rept/level3/rbspa_rel02_ect-rept-sci-L3_$Y$m$d_v$(v,seo).cdf?FEDU&timerange=20130915");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
 
             waitUntilIdle();
