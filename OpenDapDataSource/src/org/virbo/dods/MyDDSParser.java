@@ -77,8 +77,36 @@ public class MyDDSParser {
         Enumeration en = myDDS.getVariables();
         ArrayList<String> result = new ArrayList<String>();
         while (en.hasMoreElements()) {
-            result.add(((BaseType) en.nextElement()).getName());
+            BaseType bt= ((BaseType) en.nextElement());
+            result.add( bt.getName());
         }
         return result.toArray(new String[result.size()]);
+    }    
+    
+    /**
+     * returns null or the names of the depend variables.
+     * @param var the variable name (e.g. TerrainReflectivity)
+     * @return the depend names (e.g. [lat,lon] )
+     * @throws NoSuchVariableException
+     * @throws InvalidParameterException 
+     */
+    String[] getDepends( String var ) throws NoSuchVariableException, InvalidParameterException {
+        BaseType bt= myDDS.getVariable(var);
+        ArrayList<String> result= new ArrayList();
+        if ( bt instanceof DArray ) {
+            DArray a= ((DArray) bt);
+            for ( int i=0; i<a.numDimensions(); i++ ) {
+                String n= a.getDimension(i).getName();
+                result.add(n);
+            }                
+            if ( result.size()>0 && result.get(0).equals(var) ) {
+                return null;
+            } else {
+                return result.toArray( new String[result.size()] );
+            }
+        } else {
+            return null;
+        }
+        
     }
 }
