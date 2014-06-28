@@ -35,11 +35,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.URISplit;
+import org.virbo.dsutil.TransposeRankNDataSet;
 
 /**
  *
@@ -62,6 +64,39 @@ public class DodsDataSource extends AbstractDataSource {
 
     private final static Logger logger= Logger.getLogger("apdss.dods");
 
+    /**
+     * check for lat and lon tags, transpose if lat come before lon.
+     * If lat and lon are not found or they are already in order, then just return 
+     * the dataset.
+     * 
+     * See http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5.dds?TerrainReflectivity
+     * 
+     * @param v dataset that might have lat and lon. 
+     */
+    private MutablePropertyDataSet checkLatLon( MutablePropertyDataSet v ) {
+        int lat=-1;
+        int lon=-1;
+        for ( int i=0; i<v.rank();i++ ) {
+            QDataSet dep= (QDataSet) v.property( "DEPEND_"+i );
+            if ( dep!=null ) {
+                String name= (String) dep.property("NAME");
+                if ( "lon".equals(name) ) lon=i;
+                if ( "lat".equals(name) ) lat=i;
+            }
+        }
+        if ( lat>-1 && lon>-1 && lat<lon ) {
+            int[] order= new int[v.rank()];
+            for ( int i=0;i<v.rank(); i++) order[i]= i;
+            int t= order[lat];
+            order[lat]= order[lon];
+            order[lon]= t;
+            AbstractDataSet transpose= new TransposeRankNDataSet( v, order );
+            return transpose;
+        } else {
+            return v;
+        }
+    }    
+    
     /**
      * Creates a new instance of DodsDataSetSource
      *
@@ -272,6 +307,7 @@ public class DodsDataSource extends AbstractDataSource {
             adapter.loadDataset( mon, metadata );
             MutablePropertyDataSet ds = (MutablePropertyDataSet) adapter.getDataSet(metadata);
                 
+            ds= checkLatLon( ds );
             
             Object val;
             val= metadata.get("missing_value");
