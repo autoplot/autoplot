@@ -31,6 +31,7 @@ import org.das2.datum.Units;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,9 +65,10 @@ public class DodsDataSource extends AbstractDataSource {
     /**
      * Creates a new instance of DodsDataSetSource
      *
-     * http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density
-     * http://www.cdc.noaa.gov/cgi-bin/nph-nc/Datasets/kaplan_sst/sst.mean.anom.nc.dds?sst
-     * http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/polar/hyd_h0/1997/po_h0_hyd_19970102_v01.cdf.dds?ELECTRON_DIFFERENTIAL_ENERGY_FLUX
+     * CDAWEB no longer supports: http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density
+     * No longer operational: http://www.cdc.noaa.gov/cgi-bin/nph-nc/Datasets/kaplan_sst/sst.mean.anom.nc.dds?sst
+     * http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5.dds?TerrainReflectivity
+     * CDAWEB no longer supports: http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/polar/hyd_h0/1997/po_h0_hyd_19970102_v01.cdf.dds?ELECTRON_DIFFERENTIAL_ENERGY_FLUX
      *
      */
     public DodsDataSource(URI uri) throws IOException {
@@ -166,6 +168,54 @@ public class DodsDataSource extends AbstractDataSource {
         return constraint1.toString();
     }
 
+    private String getDependsConstraint( DodsAdapter da, Map meta, MyDDSParser parser, String variable, String[] depVars ) throws DDSException {
+
+        StringBuilder constraint1 = new StringBuilder("?");
+
+        constraint1.append(variable);
+
+        String dimsStr=null;
+        if ( da.getConstraint()!=null ) {
+            int i= da.getConstraint().indexOf('[');
+            if (i!=-1) {
+                dimsStr= da.getConstraint().substring(i);
+                constraint1.append( dimsStr );
+            }
+        }  else {
+            int[] ii = parser.getRecDims(variable);
+
+            if (ii != null) {
+                for (int i = 0; i < ii.length; i++) {
+                    dimsStr= ""; //TODO: what?
+                    constraint1.append(dimsStr);
+                }
+            }
+        }
+
+        for (int i = 0; i < depVars.length; i++) {
+                String var = depVars[i];
+                //int[] ii2 = parser.getRecDims(var);
+                constraint1.append(",").append(var);
+                if ( dimsStr!=null) constraint1.append(dimsStr);
+                da.setDependName(i, var);
+
+                //Map<String, Object> depMeta = getMetaData(var);
+
+                //Map m = new IstpMetadataModel().properties(depMeta);
+
+                //if (m.containsKey(QDataSet.UNITS)) {
+                //    da.setDimUnits(i, (Units) m.get(QDataSet.UNITS));
+                //}
+
+                //da.setDimProperties(i, m);
+
+        }
+
+
+        da.setConstraint(constraint1.toString());
+        return constraint1.toString();
+    }
+    
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException, CancelledOperationException {
 
         mon.setTaskSize(-1);
@@ -198,24 +248,45 @@ public class DodsDataSource extends AbstractDataSource {
 
             } else {
 
-                if (this.constraint == null && adapter.getVariable()!=null ) {
-                    StringBuilder constraint1 = new StringBuilder("?");
-                    constraint1.append(adapter.getVariable());
-                    if (!adapter.getVariable().contains("[")) {
-                        int[] ii = parser.getRecDims(adapter.getVariable());
-                        if (ii != null) {
-                            for (int i = 0; i < ii.length; i++) {
-                                constraint1.append("[0:1:").append(ii[i]).append("]");
+                String[] deps= parser.getDepends(variable);
+                if ( deps!=null ) {
+                    String constraint1= getDependsConstraint( adapter, metadata, parser, variable, deps );
+                    adapter.setConstraint(constraint1);
+                } else {
+                    if (this.constraint == null && adapter.getVariable()!=null ) {
+                        StringBuilder constraint1 = new StringBuilder("?");
+                        constraint1.append(adapter.getVariable());
+                        if (!adapter.getVariable().contains("[")) {
+                            int[] ii = parser.getRecDims(adapter.getVariable());
+                            if (ii != null) {
+                                for (int i = 0; i < ii.length; i++) {
+                                    constraint1.append("[0:1:").append(ii[i]).append("]");
+                                }
                             }
                         }
+                        adapter.setConstraint(constraint1.toString());
                     }
-                    adapter.setConstraint(constraint1.toString());
                 }
             }
 
             adapter.loadDataset( mon, metadata );
             MutablePropertyDataSet ds = (MutablePropertyDataSet) adapter.getDataSet(metadata);
-
+                
+            
+            Object val;
+            val= metadata.get("missing_value");
+            if ( val!=null ) {
+                try {
+                    ds.putProperty(QDataSet.FILL_VALUE, Double.parseDouble( (String)val ) );
+                } catch ( NumberFormatException ex ) {
+                    logger.log( Level.INFO, "When parsing missing_value", ex );
+                }
+            }
+            val= metadata.get("title");
+            if ( val!=null ) {
+                ds.putProperty( QDataSet.TITLE, String.valueOf(val) );
+            }
+            
             if (isIstp) {
                 interpretedMetadata.remove("DEPEND_0");
                 interpretedMetadata.remove("DEPEND_1");
