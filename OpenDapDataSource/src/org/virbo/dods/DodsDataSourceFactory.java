@@ -10,6 +10,8 @@
 package org.virbo.dods;
 
 import dods.dap.DDSException;
+import dods.dap.NoSuchVariableException;
+import dods.dap.Server.InvalidParameterException;
 import dods.dap.parser.ParseException;
 import dods.dap.parser.TokenMgrError;
 import java.net.MalformedURLException;
@@ -20,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
@@ -90,8 +94,24 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
         }
 
         String[] vars = parser.getVariableNames();
+        
         for (int j = 0; j < vars.length; j++) {
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, vars[j], this, "arg_0", null, null, true));
+            String label= vars[j];
+            try {
+                String[] deps= parser.getDepends(vars[j]);
+                if ( deps!=null ) {
+                    label= label+"["+deps[0];
+                    for ( int k=1; k<deps.length; k++ ) {
+                        label= label+","+deps[k];
+                    }
+                    label= label+"]";
+                }
+            } catch (NoSuchVariableException ex) {
+                Logger.getLogger(DodsDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidParameterException ex) {
+                Logger.getLogger(DodsDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, vars[j], this, "arg_0", null, label, true));
         }
         return result;
     }
