@@ -284,7 +284,7 @@ public class DodsAdapter {
                         tprops.put(QDataSet.UNITS, dimUnits[idim]);
                         String[] ss= DataSetUtil.dimensionProperties();
                         for ( String s: ss ) {
-                            if ( dimProperties[idim].containsKey(s) ) tprops.put( s, dimProperties[idim].get(s) );
+                            if ( dimProperties[idim]!=null && dimProperties[idim].containsKey(s) ) tprops.put( s, dimProperties[idim].get(s) );
                         }
                         DodsVarDataSet tds = DodsVarDataSet.newDataSet(t, tprops);
                         if (DataSetUtil.isMonotonic(tds)) {
