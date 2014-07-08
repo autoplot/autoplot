@@ -7,13 +7,16 @@ package org.virbo.autoplot;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -70,31 +73,70 @@ public class CdawebVapServlet extends HttpServlet {
         
         PrintWriter out = response.getWriter();
         
+        Map params= new HashMap(request.getParameterMap());
+        
+        // verify that data0 is not in there twice.
+        String qs= request.getQueryString();
+        int idata0= qs.indexOf("data0=");
+        if ( idata0==-1 ) {
+            throw new IllegalArgumentException("at least data0= must be specified");
+        }
+        idata0= qs.indexOf("data0=",idata0+6);
+        if ( idata0!=-1 ) {
+            throw new IllegalArgumentException("data0 appears to be specified twice");
+        }
+        
         LinkedHashMap<String,String> uris= new LinkedHashMap();
         int first= 0;
         String uri= getUriParam( request,"data"+first );
+        if ( uri!=null ) params.remove("data"+first);
         if ( uri==null ) { // allow data1 to be the first one.
             first= 1;
             uri= getUriParam( request,"data"+first );
+            if ( uri!=null ) params.remove("data"+first);
         }
         while ( uri!=null ) {
             uris.put( "data_"+first, uri );
             first++;
             uri= getUriParam( request,"data"+first );
+            if ( uri!=null ) params.remove("data"+first);
         }
         
         //uris.put("data_1","vap+inline:timegen('2014-01-17','60s',1440),ripples(1440)");
         //uris.put("data_2","vap+inline:timegen('2014-01-17','60s',1440),rand(1440)+ripples(1440)*100");
-
-        if ( uris.isEmpty() ) {
-            throw new IllegalArgumentException("at least data0 must be specified");
-        }
         
         //String timeRange= "2014-01-16 23:00 to 2014-01-18 01:00";
         String timeRange= request.getParameter("timeRange");
+        if ( timeRange!=null ) params.remove("timeRange");
         
         if ( timeRange==null ) {
             throw new IllegalArgumentException("timeRange must be specified");
+        }
+        
+        if ( !params.isEmpty() ) {
+            StringBuilder b= new StringBuilder();
+            Set es= params.entrySet();
+            int count=0;
+            for ( Iterator it = es.iterator(); it.hasNext(); ) { 
+                Entry e = (Entry) it.next();
+                b.append(" ");
+                Object v= e.getValue();
+                if ( v.getClass().isArray() ) {
+                    for ( int jj= 0; jj<Array.getLength(v); jj++ ) {
+                        b.append(" ");
+                        b.append(e.getKey()).append("=").append( Array.get(v,jj) );
+                        count++;
+                    }
+                } else {
+                    b.append(e.getKey()).append("=").append( e.getValue() );
+                    count++;
+                }
+            }
+            if ( count>1 ) {
+                throw new IllegalArgumentException("unrecognized parameters ("+count+"): "+b.substring(1));
+            } else {
+                throw new IllegalArgumentException("unrecognized parameter: "+b.substring(1));
+            }
         }
         
         try {
