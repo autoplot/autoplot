@@ -529,7 +529,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 Graphics g= bi.createGraphics();
                 g.drawImage( im, 0, 0, s, h1, null, null );
                 result= new ImageIcon(bi);
-                logger.log(Level.FINE, "time to load icon for {0}: {1}", new Object[]{s, System.currentTimeMillis()-t1});
+                logger.log(Level.FINE, "time to load icon for {0}: {1} ms", new Object[]{ o, System.currentTimeMillis()-t1});
                 icons.put( o.toString(), result );
             } catch (MalformedURLException ex) {
                 Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
