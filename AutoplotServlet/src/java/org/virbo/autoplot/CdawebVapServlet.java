@@ -129,10 +129,11 @@ public class CdawebVapServlet extends HttpServlet {
                     count++;
                 }
             }
+            String note= ". Note %26 should be used to escape the ampersands in Autoplot URIs.";
             if ( count>1 ) {
-                throw new IllegalArgumentException("unrecognized parameters ("+count+"): "+b.substring(1));
+                throw new IllegalArgumentException("unrecognized parameters ("+count+"): "+b.substring(1) + note);
             } else {
-                throw new IllegalArgumentException("unrecognized parameter: "+b.substring(1));
+                throw new IllegalArgumentException("unrecognized parameter: "+b.substring(1)+ note);
             }
         }
         
