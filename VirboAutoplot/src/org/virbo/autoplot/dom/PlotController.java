@@ -287,7 +287,7 @@ public class PlotController extends DomNodeController {
         if ( ds!=null &&  ds.rank()>0 ) {
             try {
                 QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-                if ( !validBounds(bounds) ) {
+                if ( !validBounds(bounds) || !SemanticOps.getUnits(bounds).isConvertableTo(dr.getUnits() ) || !DataSetUtil.asDatumRange(bounds).contains(dr) ) {
                     dr= dr.next();
                 } else {
                     DatumRange limit= DataSetUtil.asDatumRange(bounds);
@@ -333,8 +333,8 @@ public class PlotController extends DomNodeController {
         if ( ds!=null &&  ds.rank()>0 ) {
             try {
                 QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-                if ( !validBounds(bounds) ) {
-                    dr= dr.next();
+                if ( !validBounds(bounds) || !SemanticOps.getUnits(bounds).isConvertableTo(dr.getUnits() ) || !DataSetUtil.asDatumRange(bounds).contains(dr) ) {
+                    dr= dr.previous();
                 } else {
                     DatumRange limit= DataSetUtil.asDatumRange(bounds);
                     if ( !DatumRangeUtil.isAcceptable(limit,false) ) {
