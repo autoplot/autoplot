@@ -30,9 +30,6 @@
         
         <p>Notes:</p>
         <ul>
-            <li>the autoLabel and autoRange properties of the top plot are ignored as the v1.08 vap is read in.  This will be fixed.
-            <li>the spectrogram colorbar is always showing, and I need to make it so I can hide that.  The problem is only Autoplot knows if it is needed.
-            <li>I haven't tested this recently for spectrograms.
         </ul>
                 
             <small>version 20140708.1</small>
