@@ -35,6 +35,6 @@
             <li>I haven't tested this recently for spectrograms.
         </ul>
                 
-            <small>version 20140612.2</small>
+            <small>version 20140708.1</small>
     </body>
 </html>
