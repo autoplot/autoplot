@@ -4,12 +4,10 @@
  */
 package org.virbo.autoplot;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,7 +31,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.das2.datum.DatumRangeUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
