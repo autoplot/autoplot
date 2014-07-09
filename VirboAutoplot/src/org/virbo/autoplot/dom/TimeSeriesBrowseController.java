@@ -341,7 +341,8 @@ public class TimeSeriesBrowseController {
                 testCacheTag= new CacheTag( this.getTimeRange(), null ); // transitional state?  hudson autoplot-test034 was hitting this.
             }
 
-            if (tag == null || !tag.contains(testCacheTag)) {
+            // 1224: if the xAxis is null, then we need to reload whenever the tag range changes.
+            if (tag == null || ( xAxis==null ? !tag.equals(testCacheTag) : !tag.contains(testCacheTag) ) ) {
                 TimeSeriesBrowse tsb= dataSourceController.getTsb();
                 if ( tsb==null ) {
                     logger.warning("tsbc253: tsb was null");
