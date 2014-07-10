@@ -107,7 +107,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 data.length() * data.length(0), 1, 1, 1,
                 result, type);
 
-        double shift= 0;
+        double shift= 0; // shift is essentially the D/C part.
         int limit= type.equals("short") ? 32768 : 65536;
         if ( extent.value(1)>limit ) {
             if ( ( extent.value(1)-extent.value(0) ) < 65536 ) {
