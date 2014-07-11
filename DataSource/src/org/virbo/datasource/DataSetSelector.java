@@ -402,7 +402,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     if (f.reject(surl1, problems,mon)) { // This is the often-seen code that replaces the timerange in a URI. +#+#+
                         TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
                         if ( tsb!=null ) {
-                            if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
+                            if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) && !timeRange.equals(DataSourceUtil.DEFAULT_TIME_RANGE) ) {
                                 try {
                                     tsb.setURI(surl1);
                                     tsb.setTimeRange(timeRange);
