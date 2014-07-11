@@ -132,6 +132,7 @@ public class FilterChainPanel extends JPanel {
         "logHistogram() perform the auto histogram in the log space.",
         "log10() take the base-10 log of the data." ,
         "magnitude() calculate the magnitude of the vectors ",
+        "medianFilter(5) boxcar median filter.",
         "multiply(2) multiply by a scalar ",
         "negate() flip the sign on the data.",
         "setUnits('nT') reset the units to the new units",
