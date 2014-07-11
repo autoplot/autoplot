@@ -23,6 +23,7 @@ import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
@@ -30,9 +31,12 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.dsops.Ops;
+import org.virbo.dsutil.DataSetBuilder;
 
 /**
- * Format data to binary file.
+ * Format data to binary wav file.  The wav file format contains metadata in the first bytes, 
+ * and then the data as interleaved channels.  Java AudioFormat is used to format the header,
+ * and the BinaryDataSource is used to format the rest of the wav file.
  * @author jbf
  */
 public class WavDataSourceFormat implements DataSourceFormat {
@@ -86,6 +90,14 @@ public class WavDataSourceFormat implements DataSourceFormat {
         return result;
     }
 
+    /**
+     * format the data in the waveform scheme: rank 2, DEPEND_0 is the waveform packet timetags, 
+     * DEPEND_1 is the timetag offsets.
+     * @param data rank 2 waveform
+     * @param mon
+     * @param params
+     * @return 
+     */
     private ByteBuffer formatRank2Waveform(QDataSet data, ProgressMonitor mon, Map<String, String> params) {
 
         String type = params.get("type");
@@ -93,6 +105,27 @@ public class WavDataSourceFormat implements DataSourceFormat {
         if ( !DataSetUtil.isQube(data) ) {
             throw new IllegalArgumentException("data must be qube");
         }
+        
+        // cull records that are not monotonically increasing
+        QDataSet dep0= (QDataSet) data.property(QDataSet.DEPEND_0);
+        if ( dep0!=null ) {
+            DataSetBuilder b= new DataSetBuilder(1,dep0.length());
+            double t0= dep0.value(0);
+            b.putValue(b.getLength(),0);
+            for ( int i=1; i<dep0.length(); i++ ) {
+                if ( dep0.value(i)>t0 ) {
+                    b.putValue(b.getLength(),i);
+                    t0= dep0.value(i);
+                }
+            }
+            QDataSet r= b.getDataSet();
+            if ( r.length()<dep0.length() ) {
+                logger.warning("timetags are not monotonic");
+                data= DataSetOps.applyIndex( data, 0, r, false );
+            }
+        }
+        
+        
         QDataSet extent= Ops.extent(data);
         int dep0Len = 0; //(dep0 == null ? 0 : 1);
         int typeSize = BufferDataSet.byteCount(type);
@@ -139,6 +172,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
     }
 
     /**
+     * format rank 2 bundle of waveforms.  E.g. stereo[time,2] or quadraphonic[time,4]
      * @param data
      * @param mon
      * @param params
@@ -182,10 +216,12 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
     /**
      * Returns an input stream for a ByteBuffer.
-     *The read() methods use the relative ByteBuffer get() methods.
+     * The read() methods use the relative ByteBuffer get() methods.
      * from http://www.exampledepot.com/egs/java.nio/Buffer2Stream.html
+     * @param buf the buffer
+     * @return the InputStream.
      */
-    public static InputStream newInputStream(final ByteBuffer buf) {
+    private static InputStream newInputStream(final ByteBuffer buf) {
         return new InputStream() {
 
             public synchronized int read() throws IOException {
