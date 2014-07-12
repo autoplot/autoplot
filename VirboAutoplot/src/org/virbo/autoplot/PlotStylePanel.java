@@ -187,6 +187,8 @@ public class PlotStylePanel extends javax.swing.JPanel {
             StylePanel editorPanel=null;
             if ( element.getRenderType()==RenderType.spectrogram || element.getRenderType()==RenderType.nnSpectrogram ) {
                 editorPanel= new SpectrogramStylePanel(applicationModel);
+            } else if ( element.getRenderType()==RenderType.pitchAngleDistribution ) {
+                editorPanel= new SpectrogramStylePanel(applicationModel);
             } else if ( element.getRenderType()==RenderType.hugeScatter ) {
                 editorPanel= new HugeScatterStylePanel(applicationModel);
             } else if ( element.getRenderType()==RenderType.colorScatter ) {
