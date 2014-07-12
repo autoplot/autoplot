@@ -20,7 +20,6 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.autoplot.help.AutoplotHelpSystem;
@@ -83,6 +82,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         this.dom= applicationModel.getDocumentModel();
         
         this.dom.getController().addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 doElementBindings();
             }
@@ -93,7 +93,9 @@ public class PlotStylePanel extends javax.swing.JPanel {
         validate();
 
         Runnable run= new Runnable() {
+            @Override
             public String toString() { return "initPlotStyleBindings"; }
+            @Override
             public void run() {
                 doOptionsBindings();
                 doElementBindings();
@@ -158,12 +160,14 @@ public class PlotStylePanel extends javax.swing.JPanel {
     }
 
     private transient PropertyChangeListener renderTypeListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange( PropertyChangeEvent ev ) {
             doElementBindings();
         }
     };
 
     private transient PropertyChangeListener colorListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( checkColors() ) {
                 dom.getController().setStatus( "warning: Background and foreground colors are the same");
@@ -182,9 +186,11 @@ public class PlotStylePanel extends javax.swing.JPanel {
         if ( element==null ) return;
 
         Runnable run = new Runnable() { 
+            @Override
             public String toString() { return "doElementBindingsRunnable";  }
+            @Override
             public void run() {
-            StylePanel editorPanel=null;
+            StylePanel editorPanel;
             if ( element.getRenderType()==RenderType.spectrogram || element.getRenderType()==RenderType.nnSpectrogram ) {
                 editorPanel= new SpectrogramStylePanel(applicationModel);
             } else if ( element.getRenderType()==RenderType.pitchAngleDistribution ) {
@@ -194,6 +200,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
             } else if ( element.getRenderType()==RenderType.colorScatter ) {
                 editorPanel= new ColorScatterStylePanel(applicationModel);
             } else {
+                //TODO: consider generic style panel that is based on completions of Renderer control.
                 editorPanel= new SeriesStylePanel(applicationModel);
             }
 
