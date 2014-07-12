@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Strange bug (1215) with rendering still shows with this dataset.</small></p>
+        <p><small>The pitch angle distribution mode got some attention.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,14 +23,27 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-06-25):</p>
+        <p>Bugfixes (2014-07-12):</p>
         <ul>
-            <li>rich headers containing a value element will not be connected to the data column by implicit name (P1).</li>
+            <li>pitchAngleDistribution mode wouldn't get a colorbar because it wasn't installed in the canvas</li>
+            <li>medianFilter was never put in the filters list</li>
+            <li>jyds would use 2010-01-01 (the default timerange) incorrectly.</li>
+            <li>check for zero-length datasets in extent function, this was preventing reduceMean from working with all-fill records.</li>
+            <li>use SpectrogramStylePanel for pitchAngleDistribution</li>
+            <li>export to .wav file checks for non-monotonically increasing data, after discovering das2server would repeat records.</li>
+            <li>reduceMean checks for NaNs, and treats them as fill data to be consistent with other codes.</li>
+            <li>1224: TSB load when timerange is context (not x-axis), zoom in on timerange </li>
+            <li>1222: next/​prev buttons get into funky state as if not updating</li>
+            <li>1226: rich headers containing a value element will not be connected to the data column by implicit name (P1).</li>
             <li>1216: series renderer misconfigured for large datasets rendering.</li>
             <li>1217: Spectrogram rebinner reverts after change and TSB reload.</li>
             <li>1215: occasional blips in SeriesRenderer http://www.sarahandjeremy.net:8080/hudson/job/autoplot-test140/lastSuccessfulBuild/artifact/diffs.test141_file__home_jbf_ct_autoplot_vap_bugs_pw_generalPathBlips_generalPathBlips.vap.png</li>
             <li>ds=&lt;C&gt; completions in PDSPPI source.</li>
             <li>rte_1282463981: guard against data that was mismarked as monotonic in ArrayDataSet</li> 
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
+            <li>minor bug in local file cache browser fixed</li>
             <li>vapfile:http://server.gov/vapserver?data0=... works now</li>
             <li>formatDataSet command accepts arguments like "foo.xls?sheet=Sheet1"</li>
             <li>more bugfixes to support v1.08 vap files (auto renderstyle)</li>
@@ -65,38 +78,16 @@
             <li>boolean properties failed in completions because of "isProp" instead of "getProp"</li>
             <li>set unit increment on filters list scroll bar on Filters panel.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>default vap version v1.07 was not set properly, and vap files v1.06 by default.</li>
-            <li>doResetRanges no longer throws RuntimeError when component process string fails, allowing ECT file with missing channel to load.</li>
-            <li>MouseModule messages don't clobber Autoplot messages like "plotElement_1 selected"</li>
-            <li>autoRanging was always turned off when loading in vaps, making it more difficult to produce vap files dynamically. v1.08 introduced.</li>
-            <li>1184: reduce use of history.txt for repeat URIs motivated by filePollUpdating.</li>
-            <li>1183: clean up old code that was mis-managing transition from stack of series plots to spectrogram fails (Akebono MCA)</li>
-            <li>addTab adds the component in a scroll pane, to protect the rest of the GUI from scripts. (Sebastian's digitizer was huge.)</li>
-            <li>putProperty checks isImmutable flag and copies dataset if it is not mutable.</li>
-            <li>1182: CDF missing component labels resulted in editor failure</li>
-            <li>Butterworth high-pass filter scale factor corrected.</li>
-            <li>Survey places where locking is done without a try/finally block, which can hang the application.</li>
-            <li>imax (index of the maximum value) was incorrectly coded to use MIN_VALUE (1e-308) instead of NEGATIVE_INFINITY</li>
-	        <li>Rob R pointed out RTE when ftp:// is entered and inspect button pressed.</li>
-            <li>440: any FileFilter needs to check for null from file.toString().  The DataPointRecorder didn't do this, Bill pointed out.</li>
-            <li>don't print a warning when EnumerationUnits have the same ID.  This happens with "default" and is harmless.</li>
-            <li>1180: use autoranging consistent with Series for Scatter</li>
-            <li>Craig pointed out where makeAggregation was converting 20130402T00 to $Y$m$d-$H (T to -).</li>
-            <li>rte 0948397190: runtime error in HDF5 reader when file is not found.</li>
-            <li>1129: experiments with rendering after we would still see occasional failures.</li>
-            <li>lanlNNRebinner supports time-varying Y tags.</li>
-            <li>FUNCT or FUNCTION in C-implementation of CDF reader</li>
-            <li>improve feedback with errors from VOTable reader.</li>
-            <li>FileStorageModel had an bug where getFiles would return multiple references to the same file, since 2014/3/14</li>
-            <li>FileStorageModel was missing getField to make clean way to get the version ($v)</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>OpenDAP looks for missing_value and title metadata, preparing to update demo 1 bookmark.</li>
+            <li>CDAWeb vap servlet improves error feedback</li>
             <li>PDSPPI source allows completions based on the names in the VOTables</li>
             <li>read description and valid min and valid max from VOTables.</li>
             <li>add butterworth to the filters</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>export to xls allows append and more ordinal data</li>
             <li>experimental secret clean cache feature introduced.</li>
             <li>351: save previous entries to jython getParam forms.  Allow address bar trigger to contain parameter settings.</li>
@@ -127,32 +118,6 @@
             <li>add showYPosition(false) to the connector between two plots (Kristoff).</li>
             <li>363: improvements to completions in Jython editor, including JOptionPane.s&lt;C&gt;</li>
             <li>About Autoplot dialog shows build server location.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>add support for export to CDF use pure-java CDF library.</li>
-            <li>"about autoplot" reports the Hudson/Jenkins URL where the code was built.</li>
-            <li>356: allow DELTA_PLUS and DELTA_MINUS in CDF to be empty string, so that master file can override incorrect value.</li>
-            <li>357: DataPointRecorderNew allows the columns to be pre-set with defaults and old files merged in.</li>
-            <li>358: cull repeat entries to history.txt to just first and last, filePollUpdates was adding an entry each cycle.</li>
-            <li>export to CDF formats labels for rank 2 bundles</li>
-            <li>Minor cleanup of html table reader</li>
-            <li>completions suggest $Y$m$dT$H$M now</li>
-            <li>FillPollUpdating works with http for single files</li>
-            <li>In makePngWalk script, setting batchUri parameter in main method sets useBatchUri to true.  This mode is in tests now.</li>
-            <li>DataPointRecorderNew supports events lists, will replace DataPointRecorder</li>
-            <li>rank 0 DDataSet.putValue checks rank because it's easy to forget the index</li>
-            <li>SparseDataSetBuilder checks that setLength was called.</li>
-            <li>Units.parse supports parsing 0x0000FF as 255, to support events lists.</li>
-            <li>parseISO8601Range now throws ParseException, before this was a runtime exception</li>
-            <li>introduce butterworth filter</li>
-            <li>introduce indexOfBundledDataSet</li>
-            <li>draw a box on the layout tab to hint at multiple selections, make the handle easier to grab</li>
-            <li>EventQueueBlocker_1 renamed to EventQueueBlocker.  FileStorageModelNew renamed to FileStorageModel.</li>
-            <li>EnumerationUnits are always backed by a String context, was the class.</li>
-            <li>enumerationUnit entries can be defined within the qstream as they occur.</li>
-            <li>FileStorageModel has getFilesFor( String[] ref )</li>
-            <li>FileStorageModel has getField("v") to retrieve version and other custom fields.</li>
         </ul>
 
         <p>Known issues:</p>
