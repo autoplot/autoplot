@@ -107,6 +107,11 @@ public class CdawebVapServlet extends HttpServlet {
         if ( timeRange!=null ) params.remove("timeRange");
         
         if ( timeRange==null ) {
+            timeRange= request.getParameter("timerange");
+            if ( timeRange!=null ) params.remove("timerange");
+        }
+        
+        if ( timeRange==null ) {
             throw new IllegalArgumentException("timeRange must be specified");
         }
         
