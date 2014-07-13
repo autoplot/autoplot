@@ -490,7 +490,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             this.uri = DataSetURI.getURI(surl);
             URISplit split = URISplit.parse(uri);
             params = URISplit.parseParams(split.params);
-            resourceURI = new URI(split.file);
+            resourceURI = DataSetURI.toUri(split.file);
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
