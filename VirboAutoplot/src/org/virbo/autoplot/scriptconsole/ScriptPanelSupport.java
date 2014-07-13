@@ -7,12 +7,11 @@ package org.virbo.autoplot.scriptconsole;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Event;
-import java.beans.PropertyChangeSupport;
-import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import java.awt.HeadlessException;
 import java.beans.ExceptionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,9 +51,6 @@ import javax.swing.text.StyleConstants;
 import org.das2.components.DasProgressPanel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.autoplot.ApplicationModel;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURI;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyException;
@@ -65,12 +61,16 @@ import org.python.core.PyTraceback;
 import org.python.core.ThreadState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
+import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.jython.JythonDataSourceFactory;
+import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import org.virbo.jythonsupport.ui.ParametersFormPanel;
 
 /**
@@ -88,7 +88,7 @@ public class ScriptPanelSupport {
     final DataSetSelector selector;
     final JythonScriptPanel panel;
     final EditorAnnotationsSupport annotationsSupport;
-    private String PREFERENCE_OPEN_FILE = "openFile";
+    private final String PREFERENCE_OPEN_FILE = "openFile";
     private InteractiveInterpreter interruptible;
     ThreadState ts;
 
@@ -145,6 +145,18 @@ public class ScriptPanelSupport {
                 sfile= split.resourceUri.toString();
             }
             final URI fsfile= DataSetURI.getURI(sfile);
+            URI u1= DataSetURI.getURI(panel.getFilename());
+            String f1= URISplit.parse(u1).file;
+            URI u2= DataSetURI.getURI(sfile);
+            String f2= URISplit.parse(u2).file;
+            if ( f1.startsWith("file:" ) && f2.startsWith("file:") ) {
+                File ff1= new File( f1.substring(5) );
+                File ff2= new File( f2.substring(5) );
+                if ( ff1.equals(ff2) ) {
+                    return true;
+                }
+            }
+            
             //TODO: why can't we have a DasProgressPanel on any component?
             Runnable run= new Runnable() {
                 public void run() {
