@@ -2401,10 +2401,12 @@ public class PlotElementController extends DomNodeController {
             s.setSymbolConnector(PsymConnector.SOLID);
             int size= 0;
             if ( ele.controller!=null ) { // kludge to turn off plot symbols for large datasets.
-                if ( ele.controller.processDataSet!=null ) {
-                    size= ele.controller.processDataSet.length();   
-                } else if ( ele.controller.dataSet!=null ) {
-                    size= ele.controller.dataSet.length();   
+                QDataSet processDataSet= ele.controller.processDataSet;
+                QDataSet dataSet= ele.controller.dataSet;
+                if ( processDataSet!=null ) {
+                    size= processDataSet.length();   
+                } else if ( dataSet!=null ) {
+                    size= dataSet.length();   
                 }
             }
             if ( size>SYMSIZE_DATAPOINT_COUNT ) {
