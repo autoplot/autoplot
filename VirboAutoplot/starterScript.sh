@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # This file consists of a Java jar archive prefixed with a starter script.
 # It should be executable on any POSIX.1 compliant OS. (Any UNIX, Linux
