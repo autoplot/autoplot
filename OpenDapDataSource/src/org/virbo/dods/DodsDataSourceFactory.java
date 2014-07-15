@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
@@ -37,6 +38,8 @@ import org.virbo.datasource.URISplit;
  */
 public class DodsDataSourceFactory extends AbstractDataSourceFactory implements DataSourceFactory {
     
+    private static final Logger logger= LoggerManager.getLogger("apdss.opendap");
+    
     /** Creates a new instance of DodsDataSourceFactory */
     public DodsDataSourceFactory() {
     }
@@ -49,8 +52,8 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
         }
     }
     
+    @Override
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
-        
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
             return getVars(file);
@@ -59,6 +62,7 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
         return Collections.emptyList();
     }
 
+    @Override
     public boolean reject( String surl, List<String> problems, ProgressMonitor mon) {
         if ( surl.contains("?") ) {
             return false;
@@ -67,8 +71,14 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
                 URISplit split= URISplit.parse(surl);
                 List<CompletionContext> cc = getVars(split.file);
                 return cc.size() > 1;
-            } catch ( Throwable ex ) {
-                ex.printStackTrace();
+            } catch ( DDSException ex ) {
+                logger.log(Level.WARNING,null,ex);
+                return true; // let someone else indicate the error.
+            } catch (IOException ex) {
+                logger.log(Level.WARNING,null,ex);
+                return true; // let someone else indicate the error.
+            } catch (ParseException ex) {
+                logger.log(Level.WARNING,null,ex);
                 return true; // let someone else indicate the error.
             }
         }
@@ -95,28 +105,25 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
 
         String[] vars = parser.getVariableNames();
         
-        for (int j = 0; j < vars.length; j++) {
-            String label= vars[j];
+        for ( String var : vars ) {
+            StringBuilder label = new StringBuilder(var);
             try {
-                String[] deps= parser.getDepends(vars[j]);
+                String[] deps = parser.getDepends(var);
                 if ( deps!=null ) {
-                    label= label+"["+deps[0];
+                    label.append("[").append(deps[0]);
                     for ( int k=1; k<deps.length; k++ ) {
-                        label= label+","+deps[k];
+                        label.append(",").append(deps[k]);
                     }
-                    label= label+"]";
+                    label.append("]");
                 }
             } catch (NoSuchVariableException ex) {
                 Logger.getLogger(DodsDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
             } catch (InvalidParameterException ex) {
                 Logger.getLogger(DodsDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
             }
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, vars[j], this, "arg_0", null, label, true));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, var, this, "arg_0", null, label.toString(), true));
         }
         return result;
     }
 
-    public <T> T getCapability(Class<T> clazz) {
-        return null;
-    }
 }
