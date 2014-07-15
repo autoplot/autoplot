@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #make the single jar ("jumbojar") on the server side so the release need only be transferred once.  Before we would copy both multi-jar and single-jar versions at once.  This should be run in the directory with AutoplotStable.jar in it.
 # This should be run immediately after the autoplot-release script is run, and from within the dist folder.

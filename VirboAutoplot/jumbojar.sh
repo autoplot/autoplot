@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ./compile-application-all.sh
 cp jumbojar_header.txt dist/Autoplot
