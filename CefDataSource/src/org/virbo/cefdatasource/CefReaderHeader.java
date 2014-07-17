@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 
 /**
  *
@@ -18,6 +21,8 @@ import java.util.Map;
  */
 public class CefReaderHeader {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.cef");
+    
     private enum State {
 
         TOP, END, DATA_READ, GLOBAL, PARAM
@@ -328,6 +333,7 @@ public class CefReaderHeader {
                                 //;data as we do for the real data fields. Something for the next release?
                                 //********************************
                                 } else if (key.equals("SIZES")) {
+                                    logger.log( Level.FINER, "" + key + " " + value );
                                     if (value.length > 1) {
                                         String[] rev = new String[value.length];
                                         for (int k = 0; k < value.length; k++) {
