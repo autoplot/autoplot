@@ -193,7 +193,7 @@ public class CefDataSource extends AbstractDataSource {
 
                 setDsName( var, ds );
 
-                if (param.sizes.length > 2) {
+                if (param.sizes.length >= 2) {
                     int[] sizes = new int[param.sizes.length + 1];
                     sizes[0] = ds.length();
                     int ndim = sizes.length;
