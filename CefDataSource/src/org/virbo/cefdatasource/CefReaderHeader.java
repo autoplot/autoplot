@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -333,7 +334,7 @@ public class CefReaderHeader {
                                 //;data as we do for the real data fields. Something for the next release?
                                 //********************************
                                 } else if (key.equals("SIZES")) {
-                                    logger.log( Level.FINER, "" + key + " " + value );
+                                    logger.log( Level.FINER, "{0}={1}", new Object[]{key, Arrays.toString(value)});
                                     if (value.length > 1) {
                                         String[] rev = new String[value.length];
                                         for (int k = 0; k < value.length; k++) {
