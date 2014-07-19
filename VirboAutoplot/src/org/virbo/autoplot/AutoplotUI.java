@@ -3467,7 +3467,7 @@ private void updateFrameTitle() {
         }
         
 
-        if ( app.dataSetSelector.checkActionTriggers(url) ) {
+        if ( app.dataSetSelector.hasActionTrigger(url) ) {
             if ( url!=null ) app.dataSetSelector.setValue(url);
             app.dataSetSelector.maybePlot(false); // allow for completions
             return;
