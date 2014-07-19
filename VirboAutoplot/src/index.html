@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The pitch angle distribution mode got some attention.</small></p>
+        <p><small>New candidate for OpenDAP bookmark demo 1.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,14 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-07-12):</p>
+        <p>Bugfixes (2014-07-19):</p>
         <ul>
+            <li>minor improvements to CEF including UNITS, DELTA_PLUS/DELTA_MINUS, showing data before support data.</li>
+            <li>rank 2 data was misread in the CEF reader.</li>
+            <li>http://autoplot.org/autoplot.jnlp?bookmarks:...bookmarks.xml now works in re-enter code.</li>
+            <li>medianFilter had a bug where repeated values were not counted twice.  Thanks Kenzie!</li>
+            <li>spectrogram style panel comes up for PitchAngleDistribution mode now, which is slightly better than Series panel.</li>
+            <li>don't load the file automatically into the jython editor if it is already loaded.  This is dangerous and distracting.</li>
             <li>pitchAngleDistribution mode wouldn't get a colorbar because it wasn't installed in the canvas</li>
             <li>medianFilter was never put in the filters list</li>
             <li>jyds would use 2010-01-01 (the default timerange) incorrectly.</li>
@@ -80,6 +86,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>http web filesystem avoids listing when the filename is known already, supporting use with Github.</li>
+            <li>introduce median and mean filters, thanks Kenzie!</li>
             <li>OpenDAP looks for missing_value and title metadata, preparing to update demo 1 bookmark.</li>
             <li>CDAWeb vap servlet improves error feedback</li>
             <li>PDSPPI source allows completions based on the names in the VOTables</li>
