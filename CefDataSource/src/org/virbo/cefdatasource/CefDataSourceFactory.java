@@ -15,6 +15,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.cefdatasource.CefReaderHeader.ParamStruct;
 import org.virbo.datasource.AbstractDataSourceFactory;
@@ -40,7 +41,20 @@ public class CefDataSourceFactory extends AbstractDataSourceFactory {
         Cef cef = reader.read(in);
         Map<String, ParamStruct> h = cef.parameters;
         List<String> result = new ArrayList<String>();
-        result.addAll(h.keySet());
+        for ( Entry<String,ParamStruct> ee: h.entrySet() ) {
+            ParamStruct h1= ee.getValue();
+            String parameterType= (String)h1.entries.get("PARAMETER_TYPE");
+            if ( parameterType!=null && parameterType.equals("Data") ) {
+                result.add(ee.getKey());
+            }
+        }
+        for ( Entry<String,ParamStruct> ee: h.entrySet() ) {
+            ParamStruct h1= ee.getValue();
+            String parameterType= (String)h1.entries.get("PARAMETER_TYPE");
+            if ( parameterType==null || !parameterType.equals("Data") ) {
+                result.add(ee.getKey());
+            }
+        }
         return result;
     }
 
