@@ -3431,19 +3431,19 @@ private void updateFrameTitle() {
                      raiseApplicationWindow(frame);
                 }
 
-                String url;
+                String suri;
                 if (alm.getValue("URI") != null) {
-                    url = alm.getValue("URI").trim();
-                    logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", url );
+                    suri = alm.getValue("URI").trim();
+                    logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", suri );
                 } else if ( alm.getValue("open") !=null ) {
-                    url = alm.getValue("open").trim();
-                    logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", url );
+                    suri = alm.getValue("open").trim();
+                    logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", suri );
                 } else {
-                    url = null;
+                    suri = null;
                 }
 
                 String pos= alm.getValue("position");
-                app.handleSingleInstanceURI(url, pos);
+                app.handleSingleInstanceURI(suri, pos);
 
             }
         };
@@ -3452,38 +3452,38 @@ private void updateFrameTitle() {
 
     /**
      * extract the code that handles the single instance so that we can model it for debugging.
-     * @param url the reentry URI 
+     * @param suri the reentry URI 
      * @param pos support the --position=3 switch to support servers.
      */
-    public void handleSingleInstanceURI( String url, String pos ) {
+    public void handleSingleInstanceURI( String suri, String pos ) {
         final AutoplotUI app= this; // refactor from static class. TODO: remove this is unnecessary...
         boolean raise=false;
         
-        if ( url!=null && ( url.startsWith("pngwalk:") || url.endsWith(".pngwalk") || url.contains(".pngwalk?") ) ) {
+        if ( suri!=null && ( suri.startsWith("pngwalk:") || suri.endsWith(".pngwalk") || suri.contains(".pngwalk?") ) ) {
             //TODO: check other prefixes...
-            PngWalkTool1.start( url, app );
+            PngWalkTool1.start( suri, app );
             app.applicationModel.addRecent(app.dataSetSelector.getValue());
             return;
         }
         
 
-        if ( app.dataSetSelector.hasActionTrigger(url) ) {
-            if ( url!=null ) app.dataSetSelector.setValue(url);
+        if ( app.dataSetSelector.hasActionTrigger(suri) ) {
+            if ( suri!=null ) app.dataSetSelector.setValue(suri);
             app.dataSetSelector.maybePlot(false); // allow for completions
             return;
         }        
  
-        if ( url!=null && url.length()>1 ) { // check for relative filenames 
-            int i= url.indexOf(":");
+        if ( suri!=null && suri.length()>1 ) { // check for relative filenames 
+            int i= suri.indexOf(":");
             if ( i==-1 ) { // it's a file.
-                boolean isAbsolute= url.startsWith("/");
+                boolean isAbsolute= suri.startsWith("/");
                 if ( !isAbsolute ) {
                     try {
                         String pwd= new File(".").getCanonicalPath();
                         if ( pwd.length()>2 ) {
                             pwd= pwd + "/"; //TODO: Windows...
                         }
-                        url= pwd + url;
+                        suri= pwd + suri;
                     } catch ( IOException ex ) {
                         ex.printStackTrace();
                     }
@@ -3493,11 +3493,11 @@ private void updateFrameTitle() {
 
         if ( pos!=null ) {
             app.applicationModel.setFocus( Integer.parseInt(pos) );
-            if ( url!=null ) app.dataSetSelector.setValue(url);
+            if ( suri!=null ) app.dataSetSelector.setValue(suri);
             app.dataSetSelector.maybePlot(false); // allow for completions
 
         } else {
-            if (url == null) {
+            if (suri == null) {
                 int action = JOptionPane.showConfirmDialog(ScriptContext.getViewWindow(), "<html>Autoplot is already running.<br>Start another window?", "Reenter Autoplot", JOptionPane.YES_NO_OPTION);
                 if (action == JOptionPane.YES_OPTION) {
                     app.support.newApplication();
@@ -3511,13 +3511,13 @@ private void updateFrameTitle() {
                         "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
                         + "or replace the current plot with the new URI, possibly entering the editor, <br>"
                         + "or always enter the editor to inspect and insert the plot below.<br>"
-                        + "View in new window, replace, or add plot, using<br>%s?", url );
+                        + "View in new window, replace, or add plot, using<br>%s?", suri );
                 } else {
                         msg= String.format(
                         "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
                         + "or replace the current plot with the new URI, possibly entering the editor <br>"
                         + "or always enter the editor to inspect before plotting.<br>"
-                        + "View in new window, replace, or add plot, using<br>%s?", url );
+                        + "View in new window, replace, or add plot, using<br>%s?", suri );
                 }
                 String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
                         msg,
@@ -3525,15 +3525,15 @@ private void updateFrameTitle() {
                         new String[] { "New Window", "Replace", "Add Plot" }, "Add Plot" );
                 if ( action!=null ) {
                     if (action.equals("Replace")) {
-                        app.plotUri(url);
+                        app.plotUri(suri);
                         raise= true;
                     } else if (action.equals("Add Plot")) {
-                        app.dataSetSelector.setValue(url);
+                        app.dataSetSelector.setValue(suri);
                         app.dataSetSelector.maybePlot( KeyEvent.ALT_MASK ); // enter the editor
                         raise= true;
                     } else if (action.equals("New Window")) {
                         AutoplotUI ui2= app.newApplication();
-                        ui2.plotUri(url);
+                        ui2.plotUri(suri);
                     }
                 } else {
                     raise= true;
