@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 
 /**
- *
+ * Reads the CEF Header, which contains metadata and information about how to parse the stream.
  * @author jbf
  */
 public class CefReaderHeader {
