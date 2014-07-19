@@ -9,10 +9,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.CharacterCodingException;
-//import java.nio.charset.Charset;
-//import java.nio.charset.CharsetDecoder;
 import java.text.ParseException;
-import org.virbo.dataset.DDataSet;
+import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dsutil.DataSetBuilder;
 
 /**
@@ -21,6 +21,8 @@ import org.virbo.dsutil.DataSetBuilder;
  */
 public class CefReaderData {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.cef");
+    
     FieldParser[] parsers;
     //CharsetDecoder charsetDecoder;
     
@@ -171,9 +173,9 @@ public class CefReaderData {
 
     }
 
-    public DDataSet cefReadData(ReadableByteChannel lun, Cef cef) throws IOException, ParseException {
+    public MutablePropertyDataSet cefReadData( ReadableByteChannel lun, Cef cef ) throws IOException, ParseException {
 
-        System.err.println("Reading data records, please wait...");
+        logger.fine("Reading data records, please wait...");
 
         // *** Define the read buffer that we'll use to pull in chunks
         // *** of the file. This is a trade off between memory footprint
@@ -304,7 +306,7 @@ public class CefReaderData {
         //read_buffer = null;
 
 
-        System.err.println("Reading of data complete");
+        logger.fine("Reading of data complete");
 
         return builder==null ? null : builder.getDataSet();
     }
