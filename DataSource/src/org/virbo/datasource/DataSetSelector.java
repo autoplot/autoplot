@@ -286,15 +286,30 @@ public class DataSetSelector extends javax.swing.JPanel {
     
     /**
      * check to see if any of the action triggers will handle the URI.
-     * @param surl the URI.
+     * @param suri the URI.
      * @return  true if the URI was handled.
      */
-    private boolean checkActionTriggers( String surl ) {
+    private boolean checkActionTriggers( String suri ) {
         for (String actionTriggerRegex : actionTriggers.keySet()) {
-            if (Pattern.matches(actionTriggerRegex, surl)) {
+            if (Pattern.matches(actionTriggerRegex, suri)) {
                 logger.finest("matches action trigger");
                 Action action = actionTriggers.get(actionTriggerRegex);
                 action.actionPerformed(new ActionEvent(this, 123, "dataSetSelect"));
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * return true if the action trigger would be handled.
+     * @param suri the URI.
+     * @return true if the action trigger would be handled.
+     */
+    public boolean hasActionTrigger( String suri ) {
+        for (String actionTriggerRegex : actionTriggers.keySet()) {
+            if (Pattern.matches(actionTriggerRegex, suri)) {
+                logger.log(Level.FINEST, "matches action trigger: {0}", actionTriggerRegex);
                 return true;
             }
         }
