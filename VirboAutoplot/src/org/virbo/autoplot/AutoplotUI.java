@@ -3425,7 +3425,6 @@ private void updateFrameTitle() {
                 }
 
                 alm.process(argv);
-                boolean raise= false;
 
                 final JFrame frame = (JFrame) ScriptContext.getViewWindow();
                 if ( frame!=null ) {
@@ -3443,97 +3442,116 @@ private void updateFrameTitle() {
                     url = null;
                 }
 
-                if ( url!=null && ( url.startsWith("pngwalk:") || url.endsWith(".pngwalk") || url.contains(".pngwalk?") ) ) {
-                    //TODO: check other prefixes...
-                    PngWalkTool1.start( url, app );
-                    app.applicationModel.addRecent(app.dataSetSelector.getValue());
-                    return;
-                }
-
-                if ( url!=null && url.length()>1 ) { // check for relative filenames 
-                    int i= url.indexOf(":");
-                    if ( i==-1 ) { // it's a file.
-                        boolean isAbsolute= url.startsWith("/");
-                        if ( !isAbsolute ) {
-                            try {
-                                String pwd= new File(".").getCanonicalPath();
-                                if ( pwd.length()>2 ) {
-                                    pwd= pwd + "/"; //TODO: Windows...
-                                }
-                                url= pwd + url;
-                            } catch ( IOException ex ) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    }
-                }
-                
                 String pos= alm.getValue("position");
+                app.handleSingleInstanceURI(url, pos);
 
-                if ( pos!=null ) {
-                    app.applicationModel.setFocus( Integer.parseInt(pos) );
-                    if ( url!=null ) app.dataSetSelector.setValue(url);
-                    app.dataSetSelector.maybePlot(false); // allow for completions
-                    
-                } else {
-                    if (url == null) {
-                        int action = JOptionPane.showConfirmDialog(ScriptContext.getViewWindow(), "<html>Autoplot is already running.<br>Start another window?", "Reenter Autoplot", JOptionPane.YES_NO_OPTION);
-                        if (action == JOptionPane.YES_OPTION) {
-                            app.support.newApplication();
-                        } else {
-                            raise= true;
-                        }
-                    } else {
-                        String msg;
-                        if ( app.isExpertMode() ) {
-                                msg= String.format(
-                                "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
-                                + "or replace the current plot with the new URI, possibly entering the editor, <br>"
-                                + "or always enter the editor to inspect and insert the plot below.<br>"
-                                + "View in new window, replace, or add plot, using<br>%s?", url );
-                        } else {
-                                msg= String.format(
-                                "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
-                                + "or replace the current plot with the new URI, possibly entering the editor <br>"
-                                + "or always enter the editor to inspect before plotting.<br>"
-                                + "View in new window, replace, or add plot, using<br>%s?", url );
-                        }
-                        String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
-                                msg,
-                                "Incorporate New URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
-                                new String[] { "New Window", "Replace", "Add Plot" }, "Add Plot" );
-                        if ( action!=null ) {
-                            if (action.equals("Replace")) {
-                                app.plotUri(url);
-                                raise= true;
-                            } else if (action.equals("Add Plot")) {
-                                app.dataSetSelector.setValue(url);
-                                app.dataSetSelector.maybePlot( KeyEvent.ALT_MASK ); // enter the editor
-                                raise= true;
-                            } else if (action.equals("New Window")) {
-                                AutoplotUI ui2= app.newApplication();
-                                ui2.plotUri(url);
-                            }
-                        } else {
-                            raise= true;
-                        }
-                    }
-                }
-                if ( raise ) {
-                    if ( frame!=null ) {
-                        EventQueue.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                raiseApplicationWindow(frame);
-                            }
-                        });
-                    }
-                }
             }
         };
         sis.addSingleInstanceListener(sisL);
     }
 
+    /**
+     * extract the code that handles the single instance so that we can model it for debugging.
+     * @param url the reentry URI 
+     * @param pos support the --position=3 switch to support servers.
+     */
+    public void handleSingleInstanceURI( String url, String pos ) {
+        final AutoplotUI app= this; // refactor from static class. TODO: remove this is unnecessary...
+        boolean raise=false;
+        
+        if ( url!=null && ( url.startsWith("pngwalk:") || url.endsWith(".pngwalk") || url.contains(".pngwalk?") ) ) {
+            //TODO: check other prefixes...
+            PngWalkTool1.start( url, app );
+            app.applicationModel.addRecent(app.dataSetSelector.getValue());
+            return;
+        }
+        
+
+        if ( app.dataSetSelector.checkActionTriggers(url) ) {
+            if ( url!=null ) app.dataSetSelector.setValue(url);
+            app.dataSetSelector.maybePlot(false); // allow for completions
+            return;
+        }        
+ 
+        if ( url!=null && url.length()>1 ) { // check for relative filenames 
+            int i= url.indexOf(":");
+            if ( i==-1 ) { // it's a file.
+                boolean isAbsolute= url.startsWith("/");
+                if ( !isAbsolute ) {
+                    try {
+                        String pwd= new File(".").getCanonicalPath();
+                        if ( pwd.length()>2 ) {
+                            pwd= pwd + "/"; //TODO: Windows...
+                        }
+                        url= pwd + url;
+                    } catch ( IOException ex ) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        if ( pos!=null ) {
+            app.applicationModel.setFocus( Integer.parseInt(pos) );
+            if ( url!=null ) app.dataSetSelector.setValue(url);
+            app.dataSetSelector.maybePlot(false); // allow for completions
+
+        } else {
+            if (url == null) {
+                int action = JOptionPane.showConfirmDialog(ScriptContext.getViewWindow(), "<html>Autoplot is already running.<br>Start another window?", "Reenter Autoplot", JOptionPane.YES_NO_OPTION);
+                if (action == JOptionPane.YES_OPTION) {
+                    app.support.newApplication();
+                } else {
+                    raise= true;
+                }
+            } else {
+                String msg;
+                if ( app.isExpertMode() ) {
+                        msg= String.format(
+                        "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
+                        + "or replace the current plot with the new URI, possibly entering the editor, <br>"
+                        + "or always enter the editor to inspect and insert the plot below.<br>"
+                        + "View in new window, replace, or add plot, using<br>%s?", url );
+                } else {
+                        msg= String.format(
+                        "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
+                        + "or replace the current plot with the new URI, possibly entering the editor <br>"
+                        + "or always enter the editor to inspect before plotting.<br>"
+                        + "View in new window, replace, or add plot, using<br>%s?", url );
+                }
+                String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
+                        msg,
+                        "Incorporate New URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
+                        new String[] { "New Window", "Replace", "Add Plot" }, "Add Plot" );
+                if ( action!=null ) {
+                    if (action.equals("Replace")) {
+                        app.plotUri(url);
+                        raise= true;
+                    } else if (action.equals("Add Plot")) {
+                        app.dataSetSelector.setValue(url);
+                        app.dataSetSelector.maybePlot( KeyEvent.ALT_MASK ); // enter the editor
+                        raise= true;
+                    } else if (action.equals("New Window")) {
+                        AutoplotUI ui2= app.newApplication();
+                        ui2.plotUri(url);
+                    }
+                } else {
+                    raise= true;
+                }
+            }
+        }
+        if ( raise ) {
+            if ( app!=null ) {
+                EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        raiseApplicationWindow(app);
+                    }
+                });
+            }
+        }
+
+    }
 
     /**
      * get the runnable for the script.
