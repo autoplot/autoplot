@@ -11,6 +11,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,9 +33,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.TimeRangeTool;
@@ -73,26 +79,43 @@ public class ParametersFormPanel {
         return spacer;
     }
     
-    
+    /**
+     * represent the data on the form.
+     */
     public static class FormData {
         ArrayList<JComponent> tflist;
         ArrayList<String> paramsList;
         ArrayList<String> deftsList;
+        ArrayList<Object> deftObjectList;
         ArrayList<Character> typesList;
         public int count;
         
         /**
          * T (TimeRange), A (String), F (Double or Integer), or R (URI)
+         * D Datum
+         * S DatumRange
          */
-        public void implement( PythonInterpreter interp, String param, String value ) {
+        public void implement( PythonInterpreter interp, String param, String value ) throws ParseException {
+            PyDictionary paramsDictionary= ((PyDictionary)interp.get( "params" ));
             for ( int i=0; i<paramsList.size(); i++ ) {
-                
                 if ( paramsList.get(i).equals(param) ) {
-                   
+                    String n= String.format( "params['%s']", param );
+                    Object deft= deftObjectList.get(i);;
                     if ( typesList.get(i).equals('T') && value.length()>1 && value.charAt(0)!='\'' && value.charAt(value.length()-1)!='\'' ) {
-                        value= "'"+value+"'";
+                        paramsDictionary.__setitem__( param, Py.java2py( value ) );
+                    } else if ( typesList.get(i).equals('D') ) {
+                        paramsDictionary.__setitem__( param, Py.java2py( ((Datum)deft).getUnits().parse(value) ) );
+                    } else if ( typesList.get(i).equals('S') ) {
+                        paramsDictionary.__setitem__( param, Py.java2py( DatumRangeUtil.parseDatumRange(value,(DatumRange)deft ) ) );
+                    } else if ( typesList.get(i).equals('U') ) {
+                        try {
+                            paramsDictionary.__setitem__( param, Py.java2py( new java.net.URI( value ) ) );
+                        } catch (URISyntaxException ex) {
+                            throw new ParseException( "URI is not formed properly",0);
+                        }
+                    } else {
+                        interp.exec( String.format("params['%s']=%s", param, value ) ); // TODO: nasty/clever code handles float vs int.
                     }
-                    interp.exec( String.format("params['%s']=%s", param, value ) );
                     return;
                 }
                 
@@ -185,18 +208,38 @@ public class ParametersFormPanel {
     }
     
     /**
-     * Populates the JPanel with options.  See org.virbo.jythonsupport.ui.Util.createForm.
+     * return spacer of width size.
+     * @param size
+     * @return 
+     */
+    private JComponent getSpacer( int size ) {
+        JComponent spacer= new JLabel(" ");
+        spacer.setSize( new Dimension(size,16) );
+        spacer.setMinimumSize( new Dimension(size,16) );
+        spacer.setPreferredSize( new Dimension(size,16) );
+        return spacer;
+    }
+    
+    public FormData doVariables( final String src, Map<String,String> params, final JPanel zparamsPanel ) {
+        return doVariables( null, src, params, zparamsPanel );
+    }
+    
+    /**
+     * Populates the JPanel with options.  See org.virbo.jythonsupport.ui.Util.createForm, this is only used with the .jyds.  TODO: Fix this!!!
+     * 
+     * @param env null or an map containing variables like "dom" and "PWD"
      * @param src the script loaded into a string.
      * @param params map containing any settings for the variables.
      * @return the FormData from the initial view, since some clients will not show a GUI when there are no parameters.
      */
-    public FormData doVariables( final String src, Map<String,String> params, final JPanel zparamsPanel ) {
+    public FormData doVariables( Map<String,Object> env, final String src, Map<String,String> params, final JPanel zparamsPanel ) {
         this.params= new HashMap(params);
 
         boolean hasVars;
         fd.tflist= new ArrayList();
         fd.paramsList= new ArrayList();
         fd.deftsList= new ArrayList();
+        fd.deftObjectList= new ArrayList();
         fd.typesList= new ArrayList();
         
         JScrollPane jp= new JScrollPane();
@@ -206,7 +249,7 @@ public class ParametersFormPanel {
         paramsPanel.setLayout(new javax.swing.BoxLayout(paramsPanel, javax.swing.BoxLayout.Y_AXIS));
         
         try {
-            Map<String,Param> parms= getParams( src, params, new NullProgressMonitor() );
+            Map<String,Param> parms= getParams( env, src, params, new NullProgressMonitor() );
 
             paramsPanel.add( new JLabel("<html>This script has the following input parameters.  Buttons on the right show default values.<br><br></html>") );
 
@@ -309,6 +352,29 @@ public class ParametersFormPanel {
                     valuePanel.add( ctf );
                     filesButton.setAlignmentX( JComponent.LEFT_ALIGNMENT );
                     valuePanel.add( filesButton );
+                    
+                } else if ( parm.type=='U' ) {
+                    final DataSetSelector sel= new DataSetSelector();
+                    sel.setPlotItButtonVisible(false);
+                    String val;
+                    if (params.get(vname)!=null ) {
+                        val= params.get(vname);
+                        if ( val.startsWith("'") ) val= val.substring(1);
+                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                    } else {
+                        val= String.valueOf( parm.deft );
+                        params.put( vname, val );
+                    }
+                    sel.setRecent( DataSetSelector.getDefaultRecent() );
+                    sel.setValue( val );
+                    
+                    valuePanel.add( getSpacer(7) );  // kludge.  Set on Jeremy's home Ubuntu
+                    valuePanel.add( sel );
+                    sel.setValue( val );
+                    valuePanel.add( getSpacer(10) ); // put a little space in after the selector as well.
+                            
+                    ctf= sel;
+                    
                 } else if ( parm.type=='T' ) {
                     String val;
                     if ( params.get(vname)!=null ) {
@@ -444,6 +510,7 @@ public class ParametersFormPanel {
 
                 fd.paramsList.add( parm.name );
                 fd.deftsList.add( String.valueOf( parm.deft ) );
+                fd.deftObjectList.add( parm.deft );
                 fd.typesList.add( parm.type );
 
                 hasVars= true;

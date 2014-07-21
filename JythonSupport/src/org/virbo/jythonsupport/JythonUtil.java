@@ -31,6 +31,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -375,6 +377,9 @@ public class JythonUtil {
 
     }
 
+    /**
+     * TODO: this ought to remove the need for ParametersFormPanel.
+     */
     public static class Param {
         public String name;
         public String label; // the label for the variable used in the script
@@ -384,6 +389,8 @@ public class JythonUtil {
         /**
          * T (TimeRange), A (String), F (Double or Integer), or R (URI)
          * Note a string with the values enumerated either T or F is treated as a boolean.
+         * D datum
+         * S DatumRange
          */
         public char type;
         @Override
@@ -574,7 +581,11 @@ public class JythonUtil {
          return false;
      }     
 
-     
+     /**
+      * put quotes around values that appear to be strings.  We see if it's parsable as a double or the keyword True or False.
+      * @param sval
+      * @return 
+      */
      public static String maybeQuoteString(String sval) {
         boolean isNumber= false;
         try {
@@ -592,6 +603,11 @@ public class JythonUtil {
 
     }
 
+    /**
+     * put each parameter into the dictionary autoplot.params.
+     * @param interp
+     * @param paramsl 
+     */ 
     public static void setParams( PythonInterpreter interp, Map<String,String> paramsl ) {
         interp.exec("import autoplot");
         interp.exec("autoplot.params=dict()");
@@ -605,7 +621,6 @@ public class JythonUtil {
                 interp.exec("autoplot.params['" + s + "']=" + sval);
             }
         }
-        //interp.eval("autoplot.params");
     }
 
      
@@ -615,7 +630,7 @@ public class JythonUtil {
       * @return 
       */
      private static boolean simplifyScriptToGetParamsOkay( stmtType o, HashSet<String> variableNames ) {
-         //if ( o.beginLine==607 ) {
+         //if ( o.beginLine==607 ) {  // leave this commented code as a reference for debugging
          //    System.err.println("here at line "+o.beginLine);
          //}
          if ( ( o instanceof org.python.parser.ast.ImportFrom ) ) return true;
@@ -875,7 +890,7 @@ public class JythonUtil {
          }
          
          // check for continuation in last getParam call.
-         while ( ss[lastLine].trim().length()>0 && Character.isWhitespace( ss[lastLine].charAt(0) ) && ss.length>lastLine+1 ) {
+         while ( ss.length>lastLine+1 && ss[lastLine].trim().length()>0 && Character.isWhitespace( ss[lastLine].charAt(0) ) ) {
              lastLine++;
          }
          
@@ -961,19 +976,50 @@ public class JythonUtil {
       * @throws PyException 
       */
      public static List<Param> getGetParams( String script, Map<String,String>params ) throws PyException {
-        
+        return getGetParams( null, script, params );
+     }
+     
+     /**
+      * look through the script, removing expensive calls to make a script
+      * that can be executed to get a list of getParam calls.  The user
+      * can provide a list of current settings, so that the thread of execution 
+      * is matched.
+      * Each parameter is given a type code:<tt>
+      **<blockquote><pre><small>{@code
+      * R resourceURI, special string
+      * T timerange, special string
+      * A string
+      * F float, double, or int
+      * U URI
+      * D Datum
+      * S DatumRange
+      * 
+      *}</small></pre></blockquote>
+      * 
+      * @param interp any values which may be defined already, such as "dom" and "monitor"
+      * @param script any jython script.
+      * @param params user-specified values.
+      * @return a list of parameters.
+      * @throws PyException 
+      */
+     public static List<Param> getGetParams( Map<String,Object> env, String script, Map<String,String>params ) throws PyException {        
         String prog= simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
-        
+
         PythonInterpreter interp;
         try {
-            interp= createInterpreter(true);
-            setParams( interp, params );
-            interp.exec(prog);
+            interp= createInterpreter(true);         
         } catch ( IOException ex ) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            return new ArrayList();            
+            return new ArrayList();
         }
         
+        if ( env!=null ) {
+            for ( Entry<String,Object> ent: env.entrySet() ) {
+                interp.set( ent.getKey(), ent.getValue() );
+            }
+        }
+        
+        setParams( interp, params );
+        interp.exec(prog);
         interp.exec("import autoplot\n");
         PyList sort= (PyList) interp.eval( "autoplot._paramSort" );
 
@@ -1011,7 +1057,7 @@ public class JythonUtil {
                 } else if ( p.deft instanceof PyString ) {
                     p.type= 'A';
                     p.deft= p.deft.toString();
-                } else if ( p.deft instanceof PyInteger ) {
+                } else if ( p.deft instanceof PyInteger ) { //TODO: Consider if int types should be preserved.
                     p.type= 'F';
                     p.deft= ((PyInteger)p.deft).__tojava__(int.class);
                 } else if ( p.deft instanceof PyFloat ) {
@@ -1020,7 +1066,15 @@ public class JythonUtil {
                 } else if ( p.deft instanceof PyJavaInstance ) {
                     Object pp=  ((PyJavaInstance)p.deft).__tojava__( URI.class );
                     if ( pp==Py.NoConversion ) {
-                        throw new IllegalArgumentException("unable to use type: "+p.deft);
+                        pp=  ((PyJavaInstance)p.deft).__tojava__( Datum.class );
+                        if ( pp==Py.NoConversion ) {
+                            pp=  ((PyJavaInstance)p.deft).__tojava__( DatumRange.class );
+                            p.type= 'S';
+                            p.deft= pp; 
+                        } else {
+                            p.type= 'D';
+                            p.deft= pp;
+                        }
                     } else {
                         p.type= 'U';
                         p.deft= pp;

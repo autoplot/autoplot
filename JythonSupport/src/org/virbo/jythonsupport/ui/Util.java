@@ -4,11 +4,9 @@
  */
 package org.virbo.jythonsupport.ui;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -17,6 +15,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
+import org.python.util.PythonInterpreter;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.JythonUtil;
@@ -73,8 +72,21 @@ public class Util {
     }
     
     protected static Map<String,JythonUtil.Param> getParams( String src, Map<String,String> params, ProgressMonitor mon ) throws IOException {
+        return getParams( null, src, params, mon );
+    }
 
-        List<JythonUtil.Param> r2= JythonUtil.getGetParams( src, params );
+    /**
+     * get the parameters for the script.
+     * @param env null, or a script context that can contain values such as dom and PWD.
+     * @param src the script, all in one string.
+     * @param params default values for the parameters.
+     * @param mon
+     * @return list of parameters.
+     * @throws IOException 
+     */
+    protected static Map<String,JythonUtil.Param> getParams( Map<String,Object> env, String src, Map<String,String> params, ProgressMonitor mon ) throws IOException {
+        logger.finer("enter getParams");
+        List<JythonUtil.Param> r2= JythonUtil.getGetParams( env, src, params );
 
         Map<String,JythonUtil.Param> result= new LinkedHashMap();
 
