@@ -303,6 +303,8 @@ public class ParametersFormPanel {
                     labelPanel.add( l );
                     labelPanel.setAlignmentX( JComponent.LEFT_ALIGNMENT );
                     paramsPanel.add( labelPanel );
+                } else {
+                    paramsPanel.add( Box.createVerticalStrut( paramsPanel.getFont().getSize() / 2 ) ); //TODO: verify.
                 }
 
                 JPanel valuePanel= new JPanel(  );
@@ -515,7 +517,7 @@ public class ParametersFormPanel {
                 fd.deftObjectList.add( parm.deft );
                 fd.typesList.add( parm.type );
 
-                hasVars= true;
+                paramsPanel.add( Box.createVerticalStrut( paramsPanel.getFont().getSize() * 2 ) );
             }
                 
             hasVars= parms.size()>0;
