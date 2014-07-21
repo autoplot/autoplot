@@ -179,10 +179,9 @@ public class CefDataSource extends AbstractDataSource {
             }
             ds = DDataSet.wrap(ddata);
             ds.putProperty(QDataSet.FILL_VALUE, ceffill );
+            ds.putProperty(QDataSet.UNITS, u );
             
             getDeltaPlusDeltaMinus( param, tds, ds );
-            
-            ds.putProperty(QDataSet.UNITS, u );
             
             setDsName( var, ds );
             rank0 = ds.rank();
@@ -417,7 +416,7 @@ public class CefDataSource extends AbstractDataSource {
         String sdeltaPlus= (String)param.entries.get("DELTA_PLUS");
         String sdeltaMinus= (String)param.entries.get("DELTA_MINUS");
 
-        Units units= SemanticOps.getUnits(tds);
+        Units units= SemanticOps.getUnits(ds);
         
         if ( sdeltaMinus!=null && sdeltaPlus!=null ) {  // check for in-line scalar.
             logger.finest("handling DELTA_PLUS DELTA_MINUS");
