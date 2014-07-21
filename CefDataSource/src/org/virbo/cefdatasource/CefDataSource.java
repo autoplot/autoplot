@@ -27,10 +27,12 @@ import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.SortDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
@@ -155,6 +157,15 @@ public class CefDataSource extends AbstractDataSource {
             ceffill = fill;
         }
 
+        if (tds == null) {
+            CefReaderData readerd = new CefReaderData();
+            for (int i = 0; i < CefReaderData.MAX_FIELDS; i++) {
+                readerd.skipParse(i);
+            }
+            setParseFlags(cef, var, readerd);
+            tds = readerd.cefReadData(cmon, cef);
+        }
+        
         MutablePropertyDataSet ds;
         if (param.cefFieldPos[0] == -1) { // data is inside the CEF header
             String[] data = (String[]) param.entries.get("DATA");
@@ -169,13 +180,7 @@ public class CefDataSource extends AbstractDataSource {
             ds = DDataSet.wrap(ddata);
             ds.putProperty(QDataSet.FILL_VALUE, ceffill );
             
-            String sdeltaPlus= (String)param.entries.get("DELTA_PLUS");
-            String sdeltaMinus= (String)param.entries.get("DELTA_MINUS");
-            if ( sdeltaMinus!=null && sdeltaPlus!=null ) {
-                logger.finest("handling DELTA_PLUS DELTA_MINUS");
-                ds.putProperty( QDataSet.DELTA_PLUS, Ops.putProperty( Ops.replicate( Double.parseDouble(sdeltaPlus), ds.length() ), QDataSet.UNITS, u.getOffsetUnits() ) );
-                ds.putProperty( QDataSet.DELTA_MINUS, Ops.putProperty( Ops.replicate( Double.parseDouble(sdeltaMinus), ds.length() ), QDataSet.UNITS, u.getOffsetUnits() ) );
-            }
+            getDeltaPlusDeltaMinus( param, tds, ds );
             
             ds.putProperty(QDataSet.UNITS, u );
             
@@ -184,14 +189,6 @@ public class CefDataSource extends AbstractDataSource {
 
         // TODO: check for fill
         } else { // data should be extracted from rank 2 table.
-            if (tds == null) {
-                CefReaderData readerd = new CefReaderData();
-                for (int i = 0; i < CefReaderData.MAX_FIELDS; i++) {
-                    readerd.skipParse(i);
-                }
-                setParseFlags(cef, var, readerd);
-                tds = readerd.cefReadData(cmon, cef);
-            }
 
             if (param.sizes.length > 1 || param.sizes[0] > 1) {
                 if (tds == null) { // create empty dataset with correct geometry
@@ -205,24 +202,8 @@ public class CefDataSource extends AbstractDataSource {
                 dds.putProperty(QDataSet.UNITS, u);
                 dds.putProperty(QDataSet.FILL_VALUE, ceffill );
                 ds = dds;
-
-                String sdeltaPlus= (String)param.entries.get("DELTA_PLUS");
-                String sdeltaMinus= (String)param.entries.get("DELTA_MINUS");
-                if ( sdeltaMinus!=null && sdeltaPlus!=null ) {
-                    logger.finest("handling DELTA_PLUS DELTA_MINUS for time series"); // STA_L2_SWEA_PAD_20070117_V04.cef?energy_table
-                    CefReaderHeader.ParamStruct p1 = cef.parameters.get(sdeltaPlus);
-                    MutablePropertyDataSet mds= org.virbo.dataset.DataSetOps.leafTrim( tds, p1.cefFieldPos[0], p1.cefFieldPos[1] + 1);
-                    if ( p1.entries.containsKey("UNITS") ) {
-                        mds.putProperty( QDataSet.UNITS, Units.lookupUnits((String)p1.entries.get("UNITS")) );
-                    }
-                    ds.putProperty( QDataSet.DELTA_PLUS, mds );
-                    p1 = cef.parameters.get(sdeltaMinus);
-                    mds= org.virbo.dataset.DataSetOps.leafTrim( tds, p1.cefFieldPos[0], p1.cefFieldPos[1] + 1);
-                    if ( p1.entries.containsKey("UNITS") ) {
-                        mds.putProperty( QDataSet.UNITS, Units.lookupUnits((String)p1.entries.get("UNITS")) );
-                    }
-                    ds.putProperty( QDataSet.DELTA_MINUS, mds );
-                }
+                
+                getDeltaPlusDeltaMinus( param, tds, ds );
 
                 setDsName( var, ds );
 
@@ -430,5 +411,41 @@ public class CefDataSource extends AbstractDataSource {
     @Override
     public MetadataModel getMetadataModel() {
         return new CefMetadataModel();
+    }
+
+    private void getDeltaPlusDeltaMinus( ParamStruct param, MutablePropertyDataSet tds, MutablePropertyDataSet ds ) {
+        String sdeltaPlus= (String)param.entries.get("DELTA_PLUS");
+        String sdeltaMinus= (String)param.entries.get("DELTA_MINUS");
+
+        Units units= SemanticOps.getUnits(tds);
+        
+        if ( sdeltaMinus!=null && sdeltaPlus!=null ) {  // check for in-line scalar.
+            logger.finest("handling DELTA_PLUS DELTA_MINUS");
+            if ( DataSourceUtil.isJavaDouble(sdeltaPlus) && DataSourceUtil.isJavaDouble(sdeltaMinus) ) {
+                ds.putProperty( QDataSet.DELTA_PLUS, Ops.putProperty( Ops.replicate( Double.parseDouble(sdeltaPlus), ds.length() ), QDataSet.UNITS, units.getOffsetUnits() ) );
+                ds.putProperty( QDataSet.DELTA_MINUS, Ops.putProperty( Ops.replicate( Double.parseDouble(sdeltaMinus), ds.length() ), QDataSet.UNITS, units.getOffsetUnits() ) );            
+                return;
+            }
+        }
+
+        if ( sdeltaMinus!=null && sdeltaPlus!=null ) {
+            logger.finest("handling DELTA_PLUS DELTA_MINUS for time series"); // STA_L2_SWEA_PAD_20070117_V04.cef?energy_table
+            CefReaderHeader.ParamStruct p1 = cef.parameters.get(sdeltaPlus);
+            if ( p1.cefFieldPos[0]>-1 && p1.cefFieldPos[1]>-1 ) {
+                MutablePropertyDataSet mds= org.virbo.dataset.DataSetOps.leafTrim( tds, p1.cefFieldPos[0], p1.cefFieldPos[1] + 1);
+                if ( p1.entries.containsKey("UNITS") ) {
+                    mds.putProperty( QDataSet.UNITS, Units.lookupUnits((String)p1.entries.get("UNITS")) );
+                }
+                ds.putProperty( QDataSet.DELTA_PLUS, mds );
+                p1 = cef.parameters.get(sdeltaMinus);
+                mds= org.virbo.dataset.DataSetOps.leafTrim( tds, p1.cefFieldPos[0], p1.cefFieldPos[1] + 1);
+                if ( p1.entries.containsKey("UNITS") ) {
+                    mds.putProperty( QDataSet.UNITS, Units.lookupUnits((String)p1.entries.get("UNITS")) );
+                }
+                ds.putProperty( QDataSet.DELTA_MINUS, mds );
+            } else {
+                logger.fine("unable to locate DELTA_PLUS and/or DELTA_MINUS variable for "+param.name);
+            }
+        }
     }
 }
