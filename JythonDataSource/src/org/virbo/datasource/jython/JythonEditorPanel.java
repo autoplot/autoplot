@@ -369,6 +369,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     labelPanel.add( l );
                     labelPanel.setAlignmentX( JComponent.LEFT_ALIGNMENT );
                     paramsPanel.add( labelPanel );
+                } else {
+                    paramsPanel.add( Box.createVerticalStrut(paramsPanel.getFont().getSize()/2 ) ); //TODO: other code that writes the GUI needs this too.
                 }
 
                 JPanel valuePanel= new JPanel(  );
@@ -594,7 +596,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 paramsPanel.add( new JLabel("<html><em>no input parameters</em></html>") );
             }
 
-            paramsPanel.add( Box.createVerticalStrut(24) );
+            paramsPanel.add( Box.createVerticalStrut(paramsPanel.getFont().getSize()*2 ) );
             
             paramsPanel.revalidate();
 
