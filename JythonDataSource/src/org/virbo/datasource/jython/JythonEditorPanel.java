@@ -594,7 +594,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 paramsPanel.add( new JLabel("<html><em>no input parameters</em></html>") );
             }
 
-            paramsPanel.add( Box.createVerticalGlue() );
+            paramsPanel.add( Box.createVerticalStrut(24) );
+            
             paramsPanel.revalidate();
 
         } catch (IOException ex) {
