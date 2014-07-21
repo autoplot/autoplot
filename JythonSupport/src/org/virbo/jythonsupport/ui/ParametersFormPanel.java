@@ -99,7 +99,6 @@ public class ParametersFormPanel {
             PyDictionary paramsDictionary= ((PyDictionary)interp.get( "params" ));
             for ( int i=0; i<paramsList.size(); i++ ) {
                 if ( paramsList.get(i).equals(param) ) {
-                    String n= String.format( "params['%s']", param );
                     Object deft= deftObjectList.get(i);;
                     if ( typesList.get(i).equals('T') && value.length()>1 && value.charAt(0)!='\'' && value.charAt(value.length()-1)!='\'' ) {
                         paramsDictionary.__setitem__( param, Py.java2py( value ) );
