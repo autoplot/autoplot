@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -152,8 +153,8 @@ public class JythonUtil {
      * @param dom if null, then null is passed into the script and the script must not use dom.
      * @param mon monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
      */
-    public static void invokeScriptSoon( final URL url, final Application dom, ProgressMonitor mon1 ) throws IOException {
-        invokeScriptSoon( url, dom, new HashMap(), false, false, mon1 );
+    public static void invokeScriptSoon( final URL url, final Application dom, ProgressMonitor mon ) throws IOException {
+        invokeScriptSoon( url, dom, new HashMap(), false, false, mon );
     }
     
     /**
@@ -165,12 +166,12 @@ public class JythonUtil {
      * @param resourceUri when the user decides to make a tool, we need the source location.
      * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION if the user cancels.
      */
-    private static int showScriptDialog( Component parent, File file, Map<String,String> fvars, boolean makeTool, final URI resourceUri ) throws IOException {
+    private static int showScriptDialog( Component parent, Map<String,Object> env, File file, Map<String,String> fvars, boolean makeTool, final URI resourceUri ) throws IOException {
         
         JPanel p= new JPanel();
         
         ParametersFormPanel fpf= new org.virbo.jythonsupport.ui.ParametersFormPanel();
-        ParametersFormPanel.FormData fd=  fpf.doVariables( file, fvars, p );
+        ParametersFormPanel.FormData fd=  fpf.doVariables( env, file, fvars, p );
 
         if ( fd.count==0 && !makeTool ) {
             return JOptionPane.OK_OPTION;
@@ -261,6 +262,14 @@ public class JythonUtil {
             fvars= vars;
         }
         
+        ParametersFormPanel pfp= new org.virbo.jythonsupport.ui.ParametersFormPanel();
+        Map<String,Object> env= new HashMap();
+        env.put("dom",dom );
+        URISplit split= URISplit.parse(url.toString());
+        env.put( "PWD", split.path );
+        
+        final ParametersFormPanel.FormData fd;
+        
         int response= JOptionPane.OK_OPTION;
         if ( askParams ) {     
             URI uri = null;
@@ -270,10 +279,18 @@ public class JythonUtil {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             file = DataSetURI.getFile( url, new NullProgressMonitor() );
-            response= showScriptDialog( dom.getController().getDasCanvas(), file, fvars, makeTool, uri );
+            Map<String,Object> args= new HashMap();
+            args.put( "dom", dom );
+            args.put( "PWD", split.path ); 
+    
+            JPanel params= new JPanel();
+            fd=  pfp.doVariables( env, file, vars, params );
+            
+            response= showScriptDialog( dom.getController().getDasCanvas(), args, file, fvars, makeTool, uri );
             
         } else {
             file = DataSetURI.getFile( url, new NullProgressMonitor() );
+            fd=  pfp.doVariables( env, file, vars, null );
         }
         
         Runnable run= new Runnable() {
@@ -282,17 +299,15 @@ public class JythonUtil {
                     PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, mon );
                     logger.log(Level.FINE, "invokeScriptSoon({0})", url);
                     for ( Map.Entry<String,String> v: fvars.entrySet() ) {
-                        if ( v.getValue() instanceof String ) {
-                            if ( !v.getValue().startsWith("'") ) {
-                                interp.exec( String.format("params['%s']='%s'", v.getKey(), v.getValue() ) );
-                            } else {
-                                interp.exec( String.format("params['%s']=%s", v.getKey(), v.getValue() ) );
-                            }
-                        } else {
-                            interp.exec( String.format("params['%s']=%s", v.getKey(), v.getValue() ) );
+                        try {
+                            fd.implement( interp, v.getKey(), v.getValue() );
+                        } catch ( ParseException ex ) {
+                            ex.printStackTrace();
+                            logger.log( Level.WARNING, null, ex );
                         }
                     }
                     URISplit split= URISplit.parse(url.toString());
+                    interp.set( "dom", dom );
                     interp.set( "PWD", split.path );   
                     FileInputStream in= new FileInputStream(file);
                     try {
