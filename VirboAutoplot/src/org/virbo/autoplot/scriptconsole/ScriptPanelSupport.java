@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -505,16 +506,28 @@ public class ScriptPanelSupport {
                                     JPanel p= new JPanel();
                                     Map<String,String> vars= new HashMap();
                                     ParametersFormPanel pfp= new org.virbo.jythonsupport.ui.ParametersFormPanel();
-                                    ParametersFormPanel.FormData fd=  pfp.doVariables( panel.getEditorPanel().getText(), vars, p );
+                                    Map<String,Object> env= new HashMap();
+                                    env.put("dom",interp.get("dom") );
+                                    env.put("PWD",interp.get("PWD") );
+                                    ParametersFormPanel.FormData fd=  pfp.doVariables( env, panel.getEditorPanel().getText(), vars, p );
                                     if ( fd.count>0 ) {
                                         JScrollPane pane= new JScrollPane(p);
                                         
                                         if ( AutoplotUtil.showConfirmDialog2( panel, pane, "edit parameters", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                                             ParametersFormPanel.resetVariables( fd, vars );
+                                            String parseExcept= null;
                                             for ( Entry<String,String> v: vars.entrySet() ) {
-                                                fd.implement( interp, v.getKey(), v.getValue() );
+                                                try {
+                                                    fd.implement( interp, v.getKey(), v.getValue() );
+                                                } catch ( ParseException ex ) {
+                                                    parseExcept= v.getKey();
+                                                }
                                             }
-                                            interp.exec(panel.getEditorPanel().getText());
+                                            if ( parseExcept!=null ) {
+                                                JOptionPane.showMessageDialog( panel, "ParseException in parameter "+parseExcept );
+                                            } else {
+                                                interp.exec(panel.getEditorPanel().getText());
+                                            }
                                         }
                                     } else {
                                         // no parameters
