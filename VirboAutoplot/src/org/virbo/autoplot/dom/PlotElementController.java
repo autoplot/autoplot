@@ -2049,6 +2049,7 @@ public class PlotElementController extends DomNodeController {
                 label=  (String) qube.slice(1).property( QDataSet.LABEL );
                 peleCopy.getPlotDefaults().getYaxis().setLabel( label==null ? "" : label );
                 peleCopy.getPlotDefaults().getZaxis().setRange( DataSetUtil.asDatumRange( qube.slice(2),true ) );
+                peleCopy.getPlotDefaults().getZaxis().setLog( "log".equals( qube.slice(2).property(QDataSet.SCALE_TYPE) ) );
             }
 
         } else if ( spec==RenderType.digital ) {
