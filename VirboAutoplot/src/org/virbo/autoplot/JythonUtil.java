@@ -204,7 +204,7 @@ public class JythonUtil {
         
         tp.add( scriptPanel, "script" );
         
-        JScrollPane params= new JScrollPane(p);
+        JScrollPane params= new JScrollPane(p); // TODO: why do I need this?
         params.setMinimumSize( new Dimension(640,480) );
         tp.add( params, "params" );
         if ( makeTool ) {
