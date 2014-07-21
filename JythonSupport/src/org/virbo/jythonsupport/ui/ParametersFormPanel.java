@@ -171,11 +171,13 @@ public class ParametersFormPanel {
             
     /**
      * Populates the JPanel with options.  See org.virbo.jythonsupport.ui.Util.createForm.
+     * @param env environment variables such as PWD and dom.
      * @param f the file containing the script.
      * @param params map containing any settings for the variables.
+     * @param paramsPanel 
      * @return 
      */
-    public FormData doVariables( File f, Map<String,String> params, final JPanel paramsPanel ) throws IOException {
+    public FormData doVariables( Map<String,Object> env, File f, Map<String,String> params, final JPanel paramsPanel ) throws IOException {
         StringBuilder build= new StringBuilder();
         BufferedReader r;
         r = new BufferedReader( new FileReader(f) );
@@ -188,7 +190,7 @@ public class ParametersFormPanel {
         } finally {
             r.close();
         }
-        return doVariables(build.toString(),params,paramsPanel);
+        return doVariables( env, build.toString(),params,paramsPanel);
     }
     
     
@@ -229,6 +231,7 @@ public class ParametersFormPanel {
      * @param env null or an map containing variables like "dom" and "PWD"
      * @param src the script loaded into a string.
      * @param params map containing any settings for the variables.
+     * @param zparamsPanel JPanel to populate with the GUI items. (Can be null.)
      * @return the FormData from the initial view, since some clients will not show a GUI when there are no parameters.
      */
     public FormData doVariables( Map<String,Object> env, final String src, Map<String,String> params, final JPanel zparamsPanel ) {
@@ -242,7 +245,7 @@ public class ParametersFormPanel {
         fd.typesList= new ArrayList();
         
         JScrollPane jp= new JScrollPane();
-        zparamsPanel.add( jp );
+        if ( zparamsPanel!=null ) zparamsPanel.add( jp );
         final JPanel paramsPanel= new JPanel();
         jp.getViewport().add(paramsPanel);
         paramsPanel.setLayout(new javax.swing.BoxLayout(paramsPanel, javax.swing.BoxLayout.Y_AXIS));
