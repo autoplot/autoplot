@@ -430,7 +430,8 @@ public class JythonUtil {
      
      //there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as the string.upper() function.
      //The commas are to guard against the id being a subset of another id ("lower," does not match "lowercase").
-     private static String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper,", "URI," };
+     //TODO: update this after Python upgrade.
+     private static String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper,", "URI,", "DatumRangeUtil," };
      
      /**
       * return true if the function call is trivial to execute and can be evaluated within a few milliseconds.
