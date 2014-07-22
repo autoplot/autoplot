@@ -278,7 +278,8 @@ public class LogConsole extends javax.swing.JPanel {
                     }
                     if ( ( recMsg==null || recMsg.length()==0 ) && rec.getThrown()!=null ) {
                         recMsg= rec.getThrown().toString();
-                        //rec.getThrown().printStackTrace();
+                        //TODO: consider if "debug" property should be set instead.  Also it would be nice to digest this for jython errors.
+                        rec.getThrown().printStackTrace();
                         // This is interesting--I've wondered where the single-line-message items have been coming from...
                     } else {
                         // no message.  breakpoint here for debugging.
