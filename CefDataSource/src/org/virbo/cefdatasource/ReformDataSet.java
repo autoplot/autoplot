@@ -101,6 +101,7 @@ public class ReformDataSet extends AbstractDataSet implements RankNDataSet {
         return ds.value(i / dsLen1, i % dsLen1);
     }
 
+    @Override
     public double value(int i0, int i1, int i2, int i3) {
         int i = offset + i0 * n1 * n2 * n3 + i1 * n2 * n3 + i2 * n3 + i3;
         return ds.value(i / dsLen1, i % dsLen1);
@@ -130,10 +131,12 @@ public class ReformDataSet extends AbstractDataSet implements RankNDataSet {
         return n2;
     }
 
+    @Override
     public int length(int i, int j, int k) {
         return n3;
     }
 
+    @Override
     public QDataSet slice(int dim) {
         int[] newSizes = new int[rank - 1];
         offset = dim;
@@ -145,34 +148,5 @@ public class ReformDataSet extends AbstractDataSet implements RankNDataSet {
         return new ReformDataSet(ds, offset, newSizes);
 
     }
-
-    public String toString() {
-        String name = (String) ds.property(QDataSet.NAME);
-        if (name == null) {
-            name = "dataSet";
-        }
-
-        int[] qube = DataSetUtil.qubeDims(this);
-        String qubeStr = qube == null ? "*" : "";
-
-        StringBuffer dimStr = new StringBuffer("" + length());
-        if (qube != null) {
-            for ( int i=1; i<qube.length; i++ ) {
-                dimStr.append( "," + qube[i] );
-            }
-        } else {
-            if (rank() > 1) {
-                dimStr.append("," + length(0) + qubeStr);
-            }
-            if (rank() > 2) {
-                dimStr.append("," + length(0, 0) + qubeStr);
-            }
-        }
-
-        String u = String.valueOf(ds.property(QDataSet.UNITS));
-        if (u.equals("null") || u.equals("")) {
-            u = "dimensionless";
-        }
-        return name + "[" + dimStr.toString() + "] (" + u + ")";
-    }
+    
 }
