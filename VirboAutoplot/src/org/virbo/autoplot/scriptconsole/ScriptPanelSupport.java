@@ -146,15 +146,17 @@ public class ScriptPanelSupport {
                 sfile= split.resourceUri.toString();
             }
             final URI fsfile= DataSetURI.getURI(sfile);
-            URI u1= DataSetURI.getURI(panel.getFilename());
-            String f1= URISplit.parse(u1).file;
-            URI u2= DataSetURI.getURI(sfile);
-            String f2= URISplit.parse(u2).file;
-            if ( f1.startsWith("file:" ) && f2.startsWith("file:") ) {
-                File ff1= new File( f1.substring(5) );
-                File ff2= new File( f2.substring(5) );
-                if ( ff1.equals(ff2) ) {
-                    return true;
+            if ( panel.getFilename()!=null ) {
+                URI u1= DataSetURI.getURI(panel.getFilename());
+                String f1= URISplit.parse(u1).file;
+                URI u2= DataSetURI.getURI(sfile);
+                String f2= URISplit.parse(u2).file;
+                if ( f1.startsWith("file:" ) && f2.startsWith("file:") ) {
+                    File ff1= new File( f1.substring(5) );
+                    File ff2= new File( f2.substring(5) );
+                    if ( ff1.equals(ff2) ) {
+                        return true;
+                    }
                 }
             }
             
