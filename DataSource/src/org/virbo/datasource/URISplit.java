@@ -746,6 +746,9 @@ public class URISplit {
             } else {
                 String value = (String) e.getValue();
                 if (value != null) {
+                    if ( key.equals( URISplit.PARAM_TIME_RANGE ) ) {
+                        value= value.replaceAll("\\s+","+");
+                    }
                     value= uriEncode(value);
                     value= value.replaceAll("&", "%26");
                     result.append("&").append(key).append("=").append(value);
