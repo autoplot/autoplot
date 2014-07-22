@@ -5,10 +5,12 @@
 package org.virbo.cefdatasource;
 
 import java.util.Arrays;
+import java.util.Map;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.RankNDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.DataSetOps;
 
 /**
  *
@@ -145,8 +147,11 @@ public class ReformDataSet extends AbstractDataSet implements RankNDataSet {
             offset *= this.sizes[i + 1];
         }
 
-        return new ReformDataSet(ds, offset, newSizes);
-
+        ReformDataSet result= new ReformDataSet(ds, offset, newSizes);
+        Map<String,Object> props= DataSetOps.sliceProperties0(dim,DataSetUtil.getProperties(this));
+        props= DataSetUtil.sliceProperties( this, dim, props );
+        DataSetUtil.putProperties( props, result );
+        return result;
     }
     
 }
