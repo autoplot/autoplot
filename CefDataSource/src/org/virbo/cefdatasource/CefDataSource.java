@@ -268,7 +268,7 @@ public class CefDataSource extends AbstractDataSource {
                         QDataSet dp01 = (QDataSet) dep0ds.property(QDataSet.DEPEND_0);
                         QDataSet dp02 = (QDataSet) ds.property(QDataSet.DEPEND_0);
                         if (dp01 != null && dp02 != null && dp01.length() == dp02.length()) {
-                            dep0ds = org.virbo.dataset.DataSetOps.slice0(dep0ds, 0); // kludge for CLUSTER/PEACE
+                            dep0ds = org.virbo.dataset.DataSetOps.slice0(dep0ds, 0); // kludge for CLUSTER/PEACE //TODO: probably isn't necessary now.
                             dep0ds.putProperty( QDataSet.CONTEXT_0, null );
                             if (dep0ds.length() > qube[newDim]) { // second kludge for CLUSTER/PEACE
                                 dep0ds = org.virbo.dataset.DataSetOps.trim(dep0ds, 0, qube[newDim]);
