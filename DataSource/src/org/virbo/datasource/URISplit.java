@@ -722,6 +722,9 @@ public class URISplit {
             } else {
                 name = ss[i].substring(0, j);
                 value = ss[i].substring(j + 1);
+                if ( name.equals( URISplit.PARAM_TIME_RANGE ) ) {
+                    value= value.replaceAll("\\+", " ");
+                }
                 value = value.replaceAll("%3D", "=" ); // https://sourceforge.net/tracker/?func=detail&aid=3049295&group_id=199733&atid=970682
                 value = value.replaceAll("%26", "&");
                 result.put(name, value);
