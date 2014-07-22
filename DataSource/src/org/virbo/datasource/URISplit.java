@@ -806,7 +806,7 @@ public class URISplit {
     /**
      * convert " " to "%20", etc, by looking for and encoding illegal characters.
      * We can't just aggressively convert...
-     * @param s
+     * @param surl 
      * @return
      */
     public static String uriEncode(String surl) {
