@@ -275,6 +275,7 @@ public class ScriptPanelSupport {
             while (s != null) {
                 if ( s.contains("\t") ) {
                     panel.containsTabs= true;
+                    logger.log(Level.FINE, "line contains tabs: {0}", s);
                 }
                 buf.append(s).append("\n");
                 s = r.readLine();
@@ -599,10 +600,8 @@ public class ScriptPanelSupport {
         OutputStream out = null;
         int result= JFileChooser.CANCEL_OPTION;
         try {
-            boolean updateSurl = false;
             result= getSaveFile();
             if (result == JFileChooser.APPROVE_OPTION) {
-                updateSurl = panel.getContext() == JythonScriptPanel.CONTEXT_DATA_SOURCE;
                 out = new FileOutputStream(file);
                 String text = panel.getEditorPanel().getText();
                 out.write(text.getBytes());
@@ -611,11 +610,6 @@ public class ScriptPanelSupport {
 
                 Preferences prefs = Preferences.userNodeForPackage(ScriptPanelSupport.class);
                 prefs.put(PREFERENCE_OPEN_FILE, file.toString() );
-
-                //if (updateSurl) {
-                //    model.setDataSourceURL(file.toString());
-                //    model.getDataSourceFilterController().update(true, true);
-                //}
                 
                 if ( file.toString().endsWith(".jyds") ) {
                     panel.setContext( JythonScriptPanel.CONTEXT_DATA_SOURCE );
@@ -642,18 +636,19 @@ public class ScriptPanelSupport {
 
     protected void newScript() {
         if (panel.isDirty()) {
-           int result = JOptionPane.showConfirmDialog(panel,
-                "save edits first?", "new script", JOptionPane.YES_NO_CANCEL_OPTION );
-                if (result == JOptionPane.OK_CANCEL_OPTION) {
-                    return;
-                }
-                if ( result==JOptionPane.OK_OPTION ) {
-                    if ( saveAs()==JOptionPane.CANCEL_OPTION ) return;
-                }
+       int result = JOptionPane.showConfirmDialog(panel,
+            "save edits first?", "new script", JOptionPane.YES_NO_CANCEL_OPTION );
+            if (result == JOptionPane.OK_CANCEL_OPTION) {
+                return;
             }
+            if ( result==JOptionPane.OK_OPTION ) {
+                if ( saveAs()==JOptionPane.CANCEL_OPTION ) return;
+            }
+        }
         try {
             Document d = panel.getEditorPanel().getDocument();
             d.remove(0, d.getLength());
+            panel.containsTabs= false;
             panel.setDirty(false);
             panel.setFilename(null);
             annotationsSupport.clearAnnotations();
