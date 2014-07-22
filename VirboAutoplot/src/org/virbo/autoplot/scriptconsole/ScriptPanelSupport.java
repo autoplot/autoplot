@@ -272,10 +272,14 @@ public class ScriptPanelSupport {
             StringBuilder buf = new StringBuilder();
             r = new BufferedReader(new InputStreamReader(in));
             String s = r.readLine();
+            int tabWarn= 3;
             while (s != null) {
                 if ( s.contains("\t") ) {
                     panel.containsTabs= true;
-                    logger.log(Level.FINE, "line contains tabs: {0}", s);
+                    if ( tabWarn>0 ) {
+                        logger.log(Level.FINE, "line contains tabs: {0}", s);
+                        tabWarn--;
+                    }
                 }
                 buf.append(s).append("\n");
                 s = r.readLine();
