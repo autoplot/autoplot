@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.JythonUtil.Param;
+import static org.virbo.jythonsupport.ui.Util.getParams;
 import static org.virbo.jythonsupport.ui.Util.getParams;
 
 /**
@@ -235,6 +237,7 @@ public class ParametersFormPanel {
      * @return the FormData from the initial view, since some clients will not show a GUI when there are no parameters.
      */
     public FormData doVariables( Map<String,Object> env, final String src, Map<String,String> params, final JPanel zparamsPanel ) {
+        if ( params==null ) params= Collections.emptyMap();
         this.params= new HashMap(params);
 
         boolean hasVars;
@@ -251,7 +254,7 @@ public class ParametersFormPanel {
         paramsPanel.setLayout(new javax.swing.BoxLayout(paramsPanel, javax.swing.BoxLayout.Y_AXIS));
         
         try {
-            Map<String,Param> parms= getParams( env, src, params, new NullProgressMonitor() );
+            Map<String,Param> parms= getParams( env, src, this.params, new NullProgressMonitor() );
 
             paramsPanel.add( new JLabel("<html>This script has the following input parameters.  Buttons on the right show default values.<br><br></html>") );
 
@@ -517,18 +520,17 @@ public class ParametersFormPanel {
                 fd.deftObjectList.add( parm.deft );
                 fd.typesList.add( parm.type );
 
-                paramsPanel.add( Box.createVerticalStrut( paramsPanel.getFont().getSize() * 2 ) );
             }
-                
+
             hasVars= parms.size()>0;
 
             if ( !hasVars ) {
                 JLabel l= new JLabel("<html><em>(no input parameters)</em></html>");
                 l.setToolTipText("This looks through the code for getParam calls, and no conforming calls were found");
                 paramsPanel.add( l );
-            }
-
-            paramsPanel.add( Box.createVerticalGlue() );
+            } 
+            
+            paramsPanel.add( Box.createVerticalStrut( paramsPanel.getFont().getSize() * 2 ) );
             paramsPanel.revalidate();
 
             fd.count= fd.paramsList.size();
