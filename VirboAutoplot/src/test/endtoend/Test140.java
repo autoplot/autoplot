@@ -253,6 +253,9 @@ public class Test140 {
                 }
                 s= s.trim();
                 if ( s.length()>0 ) {
+                    //if ( iid==17 ) {
+                    //    System.err.println("Here at doHistory #"+iid+": "+s);
+                    //}
                     String[] ss= s.split("\t");
                     String uri= ss[ss.length-1];
                     try {
