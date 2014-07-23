@@ -833,11 +833,11 @@ public class PlotElementController extends DomNodeController {
                 }
                 
                 if (resetPlotElement) {
-                    if ( getRenderer()!=null ) getRenderer().setDataSet(null); //bug1065
                     if (comp.equals("")) {
                         String s= resolveRenderType( fillDs );
                         int i= s.indexOf(">");
                         RenderType renderType= RenderType.valueOf(s.substring(0,i));
+                        if ( !renderType.equals(plotElement.renderType) &&  getRenderer()!=null ) getRenderer().setDataSet(null); //bug1065
                         plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
                         resetPlotElement(fillDs, renderType, s.substring(i+1) );
                         setResetPlotElement(false);
@@ -848,6 +848,7 @@ public class PlotElementController extends DomNodeController {
                             String s= resolveRenderType( fillDs2 );
                             int i= s.indexOf(">");
                             RenderType renderType= RenderType.valueOf(s.substring(0,i));
+                            if ( !renderType.equals(plotElement.renderType) &&  getRenderer()!=null ) getRenderer().setDataSet(null); //bug1065
                             plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
                             resetPlotElement(fillDs2, renderType, s.substring(i+1) );
                             setResetPlotElement(false);
