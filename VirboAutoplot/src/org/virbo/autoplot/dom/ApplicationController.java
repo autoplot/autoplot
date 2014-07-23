@@ -793,7 +793,6 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         lcanvas.add(overviewPlotConnector);
         lcanvas.revalidate();
-    //TODO: disconnect/delete if one plotId is deleted.
 
     }
 
