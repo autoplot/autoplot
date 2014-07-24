@@ -453,7 +453,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     @Override
     public boolean reject(String uri) throws Exception {
         URISplit split= URISplit.parse(uri);
-        if ( split.file==null || split.file.equals("file:///") ) {
+        if ( split.file==null || split.file.equals("file:///") ) { //TODO: other parts of the code appear to allow non-file URIs...
             return true;
         } else {
             return false;
