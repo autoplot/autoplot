@@ -61,18 +61,13 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
     }
 
     /**
-     * return true if the surl is not a file (like with vap+cdaweb:...);
+     * return true if surl is not a file (like with vap+cdaweb:...);
      * @param surl1
-     * @return 
+     * @return true if the URI is not a file.
      */
     private boolean isNotFile( String surl1 ) {
-        int icolon= surl1.indexOf(":");
-        if ( icolon>-1 && icolon<MAX_VAP_PREFIX && surl1.length()>16 ) {
-            if ( surl1.charAt(icolon+1)!='/' ) {
-                return true;
-            }
-        }
-        return false;
+        URISplit split= URISplit.parse(surl1);
+        return split.file==null || split.file.equals("") || split.file.equals("file:///");
     }
     
     private CompletionContext prepareContext( String surl1, int carotPos ) {
@@ -265,7 +260,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
                 }
 
-                final JComboBox jopts=  new JComboBox( new Vector(options) );
+                final JComboBox jopts=  new JComboBox( options.toArray() );
                 jopts.setEditable(true);
                 optPanel.add( BorderLayout.CENTER, jopts );
                 if ( isel!=-1 ) {
@@ -278,6 +273,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                 }
 
                 jcheckBox.addItemListener( new ItemListener() {
+                    @Override
                     public void itemStateChanged(ItemEvent e) {
                         jopts.setEnabled( jcheckBox.isSelected());
                     }
@@ -322,7 +318,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             }
 
 
-            JComboBox jopts= new JComboBox( new Vector(arg0options) );
+            JComboBox jopts= new JComboBox( arg0options.toArray() );
             optPanel.add( BorderLayout.CENTER, jopts );
             if ( isel!=-1 ) {
                 jopts.setSelectedIndex(isel);
