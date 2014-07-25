@@ -655,6 +655,11 @@ public class JythonCompletionTask implements CompletionTask {
         return count;
     }
     
+    private static String hideJavaPaths( String label ) {
+        label= label.replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String").replaceAll("java.lang.Object", "Object");
+        return label;
+    }
+    
     public static List<DefaultCompletionItem> getLocalsCompletions(PythonInterpreter interp, CompletionContext cc) {
         
         List<DefaultCompletionItem> result= new ArrayList();
@@ -682,9 +687,9 @@ public class JythonCompletionTask implements CompletionTask {
                         int j= signature.indexOf("#");
                         if ( j>-1 ) {
                             label= signature.substring(j+1);
-                            label= label.replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String");
+                            label= hideJavaPaths( label );
                             Class ret= peek.getMethod(0).getReturnType();
-                            label= label + "->" + ret.getCanonicalName().replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String");
+                            label= label + "->" + hideJavaPaths( ret.getCanonicalName() );
                         }
                         signatures.add(signature);
                         labels.add(label);
