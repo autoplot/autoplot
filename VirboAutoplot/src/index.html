@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Fun bug as the Pitch Angle Distribution plots got some attention.</small></p>
+        <p><small>Fun using interpolation to distort part of an image.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,13 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-07-22):</p>
+        <p>Bugfixes (2014-07-25):</p>
         <ul>
+            <li>interpolation codes preserve more metadata</li>
+            <li>jython completions allow selection for all argument types.</li>
+            <li>completions-based editor bugfix, where it would not recognize HDF5 as file-based</li>
+            <li>append wasn't able to append two datasets that had enumerations that didn't have the same units.  Now it can.</li>
+            <li>kludge in URI formatting to use + instead of %20 in timeranges to improve ledgibility</li>
             <li>1065: reduce flickering caused by unneeded setDataSet(null)</li>
             <li>tweaks to the jython editor panel automatic GUI.</li>
             <li>minor improvements to CEF including UNITS, DELTA_PLUS/DELTA_MINUS, showing data before support data.</li>
