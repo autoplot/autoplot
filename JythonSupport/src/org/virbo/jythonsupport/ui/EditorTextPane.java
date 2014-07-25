@@ -43,6 +43,9 @@ import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
 import org.python.core.PyObject;
+import org.virbo.dataset.ArrayDataSet;
+import org.virbo.dataset.MutablePropertyDataSet;
+import org.virbo.dataset.QDataSet;
 import org.virbo.jythonsupport.PyQDataSet;
 import org.virbo.qstream.StreamException;
 
@@ -155,6 +158,10 @@ public class EditorTextPane extends JEditorPane {
         return support;
     }
 
+    /**
+     * send the QDataSet resolved from the String doThis to the Autoplot server on port 12345.
+     * @param doThis an expression evaluated by the current interpreter.
+     */
     void plot(String doThis) {
         if ( support.interp==null ) {
             JOptionPane.showMessageDialog(this,"Session is not running.  There must be an active debugger to plot variables.");
@@ -168,7 +175,10 @@ public class EditorTextPane extends JEditorPane {
                     File tmpDir= File.createTempFile( "autoplot", ".qds" ).getParentFile();
                     File tmpfile =  new File( tmpDir, "autoplot.qds" );
                     String cmd = "plot( 'file:" + tmpfile.toString() + "' );";
-                    new org.virbo.qstream.SimpleStreamFormatter().format(pds.getQDataSet(), new FileOutputStream(tmpfile), true );
+                    MutablePropertyDataSet mpds= ArrayDataSet.copy(pds.getQDataSet());
+                    String oldTitle= (String) mpds.property(QDataSet.TITLE);
+                    mpds.putProperty(QDataSet.TITLE, oldTitle==null ? doThis : ( doThis+": "+oldTitle ) );
+                    new org.virbo.qstream.SimpleStreamFormatter().format(mpds, new FileOutputStream(tmpfile), true );
                     Socket s= new Socket("localhost",12345);
                     OutputStream out= s.getOutputStream();
                     out.write( ( cmd + "\n").getBytes() );
