@@ -184,6 +184,11 @@ public class CreatePngWalk {
          */
         public boolean update= false;
 
+        /**
+         * presently this is png or pdf
+         */
+        public String outputFormat = null;
+        
         @Override
         public String toString() {
             return String.format( "outputFolder=%s\ntimeRange=%s\nrescalex=%s\nautorange=%s\nversion=%s\nproduct=%s\ntimeFormat=%s\ncreateThumbs=%s\nupdate=%s\n",
@@ -329,6 +334,12 @@ public class CreatePngWalk {
                 ff.println( "version="+ params.version );
                 build.append("--version=").append( params.version);
             }
+            
+            if ( !params.outputFormat.equals("png") ) {
+                ff.println( "outputFormat="+ params.outputFormat );
+                build.append("--outputFormat=").append( params.outputFormat );
+            }
+            
         } finally {
             if ( ff!=null ) ff.close();
         }
@@ -348,7 +359,6 @@ public class CreatePngWalk {
 
         String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version.trim();
 
-        
         appmodel.setExceptionHandler( new ExceptionHandler() {
             @Override
             public void handle(Throwable t) {
@@ -373,7 +383,7 @@ public class CreatePngWalk {
                 atime= atime.substring(0,ic);
             }
             
-            String filename= String.format("%s%s_%s%s.png", params.outputFolder, params.product, atime, vers );
+            String filename= String.format("%s%s_%s%s.%s", params.outputFolder, params.product, atime, vers, params.outputFormat );
 
             count = count + 1;
             if (mon.isCancelled()) {
@@ -426,7 +436,13 @@ public class CreatePngWalk {
                 appmodel.waitUntilIdle(false);
             }
             
-            BufferedImage image = myWriteToPng( filename, appmodel, dom2, w0, h0);
+            BufferedImage image = null;
+            
+            if ( params.outputFormat.equals("png") ) {
+                image= myWriteToPng( filename, appmodel, dom2, w0, h0);
+            } else {
+                dom2.getCanvases(0).getController().getDasCanvas().writeToPDF(filename);
+            }
 
             if ( returnCode1==0 ) {
                 returnCodeAll= 0;
@@ -434,7 +450,7 @@ public class CreatePngWalk {
                 returnCodeAll= returnCode1;
             }
             
-            if (params.createThumbs) {
+            if ( params.createThumbs && params.outputFormat.equals("png") ) {
                 BufferedImage thumb400 = ImageResize.getScaledInstance(image, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
                 File outf= new java.io.File(String.format("%sthumbs400/%s_%s%s.png", params.outputFolder, params.product, atime, vers ) );
                 File parentf= outf.getParentFile();
@@ -523,7 +539,7 @@ public class CreatePngWalk {
                         url = "file:" + params.outputFolder;
                     }
 
-                    if (ScriptContext.getViewWindow() != null) {
+                    if ( ScriptContext.getViewWindow() != null && params.outputFormat.equals("png" ) ) {
                         logger.log(Level.FINE, "version=\"{0}\"", String.valueOf(params.version));
                         String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version.trim();
                         final String st= url + params.product + "_" + params.timeFormat + vers + ".png";
@@ -533,6 +549,10 @@ public class CreatePngWalk {
                                 PngWalkTool1.start( st, ScriptContext.getViewWindow() );
                             }
                         } );
+                    } else if ( ScriptContext.getViewWindow() != null ) {
+                        String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version.trim();
+                        final String st= url + params.product + "_" + params.timeFormat + vers + "." + params.outputFormat;
+                        JOptionPane.showMessageDialog( ScriptContext.getViewWindow(), "<html>Files created:<br>"+st );
                     }
                 }
             }
@@ -577,6 +597,7 @@ public class CreatePngWalk {
         alm.addOptionalSwitchArgument( "createThumbs", "t", "createThumbs", "y", "create thumbnails, y (default) or n" );
         alm.addOptionalSwitchArgument( "product", "n", "product", "product", "product name in each filename (default=product)");
         alm.addOptionalSwitchArgument( "outputFolder", "o", "outputFolder", "pngwalk", "location of root of pngwalk");
+        alm.addOptionalSwitchArgument( "outputFormat", null, "outputFormat", "png", "output format png or pdf");
         alm.addSwitchArgument( "vap", "v", "vap", "vap file or URI to plot");
         alm.addOptionalSwitchArgument( "rescalex", null, "rescalex", "0%,100%", "rescale factor, such as '0%-1hr,100%+1hr', to provide context to each image");
         alm.addOptionalSwitchArgument( "version", null, "version", null, "additional version string to add to each filename, like v1.0");
@@ -605,6 +626,7 @@ public class CreatePngWalk {
         params.update= alm.getBooleanValue("update");
         params.batchUri= alm.getValue("batchUri");
         if ( params.batchUri!=null && params.batchUri.length()>0 ) params.useBatchUri= true;
+        params.outputFormat= alm.getValue("outputFormat");
         String vap= alm.getValue("vap");
         ScriptContext.plot(vap);
 
