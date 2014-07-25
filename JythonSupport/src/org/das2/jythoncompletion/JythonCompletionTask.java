@@ -666,24 +666,29 @@ public class JythonCompletionTask implements CompletionTask {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
             String signature = null; // java signature
+            List<String> signatures= new ArrayList();
             if (ss.startsWith(cc.completable)) {
                 PyObject po = locals.get(s);
                 String label = ss;
+                List<String> labels= new ArrayList();
                 String args = "";
                 if (po instanceof PyReflectedFunction) {
                     label = ss + "() JAVA";
                     PyReflectedFunction prf = (PyReflectedFunction) po;
                     PyReflectedFunctionPeeker peek = new PyReflectedFunctionPeeker(prf);
-                    signature = methodSignature(peek.getMethod(0));
-                    args = methodArgs(peek.getMethod(0));
-                    int j= signature.indexOf("#");
-                    if ( j>-1 ) {
-                        label= signature.substring(j+1);
-                        label= label.replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String");
-                        Class ret= peek.getMethod(0).getReturnType();
-                        label= label + "->" + ret.getCanonicalName().replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String");
+                    for ( int jj=0; jj<peek.getArgsCount(); jj++ ) {
+                        signature = methodSignature(peek.getMethod(jj));
+                        args = methodArgs(peek.getMethod(jj));
+                        int j= signature.indexOf("#");
+                        if ( j>-1 ) {
+                            label= signature.substring(j+1);
+                            label= label.replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String");
+                            Class ret= peek.getMethod(0).getReturnType();
+                            label= label + "->" + ret.getCanonicalName().replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String");
+                        }
+                        signatures.add(signature);
+                        labels.add(label);
                     }
-
                 } else if (po.isCallable()) {
                     label = ss + "() ";
                     signature= "x"; // oh wow we don't use signature anymore...
@@ -710,14 +715,29 @@ public class JythonCompletionTask implements CompletionTask {
                     logger.fine("");
                 }
                 
-                String link = null;
-                if (signature != null) {
-                    link= getLinkForJavaSignature(signature);
+                if ( !signatures.isEmpty() ) {
+                    for ( int jj= 0; jj<signatures.size(); jj++ ) {
+                        signature= signatures.get(jj);
+                        label= labels.get(jj);
+                        String link = null;
+                        if (signature != null) {
+                            link= getLinkForJavaSignature(signature);
+                        }
+                        if ( ss.equals("dom") ) {
+                            link= "http://autoplot.org/developer.scripting#DOM";
+                        }
+                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link) );
+                    }
+                } else {
+                    String link = null;
+                    if (signature != null) {
+                        link= getLinkForJavaSignature(signature);
+                    }
+                    if ( ss.equals("dom") ) {
+                        link= "http://autoplot.org/developer.scripting#DOM";
+                    }
+                    result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link) );
                 }
-                if ( ss.equals("dom") ) {
-                    link= "http://autoplot.org/developer.scripting#DOM";
-                }
-                result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link) );
             }
         }
         
