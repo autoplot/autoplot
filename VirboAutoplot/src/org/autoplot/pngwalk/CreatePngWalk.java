@@ -187,7 +187,7 @@ public class CreatePngWalk {
         /**
          * presently this is png or pdf
          */
-        public String outputFormat = null;
+        public String outputFormat = "png";
         
         @Override
         public String toString() {
