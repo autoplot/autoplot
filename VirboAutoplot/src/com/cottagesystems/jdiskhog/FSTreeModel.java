@@ -4,8 +4,6 @@
  */
 package com.cottagesystems.jdiskhog;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -69,6 +67,7 @@ public class FSTreeModel implements TreeModel {
             }
         }
 
+        @Override
         public String toString() {
             if (f.isFile()) {
                 return getName() + " " + nf.format(f.length() / 1000000.) + " MB";
@@ -174,10 +173,12 @@ public class FSTreeModel implements TreeModel {
         this.hideListingFile = hideListingFile;
     }
 
+    @Override
     public Object getRoot() {
         return new TreeNode(root, null, true);
     }
 
+    @Override
     public Object getChild(Object parent, int index) {
         File fparent = ((TreeNode) parent).getFile();
         File[] ff = listings.get(fparent);
@@ -196,10 +197,12 @@ public class FSTreeModel implements TreeModel {
     }
     
     public Comparator fileSizeComparator = new Comparator() {
+        @Override
         public String toString() {
             return "fileSize";
         }
 
+        @Override
         public int compare(Object o1, Object o2) {
             long s1, s2;
             File f1 = (File) o1, f2 = (File) o2;
@@ -248,6 +251,7 @@ public class FSTreeModel implements TreeModel {
 
     public static final Comparator alphaComparator = new Comparator() {
 
+        @Override
         public int compare(Object o1, Object o2) {
             File f1 = (File) o1, f2 = (File) o2;
 
@@ -261,11 +265,13 @@ public class FSTreeModel implements TreeModel {
             return key1.compareTo(key2);
         }
 
+        @Override
         public String toString() {
             return "alpha";
         }
     };
 
+    @Override
     public synchronized int getChildCount(Object parent) {
         final File f = ((TreeNode) parent).getFile();
         if (!f.exists()) {
@@ -287,11 +293,13 @@ public class FSTreeModel implements TreeModel {
         return ff.length;
     }
 
+    @Override
     public boolean isLeaf(Object node) {
         File f = ((TreeNode) node).getFile();
         return f.isFile();
     }
 
+    @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -309,6 +317,7 @@ public class FSTreeModel implements TreeModel {
         }
     }
 
+    @Override
     public int getIndexOfChild(Object parent, Object child) {
         File f = ((TreeNode) parent).getFile();
         File fchild = ((TreeNode) child).getFile();
@@ -322,10 +331,12 @@ public class FSTreeModel implements TreeModel {
     }
     ArrayList<TreeModelListener> listeners = new ArrayList();
 
+    @Override
     public void addTreeModelListener(TreeModelListener l) {
         listeners.add(l);
     }
 
+    @Override
     public void removeTreeModelListener(TreeModelListener l) {
         listeners.remove(l);
     }
