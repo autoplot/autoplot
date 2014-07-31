@@ -109,9 +109,14 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
         URISplit split= URISplit.parse(surl);
         Map<String,String> params= URISplit.parseParams(split.params);
 
-        if ( !( params.containsKey("ds") && params.containsKey("id") ) ) return true;
+        return ( !( params.containsKey("ds") && params.containsKey("id") ) );
         
-        return false;
     }
 
+    @Override
+    public boolean supportsDiscovery() {
+        return true;
+    }
+
+    
 }

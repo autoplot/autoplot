@@ -26,6 +26,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.das2.util.filesystem.FSTreeModel;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSourceUtil;
@@ -42,7 +43,7 @@ import org.xml.sax.SAXException;
 public class PDSPPIFileSystem extends WebFileSystem {
 
     public PDSPPIFileSystem( String s ) throws URISyntaxException {
-        super( new URI("http://ppi.pds.nasa.gov/"+s ), new File("/Users/jbf/.das2/fsCache/wfs/PDSPPI/tmp/") );
+        super( new URI("http://ppi.pds.nasa.gov/"+s ), new File( FileSystem.settings().getLocalCacheDir(), "/PDSPPI/tmp/") );
         root= root + s;
     }
     
