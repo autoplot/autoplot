@@ -45,6 +45,7 @@ import org.autoplot.wgetfs.WGetFileSystemFactory;
 import org.das2.datum.DatumRange;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.DasProgressMonitorInputStream;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.das2.util.filesystem.LocalFileSystem;
 import org.das2.util.filesystem.URIException;
@@ -66,7 +67,7 @@ public class DataSetURI {
     private static final Object ACTION_DOWNLOAD = "DOWNLOAD";
     private static final Object ACTION_USE_CACHE = "USE_CACHE";
 
-    private static final Logger logger = Logger.getLogger("apdss.uri");
+    private static final Logger logger = LoggerManager.getLogger("apdss.uri");
 
 
     static {
