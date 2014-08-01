@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -95,7 +96,11 @@ public class PDSPPIDB {
     
     String[] _spacecraft=null;
     
-    public synchronized List<String> getSpacecraft() {
+    /**
+     * returns the spacecraft.  
+     * @return 
+     */
+    public synchronized String[] getSpacecraft() {
         if ( _spacecraft==null ) {
             try {
                 _spacecraft= getStringArrayFromXML( PDSPPIDB.class.getResource("/resources/spacecraft.xml"), "/Doc/SPACECRAFT_NAME[text()]");
@@ -103,7 +108,7 @@ public class PDSPPIDB {
                 throw new RuntimeException(ex);
             }
         }
-        return Arrays.asList( _spacecraft );
+        return Arrays.copyOf(_spacecraft,_spacecraft.length);
     }
     
     public List<String> getIds() {
@@ -128,15 +133,19 @@ public class PDSPPIDB {
     /**
      * return the result of the URL as a string array.
      * @param src the source.
+     * @param reqPrefix the prefix that each entry should start with.
      * @return the string array. 
      */
-    private String[] getStringArray( URL src ) throws IOException {
+    private String[] getStringArray( URL src, String reqPrefix ) throws IOException {
         List<String> result= new ArrayList();
         BufferedReader reader= null;
         try {
             reader= new BufferedReader( new InputStreamReader( src.openStream() ) );
             String line= reader.readLine();
             while ( line!=null ) {
+                if ( !line.startsWith(reqPrefix) ) {
+                    line= reqPrefix + line;
+                }
                 result.add(line);
                 line= reader.readLine();
             }
@@ -202,17 +211,18 @@ public class PDSPPIDB {
     /**
      * Get the IDs matching the constraint.
      * @param constraint constaints, such as sc=Galileo
+     * @param reqPrefix each item of result must start with this.  (PPI/ was omitted.)
      * @return 
      */
-    public String[] getIds( String constraint ) {
-        Pattern p= Pattern.compile("sc=[a-zA-Z]*");
+    public String[] getIds( String constraint, String reqPrefix ) {
+        Pattern p= Pattern.compile("sc=[a-zA-Z 0-9]*");
         if ( !p.matcher(constraint).matches() ) {
             throw new IllegalArgumentException("constraint doesn't match");
         }
         try {
             //http://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&facet=SPACECRAFT_NAME&title=Cassini&o=txt
-            URL url= new URL( String.format( "http://ppi.pds.nasa.gov/ditdos/inventory?%s&o=txt", constraint ) );
-            final String[] dss= getStringArray( url );
+            URL url= new URL( String.format( "http://ppi.pds.nasa.gov/ditdos/inventory?%s&o=txt", constraint.replaceAll(" ","+") ) );
+            final String[] dss= getStringArray( url, reqPrefix ); //TODO: I still don't know why I need to add this.
             return dss;
         } catch ( IOException ex ) {
             throw new RuntimeException(ex);
