@@ -47,7 +47,8 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             this.setEnabled(false);
             return;
         }
-        updateInventorySoon();
+        updateSpacecraftSoon();
+        //updateInventorySoon();
     }
 
     /**
@@ -63,9 +64,12 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         jLabel1 = new javax.swing.JLabel();
         inventoryScComboBox = new javax.swing.JComboBox();
         idComboBox = new javax.swing.JComboBox();
-        jButton1 = new javax.swing.JButton();
+        pickProductButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         paramList = new javax.swing.JList();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
 
         idTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -89,10 +93,10 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             }
         });
 
-        jButton1.setText("Pick...");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        pickProductButton.setText("Pick...");
+        pickProductButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                pickProductButtonActionPerformed(evt);
             }
         });
 
@@ -103,6 +107,12 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         });
         jScrollPane1.setViewportView(paramList);
 
+        jLabel2.setText("Dataset:");
+
+        jLabel3.setText("Product:");
+
+        jLabel4.setText("Parameters:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -110,24 +120,33 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addComponent(jScrollPane1))
+                    .addGroup(layout.createSequentialGroup()
                         .addGap(16, 16, 16)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(idComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel1)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(inventoryScComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(0, 194, Short.MAX_VALUE))
+                                .addComponent(jLabel4)
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addComponent(idTextField)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(jScrollPane1)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel3)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(idTextField))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jLabel1)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(inventoryScComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(jLabel2)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(idComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addGap(0, 115, Short.MAX_VALUE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(pickProductButton)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -138,18 +157,23 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(jLabel1)
                     .addComponent(inventoryScComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(idComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(idComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(idTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1))
+                    .addComponent(pickProductButton)
+                    .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
+                .addComponent(jLabel4)
+                .addGap(3, 3, 3)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void pickProductButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickProductButtonActionPerformed
         try {
             String id= idTextField.getText();
             String root= idComboBox.getSelectedItem().toString();
@@ -162,14 +186,12 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                 }
                 idTextField.setText( ds );
                 id= idTextField.getText();
-                root= idComboBox.getSelectedItem().toString();
-                id= "PPI/"+root+"/"+id;
                 updateParamsSoon(id);
             }
         } catch (URISyntaxException ex) {
             Logger.getLogger(PDSPPIDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_pickProductButtonActionPerformed
 
     /**
      * update the paramComboBox later on the event thread.
@@ -189,6 +211,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                     lm.addElement(s);
                 }
                 paramList.setModel( lm );
+                paramList.setSelectedValue( param, true );
             }
         };
         SwingUtilities.invokeLater(run);
@@ -199,6 +222,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
      * @param id 
      */
     private void updateParamsSoon( final String id ) {
+        String product= this.idComboBox.getSelectedItem() + this.id;
         final Map<String,String> dss= PDSPPIDB.getInstance().getParams( id, new NullProgressMonitor() );
         updateParamComboBoxSoon(dss);
         logger.warning("work done on the event thread. TODO: move to its own thread.");
@@ -215,10 +239,8 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     private void idTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idTextFieldActionPerformed
             String id= idTextField.getText();
             String root= idComboBox.getSelectedItem().toString();
-            id= "PPI/"+root+"/"+id;
+            id= root+"/"+id;
             updateParamsSoon(id);
-            
-            
     }//GEN-LAST:event_idTextFieldActionPerformed
 
     private void idComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idComboBoxActionPerformed
@@ -226,26 +248,48 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     }//GEN-LAST:event_idComboBoxActionPerformed
 
     private void inventoryScComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_inventoryScComboBoxItemStateChanged
+        this.sc= evt.getItem().toString();
         updateInventorySoon();
     }//GEN-LAST:event_inventoryScComboBoxItemStateChanged
 
+    private void updateSpacecraftSoon() {
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                final String[] scs= PDSPPIDB.getInstance().getSpacecraft();
+                logger.fine("updateFacetSoon");
+                Runnable run= new Runnable() { public void run() {
+                    inventoryScComboBox.setModel( new DefaultComboBoxModel(scs) );
+                    inventoryScComboBox.setSelectedItem( sc.replaceAll("\\+"," ") );
+                    updateInventorySoon();
+                } };
+                SwingUtilities.invokeLater(run);
+            }   
+        };
+        new Thread(run).start();
+    }
+    
+    private void doCheckIdSelectedItem() {
+        if ( inventoryScComboBox.getSelectedItem().equals(sc) ) { 
+            int i= id.indexOf("/",0);
+            i= id.indexOf("/",i+1);
+            idComboBox.setSelectedItem(id.substring(0,i) );
+            idTextField.setText(id.substring(i+1));
+            updateParamsSoon(id);
+        }
+    }
     
     private void updateInventorySoon() {
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                try {
-                    logger.fine("updateFacetSoon");
-                    String sc= String.valueOf(inventoryScComboBox.getSelectedItem());
-                    URL url= new URL( String.format( "http://ppi.pds.nasa.gov/ditdos/inventory?sc=%s&facet=SPACECRAFT_NAME&title=%s&o=txt", sc, sc ) );
-                    final String[] dss= PDSPPIDB.getInstance().getIds("sc="+sc);
-                    Runnable run= new Runnable() { public void run() {
-                        idComboBox.setModel( new DefaultComboBoxModel(dss) );
-                    } };
-                    SwingUtilities.invokeLater(run);
-                } catch (MalformedURLException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                }
+                logger.fine("updateInventorySoon");
+                final String[] dss= PDSPPIDB.getInstance().getIds("sc="+sc,"PPI/");
+                Runnable run= new Runnable() { public void run() {
+                    idComboBox.setModel( new DefaultComboBoxModel(dss) );
+                    doCheckIdSelectedItem();
+                } };
+                SwingUtilities.invokeLater(run);
             }   
         };
         new Thread(run).start();
@@ -255,10 +299,13 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     private javax.swing.JComboBox idComboBox;
     private javax.swing.JTextField idTextField;
     private javax.swing.JComboBox inventoryScComboBox;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList paramList;
+    private javax.swing.JButton pickProductButton;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -287,14 +334,18 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     public void setURI(String uri) {
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
-        String sc= params.get(SC);
+        this.sc= params.get(SC);
         if ( sc!=null ) {
             this.inventoryScComboBox.setSelectedItem(sc);
         }
-        String id= params.get(ID);
-        this.idTextField.setText(id);   
-        
+        this.id= params.get(ID); 
+        this.param= params.get(PARAM);
+        updateSpacecraftSoon();
     }
+    
+    private String sc;
+    private String id;
+    private String param;
     
     public static final String PARAM = "param";
     public static final String ID = "id";
@@ -312,13 +363,16 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     @Override
     public String getURI() {
-        String id= "PPI/" + this.idComboBox.getSelectedItem() + "/" + this.idTextField.getText(); //TODO: why must I add PPI??
-        String param= this.paramList.getSelectedValue().toString();
-        return "vap+pdsppi:" + SC+"="+ inventoryScComboBox.getSelectedItem() + "&" + ID + "="+ id + "&" + PARAM + "="+ param;
+        String id= this.idComboBox.getSelectedItem() + "/" + this.idTextField.getText(); //TODO: why must I add PPI??
+        id= id.replaceAll(" ","+");
+        String param= this.paramList.getSelectedValue().toString().replaceAll(" ","+");
+        String sc= inventoryScComboBox.getSelectedItem().toString().replaceAll(" ","+");
+        return "vap+pdsppi:" + SC+"="+ sc + "&" + ID + "="+ id + "&" + PARAM + "="+ param;
     }
     
     public static void main( String[] args ) {
         PDSPPIDataSourceEditorPanel test= new PDSPPIDataSourceEditorPanel();
+        test.setURI("vap+pdsppi:sc=Voyager+2&id=PPI/VG2-J-CRS-5-SUMM-FLUX-V1.0/DATA/BS2E_RATE&param=BS2E RATE2");
         JOptionPane.showMessageDialog( null, test);
         System.err.println( test.getURI() );
                 
