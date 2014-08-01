@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,12 +22,23 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.spase.VOTableReader;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -81,6 +93,19 @@ public class PDSPPIDB {
         }
     }
     
+    String[] _spacecraft=null;
+    
+    public synchronized List<String> getSpacecraft() {
+        if ( _spacecraft==null ) {
+            try {
+                _spacecraft= getStringArrayFromXML( PDSPPIDB.class.getResource("/resources/spacecraft.xml"), "/Doc/SPACECRAFT_NAME[text()]");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        return Arrays.asList( _spacecraft );
+    }
+    
     public List<String> getIds() {
         return Collections.unmodifiableList(ids);
     }
@@ -121,6 +146,59 @@ public class PDSPPIDB {
         return result.toArray( new String[result.size()] );
     }
     
+    /**
+     * return an array of strings from the given path.
+     * @param url resource location.
+     * @param path XPath path, like /Doc/SPACECRAFT_NAME for
+     *<code> <Doc><SPACECRAFT_NAME>Voyager 1</SPACECRAFT_NAME><Doc></code>
+     * @return the string array, like [ "Voyager 1" ]
+     */
+    private String[] getStringArrayFromXML( URL url, String path ) throws IOException {
+               
+        List<String> result= new ArrayList(); 
+        InputStream fin=null;
+            
+        Document document;
+        
+        try {
+            logger.log(Level.FINE, "opening {0}", url);
+            fin= url.openStream();
+
+            InputSource source = new InputSource( fin );
+            
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            document = builder.parse(source); 
+            
+            XPathFactory xpf= DataSourceUtil.getXPathFactory();
+            XPath xp = xpf.newXPath();
+            
+            NodeList nodes = (NodeList) xp.evaluate( path, document, XPathConstants.NODESET );
+            if ( nodes==null ) {
+                return new String[0];
+            } else {
+                for ( int i=0; i<nodes.getLength(); i++ ) {
+                    Element node= (Element)nodes.item(i);
+                    result.add( node.getChildNodes().item(0).getNodeValue() );
+                }
+            }
+            
+        } catch ( XPathExpressionException ex ) {
+            throw new RuntimeException(ex);   
+            
+        } catch ( SAXException ex ) {
+            throw new RuntimeException(ex);   
+            
+        } catch ( ParserConfigurationException ex ) {
+            throw new RuntimeException(ex);
+            
+        } finally {
+            if ( fin!=null ) fin.close();
+        }
+            String[] listing=result.toArray(new String[result.size()]);
+           
+            return listing;
+            
+    }
     /**
      * Get the IDs matching the constraint.
      * @param constraint constaints, such as sc=Galileo
@@ -181,5 +259,8 @@ public class PDSPPIDB {
             return Collections.singletonMap( "ParserConfigurationException", ex.getMessage() );
         }
     }
-    
+ 
+    public static void main( String[] args ) {
+        System.err.println( getInstance().getSpacecraft() );
+    }
 }
