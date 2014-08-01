@@ -69,11 +69,11 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             List<CompletionContext> ccresult= new ArrayList<CompletionContext>(10);
             ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "id=", "id=", "table id" ) );
-            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "ds=", "ds=", "dataset within a table" ) );
+            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "param=", "param=", "dataset within a table" ) );
             return ccresult;
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String param= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
-            if ( param.equals("ds") ) {
+            if ( param.equals("param") ) {
                 URISplit split= URISplit.parse(cc.surl);
                 Map<String,String> pp= URISplit.parseParams(split.params);
                 String id= pp.get("id");
@@ -109,7 +109,12 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
         URISplit split= URISplit.parse(surl);
         Map<String,String> params= URISplit.parseParams(split.params);
 
-        return ( !( params.containsKey("ds") && params.containsKey("id") ) );
+        String param= params.get("param");
+        if ( param==null ) {
+            param= params.get("ds");
+        }
+        
+        return ( param==null || !params.containsKey("id") );
         
     }
 
