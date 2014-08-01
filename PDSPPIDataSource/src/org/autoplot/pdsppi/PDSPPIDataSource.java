@@ -36,7 +36,10 @@ public class PDSPPIDataSource extends AbstractDataSource {
     @Override
     public org.virbo.dataset.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         String id= (String) getParams().get("id");
-        String param= (String) getParams().get("ds");
+        String param= (String) getParams().get("param");
+        if ( param==null ) {
+             param= (String) getParams().get("ds");
+        }
         if ( id==null ) throw new IllegalArgumentException("id not specified");
         if ( param==null ) throw new IllegalArgumentException("ds not specified");
         
