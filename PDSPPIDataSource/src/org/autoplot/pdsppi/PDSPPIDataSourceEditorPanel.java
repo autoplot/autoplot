@@ -177,7 +177,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         try {
             String id= idTextField.getText();
             String root= idComboBox.getSelectedItem().toString();
-            FileSystem fs= new PDSPPIFileSystem( "/PPI/"+root+"/"+id );
+            FileSystem fs= new PDSPPIFileSystem( root+"/"+id );
             javax.swing.JTree tree= new javax.swing.JTree( new FSTreeModel(fs) );
             if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(idComboBox, new JScrollPane(tree) ) ) {
                 String ds= tree.getSelectionPath().getLastPathComponent().toString();
@@ -271,11 +271,13 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     
     private void doCheckIdSelectedItem() {
         if ( inventoryScComboBox.getSelectedItem().equals(sc) ) { 
-            int i= id.indexOf("/",0);
-            i= id.indexOf("/",i+1);
-            idComboBox.setSelectedItem(id.substring(0,i) );
-            idTextField.setText(id.substring(i+1));
-            updateParamsSoon(id);
+            if ( id!=null ) {
+                int i= id.indexOf("/",0);
+                i= id.indexOf("/",i+1);
+                idComboBox.setSelectedItem(id.substring(0,i) );
+                idTextField.setText(id.substring(i+1));
+                updateParamsSoon(id);
+            }
         }
     }
     
@@ -372,7 +374,8 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     
     public static void main( String[] args ) {
         PDSPPIDataSourceEditorPanel test= new PDSPPIDataSourceEditorPanel();
-        test.setURI("vap+pdsppi:sc=Voyager+2&id=PPI/VG2-J-CRS-5-SUMM-FLUX-V1.0/DATA/BS2E_RATE&param=BS2E RATE2");
+        //test.setURI("vap+pdsppi:sc=Voyager+2&id=PPI/VG2-J-CRS-5-SUMM-FLUX-V1.0/DATA/BS2E_RATE&param=BS2E RATE2");
+        test.setURI("vap+pdsppi:sc=Voyager+2");
         JOptionPane.showMessageDialog( null, test);
         System.err.println( test.getURI() );
                 
