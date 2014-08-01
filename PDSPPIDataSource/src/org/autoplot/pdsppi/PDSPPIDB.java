@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -98,22 +99,63 @@ public class PDSPPIDB {
         }
         return result;
     }
+
+    /**
+     * return the result of the URL as a string array.
+     * @param src the source.
+     * @return the string array. 
+     */
+    private String[] getStringArray( URL src ) throws IOException {
+        List<String> result= new ArrayList();
+        BufferedReader reader= null;
+        try {
+            reader= new BufferedReader( new InputStreamReader( src.openStream() ) );
+            String line= reader.readLine();
+            while ( line!=null ) {
+                result.add(line);
+                line= reader.readLine();
+            }
+        } finally {
+            if ( reader!=null ) reader.close();
+        }
+        return result.toArray( new String[result.size()] );
+    }
     
     /**
-     * return a list of the plottable datasets within the ID.
+     * Get the IDs matching the constraint.
+     * @param constraint constaints, such as sc=Galileo
+     * @return 
+     */
+    public String[] getIds( String constraint ) {
+        Pattern p= Pattern.compile("sc=[a-zA-Z]*");
+        if ( !p.matcher(constraint).matches() ) {
+            throw new IllegalArgumentException("constraint doesn't match");
+        }
+        try {
+            //http://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&facet=SPACECRAFT_NAME&title=Cassini&o=txt
+            URL url= new URL( String.format( "http://ppi.pds.nasa.gov/ditdos/inventory?%s&o=txt", constraint ) );
+            final String[] dss= getStringArray( url );
+            return dss;
+        } catch ( IOException ex ) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    /**
+     * return a list of the plottable parameter datasets within the ID.
      * TODO: this loads the entire dataset, this will be fixed.
      * @param id
      * @param mon
-     * @return 
+     * @return Map label->title of the params.
      */
-    public Map<String,String> getDss( String id, ProgressMonitor mon ) {
+    public Map<String,String> getParams( String id, ProgressMonitor mon ) {
         try {
             VOTableReader read;
             
             String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
             read= new VOTableReader();
             mon.setProgressMessage("downloading data");
-            logger.fine("read "+url );
+            logger.log(Level.FINE, "read {0}", url);
             File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon );
             mon.setProgressMessage("reading data");
             QDataSet ds= read.readHeader( f.toString(), mon );
