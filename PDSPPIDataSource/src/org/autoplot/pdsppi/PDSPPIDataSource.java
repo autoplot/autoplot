@@ -22,7 +22,9 @@ import org.virbo.dsops.Ops;
 import org.virbo.spase.VOTableReader;
 
 /**
- *
+ * Read data from PDS PPI, using their web interface.  Data is communicated 
+ * in VOTABLEs.
+ * 
  * @author jbf
  */
 public class PDSPPIDataSource extends AbstractDataSource {
