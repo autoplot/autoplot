@@ -1,0 +1,12 @@
+# this shows how constraints work.  
+http://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&o=txt
+
+# here is a listing of available products.
+http://ppi.pds.nasa.gov/writeFileSYS?id=pds://PPI/CO-V_E_J_S_SS-RPWS-2-REFDR-ALL-V1.0/DATA/RPWS_RAW_COMPLETE
+
+# here is a request for a dataset.
+#dataset = top-level collection of products.
+#id= identifies the location of the LABEL and TABLE
+#product =  one LABEL and TABLE file (or any data files within the dataset).
+#param = one plottable set of data.
+http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
