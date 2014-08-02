@@ -263,7 +263,7 @@ public class PDSPPIDB {
             return Collections.singletonMap( "IOException from "+url, ex.getMessage() );
         } catch (SAXException ex) {
             logger.log(Level.SEVERE, null, ex);
-            return Collections.singletonMap( "SAXException", ex.getMessage() );
+            return Collections.singletonMap( "SAXException from "+url, ex.getMessage() );
         } catch (ParserConfigurationException ex) {
             logger.log(Level.SEVERE, null, ex);
             return Collections.singletonMap( "ParserConfigurationException", ex.getMessage() );
