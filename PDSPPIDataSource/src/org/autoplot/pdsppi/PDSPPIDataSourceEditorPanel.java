@@ -213,7 +213,9 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                     lm.addElement(s);
                 }
                 paramList.setModel( lm );
-                paramList.setSelectedValue( param, true );
+                String lparam= param.replaceAll("\\+"," ");
+                
+                paramList.setSelectedValue( lparam, true );
             }
         };
         SwingUtilities.invokeLater(run);
