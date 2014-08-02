@@ -187,7 +187,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                     ds= ds.substring(0,ds.length()-4);
                 }
                 idTextField.setText( ds );
-                l_id= idTextField.getText();
+                l_id= this.idComboBox.getModel().getSelectedItem().toString() + "/" + idTextField.getText();
                 updateParamsSoon(l_id);
             }
         } catch (URISyntaxException ex) {
