@@ -224,18 +224,18 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
      * @param id 
      */
     private void updateParamsSoon( final String id ) {
-        String product= this.idComboBox.getSelectedItem() + "/" + id;
+        String product= id;
         final Map<String,String> dss= PDSPPIDB.getInstance().getParams( product, new NullProgressMonitor() );
-        updateParamComboBoxSoon(dss);
+        //updateParamComboBoxSoon(dss);
         logger.warning("work done on the event thread. TODO: move to its own thread.");
-        //Runnable run= new Runnable() {
-         //   @Override
-         //   public void run() {
-         //       final Map<String,String> dss= PDSPPIDB.getInstance().getParams( id, new NullProgressMonitor() );
-         //       updateDssComboBoxSoon(dss);
-         //   }
-        //};
-        //new Thread(run).start();
+        Runnable run= new Runnable() {
+           @Override
+           public void run() {
+               final Map<String,String> dss= PDSPPIDB.getInstance().getParams( id, new NullProgressMonitor() );
+               updateParamComboBoxSoon(dss);
+           }
+        };
+        new Thread(run).start();
     }
     
     private void idTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idTextFieldActionPerformed
