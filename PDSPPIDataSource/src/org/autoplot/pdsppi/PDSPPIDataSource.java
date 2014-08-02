@@ -45,6 +45,8 @@ public class PDSPPIDataSource extends AbstractDataSource {
         if ( id==null ) throw new IllegalArgumentException("id not specified");
         if ( param==null ) throw new IllegalArgumentException("ds not specified");
         
+        param= param.replaceAll("\\+"," ");
+        
         String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
         VOTableReader read= new VOTableReader();
         mon.setProgressMessage("downloading data");
