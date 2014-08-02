@@ -7,12 +7,16 @@
 package org.autoplot.pdsppi;
 
 import java.awt.Dimension;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PushbackInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -61,20 +65,48 @@ public class PDSPPIFileSystem extends WebFileSystem {
     public boolean isDirectory(String filename) throws IOException {
         return filename.endsWith("/");
     }
-
+    
     @Override
     public String[] listDirectory(String directory) throws IOException {
-        String s= root + directory;
-        URL url= new URL(s);
+        URL url;
+        if ( !directory.startsWith("/") ) {
+            url= new URL( root + "/"+directory );
+        } else {
+            url= new URL( root + directory );
+        }
         InputStream fin;
             
         Document document;
         
         try {
             logger.log(Level.FINE, "opening {0}", url);
-            fin= url.openStream();
-
-            InputSource source = new InputSource( fin );
+            
+            URLConnection connect= url.openConnection();
+            connect.connect();
+            //if ( !connect.getContentType().equals("text/xml") ) {  //TODO: work with Todd to get response headers
+            //    throw new IOException("bad request: "+url);
+            //}
+            fin= connect.getInputStream();
+            PushbackInputStream pbin= new PushbackInputStream(fin);
+            byte[] peek= new byte[1];
+            int bytesRead= 0;
+            while ( bytesRead<1 ) {
+                int ch= pbin.read();
+                if (ch>=0 ) {
+                    peek[bytesRead]= (byte)ch;
+                }
+                bytesRead+=1;
+            }
+            if ( ! ( new String(peek).equals("<") ) ) { // I was having a heck of a time with 4 characters...
+                pbin.unread(peek);
+                BufferedReader read= new BufferedReader( new InputStreamReader(pbin) );
+                String s= read.readLine();
+                pbin.close();
+                throw new IOException( "\"" + s + "\" from "+url );
+            } else {
+                pbin.unread(peek);
+            }
+            InputSource source = new InputSource( pbin );
             
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             document = builder.parse(source); 

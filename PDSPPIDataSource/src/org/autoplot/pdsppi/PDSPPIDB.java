@@ -237,10 +237,10 @@ public class PDSPPIDB {
      * @return Map label->title of the params.
      */
     public Map<String,String> getParams( String id, ProgressMonitor mon ) {
+        VOTableReader read;
+        String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
+        
         try {
-            VOTableReader read;
-            
-            String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
             read= new VOTableReader();
             mon.setProgressMessage("downloading data");
             logger.log(Level.FINE, "read {0}", url);
@@ -260,7 +260,7 @@ public class PDSPPIDB {
             
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
-            return Collections.singletonMap( "IOException", ex.getMessage() );
+            return Collections.singletonMap( "IOException from "+url, ex.getMessage() );
         } catch (SAXException ex) {
             logger.log(Level.SEVERE, null, ex);
             return Collections.singletonMap( "SAXException", ex.getMessage() );
