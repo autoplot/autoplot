@@ -222,6 +222,7 @@ public class PDSPPIDB {
         try {
             //http://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&facet=SPACECRAFT_NAME&title=Cassini&o=txt
             URL url= new URL( String.format( "http://ppi.pds.nasa.gov/ditdos/inventory?%s&o=txt", constraint.replaceAll(" ","+") ) );
+            logger.log( Level.FINE, "getIds {0}", url);
             final String[] dss= getStringArray( url, reqPrefix ); //TODO: I still don't know why I need to add this.
             return dss;
         } catch ( IOException ex ) {
@@ -243,7 +244,7 @@ public class PDSPPIDB {
         try {
             read= new VOTableReader();
             mon.setProgressMessage("downloading data");
-            logger.log(Level.FINE, "read {0}", url);
+            logger.log(Level.FINE, "getParams {0}", url);
             File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon );
             mon.setProgressMessage("reading data");
             QDataSet ds= read.readHeader( f.toString(), mon );
@@ -259,13 +260,13 @@ public class PDSPPIDB {
             return result;
             
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, "IOException from "+url, ex);
             return Collections.singletonMap( "IOException from "+url, ex.getMessage() );
         } catch (SAXException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, "SAXException from "+url, ex);
             return Collections.singletonMap( "SAXException from "+url, ex.getMessage() );
         } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, "ParserConfigurationException", ex);
             return Collections.singletonMap( "ParserConfigurationException", ex.getMessage() );
         }
     }
