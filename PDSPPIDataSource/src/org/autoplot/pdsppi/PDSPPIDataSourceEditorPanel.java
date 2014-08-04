@@ -174,10 +174,18 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         return root.substring(0,i) + root.substring(i).replaceAll("/","_");
     }
     
+    /**
+     * return the current dataset.
+     * @return 
+     */
+    private String getCurrentRoot() {
+        return removeExtraSlashes( idComboBox.getSelectedItem().toString() );
+    }
+    
     private void pickProductButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickProductButtonActionPerformed
         try {
             String l_id= idTextField.getText();
-            String root= removeExtraSlashes( idComboBox.getSelectedItem().toString() );
+            String root= getCurrentRoot();
             FileSystem fs= new PDSPPIFileSystem( root );
             javax.swing.JTree tree= new javax.swing.JTree( new FSTreeModel(fs) );
             if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(idComboBox, new JScrollPane(tree), "dataset", JOptionPane.OK_CANCEL_OPTION ) ) {
@@ -186,7 +194,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                     ds= ds.substring(0,ds.length()-4);
                 }
                 idTextField.setText( ds );
-                l_id= this.idComboBox.getModel().getSelectedItem().toString() + "/" + idTextField.getText();
+                l_id= removeExtraSlashes( this.idComboBox.getModel().getSelectedItem().toString() ) + "/" + idTextField.getText();
                 updateParamsSoon(l_id);
             }
         } catch (URISyntaxException ex) {
@@ -212,9 +220,12 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                     lm.addElement(s);
                 }
                 paramList.setModel( lm );
-                String lparam= param.replaceAll("\\+"," ");
                 
-                paramList.setSelectedValue( lparam, true );
+                String lparam= param;
+                if ( lparam!=null ) {
+                    lparam= lparam.replaceAll("\\+"," ");
+                    paramList.setSelectedValue( lparam, true );
+                }
             }
         };
         SwingUtilities.invokeLater(run);
@@ -242,7 +253,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     
     private void idTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idTextFieldActionPerformed
             String lid= idTextField.getText();
-            String root= idComboBox.getSelectedItem().toString();
+            String root= getCurrentRoot();
             lid= root+"/"+lid;
             updateParamsSoon(lid);
     }//GEN-LAST:event_idTextFieldActionPerformed
@@ -375,7 +386,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     @Override
     public String getURI() {
-        String lid= this.idComboBox.getSelectedItem() + "/" + this.idTextField.getText(); //TODO: why must I add PPI??
+        String lid= getCurrentRoot() + "/" + this.idTextField.getText(); //TODO: why must I add PPI??
         lid= lid.replaceAll(" ","+");
         String lparam= this.paramList.getSelectedValue().toString().replaceAll(" ","+");
         String lsc= inventoryScComboBox.getSelectedItem().toString().replaceAll(" ","+");
