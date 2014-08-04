@@ -7,6 +7,7 @@
 package org.autoplot.pdsppi;
 
 import java.awt.Window;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
@@ -240,10 +241,10 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     }
     
     private void idTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idTextFieldActionPerformed
-            String id= idTextField.getText();
+            String lid= idTextField.getText();
             String root= idComboBox.getSelectedItem().toString();
-            id= root+"/"+id;
-            updateParamsSoon(id);
+            lid= root+"/"+lid;
+            updateParamsSoon(lid);
     }//GEN-LAST:event_idTextFieldActionPerformed
 
     private void idComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idComboBoxActionPerformed
@@ -344,13 +345,13 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     @Override
     public void setURI(String uri) {
         URISplit split= URISplit.parse(uri);
-        Map<String,String> params= URISplit.parseParams(split.params);
-        this.sc= params.get(SC);
+        Map<String,String> lparams= URISplit.parseParams(split.params);
+        this.sc= lparams.get(SC);
         if ( sc!=null ) {
             this.inventoryScComboBox.setSelectedItem(sc);
         }
-        this.id= params.get(ID); 
-        this.param= params.get(PARAM);
+        this.id= lparams.get(ID); 
+        this.param= lparams.get(PARAM);
         updateSpacecraftSoon();
     }
     
@@ -374,11 +375,11 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     @Override
     public String getURI() {
-        String id= this.idComboBox.getSelectedItem() + "/" + this.idTextField.getText(); //TODO: why must I add PPI??
-        id= id.replaceAll(" ","+");
-        String param= this.paramList.getSelectedValue().toString().replaceAll(" ","+");
-        String sc= inventoryScComboBox.getSelectedItem().toString().replaceAll(" ","+");
-        return "vap+pdsppi:" + SC+"="+ sc + "&" + ID + "="+ id + "&" + PARAM + "="+ param;
+        String lid= this.idComboBox.getSelectedItem() + "/" + this.idTextField.getText(); //TODO: why must I add PPI??
+        lid= lid.replaceAll(" ","+");
+        String lparam= this.paramList.getSelectedValue().toString().replaceAll(" ","+");
+        String lsc= inventoryScComboBox.getSelectedItem().toString().replaceAll(" ","+");
+        return "vap+pdsppi:" + SC+"="+ lsc + "&" + ID + "="+ lid + "&" + PARAM + "="+ lparam;
     }
     
     public static void main( String[] args ) {
