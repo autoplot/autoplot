@@ -198,14 +198,15 @@ public class ParametersFormPanel {
     
     /**
      * Repopulates the JPanel with options, to be used when the parameters can change the params that are read in.
+     * @param env environment variables such as PWD and dom. 
      * @param src the script loaded into a string.
      * @param params map containing any settings for the variables.
-     * @return 
+     * @param paramsPanel the GUI which needs to be revalidated.
      */
-    public void redoVariables( String src, Map<String,String> params, final JPanel paramsPanel ) {
+    public void redoVariables( Map<String,Object> env, String src, Map<String,String> params, final JPanel paramsPanel ) {
         paramsPanel.removeAll();
         resetVariables( fd, params );
-        doVariables( src, params, paramsPanel );
+        doVariables( env, src, params, paramsPanel );
         paramsPanel.revalidate();
         paramsPanel.repaint();
     }
@@ -236,7 +237,7 @@ public class ParametersFormPanel {
      * @param zparamsPanel JPanel to populate with the GUI items. (Can be null.)
      * @return the FormData from the initial view, since some clients will not show a GUI when there are no parameters.
      */
-    public FormData doVariables( Map<String,Object> env, final String src, Map<String,String> params, final JPanel zparamsPanel ) {
+    public FormData doVariables( final Map<String,Object> env, final String src, Map<String,String> params, final JPanel zparamsPanel ) {
         if ( params==null ) params= Collections.emptyMap();
         this.params= new HashMap(params);
 
@@ -435,7 +436,7 @@ public class ParametersFormPanel {
                             jcb.addActionListener( new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    redoVariables( src, ParametersFormPanel.this.params, zparamsPanel );
+                                    redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
                                 }
                             });
                             ctf= jcb;
@@ -462,7 +463,7 @@ public class ParametersFormPanel {
                             jcb.addActionListener( new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    redoVariables( src, ParametersFormPanel.this.params, zparamsPanel );
+                                    redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
                                 }
                             });
                             Dimension x= ctf.getPreferredSize();
