@@ -79,7 +79,7 @@ public class PDSPPIFileSystem extends WebFileSystem {
         Document document;
         
         try {
-            logger.log(Level.FINE, "opening {0}", url);
+            logger.log(Level.FINE, "listDirectory {0}", url);
             
             URLConnection connect= url.openConnection();
             connect.connect();
