@@ -49,6 +49,7 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
         String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
         read= new VOTableReader();            
         mon.setProgressMessage("downloading data");
+        logger.log(Level.FINE, "getDataSetCompletions {0}", url);
         File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon );
         mon.setProgressMessage("reading data");
         QDataSet ds= read.readHeader( f.toString(), mon );
