@@ -25,6 +25,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
+import org.virbo.dsops.Ops;
 
 /**
  * Editor panel for getting data from PDS/PPI node.
@@ -178,7 +179,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             String root= removeExtraSlashes( idComboBox.getSelectedItem().toString() );
             FileSystem fs= new PDSPPIFileSystem( root );
             javax.swing.JTree tree= new javax.swing.JTree( new FSTreeModel(fs) );
-            if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(idComboBox, new JScrollPane(tree) ) ) {
+            if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(idComboBox, new JScrollPane(tree), "dataset", JOptionPane.OK_CANCEL_OPTION ) ) {
                 String ds= tree.getSelectionPath().getLastPathComponent().toString();
                 if ( ds.endsWith(".lbl") || ds.endsWith(".LBL") || ds.endsWith(".tab" ) || ds.endsWith(".TAB")  ) {
                     ds= ds.substring(0,ds.length()-4);
@@ -223,6 +224,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
      * @param id 
      */
     private void updateParamsSoon( final String id ) {
+        paramList.setModel(new DefaultListModel());
         String product= id;
         final Map<String,String> dss= PDSPPIDB.getInstance().getParams( product, new NullProgressMonitor() );
         //updateParamComboBoxSoon(dss);
