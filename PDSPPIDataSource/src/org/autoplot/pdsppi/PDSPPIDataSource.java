@@ -50,7 +50,7 @@ public class PDSPPIDataSource extends AbstractDataSource {
         String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
         VOTableReader read= new VOTableReader();
         mon.setProgressMessage("downloading data");
-        logger.log(Level.FINE, "load {0}", url);
+        logger.log(Level.FINE, "getDataSet {0}", url);
         File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon );
         mon.setProgressMessage("reading data");
         QDataSet ds= read.readTable( f.toString(), mon );
