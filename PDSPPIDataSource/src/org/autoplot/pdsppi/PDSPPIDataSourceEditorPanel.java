@@ -26,7 +26,6 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
-import org.virbo.dsops.Ops;
 
 /**
  * Editor panel for getting data from PDS/PPI node.
@@ -184,7 +183,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     
     private void pickProductButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickProductButtonActionPerformed
         try {
-            String l_id= idTextField.getText();
+            String l_id;
             String root= getCurrentRoot();
             FileSystem fs= new PDSPPIFileSystem( root );
             javax.swing.JTree tree= new javax.swing.JTree( new FSTreeModel(fs) );
