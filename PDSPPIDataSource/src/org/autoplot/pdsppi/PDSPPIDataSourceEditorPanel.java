@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FSTreeModel;
 import org.das2.util.filesystem.FileSystem;
@@ -188,13 +189,16 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             FileSystem fs= new PDSPPIFileSystem( root );
             javax.swing.JTree tree= new javax.swing.JTree( new FSTreeModel(fs) );
             if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(idComboBox, new JScrollPane(tree), "dataset", JOptionPane.OK_CANCEL_OPTION ) ) {
-                String ds= tree.getSelectionPath().getLastPathComponent().toString();
-                if ( ds.endsWith(".lbl") || ds.endsWith(".LBL") || ds.endsWith(".tab" ) || ds.endsWith(".TAB")  ) {
-                    ds= ds.substring(0,ds.length()-4);
+                TreePath p= tree.getSelectionPath();
+                if ( p!=null ) {
+                    String ds= p.getLastPathComponent().toString();
+                    if ( ds.endsWith(".lbl") || ds.endsWith(".LBL") || ds.endsWith(".tab" ) || ds.endsWith(".TAB")  ) {
+                        ds= ds.substring(0,ds.length()-4);
+                    }
+                    idTextField.setText( ds );
+                    l_id= removeExtraSlashes( this.idComboBox.getModel().getSelectedItem().toString() ) + "/" + idTextField.getText();
+                    updateParamsSoon(l_id);
                 }
-                idTextField.setText( ds );
-                l_id= removeExtraSlashes( this.idComboBox.getModel().getSelectedItem().toString() ) + "/" + idTextField.getText();
-                updateParamsSoon(l_id);
             }
         } catch (URISyntaxException ex) {
             Logger.getLogger(PDSPPIDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
