@@ -167,11 +167,11 @@ class Das2ServerDataSource extends AbstractDataSource {
         mon.setProgressMessage("request "+dataset );
 
         if ( interval!=null ) { // TCAs use interval parameter
-            logger.fine("dataset is a TCA, so do not use resolution");
+            logger.finer("dataset is a TCA, so do not use resolution");
             params2.put("interval",URLEncoder.encode(interval, "US-ASCII"));
             params2.remove("resolution");
         } else {
-            logger.fine("dataset is not a TCA");
+            logger.finer("dataset is not a TCA");
         }
         
         params2.put("dataset", URLEncoder.encode(dataset, "US-ASCII") );
@@ -243,8 +243,6 @@ class Das2ServerDataSource extends AbstractDataSource {
             }
             
         }
-
-        logger.fine( String.valueOf(url2) );
 
         boolean qds= "1".equals( dsdfParams.get("qstream") );
         
