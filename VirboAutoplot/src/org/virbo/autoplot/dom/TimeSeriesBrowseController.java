@@ -84,7 +84,8 @@ public class TimeSeriesBrowseController {
 
         this.changesSupport= new ChangesSupport(this.propertyChangeSupport,this);
         
-        updateTsbTimer = new TickleTimer(100, new PropertyChangeListener() {
+        updateTsbTimer = new TickleTimer(300, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 //TODO: this would work, but the particular axis is not actually adjusting.  We need
                 //to figure out who it's attached to, and see if any are adjusting.  Maybe even
@@ -113,10 +114,15 @@ public class TimeSeriesBrowseController {
                     logger.log( Level.FINEST, "applicationController is adjusting" );
                 } else {
                     try {
-                        changesSupport.performingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
-                        if ( fpe!=null && ( fdsf==null || ftsb == null ) ) {
+                        if ( fpe!=null && fpe.getController().getDataSourceFilter().getController().isPendingChanges() ) {
+                            logger.log( Level.FINEST, "DataSourceFilter is already pending changes, retickle");
+                            updateTsbTimer.tickle(); 
                         } else {
-                            updateTsb(false);
+                            changesSupport.performingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
+                            if ( fpe!=null && ( fdsf==null || ftsb == null ) ) {
+                            } else {
+                                updateTsb(false);
+                            }
                         }
                     } finally {
                         changesSupport.changePerformed( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
@@ -280,6 +286,8 @@ public class TimeSeriesBrowseController {
 
     public void updateTsb(boolean autorange) {
 
+        System.err.println("updateTsb("+autorange+")...");
+        
         DatumRange trange= this.getTimeRange();
 
         if ( trange!=null ) {
@@ -375,8 +383,13 @@ public class TimeSeriesBrowseController {
                         //  * We do the filtering.
                     }
                 } else {
+                    if ( ! surl.equals( dataSourceController.getTsbSuri()) ) {
+                        System.err.println("update b/c surl!=tsbSuri:");
+                        System.err.println("  "+surl );
+                        System.err.println("  "+dataSourceController.getTsbSuri() );
+                    }
                     dataSourceController.cancel();
-                    dataSourceController.update();
+                    dataSourceController.update(false);
                     dataSourceController.setTsbSuri(surl);
                 }
             } else {
