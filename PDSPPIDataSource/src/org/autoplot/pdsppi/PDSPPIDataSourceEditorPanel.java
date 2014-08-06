@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
@@ -191,7 +192,12 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(idComboBox, new JScrollPane(tree), "dataset", JOptionPane.OK_CANCEL_OPTION ) ) {
                 TreePath p= tree.getSelectionPath();
                 if ( p!=null ) {
-                    String ds= p.getLastPathComponent().toString();
+                    Object[] o= p.getPath();
+                    StringBuilder dsb= new StringBuilder();
+                    for ( int i=1; i<o.length; i++ ) {
+                        dsb.append(o[i].toString());
+                    }
+                    String ds= dsb.toString();
                     if ( ds.endsWith(".lbl") || ds.endsWith(".LBL") || ds.endsWith(".tab" ) || ds.endsWith(".TAB")  ) {
                         ds= ds.substring(0,ds.length()-4);
                     }
@@ -397,6 +403,12 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     }
     
     public static void main( String[] args ) {
+        LoggerManager.getLogger( "apdss.pdsppi" ).setLevel(Level.ALL);
+        ConsoleHandler h= new ConsoleHandler();
+        h.setLevel(Level.ALL);
+        Logger.getLogger("").addHandler(h);
+        Logger.getLogger("apdss.pdsppi").fine("run from main");
+        
         PDSPPIDataSourceEditorPanel test= new PDSPPIDataSourceEditorPanel();
         //test.setURI("vap+pdsppi:sc=Voyager+2&id=PPI/VG2-J-CRS-5-SUMM-FLUX-V1.0/DATA/BS2E_RATE&param=BS2E RATE2");
         test.setURI("vap+pdsppi:sc=Voyager+2");
