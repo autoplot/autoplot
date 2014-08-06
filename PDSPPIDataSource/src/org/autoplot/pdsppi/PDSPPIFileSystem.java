@@ -51,8 +51,13 @@ public class PDSPPIFileSystem extends WebFileSystem {
     private static final Logger logger= LoggerManager.getLogger("apdss.pdsppi");
     
     public PDSPPIFileSystem( String s ) throws URISyntaxException {
+        // the following URI is ignored.
         super( new URI("http://ppi.pds.nasa.gov/"+s ), new File( FileSystem.settings().getLocalCacheDir(), "/PDSPPI/tmp/") );
-        root= root + s;
+        if ( !s.startsWith("/") ) {
+            root= root + "/" + s;
+        } else {
+            root= root + s;
+        }
     }
     
     //http://ppi.pds.nasa.gov/ditdos/inventory?sc=Cassini&facet=SPACECRAFT_NAME&title=Cassini&o=txt
