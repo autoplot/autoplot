@@ -20,6 +20,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.xml.parsers.DocumentBuilder;
@@ -29,6 +30,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FSTreeModel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.WebFileSystem;
@@ -46,6 +48,8 @@ import org.xml.sax.SAXException;
  */
 public class PDSPPIFileSystem extends WebFileSystem {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.pdsppi");
+    
     public PDSPPIFileSystem( String s ) throws URISyntaxException {
         super( new URI("http://ppi.pds.nasa.gov/"+s ), new File( FileSystem.settings().getLocalCacheDir(), "/PDSPPI/tmp/") );
         root= root + s;
@@ -58,7 +62,7 @@ public class PDSPPIFileSystem extends WebFileSystem {
     
     @Override
     protected void downloadFile(String filename, File f, File partfile, ProgressMonitor monitor) throws IOException {
-        System.err.println("download file "+filename );
+        logger.log(Level.WARNING, "download file {0}", filename);
     }
 
     @Override
