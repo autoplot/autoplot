@@ -72,6 +72,12 @@ public class PDSPPIFileSystem extends WebFileSystem {
     
     @Override
     public String[] listDirectory(String directory) throws IOException {
+        
+        DirectoryEntry[] cached= listDirectoryFromMemory(directory);
+        if ( cached!=null ) {
+            return FileSystem.getListing( cached );
+        }
+                
         URL url;
         if ( !directory.startsWith("/") ) {
             url= new URL( root + "/"+directory );
@@ -142,6 +148,17 @@ public class PDSPPIFileSystem extends WebFileSystem {
             }
             String[] listing=result.toArray(new String[result.size()]);
            
+            DirectoryEntry[] des= new DirectoryEntry[listing.length];
+            for ( int i=0; i<des.length; i++ ) {
+                DirectoryEntry des1= new DirectoryEntry();
+                des1.name= listing[i];
+                des1.modified= 0;
+                des1.size= 0;
+                des1.type= listing[i].endsWith("/") ? 'd' : 'f';
+                des[i]= des1;
+            }
+            cacheListing( directory, des );
+            
             return listing;
             
         } catch ( IOException ex ){
