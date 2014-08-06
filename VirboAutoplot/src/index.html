@@ -23,10 +23,12 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-07-25):</p>
+        <p>Bugfixes (2014-08-06):</p>
         <ul>
+            <li>421: double load of Das2Source caused by mouse-wheeling</li>
+            <li>Kristoff pointed out where Jython GUI wouldn't reset properly when dom.plots[0].yaxis.range was used as default.</li>
             <li>interpolation codes preserve more metadata</li>
-            <li>jython completions allow selection for all argument types.</li>
+            <li>jython completions allow selection for all argument combinations, not just one.</li>
             <li>completions-based editor bugfix, where it would not recognize HDF5 as file-based</li>
             <li>append wasn't able to append two datasets that had enumerations that didn't have the same units.  Now it can.</li>
             <li>kludge in URI formatting to use + instead of %20 in timeranges to improve ledgibility</li>
@@ -93,6 +95,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>AutoplotServer images are set to .vap file height and width by default</li>
+            <li>Make PNGWalk allows writing to PDF files instead of .PNG files.</li>
+            <li>PDSPPI supports discovery (File->Add Plot From...->PDSPPI)</li>
+            <li>RBSP orbits updated to 2014-08-13.</li>
             <li>minor kludge in URI format/parse to use + in timerange parameters instead of %20, so the URIs are more legible.</li>
             <li>370: getParam dom for defaults.  Datum and DatumRange now allowed as parameters.  URI uses DataSetSelector.</li>
             <li>http web filesystem avoids listing when the filename is known already, supporting use with Github.</li>
