@@ -286,7 +286,7 @@ public class TimeSeriesBrowseController {
 
     public void updateTsb(boolean autorange) {
 
-        System.err.println("updateTsb("+autorange+")...");
+        logger.log(Level.FINE, "updateTsb({0})...", autorange);
         
         DatumRange trange= this.getTimeRange();
 
@@ -384,9 +384,7 @@ public class TimeSeriesBrowseController {
                     }
                 } else {
                     if ( ! surl.equals( dataSourceController.getTsbSuri()) ) {
-                        System.err.println("update b/c surl!=tsbSuri:");
-                        System.err.println("  "+surl );
-                        System.err.println("  "+dataSourceController.getTsbSuri() );
+                        logger.log( Level.FINER, "update b/c surl!=tsbSuri:\n  {0}\n  {1}", new Object[]{surl, dataSourceController.getTsbSuri()});
                     }
                     dataSourceController.cancel();
                     dataSourceController.update(false);
