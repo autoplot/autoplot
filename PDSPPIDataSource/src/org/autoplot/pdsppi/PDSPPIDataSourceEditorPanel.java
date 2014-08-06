@@ -299,11 +299,33 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         new Thread(run).start();
     }
     
+    // PPI/CO-E/J/S/SW... is the same as PPI/CO-E_J_S_SW...
+    private static boolean isSameId( String s, String t ) {
+        if ( s.length()>t.length() ) {
+            return false;
+        }
+        for ( int i=0; i<s.length(); i++ ) {
+            if ( s.charAt(i)!='/' && s.charAt(i)!=t.charAt(i) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     private void doCheckIdSelectedItem() {
         if ( inventoryScComboBox.getSelectedItem().equals(sc) ) { 
             if ( id!=null ) {
                 int i= id.indexOf("/",0);
                 i= id.indexOf("/",i+1);
+                for ( int ii=0; ii<idComboBox.getModel().getSize(); ii++ ) {
+                    String s= idComboBox.getModel().getElementAt(ii).toString(); // DANGER: assumes labels are machine readable
+                    if ( ii==7 ) {
+                        System.err.println("lllsllls===  "+s );
+                    }
+                    if ( isSameId( s, id ) ) {
+                        idComboBox.setSelectedIndex(ii);
+                    }
+                }
                 idComboBox.setSelectedItem(id.substring(0,i) );
                 idTextField.setText(id.substring(i+1));
                 updateParamsSoon(id);
