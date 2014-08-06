@@ -67,8 +67,10 @@ public class AutoplotServer {
         
         // do dimensions
         if ("".equals(scanvasAspect)) {
-            if (width == -1) width = 700;
-            if (height == -1) height = 400;
+            if ( vap.length()==0 ) {
+                if (width == -1) width = 700;
+                if (height == -1) height = 400;
+            }
         } else {
             double aspect = Units.dimensionless.parse(scanvasAspect).doubleValue(Units.dimensionless);
             if (width == -1 && height != -1)
@@ -77,9 +79,14 @@ public class AutoplotServer {
                 height = (int) (width / aspect);
         }
         
-        if ( vap!=null && !vap.equals("") ) {
+        if ( !vap.equals("") ) {
             load(vap);
+            if ( width==-1 || height==-1) {
+                width= dom.getController().getCanvas().getWidth();
+                height= dom.getController().getCanvas().getHeight();
+            }
             DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
+            
             c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
         } else {
             dom.getController().getCanvas().setWidth(width);
