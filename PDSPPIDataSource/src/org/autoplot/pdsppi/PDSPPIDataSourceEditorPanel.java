@@ -299,7 +299,14 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         new Thread(run).start();
     }
     
-    // PPI/CO-E/J/S/SW... is the same as PPI/CO-E_J_S_SW...
+    /**
+     * test if the two are the same, where t is at least as long as s, and
+     * slashes in s are ignored.
+     * PPI/CO-E/J/S/SW... is the same as PPI/CO-E_J_S_SW...
+     * @param s e.g. PPI/CO-E/J/S/SW
+     * @param t e.g. PPI/CO-E_J_S_SW/foo/
+     * @return true if they are referreinf to the same dataset, e.g. true in the example case.
+     */
     private static boolean isSameId( String s, String t ) {
         if ( s.length()>t.length() ) {
             return false;
