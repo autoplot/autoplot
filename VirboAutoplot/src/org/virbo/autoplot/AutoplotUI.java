@@ -52,6 +52,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.StringReader;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
@@ -1251,6 +1252,37 @@ APSplash.checkTime("init 270");
         return result;
     }
 
+    
+    /**
+     * add the URI to the discovery use file bookmarks/discovery.txt
+     * @param uri 
+     */
+    private void addToDiscoveryUseSoon( final String uri ) {
+        Runnable run= new Runnable() {
+            public void run() {
+                // always tack on the URI to history.dat file
+                File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );    
+                final File f3 = new File( f2, "discovery.txt");
+                FileWriter out3=null;
+                try {
+                    out3 = new FileWriter( f3, true );                
+                    TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+                    Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
+                    out3.append( tp.format( now, null) + "\t" + uri + "\n" );
+                    out3.close();
+                } catch ( IOException ex ) {
+                    logger.log(Level.SEVERE,ex.getMessage(),ex);
+                    if ( out3!=null ) try {
+                        out3.close();
+                    } catch (IOException ex1) {
+                        logger.log(Level.SEVERE, ex1.getMessage(), ex1);
+                    }
+                }
+            }
+        };
+        new Thread(run).start();
+    }
+    
     private void fillAddDataFromMenuImmediately(final List<String> exts) {
         addDataFromMenu.removeAll();
         for ( String ext: exts ) {
@@ -1264,8 +1296,10 @@ APSplash.checkTime("init 270");
                         String uri = "vap+" + fext + ":";
                         String refuri= (String) dataSetSelector.getEditor().getText();
                         if ( refuri.startsWith(uri) ) {
+                            addToDiscoveryUseSoon(refuri);
                             dataSetSelector.browseSourceType();
                         } else {
+                            addToDiscoveryUseSoon(uri);
                             dataSetSelector.setValue(uri);
                             dataSetSelector.maybePlot( true );
                         }
@@ -1285,6 +1319,36 @@ APSplash.checkTime("init 270");
      */
     private void fillAddDataFromMenu() {
         final List<String> exts= DataSetURI.getDiscoverableExtensions();
+        
+        File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) + "/bookmarks/discovery.txt" );
+        if ( f.exists()&& f.canRead()) {
+            BufferedReader reader=null;
+            try {
+                reader= new BufferedReader( new FileReader(f) );
+                String s= reader.readLine();
+                while ( s!=null ) {
+                    if ( s.length()>29 && s.substring(25,29).equals("vap+") ) {
+                        int i= s.indexOf(":",29);
+                        String ex1= "."+s.substring(29,i);
+                        if ( exts.contains(ex1) ) {
+                            exts.remove(ex1);
+                            exts.add(0,ex1);
+                        }
+                    }
+                    s= reader.readLine();
+                }
+            } catch ( IOException ex ) {
+            } finally {
+                if ( reader!=null ) {
+                    try {
+                        reader.close();
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        
         Runnable run= new Runnable() {
             @Override
             public void run() {
