@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Fun using interpolation to distort part of an image.</small></p>
+        <p><small>All the elements of arrays in the global attributes of a CDF files are now shown.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -25,6 +25,8 @@
         to resolve old numbers.
         <p>Bugfixes (2014-08-06):</p>
         <ul>
+            <li>CDF Metadata uses arrays when there are multiple values.  Thanks Ken for pointing this out.</li>
+            <li>PDS/PPI file browsing is done off the event thread</li>
             <li>421: double load of Das2Source caused by mouse-wheeling</li>
             <li>Kristoff pointed out where Jython GUI wouldn't reset properly when dom.plots[0].yaxis.range was used as default.</li>
             <li>interpolation codes preserve more metadata</li>
@@ -95,6 +97,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>File->Add Plot From... list is sorted by last use.</li>
             <li>AutoplotServer images are set to .vap file height and width by default</li>
             <li>Make PNGWalk allows writing to PDF files instead of .PNG files.</li>
             <li>PDSPPI supports discovery (File->Add Plot From...->PDSPPI)</li>
