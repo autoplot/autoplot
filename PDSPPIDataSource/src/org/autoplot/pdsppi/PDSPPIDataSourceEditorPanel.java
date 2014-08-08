@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -189,7 +190,13 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             String root= getCurrentRoot();
             FileSystem fs= new PDSPPIFileSystem( root );
             javax.swing.JTree tree= new javax.swing.JTree( new FSTreeModel(fs) );
-            if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(idComboBox, new JScrollPane(tree), "dataset", JOptionPane.OK_CANCEL_OPTION ) ) {
+            ImageIcon icon= new ImageIcon( PDSPPIDataSourceEditorPanel.class.getResource("/resources/ppi_home_16_crop.gif") );
+            if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( idComboBox, 
+                    new JScrollPane(tree), 
+                    "Pick Dataset ID",
+                    JOptionPane.OK_CANCEL_OPTION, 
+                    JOptionPane.QUESTION_MESSAGE,
+                    icon ) ) {
                 TreePath p= tree.getSelectionPath();
                 if ( p!=null ) {
                     Object[] o= p.getPath();
@@ -399,11 +406,11 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             this.inventoryScComboBox.setSelectedItem(sc);
         }
         this.id= lparams.get(ID); 
-        if ( id.startsWith("/") ) {
+        if ( id!=null && id.startsWith("/") ) {
             logger.warning("id ought not start with slash, just PPI/CO-E...");
             id= id.substring(1);
         }
-        if ( id.startsWith("pds://") ) {
+        if ( id!=null && id.startsWith("pds://") ) {
             logger.warning("id ought not start with pds://, just PPI/CO-E...");
             id= id.substring(6);
         }
