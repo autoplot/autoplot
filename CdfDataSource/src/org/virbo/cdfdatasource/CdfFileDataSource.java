@@ -842,9 +842,20 @@ public class CdfFileDataSource extends AbstractDataSource {
                         if ( depth==0 ) {
                             Vector vv = attr.getEntries();
                             if ( vv.size()>0 ) {
-                                Entry e2= (Entry)vv.get(0);
-                                if ( e2!=null ) {
-                                    gattrs.put( attr.getName(), e2.getData() );
+                                if ( vv.size()>1 ) {
+                                    Object[] oo= new Object[vv.size()];
+                                    for ( int i=0; i<vv.size(); i++ ) {
+                                        Entry e2= (Entry)vv.get(i);
+                                        if ( e2!=null ) {
+                                            oo[i]= e2.getData();
+                                        }
+                                    }
+                                    gattrs.put( attr.getName(), oo );
+                                } else {
+                                    Entry e2= (Entry)vv.get(0);
+                                    if ( e2!=null ) {
+                                        gattrs.put( attr.getName(), e2.getData() );
+                                    }
                                 }
                             }
                         }

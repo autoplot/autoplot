@@ -575,7 +575,16 @@ public class CdfJavaDataSource extends AbstractDataSource {
             for (int i = 0; i < vv.length; i++) {
                 Object attr= cdf.getAttribute(vv[i]);
                 if ( attr!=null && attr.getClass().isArray() && Array.getLength(attr)>0 ) {
-                    gattrs.put( vv[i], Array.get(attr,0) );
+                    int n= Array.getLength(attr);
+                    if ( n>1 ) {
+                        Object[] oo= new Object[n];
+                        for ( int ii=0; ii<n; ii++ ) {
+                            oo[ii]= Array.get(attr,ii);
+                        }
+                        gattrs.put( vv[i], oo );
+                    } else {
+                        gattrs.put( vv[i], Array.get(attr,0) );
+                    }
                 }
             }
         
