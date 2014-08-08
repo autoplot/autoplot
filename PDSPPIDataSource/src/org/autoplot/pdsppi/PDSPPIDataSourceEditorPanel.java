@@ -326,16 +326,15 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                 i= id.indexOf("/",i+1);
                 for ( int ii=0; ii<idComboBox.getModel().getSize(); ii++ ) {
                     String s= idComboBox.getModel().getElementAt(ii).toString(); // DANGER: assumes labels are machine readable
-                    if ( ii==7 ) {
-                        System.err.println("lllsllls===  "+s );
-                    }
                     if ( isSameId( s, id ) ) {
                         idComboBox.setSelectedIndex(ii);
                     }
                 }
                 idComboBox.setSelectedItem(id.substring(0,i) );
                 idTextField.setText(id.substring(i+1));
-                updateParamsSoon(id);
+                if ( id.length()>i+1 ) {
+                    updateParamsSoon(id);
+                }
             }
         }
     }
@@ -400,6 +399,14 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             this.inventoryScComboBox.setSelectedItem(sc);
         }
         this.id= lparams.get(ID); 
+        if ( id.startsWith("/") ) {
+            logger.warning("id ought not start with slash, just PPI/CO-E...");
+            id= id.substring(1);
+        }
+        if ( id.startsWith("pds://") ) {
+            logger.warning("id ought not start with pds://, just PPI/CO-E...");
+            id= id.substring(6);
+        }
         this.param= lparams.get(PARAM);
         updateSpacecraftSoon();
     }
@@ -440,7 +447,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         
         PDSPPIDataSourceEditorPanel test= new PDSPPIDataSourceEditorPanel();
         //test.setURI("vap+pdsppi:sc=Voyager+2&id=PPI/VG2-J-CRS-5-SUMM-FLUX-V1.0/DATA/BS2E_RATE&param=BS2E RATE2");
-        test.setURI("vap+pdsppi:sc=Voyager+2");
+        test.setURI("vap+pdsppi:sc=Cassini&id=PPI/CO-E_J_S_SW-CAPS-5-DDR-ELE-MOMENTS-V1.0/");
         JOptionPane.showMessageDialog( null, test);
         System.err.println( test.getURI() );
                 
