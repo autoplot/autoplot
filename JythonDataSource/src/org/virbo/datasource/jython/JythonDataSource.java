@@ -343,8 +343,18 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     for ( Iterator i= keys.iterator(); i.hasNext();  ) {
                         Object key= i.next();
                         String name= key.toString();
-                        String val= dict.get( Py.java2py(key) ).toString();
-                        metadata.put(name,val);
+                        Object o= dict.get(  Py.java2py(key) );
+                        if ( o instanceof PyList ) {
+                            String[] arr= new String[ ((PyList)o).__len__() ];
+                            for ( int i2=0; i2<arr.length; i2++ ) {
+                                arr[i2]= ((PyList)o).__getitem__(i2).toString();
+                            }
+                            metadata.put(name,arr);
+                        } else {
+                            String val= o.toString();
+                            metadata.put(name,val);
+                        }
+                        
                     }
                 }
             } catch ( PyException ex ) {
