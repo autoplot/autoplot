@@ -3531,8 +3531,8 @@ private void updateFrameTitle() {
         }
         
 
-        if ( app.dataSetSelector.hasActionTrigger(suri) ) {
-            if ( suri!=null ) app.dataSetSelector.setValue(suri);
+        if ( suri!=null && app.dataSetSelector.hasActionTrigger(suri) ) {
+            app.dataSetSelector.setValue(suri);
             app.dataSetSelector.maybePlot(false); // allow for completions
             return;
         }        
