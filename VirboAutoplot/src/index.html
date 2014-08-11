@@ -25,6 +25,8 @@
         to resolve old numbers.
         <p>Bugfixes (2014-08-06):</p>
         <ul>
+            <li>PDS/PPI uses "times=false" to speed things up for now.</li>
+            <li>JNLP single-instance bug that resulted in NullPointerException</li>
             <li>CDF Metadata uses arrays when there are multiple values.  Thanks Ken for pointing this out.</li>
             <li>PDS/PPI file browsing is done off the event thread</li>
             <li>421: double load of Das2Source caused by mouse-wheeling</li>
@@ -42,6 +44,9 @@
             <li>medianFilter had a bug where repeated values were not counted twice.  Thanks Kenzie!</li>
             <li>spectrogram style panel comes up for PitchAngleDistribution mode now, which is slightly better than Series panel.</li>
             <li>don't load the file automatically into the jython editor if it is already loaded.  This is dangerous and distracting.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>pitchAngleDistribution mode wouldn't get a colorbar because it wasn't installed in the canvas</li>
             <li>medianFilter was never put in the filters list</li>
             <li>jyds would use 2010-01-01 (the default timerange) incorrectly.</li>
@@ -58,45 +63,16 @@
             <li>ds=&lt;C&gt; completions in PDSPPI source.</li>
             <li>rte_1282463981: guard against data that was mismarked as monotonic in ArrayDataSet</li> 
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>minor bug in local file cache browser fixed</li>
-            <li>vapfile:http://server.gov/vapserver?data0=... works now</li>
-            <li>formatDataSet command accepts arguments like "foo.xls?sheet=Sheet1"</li>
-            <li>more bugfixes to support v1.08 vap files (auto renderstyle)</li>
-            <li>setStatus would often push extra event on to event queue.</li>
-            <li>clean up for drag and drop URIs to make things work on Mac and Windows.</li>
-            <li>1210: http user agent was not indicated in web server logs.</li>
-            <li>1209: nextprev scan thread can spin in endless loop</li>
-            <li>1208: occasional hang that seems to be associated with TimSort bug</li>
-            <li>1205: aggregate all breaks with jyds script with timerange param </li>
-            <li>File->print is performed off the event thread because this can be slow or even hang on Linux.</li>
-            <li>421: double load of Das2Source caused by misformatted URI</li>
-            <li>"getting started" dialog had unused browseLocal branch that was broken</li>
-            <li>bug in slicing would loose TCA metadata from das2server in d2s, loosing fill value.</li>
-            <li>dataVisible and layoutVisible flags were not set properly new window, so these tabs were not properly initialized.</li>
-            <li>isNotFile corrected to match "file:/home..." as a file in automatic completions-based editor.</li>
-            <li>rte_0829456451: file:/home/... instead of file:///home/... would result in null pointer exception with completions-based GUI.  Thanks Chris!</li>
-            <li>bug 1195:  Akebono MCA data script shows memory leaks. Thanks Takahiro!</li>
-            <li>trim out indented blocks in removeSideEffects</li>
-            <li>check for invalid URLs in Das2DataSource editor panel.</li>
-            <li>aggregate one (just the address bar) no longer resets the range</li>
-            <li>vap+orbit: URIs work with Automatic data source editor GUI.</li>
-            <li>append( FDataSet, DDataSet ) would fail</li>
-            <li>support $x in timeformat parameter of ascii parser.</li>
-            <li>null pointer exception in logging because of misuse of logger.log( level, template, parms )</li>
-            <li>fix occasional index-out-of-bounds seen when scripting by making defensive copy of application state.</li>
-            <li>rte_1786254278: disable the pngwalk navigate menu when there is no sequence loaded.  Thanks mariahelgacosentino!</li>
-            <li>das2Stream "no data found" exception handled properly</li>
-            <li>current das2server is set on the event thread after Chris showed where sloppy code would occasionally fail.</li>
-            <li>newer Axis scan/step code could get stuck in a infinite loop when invalid bounds were returned (Cindy's data showed this)</li>
-            <li>ascii table editor wasn't resizing with the GUI.</li>
-            <li>EFW produced a CDF file with no depend 0, this should work instead of RTE.</li>
-            <li>boolean properties failed in completions because of "isProp" instead of "getProp"</li>
-            <li>set unit increment on filters list scroll bar on Filters panel.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>OpenDAP looks for missing_value and title metadata, preparing to update demo 1 bookmark.</li>
+            <li>CDAWeb vap servlet improves error feedback</li>
+            <li>PDSPPI source allows completions based on the names in the VOTables</li>
+            <li>read description and valid min and valid max from VOTables.</li>
+            <li>add butterworth to the filters</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>            
             <li>File->Add Plot From... list is sorted by last use.</li>
             <li>AutoplotServer images are set to .vap file height and width by default</li>
             <li>Make PNGWalk allows writing to PDF files instead of .PNG files.</li>
@@ -111,39 +87,6 @@
             <li>PDSPPI source allows completions based on the names in the VOTables</li>
             <li>read description and valid min and valid max from VOTables.</li>
             <li>add butterworth to the filters</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>export to xls allows append and more ordinal data</li>
-            <li>experimental secret clean cache feature introduced.</li>
-            <li>351: save previous entries to jython getParam forms.  Allow address bar trigger to contain parameter settings.</li>
-            <li>add weights to output of rebinBundle.</li>
-            <li>improve feedback while scanning local cache.</li>
-            <li>add allow embed in vap file dialog.  This works well enough.</li>
-            <li>jython "show usages" action added</li>
-            <li>jython script can be run from any Autoplot window, ask if switch context.</li>
-            <li>move lookupUnits to Units class from SemanticOps, introduce lookupDatum to make standard spot for this logic</li>
-            <li>das2streams allow the monitor taskSize to be set in a comment.</li>
-            <li>put in filesystem completions when the method is "File" constructor</li>
-            <li>rfe 361: give the user the option of resetting the main window when a script is run from a second window.</li>
-            <li>rfe 337: Reset timerange when using URIs from bookmarks and recent history</li>            
-            <li>add code to get the PID to aid in debugging with JVisualVM</li>
-            <li>keep track of reason why filesystem is offline.</li>
-            <li>add option to disable scan (instead of step), which can cause problems with batch processing</li>
-            <li>add monitor use to example codes in Jython editor.</li>
-            <li>when zoomX is selected, mouse wheel will also only zoom in X.</li>
-            <li>make it less likely to select a long, narrow box, which messes up ranges.</li>
-            <li>rfe 363: improvements to completions in the editor.</li>
-            <li>rfe 364: propogate timetags through findex and interpolate.</li>
-            <li>support rank 2 DEPEND_1 in CDF export</li>
-            <li>allow "file:" prefix in writeToPng</li>
-            <li>add insert new plot above</li>
-            <li>add break into stack of plots</li>
-            <li>Ctrl-F is bound to Fix-Layout feature</li>
-            <li>writeToPng allows "file:///tmp/png/foo.png" because it's easy to assume "file:" would be okay (Takahiro)</li>
-            <li>add showYPosition(false) to the connector between two plots (Kristoff).</li>
-            <li>363: improvements to completions in Jython editor, including JOptionPane.s&lt;C&gt;</li>
-            <li>About Autoplot dialog shows build server location.</li>
         </ul>
 
         <p>Known issues:</p>
