@@ -82,12 +82,18 @@ public class PDSPPIFileSystem extends WebFileSystem {
         if ( cached!=null ) {
             return FileSystem.getListing( cached );
         }
+        
+        boolean noTimes= true;  // turn of time filtering until we figure out cause of delays.
+        String noTimeString= "";
+        if ( noTimes ) {
+            noTimeString= "&times=false";
+        }
                 
         URL url;
         if ( !directory.startsWith("/") ) {
-            url= new URL( root + "/"+directory );
+            url= new URL( root + "/"+directory + noTimeString );
         } else {
-            url= new URL( root + directory );
+            url= new URL( root + directory + noTimeString );
         }
         InputStream fin;
             
