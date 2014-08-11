@@ -366,28 +366,55 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
             String w= (String)map.get( PARAM_WHERE );
             if ( w!=null && w.length()>0 ) {
-                Pattern p= Pattern.compile("\\.([elg][qte])\\(");
+                Pattern p= Pattern.compile("\\.([elgn][qte])\\(");
                 Matcher m= p.matcher(w);
                 int ieq;
                 if ( !m.find() ) {
-                    throw new IllegalArgumentException("where can only contain .eq,.gt,or.lt");
+                    throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
                 } else {
                     ieq= m.start();
                     String op= m.group(1);
                     String sval= w.substring(ieq+4);
                     if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
-                    double d= Double.parseDouble(sval);
                     String sparm= w.substring(0,ieq);
                     QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, attr1 );
                     QDataSet r;
+                    double d;
+                    if ( parm.rank()==2 ) {
+                        if ( sval.equals("mode") && ( op.equals("eq") || op.equals("ne") ) ) {
+                            QDataSet hash= Ops.hash(parm);
+                            QDataSet mode= Ops.mode(hash);
+                            d= mode.value();
+                            parm= hash;
+                        } else {
+                            throw new IllegalArgumentException("not supported for rank 2");
+                        }
+                    } else if ( parm.rank()==1 ) {
+                        if ( sval.equals("mode") ) {
+                            QDataSet mode= Ops.mode(parm);
+                            d= mode.value();
+                        } else if ( sval.equals("median") ) {
+                            QDataSet median= Ops.median(parm);
+                            d= median.value();
+                        } else if ( sval.equals("mean") ) {
+                            QDataSet mean= Ops.mean(parm);
+                            d= mean.value();
+                        } else {
+                            d= Double.parseDouble(sval);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("param is rank>2");
+                    }
                     if ( op.equals("gt" ) ){
                         r= Ops.where( Ops.gt( parm,d ) );
                     } else if ( op.equals("lt") ) {
                         r= Ops.where( Ops.lt( parm,d ) );
                     } else if ( op.equals("eq") ) {
                         r= Ops.where( Ops.eq( parm,d ) );
+                    } else if ( op.equals("ne") ) {
+                        r= Ops.where( Ops.ne( parm,d ) );
                     } else {
-                        throw new IllegalArgumentException("where can only contain .eq,.gt,or.lt");
+                        throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
                     }
                     if ( r.length()==0 ) {
                         throw new NoDataInIntervalException("'where' argument removes all data");

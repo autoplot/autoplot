@@ -149,12 +149,13 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereParamList, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        whereOp.setModel(new javax.swing.DefaultComboBoxModel(new String[] { ".eq", ".gt", ".lt" }));
+        whereOp.setModel(new javax.swing.DefaultComboBoxModel(new String[] { ".eq", ".gt", ".lt", ".ne" }));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereOp, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
         whereTF.setText("0");
+        whereTF.setToolTipText("enter the value, or \"mode\" for the most frequently occuring value.");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereTF, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -420,7 +421,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             
             Map<String,String> allParameterInfo= CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, true, isMaster );
             Map<String,String> dataParameterInfo= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true, isMaster );
-            Map<String,String> whereParameterInfo= CdfUtil.getPlottable( cdf, false, 1, false, isMaster );
+            Map<String,String> whereParameterInfo= CdfUtil.getPlottable( cdf, false, 2, false, isMaster );
 
             String label;
             if ( this.showAllVarTypeCB.isSelected() ) {

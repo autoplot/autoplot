@@ -135,7 +135,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 } catch (Throwable ex) {
                     throw new RuntimeException(ex);
                 }
-                Map<String,String> result= CdfUtil.getPlottable( cdf, false, 1 );
+                Map<String,String> result= CdfUtil.getPlottable( cdf, false, 2 );
                                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                 for ( Map.Entry<String,String> e:result.entrySet() ) {

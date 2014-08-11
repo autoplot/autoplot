@@ -170,7 +170,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 
                 CDF cdf= CdfFileDataSourceFactory.getCDFFile( fileName );
-                Map<String,String> result= CdfUtil.getPlottable( cdf, false, 1 );
+                Map<String,String> result= CdfUtil.getPlottable( cdf, false, 2 );
                 CdfFileDataSourceFactory.closeCDF(cdf);
                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();

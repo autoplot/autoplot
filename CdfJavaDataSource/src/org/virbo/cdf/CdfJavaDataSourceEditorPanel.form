@@ -259,10 +259,11 @@
                     <Component class="javax.swing.JComboBox" name="whereOp">
                       <Properties>
                         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                          <StringArray count="3">
+                          <StringArray count="4">
                             <StringItem index="0" value=".eq"/>
                             <StringItem index="1" value=".gt"/>
                             <StringItem index="2" value=".lt"/>
+                            <StringItem index="3" value=".ne"/>
                           </StringArray>
                         </Property>
                       </Properties>
@@ -273,6 +274,7 @@
                     <Component class="javax.swing.JTextField" name="whereTF">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="0"/>
+                        <Property name="toolTipText" type="java.lang.String" value="enter the value, or &quot;mode&quot; for the most frequently occuring value."/>
                       </Properties>
                       <BindingProperties>
                         <BindingProperty name="enabled" source="whereCB" sourcePath="${selected}" target="whereTF" targetPath="enabled" updateStrategy="0" immediately="false"/>
