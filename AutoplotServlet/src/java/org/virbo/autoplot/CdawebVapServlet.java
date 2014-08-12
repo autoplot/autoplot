@@ -35,7 +35,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- *
+ * Servlet takes a set of URIs and returns a vap v1.08 that will display them.
  * @author jbf
  */
 public class CdawebVapServlet extends HttpServlet {
