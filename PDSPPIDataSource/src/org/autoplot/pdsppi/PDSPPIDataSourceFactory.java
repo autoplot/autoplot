@@ -6,7 +6,6 @@
 package org.autoplot.pdsppi;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
@@ -26,7 +24,6 @@ import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.URISplit;
 import org.virbo.spase.VOTableReader;
-import org.xml.sax.SAXException;
 
 /**
  * PDS/PPI node factory.  Examples include:
@@ -83,12 +80,20 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
                 } else {
                     return getDataSetCompletions( id, mon );
                 }
-            } else if ( param.equals("id") ) {
+            } else if ( param.equals("sc") ) {
+                String[] scs= PDSPPIDB.getInstance().getSpacecraft();
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
+                for ( String sc: scs) {
+                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, sc, this, null, sc, sc, true  );
+                    ccresult.add(cc1);
+                }
+                return ccresult;
+            } else if ( param.equals("id") ) {
                 ArrayList<String> keys= new ArrayList();
                 keys.add("MESSMAGDATA_3001/DATA/SCIENCE_DATA/RTN/2009/AUG/MAGRTNSCIAVG09213_05_V05");
-                keys.add("GOMW_5004/DATA/MAG/SATELLITES/EUROPA/ORB25_EUR_EPHIO");
+                keys.add("PPI/VG1-S-PLS-5-SUMM-ELE-FIT-96SEC-V1.0");
                 keys.add("PPI/VG_1502/DATA/MAG/HG_1_92S_I");
+                List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                 for ( String key: keys ) {
                     CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, null, key, key, true  );
                     ccresult.add(cc1);
