@@ -51,8 +51,8 @@ public class JnlpServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //response.setContentType("application/x-java-jnlp-file;charset=UTF-8");
-        response.setContentType("text/xml;charset=UTF-8");
+        response.setContentType("application/x-java-jnlp-file;charset=UTF-8");
+        //response.setContentType("text/xml;charset=UTF-8");
         
         response.setHeader("Content_Disposition", "attachment;filename=\"autoplot.jnlp\"");
         response.setHeader("cache-control","no-cache, no-store, must-revalidate");
