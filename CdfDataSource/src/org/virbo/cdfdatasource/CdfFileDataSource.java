@@ -216,7 +216,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                     double d;
                     if ( parm.rank()==2 ) {
                         if ( sval.equals("mode") && ( op.equals("eq") || op.equals("ne") ) ) {
-                            QDataSet hash= Ops.hash(parm);
+                            QDataSet hash= Ops.hashcodes(parm);
                             QDataSet mode= Ops.mode(hash);
                             d= mode.value();
                             parm= hash;
