@@ -57,6 +57,7 @@
             <a href="thin/zoom/demo.html">thin</a>: a more fully-developed thin-client app.<br>
         </p>
         
+        <hr>
         <small><%= SimpleServlet.version %> A</small>
     </body>
 </html>
