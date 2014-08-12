@@ -88,7 +88,7 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
                     ccresult.add(cc1);
                 }
                 return ccresult;
-            } else if ( param.equals("id") ) {
+            } else if ( param.equals("id") ) { // TODO: There should be a way to get what's been specified already.
                 ArrayList<String> keys= new ArrayList();
                 keys.add("MESSMAGDATA_3001/DATA/SCIENCE_DATA/RTN/2009/AUG/MAGRTNSCIAVG09213_05_V05");
                 keys.add("PPI/VG1-S-PLS-5-SUMM-ELE-FIT-96SEC-V1.0");
