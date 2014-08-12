@@ -655,9 +655,33 @@ public class JythonCompletionTask implements CompletionTask {
         return count;
     }
     
+    /**
+     * replace java names like org.virbo.dataset.QDataSet with less-ominous names like "QDataSet"
+     * @param label
+     * @return the simplified name.
+     */
     private static String hideJavaPaths( String label ) {
-        label= label.replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String").replaceAll("java.lang.Object", "Object");
-        return label;
+        StringBuffer build= new StringBuffer();
+        Pattern p= Pattern.compile("(org.virbo.dataset.QDataSet|java.lang.String|java.lang.Object|org.das2.util.monitor.ProgressMonitor|org.das2.datum.DatumRange|org.das2.datum.Datum)");
+        Matcher m= p.matcher(label);
+        while ( m.find() ) {
+            String s= m.group(1);
+            if ( s.equals("org.virbo.dataset.QDataSet") ) {
+                m.appendReplacement(build,"QDataSet");
+            } else if ( s.equals("java.lang.String") ) {
+                m.appendReplacement(build,"String");
+            } else if ( s.equals("java.lang.Object") ) {
+                m.appendReplacement(build,"Object");
+            } else if ( s.equals("org.das2.util.monitor.ProgressMonitor") ) {
+                m.appendReplacement(build,"Monitor");
+            } else if ( s.equals("org.das2.datum.DatumRange") ) {
+                m.appendReplacement(build,"DatumRange");
+            } else if ( s.equals("org.das2.datum.Datum") ) {
+                m.appendReplacement(build,"Datum");
+            }
+        }
+        m.appendTail(build);
+        return build.toString();
     }
     
     public static List<DefaultCompletionItem> getLocalsCompletions(PythonInterpreter interp, CompletionContext cc) {
