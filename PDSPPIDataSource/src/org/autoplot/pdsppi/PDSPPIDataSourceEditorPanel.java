@@ -253,9 +253,6 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
      */
     private void updateParamsSoon( final String id ) {
         paramList.setModel(new DefaultListModel());
-        String product= id;
-        final Map<String,String> dss= PDSPPIDB.getInstance().getParams( product, new NullProgressMonitor() );
-        //updateParamComboBoxSoon(dss);
         logger.warning("work done on the event thread. TODO: move to its own thread.");
         Runnable run= new Runnable() {
            @Override
