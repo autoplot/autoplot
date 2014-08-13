@@ -52,9 +52,12 @@ public class JythonCompletionTask implements CompletionTask {
     
     public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
     JTextComponent editor;
-    String context;
     private final JythonInterpreterProvider jythonInterpreterProvider;
 
+    /**
+     * create the completion task on the text component, using its content and caret position.
+     * @param t the text component
+     */
     public JythonCompletionTask(JTextComponent t) {
         this.editor = t;
         jythonInterpreterProvider = (JythonInterpreterProvider) t.getClientProperty(CLIENT_PROPERTY_INTERPRETER_PROVIDER);
@@ -101,6 +104,12 @@ public class JythonCompletionTask implements CompletionTask {
         }
     }
 
+    /**
+     * perform the completions query.
+     * @param cc
+     * @param arg0
+     * @return the count
+     */
     public int doQuery( CompletionContext cc, CompletionResultSet arg0 ) {
         int c=0;
         try {
@@ -324,6 +333,12 @@ public class JythonCompletionTask implements CompletionTask {
         return count;
     }
 
+    /**
+     * 
+     * @param cc
+     * @param rs
+     * @return the count
+     */
     private int queryModules(CompletionContext cc, CompletionResultSet rs) {
         PythonInterpreter interp = getInterpreter();
 
@@ -359,6 +374,12 @@ public class JythonCompletionTask implements CompletionTask {
         return count;
     }
 
+    /**
+     * look for package names.
+     * @param cc
+     * @param rs
+     * @return the count
+     */
     private int queryPackages(CompletionContext cc, CompletionResultSet rs) {
         PythonInterpreter interp = getInterpreter();
 
