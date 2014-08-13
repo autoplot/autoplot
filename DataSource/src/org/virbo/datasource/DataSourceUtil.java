@@ -889,12 +889,16 @@ public class DataSourceUtil {
         URISplit split= URISplit.parse(uri);
         Map<String,String> args= URISplit.parseParams(split.params);
         String name="ds"; //default name
+        String altName=null;
         if ( args.containsKey(URISplit.PARAM_ARG_0) ) {
-            name= Ops.safeName( args.get(URISplit.PARAM_ARG_0) );
+            altName= Ops.safeName( args.get(URISplit.PARAM_ARG_0) );
         } else if ( args.containsKey(URISplit.PARAM_ID) ) {
-            name= Ops.safeName( args.get(URISplit.PARAM_ID) );
+            altName= Ops.safeName( args.get(URISplit.PARAM_ID) );
         } else if ( args.containsKey("column") ) {
-            name= Ops.safeName( args.get("column") );
+            altName= Ops.safeName( args.get("column") );
+        }
+        if ( altName!=null && altName.length()<30 ) {
+            name= altName;
         }
         // identifiers starting with upper case are going to bug me.  reset the case. UPPER->upper and UpperCase->upperCase
         if ( name.length()>1 && Character.isUpperCase(name.charAt(0)) && Character.isUpperCase(name.charAt(1) ) ) {
