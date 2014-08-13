@@ -1388,10 +1388,12 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             Row deleteRow = null; // if non-null, delete this row.
             Row row = (Row) DomUtil.getElementById(application, domPlot.getRowId());
-            List<DomNode> plotsUsingRow = DomUtil.rowUsages(application, row.getId());
-            plotsUsingRow.remove(domPlot);
-            if (plotsUsingRow.isEmpty()) {
-                deleteRow = row;
+            if ( row!=null ) { // leftover bug from "Add Hidden Plot"
+                List<DomNode> plotsUsingRow = DomUtil.rowUsages(application, row.getId());
+                plotsUsingRow.remove(domPlot);
+                if (plotsUsingRow.isEmpty()) {
+                    deleteRow = row;
+                }
             }
 
             //domPlot.removePropertyChangeListener(application.childListener);
