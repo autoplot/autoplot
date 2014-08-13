@@ -43,7 +43,7 @@ import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
 
 /**
- *
+ * Completions for Jython code.
  * @author jbf
  */
 public class JythonCompletionTask implements CompletionTask {
