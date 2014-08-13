@@ -188,6 +188,29 @@ public class PDSPPIDB {
             return listing;
             
     }
+    
+    /**
+     * apparently the id needs to have underscores where there are slashes...  e.g.
+     * PPI/CO-E/J/S/SW-CAPS-5-DDR-ELE-MOMENTS-V1.0 -> PPI/CO-E_J_S_SW-CAPS-5-DDR-ELE-MOMENTS-V1.0
+     * @param root like PPI/CO-E/J/S/SW-CAPS-5-DDR-ELE-MOMENTS-V1.0/
+     * @return result like PPI/CO-E_J_S_SW-CAPS-5-DDR-ELE-MOMENTS-V1.0
+     */
+    public static String removeExtraSlashes( String root ) {
+        int i= root.indexOf("/"); // 4 for PPI/
+        i++;
+        return root.substring(0,i) + root.substring(i).replaceAll("/","_");
+    }
+        
+    
+    /**
+     * return true if the name appears to be a plottable id.
+     * @param id
+     * @return true if the id appears to be plottable.
+     */
+    public static boolean isPlottable( String id ) {
+        return id.endsWith(".lbl") || id.endsWith(".LBL") || id.endsWith(".tab" ) || id.endsWith(".TAB");       
+    }
+    
     /**
      * Get the IDs matching the constraint.
      * @param constraint constaints, such as sc=Galileo
@@ -195,7 +218,7 @@ public class PDSPPIDB {
      * @return 
      */
     public String[] getIds( String constraint, String reqPrefix ) {
-        Pattern p= Pattern.compile("sc=[a-zA-Z 0-9]*");
+        Pattern p= Pattern.compile("sc=[a-zA-Z_ 0-9]*");
         if ( !p.matcher(constraint).matches() ) {
             throw new IllegalArgumentException("constraint doesn't match");
         }

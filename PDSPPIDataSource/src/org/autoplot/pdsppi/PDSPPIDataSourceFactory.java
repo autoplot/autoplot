@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSourceFactory;
@@ -84,21 +85,60 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
                 String[] scs= PDSPPIDB.getInstance().getSpacecraft();
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                 for ( String sc: scs) {
-                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, sc, this, null, sc, sc, true  );
+                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, sc, this, null, sc, sc, false  );
                     ccresult.add(cc1);
                 }
                 return ccresult;
             } else if ( param.equals("id") ) { // TODO: There should be a way to get what's been specified already.
-                ArrayList<String> keys= new ArrayList();
-                keys.add("MESSMAGDATA_3001/DATA/SCIENCE_DATA/RTN/2009/AUG/MAGRTNSCIAVG09213_05_V05");
-                keys.add("PPI/VG1-S-PLS-5-SUMM-ELE-FIT-96SEC-V1.0");
-                keys.add("PPI/VG_1502/DATA/MAG/HG_1_92S_I");
-                List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
-                for ( String key: keys ) {
-                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, null, key, key, true  );
-                    ccresult.add(cc1);
+                String u= cc.surl.substring(0,cc.surlpos);
+                URISplit split= URISplit.parse(u);
+                Map<String,String> params= URISplit.parseParams(split.params);
+                String sc= params.get("sc");
+                sc= sc.replaceAll("\\+"," ");
+                if ( sc!=null ) {
+                    String[] ids= PDSPPIDB.getInstance().getIds("sc="+sc,"PPI/");
+                    List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
+                    String id1= params.get("id");
+                    if ( id1!=null && id1.length()>0 ) {
+                        String file=null;
+                        String iid= null;
+                        for ( String id : ids ) {
+                            if ( id1.startsWith(id) ) {
+                                file= id1.substring(id.length());
+                                iid= id;
+                            }
+                        }
+                        if ( file!=null ) {
+                            FileSystem fs= new PDSPPIFileSystem(PDSPPIDB.removeExtraSlashes(iid));
+                            int i= file.lastIndexOf("/");
+                            file= file.substring(0,i+1);
+                            String[] ff= fs.listDirectory(file,mon);
+                            for ( String ff1 : ff ) {
+                                String theid= iid+file+ff1;
+                                CompletionContext cc1;
+                                if ( PDSPPIDB.isPlottable(theid) ) {
+                                    int dotpos= theid.lastIndexOf("."); // pop off the extension
+                                    theid= theid.substring(0,dotpos);
+                                    cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, theid, this, null, theid, theid, true  );
+                                } else {
+                                    cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, theid, this, null, theid, theid, false );
+                                }
+                                ccresult.add(cc1);
+                            }
+                            return ccresult;
+                        } else {
+                            return Collections.singletonList(  new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "", "error", "error" ) );
+                        }
+                    } else {
+                        for ( String id : ids ) {
+                            CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, id, this, null, id, id, false  );
+                            ccresult.add(cc1);
+                        }
+                    }
+                    return ccresult;
+                } else {
+                    return Collections.singletonList(  new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "", "enter sc first", "sc constraint needed" ) );
                 }
-                return ccresult;
             }
         }
         return new ArrayList<CompletionContext>() {};
