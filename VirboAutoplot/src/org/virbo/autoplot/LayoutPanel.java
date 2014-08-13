@@ -904,94 +904,97 @@ public class LayoutPanel extends javax.swing.JPanel {
             if ( plots.isEmpty() ) return;
 
             app.getController().registerPendingChange( this, lock);
-            app.getController().performingChange( this, lock);
+            try {
+                app.getController().performingChange( this, lock);
 
-            Column col= DomOps.getOrCreateSelectedColumn( app, getSelectedPlots(), true );
-            Row row= DomOps.getOrCreateSelectedRow( app, getSelectedPlots(), true );
+                Column col= DomOps.getOrCreateSelectedColumn( app, getSelectedPlots(), true );
+                Row row= DomOps.getOrCreateSelectedRow( app, getSelectedPlots(), true );
 
-            Plot p= app.getController().addPlot(row, col);
-            p.setVisible(false);
-            p.getXaxis().setVisible(false);
-            p.getYaxis().setVisible(false);
+                Plot p= app.getController().addPlot(row, col);
+                p.setVisible(false);
+                p.getXaxis().setVisible(false);
+                p.getYaxis().setVisible(false);
 
-            Plot[] bottomTopPlots= DomOps.bottomAndTopMostPlot(app, plots);
+                Plot[] bottomTopPlots= DomOps.bottomAndTopMostPlot(app, plots);
 
-            if ( dia.getCondenseColorBarsCB().isSelected() ) {
-                p.getZaxis().setVisible(true);
-                for ( Plot p1: plots ) {
-                    p1.getZaxis().setVisible(false);
+                if ( dia.getCondenseColorBarsCB().isSelected() ) {
+                    p.getZaxis().setVisible(true);
+                    for ( Plot p1: plots ) {
+                        p1.getZaxis().setVisible(false);
+                    }
+                    p.getZaxis().setVisible(true);
+                } else {
+                    p.getZaxis().setVisible(false);
                 }
-                p.getZaxis().setVisible(true);
-            } else {
-                p.getZaxis().setVisible(false);
-            }
-            if ( dia.getxAxisCB().isSelected() ) { // bind the xaxes
-                DatumRange range= getSelectedPlots().get(0).getXaxis().getRange();
-                boolean log= getSelectedPlots().get(0).getXaxis().isLog();
-                for ( Plot p1: getSelectedPlots() ) {
-                    range= DatumRangeUtil.union( range, p1.getXaxis().getRange() );
-                    log= log && p1.getXaxis().isLog();
+                if ( dia.getxAxisCB().isSelected() ) { // bind the xaxes
+                    DatumRange range= getSelectedPlots().get(0).getXaxis().getRange();
+                    boolean log= getSelectedPlots().get(0).getXaxis().isLog();
+                    for ( Plot p1: getSelectedPlots() ) {
+                        range= DatumRangeUtil.union( range, p1.getXaxis().getRange() );
+                        log= log && p1.getXaxis().isLog();
+                    }
+                    for ( Plot p1: getSelectedPlots() ) {
+                        p.getXaxis().setRange( range );
+                        if ( !log ) p1.getXaxis().setLog(log);
+                        app.getController().bind( p.getXaxis(), "range", p1.getXaxis(), "range" );
+                        p.getXaxis().setLog( log );
+                        app.getController().bind( p.getXaxis(), "log", p1.getXaxis(), "log" );
+                    }
                 }
-                for ( Plot p1: getSelectedPlots() ) {
-                    p.getXaxis().setRange( range );
-                    if ( !log ) p1.getXaxis().setLog(log);
-                    app.getController().bind( p.getXaxis(), "range", p1.getXaxis(), "range" );
-                    p.getXaxis().setLog( log );
-                    app.getController().bind( p.getXaxis(), "log", p1.getXaxis(), "log" );
+                if ( dia.getyAxisCB().isSelected() ) { // bind the xaxes
+                    DatumRange range= getSelectedPlots().get(0).getYaxis().getRange();
+                    boolean log= getSelectedPlots().get(0).getYaxis().isLog();
+                    for ( Plot p1: getSelectedPlots() ) {
+                        range= DatumRangeUtil.union( range, p1.getYaxis().getRange() );
+                        log= log && p1.getYaxis().isLog();
+                    }
+                    for ( Plot p1: getSelectedPlots() ) {
+                        p.getYaxis().setRange( range );
+                        if ( !log ) p1.getYaxis().setLog(log);
+                        app.getController().bind( p.getYaxis(), "range", p1.getYaxis(), "range" );
+                        p.getYaxis().setLog( log );
+                        app.getController().bind( p.getYaxis(), "log", p1.getYaxis(), "log" );
+                    }
                 }
-            }
-            if ( dia.getyAxisCB().isSelected() ) { // bind the xaxes
-                DatumRange range= getSelectedPlots().get(0).getYaxis().getRange();
-                boolean log= getSelectedPlots().get(0).getYaxis().isLog();
-                for ( Plot p1: getSelectedPlots() ) {
-                    range= DatumRangeUtil.union( range, p1.getYaxis().getRange() );
-                    log= log && p1.getYaxis().isLog();
+                if ( dia.getzAxisCB().isSelected() ) { // bind the xaxes
+                    DatumRange range= getSelectedPlots().get(0).getZaxis().getRange();
+                    boolean log= getSelectedPlots().get(0).getZaxis().isLog();
+                    for ( Plot p1: getSelectedPlots() ) {
+                        range= DatumRangeUtil.union( range, p1.getZaxis().getRange() );
+                        log= log && p1.getZaxis().isLog();
+                    }
+                    for ( Plot p1: getSelectedPlots() ) {
+                        p.getZaxis().setRange( range );
+                        if ( !log ) p1.getZaxis().setLog(log);
+                        app.getController().bind( p.getZaxis(), "range", p1.getZaxis(), "range" );
+                        p.getZaxis().setLog( log );
+                        app.getController().bind( p.getZaxis(), "log", p1.getZaxis(), "log" );
+                    }
                 }
-                for ( Plot p1: getSelectedPlots() ) {
-                    p.getYaxis().setRange( range );
-                    if ( !log ) p1.getYaxis().setLog(log);
-                    app.getController().bind( p.getYaxis(), "range", p1.getYaxis(), "range" );
-                    p.getYaxis().setLog( log );
-                    app.getController().bind( p.getYaxis(), "log", p1.getYaxis(), "log" );
+                // bind the colortables
+                if ( dia.getCondenseColorBarsCB().isSelected() ) { 
+                    for ( Plot p1: getSelectedPlots() ) {
+                        app.getController().bind( p, "colortable", p1, "colortable" );
+                    }
                 }
-            }
-            if ( dia.getzAxisCB().isSelected() ) { // bind the xaxes
-                DatumRange range= getSelectedPlots().get(0).getZaxis().getRange();
-                boolean log= getSelectedPlots().get(0).getZaxis().isLog();
-                for ( Plot p1: getSelectedPlots() ) {
-                    range= DatumRangeUtil.union( range, p1.getZaxis().getRange() );
-                    log= log && p1.getZaxis().isLog();
-                }
-                for ( Plot p1: getSelectedPlots() ) {
-                    p.getZaxis().setRange( range );
-                    if ( !log ) p1.getZaxis().setLog(log);
-                    app.getController().bind( p.getZaxis(), "range", p1.getZaxis(), "range" );
-                    p.getZaxis().setLog( log );
-                    app.getController().bind( p.getZaxis(), "log", p1.getZaxis(), "log" );
-                }
-            }
-            // bind the colortables
-            if ( dia.getCondenseColorBarsCB().isSelected() ) { 
-                for ( Plot p1: getSelectedPlots() ) {
-                    app.getController().bind( p, "colortable", p1, "colortable" );
-                }
-            }
 
-            if ( dia.getCondenseXAxisLabelsCB().isSelected() ) {
-                String t= plots.get(0).getTitle();
-                for ( Plot p1: getSelectedPlots() ) {
-                    p1.getXaxis().setDrawTickLabels(false);
-                    p1.getXaxis().setLabel("");
-                    p1.setTitle("");
-                    Row r= app.getCanvases(0).getController().getRowFor(p1);
-                    r.setTop( r.getTop().replaceAll( "(.*)\\+([\\d\\.]+)em(.*)","$1+0.5em" ) );
-                    r.setBottom( r.getBottom().replaceAll( "(.*)\\-([\\d\\.]+)em","$1-0.5em" ) );
+                if ( dia.getCondenseXAxisLabelsCB().isSelected() ) {
+                    String t= plots.get(0).getTitle();
+                    for ( Plot p1: getSelectedPlots() ) {
+                        p1.getXaxis().setDrawTickLabels(false);
+                        p1.getXaxis().setLabel("");
+                        p1.setTitle("");
+                        Row r= app.getCanvases(0).getController().getRowFor(p1);
+                        r.setTop( r.getTop().replaceAll( "(.*)\\+([\\d\\.]+)em(.*)","$1+0.5em" ) );
+                        r.setBottom( r.getBottom().replaceAll( "(.*)\\-([\\d\\.]+)em","$1-0.5em" ) );
+                    }
+                    bottomTopPlots[1].setTitle(t);
+                    bottomTopPlots[0].getXaxis().setDrawTickLabels(true);
                 }
-                bottomTopPlots[1].setTitle(t);
-                bottomTopPlots[0].getXaxis().setDrawTickLabels(true);
-            }
 
-            app.getController().changePerformed( this, lock);
+            } finally {
+                app.getController().changePerformed( this, lock);
+            }
 
 
         }
@@ -1017,8 +1020,10 @@ public class LayoutPanel extends javax.swing.JPanel {
         org.das2.util.LoggerManager.logGuiEvent(evt);                
         List<Row> rows= new ArrayList<Row>();
         for ( Plot p1: getSelectedPlots() ) {
-            Row row= p1.getController().getRow();
-            if ( !rows.contains(row) ) rows.add(row);
+            if ( p1.isVisible() ) {
+                Row row= p1.getController().getRow();
+                if ( !rows.contains(row) ) rows.add(row);
+            }
         }
         
         for ( Row r: rows ) {
@@ -1038,8 +1043,10 @@ public class LayoutPanel extends javax.swing.JPanel {
         org.das2.util.LoggerManager.logGuiEvent(evt);                
         List<Row> rows= new ArrayList<Row>();
         for ( Plot p1: getSelectedPlots() ) {
-            Row row= p1.getController().getRow();
-            if ( !rows.contains(row) ) rows.add(row);
+            if ( p1.isVisible() ) {
+                Row row= p1.getController().getRow();
+                if ( !rows.contains(row) ) rows.add(row);
+            }
         }
 
         double size= 0;
@@ -1081,8 +1088,10 @@ public class LayoutPanel extends javax.swing.JPanel {
         org.das2.util.LoggerManager.logGuiEvent(evt);                
         List<Row> rows= new ArrayList<Row>();
         for ( Plot p1: getSelectedPlots() ) {
-            Row row= p1.getController().getRow();
-            if ( !rows.contains(row) ) rows.add(row);
+            if ( p1.isVisible() ) {
+                Row row= p1.getController().getRow();
+                if ( !rows.contains(row) ) rows.add(row);
+            }
         }
 
         for ( Row r: rows ) {
