@@ -23,12 +23,12 @@ public class WGetFileSystemFactory implements FileSystemFactory {
     /**
      * support curl too, since it is on macs by default.
      */
-    private static boolean useCurl= true;
+    static boolean useCurl= true;
 
     /**
      * the executable to spawn.  See createFileSystem for use of AP_WGET or AP_CURL environment variables.
      */
-    private static String exe=null;
+    static String exe=null;
     
     private static void doInitialize() {
         if ( exe==null ) {
