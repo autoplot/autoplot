@@ -100,12 +100,11 @@ public class Util {
             logger.info("Warning: TimeSeriesBrowse capability not found, simply returning dataset.");
         }
         QDataSet rds= result.getDataSet(monitor);
-        //Logger.getLogger("virbo.jythonsupport").fine( "created dataset #"+rds.getClass().gethashCode() );
 
         try {
             metadata= result.getMetadata( new NullProgressMonitor() );
         } catch ( Exception e ) {
-
+            logger.log( Level.INFO, e.getMessage(), e );
         }
         metadataSurl= suri;
 
@@ -117,7 +116,11 @@ public class Util {
             if ( DataSetUtil.isQube(rds) ) {
                 return DDataSet.copy(rds); // fixes a bug where a MutablePropertiesDataSet and WritableDataSet copy in coerce
             } else {
-                return JoinDataSet.deepCopy(rds);
+                //return JoinDataSet.deepCopy(rds); // Note, Operators assume qubes as well, so there's no point to this.
+                logger.info("unable to copy read-only dataset, which may cause problems elsewhere.");
+                //TODO: document this.
+                //TODO: fix this.
+                return rds;                
             }
         }
     }
@@ -156,7 +159,11 @@ public class Util {
             if ( DataSetUtil.isQube(rds) ) {
                 return DDataSet.copy(rds); // fixes a bug where a MutablePropertiesDataSet and WritableDataSet copy in coerce
             } else {
-                return JoinDataSet.deepCopy(rds);
+                //return JoinDataSet.deepCopy(rds); // Note, Operators assume qubes as well, so there's no point to this.
+                logger.info("unable to copy read-only dataset, which may cause problems elsewhere.");
+                //TODO: document this.
+                //TODO: fix this.
+                return rds;            
             }
         }
     }
