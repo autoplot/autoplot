@@ -73,26 +73,6 @@ public class PDSPPIDB {
         return instance;
     }
     
-    private void load() {
-        InputStream in= null;
-        try {
-            URL url= PDSPPIDB.class.getResource("pdsid.txt");
-            in = url.openStream();
-            BufferedReader bin= new BufferedReader(new InputStreamReader(in));
-            String line= bin.readLine();
-            while ( line!=null ) {
-                ids.add(line);
-            }
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                in.close();
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
-        }
-    }
     
     String[] _spacecraft=null;
     
@@ -272,6 +252,9 @@ public class PDSPPIDB {
     }
  
     public static void main( String[] args ) {
-        System.err.println( getInstance().getSpacecraft() );
+        String[] scs= getInstance().getSpacecraft();
+        for ( String sc: scs ) {
+            System.err.println( sc );
+        }
     }
 }
