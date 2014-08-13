@@ -35,6 +35,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURI;
@@ -61,7 +62,8 @@ public class Util {
      *
      * @param suri the URI of the dataset, such as "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
      * @param stimeRange a string representing the timerange to load, such as 2012-02-02/2012-02-03
-     * @param monitor progress monitor object.
+     * @param mon progress monitor object.
+     * @return QDataSet from the load.
      */
     public static QDataSet getDataSet( String suri, String stimeRange, ProgressMonitor mon ) throws Exception {
         logger.log( Level.FINE, "getDataSet({0},{1})", new Object[]{suri, stimeRange} );
@@ -115,10 +117,7 @@ public class Util {
             if ( DataSetUtil.isQube(rds) ) {
                 return DDataSet.copy(rds); // fixes a bug where a MutablePropertiesDataSet and WritableDataSet copy in coerce
             } else {
-                logger.info("unable to copy read-only dataset, which may cause problems elsewhere.");
-                //TODO: document this.
-                //TODO: fix this.
-                return rds;
+                return JoinDataSet.deepCopy(rds);
             }
         }
     }
@@ -128,7 +127,9 @@ public class Util {
      * load the data specified by URL into Autoplot's internal data model.  This will
      * block until the load is complete, and a ProgressMonitor object can be used to
      * monitor the load.
-     * @param ds
+     * @param suri the data address to load.
+     * @param mon null or a progress monitor to monitor the load
+     * @return the dataset.
      */
     public static QDataSet getDataSet(String suri, ProgressMonitor mon) throws Exception {
         logger.log( Level.FINE, "getDataSet({0})", suri );
@@ -140,12 +141,11 @@ public class Util {
             mon = new NullProgressMonitor();
         }
         QDataSet rds= result.getDataSet(mon);
-        //Logger.getLogger("virbo.jythonsupport").fine( "created dataset #"+rds.getClass().gethashCode() );
 
         try {
             metadata= result.getMetadata( new NullProgressMonitor() );
         } catch ( Exception e ) {
-            
+            logger.log( Level.INFO, e.getMessage(), e );
         }
         metadataSurl= suri;
 
@@ -156,10 +156,7 @@ public class Util {
             if ( DataSetUtil.isQube(rds) ) {
                 return DDataSet.copy(rds); // fixes a bug where a MutablePropertiesDataSet and WritableDataSet copy in coerce
             } else {
-                logger.info("unable to copy read-only dataset, which may cause problems elsewhere.");
-                //TODO: document this.
-                //TODO: fix this.
-                return rds;
+                return JoinDataSet.deepCopy(rds);
             }
         }
     }
@@ -236,7 +233,7 @@ public class Util {
      * load the data specified by URL into Autoplot's internal data model.  This will
      * block until the load is complete.
      * @param suri data URI like "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
-     * @param stimeRange timerange like "2012-02-02/2012-02-03"
+     * @param stimerange timerange like "2012-02-02/2012-02-03"
      * @return data set for the URI.
      * @throws Exception depending on data source.
      */
@@ -248,23 +245,27 @@ public class Util {
      * load the data specified by URL into Autoplot's internal data model.  This will
      * block until the load is complete.
      * @param suri data URI like "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
-     * @param timeRange timerange object
+     * @param timerange timerange object
      * @return data set for the URI.
      * @throws Exception depending on data source.
      */    
     public static QDataSet getDataSet(String suri, DatumRange timerange ) throws Exception {
         return getDataSet(suri, timerange, new NullProgressMonitor() );
     }
+    
     /**
      * load data from the input stream into Autoplot internal data model.  This
      * will block until the load is complete.  This works by creating a temporary
      * file and then using the correct reader to read the data.  When the data source
      * is able to read directly from a stream, no temporary file is created.  Currently
      * this always loads to a file, and therefore does not support applets.
+     * 
+     * This may have been introduced to support scripts, but it's not clear who uses it.
      *
-     * @param ext the extension and any parsing parameters, such as "vap+bin:?recLength=2000&rank2=1:"
-     * @param in
-     * @return
+     * @param spec the extension and any parsing parameters, such as "vap+bin:?recLength=2000&rank2=1:"
+     * @param in the input stream
+     * @param mon a progress monitor.
+     * @return QDataSet
      * @throws java.lang.Exception
      */
     public static QDataSet getDataSet( String spec, InputStream in, ProgressMonitor mon ) throws Exception {
