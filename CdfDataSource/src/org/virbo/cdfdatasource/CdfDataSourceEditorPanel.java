@@ -430,11 +430,9 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             this.selectVariableLabel.setToolTipText("ISTP metadata marks parameters as data or support_data");
 
             String param= params.get("arg_0");
-            String subset= null;
             if ( param!=null ) {
                 int i= param.indexOf("[");
                 if ( i!=-1 ) {
-                    subset= param.substring(i);
                     param= param.substring(0,i);
                 }
             }
