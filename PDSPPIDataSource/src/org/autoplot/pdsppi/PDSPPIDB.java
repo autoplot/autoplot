@@ -208,7 +208,7 @@ public class PDSPPIDB {
      * @return true if the id appears to be plottable.
      */
     public static boolean isPlottable( String id ) {
-        return id.endsWith(".lbl") || id.endsWith(".LBL") || id.endsWith(".tab" ) || id.endsWith(".TAB");       
+        return id.endsWith(".tab" ) || id.endsWith(".TAB") || id.endsWith(".dat" ) || id.endsWith(".DAT");
     }
     
     /**
