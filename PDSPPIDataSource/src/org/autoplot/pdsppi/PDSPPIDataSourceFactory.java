@@ -140,6 +140,10 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
                         }
                     } else {
                         for ( String id : ids ) {
+                            if ( id.indexOf("\t")>-1 ) {
+                                logger.log(Level.FINE, "tab in id from PDSPPIDB.getInstance().getIds(sc={0})", sc);
+                                continue;
+                            }
                             CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, id+"/", this, null, id+"/", id+"/", false  );
                             ccresult.add(cc1);
                         }
