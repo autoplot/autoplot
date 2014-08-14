@@ -126,10 +126,13 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
                                     int dotpos= theid.lastIndexOf("."); // pop off the extension
                                     theid= theid.substring(0,dotpos);
                                     cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, theid, this, null, theid, theid, true  );
+                                    ccresult.add(cc1);
                                 } else {
-                                    cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, theid, this, null, theid, theid, false );
+                                    if ( theid.endsWith("/") ) {
+                                        cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, theid, this, null, theid, theid, false );
+                                        ccresult.add(cc1);
+                                    }
                                 }
-                                ccresult.add(cc1);
                             }
                             return ccresult;
                         } else {
