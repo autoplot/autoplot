@@ -99,6 +99,12 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
                     String[] ids= PDSPPIDB.getInstance().getIds("sc="+sc,"PPI/");
                     List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                     String id1= params.get("id");
+                    if ( id1!=null ) {
+                        String[] ss= id1.split("/",-2);
+                        if ( ss.length==2 ) {
+                            id1= ""; // just do completions on root part.
+                        }
+                    }
                     if ( id1!=null && id1.length()>0 ) {
                         String file=null;
                         String iid= null;
@@ -131,7 +137,7 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
                         }
                     } else {
                         for ( String id : ids ) {
-                            CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, id, this, null, id, id, false  );
+                            CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, id+"/", this, null, id+"/", id+"/", false  );
                             ccresult.add(cc1);
                         }
                     }
