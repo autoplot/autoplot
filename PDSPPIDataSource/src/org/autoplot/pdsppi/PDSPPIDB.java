@@ -218,9 +218,9 @@ public class PDSPPIDB {
      * @return 
      */
     public String[] getIds( String constraint, String reqPrefix ) {
-        Pattern p= Pattern.compile("sc=[a-zA-Z_ 0-9]*");
+        Pattern p= Pattern.compile("sc=[a-zA-Z_ 0-9/\\(\\)]*");
         if ( !p.matcher(constraint).matches() ) {
-            throw new IllegalArgumentException("constraint doesn't match");
+            throw new IllegalArgumentException("constraint doesn't match (sc=[a-zA-Z_ 0-9/]*): "+constraint);
         }
         try {
             //http://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&facet=SPACECRAFT_NAME&title=Cassini&o=txt
