@@ -66,6 +66,8 @@ public class OptionsPrefsController {
                 prefs.putInt(evt.getPropertyName(), ((Integer)evt.getNewValue()).intValue() );
             } else if ( evt.getNewValue() instanceof Double ) {
                 prefs.putDouble(evt.getPropertyName(), ((Double)evt.getNewValue()).doubleValue() );
+            } else if ( evt.getNewValue() instanceof Float ) {
+                prefs.putFloat(evt.getPropertyName(), ((Float)evt.getNewValue()).floatValue() );
             } else {
                 throw new RuntimeException("unsupported property type needs to be implemented: "+evt.getPropertyName() + "  " + evt.getNewValue().getClass() );
             }
@@ -125,6 +127,7 @@ public class OptionsPrefsController {
         }
         options.setFlipColorbarLabel( prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel ) );
         options.setTicklen( prefs.get(Options.PROP_TICKLEN, options.ticklen ) );
+        options.setMultiLineTextAlignment( prefs.getFloat( Options.PROP_MULTILINETEXTALIGNMENT, options.multiLineTextAlignment ) );
         options.setPrintingTag( prefs.get(Options.PROP_PRINTINGTAG, options.printingTag ) );
         options.setPrintingLogLevel( Level.parse( prefs.get(Options.PROP_PRINTINGLOGLEVEL, options.printingLogLevel.toString() ) ) );
         options.setDisplayLogLevel( Level.parse( prefs.get(Options.PROP_DISPLAYLOGLEVEL, options.displayLogLevel.toString() ) ) );
@@ -172,6 +175,7 @@ public class OptionsPrefsController {
         }
         options.flipColorbarLabel= prefs.getBoolean(Options.PROP_FLIPCOLORBARLABEL,options.flipColorbarLabel );
         options.ticklen= prefs.get(Options.PROP_TICKLEN, options.ticklen );
+        options.multiLineTextAlignment= prefs.getFloat(Options.PROP_MULTILINETEXTALIGNMENT, options.multiLineTextAlignment );
         options.printingTag= prefs.get(Options.PROP_PRINTINGTAG, options.printingTag );
         options.printingLogLevel= Level.parse( prefs.get(Options.PROP_PRINTINGLOGLEVEL, options.printingLogLevel.toString() ) );
         options.displayLogLevel= Level.parse( prefs.get(Options.PROP_DISPLAYLOGLEVEL, options.displayLogLevel.toString() ) );

@@ -597,6 +597,7 @@ public class PlotController extends DomNodeController {
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, dasPlot1.getXAxis(), "tickLength");
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, dasPlot1.getYAxis(), "tickLength");
         ac.bind(application.getOptions(), Options.PROP_TICKLEN, colorbar, "tickLength");
+        ac.bind(application.getOptions(), Options.PROP_MULTILINETEXTALIGNMENT, dasPlot1, DasPlot.PROP_MULTILINETEXTALIGNMENT);
 
         ac.bind(this.plot, Plot.PROP_LEGENDPOSITION, dasPlot1, DasPlot.PROP_LEGENDPOSITION );
         ac.bind(this.plot, Plot.PROP_DISPLAYLEGEND, dasPlot1, DasPlot.PROP_DISPLAYLEGEND );

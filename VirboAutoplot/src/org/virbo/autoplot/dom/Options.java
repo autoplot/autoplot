@@ -206,6 +206,23 @@ public class Options extends DomNode {
         this.ticklen = ticklen;
         propertyChangeSupport.firePropertyChange(PROP_TICKLEN, oldTicklen, ticklen);
     }
+    
+    /**
+     * for multiline labels, the alignment, where 0 is left, 0.5 is center, and 1.0 is right.
+     */
+    protected float multiLineTextAlignment = 0.f;
+    public static final String PROP_MULTILINETEXTALIGNMENT = "multiLineTextAlignment";
+
+    public float getMultiLineTextAlignment() {
+        return multiLineTextAlignment;
+    }
+
+    public void setMultiLineTextAlignment(float multiLineTextAlignment) {
+        float oldMultiLineTextAlignment = this.multiLineTextAlignment;
+        this.multiLineTextAlignment = multiLineTextAlignment;
+        propertyChangeSupport.firePropertyChange(PROP_MULTILINETEXTALIGNMENT, oldMultiLineTextAlignment, multiLineTextAlignment);
+    }
+    
 
     protected boolean flipColorbarLabel = false;
     public static final String PROP_FLIPCOLORBARLABEL = "flipColorbarLabel";
