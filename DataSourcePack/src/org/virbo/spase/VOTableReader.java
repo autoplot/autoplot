@@ -78,6 +78,7 @@ public class VOTableReader {
     
     List<String> ids= new ArrayList<String>();
     List<String> descriptions=  new ArrayList<String>(); // one-line describing the data.
+    List<Integer> dep0s= new ArrayList<Integer>();
     List<String> datatypes= new ArrayList<String>(); // we only support double and UTC then the ucd is time.epoch.
     List<Integer> arraysizes= new ArrayList<Integer>(); // support for 2-D arrays.  -1,0 or N  -2 means *, -1 means scalar, positive means 2-D array
     List<String> names= new ArrayList<String>();
@@ -128,6 +129,13 @@ public class VOTableReader {
     private final int ARRAYSIZE_SCALAR= -1;
     
     private boolean justHeader= false;
+    
+    /**
+     * the current column describing the time.
+     */
+    int currentDep0= -1;
+    
+    boolean lookForCurrentDep0= true;
             
     private StringBuilder valueBuilder= new StringBuilder();
     
@@ -188,9 +196,11 @@ public class VOTableReader {
                         if ( arraysize.equals("*") ) {
                             arraysizes.add( ARRAYSIZE_ANY );
                             if ( !dt.equals("char") ) {
-                                throw new IllegalArgumentException("only char can have variable length");
+                                logger.warning("only char can have variable length");
+                                nelements+= 1;
+                            } else {
+                                nelements+= 1;
                             }
-                            nelements+= 1;
                         } else {
                             if ( dt.equals("char") ) {
                                 arraysizes.add( ARRAYSIZE_SCALAR );
@@ -206,13 +216,22 @@ public class VOTableReader {
                     }
                     if ( sunit==null ) {
                         units.add(Units.dimensionless);
+                        lookForCurrentDep0= true;
                     } else if ( sunit.equals( UNIT_UTC ) ) {
                         units.add(Units.cdfTT2000);
+                        if ( lookForCurrentDep0==true  ) {
+                            currentDep0= descriptions.size();
+                            lookForCurrentDep0= false;
+                        }
                     } else if ( sunit.equals( UNIT_ENUM ) ) {
                         units.add( EnumerationUnits.create(id) );
+                        lookForCurrentDep0= true;
                     } else {
-                        units.add( SemanticOps.lookupUnits( sunit) );
+                        units.add( Units.lookupUnits( sunit) );
+                        lookForCurrentDep0= true;
                     }
+                    
+                    dep0s.add(currentDep0);
                     descriptions.add(null);
                     fillValues.add(null);
                     minValues.add(null);
@@ -408,6 +427,9 @@ public class VOTableReader {
                 
             } else {
                 head.putProperty( QDataSet.NAME, ielement, ids.get(ii) );
+                if ( dep0s.get(ii)>-1 && dep0s.get(ii)<ii ) {
+                    head.putProperty( QDataSet.DEPENDNAME_0, ielement, ids.get(dep0s.get(ii)) ); 
+                }
                 head.putProperty( QDataSet.LABEL, ielement, names.get(ii) ); 
                 head.putProperty( QDataSet.UNITS, ielement, units.get(ii) ); 
                 head.putProperty( QDataSet.TITLE, ielement, descriptions.get(ii) ); 
@@ -430,7 +452,7 @@ public class VOTableReader {
                 }                
                 ielement++;
             }
-            if ( ii>0 ) head.putProperty( QDataSet.DEPENDNAME_0, ielement, ids.get(0) );
+            //if ( ii>0 ) head.putProperty( QDataSet.DEPENDNAME_0, ielement, ids.get(0) );
         }
         return head.getDataSet();
     }
