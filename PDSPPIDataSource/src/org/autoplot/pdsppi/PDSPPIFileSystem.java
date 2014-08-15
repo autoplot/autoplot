@@ -18,6 +18,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -158,6 +159,7 @@ public class PDSPPIFileSystem extends WebFileSystem {
                 }
             }
             String[] listing=result.toArray(new String[result.size()]);
+            Arrays.sort(listing);
            
             DirectoryEntry[] des= new DirectoryEntry[listing.length];
             for ( int i=0; i<des.length; i++ ) {
