@@ -205,7 +205,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                         dsb.append(o[i].toString());
                     }
                     String ds= dsb.toString();
-                    if ( ds.endsWith(".lbl") || ds.endsWith(".LBL") || ds.endsWith(".tab" ) || ds.endsWith(".TAB")  ) {
+                    if ( ds.endsWith(".lbl") || ds.endsWith(".LBL") || ds.endsWith(".tab" ) || ds.endsWith(".TAB") || ds.endsWith(".csv" ) || ds.endsWith(".CSV") ) {
                         ds= ds.substring(0,ds.length()-4);
                     }
                     idTextField.setText( ds );
