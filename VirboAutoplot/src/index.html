@@ -23,8 +23,14 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-08-06):</p>
+        <p>Bugfixes (2014-08-15):</p>
         <ul>
+            <li>Y-label is center-justified when there are multiple lines.</li>
+            <li>spaces and underscores in component names are ignored, when exact matches cannot be found.</li>
+            <li>getDataSet action in Jython limits suggested variable name to 30 characters</li>            
+            <li>improve completions in PDS/PPI plugin, to support testing.</li>
+            <li>PDS/PPI discovers can use times in second column.</li>
+            <li>PDS/PPI can use .csv files.</li>
             <li>PDS/PPI uses "times=false" to speed things up for now.</li>
             <li>JNLP single-instance bug that resulted in NullPointerException</li>
             <li>CDF Metadata uses arrays when there are multiple values.  Thanks Ken for pointing this out.</li>
@@ -65,6 +71,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>multiline justification property</li>
+            <li>Jython completions made more readable shortening names like org.das2.datum.Datum to Datum, etc</li>
             <li>where in CDF readers allows mode, median, and mean filters.</li>
             <li>OpenDAP looks for missing_value and title metadata, preparing to update demo 1 bookmark.</li>
             <li>CDAWeb vap servlet improves error feedback</li>
