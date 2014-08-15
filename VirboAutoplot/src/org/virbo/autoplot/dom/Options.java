@@ -210,7 +210,7 @@ public class Options extends DomNode {
     /**
      * for multiline labels, the alignment, where 0 is left, 0.5 is center, and 1.0 is right.
      */
-    protected float multiLineTextAlignment = 0.f;
+    protected float multiLineTextAlignment = 0.5f;
     public static final String PROP_MULTILINETEXTALIGNMENT = "multiLineTextAlignment";
 
     public float getMultiLineTextAlignment() {
