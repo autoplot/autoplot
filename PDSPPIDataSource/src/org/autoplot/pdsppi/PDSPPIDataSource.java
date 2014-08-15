@@ -11,11 +11,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
@@ -56,11 +59,20 @@ public class PDSPPIDataSource extends AbstractDataSource {
         QDataSet ds= read.readTable( f.toString(), mon );
         QDataSet result= DataSetOps.unbundle( ds, param );
         
+        if ( result.property(QDataSet.DEPEND_0)==null ) {
+            QDataSet bds= (QDataSet) ds.property(QDataSet.BUNDLE_1);
+            int i= DataSetOps.indexOfBundledDataSet( ds, param );
+            String n= (String) bds.property(QDataSet.DEPENDNAME_0,i);
+            if ( n!=null ) {
+                result= Ops.link( DataSetOps.unbundle(ds,n), result );
+            }
+        }
+        
         QDataSet ah= Ops.autoHistogram(result);
         Map<String,Object> up= (Map<String,Object>) ah.property(QDataSet.USER_PROPERTIES);
         Map<Double,Integer> outl= (Map<Double,Integer>) up.get("outliers");
         Integer outlierCount= (Integer) up.get("outlierCount");
-        if ( outlierCount>10 ) {
+        if ( outlierCount>10 ) { //TODO: review this code.  PDSPPI should be doing this.
             for ( Entry<Double,Integer> out: outl.entrySet() ) {
                 if ( out.getValue()>outlierCount*8/10 ) { // ID FILL
                     logger.log(Level.FINE, "identified fill: {0}", out.getKey());
