@@ -46,6 +46,7 @@ import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.datum.InconvertibleUnitsException;
+import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.dataset.QDataSet;
@@ -869,12 +870,15 @@ public class ScriptContext extends PyJavaInstance {
      * and dst should be a view.  The properties must fire property
      * change events for the binding mechanism to work.
      * 
+     * As of v2014a_10, if the src is a DomNode and a child of the application, then use
+     * dom.getController().bind so that the vap will contain the binding.
+     * 
      * Example:
      * model= getApplicationModel()
      * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
      * 
-     * @see ApplicationController.bind(Object src, String srcProp, Object dst, String dstProp), which will save the binding to a
-     * vap
+     * @see ApplicationController.bind( DomNode src, String srcProp, Object dst, String dstProp), 
+     *    which will save the binding to a vap.
      * @param src java bean such as model.getPlotDefaults()
      * @param srcProp a property name such as "title"
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
@@ -882,6 +886,11 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void bind( Object src, String srcProp, Object dst, String dstProp ) {
         if ( DasApplication.hasAllPermission() ) {
+            if ( src instanceof DomNode && dom.getController().getElementById(((DomNode)src).getId())==src ) {
+                DomNode srcNode= (DomNode)src;
+                dom.getController().bind( srcNode, srcProp, dst, dstProp );
+                return;
+            }
             BeanProperty srcbp= BeanProperty.create(srcProp);
             Object value= srcbp.getValue(src);
             if ( value==null ) {
