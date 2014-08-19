@@ -284,11 +284,14 @@ public class Test019 {
 
     public static void main( String[] args ) {
         try {
+            System.err.println( "=testDeadFileSystemListing=" );
             testDeadFileSystemListing();
             TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
             tp.format( TimeUtil.now(), null);
             
+            System.err.println( "=testFileSystemListing=" );
             testFileSystemListing();
+            System.err.println( "=testFSMVersioning=" );
             testFSMVersioning();
             
             tp= TimeParser.create("$Y$m$d-$(enum,values=a|b|c|d,id=sc)");
@@ -297,6 +300,7 @@ public class Test019 {
             System.err.println( "sc="+extra.get("sc") );
             testParse8601(); // this test comes from a test within das2.
             testTimeParser();
+            System.err.println( "=testRestrictedFileSystemAccess=" );
             testRestrictedFileSystemAccess();
             testLayout();
             testFileSystemModel();
