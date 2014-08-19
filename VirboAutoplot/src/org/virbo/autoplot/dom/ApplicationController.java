@@ -1753,10 +1753,19 @@ public class ApplicationController extends DomNodeController implements RunLater
 
 
     /**
+     * for debugging in scripts.
+     * @return the BindingSupport object.
+     */
+    public BindingSupport peekBindingSupport() {
+        return this.bindingSupport;
+    }    
+
+    /**
      * binds two bean properties together.  Bindings are bidirectional, but
      * the initial copy is from src to dst.  In MVC terms, src should be the model
      * and dst should be a view.  The properties must fire property
-     * change events for the binding mechanism to work.
+     * change events for the binding mechanism to work.  A converter object can be 
+     * provided that converts the object type between the two nodes.
      *
      * BeansBinding library is apparently not thread-safe.
      * 
@@ -1769,6 +1778,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param srcProp a property name such as "title"
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
      * @param dstProp a property name such as "label"
+     * @param converter a converter object for the binding.  (e.g. Color name to Color object)
      */
     public void bind(DomNode src, String srcProp, Object dst, String dstProp, Converter converter ) {
         
@@ -1858,17 +1868,25 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
     }
-
-    public BindingSupport peekBindingSupport() {
-        return this.bindingSupport;
-    }
     
     /**
-     * bind the dom node to another object.
-     * @param src
-     * @param srcProp string containing the property name.
-     * @param dst
-     * @param dstProp
+     * binds two bean properties together.  Bindings are bidirectional, but
+     * the initial copy is from src to dst.  In MVC terms, src should be the model
+     * and dst should be a view.  The properties must fire property
+     * change events for the binding mechanism to work.
+     *
+     * BeansBinding library is apparently not thread-safe.
+     * 
+     * Example:
+     *<blockquote><pre><small>{@code
+     * model= getApplicationModel()
+     * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
+     *}</small></pre></blockquote> 
+     * @param src java bean such as model.getPlotDefaults()
+     * @param srcProp a property name such as "title"
+     * @param dst java bean such as model.getPlotDefaults().getXAxis()
+     * @param dstProp a property name such as "label"
+     * @see ScriptContext.bind( Object src, String srcProp, Object dst, String dstProp), which can bind any two objects together.
      */
     public void bind( DomNode src, String srcProp, Object dst, String dstProp) {
         bind(src, srcProp, dst, dstProp, null );
