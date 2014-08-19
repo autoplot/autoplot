@@ -573,6 +573,7 @@ public class ScriptContext extends PyJavaInstance {
         waitUntilIdle();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
+        System.err.println("writeToPng(filename) uses w="+width+",h="+height+")");
         writeToPng( filename, width, height );
         File f= new File(filename);
         setStatus("wrote to "+f.getAbsolutePath());
