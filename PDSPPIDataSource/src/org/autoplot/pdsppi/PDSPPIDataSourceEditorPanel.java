@@ -20,7 +20,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FSTreeModel;
@@ -184,12 +186,35 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         return removeExtraSlashes( idComboBox.getSelectedItem().toString() );
     }
     
+    private void setSelectedProduct( JTree tree, TreeModel m, String s ) { 
+        String[] ss= s.split("/",-2);
+        Object parent= m.getRoot();
+        TreePath p= new TreePath(parent);
+        for ( String s1 : ss ) {
+            int idx= -1;
+            for ( int i=0; i<m.getChildCount(parent); i++ ) {
+                if ( m.getChild( parent, i).toString().equals(s1+"/") ) {
+                    idx= i;
+                }
+            }
+            if ( idx!=-1 ) {
+                parent= m.getChild(parent,idx);
+                p= p.pathByAddingChild( parent );
+            } else {
+            }
+        }
+        tree.setSelectionPath(p);
+    }
+    
     private void pickProductButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickProductButtonActionPerformed
         try {
             String l_id;
             String root= getCurrentRoot();
             FileSystem fs= new PDSPPIFileSystem( root );
+            String s= idTextField.getText( );
             javax.swing.JTree tree= new javax.swing.JTree( new FSTreeModel(fs) );
+   //TODO: get this working...
+            //setSelectedProduct( tree, tree.getModel(), s );
             ImageIcon icon= new ImageIcon( PDSPPIDataSourceEditorPanel.class.getResource("/resources/ppi_home_16_crop.gif") );
             if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( idComboBox, 
                     new JScrollPane(tree), 
