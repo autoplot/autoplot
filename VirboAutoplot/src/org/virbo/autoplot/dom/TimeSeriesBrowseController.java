@@ -116,6 +116,7 @@ public class TimeSeriesBrowseController {
                     try {
                         if ( fpe!=null && fpe.getController().getDataSourceFilter().getController().isPendingChanges() ) {
                             logger.log( Level.FINEST, "DataSourceFilter is already pending changes, retickle");
+                            changesSupport.performingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
                             updateTsbTimer.tickle(); 
                         } else {
                             changesSupport.performingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
