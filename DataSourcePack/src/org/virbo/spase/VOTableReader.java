@@ -176,13 +176,16 @@ public class VOTableReader {
                     String arraysize= attributes.getValue("arraysize");
                     
                     if ( dt.equals("char") ) {
-                        if ( ( ucd!=null && ucd.equals("time.epoch") ) || ( sunit!=null && sunit.equals("DateTime") ) ) {
+                         if ( ( ucd!=null && ucd.equals("time.epoch") ) || ( sunit!=null && sunit.equals("DateTime") ) ) {
                             sunit= UNIT_UTC;
                             datatypes.add( DATATYPE_UTC );
                         } else if ( ( ucd!=null && ucd.equals("time.start") ) ) {
                             sunit= UNIT_UTC;
                             datatypes.add( DATATYPE_UTC );
                         } else if ( ( ucd!=null && ucd.equals("time.stop") ) ) {
+                            sunit= UNIT_UTC;
+                            datatypes.add( DATATYPE_UTC );
+                        } else if ( name.equalsIgnoreCase("UTC") ) {
                             sunit= UNIT_UTC;
                             datatypes.add( DATATYPE_UTC );
                         } else {
