@@ -186,15 +186,26 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         return removeExtraSlashes( idComboBox.getSelectedItem().toString() );
     }
     
+    /** 
+     * there's a little problem that we can't set this on the event thread, because it 
+     * involves listing files.
+     * @param tree
+     * @param m
+     * @param s 
+     */
     private void setSelectedProduct( JTree tree, TreeModel m, String s ) { 
         String[] ss= s.split("/",-2);
         Object parent= m.getRoot();
         TreePath p= new TreePath(parent);
         for ( String s1 : ss ) {
+            s1= s1+"/";
             int idx= -1;
             for ( int i=0; i<m.getChildCount(parent); i++ ) {
-                if ( m.getChild( parent, i).toString().equals(s1+"/") ) {
+                String test= m.getChild( parent, i).toString();
+                if ( test.equals(s1) ) {
                     idx= i;
+                    parent= m.getChild(parent,idx);
+                    break;
                 }
             }
             if ( idx!=-1 ) {
@@ -212,8 +223,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             String root= getCurrentRoot();
             FileSystem fs= new PDSPPIFileSystem( root );
             String s= idTextField.getText( );
-            javax.swing.JTree tree= new javax.swing.JTree( new FSTreeModel(fs) );
-   //TODO: get this working...
+            javax.swing.JTree tree= new javax.swing.JTree( new FSTreeModel(fs) );   
             //setSelectedProduct( tree, tree.getModel(), s );
             ImageIcon icon= new ImageIcon( PDSPPIDataSourceEditorPanel.class.getResource("/resources/ppi_home_16_crop.gif") );
             if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( idComboBox, 
