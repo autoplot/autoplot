@@ -320,10 +320,10 @@ public class EditorAnnotationsSupport {
     public String getToolTipText(MouseEvent me) {
         int offset= editorPanel.viewToModel(me.getPoint());
         if ( editorPanel.getSelectionStart()<=offset && offset<editorPanel.getSelectionEnd() ) {
-            String eval= editorPanel.getSelectedText();
+            String expr= editorPanel.getSelectedText();
             if ( interp!=null ) {
                 try {
-                    PyObject po= interp.eval(eval);
+                    PyObject po= interp.eval(expr);
                     String peek;
                     peek= String.valueOf( po.__str__() );
                     return peek;
