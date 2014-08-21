@@ -271,7 +271,6 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
          data= { 'x':range(s[1]), 'y':xx, 'delta_plus':delta_plus, 'delta_minus':delta_minus, 'tags':['x','z','delta_plus','delta_minus']  }
          qstream( data, tmpfile, ascii=0, xunits='', delta_plus='delta_plus', delta_minus='delta_minus' )
    else:
-     print 'np=', np, ' xx=', xx, ' yy=', yy
      if np==3:
         data= { 'x':xx, 'z':zz, 'tags':['x','z']  }
         das2stream( data, tmpfile, ytags=yy, xunits=xunits, ascii=1 )
