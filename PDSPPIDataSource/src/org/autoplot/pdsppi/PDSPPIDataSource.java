@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetOps;
@@ -60,6 +61,12 @@ public class PDSPPIDataSource extends AbstractDataSource {
         logger.log(Level.FINE, "getDataSet {0}", url);
         File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon );
         mon.setProgressMessage("reading data");
+        
+        String error= PDSPPIDB.getInstance().checkXML(f);
+        if ( error!=null ) {
+            throw new NoDataInIntervalException(error);
+        }
+        
         QDataSet ds= read.readTable( f.toString(), mon );
         QDataSet result= DataSetOps.unbundle( ds, param );
         
