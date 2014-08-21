@@ -1,9 +1,13 @@
+# Write from python to d2s.  This will not work on Windows because of linefeeds.  (Ask Chris
+# how to write out 0x10 and doubles.)
+
 ### for rank 2, ytags must be specified
 ## ascii, boolean, use ascii transfer types
+dataStruct=1
 
 def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
 #filename='/tmp/python.d2s'
-#ascii=1
+#ascii=0
 #dataStruct= { 'x':[1,2,3,4,5], 'y':[2,3,4,4,3] }
 #xunits= ''
 #if (True):
@@ -48,7 +52,7 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
       if ( rank==1 ):
          packetDescriptor.append( '   <y type="'+datatype+'" name="'+name+'" idlname="'+t[i]+'" />' )
 
-         if ( i<nt ): format.append('%16.4e')
+         if ( i<nt-1 ): format.append('%16.4e')
          else: format.append( '%15.3e' )
          totalItems= totalItems + 1
       else:
@@ -57,7 +61,7 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
          nitems= s[2]
          packetDescriptor= packetDescriptor + '   <yscan type="' +datatype+'" name="'+name +'" nitems="'+str(nitems)  +'" yTags="'+sytags+'"'             +' />' 
          for i in xrange(1,nitems): format.append('%16.4e')
-         if ( i<len(t) ):
+         if ( i<nt-1 ):
              format.append('%16.4e')
          else:
              format.append('%15.4e')
@@ -97,7 +101,7 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
             s= format[j] %  dataStruct[t][i]
             unit.write( s )
          else:
-            unit.write( double(dataStruct[t][i]) )
+            unit.write( float(dataStruct[t][i]) )
       unit.write( '\n' )
     
    unit.close() 
