@@ -23,7 +23,7 @@ public interface DataSource {
      * retrieve the dataset.  This allowed to be sub-interactive or batch time scale, and will block
      * until the dataset is produced.
      *
-     * //TODO: I believe this this may return null when no data is available.
+     * This may return null when no data is available.
      *
      * If the user cancelled the operation, then java.io.InterrupedIOExcaption or
      * better yet org.das2.CancelledOperationException should be called.  These will
@@ -69,7 +69,14 @@ public interface DataSource {
     Map<String,Object> getProperties();
    
     /**
-     * cookie jar of cabilities, see org.virbo.datasource.capability
+     * cookie jar of capabilities, see org.virbo.datasource.capability.  Each capability can be 
+     * queried, and either an object implementing the capability or null is returned.  Example
+     * capabilities include:<table>
+     * <tr><td>TimeSeriesBrowse</td><td>which allows the user to request data from a different interval. </td></tr>
+     * <tr><td>Caching</td><td>which should be queried before the loader is called again.</td></tr>
+     * </table>
+     * Note the DataSourceFactory also has a getCapability method, solely to provide TimeSeriesBrowse so that 
+     * new URIs can be created in without reading data.
      */
     <T> T getCapability( Class<T> clazz );
 }
