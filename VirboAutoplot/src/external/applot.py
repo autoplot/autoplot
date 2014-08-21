@@ -47,7 +47,11 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
           continue
       else:
           name= tags[i]    ### stream reader needs a default plane
-      rank= 1
+      if ( isinstance( d, list ) ):
+          rank= 1
+      elif ( hasattr( d, "shape") ):  # check for numpy
+          rank= len(d.shape)
+
       if ( rank==1 ):
          packetDescriptor.append( '   <y type="'+datatype+'" name="'+name+'" idlname="'+tags[i]+'" />' )
 
@@ -56,9 +60,10 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
          totalItems= totalItems + 1
       else:
          if ytags==None: ytags= range(s[2])
-         sytags= ','.join( ytags.strip() )
-         nitems= s[2]
-         packetDescriptor= packetDescriptor + '   <yscan type="' +datatype+'" name="'+name +'" nitems="'+str(nitems)  +'" yTags="'+sytags+'"'             +' />' 
+         sytags= ','.join( [ "%f"%n for n in ytags ] )
+         nitems= len(ytags)
+         packetDescriptor.append( '   <yscan type="' +datatype+'" name="' +name +'" nitems="'+str(nitems) +'" yTags="'+sytags+'"' +' />' )
+ 
          for i in xrange(1,nitems): format.append('%16.4e')
          if ( i<nt-1 ):
              format.append('%16.4e')
@@ -91,18 +96,33 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
    
    keys= dataStruct.keys()
    
+   newline= ascii
    for i in xrange(nr):
       unit.write( ':01:' )
       for j in xrange(nt):
          tag= tags[j]
          if ( ascii ):
-            #s= string( data[:,i], format=format )
-            s= format[j] %  dataStruct[tag][i]
-            unit.write( s )
+            rec= dataStruct[tag][i]
+            if hasattr(rec, "__len__"):
+               l= len(rec)
+               for k in xrange(l):
+                  s= format[j] %  rec[k]
+                  unit.write( s )
+               if ( j==nt-1 ): newline=False
+            else:
+               s= format[j] % rec
+               unit.write( s )
          else:
             import struct
-            unit.write( struct.pack( '>d', dataStruct[tag][i] ) )
-      if ( ascii ): unit.write( '\n' )
+            rec= dataStruct[tag][i]
+            if hasattr(rec, "__len__"):
+               l= len(rec)
+               for j in xrange(l):
+                  unit.write( struct.pack( '>d', rec[j] ) )
+            else:
+               unit.write( struct.pack( '>d', rec ) )
+
+      if ( newline ): unit.write( '\n' )
     
    unit.close() 
 
@@ -253,7 +273,7 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
       if ( y!=None ): yy= y
       if ( z!=None ): zz= z
    
-   ascii=0
+   ascii=1
 
    if ( delta_plus!=None and delta_minus!=None ):
      if ( ext != 'qds' ):
