@@ -13,7 +13,6 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
 #if (True):
 
    print 'writing das2stream to ' + filename
-   print dataStruct
    import time
 
    streamHeader= [ '[00]xxxxxx<stream source="applot.pro" localDate="'+time.asctime()+'">', '</stream>' ]
@@ -321,5 +320,5 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
 #      endif
 #   endfor
 
-test_dump()
+#test_dump()
 #applot( [1,2,3,4,5] )
