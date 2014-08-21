@@ -77,7 +77,7 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
    x= x[0:4]+'%06d' % contentLength + x[10:]
    packetDescriptor[0]= x
 
-   unit= open( filename, 'w' )
+   unit= open( filename, 'wb' )
 
    for i in xrange(len(streamHeader)):
      unit.write( streamHeader[i] )
@@ -85,7 +85,7 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
 
    for i in xrange(len(packetDescriptor)):
      unit.write( packetDescriptor[i] )
-     unit.write( '\n' )    #'\0a' )
+     unit.write( '\n' )   
 
    nr= len( dataStruct['x'] )
    
@@ -100,8 +100,9 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
             s= format[j] %  dataStruct[tag][i]
             unit.write( s )
          else:
-            unit.write( float(dataStruct[tag][i]) )
-      unit.write( '\n' )
+            import struct
+            unit.write( struct.pack( '>d', dataStruct[tag][i] ) )
+      if ( ascii ): unit.write( '\n' )
     
    unit.close() 
 
@@ -252,39 +253,41 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
       if ( y!=None ): yy= y
       if ( z!=None ): zz= z
    
+   ascii=0
+
    if ( delta_plus!=None and delta_minus!=None ):
      if ( ext != 'qds' ):
          raise Exception('internal error, ext does should be qds')
      
      if np==3:
        data= { 'x':xx, 'z':zz, 'tags':['x','z'] }
-       qstream( data, tmpfile, ytags=yy, xunits=xunits, ascii=1  )
+       qstream( data, tmpfile, ytags=yy, xunits=xunits, ascii=ascii  )
      elif np==2:
        data= { 'x':xx, 'y':yy, 'delta_plus':delta_plus, 'delta_minus':delta_minus, 'tags':['x','z','delta_plus','delta_minus'] }
-       qstream( data, tmpfile, ascii=1, xunits=xunits, delta_plus='delta_plus', delta_minus='delta_minus'  )
+       qstream( data, tmpfile, ascii=ascii, xunits=xunits, delta_plus='delta_plus', delta_minus='delta_minus'  )
      else:
        s= [1]  # TODO: support rank 2
        if s[0]==2:
          data= { 'x':range(s[1]), 'z':xx, 'tags':['x','z'] }
-         qstream( data, tmpfile, ytags=findgen(s[2]), ascii=1, xunits='' )
+         qstream( data, tmpfile, ytags=findgen(s[2]), ascii=ascii, xunits='' )
        else:
          data= { 'x':range(s[1]), 'y':xx, 'delta_plus':delta_plus, 'delta_minus':delta_minus, 'tags':['x','z','delta_plus','delta_minus']  }
-         qstream( data, tmpfile, ascii=0, xunits='', delta_plus='delta_plus', delta_minus='delta_minus' )
+         qstream( data, tmpfile, ascii=ascii, xunits='', delta_plus='delta_plus', delta_minus='delta_minus' )
    else:
      if np==3:
         data= { 'x':xx, 'z':zz, 'tags':['x','z']  }
-        das2stream( data, tmpfile, ytags=yy, xunits=xunits, ascii=1 )
+        das2stream( data, tmpfile, ytags=yy, xunits=xunits, ascii=ascii )
      elif np==2:
         data= { 'x':xx, 'y':yy, 'tags':['x','y'] }
-        das2stream( data, tmpfile, ascii=1, xunits=xunits )
+        das2stream( data, tmpfile, ascii=ascii, xunits=xunits )
      else:
         rank=1
         if ( rank==2 ):
           data= { 'x':range(len(xx)), 'z':xx, 'tags':['x','z']  }
-          das2stream( data, tmpfile, ytags=xrange(s[2]), ascii=1, xunits='' )
+          das2stream( data, tmpfile, ytags=xrange(s[2]), ascii=ascii, xunits='' )
         else:
           data= { 'x':range(len(xx)), 'y':xx, 'tags':['x','y']  }
-          das2stream( data, tmpfile, ascii=1, xunits='' )
+          das2stream( data, tmpfile, ascii=ascii, xunits='' )
     
    if noplot==1:
       return
