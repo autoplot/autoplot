@@ -8,6 +8,7 @@ package org.autoplot.pdsppi;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -234,6 +235,27 @@ public class PDSPPIDB {
     }
     
     /**
+     * check if the file appears to be XML.  This currently looks for <pre>"<?xml "</pre>
+     * @param f the file
+     * @return null if the file appears to be XML, the first line otherwise.
+     * @throws IOException 
+     */
+    String checkXML( File f ) throws IOException {
+        BufferedReader read=null;
+        try {
+            read= new BufferedReader( new InputStreamReader( new FileInputStream(f) ) );
+            String s= read.readLine();
+            if ( s.length() >= 6 && s.substring(0,6).equals("<?xml ") ) {
+                return null;
+            } else {
+                return s;
+            }
+        } finally {
+            if ( read!=null ) read.close();
+        }
+    }
+    
+    /**
      * return a list of the plottable parameter datasets within the ID.
      * TODO: this loads the entire dataset, this will be fixed.
      * @param id
@@ -249,6 +271,11 @@ public class PDSPPIDB {
             mon.setProgressMessage("downloading data");
             logger.log(Level.FINE, "getParams {0}", url);
             File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon );
+            String s= checkXML(f);
+            if ( s!=null ) {
+                throw new IllegalArgumentException("file does not appear to be xml: "+s );
+            }
+            
             mon.setProgressMessage("reading data");
             QDataSet ds= read.readHeader( f.toString(), mon );
             
