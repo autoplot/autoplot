@@ -3,17 +3,17 @@
 
 ### for rank 2, ytags must be specified
 ## ascii, boolean, use ascii transfer types
-dataStruct=1
 
 def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
+
 #filename='/tmp/python.d2s'
 #ascii=0
-#dataStruct= { 'x':[1,2,3,4,5], 'y':[2,3,4,4,3] }
+#dataStruct= { 'x':[1,2,3,4,5], 'y':[2,3,4,4,3], 'tags':['x','y'] }
 #xunits= ''
 #if (True):
 
    print 'writing das2stream to ' + filename
-
+   print dataStruct
    import time
 
    streamHeader= [ '[00]xxxxxx<stream source="applot.pro" localDate="'+time.asctime()+'">', '</stream>' ]
@@ -31,26 +31,26 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
    else: datatype='sun_real8'
 
    packetDescriptor= [ '[01]xxxxxx<packet>' ]
-   t= dataStruct.keys()
-   nt= len(t)
-   packetDescriptor.append( '   <x type="'+xdatatype+'" name="'+t[0]+'" units="'+xunits+'" />' )
+   tags= dataStruct['tags']
+   nt= len(tags)
+   packetDescriptor.append( '   <x type="'+xdatatype+'" name="'+tags[0]+'" units="'+xunits+'" />' )
 
    totalItems=1
 
    format=['%24.12f']
    reclen= 4 + 24 + (nt-1) * 20
    i=0
-   for tags in dataStruct:
-      d= dataStruct[tags]
+   for tag in tags:
+      d= dataStruct[tag]
       if ( i==0 ):
           name=''
           i=i+1
           continue
       else:
-          name= t[i]    ### stream reader needs a default plane
+          name= tags[i]    ### stream reader needs a default plane
       rank= 1
       if ( rank==1 ):
-         packetDescriptor.append( '   <y type="'+datatype+'" name="'+name+'" idlname="'+t[i]+'" />' )
+         packetDescriptor.append( '   <y type="'+datatype+'" name="'+name+'" idlname="'+tags[i]+'" />' )
 
          if ( i<nt-1 ): format.append('%16.4e')
          else: format.append( '%15.3e' )
@@ -95,13 +95,13 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
    for i in xrange(nr):
       unit.write( ':01:' )
       for j in xrange(nt):
-         t= keys[j]
+         tag= tags[j]
          if ( ascii ):
             #s= string( data[:,i], format=format )
-            s= format[j] %  dataStruct[t][i]
+            s= format[j] %  dataStruct[tag][i]
             unit.write( s )
          else:
-            unit.write( float(dataStruct[t][i]) )
+            unit.write( float(dataStruct[tag][i]) )
       unit.write( '\n' )
     
    unit.close() 
@@ -110,7 +110,7 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
 def test_dump():
    x= range(3000)
    y= range(2,3002)
-   data= { 'x':x, 'y':y }
+   data= { 'x':x, 'y':y, 'tags':['x','y'] }
    das2stream( data, '/tmp/my.d2s', ascii=1 )
 
 
@@ -220,29 +220,6 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
 
    port= 12345
    
-#   if keyword_set(respawn) then begin
-#      javahome= getenv( 'JAVA_HOME' )
-#      if javahome eq '' then javahome= 'c:/"program files"/java/jre1.6.0_03/'
-#
-#      print, 'spawn autoplot java process'
-#      cmd= javahome+'/bin/java -cp '+classpath+ ' org.virbo.autoplot.AutoplotUI --port='+strtrim(port,2)
-#      print, cmd
-#      if !version.os_family eq 'Windows' then begin
-#        spawn, cmd, pid=appid, /nowait
-#      endif else begin
-#        spawn, cmd+' &', pid=appid
-#      endelse
-#
-#      t0= systime(1)
-#      print, 'sleeping until AP wakes up...'
-#      while ( ( systime(1)-t0) lt 15 && tryPortConnect( 'localhost', port ) ne 0 ) do begin
-#          sleep, 1
-#          print, 'sleeping...'
-#      endwhile
-#
-#      print, 'survived spawn'
-#   endif
-
    ext='d2s'
    if ( delta_plus!=None ):
        ext='qds'
@@ -251,7 +228,7 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
      import datetime
      dt= datetime.datetime.today()
      tag= dt.strftime("%Y%m%dT%H%M%S")
-     tmpfile= '/tmp/' + 'autoplot.' + tag + '.???.'+ext
+     tmpfile= '/tmp/' + 'autoplot.' + tag + '.001.'+ext
    else:
      if ( tmpfile.index('.'+ext) != len(tmpfile)-4 ):
        tmpfile= tmpfile + '.'+ext  # add the extension
@@ -281,34 +258,35 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
          raise Exception('internal error, ext does should be qds')
      
      if np==3:
-       data= { 'x':xx, 'z':zz }
-       qstream( data, tmpfile, ytags=yy, xunits=xunits, ascii=0  )
+       data= { 'x':xx, 'z':zz, 'tags':['x','z'] }
+       qstream( data, tmpfile, ytags=yy, xunits=xunits, ascii=1  )
      elif np==2:
-       data= { 'x':xx, 'y':yy, 'delta_plus':delta_plus, 'delta_minus':delta_minus }
-       qstream( data, tmpfile, ascii=0, xunits=xunits, delta_plus='delta_plus', delta_minus='delta_minus' )
+       data= { 'x':xx, 'y':yy, 'delta_plus':delta_plus, 'delta_minus':delta_minus, 'tags':['x','z','delta_plus','delta_minus'] }
+       qstream( data, tmpfile, ascii=1, xunits=xunits, delta_plus='delta_plus', delta_minus='delta_minus'  )
      else:
        s= [1]  # TODO: support rank 2
        if s[0]==2:
-         data= { 'x':range(s[1]), 'z':xx }
-         qstream( data, tmpfile, ytags=findgen(s[2]), ascii=0, xunits='' )
+         data= { 'x':range(s[1]), 'z':xx, 'tags':['x','z'] }
+         qstream( data, tmpfile, ytags=findgen(s[2]), ascii=1, xunits='' )
        else:
-         data= { 'x':range(s[1]), 'y':xx, 'delta_plus':delta_plus, 'delta_minus':delta_minus }
+         data= { 'x':range(s[1]), 'y':xx, 'delta_plus':delta_plus, 'delta_minus':delta_minus, 'tags':['x','z','delta_plus','delta_minus']  }
          qstream( data, tmpfile, ascii=0, xunits='', delta_plus='delta_plus', delta_minus='delta_minus' )
    else:
+     print 'np=', np, ' xx=', xx, ' yy=', yy
      if np==3:
-        data= { 'x':xx, 'z':zz }
-        das2stream( data, tmpfile, ytags=yy, xunits=xunits, ascii=0 )
+        data= { 'x':xx, 'z':zz, 'tags':['x','z']  }
+        das2stream( data, tmpfile, ytags=yy, xunits=xunits, ascii=1 )
      elif np==2:
-        data= { 'x':xx, 'y':yy }
-        das2stream( data, tmpfile, ascii=0, xunits=xunits )
+        data= { 'x':xx, 'y':yy, 'tags':['x','y'] }
+        das2stream( data, tmpfile, ascii=1, xunits=xunits )
      else:
         rank=1
         if ( rank==2 ):
-          data= { 'x':range(len(xx)), 'z':xx }
-          das2stream( data, tmpfile, ytags=xrange(s[2]), ascii=0, xunits='' )
+          data= { 'x':range(len(xx)), 'z':xx, 'tags':['x','z']  }
+          das2stream( data, tmpfile, ytags=xrange(s[2]), ascii=1, xunits='' )
         else:
-          data= { 'x':range(len(xx)), 'y':xx }
-          das2stream( data, tmpfile, ascii=0, xunits='' )
+          data= { 'x':range(len(xx)), 'y':xx, 'tags':['x','y']  }
+          das2stream( data, tmpfile, ascii=1, xunits='' )
     
    if noplot==1:
       return
@@ -326,10 +304,6 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
            cmd= 'plotx( "file:'+tmpfile+'" );'  # semicolon means no echo
 
        foo= sendCommand( s, cmd )
-
-       if ytitle!=None:
-          cmd= 'dom.controller.plot.yaxis.label="'+ytitle+'"'  #TODO: this needs attention
-          foo= sendCommand( s, cmd )
 
    else:
       raise Exception( 'error encountered!' )
