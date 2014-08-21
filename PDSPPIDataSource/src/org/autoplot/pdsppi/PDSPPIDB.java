@@ -256,6 +256,31 @@ public class PDSPPIDB {
     }
     
     /**
+     * parameterize the uri so that any number of files can be read in.  For example,
+     **<blockquote><pre><small>{@code
+     * vap+pdsppi:sc=Cassini&id=PPI/CO-S-MIMI-4-LEMMS-CALIB-V1.0/DATA/LACCAVG0_1MIN/2006/LACCAVG0_1MIN_2006269_01&param=E0
+     *}</small></pre></blockquote>
+     * would result in 
+     *<blockquote><pre><small>{@code
+     *vap+pdsppi:sc=Cassini&id=PPI/CO-S-MIMI-4-LEMMS-CALIB-V1.0/DATA/LACCAVG0_1MIN/$Y/LACCAVG0_1MIN_$Y$j_01&param=E0
+     *}</small></pre></blockquote> 
+     * 
+     * @param uri 
+     * @return the aggregation URI or null.
+     */
+    public String checkTimeSeriesBrowse( String uri ) {
+        String agg= org.virbo.datasource.DataSourceUtil.makeAggregation(uri);
+        if ( agg.equals( uri ) ){
+            return null;
+        } else {
+            int i= agg.indexOf("?timerange=");
+            agg= agg.substring(0,i);
+            return agg;
+        }
+    }
+    
+    
+    /**
      * return a list of the plottable parameter datasets within the ID.
      * TODO: this loads the entire dataset, this will be fixed.
      * @param id

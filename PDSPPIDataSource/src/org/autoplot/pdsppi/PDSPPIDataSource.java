@@ -15,6 +15,8 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 import org.virbo.spase.VOTableReader;
 
@@ -30,10 +32,18 @@ public class PDSPPIDataSource extends AbstractDataSource {
     
     PDSPPIDataSource( URI uri ) {
         super(uri);
+        addCability( TimeSeriesBrowse.class, new PDSPPITimeSeriesBrowse(uri.toString()) );
     }
     
     @Override
     public org.virbo.dataset.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
+        String luri= getCapability( TimeSeriesBrowse.class ).getURI();
+        
+        if ( luri!=null ) {
+            URISplit split = URISplit.parse(luri);
+            params = URISplit.parseParams(split.params);
+        }
+
         String id= (String) getParams().get("id");
         String param= (String) getParams().get("param");
         if ( param==null ) {
@@ -77,6 +87,11 @@ public class PDSPPIDataSource extends AbstractDataSource {
         }
         return result;
         
+    }
+
+    @Override
+    public <T> T getCapability(Class<T> clazz) {
+        return super.getCapability(clazz); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

@@ -24,6 +24,7 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.spase.VOTableReader;
 
 /**
@@ -159,7 +160,11 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
 
     @Override
     public <T> T getCapability(Class<T> clazz) {
-        return null;
+        if ( clazz==TimeSeriesBrowse.class ) {
+            return (T) new PDSPPITimeSeriesBrowse();
+        } else {
+            return null;
+        }
     }
 
 
