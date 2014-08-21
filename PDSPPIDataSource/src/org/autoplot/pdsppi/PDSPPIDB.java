@@ -270,7 +270,7 @@ public class PDSPPIDB {
      */
     public String checkTimeSeriesBrowse( String uri ) {
         String agg= org.virbo.datasource.DataSourceUtil.makeAggregation(uri);
-        if ( agg.equals( uri ) ){
+        if ( agg==null || agg.equals( uri ) ){
             return null;
         } else {
             int i= agg.indexOf("?timerange=");
