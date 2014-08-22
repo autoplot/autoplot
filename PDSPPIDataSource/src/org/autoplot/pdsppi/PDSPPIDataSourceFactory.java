@@ -160,11 +160,12 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
 
     @Override
     public <T> T getCapability(Class<T> clazz) {
-        if ( clazz==TimeSeriesBrowse.class ) {
-            return (T) new PDSPPITimeSeriesBrowse();
-        } else {
-            return null;
-        }
+        return null;
+//        if ( clazz==TimeSeriesBrowse.class ) {
+//            return (T) new PDSPPITimeSeriesBrowse();
+//        } else {
+//            return null;
+//        }
     }
 
 

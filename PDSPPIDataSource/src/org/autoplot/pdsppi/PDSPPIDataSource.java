@@ -33,7 +33,7 @@ public class PDSPPIDataSource extends AbstractDataSource {
     
     PDSPPIDataSource( URI uri ) {
         super(uri);
-        addCability( TimeSeriesBrowse.class, new PDSPPITimeSeriesBrowse(uri.toString()) );
+        //addCability( TimeSeriesBrowse.class, new PDSPPITimeSeriesBrowse(uri.toString()) );
     }
     
     @Override
