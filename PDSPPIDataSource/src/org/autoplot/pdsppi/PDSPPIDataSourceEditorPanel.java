@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -282,17 +283,42 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         SwingUtilities.invokeLater(run);
     }
     
+    ListModel getMessageModel( final String message ) {
+        return new DefaultListModel() {
+
+            @Override
+            public Object getElementAt(int index) {
+                return message;
+            }
+
+            @Override
+            public int getSize() {
+                return 1;
+            }
+            
+        };
+    };
+    
     /**
      * given the new ID, update the available params.
      * @param id 
      */
     private void updateParamsSoon( final String id ) {
-        paramList.setModel(new DefaultListModel());
+        paramList.setModel( getMessageModel("Please Wait...") );
         Runnable run= new Runnable() {
            @Override
            public void run() {
-               final Map<String,String> dss= PDSPPIDB.getInstance().getParams( id, new NullProgressMonitor() );
-               updateParamComboBoxSoon(dss);
+               try {
+                  final Map<String,String> dss= PDSPPIDB.getInstance().getParams( id, new NullProgressMonitor() );
+                  updateParamComboBoxSoon(dss);
+               } catch ( final IllegalArgumentException ex ) {
+                  Runnable run= new Runnable() {
+                      public void run() {
+                          paramList.setModel( getMessageModel(ex.getMessage()) );
+                      }
+                  };
+                  SwingUtilities.invokeLater(run);
+               }
            }
         };
         new Thread(run).start();
