@@ -269,14 +269,15 @@ public class PDSPPIDB {
      * @return the aggregation URI or null.
      */
     public String checkTimeSeriesBrowse( String uri ) {
-        String agg= org.virbo.datasource.DataSourceUtil.makeAggregation(uri);
-        if ( agg==null || agg.equals( uri ) ){
-            return null;
-        } else {
-            int i= agg.indexOf("?timerange=");
-            agg= agg.substring(0,i);
-            return agg;
-        }
+        return null;
+        //String agg= org.virbo.datasource.DataSourceUtil.makeAggregation(uri);
+        //if ( agg==null || agg.equals( uri ) ){
+        //    return null;
+        //} else {
+        //    int i= agg.indexOf("?timerange=");
+        //    agg= agg.substring(0,i);
+        //    return agg;
+        //}
     }
     
     
@@ -286,8 +287,9 @@ public class PDSPPIDB {
      * @param id
      * @param mon
      * @return Map label->title of the params.
+     * @throws IllegalArgumentException the server can throw exceptions
      */
-    public Map<String,String> getParams( String id, ProgressMonitor mon ) {
+    public Map<String,String> getParams( String id, ProgressMonitor mon ) throws IllegalArgumentException {
         VOTableReader read;
         String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
         
