@@ -23,8 +23,9 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-08-15):</p>
+        <p>Bugfixes (2014-08-22):</p>
         <ul>
+            <li>minimum limit of 6 characters in QStream fields removed.</li>
             <li>Y-label is center-justified when there are multiple lines.</li>
             <li>spaces and underscores in component names are ignored, when exact matches cannot be found.</li>
             <li>getDataSet action in Jython limits suggested variable name to 30 characters</li>            
@@ -71,7 +72,10 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>multiline justification property</li>
+            <li>bind(o1,p1,o2,p2) is automatically delegated to dom.controller.bind if possible, so the binding becomes part of the vap.</li>
+            <li>multiline justification property allows user to control justification preference</li>
+            <li>applot.py allows plotting to Autoplot from Python and NumPy.</li>
+            <li>VOTable parser allows any column called UTC to be treated as timetag for subsequent columns</li>
             <li>Jython completions made more readable shortening names like org.das2.datum.Datum to Datum, etc</li>
             <li>where in CDF readers allows mode, median, and mean filters.</li>
             <li>OpenDAP looks for missing_value and title metadata, preparing to update demo 1 bookmark.</li>
