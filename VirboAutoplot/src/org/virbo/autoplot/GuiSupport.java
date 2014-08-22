@@ -1163,11 +1163,13 @@ public class GuiSupport {
                 applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
                 applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
                 dom.getController().doplot(plot, pelement, dia.getSecondaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
+                dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(pelement).getUri());
             } else if (dia.getDepCount() == 2) {
                 applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
                 applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
                 applicationModel.addRecent(dia.getTertiaryDataSetSelector().getValue());
                 dom.getController().doplot(plot, pelement, dia.getSecondaryDataSetSelector().getValue(), dia.getTertiaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
+                dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(pelement).getUri());
             } else if (dia.getDepCount() == -1) {
                 //if (pelement == null) {
                 //    pelement = dom.getController().addPlotElement(plot, null);
