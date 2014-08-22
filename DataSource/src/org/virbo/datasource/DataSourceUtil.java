@@ -407,7 +407,7 @@ public class DataSourceUtil {
         
     /**
      * attempt to create an equivalent URL that uses an aggregation template
-     * instead of the explicit filename.
+     * instead of the explicit filename.  This also return null when things go wrong.
      * For example, file:/tmp/20091102.dat -> file:/tmp/$Y$m$d.dat?timerange=20091102
      * Also, look for version numbers.  If multiple periods are found, then use $(v,sep) otherwise use numeric $v.
      *<blockquote><pre><small>{@code
@@ -415,7 +415,7 @@ public class DataSourceUtil {
      *x= makeAggregation("file:/tmp/20091102T02.dat");   // file:/tmp/$Y$m$dT$H.dat?timerange=2009-11-02 2:00 to 3:00
      *}</small></pre></blockquote>
      * @param surl
-     * @return the string with aggregations ($Y.dat) instead of filename (1999.dat)
+     * @return the string with aggregations ($Y.dat) instead of filename (1999.dat) or null, or the original filename.
      */
     public static String makeAggregation( String surl ) {
         String yyyy= "/(19|20)\\d{2}/";
