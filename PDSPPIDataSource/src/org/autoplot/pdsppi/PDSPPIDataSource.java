@@ -38,11 +38,13 @@ public class PDSPPIDataSource extends AbstractDataSource {
     
     @Override
     public org.virbo.dataset.QDataSet getDataSet(ProgressMonitor mon) throws Exception {
-        String luri= getCapability( TimeSeriesBrowse.class ).getURI();
-        
-        if ( luri!=null ) {
-            URISplit split = URISplit.parse(luri);
-            params = URISplit.parseParams(split.params);
+        TimeSeriesBrowse tsb= getCapability( TimeSeriesBrowse.class );
+        if ( tsb!=null ) {
+            String luri= tsb.getURI();
+            if ( luri!=null ) {
+                URISplit split = URISplit.parse(luri);
+                params = URISplit.parseParams(split.params);
+            }
         }
 
         String id= (String) getParams().get("id");
