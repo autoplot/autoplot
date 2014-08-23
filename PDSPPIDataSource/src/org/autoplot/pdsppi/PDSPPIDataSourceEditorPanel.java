@@ -223,7 +223,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             String l_id;
             String root= getCurrentRoot();
             FileSystem fs= new PDSPPIFileSystem( root );
-            String s= idTextField.getText( );
+            //String s= idTextField.getText( );
             javax.swing.JTree tree= new javax.swing.JTree( new FSTreeModel(fs) );   
             //setSelectedProduct( tree, tree.getModel(), s );
             ImageIcon icon= new ImageIcon( PDSPPIDataSourceEditorPanel.class.getResource("/resources/ppi_home_16_crop.gif") );
