@@ -339,6 +339,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     private void datasetComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_datasetComboBoxActionPerformed
         productTextField.setText("");
+        paramList.setModel( getMessageModel("") );
     }//GEN-LAST:event_datasetComboBoxActionPerformed
 
     private void inventoryScComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_inventoryScComboBoxItemStateChanged
