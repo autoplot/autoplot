@@ -269,6 +269,10 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                 //paramComboBox.setModel( new DefaultComboBoxModel(ss) );
                 //paramComboBox.setEnabled(true);
                 
+                if ( ss.length==0 ) {
+                    paramList.setModel( getMessageModel("(No plottable parameters)") );
+                    return;
+                }
                 DefaultListModel lm= new DefaultListModel();
                 for ( String s: ss ) {
                     lm.addElement(s);
@@ -306,7 +310,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
      * @param id 
      */
     private void updateParamsSoon( final String id ) {
-        paramList.setModel( getMessageModel("Please Wait...") );
+        paramList.setModel( getMessageModel("(Please Wait...)") );
         Runnable run= new Runnable() {
            @Override
            public void run() {
@@ -316,7 +320,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                } catch ( final IllegalArgumentException ex ) {
                   Runnable run= new Runnable() {
                       public void run() {
-                          paramList.setModel( getMessageModel(ex.getMessage()) );
+                          paramList.setModel( getMessageModel("("+ex.getMessage()+")" ) );
                       }
                   };
                   SwingUtilities.invokeLater(run);
@@ -338,7 +342,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     }//GEN-LAST:event_idComboBoxActionPerformed
 
     private void inventoryScComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_inventoryScComboBoxItemStateChanged
-        this.sc= evt.getItem().toString();
+        this.sc= evt.getItem().toString().replaceAll("\\+"," ");
         updateInventorySoon();
     }//GEN-LAST:event_inventoryScComboBoxItemStateChanged
 
@@ -353,10 +357,10 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                     
                     if ( sc==null ) {
                         logger.finer("picking arbitrary spacecraft for GUI");
-                        sc=scs[0];
+                        sc=scs[0].replaceAll("\\+"," ");
                     } //TODO: pref for last spacecraft
                     
-                    inventoryScComboBox.setSelectedItem( sc.replaceAll("\\+"," ") );
+                    inventoryScComboBox.setSelectedItem( sc );
                     updateInventorySoon();
                 } };
                 SwingUtilities.invokeLater(run);
@@ -460,7 +464,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     public void setURI(String uri) {
         URISplit split= URISplit.parse(uri);
         Map<String,String> lparams= URISplit.parseParams(split.params);
-        this.sc= lparams.get(SC);
+        this.sc= lparams.get(SC).replaceAll("\\+"," ");
         if ( sc!=null ) {
             this.inventoryScComboBox.setSelectedItem(sc);
         }
@@ -499,9 +503,14 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     public String getURI() {
         String lid= getCurrentRoot() + "/" + this.idTextField.getText(); //TODO: why must I add PPI??
         lid= lid.replaceAll(" ","+");
-        String lparam= this.paramList.getSelectedValue().toString().replaceAll(" ","+");
+        String lparam= (String) this.paramList.getSelectedValue();
+        if ( lparam!=null ) lparam= lparam.replaceAll(" ","+");
         String lsc= inventoryScComboBox.getSelectedItem().toString().replaceAll(" ","+");
-        return "vap+pdsppi:" + SC+"="+ lsc + "&" + ID + "="+ lid + "&" + PARAM + "="+ lparam;
+        if ( lparam==null || lparam.startsWith("(") ) {
+            return "vap+pdsppi:" + SC+"="+ lsc + "&" + ID + "="+ lid;
+        } else {
+            return "vap+pdsppi:" + SC+"="+ lsc + "&" + ID + "="+ lid + "&" + PARAM + "="+ lparam;
+        }
     }
     
     public static void main( String[] args ) {
