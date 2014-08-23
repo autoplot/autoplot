@@ -322,13 +322,13 @@ public class PDSPPIDB {
             
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "IOException from "+url, ex);
-            return Collections.singletonMap( "IOException from "+url, ex.getMessage() );
+            return Collections.singletonMap( "(IOException from "+url+")", ex.getMessage() );
         } catch (SAXException ex) {
             logger.log(Level.SEVERE, "SAXException from "+url, ex);
-            return Collections.singletonMap( "SAXException from "+url, ex.getMessage() );
+            return Collections.singletonMap( "(SAXException from "+url+")", ex.getMessage() );
         } catch (ParserConfigurationException ex) {
             logger.log(Level.SEVERE, "ParserConfigurationException", ex);
-            return Collections.singletonMap( "ParserConfigurationException", ex.getMessage() );
+            return Collections.singletonMap( "(ParserConfigurationException)", ex.getMessage() );
         }
     }
  
