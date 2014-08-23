@@ -28,14 +28,14 @@
                           <Group type="102" attributes="0">
                               <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="idTextField" max="32767" attributes="0"/>
+                              <Component id="productTextField" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="pickProductButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="idComboBox" max="32767" attributes="0"/>
+                              <Component id="datasetComboBox" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -65,12 +65,12 @@
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="idComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="datasetComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="idTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="productTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="pickProductButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
@@ -84,9 +84,9 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JTextField" name="idTextField">
+    <Component class="javax.swing.JTextField" name="productTextField">
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="idTextFieldActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="productTextFieldActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
@@ -108,14 +108,14 @@
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="inventoryScComboBoxItemStateChanged"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JComboBox" name="idComboBox">
+    <Component class="javax.swing.JComboBox" name="datasetComboBox">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="0"/>
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="idComboBoxActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="datasetComboBoxActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="pickProductButton">

@@ -64,10 +64,10 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        idTextField = new javax.swing.JTextField();
+        productTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         inventoryScComboBox = new javax.swing.JComboBox();
-        idComboBox = new javax.swing.JComboBox();
+        datasetComboBox = new javax.swing.JComboBox();
         pickProductButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         paramList = new javax.swing.JList();
@@ -75,9 +75,9 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
 
-        idTextField.addActionListener(new java.awt.event.ActionListener() {
+        productTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                idTextFieldActionPerformed(evt);
+                productTextFieldActionPerformed(evt);
             }
         });
 
@@ -90,9 +90,9 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             }
         });
 
-        idComboBox.addActionListener(new java.awt.event.ActionListener() {
+        datasetComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                idComboBoxActionPerformed(evt);
+                datasetComboBoxActionPerformed(evt);
             }
         });
 
@@ -126,13 +126,13 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(idTextField)
+                                .addComponent(productTextField)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(pickProductButton))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(idComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(datasetComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel4)
@@ -152,11 +152,11 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(inventoryScComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(idComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(datasetComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(idTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(productTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pickProductButton)
                     .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -184,7 +184,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
      * @return 
      */
     private String getCurrentRoot() {
-        return removeExtraSlashes( idComboBox.getSelectedItem().toString() );
+        return removeExtraSlashes( datasetComboBox.getSelectedItem().toString() );
     }
     
     /** 
@@ -227,7 +227,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             javax.swing.JTree tree= new javax.swing.JTree( new FSTreeModel(fs) );   
             //setSelectedProduct( tree, tree.getModel(), s );
             ImageIcon icon= new ImageIcon( PDSPPIDataSourceEditorPanel.class.getResource("/resources/ppi_home_16_crop.gif") );
-            if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( idComboBox, 
+            if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( datasetComboBox, 
                     new JScrollPane(tree), 
                     "Pick Dataset ID",
                     JOptionPane.OK_CANCEL_OPTION, 
@@ -246,8 +246,8 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                         int dotpos= ds.lastIndexOf("."); // pop off the extension
                         ds= ds.substring(0,dotpos);
                     }
-                    idTextField.setText( ds );
-                    l_id= removeExtraSlashes( this.idComboBox.getModel().getSelectedItem().toString() ) + "/" + idTextField.getText();
+                    productTextField.setText( ds );
+                    l_id= removeExtraSlashes( this.datasetComboBox.getModel().getSelectedItem().toString() ) + "/" + productTextField.getText();
                     updateParamsSoon(l_id);
                 }
             }
@@ -330,16 +330,16 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         new Thread(run).start();
     }
     
-    private void idTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idTextFieldActionPerformed
-            String lid= idTextField.getText();
+    private void productTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_productTextFieldActionPerformed
+            String lid= productTextField.getText();
             String root= getCurrentRoot();
             lid= root+"/"+lid;
             updateParamsSoon(lid);
-    }//GEN-LAST:event_idTextFieldActionPerformed
+    }//GEN-LAST:event_productTextFieldActionPerformed
 
-    private void idComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_idComboBoxActionPerformed
-        idTextField.setText("");
-    }//GEN-LAST:event_idComboBoxActionPerformed
+    private void datasetComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_datasetComboBoxActionPerformed
+        productTextField.setText("");
+    }//GEN-LAST:event_datasetComboBoxActionPerformed
 
     private void inventoryScComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_inventoryScComboBoxItemStateChanged
         this.sc= evt.getItem().toString().replaceAll("\\+"," ");
@@ -394,14 +394,14 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             if ( id!=null ) {
                 int i= id.indexOf("/",0);
                 i= id.indexOf("/",i+1);
-                for ( int ii=0; ii<idComboBox.getModel().getSize(); ii++ ) {
-                    String s= idComboBox.getModel().getElementAt(ii).toString(); // DANGER: assumes labels are machine readable
+                for ( int ii=0; ii<datasetComboBox.getModel().getSize(); ii++ ) {
+                    String s= datasetComboBox.getModel().getElementAt(ii).toString(); // DANGER: assumes labels are machine readable
                     if ( isSameId( s, id ) ) {
-                        idComboBox.setSelectedIndex(ii);
+                        datasetComboBox.setSelectedIndex(ii);
                     }
                 }
-                idComboBox.setSelectedItem(id.substring(0,i) );
-                idTextField.setText(id.substring(i+1));
+                datasetComboBox.setSelectedItem(id.substring(0,i) );
+                productTextField.setText(id.substring(i+1));
                 if ( id.length()>i+1 ) {
                     updateParamsSoon(id);
                 }
@@ -416,7 +416,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                 logger.fine("updateInventorySoon");
                 final String[] dss= PDSPPIDB.getInstance().getIds("sc="+sc,"PPI/");
                 Runnable run= new Runnable() { public void run() {
-                    idComboBox.setModel( new DefaultComboBoxModel(dss) );
+                    datasetComboBox.setModel( new DefaultComboBoxModel(dss) );
                     doCheckIdSelectedItem();
                 } };
                 SwingUtilities.invokeLater(run);
@@ -426,8 +426,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox idComboBox;
-    private javax.swing.JTextField idTextField;
+    private javax.swing.JComboBox datasetComboBox;
     private javax.swing.JComboBox inventoryScComboBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -436,6 +435,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList paramList;
     private javax.swing.JButton pickProductButton;
+    private javax.swing.JTextField productTextField;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -501,7 +501,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     @Override
     public String getURI() {
-        String lid= getCurrentRoot() + "/" + this.idTextField.getText(); //TODO: why must I add PPI??
+        String lid= getCurrentRoot() + "/" + this.productTextField.getText(); //TODO: why must I add PPI??
         lid= lid.replaceAll(" ","+");
         String lparam= (String) this.paramList.getSelectedValue();
         if ( lparam!=null ) lparam= lparam.replaceAll(" ","+");
