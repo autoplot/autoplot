@@ -241,8 +241,10 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                         dsb.append(o[i].toString());
                     }
                     String ds= dsb.toString();
-                    if ( ds.endsWith(".lbl") || ds.endsWith(".LBL") || ds.endsWith(".tab" ) || ds.endsWith(".TAB") || ds.endsWith(".csv" ) || ds.endsWith(".CSV") ) {
-                        ds= ds.substring(0,ds.length()-4);
+
+                    if ( PDSPPIDB.isPlottable(ds) ) {
+                        int dotpos= ds.lastIndexOf("."); // pop off the extension
+                        ds= ds.substring(0,dotpos);
                     }
                     idTextField.setText( ds );
                     l_id= removeExtraSlashes( this.idComboBox.getModel().getSelectedItem().toString() ) + "/" + idTextField.getText();
