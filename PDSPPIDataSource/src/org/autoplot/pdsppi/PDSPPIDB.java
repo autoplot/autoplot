@@ -205,16 +205,20 @@ public class PDSPPIDB {
     
     /**
      * return true if the name appears to be a plottable id.
-     * @param id
+     * @param id name from their filesystem that ends with .lbl, .tab, etc.
      * @return true if the id appears to be plottable.
      */
-    public static boolean isPlottable( String id ) {
-        return id.endsWith(".tab" ) || id.endsWith(".TAB") || id.endsWith(".dat" ) || id.endsWith(".DAT");
+    public static boolean isPlottable( String ds ) {
+        if ( ds.endsWith(".lbl") || ds.endsWith(".LBL") || ds.endsWith(".tab" ) || ds.endsWith(".DAT") || ds.endsWith(".dat" ) || ds.endsWith(".TAB") || ds.endsWith(".csv" ) || ds.endsWith(".CSV") ) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
     /**
      * Get the IDs matching the constraint.
-     * @param constraint constaints, such as sc=Galileo
+     * @param constraint constraints, such as sc=Galileo
      * @param reqPrefix each item of result must start with this.  (PPI/ was omitted.)
      * @return 
      */
