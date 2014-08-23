@@ -94,9 +94,9 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
                 String u= cc.surl.substring(0,cc.surlpos);
                 URISplit split= URISplit.parse(u);
                 Map<String,String> params= URISplit.parseParams(split.params);
-                String sc= params.get("sc");
-                sc= sc.replaceAll("\\+"," ");
+                String sc= params.get("sc");                
                 if ( sc!=null ) {
+                    sc= sc.replaceAll("\\+"," ");
                     String[] ids= PDSPPIDB.getInstance().getIds("sc="+sc,"PPI/");
                     List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                     String id1= params.get("id");

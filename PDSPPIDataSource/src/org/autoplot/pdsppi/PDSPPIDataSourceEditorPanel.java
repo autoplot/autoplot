@@ -465,8 +465,9 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     public void setURI(String uri) {
         URISplit split= URISplit.parse(uri);
         Map<String,String> lparams= URISplit.parseParams(split.params);
-        this.sc= lparams.get(SC).replaceAll("\\+"," ");
+        this.sc= lparams.get(SC);
         if ( sc!=null ) {
+            sc= sc.replaceAll("\\+"," ");
             this.inventoryScComboBox.setSelectedItem(sc);
         }
         this.id= lparams.get(ID); 
