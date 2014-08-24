@@ -973,17 +973,25 @@ public abstract class Bookmark {
         List<Bookmark> bookmarks;
 
         /**
-         * a remote bookmark is one that is a copy of a folder at the remote
-         * location.  If it's a remote folder, then we use it to maintain the
-         * bookmarks.  We'll keep a local copy, but this may be updated.
-         * null indicates that this this a not a remote bookmark.
+         * the remote bookmark URL or null.
          */
         String remoteUrl= null;
 
+        /**
+         * set this to the location of the master copy of the bookmarks, or null.
+         * @param url 
+         */
         public void setRemoteUrl( String url ) {
             this.remoteUrl= url;
         }
 
+        /**
+         * a remote bookmark is one that is a copy of a folder at the remote
+         * location.  If it's a remote folder, then we use it to maintain the
+         * bookmarks.  We'll keep a local copy, but this may be updated.
+         * null indicates that this this a not a remote bookmark.
+         * @return a URI or null.
+         */
         public String getRemoteUrl( ) {
             return this.remoteUrl;
         }
@@ -1000,10 +1008,20 @@ public abstract class Bookmark {
          */
         int remoteStatus= REMOTE_STATUS_NOT_LOADED;
 
+        /**
+         * set the remote status.
+         * @param status the new status: -1 not loaded, 0 successful, 1 unsuccessful.
+         */
         public void setRemoteStatus( int status ) {
             this.remoteStatus= status;
         }
 
+        /**
+         * remote status indicator.
+         * -1 not loaded
+         * 0 successful
+         * 1 unsuccessful.
+         */
         public int getRemoteStatus( ) {
             return this.remoteStatus;
         }
