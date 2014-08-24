@@ -22,8 +22,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -46,10 +44,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import org.das2.util.Base64;
-import org.das2.util.filesystem.FileObject;
-import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.FileSystemUtil;
-import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
@@ -65,7 +59,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Internal representation of a Bookmark, containing an Autoplot URI, title, and additional documentation 
+ * for the URI.  This can also be a folder that contains a list of Bookmarks, or a remote folder that is controlled be
+ * a remote bookmarks file./
  * @author jbf
  */
 public abstract class Bookmark {
@@ -113,6 +109,7 @@ public abstract class Bookmark {
      * @return
      * @throws SAXException
      * @throws IOException
+     * @throws org.virbo.autoplot.bookmarks.BookmarksException
      */
     public static List<Bookmark> parseBookmarks( URL url ) throws  IOException, SAXException, BookmarksException {
         try {
@@ -132,6 +129,14 @@ public abstract class Bookmark {
         }
     }
 
+    /**
+     * 
+     * @param data
+     * @return
+     * @throws IOException
+     * @throws SAXException
+     * @throws BookmarksException 
+     */
     public static Bookmark parseBookmark(String data) throws IOException, SAXException, BookmarksException {
         try {
 
@@ -325,17 +330,18 @@ public abstract class Bookmark {
      * @param remoteLevel If &gt;0, then allow remote to be retrieved (this many levels). If &lt;0 then assume remote bookmarks have been resolved.
      * @return Bookmark.  If it's a folder, then bookmark.remoteStatus can be used to determine if it needs to be reloaded.
      * @throws UnsupportedEncodingException
+     * @throws org.virbo.autoplot.bookmarks.BookmarksException
      * @throws IOException
      */
     public static Bookmark parseBookmark( Node element, String vers, int remoteLevel ) throws IOException, BookmarksException {
 
         String uri = null; // read this first in case it's useful as the title
-        String s = null;
+        String s;
         String title = null;
-        ImageIcon icon = null;
-        String description= null;
-        URL descriptionUrl= null;
-        boolean hidden= false;
+        ImageIcon icon;
+        String description;
+        URL descriptionUrl;
+        boolean hidden;
 
         Node n;
 
@@ -471,7 +477,7 @@ public abstract class Bookmark {
 
                         rs= getRemoteBookmarks( remoteUrl, remoteLevel, false, contents );
                         
-                        if ( ( contents.size()==0 ) & !rs.remoteRemote ) {
+                        if ( ( contents.isEmpty() ) & !rs.remoteRemote ) {
                             logger.log(Level.WARNING, "unable to parse bookmarks at {0}", remoteUrl);
                             logger.fine("Maybe using local copy");
                             remoteStatus= Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL;
@@ -521,8 +527,8 @@ public abstract class Bookmark {
             book.setRemoteStatusMsg( remoteStatusMsg );
             
             book.getBookmarks().addAll(contents); 
-            for ( int i=0; i<contents.size(); i++ ) {
-                contents.get(i).setParent(book);
+            for (Bookmark content : contents) {
+                content.setParent(book);
             }
             return book;
             
@@ -533,6 +539,14 @@ public abstract class Bookmark {
 
     }
 
+    /**
+     * parse the bookmarks in the element root into a list of folders and bookmarks.
+     * The root element should be a bookmark-list containing &lt;bookmark-folder&gt; and &lt;bookmark&gt;
+     * A remote level of 1 is implied.
+     * @param root the root node, from which the version scheme should be read
+     * @return the bookmarks, possibly with unresolved remote nodes.
+     * @throws BookmarksException 
+     */
     public static List<Bookmark> parseBookmarks(Element root ) throws BookmarksException {
         String vers= root.getAttribute("version");
         return parseBookmarks( root, vers, 1 );
@@ -542,7 +556,8 @@ public abstract class Bookmark {
      * parse the bookmarks, checking to see what version scheme should be used.
      * @param root the root node, from which the version scheme should be read
      * @param remoteLevel if >0, then allow remote to be retrieved (this many levels). &lt;0 means assume resolve have been resolved.
-     * @return
+     * @throws BookmarksException if the bookmark cannot be parsed.
+     * @return the bookmarks, possibly with unresolved remote nodes.
      */
     public static List<Bookmark> parseBookmarks(Element root, int remoteLevel ) throws BookmarksException {
         logger.log(Level.FINE, "parseBookmarks {0}", remoteLevel);
@@ -552,11 +567,12 @@ public abstract class Bookmark {
 
     /**
      * parse the bookmarks in the element root into a list of folders and bookmarks.
-     * The root element should be a bookmark-list containing <bookmark-folder> and <bookmark>
+     * The root element should be a bookmark-list containing &lt;bookmark-folder&gt; and &lt;bookmark&gt;
      * @param root
      * @param vers null or the version string.  If null, then check for a version attribute.
      * @param remoteLevel if &gt;0, then allow remote to be retrieved (this many levels). &lt;0 means assume resolve have been resolved.
-     * @return
+     * @throws BookmarksException if the bookmark cannot be parsed.
+     * @return the bookmarks, possibly with unresolved remote nodes.
      */
     public static List<Bookmark> parseBookmarks( Element root, String vers, int remoteLevel ) throws BookmarksException {
         if ( vers==null ) {
@@ -630,8 +646,8 @@ public abstract class Bookmark {
 
     /**
      * format the bookmarks into xml for persistent storage.
+     * @param out OutputStream for the bookmarks
      * @param bookmarks List of Bookmark.List or Bookmark
-     * @return
      */
     public static void formatBooks( OutputStream out, List<Bookmark> bookmarks ) {
 
@@ -759,14 +775,13 @@ public abstract class Bookmark {
             parent.appendChild(folder);
 
         }
-        return;
 
     }
 
     /**
      * format the bookmarks into xml for persistent storage.
-     * @param bookmarks List of Bookmark.List or Bookmark
-     * @return
+     * @param bookmark List of Bookmark.List or Bookmark
+     * @return string containing formatted bookmarks
      */
     public static String formatBookmark(Bookmark bookmark) {
 
