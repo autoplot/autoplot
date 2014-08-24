@@ -189,13 +189,15 @@ public class Test140 {
     private static int doBookmarks( List<Bookmark> books, int iid, Map<String,Exception> exceptions, Map<String,Integer> exceptionNumbers ) throws IOException, SAXException, BookmarksException {
         for ( Bookmark b: books ) {
             if ( b instanceof Bookmark.Folder ) {
-                iid= doBookmarks( ((Bookmark.Folder)b).getBookmarks(), iid, exceptions, exceptionNumbers );
+                if ( ( ( Bookmark.Folder ) b ).getRemoteUrl() != null ) {
+                    System.err.println("Skipping remote bookmarks file "  + ( ( Bookmark.Folder ) b ).getRemoteUrl() );
+                } else {
+                    iid= doBookmarks( ((Bookmark.Folder)b).getBookmarks(), iid, exceptions, exceptionNumbers );
+                }
             } else {
                 String uri= ((Bookmark.Item)b).getUri();
                 try {
-                    if ( uri.endsWith(".vap") ) {
-                        do1( uri, iid, true );
-                    }
+                    do1( uri, iid, true );
                 } catch ( Exception ex ) {
                     exceptions.put( uri, ex );
                 } finally {
@@ -296,8 +298,9 @@ public class Test140 {
             //args= new String[] { "144", "http://autoplot.org/developer.vapModifiers" };
             //args= new String[] { "145", "http://sarahandjeremy.net/~jbf/" };
             //args= new String[] { "146", "http://sarahandjeremy.net/jeremy/autoplot/tests/test140/html/RBSP%20ECT%20Data%20Products.html" };
-            args= new String[] { "142", "http://jfaden.net/~jbf/autoplot/test142.txt" };
+            //args= new String[] { "142", "http://jfaden.net/~jbf/autoplot/test142.txt" };
             //args= new String[] { "147", "http://autoplot.org//developer.listOfUris" };
+            args= new String[] { "148", "http://www-pw.physics.uiowa.edu/~jbf/autoplot/pdsppi.xml" };
         }
         testid= Integer.parseInt( args[0] );
         int iid= 0;
