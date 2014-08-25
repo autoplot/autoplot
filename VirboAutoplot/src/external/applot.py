@@ -126,12 +126,177 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
     
    unit.close() 
 
-
 def test_dump():
    x= range(3000)
    y= range(2,3002)
    data= { 'x':x, 'y':y, 'tags':['x','y'] }
    das2stream( data, '/tmp/my.d2s', ascii=1 )
+
+
+# for rank 2, ytags must be specified
+# ascii, boolean, use ascii transfer types
+def qstream( dataStruct, filename, ytags=None, ascii=True, xunits='', delta_plus=None, delta_minus=None ):
+
+   tags= dataStruct['tags']
+   nt= len(tags)
+   name= tags[-1]
+   tname= tags[0]
+
+   print( 'writing qstream to ' + filename )
+   print( tags )
+   import time
+
+   streamHeader= [ '[00]xxxxxx<stream dataset_id="'+name+'" source="applot.pro" localDate="'+time.asctime()+'">', '</stream>' ]
+   contentLength= -10 # don't include the packet tag and content length
+   for i in xrange( len( streamHeader ) ):
+      contentLength += len( streamHeader[i] ) + 1
+
+   x= streamHeader[0]
+   x= '[00]' + '%06d' % contentLength + x[10:]
+   streamHeader[0]= x
+
+   if ( ascii ): xdatatype= 'ascii24'
+   else: xdatatype='double'
+   if ( ascii ): datatype= 'ascii16'
+   else: datatype='double'
+
+   if ( ytags!=None ):
+      ny= len(ytags)
+      svals= ytags[0]
+      for j in xrange(1,len(ytags)):
+         svals= svals+','+ytags[j].strip()
+
+      dep1Descriptor= [ '[99]xxxxxx<packet>' ]
+      dep1Descriptor.append( '     <qdataset id="DEP1" rank="1" >' )
+      dep1Descriptor.append( dep1Descriptor, '       <properties>' )
+      dep1Descriptor.append( dep1Descriptor, '           <property name="NAME" type="String" value="DEP1" />')
+      dep1Descriptor.append( dep1Descriptor, '       </properties>' )
+      dep1Descriptor.append( dep1Descriptor, '       <values encoding="'+datatype+'" length="'+strtrim(ny,2)+'" values="'+svals+'" />' )
+      dep1Descriptor.append( dep1Descriptor, '     </qdataset>' )
+      dep1Descriptor.append( dep1Descriptor, '     </packet>' )
+
+      contentLength= -10 # don't include the packet tag and content length
+      for i in xrange( len( dep1Descriptor ) ):
+         contentLength += len( dep1Descriptor[i] ) + 1
+      endfor
+      x= dep1Descriptor[0]
+      x= '[00]' + '%06d' % contentLength + x[10:]
+      dep1Descriptor[0]= x
+
+
+   packetDescriptor= [ '[01]xxxxxx<packet>' ]
+
+   nt= len(tags)
+   packetDescriptor.append(  '     <qdataset id="'+tname+'" rank="1" >' )
+   packetDescriptor.append(  '       <properties>' )
+   packetDescriptor.append(  '           <property name="NAME" type="String" value="'+tname+'" />' )
+   packetDescriptor.append(  '           <property name="UNITS" type="units" value="'+xunits+'" />' )
+   packetDescriptor.append(  '       </properties>' )
+   packetDescriptor.append(  '       <values encoding="'+xdatatype+'" length="" />' )
+   packetDescriptor.append(  '     </qdataset>' )
+
+   totalItems=1
+
+   format=['%24.12f']
+   reclen= 4 + 24 + (nt-1) * 20
+
+   for tag in tags[1:]:
+      d= dataStruct[tag]
+      if ( isinstance( d, list ) ):
+          rank= 1
+      elif ( hasattr( d, "shape") ):  # check for numpy
+          rank= len(d.shape)
+
+      name= tag  ### stream reader needs a default plane
+      if ( rank==1 ):
+         packetDescriptor.append(  '     <qdataset id="'+name+'" rank="1" >' )
+         packetDescriptor.append(  '       <properties>' )
+         packetDescriptor.append(  '           <property name="NAME" type="String" value="'+name+'" />' )
+         packetDescriptor.append(  '           <property name="DEPEND_0" type="qdataset" value="'+tname+'" />' )
+         if ( i==1 ):
+             if ( delta_plus!=None ):
+                 packetDescriptor.append(  '           <property name="DELTA_PLUS" type="qdataset" value="'+delta_plus+'" />' )
+             if ( delta_minus!=None ):
+                 packetDescriptor.append(  '           <property name="DELTA_MINUS" type="qdataset" value="'+delta_minus+'" />' )
+         packetDescriptor.append(  '       </properties>' )
+         packetDescriptor.append(  '       <values encoding="'+datatype+'" length="" />' )
+         packetDescriptor.append(  '     </qdataset>' )
+         if ( i<nt-1 ): format.append('%16.4e')
+         else: format.append('%15.3e')
+         totalItems+=1
+      else:
+         nitems= d.shape[1]
+         packetDescriptor.append(  '   <qdataset id="'+name+'" rank="2" >' )
+         packetDescriptor.append(  '       <properties>' )
+         packetDescriptor.append(  '           <property name="DEPEND_0" type="qdataset" value="'+tname+'" />' )
+         packetDescriptor.append(  '           <property name="DEPEND_1" type="qdataset" value="DEP1" />' )
+         packetDescriptor.append(  '           <property name="NAME" type="String" value="'+name+'" />' )
+         packetDescriptor.append(  '       </properties>' )
+         packetDescriptor.append(  '       <values encoding="'+datatype+'" length="'+str(nitems)+'" />' )
+         packetDescriptor.append(  '   </qdataset>' )
+         for i in xrange(1,nitems):
+            format.append('e16.4')
+         totalItems+= nitems
+   packetDescriptor.append(  '</packet>' )
+
+   contentLength= -10 # don't include the packet tag and content length
+   for i in xrange(len(packetDescriptor) ):
+       contentLength += len( packetDescriptor[i] ) + 1
+
+   x= packetDescriptor[0]
+   x= x[0:4] + '%06d' % contentLength + x[10:]
+   packetDescriptor[0]= x
+
+   unit= open( filename, 'wb' )
+
+   for i in xrange(len(streamHeader)):
+     unit.write( streamHeader[i] )
+     unit.write( '\n' )
+
+   for i in xrange(len(packetDescriptor)):
+     unit.write( packetDescriptor[i] )
+     unit.write( '\n' )
+
+   nr= len( dataStruct['x'] )
+
+   if ( ytags!=None ):
+      for i in xrange(len(dep1Descriptor)):
+         unit.write(  dep1Descriptor[i] )
+         unit.write( '\n' )
+
+   nr= len(dataStruct['x'])  # number of records to output
+
+   keys= dataStruct.keys()
+
+   newline= True
+   for i in xrange(nr):
+      unit.write( ':01:' )
+      for j in xrange(nt):
+         tag= tags[j]
+         if ( ascii ):
+            rec= dataStruct[tag][i]
+            if hasattr(rec,'__len__'):
+               l= len(rec)
+               for k in xrange(l):
+                   s= format[j] % rec[k]
+                   unit.write(s)
+               if ( j==nt-1 ): newline=False
+            else:
+               s= format[j] % rec
+               unit.write(s)
+
+         else:
+            import struct
+            rec= dataStruct[tag][i]
+            if hasattr(rec,"__len__"):
+                l= len(rec)
+                for j in xrange(l):
+                    unit.write( struct.pack('>d',rec[j]) )
+            else:
+                unit.write( struct.pack('>d',rec) )
+      if ( newline ): unit.write('\n')
+   unit.close()
+
 
 
 #
@@ -240,7 +405,7 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
 
    port= 12345
    
-   ext='d2s'
+   ext='qds'
    if ( delta_plus!=None ):
        ext='qds'
    
@@ -275,7 +440,7 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
    
    ascii=1
 
-   if ( delta_plus!=None and delta_minus!=None ):
+   if ( True ):
      if ( ext != 'qds' ):
          raise Exception('internal error, ext does should be qds')
      
@@ -283,15 +448,19 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
        data= { 'x':xx, 'z':zz, 'tags':['x','z'] }
        qstream( data, tmpfile, ytags=yy, xunits=xunits, ascii=ascii  )
      elif np==2:
-       data= { 'x':xx, 'y':yy, 'delta_plus':delta_plus, 'delta_minus':delta_minus, 'tags':['x','z','delta_plus','delta_minus'] }
-       qstream( data, tmpfile, ascii=ascii, xunits=xunits, delta_plus='delta_plus', delta_minus='delta_minus'  )
+       if ( delta_plus!=None ):
+           data= { 'x':xx, 'y':yy, 'delta_plus':delta_plus, 'delta_minus':delta_minus, 'tags':['x','y','delta_plus','delta_minus'] }
+           qstream( data, tmpfile, ascii=ascii, xunits=xunits, delta_plus='delta_plus', delta_minus='delta_minus'  )
+       else:
+           data= { 'x':xx, 'y':yy, 'tags':['x','y'] }
+           qstream( data, tmpfile, ascii=ascii, xunits=xunits  )
      else:
        s= [1]  # TODO: support rank 2
        if s[0]==2:
-         data= { 'x':range(s[1]), 'z':xx, 'tags':['x','z'] }
+         data= { 'x':range(len(xx)), 'z':xx, 'tags':['x','z'] }
          qstream( data, tmpfile, ytags=findgen(s[2]), ascii=ascii, xunits='' )
        else:
-         data= { 'x':range(s[1]), 'y':xx, 'delta_plus':delta_plus, 'delta_minus':delta_minus, 'tags':['x','z','delta_plus','delta_minus']  }
+         data= { 'x':range(len(xx)), 'y':xx, 'delta_plus':delta_plus, 'delta_minus':delta_minus, 'tags':['x','z','delta_plus','delta_minus']  }
          qstream( data, tmpfile, ascii=ascii, xunits='', delta_plus='delta_plus', delta_minus='delta_minus' )
    else:
      if np==3:
@@ -343,4 +512,4 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
 #   endfor
 
 #test_dump()
-#applot( [1,2,3,4,5] )
+applot( [1,2,3,4,5], [2,4,2,4,2] )
