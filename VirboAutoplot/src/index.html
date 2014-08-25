@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>All the elements of arrays in the global attributes of a CDF files are now shown.</small></p>
+        <p><small>interpolateMod added to correctly interpolate MLT and other functions that are cyclic.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -72,6 +72,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>orbits for crres restored and Mars Express added.</li>
+            <li>interpolateMod added, so that MLT can be interpolated properly.</li>
+            <li>fail when das2stream doesn't have name identified.</li>
             <li>bind(o1,p1,o2,p2) is automatically delegated to dom.controller.bind if possible, so the binding becomes part of the vap.</li>
             <li>multiline justification property allows user to control justification preference</li>
             <li>applot.py allows plotting to Autoplot from Python and NumPy.</li>
