@@ -486,7 +486,10 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
     @Override
     public boolean satisfies(String surl) {
-        if ( surl.startsWith("vap+inline:") ) return false;
+        URISplit split= URISplit.parse(surl);
+        if ( !"vap+jyds".equals( split.vapScheme ) ) {
+            return false;
+        }
         try {
             return useCache( DataSetURI.getURI(surl) );
         } catch (URISyntaxException ex) {
