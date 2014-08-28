@@ -37,6 +37,7 @@ public class Canvas extends DomNode {
     }
 
     public void setHeight(int height) {
+        System.err.println("bug950: setHeight("+height+") on "+Thread.currentThread().getName());
         int oldHeight = this.height;
         this.height = height;
         propertyChangeSupport.firePropertyChange(PROP_HEIGHT, oldHeight, height);
