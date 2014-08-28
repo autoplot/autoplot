@@ -249,7 +249,7 @@ public class PDSPPIDB {
         try {
             read= new BufferedReader( new InputStreamReader( new FileInputStream(f) ) );
             String s= read.readLine();
-            if ( s.length() >= 6 && s.substring(0,6).equals("<?xml ") ) {
+            if ( s!=null && s.length() >= 6 && s.substring(0,6).equals("<?xml ") ) {
                 return null;
             } else {
                 return s;
@@ -260,7 +260,7 @@ public class PDSPPIDB {
     }
     
     /**
-     * parameterize the uri so that any number of files can be read in.  For example,
+     * parameterize the URI so that any number of files can be read in.  For example,
      **<blockquote><pre><small>{@code
      * vap+pdsppi:sc=Cassini&id=PPI/CO-S-MIMI-4-LEMMS-CALIB-V1.0/DATA/LACCAVG0_1MIN/2006/LACCAVG0_1MIN_2006269_01&param=E0
      *}</small></pre></blockquote>
