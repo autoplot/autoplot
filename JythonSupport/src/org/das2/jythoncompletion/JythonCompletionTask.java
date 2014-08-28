@@ -3,6 +3,7 @@ package org.das2.jythoncompletion;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -395,7 +396,6 @@ public class JythonCompletionTask implements CompletionTask {
                 "    module = getattr(module, component)\n" + 
                 "list = dir(module)\n" + 
                 "if ( '__name__' in list ): list.remove('__name__')\n" + 
-                "list.append('*')\n" + 
                 "list\n";
         PyList po2;
 
@@ -416,6 +416,29 @@ public class JythonCompletionTask implements CompletionTask {
                 count++;
             }
         }
+        
+        BufferedReader reader= null;
+        try {
+            reader= new BufferedReader( new InputStreamReader( JythonCompletionTask.class.getResourceAsStream("packagelist.txt") ) );
+            String ss= reader.readLine();
+            String search= cc.contextString + "." + cc.completable;
+            while ( ss!=null ) {
+                if ( ss.startsWith(search) ) {
+                    rs.addItem(new DefaultCompletionItem(ss, search.length(), ss, ss, null));
+                    count++;
+                }
+                ss= reader.readLine();
+            }
+        } catch ( IOException ex ) {
+            logger.log( Level.WARNING, null, ex );
+        } finally {
+            if ( reader!=null ) try {
+                reader.close();
+            } catch (IOException ex) {
+                logger.log( Level.WARNING, null, ex );
+            }
+        }
+        
         return count;
     }
 
