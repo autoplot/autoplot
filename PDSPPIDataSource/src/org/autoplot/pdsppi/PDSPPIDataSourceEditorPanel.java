@@ -7,10 +7,10 @@
 package org.autoplot.pdsppi;
 
 import java.awt.Window;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,7 +52,6 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             return;
         }
         updateSpacecraftSoon();
-        //updateInventorySoon();
     }
 
     /**
@@ -265,9 +264,11 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             @Override
             public void run() {
                 String[] ss= new String[ dss.size() ];
-                ss= dss.keySet().toArray( ss );
-                //paramComboBox.setModel( new DefaultComboBoxModel(ss) );
-                //paramComboBox.setEnabled(true);
+                int i= 0;
+                for ( Entry<String,String> e: dss.entrySet() ) {
+                    ss[i]= e.getKey()+": "+ e.getValue();
+                    i=i+1;
+                }
                 
                 if ( ss.length==0 ) {
                     paramList.setModel( getMessageModel("(No plottable parameters)") );
@@ -506,7 +507,13 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         String lid= getCurrentRoot() + "/" + this.productTextField.getText(); //TODO: why must I add PPI??
         lid= lid.replaceAll(" ","+");
         String lparam= (String) this.paramList.getSelectedValue();
-        if ( lparam!=null ) lparam= lparam.replaceAll(" ","+");
+        if ( lparam!=null ) {
+            int i= lparam.indexOf(": ");
+            if ( i>-1 ) {
+                lparam= lparam.substring(0,i);   
+            }
+            lparam= lparam.replaceAll(" ","+");
+        }
         String lsc= inventoryScComboBox.getSelectedItem().toString().replaceAll(" ","+");
         if ( lparam==null || lparam.startsWith("(") ) {
             return "vap+pdsppi:" + SC+"="+ lsc + "&" + ID + "="+ lid;
