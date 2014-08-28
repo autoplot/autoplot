@@ -1,3 +1,4 @@
+#see http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/lastSuccessfulBuild/artifact/doc/package-list
 ZoeloeSoft.projects.JFontChooser
 com.cottagesystems.jdiskhog
 external
