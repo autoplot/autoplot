@@ -573,7 +573,7 @@ public class ScriptContext extends PyJavaInstance {
         waitUntilIdle();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
-        System.err.println("writeToPng(filename) uses w="+width+",h="+height+")");
+        System.err.println("writeToPng(filename) uses w="+width+",h="+height);
         writeToPng( filename, width, height );
         File f= new File(filename);
         setStatus("wrote to "+f.getAbsolutePath());
@@ -670,11 +670,7 @@ public class ScriptContext extends PyJavaInstance {
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
 
-        System.err.println("1. writeToPng gets width,height='"+width+","+height);
-
         BufferedImage image = c.getImage(width,height);
-
-        System.err.println("2. writeToPng gets width,height='"+model.getCanvas().getWidth()+","+model.getCanvas().getHeight());
 
         DasPNGEncoder encoder = new DasPNGEncoder();
         encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
