@@ -477,7 +477,7 @@ public abstract class Bookmark {
 
                         rs= getRemoteBookmarks( remoteUrl, remoteLevel, false, contents );
                         
-                        if ( ( contents.isEmpty() ) & !rs.remoteRemote ) {
+                        if ( contents.isEmpty() && !rs.remoteRemote ) {
                             logger.log(Level.WARNING, "unable to parse bookmarks at {0}", remoteUrl);
                             logger.fine("Maybe using local copy");
                             remoteStatus= Bookmark.Folder.REMOTE_STATUS_UNSUCCESSFUL;
