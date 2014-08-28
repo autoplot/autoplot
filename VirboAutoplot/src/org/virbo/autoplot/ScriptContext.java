@@ -669,8 +669,12 @@ public class ScriptContext extends PyJavaInstance {
         DasCanvas c = model.getCanvas();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
-        
+
+        System.err.println("1. writeToPng gets width,height='"+width+","+height);
+
         BufferedImage image = c.getImage(width,height);
+
+        System.err.println("2. writeToPng gets width,height='"+model.getCanvas().getWidth()+","+model.getCanvas().getHeight());
 
         DasPNGEncoder encoder = new DasPNGEncoder();
         encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
