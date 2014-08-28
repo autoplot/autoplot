@@ -23,8 +23,9 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-08-22):</p>
+        <p>Bugfixes (2014-08-28):</p>
         <ul>
+            <li>histogram and histogram2d DEPEND_0 and DEPEND_1 indeces are corrected by 1/2 bin</li>
             <li>minimum limit of 6 characters in QStream fields removed.</li>
             <li>Y-label is center-justified when there are multiple lines.</li>
             <li>spaces and underscores in component names are ignored, when exact matches cannot be found.</li>
@@ -72,6 +73,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>applot.py added to support plotting from numpy and scipy</li>
+            <li>qstream ascii transfer types can be less than 6 characters.</li>
             <li>orbits for crres restored and Mars Express added.</li>
             <li>interpolateMod added, so that MLT can be interpolated properly.</li>
             <li>fail when das2stream doesn't have name identified.</li>
