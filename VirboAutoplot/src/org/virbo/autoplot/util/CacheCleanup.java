@@ -28,13 +28,21 @@ import javax.swing.JCheckBox;
  * @author mmclouth
  */
 public class CacheCleanup {
-
-    private String path;
     
-    public CacheCleanup(String filePath) {
-        path = filePath;
+    /**
+     * this should not be instantiated
+     */
+    private CacheCleanup() {
+
     }
     
+    /**
+     * find aggregations within the user's history.  This currently looks for $Y, but aggregations
+     * can also be $y, etc.
+     * 
+     * @return list of aggregations.
+     * @throws IOException 
+     */
     public static String[] findAggs() throws IOException {
         File filePath= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) + "/bookmarks/history.txt" );
         FileReader fr = new FileReader(filePath);
@@ -45,7 +53,7 @@ public class CacheCleanup {
         boolean hasAgg;
         int numOfLines = 0;
         
-        while ((aLine = bf.readLine()) != null)  {
+        while ((aLine = bf.readLine()) != null)  { // this is a nice bit of code that avoids two calls to readLine!
             numOfLines++;
         }
         
@@ -71,7 +79,12 @@ public class CacheCleanup {
         return result.toArray( new String[result.size()] );
     }
     
-    @SuppressWarnings("empty-statement")
+    /**
+     * Return an array of files where newer versions prevent the older from being used.  This will
+     * not look for version constraints (e.g. $(v,lt=2)), so use with some care.
+     * @return an array of files where newer versions prevent the older from being used.
+     * @throws IOException 
+     */
     public static String[] findOldVersions() throws IOException {
         String[] aggs = findAggs();
         ArrayList<String> oldversions= new ArrayList(1000);
