@@ -189,6 +189,22 @@ public class BookmarksManagerModel {
         
     }
 
+    /**
+     * there's a goofy rule that we can't have two folders with the same name, so enforce this.
+     * @param bookmarks 
+     */
+    void checkUniqueFolderNames( List<Bookmark> bookmarks ) {
+        List<String> folders= new ArrayList();
+        for (Bookmark b : bookmarks) {
+            if ( b instanceof Bookmark.Folder ) {
+                if ( folders.contains(b.getTitle()) ) {
+                    throw new IllegalArgumentException("two bookmark folders cannot have the same title");
+                }
+                folders.add(b.getTitle());
+            }
+        }
+    }
+    
     void addBookmarks(List<Bookmark> bookmarks, Bookmark context, boolean insert) {
         ArrayList<Bookmark> newList = new ArrayList<Bookmark>(this.list.size());
         for (Bookmark b : this.list) {
@@ -224,10 +240,17 @@ public class BookmarksManagerModel {
                 if (isAdded == false) newList.addAll(bookmarks);
             }
         }
+        checkUniqueFolderNames( newList );
         setList(newList);
 
     }
 
+    /**
+     * 
+     * @param bookmark
+     * @param context 
+     * @throws IllegalArgumentException when names are not unique
+     */
     void addBookmark(Bookmark bookmark, Bookmark context) {
         addBookmarks(Collections.singletonList(bookmark), context, false);
     }
