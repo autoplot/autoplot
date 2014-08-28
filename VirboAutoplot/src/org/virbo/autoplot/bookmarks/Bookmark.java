@@ -1081,8 +1081,7 @@ public abstract class Bookmark {
         public boolean equals(Object obj) {
             if (obj instanceof Bookmark.Folder) {
                 Bookmark.Folder that= (Bookmark.Folder) obj;
-                return that.bookmarks.equals(this.bookmarks)
-                        && ( that.getTitle().equals(this.getTitle()) )
+                return ( that.getTitle().equals(this.getTitle()) )
                         && ( that.getParent()==null || ( this.getParent()!=null && that.getParent().getTitle().equals(this.getParent().getTitle()) ) );
             } else {
                 return false;
