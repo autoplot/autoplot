@@ -1269,7 +1269,11 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                             showMessage("Error in format of remote " + s + "\n" + ex.toString(), "Error in remote bookmarks", JOptionPane.WARNING_MESSAGE);
                         } 
                     } else {
-                        model.addBookmark(new Bookmark.Folder(s), context );
+                        try {
+                            model.addBookmark(new Bookmark.Folder(s), context );
+                        } catch ( IllegalArgumentException ex ) {
+                            showMessage(ex.getMessage(), "Error in add bookmark", JOptionPane.WARNING_MESSAGE);
+                        }
                     }
                 }
 
