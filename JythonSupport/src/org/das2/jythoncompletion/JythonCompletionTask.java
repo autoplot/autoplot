@@ -11,6 +11,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -384,48 +385,61 @@ public class JythonCompletionTask implements CompletionTask {
     private int queryPackages(CompletionContext cc, CompletionResultSet rs) {
         PythonInterpreter interp = getInterpreter();
 
-        String eval = "import " + cc.contextString + "\n" +
-                "targetComponents = '" + cc.contextString + "'.split('.')\n" +
-                "base = targetComponents[0]\n" + 
-                "baseModule = __import__(base, globals(), locals(), [], -1 )\n" + 
-                "module = baseModule    \n" + 
-                "name= base\n" + 
-                "for component in targetComponents[1:]:\n" + 
-                "    name= name + '.' + component\n" + 
-                "    baseModule = __import__( name, None, None )\n" + 
-                "    module = getattr(module, component)\n" + 
-                "list = dir(module)\n" + 
-                "if ( '__name__' in list ): list.remove('__name__')\n" + 
-                "list\n";
-        PyList po2;
-
-        try {
-            interp.exec(eval);
-        } catch ( PyException ex ) {
-            rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
-            return 0;
-        }
-        
+        HashSet<String> results= new HashSet();       
         int count=0;
-        po2 = (PyList) interp.eval("list");
-        for (int i = 0; i < po2.__len__(); i++) {
-            PyString s = (PyString) po2.__getitem__(i);
-            String ss = s.toString();
-            if (ss.startsWith(cc.completable)) {
-                rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, null));
-                count++;
+        
+        if ( cc.contextString.contains(".") ) {
+            String eval = "import " + cc.contextString + "\n" +
+                    "targetComponents = '" + cc.contextString + "'.split('.')\n" +
+                    "base = targetComponents[0]\n" + 
+                    "baseModule = __import__(base, globals(), locals(), [], -1 )\n" + 
+                    "module = baseModule    \n" + 
+                    "name= base\n" + 
+                    "for component in targetComponents[1:]:\n" + 
+                    "    name= name + '.' + component\n" + 
+                    "    baseModule = __import__( name, None, None )\n" + 
+                    "    module = getattr(module, component)\n" + 
+                    "list = dir(module)\n" + 
+                    "if ( '__name__' in list ): list.remove('__name__')\n" + 
+                    "list\n";
+            PyList po2;
+
+            try {
+                interp.exec(eval);
+            } catch ( PyException ex ) {
+                rs.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
+                return 0;
+            }
+
+            po2 = (PyList) interp.eval("list");
+            for (int i = 0; i < po2.__len__(); i++) {
+                PyString s = (PyString) po2.__getitem__(i);
+                String ss = s.toString();
+                if (ss.startsWith(cc.completable)) {
+                    rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, null));
+                    count++;
+                    results.add(ss);
+                }
             }
         }
         
+                
         BufferedReader reader= null;
         try {
             reader= new BufferedReader( new InputStreamReader( JythonCompletionTask.class.getResourceAsStream("packagelist.txt") ) );
             String ss= reader.readLine();
             String search= cc.contextString + "." + cc.completable;
+            int plen= cc.contextString.length()+1;
+            if ( cc.contextString.equals(cc.completable) ) {
+                search= cc.contextString;
+                plen= search.length();
+            }
             while ( ss!=null ) {
-                if ( ss.startsWith(search) ) {
-                    rs.addItem(new DefaultCompletionItem(ss, search.length(), ss, ss, null));
-                    count++;
+                if ( !ss.startsWith("#") && ss.length()>0 ) {
+                    if ( ss.startsWith(search) && !results.contains(ss.substring(plen)) ) {
+                        rs.addItem(new DefaultCompletionItem(ss, search.length(), ss, ss, null));
+                        count++;
+                    }
                 }
                 ss= reader.readLine();
             }
