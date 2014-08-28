@@ -1157,7 +1157,9 @@ public class AutoplotUtil {
                 }
             }
 
-            if ( !isLin && !isHist && result.median==0 && nomMin==0 && nomMax/positiveMin>1e3 ) {  // this is where they are bunched up at zero.
+            double normalMedianLog = ( result.median / positiveMin ) / ( nomMax / positiveMin );
+
+            if ( !isLin && !isHist && normalMedianLog<0.01 && nomMin==0 && nomMax/positiveMin>1e3 && nomMin>=0 ) {  // this is where they are bunched up at zero.
                 isLog= true;
                 result.robustMin= positiveMin/10;
             }
