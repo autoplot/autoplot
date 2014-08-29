@@ -181,8 +181,7 @@ public class ScriptContext extends PyJavaInstance {
     public static void setCanvasSize(int width, int height) throws InterruptedException {
         maybeInitModel();
         model.canvas.setSize(width, height);
-        model.getDocumentModel().getCanvases(0).setWidth(width);
-        model.getDocumentModel().getCanvases(0).setHeight(height);
+        model.getDocumentModel().getCanvases(0).setSize(width,height);
         model.waitUntilIdle(false);
 
         System.err.println("bug950: setCanvasSize width,height="+width+","+height);
