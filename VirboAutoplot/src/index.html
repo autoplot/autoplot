@@ -29,6 +29,8 @@
             <li>completions on package names based on internal list, was broken with webstart.</li>
             <li>histogram and histogram2d DEPEND_0 and DEPEND_1 indeces are corrected by 1/2 bin</li>
             <li>minimum limit of 6 characters in QStream fields removed.</li>
+            <li>rte_1611550316: strange timerange parsing error, code cleanup should fix.  Thanks Cindy!</li>
+            <li>rte_2021415622: yaxis flipped property would fail with huge scatter making app unusable.  Thanks Ken!</li>
             <li>Y-label is center-justified when there are multiple lines.</li>
             <li>spaces and underscores in component names are ignored, when exact matches cannot be found.</li>
             <li>getDataSet action in Jython limits suggested variable name to 30 characters</li>            
@@ -41,11 +43,14 @@
             <li>PDS/PPI file browsing is done off the event thread</li>
             <li>421: double load of Das2Source caused by mouse-wheeling</li>
             <li>Kristoff pointed out where Jython GUI wouldn't reset properly when dom.plots[0].yaxis.range was used as default.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>interpolation codes preserve more metadata</li>
             <li>jython completions allow selection for all argument combinations, not just one.</li>
             <li>completions-based editor bugfix, where it would not recognize HDF5 as file-based</li>
             <li>append wasn't able to append two datasets that had enumerations that didn't have the same units.  Now it can.</li>
-            <li>kludge in URI formatting to use + instead of %20 in timeranges to improve ledgibility</li>
+            <li>kludge in URI formatting to use + instead of %20 in timeranges to improve legibility</li>
             <li>1065: reduce flickering caused by unneeded setDataSet(null)</li>
             <li>tweaks to the jython editor panel automatic GUI.</li>
             <li>minor improvements to CEF including UNITS, DELTA_PLUS/DELTA_MINUS, showing data before support data.</li>
@@ -55,26 +60,9 @@
             <li>spectrogram style panel comes up for PitchAngleDistribution mode now, which is slightly better than Series panel.</li>
             <li>don't load the file automatically into the jython editor if it is already loaded.  This is dangerous and distracting.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>pitchAngleDistribution mode wouldn't get a colorbar because it wasn't installed in the canvas</li>
-            <li>medianFilter was never put in the filters list</li>
-            <li>jyds would use 2010-01-01 (the default timerange) incorrectly.</li>
-            <li>check for zero-length datasets in extent function, this was preventing reduceMean from working with all-fill records.</li>
-            <li>use SpectrogramStylePanel for pitchAngleDistribution</li>
-            <li>export to .wav file checks for non-monotonically increasing data, after discovering das2server would repeat records.</li>
-            <li>reduceMean checks for NaNs, and treats them as fill data to be consistent with other codes.</li>
-            <li>1224: TSB load when timerange is context (not x-axis), zoom in on timerange </li>
-            <li>1222: next/​prev buttons get into funky state as if not updating</li>
-            <li>1226: rich headers containing a value element will not be connected to the data column by implicit name (P1).</li>
-            <li>1216: series renderer misconfigured for large datasets rendering.</li>
-            <li>1217: Spectrogram rebinner reverts after change and TSB reload.</li>
-            <li>1215: occasional blips in SeriesRenderer http://www.sarahandjeremy.net:8080/hudson/job/autoplot-test140/lastSuccessfulBuild/artifact/diffs.test141_file__home_jbf_ct_autoplot_vap_bugs_pw_generalPathBlips_generalPathBlips.vap.png</li>
-            <li>ds=&lt;C&gt; completions in PDSPPI source.</li>
-            <li>rte_1282463981: guard against data that was mismarked as monotonic in ArrayDataSet</li> 
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>update rbsp orbits to ~1930
             <li>applot.py added to support plotting from numpy and scipy</li>
             <li>qstream ascii transfer types can be less than 6 characters.</li>
             <li>orbits for crres restored and Mars Express added.</li>
@@ -90,15 +78,15 @@
             <li>CDAWeb vap servlet improves error feedback</li>
             <li>PDSPPI source allows completions based on the names in the VOTables</li>
             <li>read description and valid min and valid max from VOTables.</li>
-            <li>add butterworth to the filters</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>            
             <li>File->Add Plot From... list is sorted by last use.</li>
             <li>AutoplotServer images are set to .vap file height and width by default</li>
             <li>Make PNGWalk allows writing to PDF files instead of .PNG files.</li>
             <li>PDSPPI supports discovery (File->Add Plot From...->PDSPPI)</li>
-            <li>RBSP orbits updated to 2014-08-13.</li>
+            <li>RBSP orbits updated to 2014-08-13.</li>            
+       </ul>
+        <p>Less recent features:</p>
+        <ul>            
+            <li>add butterworth to the filters</li>
             <li>minor kludge in URI format/parse to use + in timerange parameters instead of %20, so the URIs are more legible.</li>
             <li>370: getParam dom for defaults.  Datum and DatumRange now allowed as parameters.  URI uses DataSetSelector.</li>
             <li>http web filesystem avoids listing when the filename is known already, supporting use with Github.</li>
