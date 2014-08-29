@@ -10,6 +10,7 @@ import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -797,29 +798,35 @@ public class DomUtil {
             if (props[i].equals("controller")) continue;
             try {
                 if ( pds[i] instanceof IndexedPropertyDescriptor) {
-                    Object vals1 = pds[i].getReadMethod().invoke(state, new Object[0]);
-                    for ( int j=0; j<Array.getLength(vals1); j++ ) {
-                        Object val1= Array.get( vals1, j );
-                        if ( val1 instanceof DomNode  ) {
-                            applyMacro( (DomNode)val1, node, sval );
-                        } else if ( val1 instanceof String ) {
-                            System.err.println( val1 );
-                            String sval1= (String)val1;
-                            if ( sval1.contains( node ) ) {
-                                sval1= sval1.replaceAll( node, sval );
-                                pds[i].getWriteMethod().invoke( state, sval1 );
+                    Method m=  pds[i].getReadMethod();
+                    if ( m!=null ) {
+                        Object vals1 = m.invoke(state, new Object[0]);
+                        for ( int j=0; j<Array.getLength(vals1); j++ ) {
+                            Object val1= Array.get( vals1, j );
+                            if ( val1 instanceof DomNode  ) {
+                                applyMacro( (DomNode)val1, node, sval );
+                            } else if ( val1 instanceof String ) {
+                                System.err.println( val1 );
+                                String sval1= (String)val1;
+                                if ( sval1.contains( node ) ) {
+                                    sval1= sval1.replaceAll( node, sval );
+                                    pds[i].getWriteMethod().invoke( state, sval1 );
+                                }
                             }
                         }
                     }
                 } else {
-                    Object val1 = pds[i].getReadMethod().invoke(state, new Object[0]);
-                    if ( val1 instanceof DomNode  ) {
-                        applyMacro( (DomNode)val1, node, sval );
-                    } else if ( val1 instanceof String ) {
-                        String sval1= (String)val1;
-                        if ( sval1.contains( node ) ) { 
-                            sval1= sval1.replace( node, sval );  //TODO: convert %{} to regex.
-                            pds[i].getWriteMethod().invoke( state, sval1 );
+                    Method m=  pds[i].getReadMethod();
+                    if ( m!=null ) {
+                        Object val1 = m.invoke(state, new Object[0]);
+                        if ( val1 instanceof DomNode  ) {
+                            applyMacro( (DomNode)val1, node, sval );
+                        } else if ( val1 instanceof String ) {
+                            String sval1= (String)val1;
+                            if ( sval1.contains( node ) ) { 
+                                sval1= sval1.replace( node, sval );  //TODO: convert %{} to regex.
+                                pds[i].getWriteMethod().invoke( state, sval1 );
+                            }
                         }
                     }
                 }
