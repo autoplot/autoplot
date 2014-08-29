@@ -14,6 +14,8 @@ import org.python.core.adapter.PyObjectAdapter;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
+import org.virbo.dsops.Ops;
 
 /**
  * Adapt QDataSet results to PyQDataSet, which provides __getitem__
@@ -45,16 +47,26 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
     public static QDataSet adaptList( PyList p ) {
         double[] j= new double[ p.size() ];
         //Units u= null;
+        QDataSet d1;
+        Units u= null;
         for ( int i=0; i<p.size(); i++ ) {
             Object n= p.get(i);
             //if ( u!=null || n instanceof String ) {
             //    u= EnumerationUnits.getByName("default");
             //    j[i]= ((EnumerationUnits)u).createDatum( n ).doubleValue( u );
             //} else {
-                j[i]= PyQDataSet.getNumber(n).doubleValue();
-            //}
+            if ( n instanceof PyObject ) {
+                d1= JythonOps.dataset((PyObject)n);
+            } else {
+                d1= Ops.dataset(n);
+            }
+            if ( u==null )  u= SemanticOps.getUnits(d1);
+          
+            j[i]= d1.value();
+            
         }
-        QDataSet q= DDataSet.wrap( j );
+        DDataSet q= DDataSet.wrap( j );
+        q.putProperty( QDataSet.UNITS, u );
         return q;
     }
 
