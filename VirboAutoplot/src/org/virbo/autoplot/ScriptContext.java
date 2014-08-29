@@ -182,12 +182,7 @@ public class ScriptContext extends PyJavaInstance {
         maybeInitModel();
         model.canvas.setSize(width, height);
         model.getDocumentModel().getCanvases(0).setSize(width,height);
-        model.waitUntilIdle(false);
-
-        System.err.println("bug950: setCanvasSize width,height="+width+","+height);
-
-        System.err.println("bug950: setCanvasSize gets width,height="+model.getCanvas().getWidth()+","+model.getCanvas().getHeight());
-        
+        model.waitUntilIdle(false);        
     }
 
     /**
