@@ -37,7 +37,6 @@ public class Canvas extends DomNode {
     }
 
     public void setHeight(int height) {
-        System.err.println("bug950: setHeight("+height+") on "+Thread.currentThread().getName());
         int oldHeight = this.height;
         this.height = height;
         propertyChangeSupport.firePropertyChange(PROP_HEIGHT, oldHeight, height);
@@ -53,6 +52,28 @@ public class Canvas extends DomNode {
         int oldWidth = this.width;
         this.width = width;
         propertyChangeSupport.firePropertyChange(PROP_WIDTH, oldWidth, width);
+    }
+    
+    /**
+     * set both the width and height before firing off changes.
+     * @param width the canvas width in pixels.
+     * @param height the canvas height in pixels.
+     */
+    public void setSize( int width, int height ) {
+        int oldWidth= this.width;
+        int oldHeight= this.height;
+        if ( width!=oldWidth ) {
+            this.width= width;
+        }
+        if ( height!=oldHeight ) {
+            this.height= height;
+        }
+        if ( width!=oldWidth ) {
+            propertyChangeSupport.firePropertyChange(PROP_WIDTH, oldWidth, width);
+        }
+        if ( height!=oldHeight ) {
+            propertyChangeSupport.firePropertyChange(PROP_HEIGHT, oldHeight, height);
+        }
     }
     
     protected boolean fitted = true;
