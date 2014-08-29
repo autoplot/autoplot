@@ -115,6 +115,7 @@ public class JythonOps {
      * coerce a python array into a QDataSet.
      * @param arg0 Python object or Datum
      * @return QDataSet
+     * @see org.virbo.dsops.Ops#dataset(java.lang.Object) 
      */
     public static QDataSet dataset( PyObject arg0 ) {
         if ( arg0 instanceof PyQDataSet ) {
