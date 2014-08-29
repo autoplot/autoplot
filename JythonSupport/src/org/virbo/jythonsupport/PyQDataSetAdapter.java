@@ -5,6 +5,7 @@
 
 package org.virbo.jythonsupport;
 
+import java.lang.reflect.Array;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.python.core.PyArray;
@@ -46,7 +47,6 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
      */
     public static QDataSet adaptList( PyList p ) {
         double[] j= new double[ p.size() ];
-        //Units u= null;
         QDataSet d1;
         Units u= null;
         for ( int i=0; i<p.size(); i++ ) {
@@ -72,7 +72,23 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
 
     protected static QDataSet adaptArray(PyArray pyArray) {
         Object arr= pyArray.getArray();
-        return DataSetUtil.asDataSet(arr);
+        double[] j= new double[ pyArray.__len__() ];
+        QDataSet d1;
+        Units u= null;
+        for ( int i=0; i<pyArray.__len__(); i++ ) {
+            Object n= Array.get( arr, i );
+            if ( n instanceof PyObject ) {
+                d1= JythonOps.dataset((PyObject)n);
+            } else {
+                d1= Ops.dataset(n);
+            }
+            if ( u==null )  u= SemanticOps.getUnits(d1);
+          
+            j[i]= d1.value();   
+        }
+        DDataSet q= DDataSet.wrap( j );
+        q.putProperty( QDataSet.UNITS, u );
+        return q;
     }
     
 }
