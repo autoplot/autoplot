@@ -304,7 +304,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     labels=null; 
                 }
                 if ( labels==null && labelVar!=null ) {
-                    String master= db.getMasterFile( ds.toLowerCase(), mon );
+                    String master= db.getMasterFile( ds.toLowerCase(), mon.getSubtaskMonitor("get master file") );
                     DataSource labelDss= getDelegateFactory().getDataSource( DataSetURI.getURI(master+"?"+labelVar) );
                     QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
                     if ( labelDs!=null ) {
@@ -320,7 +320,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 int islice1= Integer.parseInt(slice1);
                 String labelVar= (String)metadata.get( "LABL_PTR_1");
                 if ( labelVar!=null ) {
-                    String master= db.getMasterFile( ds.toLowerCase(), mon );
+                    String master= db.getMasterFile( ds.toLowerCase(), mon.getSubtaskMonitor("get master file")  );
                     DataSource labelDss= getDelegateFactory().getDataSource( DataSetURI.getURI(master+"?"+labelVar) );
                     QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
                     if ( labelDs!=null ) {
