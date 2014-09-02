@@ -230,7 +230,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             DatumRange lviewRange= viewRange;
             Datum lresolution= resolution;
 
-            String[] ss = getFsm().getBestNamesFor( lviewRange, mon );
+            String[] ss = getFsm().getBestNamesFor( lviewRange, mon.getSubtaskMonitor(sparams) );
             
             if ( "true".equals( System.getProperty( Version.PROP_ENABLE_CLEAN_CACHE ) ) ) {
                 logger.fine("enableCleanCache is true");
