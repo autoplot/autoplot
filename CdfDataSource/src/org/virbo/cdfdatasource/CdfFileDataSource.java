@@ -113,7 +113,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         
         mon.started();
         try {        
-            cdfFile = getFile(mon);
+            cdfFile = getFile(mon.getSubtaskMonitor("get file"));
             logger.log(Level.FINE, "reading {0}", resourceURI);
             logger.log(Level.FINE, "getDataSet ({0})", String.valueOf(cdfFile));
 
@@ -169,14 +169,14 @@ public class CdfFileDataSource extends AbstractDataSource {
                 List<QDataSet> attr= new ArrayList();
                 String function= (String)attributes.get("FUNCTION");
                 if ( function==null ) function=  (String)attributes.get("FUNCT");
-                if ( attributes.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_0"), constraint, false, true, mon ) );
-                if ( attributes.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_1"), constraint, false, true, mon ) );
-                if ( attributes.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_2"), constraint, false, true, mon ) );
-                if ( attributes.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_3"), constraint, false, true, mon ) );
-                if ( attributes.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_4"), constraint, false, true, mon ) );
+                if ( attributes.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_0"), constraint, false, true, new NullProgressMonitor() ) );
+                if ( attributes.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_1"), constraint, false, true, new NullProgressMonitor() ) );
+                if ( attributes.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_2"), constraint, false, true, new NullProgressMonitor() ) );
+                if ( attributes.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_3"), constraint, false, true, new NullProgressMonitor() ) );
+                if ( attributes.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_4"), constraint, false, true, new NullProgressMonitor() ) );
                 try {
                     Map<String,Object> qmetadata= new IstpMetadataModel().properties(attributes);
-                    result= (MutablePropertyDataSet) CdfVirtualVars.execute( qmetadata, function, attr, mon );
+                    result= (MutablePropertyDataSet) CdfVirtualVars.execute( qmetadata, function, attr, mon.getSubtaskMonitor("virtual variable") );
                 } catch ( IllegalArgumentException ex ) {
                     throw new IllegalArgumentException("virtual function "+function+" not supported",ex);
                 }
@@ -192,9 +192,9 @@ public class CdfFileDataSource extends AbstractDataSource {
                     if ( is>=n1 ) {
                         throw new IllegalArgumentException("slice1="+is+" is too big for the dimension size ("+n1+")");
                     }
-                    result= wrapDataSet( cdf, svariable, constraint, false, doDep, is, mon );
+                    result= wrapDataSet( cdf, svariable, constraint, false, doDep, is, new NullProgressMonitor() );
                 } else {
-                    result= wrapDataSet( cdf, svariable, constraint, false, doDep, -1, mon );
+                    result= wrapDataSet( cdf, svariable, constraint, false, doDep, -1, new NullProgressMonitor() );
                 }
             }
 
