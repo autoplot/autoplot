@@ -544,14 +544,14 @@ public class ScriptPanelSupport {
                                     interp.exec(panel.getEditorPanel().getText());
                                 }
                                 setInterruptible( null );
-                                mon.finished();
+                                if ( !mon.isFinished() ) mon.finished(); // bug1251: in case script didn't call finished
                                 applicationController.setStatus("done executing script");
                             } catch (IOException ex) {
-                                mon.finished();
+                                if ( !mon.isFinished() ) mon.finished();
                                 logger.log(Level.WARNING, ex.getMessage(), ex);
                                 applicationController.setStatus("error: I/O exception: " + ex.toString());
                             } catch (PyException ex) {
-                                mon.finished();
+                                if ( !mon.isFinished() ) mon.finished();
                                 annotateError(ex, offset, interp );
                                 logger.log(Level.WARNING, ex.getMessage(), ex );
                                 applicationController.setStatus("error: " + ex.toString());
@@ -565,7 +565,7 @@ public class ScriptPanelSupport {
                                 applicationController.setStatus("script interrupted");
                             }
                         } finally {
-                            mon.finished();
+                            if ( !mon.isFinished() ) mon.finished();  // bug1251: in case script didn't call finished
                             setInterruptible( null );
                         }
 
