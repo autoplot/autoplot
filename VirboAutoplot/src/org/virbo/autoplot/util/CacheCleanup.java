@@ -67,10 +67,14 @@ public class CacheCleanup {
             data[i] = bf.readLine();
             hasAgg = data[i].contains("$Y");
             if (hasAgg == true) {
-                parts = data[i].split("\\s+"); 
-
-                if (parts.length > 1)  {
-                    result.add(parts[1]);
+            
+                int iq= data[i].indexOf("?"); 
+                int iy= data[i].indexOf("$Y"); 
+                if ( iq==-1 || iq>iy ) {
+                    parts = data[i].split("\\s+"); 
+                    if (parts.length > 1)  {
+                        result.add(parts[1]);
+                    }
                 }
             }
         }
@@ -89,6 +93,7 @@ public class CacheCleanup {
         String[] aggs = findAggs();
         ArrayList<String> oldversions= new ArrayList(1000);
         String[] result;
+        FileSystem.settings().setOffline(true); // turn off web access        
         for (String agg : aggs) {
             URI fileagguri = URISplit.parse(agg).resourceUri;
             String fileagg= fileagguri.toString();
@@ -102,7 +107,6 @@ public class CacheCleanup {
             //System.out.println(constantPart);
             //System.out.println(templatePart);
             FileSystem fs= FileSystem.create( constantPart );
-            fs.settings().setOffline(true); // turn off web access
             DatumRange dr= null;    //for testing, just do one month.  None means everything but it's much slower.
             //DatumRange dr = DatumRangeUtil.parseTimeRangeValid("2010-mar");
             FileStorageModel fsm = FileStorageModel.create( fs, templatePart );
@@ -118,19 +122,17 @@ public class CacheCleanup {
         }
         if (oldversions.size() > 0) {
             result = oldversions.toArray( new String[oldversions.size()] );
-        }
-        else {
+        } else {
             result = new String[] {"No Old Versions"};
         }
+        FileSystem.settings().setOffline(false); // turn off web access
+        
     return result;
     }
     
     public static void deleteOldVersions() throws ParseException, IOException  {
         String[] oldversions = findOldVersions();
         
-        JPanel panel;
-        
-        JCheckBox trim;
     }
 }
     
