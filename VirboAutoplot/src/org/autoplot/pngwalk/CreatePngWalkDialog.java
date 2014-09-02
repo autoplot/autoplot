@@ -131,7 +131,13 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         params.update= updateCB.isSelected();
         params.version= versionTextField.getText().trim();
 
-        params.batchUri= eventsFileSelector.getValue();
+        String s= eventsFileSelector.getValue();
+        if ( s.startsWith("(") && s.endsWith(")") ) {
+            params.batchUri= "";
+        } else {
+            params.batchUri= eventsFileSelector.getValue();
+        }
+        
         params.useBatchUri= eventsFileRadioButton.isSelected();
         
         params.outputFormat= pngFormatCB.isSelected() ? "png" : "pdf";
