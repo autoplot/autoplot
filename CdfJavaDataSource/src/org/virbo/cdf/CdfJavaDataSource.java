@@ -307,7 +307,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         }
 
         File cdfFile;
-        cdfFile = getFile(mon);
+        cdfFile = getFile(mon.getSubtaskMonitor("download file"));
 
         String fileName = cdfFile.toString();
         
@@ -341,14 +341,14 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 List<QDataSet> attr= new ArrayList();
                 String function= (String)attr1.get("FUNCTION");
                 if ( function==null ) function= (String)attr1.get("FUNCT");
-                if ( attr1.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, -1, mon ) );
-                if ( attr1.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, -1, mon ) );
-                if ( attr1.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, -1, mon ) );
-                if ( attr1.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, -1, mon ) );
-                if ( attr1.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, -1, mon ) );
+                if ( attr1.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, -1, new NullProgressMonitor() ) );
+                if ( attr1.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, -1, new NullProgressMonitor() ) );
+                if ( attr1.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, -1, new NullProgressMonitor() ) );
+                if ( attr1.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, -1, new NullProgressMonitor() ) );
+                if ( attr1.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, -1, new NullProgressMonitor() ) );
                 try {
                     Map<String,Object> qmetadata= new IstpMetadataModel().properties(attr1);
-                    result= (MutablePropertyDataSet) CdfVirtualVars.execute( qmetadata, function, attr, mon );
+                    result= (MutablePropertyDataSet) CdfVirtualVars.execute( qmetadata, function, attr, mon.getSubtaskMonitor("virtual vars") );
                 } catch ( IllegalArgumentException ex ) {
                     throw new IllegalArgumentException("virtual function "+function+" not supported",ex);
                 }
@@ -357,9 +357,9 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 String os1= (String)map.get(PARAM_SLICE1);
                 if ( os1!=null && !os1.equals("") && cdf.getVariable(svariable).getDimensions().length>0 ) {
                     int is= Integer.parseInt(os1);
-                    result= wrapDataSet( cdf, svariable, constraint, false, doDep, attr1, is, mon );
+                    result= wrapDataSet( cdf, svariable, constraint, false, doDep, attr1, is, new NullProgressMonitor() );
                 } else {
-                    result= wrapDataSet(cdf, svariable, constraint, false, doDep, attr1, -1, mon );
+                    result= wrapDataSet(cdf, svariable, constraint, false, doDep, attr1, -1, new NullProgressMonitor() );
                 }
                 logger.log(Level.FINE, "got {0}", result);
             }
