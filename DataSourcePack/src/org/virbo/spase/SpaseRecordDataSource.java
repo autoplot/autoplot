@@ -131,11 +131,11 @@ public class SpaseRecordDataSource extends AbstractDataSource {
         mon.started();
         mon.setProgressMessage( "parse xml file");
         
-        File f= DataSetURI.getFile( uri, mon );
+        File f= DataSetURI.getFile( uri, mon.getSubtaskMonitor("get file") );
         type= new XMLTypeCheck().calculateType(f);
         
         if ( type!=XMLTypeCheck.TYPE_VOTABLE ) {  // this type uses a SAX parser.
-            readXML(mon); // creates the document object...
+            readXML(mon.getSubtaskMonitor("readXML")); // creates the document object...
         } else {
             document= null;
         }
@@ -154,7 +154,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
 
                 mon.setProgressMessage("reading "+delegate.getURI() );
                 
-                QDataSet result= delegate.getDataSet(mon);
+                QDataSet result= delegate.getDataSet(mon.getSubtaskMonitor("get delegate"));
 
                 return result;
 
@@ -209,7 +209,7 @@ public class SpaseRecordDataSource extends AbstractDataSource {
 
                 VOTableReader r= new VOTableReader();
                 
-                QDataSet result= r.readTable( f.toString(), mon );
+                QDataSet result= r.readTable( f.toString(), mon.getSubtaskMonitor("read votable") );
                 
                 QDataSet bds= (QDataSet) result.property(QDataSet.BUNDLE_1);
                 
