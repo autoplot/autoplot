@@ -59,7 +59,11 @@ public class NetCDFDataSource extends AbstractDataSource {
         }
     }
 */
-    /** Creates a new instance of NetCDFDataSource */
+    /** 
+     * Creates a new instance of NetCDFDataSource
+     * @param uri the URI to read.
+     * @throws java.io.IOException
+     */
     public NetCDFDataSource( URI uri ) throws IOException {
         super(uri);
         parseUrl();
@@ -102,9 +106,10 @@ public class NetCDFDataSource extends AbstractDataSource {
     public QDataSet getDataSet( ProgressMonitor mon) throws IOException {
         logger.finer("getDataSet");
         mon.started();
+        mon.setTaskSize(20);
         try { 
-            readData( mon );
-            NetCdfVarDataSet result= NetCdfVarDataSet.create( getVariable(), constraint, ncfile, mon );
+            readData( mon.getSubtaskMonitor(0,15,"read data") );
+            NetCdfVarDataSet result= NetCdfVarDataSet.create( getVariable(), constraint, ncfile, mon.getSubtaskMonitor(15,20,"copy over ") );
             QDataSet qresult= checkLatLon(result);
             
             ncfile.close();
@@ -211,7 +216,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         mon.started();
         try {
             mon.setProgressMessage("reading metadata");
-            readData( mon );
+            readData( mon.getSubtaskMonitor("readData") );
             List attr;
             attr= getVariable().getAttributes();
 
