@@ -61,7 +61,7 @@ public class PDSPPIDataSource extends AbstractDataSource {
         VOTableReader read= new VOTableReader();
         mon.setProgressMessage("downloading data");
         logger.log(Level.FINE, "getDataSet {0}", url);
-        File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon );
+        File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon.getSubtaskMonitor("download file") );
         mon.setProgressMessage("reading data");
         
         String error= PDSPPIDB.getInstance().checkXML(f);
@@ -69,7 +69,7 @@ public class PDSPPIDataSource extends AbstractDataSource {
             throw new NoDataInIntervalException(error);
         }
         
-        QDataSet ds= read.readTable( f.toString(), mon );
+        QDataSet ds= read.readTable( f.toString(), mon.getSubtaskMonitor("read table") );
         QDataSet result= DataSetOps.unbundle( ds, param );
         
         if ( result.property(QDataSet.DEPEND_0)==null ) {
