@@ -314,7 +314,7 @@ class TsdsDataSource extends AbstractDataSource {
             logit("done dataUrl from url2", t0);
         }
 
-        mon.finished();
+        if ( !mon.isFinished() ) mon.finished();
         inRequest = false;
 
         return result;
