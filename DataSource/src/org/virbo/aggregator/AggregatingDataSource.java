@@ -342,13 +342,13 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 ProgressMonitor mon1;
                 if (ss.length > 1) {
                     mon.setProgressMessage("getting " + ss[i]);
-                    mon1 = SubTaskMonitor.create(mon, i * 10, 10 * (i + 1));
+                    mon1 = mon.getSubtaskMonitor( i * 10, 10 * (i + 1), "getting "+ss[i] );
                     if ( mon1.isCancelled() ) break;
                     mon1.setTaskProgress(0); // cause it to paint
                 } else if ( ss.length==1 ) {
-                    mon1 = mon;
+                    mon.setProgressMessage("getting " + ss[0] );
+                    mon1 = mon.getSubtaskMonitor( 0, 10, sparams );
                     if ( mon1.isCancelled() ) break;
-                    mon1.setProgressMessage("getting " + ss[0] );
                     mon1.started();
                     mon1.setTaskProgress(0);
                 } else {
