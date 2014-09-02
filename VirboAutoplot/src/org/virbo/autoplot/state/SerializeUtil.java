@@ -113,7 +113,7 @@ public class SerializeUtil {
                 Method readMethod = pd.getReadMethod();
                 Method writeMethod = pd.getWriteMethod();
                 if (writeMethod == null || readMethod == null) {
-                    logger.log(Level.INFO, "skipping property \"{0}\" of {1}, failed to find read and write method.", new Object[]{propertyName, elementName});
+                    logger.log(Level.FINE, "skipping property \"{0}\" of {1}, failed to find read and write method.", new Object[]{propertyName, elementName});
                     continue;
                 }
                 Object value = null;
