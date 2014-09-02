@@ -1698,7 +1698,7 @@ public class DataSourceController extends DomNodeController {
             if ( dsf.getUri().length()>0 ) this.model.addException( dsf.getUri(), ex );
         } finally {
             // don't trust the data sources to call finished when an exception occurs.
-            mymon.finished();
+            if ( !mymon.isFinished() ) mymon.finished();
             if (mymon == this.mon) {
                 this.mon = null;
             } else {
