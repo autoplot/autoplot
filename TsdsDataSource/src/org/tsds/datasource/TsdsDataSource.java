@@ -604,7 +604,7 @@ class TsdsDataSource extends AbstractDataSource {
                 HttpURLConnection connect = (HttpURLConnection) dataUrl.openConnection();
                 connect.setRequestProperty("Accept-Encoding", "gzip, deflate");
                 logger.log(Level.FINE, "loading {0}", surl4);
-                org.virbo.binarydatasource.Double data3 = (org.virbo.binarydatasource.Double)dataUrl(connect, 3*size, 3*points, -1, mon);
+                org.virbo.binarydatasource.Double data3 = (org.virbo.binarydatasource.Double)dataUrl(connect, 3*size, 3*points, -1, mon.getSubtaskMonitor("dataUrl" ));
                 logit("done loading mean", t0);
 
                 data= (BufferDataSet)data3.trim( 0, points );
@@ -621,7 +621,7 @@ class TsdsDataSource extends AbstractDataSource {
                 HttpURLConnection connect = (HttpURLConnection) dataUrl.openConnection();
                 connect.setRequestProperty("Accept-Encoding", "gzip, deflate"); 
                 logger.log(Level.FINE, "loading {0}", dataUrl);
-                data = dataUrl(connect, size, points,-1, mon);
+                data = dataUrl(connect, size, points,-1, mon.getSubtaskMonitor("dataUrl") );
                 logit("done loading mean", t0);
             }
             
@@ -633,7 +633,7 @@ class TsdsDataSource extends AbstractDataSource {
                 URL maxUrl = new URL(sDataMax);
                 connect = (HttpURLConnection) maxUrl.openConnection();
                 connect.setRequestProperty("Accept-Encoding", "gzip, deflate");
-                BufferDataSet dataMax = dataUrl(connect, size, points,-1, mon);
+                BufferDataSet dataMax = dataUrl(connect, size, points,-1, mon.getSubtaskMonitor("dataUrl") );
                 logit("done loading max", t0);
                 dataMax.putProperty(QDataSet.NAME, "binmax");
                 String sDataMin = surl.replace("-filter_0-", "-filter_3-");
@@ -642,14 +642,14 @@ class TsdsDataSource extends AbstractDataSource {
                 URL minUrl = new URL(sDataMin);
                 connect = (HttpURLConnection) minUrl.openConnection();
                 connect.setRequestProperty("Accept-Encoding", "gzip, deflate");
-                BufferDataSet dataMin = dataUrl(connect, size, points,-1, mon);
+                BufferDataSet dataMin = dataUrl(connect, size, points,-1, mon.getSubtaskMonitor("dataUrl") );
                 logit("done loading min", t0);
                 dataMin.putProperty(QDataSet.NAME, "binmin");
                 data.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(dataMax, data));
                 data.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(data, dataMin));
             }
 
-            data.putProperty(QDataSet.UNITS, SemanticOps.lookupUnits(sunits));
+            data.putProperty(QDataSet.UNITS, Units.lookupUnits(sunits));
             data.putProperty(QDataSet.DEPEND_0, ttags);
             data.putProperty(QDataSet.NAME, name);
             data.putProperty(QDataSet.TITLE, title);
