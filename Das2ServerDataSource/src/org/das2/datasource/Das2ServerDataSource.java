@@ -257,6 +257,13 @@ class Das2ServerDataSource extends AbstractDataSource {
 
         mon.setProgressMessage("reading "+dataset);
         
+        String techContact= (String)dsdfParams.get("techContact");
+        if (techContact==null ) {
+            techContact="";
+        } else {
+            techContact="\nTechnical Contact: "+techContact;
+        }
+        
         if ( qds ) {
 
             try {
@@ -280,9 +287,9 @@ class Das2ServerDataSource extends AbstractDataSource {
                 } else if ( cause!=null && ( cause instanceof org.das2.dataset.NoDataInIntervalException )) {
                     throw (org.das2.dataset.NoDataInIntervalException)ex.getCause();
                 } else if ( ex.getMessage().contains("Empty response from reader")  ) {
-                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage());
+                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage()+techContact );
                 } else {
-                    throw new StreamException( ex.getMessage()+ "\ndataset request was\n"+url2 );
+                    throw new StreamException( ex.getMessage()+ "\ndataset request was\n"+url2+techContact );
                 }
             }
             
@@ -305,11 +312,12 @@ class Das2ServerDataSource extends AbstractDataSource {
                 if ( ex.getCause()!=null && ( ex.getCause() instanceof java.io.InterruptedIOException ) ) {
                     logger.log( Level.INFO, ex.getMessage(), ex );
                     if ( ex.getMessage().contains("Operation cancelled") ) { // TODO: nasty getMessage...
-                        throw new CancelledOperationException();
+                        throw new CancelledOperationException(techContact);
                     } else {
                         throw (java.io.InterruptedIOException)ex.getCause();
                     }
                 } else {
+                    ex= new StreamException( ex.getMessage()+ "\ndataset request was\n"+url2+techContact );
                     logger.log( Level.INFO, ex.getMessage(), ex );
                     throw ex;
                 }
