@@ -100,8 +100,7 @@ public class ReferenceCache {
 
         /**
           * park this thread until the other guy has finished loading.
-          * @param ent
-          * @param monitor
+          * @param mon monitor that will monitor the load status.
           */
         public QDataSet park( ProgressMonitor mon ) throws Exception {
             logger.log( Level.FINE, "parking thread {0} {1}", new Object[]{Thread.currentThread(), uri} );
@@ -118,6 +117,7 @@ public class ReferenceCache {
          * hand the dataset resulting from the completed load off to the reference cache.
          * Threads that are parked will continue.  If the dataset is mutable, then a 
          * copy is made.
+         * @param ds the dataset resolved from the URI.
          */
         public void finished( QDataSet ds ) {
             logger.log( Level.FINE, "finished {0} {1} {2}", new Object[]{Thread.currentThread(), ds, uri} );
@@ -136,8 +136,9 @@ public class ReferenceCache {
         }
         
         /**
-         * the load resulted in an exception and this notifies the reference cache.
+         * Notify the reference cache that the load resulted in an exception.
          * Threads that are parked will continue
+         * @param ex the exception that occurred during the load.
          */
         public void exception( Exception ex ) {
             logger.log( Level.FINE, "finished {0} {1} {2}", new Object[]{Thread.currentThread(), ex, uri} );
@@ -147,7 +148,7 @@ public class ReferenceCache {
 
         /**
          * returns true if the entry was loaded, but now has been garbage collected.
-         * @return
+         * @return true if the reference was garbage collected and is no longer available.
          */
         public boolean wasGarbageCollected( ) {
             return ReferenceCacheEntryStatus.DONE==this.status && ( this.qds==null || this.qds.get()==null );
@@ -163,8 +164,8 @@ public class ReferenceCache {
 
     /**
      * Query to see if the dataset exists in the cache.  Null is returned if it is not, or a QDataSet is returned if it is.
-     * @param uri
-     * @return
+     * @param uri the URI that can be resolved into a dataset.
+     * @return the dataset or null
      */
     public synchronized QDataSet getDataSet( String uri ) {
         ReferenceCacheEntry entry= uris.get(uri);
@@ -181,18 +182,18 @@ public class ReferenceCache {
 
     /**
      * Get a ReferenceCacheEntry for the URI, which will indicate the thread which has been designated as the load thread.
-     *
-     * <tt>
-     * rcent= ReferenceCache.getInstance().getDataSetOrLock( this.tsb.getURI(), mon);
-     * if ( !rcent.shouldILoad( Thread.currentThread() ) ) { 
-     *    QDataSet result= rcent.park( mon );
-     * }
-     * </tt>
+     **<blockquote><pre><small>{@code
+     *rcent= ReferenceCache.getInstance().getDataSetOrLock( this.tsb.getURI(), mon);
+     *if ( !rcent.shouldILoad( Thread.currentThread() ) ) { 
+     *   QDataSet result= rcent.park( mon );
+     *}
+     *</small></pre></blockquote>
      *
      * Be sure to use try/finally when using this cache!
      *
-     * @param uri
-     * @return 
+     * @param uri the URI to load.
+     * @param monitor to monitor the load.
+     * @return the ReferenceCacheEntry
      */
     public ReferenceCacheEntry getDataSetOrLock( String uri, ProgressMonitor monitor ) {
         tidy();
