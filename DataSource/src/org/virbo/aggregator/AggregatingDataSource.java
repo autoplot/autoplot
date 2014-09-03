@@ -209,6 +209,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
+        logger.log(Level.FINE, "getDataSet {0}", uri);
+        
         boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
         
         ReferenceCache.ReferenceCacheEntry cacheEntry=null;
@@ -216,6 +218,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             cacheEntry= ReferenceCache.getInstance().getDataSetOrLock( this.tsb.getURI(), mon);
             if ( !cacheEntry.shouldILoad( Thread.currentThread() ) ) {
                 try {
+                    logger.log(Level.FINE, "wait for other thread {0}", uri);
                     QDataSet result= cacheEntry.park( mon );
                     return result;
                 } catch ( Exception ex ) {
@@ -225,6 +228,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), resourceURI } );
             }
         }
+        
+        logger.log(Level.FINE, "reading {0}", uri );
 
         try {
             DatumRange lviewRange= viewRange;
@@ -523,7 +528,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 altResult.putProperty( QDataSet.USER_PROPERTIES, userProps );
 
                 if ( cacheEntry!=null ) cacheEntry.finished(altResult);
-                logger.log(Level.FINE, "loaded {0}", altResult);
+                logger.log(Level.FINE, "loaded {0} {1}", new Object[] { altResult, describeRange(result) } );
                 return altResult;
 
             } else {
@@ -561,7 +566,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 if ( reduce && result!=null && result.rank()==1 ) { // we need to use the series renderer if we have reduced the data.  It shows error bars.
                     result.putProperty( QDataSet.RENDER_TYPE, "series" );
                 }
-                logger.log(Level.FINE, "loaded {0}", result);
+                logger.log(Level.FINE, "loaded {0} {1}", new Object[] { result, describeRange(result) }  );
                 return result;
             }
         } catch ( Exception ex ) {
@@ -569,6 +574,13 @@ public final class AggregatingDataSource extends AbstractDataSource {
             throw ex;
         }
 
+    }
+    
+    private DatumRange describeRange( QDataSet result ) {
+        MutablePropertyDataSet dep0 = result == null ? null : (MutablePropertyDataSet) result.property(DDataSet.DEPEND_0);
+        if ( dep0==null ) return null;
+        QDataSet b= SemanticOps.bounds(dep0).slice(1);
+        return DatumRangeUtil.roundSections( DataSetUtil.asDatumRange( b,true ), 24 ); 
     }
 
     @Override
