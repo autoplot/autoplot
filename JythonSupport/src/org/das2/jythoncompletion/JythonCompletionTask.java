@@ -388,7 +388,7 @@ public class JythonCompletionTask implements CompletionTask {
         HashSet<String> results= new HashSet();       
         int count=0;
         
-        if ( cc.contextString.contains(".") ) {
+        if ( !cc.contextString.equals( cc.completable ) ) { // something to work with
             String eval = "import " + cc.contextString + "\n" +
                     "targetComponents = '" + cc.contextString + "'.split('.')\n" +
                     "base = targetComponents[0]\n" + 
@@ -437,7 +437,8 @@ public class JythonCompletionTask implements CompletionTask {
             while ( ss!=null ) {
                 if ( !ss.startsWith("#") && ss.length()>0 ) {
                     if ( ss.startsWith(search) && !results.contains(ss.substring(plen)) ) {
-                        rs.addItem(new DefaultCompletionItem(ss, search.length(), ss, ss, null));
+                        String link= "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/lastSuccessfulBuild/artifact/doc/" + ss.replaceAll("\\.","/") + "/package-summary.html";
+                        rs.addItem(new DefaultCompletionItem(ss, search.length(), ss, ss, link ));
                         count++;
                     }
                 }
