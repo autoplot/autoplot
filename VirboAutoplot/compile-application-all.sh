@@ -131,6 +131,11 @@ for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.p
    mkdir -p $(dirname ../temp-classes/$i)
    cp $i ../temp-classes/$i
 done
+echo '##########################################'
+for i in $( find * -name '*.txt' ); do   # kludge support for CDAWeb, where *.txt is too inclusive
+   echo $i
+done
+echo '##########################################'
 for i in $( find * -name 'filenames_alt*.txt' ); do   # kludge support for CDAWeb, where *.txt is too inclusive
    mkdir -p $(dirname ../temp-classes/$i)
    cp $i ../temp-classes/$i
