@@ -14,6 +14,9 @@
 # Used by: ???
 #
 
+# see if anyone is using this by hitting my server.
+wget -O 'compile-application-two-jars-test' http://jfaden.net/autoplot/compile-application-two-jars-test
+
 # set JAVA_HOME and JAVA6_HOME
 if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.6.0_35/
