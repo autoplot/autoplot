@@ -288,6 +288,8 @@ class Das2ServerDataSource extends AbstractDataSource {
                     throw (org.das2.dataset.NoDataInIntervalException)ex.getCause();
                 } else if ( ex.getMessage().contains("Empty response from reader")  ) {
                     throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage()+techContact );
+                } else if ( ex.getMessage().contains("No data found") ) {
+                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage());
                 } else {
                     throw new StreamException( ex.getMessage()+ "\ndataset request was\n"+url2+techContact );
                 }
