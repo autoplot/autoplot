@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>interpolateMod added to correctly interpolate MLT and other functions that are cyclic.</small></p>
+        <p><small>Improvements to completions for packages.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,9 +23,10 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-08-28):</p>
+        <p>Bugfixes (2014-09-03):</p>
         <ul>
-            <li>1251: whopping bug that didn't affect anyone in monitor management and reference caching, where finished could be called prematurely.</li>
+            <li>import completions file was missing, resulting in NullPointerException</li>
+            <li>1251: whopping bug (but somehow didn't affect anyone) in monitor management and reference caching, where finished could be called prematurely.</li>
             <li>jython dataset(array) works with string array now</li>
             <li>950: set width and height in atomic operation in script setCanvasSize</li>
             <li>completions on package names based on internal list, was broken with webstart.</li>
@@ -64,6 +65,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>import completions improved</li>
             <li>RBSP orbits updated to 2014-09-13.</li>
             <li>applot.py added to support plotting from numpy and scipy</li>
             <li>qstream ascii transfer types can be less than 6 characters.</li>
