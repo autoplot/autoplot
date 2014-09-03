@@ -174,11 +174,26 @@ echo "done special handling of META-INF stuff."
 
 echo "=== copy resources..."
 cd temp-volatile-src
-for i in $( find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.jyds' -o -name '*.xml' -o -name '*.xsl' -o -name '*.xsd' -o -name '*.CSV' -o -name '*.txt' ); do
-   mkdir -p $(dirname ../temp-volatile-classes/$i)
-   cp $i ../temp-volatile-classes/$i
+for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.jyds' -o -name '*.xml' -o -name '*.xsl' -o -name '*.xsd' -o -name '*.CSV' ); do
+   mkdir -p $(dirname ../temp-classes/$i)
+   cp $i ../temp-classes/$i
 done
-
+for i in $( find * -name 'filenames_alt*.txt' ); do   # kludge support for CDAWeb, where *.txt is too inclusive
+   mkdir -p $(dirname ../temp-classes/$i)
+   cp $i ../temp-classes/$i
+done
+for i in $( find * -name 'CDFLeapSeconds.txt' ); do   # support for CDF TT2000
+   mkdir -p $(dirname ../temp-classes/$i)
+   cp $i ../temp-classes/$i
+done
+for i in $( find * -name 'pylisting.txt' ); do   # support for python on LANL where listing of autoplot.org cannot be done.
+   mkdir -p $(dirname ../temp-classes/$i)
+   cp $i ../temp-classes/$i
+done
+for i in $( find * -name 'packagelist.txt' ); do   # TODO: why can't I do all .txt???
+   mkdir -p $(dirname ../temp-classes/$i)
+   cp $i ../temp-classes/$i
+done
 mkdir -p ../temp-volatile-classes/orbits
 for i in $( find orbits -type f ); do               # copy in orbits files
    cp $i ../temp-volatile-classes/$i
