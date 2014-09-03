@@ -271,7 +271,7 @@ public class Test019 {
                 w.close();
             }
             try {
-                Thread.sleep(1000); // sleep 100 seconds
+                Thread.sleep(100000); // sleep 100 seconds
             } catch (InterruptedException ex) {
                 TestSupport.logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
