@@ -3,8 +3,8 @@
 # Purpose: create the volatile jar that goes with the stable jar that is .pack.gz.
 # Stable is code we don't expect to change often,
 # such as third-party libraries.  The other is code we do expect to change often.
-
-# this copies all the sources into the temp directory, then compiles a few key sources, so
+#
+# This copies all the sources into the temp directory, then compiles a few key sources, so
 # that unreferenced routines are not used.  This list is separate from the ant build script,
 # so the configuration needs to be kept in sync.
 #
@@ -174,19 +174,7 @@ echo "done special handling of META-INF stuff."
 
 echo "=== copy resources..."
 cd temp-volatile-src
-for i in $( find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.jyds' -o -name '*.xml' -o -name '*.xsl' -o -name '*.xsd' -o -name '*.CSV' ); do
-   mkdir -p $(dirname ../temp-volatile-classes/$i)
-   cp $i ../temp-volatile-classes/$i
-done
-for i in $( find * -name 'filenames_alt*.txt' ); do   # kludge support for CDAWeb, where *.txt is too inclusive
-   mkdir -p $(dirname ../temp-volatile-classes/$i)
-   cp $i ../temp-volatile-classes/$i
-done
-for i in $( find * -name 'CDFLeapSeconds.txt' ); do   # support for CDF TT2000
-   mkdir -p $(dirname ../temp-volatile-classes/$i)
-   cp $i ../temp-volatile-classes/$i
-done
-for i in $( find * -name 'pylisting.txt' ); do   # support for python on LANL where listing of autoplot.org cannot be done.
+for i in $( find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.jyds' -o -name '*.xml' -o -name '*.xsl' -o -name '*.xsd' -o -name '*.CSV' -o -name '*.txt' ); do
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
