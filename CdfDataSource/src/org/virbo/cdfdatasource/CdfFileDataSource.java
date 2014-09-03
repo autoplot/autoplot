@@ -77,6 +77,9 @@ public class CdfFileDataSource extends AbstractDataSource {
     }
 
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws IOException, CDFException, ParseException, NoDataInIntervalException {
+        
+        logger.log(Level.FINE, "getDataSet {0}", uri);
+        
         File cdfFile;
 
         boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
@@ -86,6 +89,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             rcent= ReferenceCache.getInstance().getDataSetOrLock( getURI(), mon);
             if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
                 try {
+                    logger.log(Level.FINE, "wait for other thread {0}", uri);
                     QDataSet result= rcent.park( mon );
                     if ( result==null ) { 
                         logger.fine("result after parking is null");
@@ -115,7 +119,6 @@ public class CdfFileDataSource extends AbstractDataSource {
         try {        
             cdfFile = getFile(mon.getSubtaskMonitor("get file"));
             logger.log(Level.FINE, "reading {0}", resourceURI);
-            logger.log(Level.FINE, "getDataSet ({0})", String.valueOf(cdfFile));
 
             mon.setProgressMessage("retrieving file...");
             String fileName = cdfFile.toString();
@@ -984,6 +987,7 @@ public class CdfFileDataSource extends AbstractDataSource {
 
     @Override
     public synchronized Map<String, Object> getMetadata(ProgressMonitor mon) throws IOException {
+        logger.log(Level.FINE, "getMetadata {0}", uri);
         if (attributes == null) {
             try {
                 File cdfFile;
