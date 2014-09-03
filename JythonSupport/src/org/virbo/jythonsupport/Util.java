@@ -425,6 +425,10 @@ public class Util {
         
         List<String> result= new ArrayList<String>( approxCount );
         
+        if ( !range.intersects(curr) ) { // Sebastian has a strange case that failed, see 
+            curr= curr.next();
+        }
+        
         while ( range.intersects(curr) ) {
             String scurr= tp.format( curr.min(), curr.max() );
             result.add( scurr );
