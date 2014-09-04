@@ -148,6 +148,7 @@ for i in $( find * -name 'packagelist.txt' ); do
    cp $i ../temp-classes/$i
 done
 #TODO: figure out why we can't just add all txt files.  The release tag is messed up.
+
 cd ..
 echo "done copy resources."
 
