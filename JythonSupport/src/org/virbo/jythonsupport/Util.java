@@ -392,9 +392,11 @@ public class Util {
      * spec.  For example, <code>generateTimeRanges( "%Y-%m-%d", "Jun 2009" )</code> would result in
      * 2009-06-01, 2009-06-02, ..., 2009-06-30.  This is limited to create no more than 
      * 100000 elements.
+     * 
      * @param spec such as "%Y-%m".  Note specs like "%Y%m" will not be parsable.
      * @param srange range limiting the list, such as "2009"
      * @return a string array of formatted time ranges, such as [ "2009-01", "2009-02", ..., "2009-12" ]
+     * @see DatumRangeUtil#parseTimeRangeValid(java.lang.String) to convert to DatumRange objects.
      * @throws java.text.ParseException of the outer range cannot be parsed.
      */
     public static String[] generateTimeRanges( String spec, String srange ) throws ParseException {
