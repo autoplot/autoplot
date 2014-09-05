@@ -12,6 +12,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -113,20 +114,26 @@ public class TimeSeriesBrowseController {
                     updateTsbTimer.tickle(); 
                     logger.log( Level.FINEST, "applicationController is adjusting" );
                 } else {
-                    try {
-                        if ( fpe!=null && fpe.getController().getDataSourceFilter().getController().isPendingChanges() ) {
-                            logger.log( Level.FINEST, "DataSourceFilter is already pending changes, retickle");
-                            changesSupport.performingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
-                            updateTsbTimer.tickle(); 
-                        } else {
+                    Map<Object,Object> changes= new HashMap<Object, Object>();
+                    if ( fpe!=null ) {
+                        fpe.getController().getDataSourceFilter().getController().pendingChanges(changes);
+                        changes.remove( PENDING_AXIS_OR_TIMERANGE_DIRTY );
+                    }
+                    if ( fpe!=null && !changes.isEmpty() ) {
+                        logger.log( Level.FINEST, "DataSourceFilter is already pending changes, retickle");
+                        //changesSupport.performingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
+                        updateTsbTimer.tickle(); // bug 1253
+                    } else {
+                        try {                    
                             changesSupport.performingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
                             if ( fpe!=null && ( fdsf==null || ftsb == null ) ) {
                             } else {
                                 updateTsb(false);
                             }
+                        //}
+                        } finally {
+                            changesSupport.changePerformed( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );                        
                         }
-                    } finally {
-                        changesSupport.changePerformed( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
                     }
                 }
             }
