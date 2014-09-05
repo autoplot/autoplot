@@ -124,6 +124,7 @@ import org.virbo.dataset.DataSetAnnotations;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -155,15 +156,151 @@ public class AutoplotUtil {
      */
     public final static int DS_LENGTH_LIMIT = 10000000;
 
+        
+    private static void setRange( DDataSet range, DatumRange drange, boolean log ) {
+        range.putProperty( QDataSet.UNITS, drange.getUnits() );
+        range.putValue( 0,drange.min().doubleValue( drange.getUnits() ) );
+        range.putValue( 1,drange.max().doubleValue( drange.getUnits() ) );
+        if ( log ) range.putProperty( QDataSet.SCALE_TYPE, "log" );
+    }
+    
     /**
-     * this is not used.  It is called from createIcon, which is not used.
-     * @param c
-     * @param ds
-     * @param recyclable
-     * @param cb
-     * @return
+     * return the bounding qube for the given render type.  This was stolen from Test022.
+     * @param dataSet
+     * @param renderType
+     * @return bounding cube[3,2]
+     * @throws Exception 
      */
-    static DasPlot createPlot(DasCanvas c, QDataSet ds, DasPlot recyclable, DasColorBar cb) {
+    public static QDataSet bounds( QDataSet dataSet, RenderType renderType ) throws Exception {
+
+        DDataSet xrange= DDataSet.createRank1(2);
+        DDataSet yrange= DDataSet.createRank1(2);
+        DDataSet zrange= DDataSet.createRank1(2);
+
+        JoinDataSet result= new JoinDataSet(2);
+        result.join( xrange );
+        result.join( yrange );
+        result.join( zrange );
+
+        Map props= new HashMap();
+
+        if (renderType == RenderType.spectrogram || renderType==RenderType.nnSpectrogram ) {
+
+            QDataSet xds = (QDataSet) dataSet.property(QDataSet.DEPEND_0);
+            if (xds == null) {
+                if ( dataSet.property(QDataSet.JOIN_0)!=null ) {
+                    JoinDataSet ds= new JoinDataSet(2);
+                    for ( int i=0; i<dataSet.length(); i++ ) {
+                        ds.join((QDataSet)dataSet.property(QDataSet.DEPEND_0,i));
+                    }
+                    xds = ds;
+                } else {
+                    xds = DataSetUtil.indexGenDataSet(dataSet.length());
+                }
+            }
+
+            QDataSet yds = (QDataSet) dataSet.property(QDataSet.DEPEND_1);
+            Map<String,Object> yprops= (Map) props.get(QDataSet.DEPEND_1);
+            if (yds == null) {
+                if ( dataSet.property(QDataSet.JOIN_0)!=null ) {
+                    JoinDataSet ds= new JoinDataSet(2);
+                    for ( int i=0; i<dataSet.length(); i++ ) {
+                        QDataSet qds= dataSet.slice(i); //TODO: this needs work.
+                        String f= new File("foo.qds").getAbsolutePath();
+                        ScriptContext.formatDataSet( dataSet, f );
+                        ds.join((QDataSet)dataSet.property(QDataSet.DEPEND_1,i));
+                    }
+                    yds = ds;
+                } else if ( dataSet.rank()>1 ) {
+                    yds = DataSetUtil.indexGenDataSet(dataSet.length(0)); //TODO: QUBE assumed
+                } else {
+                    yds = DataSetUtil.indexGenDataSet(10); // later the user will get a message "renderer cannot plot..."
+                    yprops= null;
+                }
+            }
+
+            AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
+
+            AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, yprops );
+
+            //QDataSet hist= getDataSourceFilter().controller.getHistogram();
+            AutoplotUtil.AutoRangeDescriptor desc;
+
+            desc = AutoplotUtil.autoRange( dataSet, props );
+
+
+            setRange( zrange, desc.range, desc.log );
+            setRange( xrange, xdesc.range, xdesc.log );
+            setRange( yrange, ydesc.range, ydesc.log );
+
+        } else {
+
+            AutoplotUtil.AutoRangeDescriptor ydesc;
+
+            QDataSet depend0;
+
+            if ( SemanticOps.isBundle(dataSet) ) {
+                ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(dataSet, 1 ), props );
+                depend0= DataSetOps.unbundle(dataSet,0);
+            } else {
+                ydesc = AutoplotUtil.autoRange( dataSet, props );
+                depend0 = (QDataSet) dataSet.property(QDataSet.DEPEND_0);
+            }
+
+            setRange( yrange, ydesc.range, ydesc.log );
+
+            QDataSet xds= depend0;
+            if (xds == null) {
+                xds = DataSetUtil.indexGenDataSet(dataSet.length());
+            }
+
+            AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
+
+            setRange( xrange, xdesc.range, xdesc.log );
+
+            if (renderType == RenderType.colorScatter) {
+                AutoplotUtil.AutoRangeDescriptor zdesc;
+                if ( dataSet.property(QDataSet.BUNDLE_1)!=null ) {
+                    zdesc= AutoplotUtil.autoRange((QDataSet) DataSetOps.unbundle( dataSet, 2 ),null);
+                } else {
+                    QDataSet plane0= (QDataSet) dataSet.property(QDataSet.PLANE_0);
+                    zdesc= AutoplotUtil.autoRange(plane0,
+                        (Map) props.get(QDataSet.PLANE_0));
+                }
+
+                setRange( zrange, zdesc.range, zdesc.log );
+
+            }
+
+        }
+
+        for ( int i=0; i<result.length(); i++  ) {
+           Units u= (Units) result.property(QDataSet.UNITS,i);
+           if ( u!=null ) {
+               DatumRange dr= DatumRange.newDatumRange( result.value(i,0), result.value(i,1), u );
+               System.err.println( ""+i+": "+ dr );
+           } else {
+               System.err.println( ""+i+": "+ result.value(i,0) + "," + result.value(i,1) );
+           }
+           
+        }
+
+        return result;
+    }
+        
+        
+    /**
+     * Create a dasPlot that can be useful to scripts.
+     * @param c the canvas for the plot, or null.
+     * @param ds the dataset
+     * @param recyclable the recyclable dasPlot, or null.
+     * @param cb the colorbar, or null.
+     * @return the DasPlot.
+     */
+    public static DasPlot createPlot(DasCanvas c, QDataSet ds, DasPlot recyclable, DasColorBar cb) {
+        if ( c==null ) {
+            c= new DasCanvas(640,480);
+        }
         DasRow row = DasRow.create(c);
         DasColumn col = DasColumn.create(c);
         DasPlot result;
@@ -171,15 +308,35 @@ public class AutoplotUtil {
             result = recyclable;
         } else {
             result = DasPlot.createDummyPlot();
+            result.addRenderer( new SeriesRenderer() );
         }
         List<Renderer> recycleRends = Arrays.asList(result.getRenderers());
 
-        RenderType type = AutoplotUtil.guessRenderType(ds);
-
-        Renderer rend1= maybeCreateRenderer( type, recycleRends.get(0), cb, false);
-
+        RenderType type;
+        Renderer rend1;
+        if ( ds!=null ) {
+            type = AutoplotUtil.guessRenderType(ds);
+            rend1= maybeCreateRenderer( type, recycleRends.get(0), cb, false);
+            rend1.setDataSet(ds);
+        } else {
+            type = AutoplotUtil.guessRenderType(ds);
+            rend1= result.getRenderer(0);
+            rend1.setDataSet(ds);
+        }
+        
         if ( cb!=null && RenderTypeUtil.needsColorbar(type) ) cb.setVisible( true );  //okay, only since this is not used.
 
+        try {
+            QDataSet bounds= bounds( ds, type );
+            result.getXAxis().setDatumRange( DataSetUtil.asDatumRange( bounds.slice(0) ) );
+            result.getYAxis().setDatumRange( DataSetUtil.asDatumRange( bounds.slice(1) ) );
+            if ( cb!=null ) {
+                cb.setDatumRange( DataSetUtil.asDatumRange( bounds.slice(2) ) );
+            }
+        } catch ( Exception ex ) {
+            logger.log( Level.SEVERE, null, ex );
+        }
+        
         result.addRenderer(rend1);
 
         c.add(result, row, col);
@@ -936,8 +1093,8 @@ public class AutoplotUtil {
             return result;
         }
 
-
-        double[] dd;
+        
+        double[] dd; // two-element array that is the min and max of the data.
 
         boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC));
         if ( null != ds.property(QDataSet.CADENCE) ) {
@@ -1133,7 +1290,9 @@ public class AutoplotUtil {
             result.robustMax = dd[1];
 
             double nomMin, nomMax;
+            
             if (mono) {
+                // nomMin= dd[0]; nomMax=dd[1]   //TODO: the following two lines assume there is no fill and it is monotonically increasing.
                 nomMin = ds.value(0);
                 nomMax = ds.value(ds.length() - 1);
             } else {
@@ -1157,9 +1316,9 @@ public class AutoplotUtil {
                 }
             }
 
-            double normalMedianLog = ( result.median / positiveMin ) / ( nomMax / positiveMin );
+            //double normalMedianLog = ( result.median / positiveMin ) / ( nomMax / positiveMin );
 
-            if ( !isLin && !isHist && normalMedianLog<0.01 && nomMin==0 && nomMax/positiveMin>1e3 && nomMin>=0 ) {  // this is where they are bunched up at zero.
+            if ( !isLin && !isHist && result.median==0 && nomMin==0 && nomMax/positiveMin>1e3 ) {  // this is where they are bunched up at zero.
                 isLog= true;
                 result.robustMin= positiveMin/10;
             }
