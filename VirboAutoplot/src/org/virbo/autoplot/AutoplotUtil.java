@@ -1251,7 +1251,8 @@ public class AutoplotUtil {
         } else {
             // find the median by looking at the histogram.  If the dataset should be log, then the data will bunch up in the lowest bins.
             isHist= "stairSteps".equals( ds.property( QDataSet.RENDER_TYPE) ); // nasty bit of code
-            QDataSet hist = DataSetOps.histogram(ds, dd[0], dd[1] + (dd[1] - dd[0]) * 0.01, (dd[1] - dd[0]) / 100);
+            double binSize= (dd[1] - dd[0]) * 0.01;
+            QDataSet hist = DataSetOps.histogram(ds, dd[0] - binSize/2, dd[1] + binSize/2, (dd[1] - dd[0]) / 100);
             positiveMin= ((Double) hist.property("positiveMin"));
             total = 0;
             for (int i = 0; i < hist.length(); i++) {
