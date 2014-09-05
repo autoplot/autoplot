@@ -2013,18 +2013,16 @@ public class PlotElementController extends DomNodeController {
                 return;
             }
 
+            AutoplotUtil.AutoRangeDescriptor desc;
+            
+            desc = AutoplotUtil.autoRange( zds, props, ignoreDsProps );  // do the Z autoranging first for debugging.
+            logger.log(Level.FINE, "desc.range={0}", desc.range);
+
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0), ignoreDsProps);
             logger.log(Level.FINE, "xdesc.range={0}", xdesc.range);
 
             AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, yprops, ignoreDsProps );
-
-            //QDataSet hist= getDataSourceFilter().controller.getHistogram();
-            AutoplotUtil.AutoRangeDescriptor desc;
-            //if ( false && hist!=null ) {
-            //    desc= AutoplotUtil.autoRange( hist, fillDs, props );
-            //} else {
-                desc = AutoplotUtil.autoRange( zds, props, ignoreDsProps );
-            //}
+            logger.log(Level.FINE, "ydesc.range={0}", ydesc.range);
 
             peleCopy.getPlotDefaults().getZaxis().setRange(desc.range);
             peleCopy.getPlotDefaults().getZaxis().setLog(desc.log);
