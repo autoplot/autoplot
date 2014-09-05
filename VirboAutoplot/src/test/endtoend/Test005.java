@@ -93,9 +93,9 @@ public class Test005 {
             plot( omniSrc + "/omni2_1963.dat");
             writeToPng("test005_demo7.png");
             xxx("demo7");
-            plot( omniSrc + "/omni2_$Y.dat?timerange=1963-1965");
-            writeToPng("test005_demo8.png");
-            xxx("demo8");
+            //plot( omniSrc + "/omni2_$Y.dat?timerange=1963-1965");
+            //writeToPng("test005_demo8.png");
+            //xxx("demo8");
             plot( omniSrc + "omni2_$Y.dat?column=field17&timeFormat=$Y+$j+$H&time=field0&validMax=999&timerange=1972");
             writeToPng("test005_demo9.png");
             xxx("demo9");
