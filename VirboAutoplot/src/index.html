@@ -25,12 +25,17 @@
         to resolve old numbers.
         <p>Bugfixes (2014-09-04):</p>
         <ul>
+            <li>1255: slow rendering, flash feedback can basically hang system</li>
+            <li>In autoranging, correct the logic that detects when all data bunches into first histogram bin, indicating log should be used.</li>
             <li>1253: partial loads from daily TSB with pngwalk by orbit </li>
             <li>kludge in check for "No Data Found" from das2server</li>
             <li>1254: generateTimeRanges failure found by Sebastian</li>
             <li>0849786987:  "Attempt to copy non-qube into ArrayDataSet" message when Bill would run into with Juno reader</li>
             <li>import completions file was missing, resulting in NullPointerException</li>
             <li>1251: whopping bug (but somehow didn't affect anyone) in monitor management and reference caching, where finished could be called prematurely.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>jython dataset(array) works with string array now</li>
             <li>950: set width and height in atomic operation in script setCanvasSize</li>
             <li>completions on package names based on internal list, was broken with webstart.</li>
@@ -51,25 +56,13 @@
             <li>421: double load of Das2Source caused by mouse-wheeling</li>
             <li>Kristoff pointed out where Jython GUI wouldn't reset properly when dom.plots[0].yaxis.range was used as default.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>interpolation codes preserve more metadata</li>
-            <li>jython completions allow selection for all argument combinations, not just one.</li>
-            <li>completions-based editor bugfix, where it would not recognize HDF5 as file-based</li>
-            <li>append wasn't able to append two datasets that had enumerations that didn't have the same units.  Now it can.</li>
-            <li>kludge in URI formatting to use + instead of %20 in timeranges to improve legibility</li>
-            <li>1065: reduce flickering caused by unneeded setDataSet(null)</li>
-            <li>tweaks to the jython editor panel automatic GUI.</li>
-            <li>minor improvements to CEF including UNITS, DELTA_PLUS/DELTA_MINUS, showing data before support data.</li>
-            <li>rank 2 data was misread in the CEF reader.</li>
-            <li>http://autoplot.org/autoplot.jnlp?bookmarks:...bookmarks.xml now works in re-enter code.</li>
-            <li>medianFilter had a bug where repeated values were not counted twice.  Thanks Kenzie!</li>
-            <li>spectrogram style panel comes up for PitchAngleDistribution mode now, which is slightly better than Series panel.</li>
-            <li>don't load the file automatically into the jython editor if it is already loaded.  This is dangerous and distracting.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>stddev and variance routines added</li>
             <li>import completions improved</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>            
             <li>RBSP orbits updated to 2014-09-13.</li>
             <li>applot.py added to support plotting from numpy and scipy</li>
             <li>qstream ascii transfer types can be less than 6 characters.</li>
@@ -90,19 +83,6 @@
             <li>AutoplotServer images are set to .vap file height and width by default</li>
             <li>Make PNGWalk allows writing to PDF files instead of .PNG files.</li>
             <li>PDSPPI supports discovery (File->Add Plot From...->PDSPPI)</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>            
-            <li>add butterworth to the filters</li>
-            <li>minor kludge in URI format/parse to use + in timerange parameters instead of %20, so the URIs are more legible.</li>
-            <li>370: getParam dom for defaults.  Datum and DatumRange now allowed as parameters.  URI uses DataSetSelector.</li>
-            <li>http web filesystem avoids listing when the filename is known already, supporting use with Github.</li>
-            <li>introduce median and mean filters, thanks Kenzie!</li>
-            <li>OpenDAP looks for missing_value and title metadata, preparing to update demo 1 bookmark.</li>
-            <li>CDAWeb vap servlet improves error feedback</li>
-            <li>PDSPPI source allows completions based on the names in the VOTables</li>
-            <li>read description and valid min and valid max from VOTables.</li>
-            <li>add butterworth to the filters</li>
         </ul>
 
         <p>Known issues:</p>
