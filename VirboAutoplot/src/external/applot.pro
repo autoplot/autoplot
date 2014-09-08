@@ -33,7 +33,7 @@ pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii, xunits=xunits
       name= i eq 1 ? '' : t[i]  ;;; stream reader needs a default plane
       if ( s[0] eq 1 ) then begin
          packetDescriptor= [ packetDescriptor, $
-             '   <y type="'+datatype+'" name="'+name+'" idlname="'+t[i]+'" />' ]
+             '   <y type="'+datatype+'" name="'+name+'" idlname="'+t[i]+'" units=""/>' ]
          format= format + ( ( i lt n_elements(t)-1 ) ? ',e16.4' : ',e15.3)' )
          totalItems+=1
       endif else begin
@@ -43,7 +43,7 @@ pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii, xunits=xunits
          packetDescriptor= [ packetDescriptor, $
              '   <yscan type="'+datatype+'" name="'+name $
              +'" nitems="'+strtrim(nitems,2)  $
-             +'" yTags="'+sytags+'"' $
+             +'" yTags="'+sytags+'" yUnits="" zUnits=""' $
              +' />' ]
          for i=1,nitems-1 do format= format + ',e16.4'
          format= format + ( ( i lt n_elements(t)-1 ) ? ','+',e16.4' : ','+'e15.4)' )
