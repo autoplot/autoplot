@@ -3,14 +3,18 @@
 # this copies all the sources into the temp directory, then compiles a few key sources, so
 # that unreferenced routines are not used.
 
-echo "compile-applet-all v.20121115"
+echo "compile-applet-all v.20140908"
 
 # set JAVA5_HOME and JAVA6_HOME
 if [ "" = "$JAVA5_HOME" ]; then
     JAVA5_HOME=/usr/local/jdk1.5.0_15__32/
 fi
 if [ "" = "$JAVA6_HOME" ]; then
-    JAVA6_HOME=/usr/local/jre1.6.0_16__32/
+    JAVA6_HOME=/usr/local/jdk1.6.0_16__32/
+fi
+
+if [ "" = "$JAVA_HOME" ]; then
+    JAVA_HOME=$JAVA6_HOME
 fi
 
 rm -r -f temp-src/
@@ -31,11 +35,10 @@ done
 echo "done copy sources"
 
 cd temp-classes
-${JAVA5_HOME}bin/jar xvf ../../APLibs/lib/beansbinding-1.2.1.jar
-${JAVA5_HOME}bin/jar xvf ../../APLibs/lib/commons/commons-vfs-1.0.jar  # experiment with support for applet
-${JAVA5_HOME}bin/jar xvf ../../APLibs/lib/json-2011-01-27-gitrelease.jar
-${JAVA5_HOME}bin/jar xvf ../../APLibs/lib/javacsv.jar
-${JAVA5_HOME}bin/jar xvf ../../APLibs/lib/jython.jar
+${JAVA_HOME}bin/jar xvf ../../APLibs/lib/beansbinding-1.2.1.jar
+${JAVA_HOME}bin/jar xvf ../../APLibs/lib/commons/commons-vfs-1.0.jar  # experiment with support for applet
+${JAVA_HOME}bin/jar xvf ../../APLibs/lib/json-2011-01-27-gitrelease.jar
+${JAVA_HOME}bin/jar xvf ../../APLibs/lib/javacsv.jar
 #jar xvf ../../APLibs/lib/swing-layout-1.0.3.jar
 
 echo "Remove codes that are not used by the applet and cause problems, such as AutoplotUI.java and *EditorPanel.java"
@@ -43,6 +46,7 @@ cd ../temp-src
 # set traps for things that ought not to be needed by the applet.
 rm org/virbo/autoplot/AutoplotUI.java
 rm org/virbo/autoplot/AutoplotUI.form
+rm org/virbo/autoplot/ScriptContext.java
 rm org/virbo/datasource/DataSetSelector.java
 rm org/virbo/datasource/DataSetSelector.form
 rm org/virbo/autoplot/scriptconsole/*
@@ -58,14 +62,14 @@ rm -rf org/das2/dasml/*
 echo "compile sources..."
 pwd
 hasErrors=0
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotApplet.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/endtoend/TestApplet*.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/tsds/datasource/TsdsDataSourceFactory.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/das2Stream/Das2StreamDataSourceFactory.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/binarydatasource/BinaryDataSourceFactory.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/csv/CsvDataSourceFactory.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/components/propertyeditor/PropertyEditor.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotApplet.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/endtoend/TestApplet*.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/tsds/datasource/TsdsDataSourceFactory.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/das2Stream/Das2StreamDataSourceFactory.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/binarydatasource/BinaryDataSourceFactory.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/csv/CsvDataSourceFactory.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/components/propertyeditor/PropertyEditor.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
 
 echo "done compile sources."
 
