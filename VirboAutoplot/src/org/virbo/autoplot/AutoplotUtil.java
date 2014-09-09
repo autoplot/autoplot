@@ -42,7 +42,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
@@ -74,7 +73,6 @@ import javax.swing.table.TableModel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -205,9 +203,9 @@ public class AutoplotUtil {
                 if ( dataSet.property(QDataSet.JOIN_0)!=null ) {
                     JoinDataSet ds= new JoinDataSet(2);
                     for ( int i=0; i<dataSet.length(); i++ ) {
-                        QDataSet qds= dataSet.slice(i); //TODO: this needs work.
-                        String f= new File("foo.qds").getAbsolutePath();
-                        ScriptContext.formatDataSet( dataSet, f );
+                        //QDataSet qds= dataSet.slice(i); //TODO: this needs work.
+                        //String f= new File("foo.qds").getAbsolutePath();
+                        //ScriptContext.formatDataSet( dataSet, f );
                         ds.join((QDataSet)dataSet.property(QDataSet.DEPEND_1,i));
                     }
                     yds = ds;
