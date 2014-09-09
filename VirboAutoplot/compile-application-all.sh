@@ -149,7 +149,7 @@ for i in $( find * -name 'packagelist.txt' ); do
 done
 #TODO: figure out why we can't just add all txt files.  The release tag is messed up.
 
-mkdir -p ../temp-volatile-classes/orbits
+mkdir -p ../temp-classes/orbits
 for i in $( find orbits -type f ); do               # copy in orbits files
    cp $i ../temp-classes/$i
 done
