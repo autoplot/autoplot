@@ -857,6 +857,7 @@ public abstract class Bookmark {
         this.id= String.valueOf(++seq);
     }
 
+    @Override
     public String toString() {
         return this.title;
     }
