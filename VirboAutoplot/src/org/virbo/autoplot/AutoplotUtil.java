@@ -318,18 +318,19 @@ public class AutoplotUtil {
             rend1.setDataSet(ds);
         } else {
             type = AutoplotUtil.guessRenderType(ds);
-            rend1= result.getRenderer(0);
-            rend1.setDataSet(ds);
+            rend1= new SeriesRenderer();
         }
         
         if ( cb!=null && RenderTypeUtil.needsColorbar(type) ) cb.setVisible( true );  //okay, only since this is not used.
 
         try {
-            QDataSet bounds= bounds( ds, type );
-            result.getXAxis().setDatumRange( DataSetUtil.asDatumRange( bounds.slice(0) ) );
-            result.getYAxis().setDatumRange( DataSetUtil.asDatumRange( bounds.slice(1) ) );
-            if ( cb!=null ) {
-                cb.setDatumRange( DataSetUtil.asDatumRange( bounds.slice(2) ) );
+            if ( ds!=null ) {
+                QDataSet bounds= bounds( ds, type );
+                result.getXAxis().setDatumRange( DataSetUtil.asDatumRange( bounds.slice(0) ) );
+                result.getYAxis().setDatumRange( DataSetUtil.asDatumRange( bounds.slice(1) ) );
+                if ( cb!=null ) {
+                    cb.setDatumRange( DataSetUtil.asDatumRange( bounds.slice(2) ) );
+                }
             }
         } catch ( Exception ex ) {
             logger.log( Level.SEVERE, null, ex );
