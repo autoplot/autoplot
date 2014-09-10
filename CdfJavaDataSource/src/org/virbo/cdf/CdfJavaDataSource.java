@@ -377,7 +377,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     String sval= w.substring(ieq+4);
                     if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
                     String sparm= w.substring(0,ieq);
-                    QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, attr1 );
+                    QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, null );
                     QDataSet r;
                     double d;
                     if ( parm.rank()==2 ) {
