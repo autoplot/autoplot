@@ -317,7 +317,7 @@ public class AutoplotUtil {
             rend1= maybeCreateRenderer( type, recycleRends.get(0), cb, false);
             rend1.setDataSet(ds);
         } else {
-            type = AutoplotUtil.guessRenderType(ds);
+            type = RenderType.series;
             rend1= new SeriesRenderer();
         }
         
