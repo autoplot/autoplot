@@ -378,6 +378,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         if ( ex.getNodeName().equals("items") ) {
                             isTca= true;
                         }
+                        if ( ex.getNodeName().equals("requiresInterval") ) {
+                            isTca= !ex.getNodeValue().equals("0");
+                        }
                     }
                     if ( example!=null && curr.equals(DEFAULT_TIMERANGE) ) { // DANGER: what if they are the same?
                         Das2ServerDataSourceEditorPanel.this.timeRangeTextField.setText( example );
