@@ -150,6 +150,31 @@ public class UriTcaSource extends AbstractQFunction {
         }
     }
 
+    /**
+     * This will set the focus range for the TimeSeriesBrowse, if available, 
+     * and then call each tick individually.
+     * @param parms
+     * @return 
+     */
+    @Override
+    public synchronized QDataSet values( QDataSet parms ) {
+        if ( initialError!=null ) {
+            if ( ds==null ) {
+                return new BundleDataSet( error );
+            }
+        }
+        Datum d;
+        DatumRange dr= null;
+        for ( int i=0; i<parms.length(); i++ ) {
+            d= DataSetUtil.asDatum( parms.slice(i).slice(0) );
+            dr= DatumRangeUtil.union( dr, d );
+        }
+        if ( tsb!=null ) {
+            tsb.setTimeRange(dr);
+        }
+        return super.values(parms); // just loop over them as we did before.
+    }
+    
     @Override
     public synchronized QDataSet value(QDataSet parm) {
 
@@ -194,7 +219,9 @@ public class UriTcaSource extends AbstractQFunction {
                 logger.log( Level.FINER, "loaded dataset: {0} {1} ", new Object[]{ tsb!=null ? tsb.getTimeRange() : "", ds } );
             }
             if ( ds==null ) {
-                return new BundleDataSet( errorNoDs );
+                BundleDataSet result= new BundleDataSet( errorNoDs );
+                ((MutablePropertyDataSet)result).putProperty( QDataSet.UNITS, errorNoDs.property(QDataSet.UNITS) );
+                return result;
             }
             
             QDataSet dep0= SemanticOps.xtagsDataSet(ds);
@@ -250,6 +277,8 @@ public class UriTcaSource extends AbstractQFunction {
 
             } else {
 
+                if ( deltaPlus==null ) deltaPlus= DataSetUtil.asDataSet( SemanticOps.getUnits(dep0).getOffsetUnits().createDatum(0) );
+                if ( deltaMinus==null ) deltaMinus= deltaPlus;
                 if ( findex.value()>dep0.length()-1 && ( Ops.ge( Ops.add( dep0.slice(dep0.length()-1), deltaMinus ), d0 ).value()==1 ) ) {
                     result= ds.slice(dep0.length()-1);
 
@@ -263,6 +292,7 @@ public class UriTcaSource extends AbstractQFunction {
                             result1.bundle(nonValueDs);
                         }
                         result= result1;
+                        ((MutablePropertyDataSet)result).putProperty( QDataSet.UNITS, nonValueDs.property(QDataSet.UNITS) );
                     } else {
                         if ( tsb.getTimeRange().contains(DataSetUtil.asDatum(d0)) ) {
                             BundleDataSet result1= new BundleDataSet( nonValueDs );
@@ -270,6 +300,7 @@ public class UriTcaSource extends AbstractQFunction {
                                 result1.bundle(nonValueDs);
                             }
                             result= result1;
+                            ((MutablePropertyDataSet)result).putProperty( QDataSet.UNITS, nonValueDs.property(QDataSet.UNITS) );
                         } else {
                             logger.log( Level.INFO, "tick {0} is outside bounds of loaded data ({1}) {2}",
                                     new Object[]{DataSetUtil.asDatum(d0), tsb.getTimeRange(), ds });
@@ -278,9 +309,11 @@ public class UriTcaSource extends AbstractQFunction {
                                 result1.bundle(error);
                             }
                             result= result1;
+                            ((MutablePropertyDataSet)result).putProperty( QDataSet.UNITS, error.property(QDataSet.UNITS) );
                         }
                     }
                 }
+                return result;
             }
 
             if ( result.rank()==0 ) {
