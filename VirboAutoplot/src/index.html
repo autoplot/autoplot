@@ -23,8 +23,10 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-09-04):</p>
+        <p>Bugfixes (2014-09-11):</p>
         <ul>
+            <li>das2server source uses requiresInterval parameter from dsdf to comply with Juno ephemeris sources.</li>
+            <li>TCAs are reset in reload all data action</li>
             <li>1255: slow rendering, flash feedback can basically hang system</li>
             <li>In autoranging, correct the logic that detects when all data bunches into first histogram bin, indicating log should be used.</li>
             <li>1253: partial loads from daily TSB with pngwalk by orbit </li>
@@ -58,11 +60,13 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>CDF filtering Rank 2 variables with other Rank 2 variables</li>
+            <li>createPlot resurrected to support slicers</li>
             <li>stddev and variance routines added</li>
             <li>import completions improved</li>
        </ul>
         <p>Less recent features:</p>
-        <ul>            
+        <ul>           
             <li>RBSP orbits updated to 2014-09-13.</li>
             <li>applot.py added to support plotting from numpy and scipy</li>
             <li>qstream ascii transfer types can be less than 6 characters.</li>
