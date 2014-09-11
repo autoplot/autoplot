@@ -451,6 +451,13 @@ public class AutoplotUtil {
                 System.err.println( "not updating: " + dsf.getUri() );
             }
         }
+        for ( Plot p: dom.getPlots() ) {
+            if ( p.getTicksURI()!=null && p.getTicksURI().length()>0 ) {
+                String oldTicksURI= p.getTicksURI();
+                p.setTicksURI("");
+                p.setTicksURI(oldTicksURI);
+            }
+        }
     }
 
     static void doSearchToolTips1( final JComponent aThis, Pattern p, Map<Component,String> result  ) {
