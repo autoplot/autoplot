@@ -17,9 +17,13 @@
 #
 #  -h  --headless   run in headless mode
 #  -Jxxx            pass argument xxx to JRE (e.g. -J-Xmx4G to get 4 Gig of RAM)
+#  -s  --script     launch into script
+#
+#  Set APDEBUG=1 to print debug infomation
 #
 #  For example:
-#    ./autoplot.jar -J-Xmx4G
+#    ./autoplot.jar -J-Xmx4G -h --script myscript.jy
+#  
 
 JAVA_ARGS=""
 AP_ARGS=""
@@ -27,7 +31,9 @@ AP_ARGS=""
 memIsImplicit=1
 
 for i in "$@"; do
-   echo $i
+   if [ "$SSDEBUG" == "1" ]; then    
+       echo "arg: \"$i\""
+   fi
    if [[ $i == -J-Xmx* ]]; then
       JAVA_ARGS="${JAVA_ARGS} ${i:2}";
       memIsImplicit=0
@@ -41,6 +47,11 @@ for i in "$@"; do
       AP_ARGS="${AP_ARGS} $i";
    fi
 done
+
+if [ "$SSDEBUG" == "1" ]; then 
+   echo "JAVA_ARGS=${JAVA_ARGS}"
+   echo "AP_ARGS=${AP_ARGS}"
+fi
 
 if [[ $memIsImplicit == 1 ]]; then 
    JAVA_ARGS="${JAVA_ARGS} -Xmx1000M ";
