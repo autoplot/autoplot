@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.logging.Level;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
@@ -76,6 +77,7 @@ public class Test039 {
         
         canvas.writeToPng("test039_tca.png");
         
+        //JOptionPane.showMessageDialog(null,canvas);
     }
     
     public static void main( String[] args ) throws Exception {
