@@ -41,6 +41,7 @@ import java.util.Map.Entry;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 import org.autoplot.wgetfs.WGetFileSystemFactory;
 import org.das2.datum.DatumRange;
 import org.das2.fsm.FileStorageModel;
@@ -1014,11 +1015,32 @@ public class DataSetURI {
             boolean fail= true;
             InputStream in=null;
             try {
+                mon.setProgressMessage("downloading "+url);
+                mon.started();
                 logger.log(Level.FINEST,"downloadResourceAsTempFile-> transfer");
                 logger.log(Level.FINE, "reading URL {0}", url);
                 URLConnection urlc= url.openConnection();
+                urlc.setRequestProperty("Accept-Encoding", "gzip"); // RFE
                 urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() ); // Reiner describes hang at LANL
-                in= new DasProgressMonitorInputStream( urlc.getInputStream(), mon );
+                in= urlc.getInputStream();
+                Map<String, List<String>> headers = urlc.getHeaderFields();
+                List<String> contentEncodings=headers.get("Content-Encoding");
+                boolean hasGzipHeader=false;
+                if (contentEncodings!=null) {
+                    for (String header:contentEncodings) {
+                        if (header.equalsIgnoreCase("gzip")) {
+                            hasGzipHeader=true;
+                            break;
+                        }
+                    }
+                }
+                if ( hasGzipHeader ) {
+                    logger.fine("temp file is compressed");
+                    in= new GZIPInputStream(in);
+                } else {
+                    logger.fine("temp file is not compressed");
+                }
+                in= new DasProgressMonitorInputStream( in, mon.getSubtaskMonitor("loading") ); 
                 OutputStream out= new FileOutputStream( tempfile );
                 DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
                 fail= false;
@@ -1032,6 +1054,7 @@ public class DataSetURI {
                         logger.log(Level.WARNING, "failed to delete after exception: {0}", result);
                     }
                 }
+                mon.finished();
                 if ( in!=null ) in.close(); // This will throw the InterruptedIOException
             }
         }
