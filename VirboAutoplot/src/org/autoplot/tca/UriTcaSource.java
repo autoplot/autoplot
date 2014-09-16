@@ -170,7 +170,11 @@ public class UriTcaSource extends AbstractQFunction {
             dr= DatumRangeUtil.union( dr, d );
         }
         if ( tsb!=null ) {
+            DatumRange timeRange= tsb.getTimeRange();
             tsb.setTimeRange(dr);
+            if ( timeRange==null || !timeRange.contains(dr) ) {
+                needToRead= true;
+            }
         }
         return super.values(parms); // just loop over them as we did before.
     }
