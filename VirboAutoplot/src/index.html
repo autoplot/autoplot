@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>bug 1253, partial loads in pngwalk is fixed. The bug was unfortunately not detected in nightly tests.</small></p>
+        <p><small>HDF file showing is downloaded with downloadResourceAsTempFile, which will use gzip compression if it's available.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,11 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-09-11):</p>
+        <p>Bugfixes (2014-09-16):</p>
         <ul>
+            <li>1259: reload all needs to reload the ephemeris (TCA) data.</li>
+            <li>1250: Ephemeris (TCAs) from TSBs at the beginning beginning and NRT handled poorly.</li>
+            <li>1255: slow rendering, flash feedback can basically hang system</li>
             <li>das2server source uses requiresInterval parameter from dsdf to comply with Juno ephemeris sources.</li>
             <li>TCAs are reset in reload all data action</li>
             <li>1255: slow rendering, flash feedback can basically hang system</li>
@@ -60,6 +63,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe 387: support gzip encoding in downloadResourceAsTempFile. </li>
+            <li>rfe 386: interpolation routines must only extrapolate modestly.</li>
             <li>CDF filtering Rank 2 variables with other Rank 2 variables</li>
             <li>createPlot resurrected to support slicers</li>
             <li>stddev and variance routines added</li>
