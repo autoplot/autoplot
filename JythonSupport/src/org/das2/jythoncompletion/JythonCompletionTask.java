@@ -755,6 +755,7 @@ public class JythonCompletionTask implements CompletionTask {
             String ss = s.toString();
             String signature = null; // java signature
             List<String> signatures= new ArrayList();
+            List<String> argss= new ArrayList();
             if (ss.startsWith(cc.completable)) {
                 PyObject po = locals.get(s);
                 String label = ss;
@@ -776,6 +777,7 @@ public class JythonCompletionTask implements CompletionTask {
                         }
                         signatures.add(signature);
                         labels.add(label);
+                        argss.add(args);
                     }
                 } else if (po.isCallable()) {
                     label = ss + "() ";
@@ -814,7 +816,7 @@ public class JythonCompletionTask implements CompletionTask {
                         if ( ss.equals("dom") ) {
                             link= "http://autoplot.org/developer.scripting#DOM";
                         }
-                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link) );
+                        result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + argss.get(jj), label, link) );
                     }
                 } else {
                     String link = null;
