@@ -49,7 +49,6 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.ReferenceCache;
-import org.virbo.dsops.CoerceUtil;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 
@@ -72,7 +71,10 @@ public class CdfFileDataSource extends AbstractDataSource {
 
     private final static Logger logger= LoggerManager.getLogger("apdss.cdfn");
 
-    /** Creates a new instance of CdfFileDataSource */
+    /** 
+     * Creates a new instance of CdfFileDataSource
+     * @param uri the uri
+     */
     public CdfFileDataSource(URI uri) {
         super(uri);
     }
@@ -717,17 +719,6 @@ public class CdfFileDataSource extends AbstractDataSource {
                             }
                         }
 
-                        //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO
-                        if ( depDs.rank() == 2 && depDs.length(0) == 2 && cdf.getName().contains("LANL_1991_080") ) {
-                            logger.warning("applying kludge for LANL_1991_080");
-                            MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
-                            QDataSet binmax = DataSetOps.slice1(depDs, 1);
-                            QDataSet binmin = DataSetOps.slice1(depDs, 0);
-                            depDs1.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(depDs1, binmin));
-                            depDs1.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(binmax, depDs1));
-                            depDs = depDs1;
-                        }
-
                         if (DataSetUtil.isMonotonic(depDs)) {
                             depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
                         } else {
@@ -779,7 +770,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         }
 
         boolean swapHack = false; // TODO: figure out where this was needed.
-
+        
         if ( result.rank() == 3) {
             int n1 = result.length(0);
             int n2 = result.length(0, 0);
@@ -805,7 +796,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 }
             }
         }
-
+        
         if (swapHack && result.rank() == 3) { // need to swap for rank 3.
             QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
             QDataSet dep2 = (QDataSet) result.property(QDataSet.DEPEND_2);
@@ -829,6 +820,23 @@ public class CdfFileDataSource extends AbstractDataSource {
             attributes.put(QDataSet.DEPEND_0, att1);
             attributes.put(QDataSet.DEPEND_1, att0);
         }
+        
+        // last check for LANL min,max file
+        //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO
+        for ( int idep=1; idep<result.rank(); idep++ ) {
+            QDataSet depDs= (QDataSet) result.property("DEPEND_"+idep);
+            if ( depDs!=null && depDs.rank() == 2 && depDs.length(0) == 2 && depDs.length()==qubeDims[idep] ) {
+                logger.warning("applying min,max kludge for old LANL cdf files");
+                MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
+                QDataSet binmax = DataSetOps.slice1(depDs, 1);
+                QDataSet binmin = DataSetOps.slice1(depDs, 0);
+                depDs1.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(depDs1, binmin));
+                depDs1.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(binmax, depDs1));
+                depDs = depDs1;
+                result.putProperty("DEPEND_"+idep,depDs);
+            }
+        }
+                        
         return result;
     }
 

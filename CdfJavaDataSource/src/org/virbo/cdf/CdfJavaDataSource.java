@@ -677,7 +677,6 @@ public class CdfJavaDataSource extends AbstractDataSource {
      * @throws CDFException
      * @throws ParseException
      */
-    
     private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> thisAttributes, int slice1, ProgressMonitor mon) throws Exception, ParseException {
         Variable variable = cdf.getVariable(svariable);
         if ( variable==null ) {
@@ -952,17 +951,6 @@ public class CdfJavaDataSource extends AbstractDataSource {
                             }
                         }
 
-                        //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO
-                        boolean checkLANL_1991_080= false;
-                        if (depDs.rank() == 2 && depDs.length(0) == 2 && checkLANL_1991_080 ) {
-                            MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
-                            QDataSet binmax = DataSetOps.slice1(depDs, 1);
-                            QDataSet binmin = DataSetOps.slice1(depDs, 0);
-                            depDs1.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(depDs1, binmin));
-                            depDs1.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(binmax, depDs1));
-                            depDs = depDs1;
-                        }
-
                         if (DataSetUtil.isMonotonic(depDs)) {
                             depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
                         } else {
@@ -1088,6 +1076,23 @@ public class CdfJavaDataSource extends AbstractDataSource {
             thisAttributes.put(QDataSet.DEPEND_0, att1);
             thisAttributes.put(QDataSet.DEPEND_1, att0);
         }
+        
+        // last check for LANL min,max file
+        //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO  Autoplot Test016 has one of these vap:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU.
+        for ( int idep=1; idep<result.rank(); idep++ ) {
+            QDataSet depDs= (QDataSet) result.property("DEPEND_"+idep);
+            if ( depDs!=null && depDs.rank() == 2 && depDs.length(0) == 2 && depDs.length()==qubeDims[idep] ) {
+                logger.warning("applying min,max kludge for old LANL cdf files");
+                MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
+                QDataSet binmax = DataSetOps.slice1(depDs, 1);
+                QDataSet binmin = DataSetOps.slice1(depDs, 0);
+                depDs1.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(depDs1, binmin));
+                depDs1.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(binmax, depDs1));
+                depDs = depDs1;
+                result.putProperty("DEPEND_"+idep,depDs);
+            }
+        }      
+
         return result;
     }
 
