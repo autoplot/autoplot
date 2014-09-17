@@ -70,4 +70,6 @@ else
       $EXEC /usr/bin/env java ${JAVA_ARGS} -jar $0 "${AP_ARGS}"
 fi
 
+exit
+
 # JAR FILE DATA STARTS AFTER THIS TEXT #
