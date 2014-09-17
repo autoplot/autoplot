@@ -718,7 +718,8 @@ public class CdfFileDataSource extends AbstractDataSource {
                         }
 
                         //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO
-                        if (depDs.rank() == 2 && depDs.length(0) == 2) {
+                        if ( depDs.rank() == 2 && depDs.length(0) == 2 && cdf.getName().contains("LANL_1991_080") ) {
+                            logger.warning("applying kludge for LANL_1991_080");
                             MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
                             QDataSet binmax = DataSetOps.slice1(depDs, 1);
                             QDataSet binmin = DataSetOps.slice1(depDs, 0);
