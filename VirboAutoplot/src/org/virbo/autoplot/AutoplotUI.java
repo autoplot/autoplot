@@ -3378,7 +3378,12 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
     }
 };
 
-private static String getProcessId(final String fallback) {
+/**
+ * return the processID (pid), or the fallback if the pid cannot be found.
+ * @param fallback the string (null is okay) to return when the pid cannot be found.
+ * @return the process id or the fallback provided by the caller.
+ */
+public static String getProcessId(final String fallback) {
     // Note: may fail in some JVM implementations
     // therefore fallback has to be provided
 
