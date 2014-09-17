@@ -31,7 +31,7 @@ AP_ARGS=""
 memIsImplicit=1
 
 for i in "$@"; do
-   if [ "$SSDEBUG" == "1" ]; then    
+   if [ "$SSDEBUG"="1" ]; then    
        echo "arg: \"$i\""
    fi
    if [[ $i == -J-Xmx* ]]; then
@@ -48,19 +48,26 @@ for i in "$@"; do
    fi
 done
 
-if [ "$SSDEBUG" == "1" ]; then 
+if [ "$SSDEBUG"="1" ]; then 
    echo "JAVA_ARGS=${JAVA_ARGS}"
    echo "AP_ARGS=${AP_ARGS}"
 fi
 
-if [[ $memIsImplicit == 1 ]]; then 
+if [ $memIsImplicit="1" ]; then 
    JAVA_ARGS="${JAVA_ARGS} -Xmx1000M ";
 fi
 
-if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then
-      exec "${JAVA_HOME}"/bin/java ${JAVA_ARGS} -jar $0 "${AP_ARGS}"
+# make debugging easier by checking if this is actually the starter script being tested.
+if [ "$0"="./starterScript.sh" ]; then
+   EXEC="echo";
 else
-      exec /usr/bin/env java ${JAVA_ARGS} -jar $0 "${AP_ARGS}"
+   EXEC="exec";
+fi
+
+if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then
+      $EXEC "${JAVA_HOME}"/bin/java ${JAVA_ARGS} -jar $0 "${AP_ARGS}"
+else
+      $EXEC /usr/bin/env java ${JAVA_ARGS} -jar $0 "${AP_ARGS}"
 fi
 
 # JAR FILE DATA STARTS AFTER THIS TEXT #
