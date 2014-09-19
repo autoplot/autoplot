@@ -360,7 +360,7 @@ cp src/index.html dist  #TODO: why?
 
 echo "=== modify jar files for this particular release"
 cd temp-volatile-src
-$JAVAC -d ../temp-volatile-classes external/FileSearchReplace.java
+$JAVAC  -target 1.6 -source 1.6 -d ../temp-volatile-classes external/FileSearchReplace.java
 cd ..
 ${JAVA6_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 ${JAVA6_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
@@ -377,3 +377,4 @@ mv AutoplotStable.jar dist/
 
 echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pack.gz."
 cp src/htaccess.txt dist/
+
