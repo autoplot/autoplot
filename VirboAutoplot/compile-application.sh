@@ -32,8 +32,8 @@ if [ "" = "$TAG" ]; then
 fi
 echo "TAG=${TAG}"
 
-JAVAC=$JAVA_HOME/bin/javac
-JAR=$JAVA_HOME/bin/jar
+JAVAC=$JAVA6_HOME/bin/javac
+JAR=$JAVA6_HOME/bin/jar
 
 # we rsync over stable jars to compile against.  Setting AP_KEEP_STABLE=T means keep the Jar files.
 if [ "" = "$AP_KEEP_STABLE" ]; then
