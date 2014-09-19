@@ -47,6 +47,7 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -216,6 +217,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
     private RequestListener rlistener;
     private JDialog fontAndColorsDialog = null;
     private BookmarksManager bookmarksManager = null;
+    private BookmarksManager toolsManager = null;
     private AutoplotHelpSystem helpSystem;
     private UriDropTargetListener dropListener;
 
@@ -761,7 +763,12 @@ public final class AutoplotUI extends javax.swing.JFrame {
         invokeLater( 1000, true, run );
         APSplash.checkTime("init 90");
 
-        addTools();
+        SwingUtilities.invokeLater(
+            new Runnable() { public void run() {
+                addTools();
+            }
+        } );
+        
         addBindings();
 
         pack();
@@ -1889,9 +1896,54 @@ APSplash.checkTime("init 52.9");
         }
     }
 
+    private void maybeCreateToolsManager() {
+        if ( toolsManager==null ) {
+            toolsManager= new BookmarksManager(AutoplotUI.this, false, "Tools");
+            toolsManager.setTitle("Tools Manager");
+            toolsManager.setPrefNode("tools");
+
+            Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, applicationModel, BeanProperty.create( "tools" ), bookmarksManager.getModel(), BeanProperty.create("list"));
+            b.bind();
+
+            bookmarksManager.getModel().addPropertyChangeListener(BookmarksManagerModel.PROP_BOOKMARK, new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    updateToolsBookmarks();
+                }
+            });
+        }
+    }
+
+    private void updateToolsBookmarks() {
+
+        if ( toolsManager==null ) {
+            maybeCreateToolsManager();
+            toolsManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    SwingUtilities.invokeLater( new Runnable() { public void run() {
+                        toolsManager.updateBookmarks( toolsMenu, "userSep", AutoplotUI.this, AutoplotUI.this.dataSetSelector );
+                    } } );
+                }
+            });
+        }
+
+        Runnable run= new Runnable() { public void run() {            
+            toolsManager.setPrefNode("tools"); 
+        } };
+        invokeLater( -1, false, run );
+
+    }
+    
+    
+    protected BookmarksManager getToolsManager() {
+        return this.toolsManager;
+    }
+        
+    
     private void maybeCreateBookmarksManager() {
         if (bookmarksManager == null) {
-            bookmarksManager = new BookmarksManager(AutoplotUI.this, false);
+            bookmarksManager = new BookmarksManager(AutoplotUI.this, false, "Bookmarks");
 
             Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, applicationModel, BeanProperty.create( "bookmarks" ), bookmarksManager.getModel(), BeanProperty.create("list"));
             b.bind();
@@ -2076,6 +2128,7 @@ APSplash.checkTime("init 52.9");
         aggSeparator = new javax.swing.JSeparator();
         decodeURLItem = new javax.swing.JMenuItem();
         reloadAllMenuItem = new javax.swing.JMenuItem();
+        toolsUserSep = new javax.swing.JPopupMenu.Separator();
         helpMenu = new javax.swing.JMenu();
         autoplotHelpMenuItem = new javax.swing.JMenuItem();
         gettingStartedMenuItem = new javax.swing.JMenuItem();
@@ -2619,6 +2672,10 @@ APSplash.checkTime("init 52.9");
         });
         toolsMenu.add(reloadAllMenuItem);
 
+        toolsUserSep.setToolTipText("User items below here");
+        toolsUserSep.setName("userSep"); // NOI18N
+        toolsMenu.add(toolsUserSep);
+
         jMenuBar1.add(toolsMenu);
 
         helpMenu.setText("Help");
@@ -2728,14 +2785,14 @@ APSplash.checkTime("init 52.9");
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 661, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 669, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(statusLabel)
                     .add(statusTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                     .add(48, 48, 48)
-                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 654, Short.MAX_VALUE)
+                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE)
                     .add(20, 20, 20)))
         );
 
@@ -3696,12 +3753,12 @@ private void updateFrameTitle() {
         alm.addOptionalSwitchArgument("position", null, "position", null, "plot position for the URI, an integer indicating which data position to update.");
         alm.addOptionalSwitchArgument("bookmarks", null, "bookmarks", null, "bookmarks to load");
         alm.addOptionalSwitchArgument("port", "p", "port", "-1", "enable scripting via this port");
-        alm.addBooleanSwitchArgument("scriptPanel", "s", "scriptPanel", "enable script panel");
+        alm.addBooleanSwitchArgument("scriptPanel", null, "scriptPanel", "enable script panel");
         alm.addBooleanSwitchArgument("logConsole", "l", "logConsole", "enable log console");
         alm.addOptionalSwitchArgument("nativeLAF", "n", "nativeLAF", alm.TRUE, "use the system look and feel (T or F)");
         alm.addOptionalSwitchArgument("open", "o", "open", null, "open this URI (to support javaws)");
         alm.addOptionalSwitchArgument("print", null, "print", "", "print this URI (to support javaws)");
-        alm.addOptionalSwitchArgument("script", null, "script", "", "run this script after starting.  " +
+        alm.addOptionalSwitchArgument("script", "s", "script", "", "run this script after starting.  " +
                 "Arguments following are " +
                 "passed into the script as sys.argv");
         alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",alm.TRUE,"turn on/off initial autolayout setting");
@@ -3719,7 +3776,7 @@ private void updateFrameTitle() {
         final List<String> scriptArgs= new ArrayList<String>();
 
         for ( int i=1; i<args.length; i++ ) { // grab any arguments after --script and hide them from the processor.
-            if ( args.length>i && args[i-1].startsWith("--script") ) {
+            if ( args.length>i && ( args[i-1].startsWith("--script") || args[i-1].equals("-s") ) ) {
                 List<String> apArgs= new ArrayList<String>();
                 if ( args[i-1].length()>8 && args[i-1].charAt(8)=='=' ) {
                     for ( int j=0; j<i; j++ ) {
@@ -4280,6 +4337,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JPanel timeRangePanel;
     private javax.swing.JRadioButtonMenuItem timeRangeSelectorMenuItem;
     private javax.swing.JMenu toolsMenu;
+    private javax.swing.JPopupMenu.Separator toolsUserSep;
     private javax.swing.JMenuItem undoMenuItem;
     private javax.swing.JMenu undoMultipleMenu;
     private javax.swing.JMenu viewMenu;
@@ -4355,6 +4413,7 @@ APSplash.checkTime("init 240");
 
         
     }
+    
     /**
      * looks for and adds tools on a new thread.
      */
@@ -4386,31 +4445,16 @@ APSplash.checkTime("init 240");
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                for ( Bookmark t: tools ) {
-                    final Bookmark tt= t;
-                    if ( t instanceof Bookmark.Folder ) {
-                        //Not supported but soon will be...
-                    } else {
-                        final String suri = ((Bookmark.Item) tt).getUri();
-                        Action a= new AbstractAction(t.getTitle()) {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                org.das2.util.LoggerManager.logGuiEvent(e);
-                                try {    
-                                    runTool( suri, ActionEvent.SHIFT_MASK );
-                                    //runTool( suri, e.getModifiers() ); // modifiers are not showing up on linux.
-                                } catch (MalformedURLException ex) {
-                                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                                } catch (IOException ex ) {
-                                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                                }
-                            }
-                        };
-                        JMenuItem ji= new JMenuItem(a);
-                        ji.setToolTipText( "<html>"+ suri + "<br>press ctrl to inspect" );
-                        toolsMenu.add( ji );
+                maybeCreateToolsManager();
+                toolsManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
+                @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        SwingUtilities.invokeLater( new Runnable() { public void run() {
+                            toolsManager.updateBookmarks( toolsMenu, "userSep", AutoplotUI.this, AutoplotUI.this.dataSetSelector );
+                        } } );
                     }
-                }
+                });
+                toolsManager.updateBookmarks( toolsMenu, "userSep", AutoplotUI.this, dataSetSelector ); 
             }
         };
         
@@ -4435,7 +4479,18 @@ APSplash.checkTime("init 240");
     private List<Bookmark> loadTools() {
         List<Bookmark> tools= new ArrayList();
         File toolsDir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "tools" );
-        if ( toolsDir.exists() ) {
+        File booksDir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
+        
+        if ( booksDir.exists() ) {
+            File toolsFile= new File( booksDir, "tools.xml" );
+            if ( toolsFile.exists() ) {
+                try {
+                    logger.fine("found tools.xml, use it instead of old logic.");
+                    return Bookmark.parseBookmarks(toolsFile.toURI().toURL());
+                } catch ( Exception ex ) {
+                    
+                }
+            }
             File[] ff= toolsDir.listFiles();
             for ( int i=0; i<ff.length; i++ ) {
                 if ( ff[i].getName().toLowerCase().endsWith(".jy") ) {
@@ -4465,8 +4520,24 @@ APSplash.checkTime("init 240");
                     }
                     book.setTitle(toolLabel);
                     tools.add(book);
+                }   
+            }
+            FileOutputStream fout=null;
+            try {
+                fout= new FileOutputStream(toolsFile);
+                Bookmark.formatBooks( fout, tools);
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            } finally {
+                if ( fout!=null ) {
+                    try {
+                        fout.close();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
+             
         } else {
             if ( !toolsDir.mkdirs() ) {
                 System.err.println("failed to make tools directory");
@@ -4594,31 +4665,15 @@ APSplash.checkTime("init 240");
      * @param resourceUri 
      */
     protected void installTool( File ff, URI resourceUri ) {
-        File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
-        File cpTo= new File( tools,ff.getName() );
         try {
-            if ( !Util.copyFile( ff, cpTo ) ) {
-                setStatus("warning: unable to copy file");
-            } else {
-                setStatus("copied file to "+cpTo );
-                reloadTools();
+            String scriptUri= new URI( "script", resourceUri.toString(), null ).toString();
+            toolsManager.addBookmark(scriptUri);
+            Window w= ScriptContext.getViewWindow();
+            if ( w instanceof AutoplotUI ) {
+                ((AutoplotUI)w).reloadTools();
             }
-            FileWriter out3=null;
-            File log= new File( tools, "scripts.txt" );
-            try {
-                out3 = new FileWriter( log, true );
-                TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
-                Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
-                out3.append( tp.format( now, null) + "\t" + ff.getName() + "\t" + resourceUri + "\n" );
-            } finally {
-                if ( out3!=null ) out3.close();
-            }
-        } catch ( IOException ex ) {
-            logger.log( Level.WARNING,ex.getMessage(),ex);
-        }
-        Window w= ScriptContext.getViewWindow();
-        if ( w instanceof AutoplotUI ) {
-            ((AutoplotUI)w).reloadTools();
+        } catch (URISyntaxException ex) {
+            logger.log(Level.SEVERE, null, ex);
         }
     }
     

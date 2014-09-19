@@ -614,7 +614,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         result.add( optionsMenu );
 
         final JMenu bookmarksMenu= new JMenu("Bookmarks");
-        final BookmarksManager man= new BookmarksManager(frame,true);
+        final BookmarksManager man= new BookmarksManager(frame,true,"PNG Bookmarks");
 
         man.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {

@@ -73,7 +73,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
     }
 
     private void doBookmarks( DataSetSelector sel ) {
-        BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(this), true );
+        BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(this), true, "Bookmarks" );
         man.setHidePlotButtons(true);
         man.setPrefNode( "bookmarks", "autoplot.default.bookmarks",  "http://autoplot.org/data/bookmarks.xml" );
         //man.setPrefNode("tca","autoplot.default.tca.bookmarks", "http://autoplot.org/data/tca.demos.xml");

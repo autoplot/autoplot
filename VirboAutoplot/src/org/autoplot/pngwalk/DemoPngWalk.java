@@ -187,7 +187,7 @@ public class DemoPngWalk {
         result.add(fileMenu);
 
         final JMenu bookmarksMenu= new JMenu("Bookmarks");
-        final BookmarksManager man= new BookmarksManager(f,true);
+        final BookmarksManager man= new BookmarksManager(f,true,"PNG Bookmarks");
 
         man.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {

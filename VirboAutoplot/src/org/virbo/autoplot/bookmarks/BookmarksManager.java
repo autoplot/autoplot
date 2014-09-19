@@ -116,11 +116,28 @@ public class BookmarksManager extends javax.swing.JDialog {
         }
         return new TreePath(path);
     }
-
-    /** Creates new form BookmarksManager */
-    public BookmarksManager(java.awt.Frame parent, boolean modal) {
+    
+    /**
+     * creates new BookmarksManager.  Use 
+     * @param parent the parent component.
+     * @param modal if true, then the rest of the GUI will be modal.
+     * @deprecated use BookmarksManager(java.awt.Frame parent, boolean modal, String name )
+     */
+    public BookmarksManager(java.awt.Frame parent, boolean modal ) {
+        this( parent, modal, null );
+    }
+    
+    /** 
+     * Creates new BookmarksManager
+     * @param parent the parent component.
+     * @param modal if true, then the rest of the GUI will be modal.
+     * @param name name, such as "Bookmarks" or "Tools"
+     */
+    public BookmarksManager(java.awt.Frame parent, boolean modal, String name ) {
         super(parent, modal);
-        this.setTitle("Bookmarks Manager");
+        if ( name==null ) name= "Bookmarks";
+        this.name= name;
+        this.setTitle( name + " Manager");
         initComponents();
         this.setLocationRelativeTo(parent);
         this.model = new BookmarksManagerModel();
@@ -191,6 +208,11 @@ public class BookmarksManager extends javax.swing.JDialog {
     private boolean menuIsDirty= false;
     private JMenu dirtyMenu=null;
     private DataSetSelector dirtySelector=null;
+    
+    /**
+     * name for debugging purposes.
+     */
+    private String name;
 
     public BookmarksManagerModel getModel() {
         return model;
@@ -1627,7 +1649,22 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
     }
 
     public void updateBookmarks( JMenu bookmarksMenu, final AutoplotUI app, final DataSetSelector dataSetSelector ) {
+        updateBookmarks( bookmarksMenu, null, app, dataSetSelector );
+    }
+    
+    /**
+     * update the bookmarks 
+     * @param bookmarksMenu the menu to which we add the bookmarks.
+     * @param afterName null, or if there's an entry with the name, then add after that.
+     * @param app
+     * @param dataSetSelector the selector where the URI ought to be sent.
+     */
+    public void updateBookmarks( JMenu bookmarksMenu, String afterName, final AutoplotUI app, final DataSetSelector dataSetSelector ) {
 
+        if ( this.name.equalsIgnoreCase("tools") ) {
+            afterName="userSep"; // major kludge!
+        }
+        
         if ( this.isVisible() ) {
             menuIsDirty= true;
             dirtyMenu= bookmarksMenu;
@@ -1637,8 +1674,36 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
         List<Bookmark> bookmarks= model.getList();
 
-        bookmarksMenu.removeAll();
-
+        bookmarksMenu.getMenuComponentCount();
+                
+        int idx= -1;
+        if ( afterName==null ) {
+            idx= 0;
+        } else {
+            for ( int i=0; i<bookmarksMenu.getMenuComponentCount(); i++ ) {
+                if ( afterName.equals(bookmarksMenu.getMenuComponent(i).getName()) ) {
+                    idx= i; 
+                    break;
+                }
+            }
+        }
+        if ( idx==-1 ) {
+            throw new IllegalArgumentException("name not found: "+afterName);
+        }
+        
+        if ( idx==0 ) {
+            bookmarksMenu.removeAll();
+        } else {
+            int n= bookmarksMenu.getMenuComponentCount();
+            for ( int i=idx+1; i<n; i++ ) {
+                try {
+                    bookmarksMenu.remove(i);
+                } catch ( IllegalArgumentException ex ) {
+                    System.err.println("xzxzx "+ex);
+                }
+            }
+        }
+        
         JMenuItem mi;
 
         mi= new JMenuItem( new AbstractAction("Manage and Browse...") {
@@ -1654,23 +1719,25 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         mi.setToolTipText("Manage bookmarks, or select bookmark to plot");
         bookmarksMenu.add(mi);
 
-        mi= new JMenuItem(new AbstractAction("Add Bookmark...") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                org.das2.util.LoggerManager.logGuiEvent(e);        
-                Bookmark bookmark = addBookmark(dataSetSelector.getEditor().getText());
-                setAddBookmark(bookmark);
-                if ( !isVisible() ) {
-                    Container parent= BookmarksManager.this.getParent();
-                    BookmarksManager.this.setLocationRelativeTo( parent );
-                    setPlotActionsVisible(false);
+        if ( afterName==null ) { // nasty kludge
+            mi= new JMenuItem(new AbstractAction("Add Bookmark...") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);        
+                    Bookmark bookmark = addBookmark(dataSetSelector.getEditor().getText());
+                    setAddBookmark(bookmark);
+                    if ( !isVisible() ) {
+                        Container parent= BookmarksManager.this.getParent();
+                        BookmarksManager.this.setLocationRelativeTo( parent );
+                        setPlotActionsVisible(false);
+                    }
+                    setVisible(true);
                 }
-                setVisible(true);
-            }
-        } );
-        mi.setToolTipText("Add the current URI to the bookmarks");
-        bookmarksMenu.add(mi);
-
+            } );
+            mi.setToolTipText("Add the current URI to the bookmarks");
+            bookmarksMenu.add(mi);
+        }
+        
         bookmarksMenu.add(new JSeparator());
 
         if ( bookmarks==null ) {
@@ -1741,7 +1808,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
     }
     
     public static void main( String[] args ) {
-        new BookmarksManager(null, false).setPrefNode("bookmarks");
+        new BookmarksManager(null, false, "Bookmarks").setPrefNode("bookmarks");
     }
 
     /**

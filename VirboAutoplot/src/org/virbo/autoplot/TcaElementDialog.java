@@ -129,7 +129,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
 }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void bookmarksButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bookmarksButtonActionPerformed
-        BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(this), true );
+        BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(this), true, "Ephemeris Bookmarks" );
         man.setHidePlotButtons(true);
         man.setPrefNode("tca","autoplot.default.tca.bookmarks", "http://autoplot.org/data/tca.demos.xml");
         //man.setPrefNode("tca");
