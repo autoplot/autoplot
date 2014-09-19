@@ -297,14 +297,23 @@ public class AutoplotUtil {
      */
     public static DasPlot createPlot(DasCanvas c, QDataSet ds, DasPlot recyclable, DasColorBar cb) {
         if ( c==null ) {
-            c= new DasCanvas(640,480);
+            if ( recyclable!=null ) {
+                c= recyclable.getCanvas();
+            } 
+            if ( c==null ) {
+                c= new DasCanvas(640,480);
+            }
         }
-        DasRow row = DasRow.create(c);
-        DasColumn col = DasColumn.create(c);
+        DasRow row;
+        DasColumn col;
         DasPlot result;
         if (recyclable != null) {
             result = recyclable;
+            row = result.getRow();
+            col = result.getColumn();
         } else {
+            row = DasRow.create(c);
+            col = DasColumn.create(c);
             result = DasPlot.createDummyPlot();
             result.addRenderer( new SeriesRenderer() );
         }
@@ -312,9 +321,11 @@ public class AutoplotUtil {
 
         RenderType type;
         Renderer rend1;
+        Renderer oldRend= null;
         if ( ds!=null ) {
             type = AutoplotUtil.guessRenderType(ds);
-            rend1= maybeCreateRenderer( type, recycleRends.get(0), cb, false);
+            oldRend= recycleRends.get(0);
+            rend1= maybeCreateRenderer( type, oldRend, cb, false);
             rend1.setDataSet(ds);
         } else {
             type = RenderType.series;
@@ -336,15 +347,18 @@ public class AutoplotUtil {
             logger.log( Level.SEVERE, null, ex );
         }
         
-        result.addRenderer(rend1);
+        if ( oldRend!=rend1 ) {
+            result.addRenderer(rend1);
+        }
 
-        c.add(result, row, col);
-        c.revalidate();
-        c.validate();
-        System.err.println("c.getBounts(): "+c.getBounds());
-        System.err.println("row: "+row);
+        if ( recyclable==null ) {
+            c.add(result, row, col);
+            c.revalidate();
+            c.validate();
+        }
+         
         result.resize();
-        System.err.println("result.getBounds(): " +result.getBounds());
+        
         return result;
     }
 
