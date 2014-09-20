@@ -30,6 +30,8 @@ AP_ARGS=""
 
 memIsImplicit=1
 
+SSDEBUG=0
+
 for i in "$@"; do
    if [ "$SSDEBUG"="1" ]; then    
        echo "arg: \"$i\""
@@ -48,26 +50,28 @@ for i in "$@"; do
    fi
 done
 
-if [ "$SSDEBUG"="1" ]; then 
+if [ "$SSDEBUG" == "1" ]; then 
    echo "JAVA_ARGS=${JAVA_ARGS}"
    echo "AP_ARGS=${AP_ARGS}"
 fi
 
-if [ $memIsImplicit="1" ]; then 
+if [ $memIsImplicit == "1" ]; then 
    JAVA_ARGS="${JAVA_ARGS} -Xmx1000M ";
 fi
 
 # make debugging easier by checking if this is actually the starter script being tested.
-if [ "$0"="./starterScript.sh" ]; then
+if [ "$0" == "./starterScript.sh" ]; then
    EXEC="echo";
+   JARFILE="autoplot.jar"
 else
    EXEC="exec";
+   JARFILE=$0;
 fi
 
 if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then
-      $EXEC "${JAVA_HOME}"/bin/java ${JAVA_ARGS} -jar $0 "${AP_ARGS}"
+      $EXEC "${JAVA_HOME}"/bin/java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}"
 else
-      $EXEC /usr/bin/env java ${JAVA_ARGS} -jar $0 "${AP_ARGS}"
+      $EXEC /usr/bin/env java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}"
 fi
 
 exit
