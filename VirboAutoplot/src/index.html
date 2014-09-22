@@ -23,9 +23,10 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-09-16):</p>
+        <p>Bugfixes (2014-09-22):</p>
         <ul>
             <li>completions in jython accept the java code with correct arguments now, was taking the last one.</li>
+            <li>1264: changes to support updates as the user drags the mouse</li>
             <li>1263: old kludge for LANL prevented Maven cdf from working, tighten up kludge to only use if necessary.</li>
             <li>1259: reload all needs to reload the ephemeris (TCA) data.</li>
             <li>1250: Ephemeris (TCAs) from TSBs at the mission beginning and NRT handled poorly.</li>
@@ -65,6 +66,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>385: tools menu now supports folders</li>
+            <li>generalize mean, mode, stddev, and variance to support any rank dataset by using DataSetIterator.  Support fill data.</li>
             <li>rfe 387: support gzip encoding in downloadResourceAsTempFile. </li>
             <li>rfe 386: interpolation routines must only extrapolate modestly.</li>
             <li>CDF filtering Rank 2 variables with other Rank 2 variables</li>
