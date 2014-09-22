@@ -997,7 +997,7 @@ public class JythonUtil {
       * 
       *}</small></pre></blockquote>
       * 
-      * @param interp any values which may be defined already, such as "dom" and "monitor"
+      * @param env any values which may be defined already, such as "dom" and "monitor"
       * @param script any jython script.
       * @param params user-specified values.
       * @return a list of parameters.
