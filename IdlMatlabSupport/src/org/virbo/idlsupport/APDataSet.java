@@ -32,7 +32,7 @@ public class APDataSet extends QDataSetBridge {
 
     public APDataSet() {
         super();
-        System.err.println("APDataSet v1.3.1");
+        System.err.println("APDataSet v1.3.2");
     }
 
     /**
@@ -63,6 +63,9 @@ public class APDataSet extends QDataSetBridge {
      * @throws Exception
      */
     protected QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
+        if ( surl==null ) {
+            throw new IllegalStateException("uri has not been set.");
+        }
         URI uri= DataSetURI.getURI(surl);
         DataSourceFactory f= DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
 
@@ -83,9 +86,15 @@ public class APDataSet extends QDataSetBridge {
 
     @Override
     public String toString() {
+        if ( surl==null ) {
+            return "(uninitialized)";
+        }
+        
         QDataSet d= datasets.get( name );
 
-        StringBuilder s= new StringBuilder(this.surl);
+        StringBuilder s= new StringBuilder();
+        
+        if ( this.surl!=null ) s.append(this.surl);
         for ( String name1: datasets.keySet() ) {
             QDataSet qds= datasets.get(name1);
             s.append( "\n" ).append( name1 ).append( ": " ).append( qds.toString() );
@@ -106,7 +115,7 @@ public class APDataSet extends QDataSetBridge {
     }
     public static void main(String[] args) {
         APDataSet qds = new APDataSet();
-        qds.setDataSetURL("http://www.autoplot.org/data/autoplot.dat");
+        qds.setDataSetURI("http://www.autoplot.org/data/autoplot.dat");
         qds.doGetDataSet( new NullProgressMonitor() );
 
         String n = qds.name();
