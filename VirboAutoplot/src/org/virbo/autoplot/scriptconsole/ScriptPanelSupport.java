@@ -81,7 +81,7 @@ import org.virbo.jythonsupport.ui.ParametersFormPanel;
 public class ScriptPanelSupport {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
-    private static final int RECENT_FILES_COUNT = 10;
+    private static final int RECENT_FILES_COUNT = 20;
 
     File file;
     final ApplicationModel model;
@@ -670,7 +670,7 @@ public class ScriptPanelSupport {
         waitModel.add(0,msgWait);
         
         final JList p= new JList(waitModel);
-        p.setFont( p.getFont().deriveFont(8.f) );
+        p.setFont( p.getFont().deriveFont(10.f) );
         
         Runnable run= new Runnable() {
             @Override
