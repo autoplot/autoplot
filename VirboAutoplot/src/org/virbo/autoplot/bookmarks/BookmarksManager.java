@@ -1661,6 +1661,8 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
      */
     public void updateBookmarks( JMenu bookmarksMenu, String afterName, final AutoplotUI app, final DataSetSelector dataSetSelector ) {
 
+        JSeparator js;
+        
         if ( this.name.equalsIgnoreCase("tools") ) {
             afterName="userSep"; // major kludge!
         }
@@ -1695,7 +1697,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             bookmarksMenu.removeAll();
         } else {
             int n= bookmarksMenu.getMenuComponentCount();
-            for ( int i=idx+1; i<n; i++ ) {
+            for ( int i=n-1; i>idx; i-- ) {
                 try {
                     bookmarksMenu.remove(i);
                 } catch ( IllegalArgumentException ex ) {
@@ -1738,7 +1740,8 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             bookmarksMenu.add(mi);
         }
         
-        bookmarksMenu.add(new JSeparator());
+        js= new JSeparator();
+        bookmarksMenu.add(js);
 
         if ( bookmarks==null ) {
             bookmarks= Collections.emptyList();
