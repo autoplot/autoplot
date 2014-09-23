@@ -53,7 +53,7 @@ import org.virbo.jythonsupport.JythonUtil;
 /**
  * Use a jython script to read and process data from a number of sources.
  * Special parameters:
- *   timerange  if used then TimeSeriesBrowse is added.
+ * <li>  timerange  if used then TimeSeriesBrowse is added.
  * @author jbf
  */
 public class JythonDataSource extends AbstractDataSource implements Caching {
@@ -431,7 +431,6 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
         } catch (PyException ex) {
 
-            String msg = "PyException: " + ex;
             if (causedBy != null) {
                 throw causedBy;
             }
@@ -441,7 +440,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
             throw ex;
         } finally {
-            mon.finished();
+            if ( !mon.isFinished() ) mon.finished();
         }
     }
 
