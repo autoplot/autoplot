@@ -55,13 +55,14 @@ public abstract class QDataSetBridge {
      * preference, the existing preference is removed.
      * See clearPreferredUnits to remove all preferences.
      * Example units strings (capitalization matters):
+     **<blockquote><pre><small>{@code
      *    seconds since 2010-01-01T00:00
      *    days since 2010-01-01T00:00
      *    Hz
      *    kHz
      *    MHz
-     *
-     * @param sunits
+     *}</small></pre></blockquote>
+     * @param sunit
      */
     public void setPreferredUnits( String sunit ) {
         Units unit;
@@ -86,6 +87,9 @@ public abstract class QDataSetBridge {
         }
     }
 
+    /**
+     * clear any preference for units.
+     */
     public void clearPreferredUnits() {
         prefUnits= new ArrayList();
     }
