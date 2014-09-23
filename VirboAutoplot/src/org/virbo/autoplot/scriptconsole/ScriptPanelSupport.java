@@ -704,8 +704,7 @@ public class ScriptPanelSupport {
                         
                     } else {
                         String s=  (String)p.getSelectedValue();
-                        File ff= new File(s);
-                        c.setSelectedFile( ff ); //work around mac bug (?)
+                        File ff= new File(s); //TODO: still can't figure out mac bug where select doesn't work
                         c.setSelectedFile( ff );
                     }
                 }
