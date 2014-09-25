@@ -1055,6 +1055,7 @@ public abstract class Bookmark {
         public Folder(String title) {
             super(title);
             bookmarks = new ArrayList<Bookmark>();
+            this.remoteStatus= 0;
         }
 
         public Folder( String title, String remoteUrl ) {
@@ -1155,6 +1156,7 @@ public abstract class Bookmark {
          * depends on the context where it is being used.
          * @return
          */
+        @Override
         public Bookmark copy() {
             Bookmark.Item result = new Bookmark.Item(getUri());
             result.setTitle(getTitle());
