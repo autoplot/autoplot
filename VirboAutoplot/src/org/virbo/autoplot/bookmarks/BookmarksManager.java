@@ -1602,13 +1602,27 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         
     }
 
+    /**
+     * format the bookmarks to
+     * @param f 
+     */
     private void formatToFile( File f ) {
+
         logger.log(Level.FINE, "formatting {0}", f);
         OutputStream out = null;
         try {
-            out= new FileOutputStream(f);
+            File temp= File.createTempFile( prefNode, ".temp.xml", f.getParentFile() );
+            out= new FileOutputStream(temp);
             Bookmark.formatBooks(out,model.getList());
             out.close();
+            if ( f.exists() ) {
+                if ( !f.delete() ) {
+                    logger.warning("delete old file failed");
+                }
+            }
+            if ( !temp.renameTo(f) ) {
+                logger.warning("formatToFile mv failed");
+            }            
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
@@ -1701,7 +1715,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                 try {
                     bookmarksMenu.remove(i);
                 } catch ( IllegalArgumentException ex ) {
-                    System.err.println("xzxzx "+ex);
+                    logger.log( Level.SEVERE, "xzxzx", ex ); // this would happen, presumably because of miscode that is fixed.
                 }
             }
         }
