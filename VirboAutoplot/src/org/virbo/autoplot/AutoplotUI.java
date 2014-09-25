@@ -53,14 +53,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.StringReader;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -70,7 +68,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.TooManyListenersException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -145,14 +142,11 @@ import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.DataSourceRegistry;
-import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.SourceTypesBrowser;
 import org.virbo.datasource.TimeRangeEditor;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -222,13 +216,35 @@ public final class AutoplotUI extends javax.swing.JFrame {
     private UriDropTargetListener dropListener;
 
     private static final String RESOURCES= "/org/virbo/autoplot/resources/";
+    
+    /**
+     * yellow triangle with exclamation point, used to indicate warning condition.
+     */
     public static final Icon WARNING_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"warning-icon.png") );
+    /**
+     * red stop sign with exclaimation point, using to indicate error condition.
+     */
     public static final Icon ERROR_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"error-icon.png") );
+    /**
+     * animated gif of swirling dots, used to indicate known busy state.
+     */
     public static final Icon BUSY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"spinner.gif") );
+    /**
+     * animated gif of swirling dots, used to indicate known busy state.
+     */
     public static final Icon BUSY_OPAQUE_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"spinner_16.gif") );
+    /**
+     * not used.
+     */
     public static final Icon READY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"indProgress0.png") );
+    /**
+     * empty 16x16 image used to indicate normal status.
+     */
     public static final Icon IDLE_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"idle-icon.png") );
 
+    /**
+     * ready message.
+     */
     public static final String READY_MESSAGE= "ready";
 
     private TimeRangeEditor timeRangeEditor;
@@ -248,7 +264,10 @@ public final class AutoplotUI extends javax.swing.JFrame {
     //    return l;
     //}
     
-    /** Creates new form AutoPlotMatisse */
+    /** 
+     * Creates new form AutoplotUI 
+     * @param model the legacy model that backs the application.
+     */
     public AutoplotUI(ApplicationModel model) {
         
         setIconImage( AutoplotUtil.getAutoplotIcon() );
@@ -1549,6 +1568,12 @@ APSplash.checkTime("init 52.9");
         expertMenuItems.addAll( expertItems );
     }
 
+    /**
+     * Reset one of the actions in the File menu.  There don't appear to be any uses of 
+     * this odd function, so it might have been used with a script. 
+     * @param name the name of the action.
+     * @param a the new action.
+     */
     public void resetAction( String name, Action a ) {
         for ( int i=0; i<fileMenu.getItemCount(); i++ ) {
             JMenuItem item= fileMenu.getItem(i);
@@ -1781,8 +1806,8 @@ APSplash.checkTime("init 52.9");
      * problem where a loaded vap doesn't appear as it does when it was saved because
      * the canvas is resized.
      * 
-     * @param w
-     * @param h
+     * @param w the width
+     * @param h the height
      * @return nominal scale factor
      */
     public double resizeForCanvasSize( int w, int h ) {
@@ -1853,6 +1878,10 @@ APSplash.checkTime("init 52.9");
         return scale;
     }
 
+    /**
+     * set the status message, with "busy:" or "warning:" prefix.
+     * @param message the message to display
+     */    
     public void setStatus(String message) {
         if ( message.startsWith("busy:" ) ) {
             setMessage( BUSY_ICON, message.substring(5).trim() );
@@ -1870,6 +1899,13 @@ APSplash.checkTime("init 52.9");
         
     }
     
+    /**
+     * set the status message and icon.  Unlike setMessage, the
+     * message is logged on autoplot.gui.  Since 2013/09/18,e only WARNING_ICON is used now, and the busy status is set by checking the application controller 
+     * nodes for locks.
+     * @param icon the icon to display to the left of the message.  The icon is only used when it is WARNING_ICON.
+     * @param message the message to display
+     */
     public void setStatus( Icon icon, String message ) {
         if ( ERROR_ICON==icon ) {
             logger.severe(message);
@@ -1935,7 +1971,10 @@ APSplash.checkTime("init 52.9");
 
     }
     
-    
+    /**
+     * access the tools manager for this application.
+     * @return 
+     */
     protected BookmarksManager getToolsManager() {
         return this.toolsManager;
     }
@@ -4165,6 +4204,10 @@ APSplash.checkTime("init 240");
 
     }
 
+    /**
+     * provide access to the dropTargetListener.  Presumably this was added for testing.
+     * @return the dropListener.
+     */
     public DropTargetListener getDropTargetListener() {
         return dropListener;
     }
@@ -4172,8 +4215,8 @@ APSplash.checkTime("init 240");
     /**
      * initializes a SocketListener that accepts jython scripts that affect
      * the application state.  This implements the "--port" option.
-     * @param port
-     * @param model
+     * @param port the port for the application, often 12345.
+     * @param model the internal model.
      */
     private void setupServer(int port, final ApplicationModel model) {
 
@@ -4209,11 +4252,10 @@ APSplash.checkTime("init 240");
     }
     
     /**
-     * set the message in the lower left corner of the application with the icon, such
-     * as AutoplotUI.WARNING_ICON.  
-     * 
-     * 2013/09/18: Note only WARNING_ICON is used now, and the busy status is set by checking the application controller nodes for locks.
-     * @param icon the icon to display to the left of the message.  The icon is no longer used.
+     * Set the message in the lower left corner of the application, possibly with the AutoplotUI.WARNING_ICON.  
+     * Since 2013/09/18,e only WARNING_ICON is used now, and the busy status is set by checking the application controller 
+     * nodes for locks.
+     * @param icon the icon to display to the left of the message.  The icon is only used when it is WARNING_ICON.
      * @param message the message to display
      */
     public void setMessage( Icon icon, String message ) {
@@ -4548,6 +4590,11 @@ APSplash.checkTime("init 240");
         }
         return tools;
     }
+    
+    /**
+     * provide access to the undoRedoSupport.  Presumably this was added for testing.
+     * @return the undoRedoSupport.
+     */
     public UndoRedoSupport getUndoRedoSupport() {
         return this.undoRedoSupport;
     }
@@ -4561,14 +4608,25 @@ APSplash.checkTime("init 240");
         return this.applicationModel.getDocumentModel();
     }
     
+    /**
+     * provide access to the dataSetSelector which browses and resets the plot URIs.
+     * @return the dataSetSelector
+     */
     public DataSetSelector getDataSetSelector() {
         return this.dataSetSelector;
     }
 
+    /**
+     * provide access to the timeRangeEditor which controls dom.timerange.
+     * @return the timeRangeEditor
+     */
     public TimeRangeEditor getTimeRangeEditor() {
         return this.timeRangeEditor;
     }
 
+    /**
+     * turn on basic mode, where users can only use the app for browsing existing products.
+     */
     public void basicMode( ) {
         setExpertMode(false);
     }
@@ -4631,10 +4689,19 @@ APSplash.checkTime("init 240");
 
     }
 
+    /**
+     * true if the GUI is in expert mode, showing more functions for users comfortable with the application.
+     * @return true if the GUI is in expert mode
+     */
     public boolean isExpertMode() {
         return expertMenuItems.get(0).isVisible()==true;
     }
 
+    /**
+     * true if the GUI is in basic mode, hiding functions for new users.  In basic mode users can only browse existing
+     * products.
+     * @return true if the GUI is in basic mode
+     */
     public boolean isBasicMode() {
         return expertMenuItems.get(0).isVisible()==false;
     }
