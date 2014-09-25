@@ -4490,54 +4490,54 @@ APSplash.checkTime("init 240");
                 } catch ( Exception ex ) {
                     
                 }
-            }
-            File[] ff= toolsDir.listFiles();
-            for ( int i=0; i<ff.length; i++ ) {
-                if ( ff[i].getName().toLowerCase().endsWith(".jy") ) {
-                    Bookmark book= new Bookmark.Item(ff[i].toURI().toString());
-                    String toolLabel= ff[i].getName();
-                    // read header comments for label and description.
-                    try {
-                        BufferedReader reader = new BufferedReader(new FileReader(ff[i]));
-                        String s = reader.readLine();
-                        while (s != null) {
-                            if ( s.startsWith("#") ) {
-                                if ( s.startsWith("# label:" ) ) {
-                                   toolLabel= s.substring(8).trim();
-                                } else if ( s.startsWith("# LABEL:" ) ) {
-                                   toolLabel= s.substring(8).trim();
-                                } else if ( s.startsWith("#LABEL:" ) ) {
-                                   toolLabel= s.substring(7).trim();
+            } else {
+                File[] ff= toolsDir.listFiles();
+                for ( int i=0; i<ff.length; i++ ) {
+                    if ( ff[i].getName().toLowerCase().endsWith(".jy") ) {
+                        Bookmark book= new Bookmark.Item(ff[i].toURI().toString());
+                        String toolLabel= ff[i].getName();
+                        // read header comments for label and description.
+                        try {
+                            BufferedReader reader = new BufferedReader(new FileReader(ff[i]));
+                            String s = reader.readLine();
+                            while (s != null) {
+                                if ( s.startsWith("#") ) {
+                                    if ( s.startsWith("# label:" ) ) {
+                                       toolLabel= s.substring(8).trim();
+                                    } else if ( s.startsWith("# LABEL:" ) ) {
+                                       toolLabel= s.substring(8).trim();
+                                    } else if ( s.startsWith("#LABEL:" ) ) {
+                                       toolLabel= s.substring(7).trim();
+                                    }
+                                } else {
+                                    break;
                                 }
-                            } else {
-                                break;
+                                s = reader.readLine();
                             }
-                            s = reader.readLine();
+                            reader.close();
+                        } catch (IOException ex) {
+                            logger.log( Level.SEVERE, ex.getMessage(), ex );
                         }
-                        reader.close();
-                    } catch (IOException ex) {
-                        logger.log( Level.SEVERE, ex.getMessage(), ex );
-                    }
-                    book.setTitle(toolLabel);
-                    tools.add(book);
-                }   
-            }
-            FileOutputStream fout=null;
-            try {
-                fout= new FileOutputStream(toolsFile);
-                Bookmark.formatBooks( fout, tools);
-            } catch (FileNotFoundException ex) {
-                throw new RuntimeException(ex);
-            } finally {
-                if ( fout!=null ) {
-                    try {
-                        fout.close();
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                        book.setTitle(toolLabel);
+                        tools.add(book);
+                    }   
+                }
+                FileOutputStream fout=null;
+                try {
+                    fout= new FileOutputStream(toolsFile);
+                    Bookmark.formatBooks( fout, tools);
+                } catch (FileNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                } finally {
+                    if ( fout!=null ) {
+                        try {
+                            fout.close();
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
                     }
                 }
             }
-             
         } else {
             if ( !toolsDir.mkdirs() ) {
                 System.err.println("failed to make tools directory");
