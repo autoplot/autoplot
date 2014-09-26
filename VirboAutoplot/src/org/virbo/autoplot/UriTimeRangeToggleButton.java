@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 /**
- *
+ * Experimental component for showing the status of the data set selector.
  * @author jbf
  */
 public class UriTimeRangeToggleButton extends JPanel {
@@ -32,10 +32,25 @@ public class UriTimeRangeToggleButton extends JPanel {
         setMinimumSize( new Dimension( img.getHeight(), img.getWidth() ) );
     }
     BufferedImage img;
-            
+    BufferedImage imgUp; // upper button is selected
+    BufferedImage imgDn; // lower button is selected
+
+    /**
+     * 0 is up 1 is down.
+     * @param pos 
+     */
+    public void setPosition( int pos ) {
+        if ( pos==0 ) {
+            img= imgUp;
+        } else {
+            img= imgDn;
+        }
+        repaint();
+    }
+    
     @Override
     protected void paintComponent(Graphics g) {
-        g.drawImage( img, 0, 0, this );
+        g.drawImage( imgUp, 0, 0, this );
     }
     
 }
