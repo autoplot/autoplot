@@ -81,7 +81,7 @@ public class Util {
      */
     public static QDataSet getDataSet( String suri, DatumRange timeRange, ProgressMonitor monitor ) throws Exception {
         long t0= System.currentTimeMillis();
-        logger.log( Level.FINE, "getDataSet({0},{1})", new Object[]{suri, timeRange} );
+        logger.log( Level.FINE, "getDataSet(\"{0}\",DatumRangeUtil.parseTimeRange({1}),monitor)", new Object[]{suri, timeRange} );
         URI uri = DataSetURI.getURI(suri);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
         DataSource result = factory.getDataSource( uri );
@@ -104,7 +104,7 @@ public class Util {
         }
         metadataSurl= suri;
 
-        logger.fine( String.format( "read in %9.2f sec: %s", (System.currentTimeMillis()-t0)/1000., suri ) );
+        logger.finer( String.format( "read in %9.2f sec: \n uri: %s\n  ds: %s", (System.currentTimeMillis()-t0)/1000., suri, String.valueOf(rds) ) );
         if ( rds==null ) return null;
         if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
             return rds;
@@ -131,9 +131,10 @@ public class Util {
      * @return the dataset.
      */
     public static QDataSet getDataSet(String suri, ProgressMonitor mon) throws Exception {
-        logger.log( Level.FINE, "getDataSet({0})", suri );
+        long t0= System.currentTimeMillis();
+        logger.log( Level.FINE, "getDataSet(\"{0}\",monitor)", suri );
         URI uri = DataSetURI.getURIValid(suri);
-        DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
+        DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor()); //TODO: NullProgressMonitor
         if ( factory==null ) throw new IllegalArgumentException("unsupported extension: "+suri);
         DataSource result = factory.getDataSource( uri );
         if (mon == null) {
@@ -148,6 +149,8 @@ public class Util {
         }
         metadataSurl= suri;
 
+        logger.finer( String.format( "read in %9.2f sec: \n uri: %s\n  ds: %s", (System.currentTimeMillis()-t0)/1000., suri, String.valueOf(rds) ) );
+        
         if ( rds==null ) return null;
         if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
             return rds;
@@ -203,7 +206,7 @@ public class Util {
      * @throws java.lang.Exception
      */
     public static Map<String, Object> getMetadata(String suri, ProgressMonitor mon) throws Exception {
-        logger.log( Level.FINE, "getMetadata({0})", suri );
+        logger.log( Level.FINE, "getMetadata(\"{0}\",monitor)", suri );
 
         if (suri.equals(metadataSurl)) {
             return metadata;
@@ -272,7 +275,7 @@ public class Util {
      * @throws java.lang.Exception
      */
     public static QDataSet getDataSet( String spec, InputStream in, ProgressMonitor mon ) throws Exception {
-        logger.log( Level.FINE, "getDataSet({0},InputStream)", new Object[]{spec} );
+        logger.log( Level.FINE, "getDataSet(\"{0}\",InputStream)", new Object[]{spec} );
         String[] ss= spec.split(":",-2);
         String ext;
         int i= ss[0].indexOf("+");
@@ -334,7 +337,7 @@ public class Util {
      * @throws java.io.IOException
      */
     public static String[] listDirectory(String surl) throws IOException, URISyntaxException {
-        logger.log(Level.FINE, "listDirectory({0})", surl);
+        logger.log(Level.FINE, "listDirectory(\"{0}\")", surl);
         String[] ss = FileSystem.splitUrl(surl);
         FileSystem fs = FileSystem.create( DataSetURI.toUri(ss[2]));
         String glob = ss[3].substring(ss[2].length());
