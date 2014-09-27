@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.channels.Channel;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -28,14 +27,12 @@ import org.das2.datum.TimeParser;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.FileSystemUtil;
 import org.das2.util.filesystem.Glob;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURI;
@@ -50,7 +47,7 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 public class Util {
 
-    private static final Logger logger= LoggerManager.getLogger("jython");
+    private static final Logger logger= LoggerManager.getLogger("jython.script");
 
     /**
      * load the data specified by URI into Autoplot's internal data model.  This will
@@ -66,7 +63,6 @@ public class Util {
      * @return QDataSet from the load.
      */
     public static QDataSet getDataSet( String suri, String stimeRange, ProgressMonitor mon ) throws Exception {
-        logger.log( Level.FINE, "getDataSet({0},{1})", new Object[]{suri, stimeRange} );
         DatumRange timeRange= DatumRangeUtil.parseTimeRange(stimeRange);
         return getDataSet( suri, timeRange, mon );
     }
