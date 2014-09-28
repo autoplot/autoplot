@@ -165,6 +165,7 @@ public class CsvDataSource extends AbstractDataSource {
         mon.started();
 
         int line=0;
+        double fill= 0;
 
         while ( reader.readRecord() ) {
             line++;
@@ -219,7 +220,12 @@ public class CsvDataSource extends AbstractDataSource {
                         if ( u instanceof EnumerationUnits ) {
                             bundleb[j]= ((EnumerationUnits)u).createDatum( reader.get(icolumn+j) ).doubleValue(u);
                         } else {
-                            bundleb[j]= u.parse(reader.get(icolumn+j)).doubleValue(u);
+                            try {
+                                bundleb[j]= u.parse(reader.get(icolumn+j)).doubleValue(u);
+                            } catch ( ParseException ex ) {
+                                fill= -1e38;
+                                bundleb[j]= fill;
+                            }
                         }
                     }
                 } else {
@@ -267,6 +273,9 @@ public class CsvDataSource extends AbstractDataSource {
         ds.putProperty(QDataSet.UNITS,u);
         ds.putProperty(QDataSet.NAME,icolumnDs.property(QDataSet.NAME));
         ds.putProperty(QDataSet.LABEL,icolumnDs.property(QDataSet.LABEL));
+        if ( fill==-1e38 ) {
+            ds.putProperty( QDataSet.FILL_VALUE, fill );
+        }
 
         return ds;
     }
