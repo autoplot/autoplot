@@ -35,6 +35,7 @@ import org.xml.sax.SAXException;
 public class BookmarksManagerModel {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.bookmarks");
+    private static final String EMPTY_FOLDER = "(empty)";
     
     protected void doImport(Component c) {
         JFileChooser chooser = new JFileChooser();
@@ -310,10 +311,10 @@ public class BookmarksManagerModel {
                             dest.add(indx+1,itemBook);
                             if ( replace ) dest.remove(indx);
                         } else {
-                            List<Bookmark> list= parent.getBookmarks();
-                            indx= list.indexOf(old);
-                            list.add(indx+1,itemBook);
-                            if ( replace ) list.remove(indx);
+                            List<Bookmark> llist= parent.getBookmarks();
+                            indx= llist.indexOf(old);
+                            llist.add(indx+1,itemBook);
+                            if ( replace ) llist.remove(indx);
                         }
                     }
                 } else {
@@ -441,7 +442,7 @@ public class BookmarksManagerModel {
             if (b instanceof Bookmark.Folder) {
                 List<Bookmark> kids = ((Bookmark.Folder) b).getBookmarks();
                 if (kids.isEmpty()) {
-                    child.insert(new DefaultMutableTreeNode("(empty)"), 0);
+                    child.insert(new DefaultMutableTreeNode(EMPTY_FOLDER), 0);
                 } else {
                     addChildNodes(child, kids);
                 }
@@ -458,7 +459,7 @@ public class BookmarksManagerModel {
     protected Bookmark getSelectedBookmark(TreeModel model, TreePath path) {
         if (path == null || path.getPathCount() == 1) return null;
         Object sel = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-        if (sel.equals("(empty)")) {
+        if (sel.equals(EMPTY_FOLDER)) {
             return getSelectedBookmark(model, path.getParentPath());
         }
         return (Bookmark) sel;
@@ -478,7 +479,7 @@ public class BookmarksManagerModel {
             if (path.getPathCount() == 1) return list;
             Object sel = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
             Bookmark b;
-            if (sel.equals("(empty)")) {
+            if (sel.equals(EMPTY_FOLDER)) {
                 b= getSelectedBookmark(model, path.getParentPath());
             } else {
                 b= (Bookmark)sel;
