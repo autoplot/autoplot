@@ -8,7 +8,6 @@
  */
 package org.virbo.aggregator;
 
-import java.awt.EventQueue;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -26,8 +25,6 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
-import org.das2.datum.TimeParser;
-import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.fsm.FileStorageModel;
@@ -35,7 +32,6 @@ import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.das2.util.monitor.SubTaskMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
@@ -71,6 +67,9 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
     private static final Logger logger= LoggerManager.getLogger("apdss.agg");
 
+    /**
+     * message used when no files are found in the interval.
+     */
     public static final String MSG_NO_FILES_FOUND = "No files in interval";
 
 
@@ -127,6 +126,9 @@ public final class AggregatingDataSource extends AbstractDataSource {
         return new AggTimeSeriesBrowse();
     }
 
+    /**
+     * TimeSeriesBrowse allows users to look up new intervals automatically.
+     */
     public class AggTimeSeriesBrowse implements TimeSeriesBrowse {
 
         @Override
@@ -206,6 +208,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
     }
     
+    /**
+     * read the data.
+     * @param mon
+     * @return
+     * @throws Exception 
+     */
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
