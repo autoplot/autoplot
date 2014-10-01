@@ -6,8 +6,6 @@
 package org.virbo.autoplot.bookmarks;
 
 import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,15 +13,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSourceFactory;
 
 /**
  * JMenu that delays creating children until the folder is exposed.  Otherwise we would have thousands of
@@ -40,6 +34,15 @@ public class DelayMenu extends JMenu {
 
     private static boolean oldLogic= false;
 
+
+    /**
+     * create the menu for this depth of the tree.
+     * @param menu the menu to which items will be added.
+     * @param bookmarks the bookmarks.
+     * @param treeDepth the current depth.
+     * @param sel null for the Tools menu, otherwise let this handle the URI.
+     * @param ui the application to which we adding items.
+     */
     protected static void calculateMenu( JMenu menu, final List<Bookmark> bookmarks, final int treeDepth, final DataSetSelector sel, final AutoplotUI ui ) {
         List<Bookmark> content= bookmarks;
         for ( int i=0; i<content.size(); i++ ) {
@@ -62,11 +65,15 @@ public class DelayMenu extends JMenu {
                                 sel.maybePlot(e.getModifiers());
                             } else {
                                 // if there is nothing of value on the plot, go ahead and use this, otherwise enter dialog.
+                                String uri= ((Bookmark.Item) book).getUri();
+                                if ( uri.endsWith(".jy") ) {
+                                    ui.runScriptTools( uri );
+                                    return;
+                                }
                                 if ( ui.getDocumentModel().getDataSourceFilters().length==1 &&  ui.getDocumentModel().getDataSourceFilters(0).getUri().length()==0 ) {
                                     sel.setValue(((Bookmark.Item) book).getUri());
                                     sel.maybePlot(e.getModifiers());
                                 } else {
-                                    String uri= ((Bookmark.Item) book).getUri();
                                     ui.reviewBookmark(uri,e.getModifiers());
                                 }
                             }
@@ -144,18 +151,19 @@ public class DelayMenu extends JMenu {
 
         addMenuListener( new MenuListener() {
 
+            @Override
             public void menuSelected(MenuEvent e) {
                 logger.log(Level.FINEST, "resolving menu {0}...", label);
                 DelayMenu.this.removeAll();
                 calculateMenu( DelayMenu.this, bookmarks, treeDepth, sel, ui );
             }
 
+            @Override
             public void menuDeselected(MenuEvent e) {
-
             }
 
+            @Override
             public void menuCanceled(MenuEvent e) {
-
             }
 
         });
