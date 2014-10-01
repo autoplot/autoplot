@@ -489,6 +489,10 @@ public class BookmarksManagerModel {
     }
 
 
+    /**
+     * merge the given list into the list.
+     * @param books 
+     */
     public void importList(List<Bookmark> books) {
         List<Bookmark> newList= new ArrayList(this.list.size());
         for ( int i=0; i<this.list.size(); i++ ) {
@@ -498,6 +502,11 @@ public class BookmarksManagerModel {
         setList(newList);
     }
 
+    /**
+     * add the bookmarks in the remote URL to the list.
+     * @param surl
+     * @throws MalformedRemoteBookmarksException 
+     */
     public void addRemoteBookmarks(String surl ) throws MalformedRemoteBookmarksException {
         addRemoteBookmarks(surl,null);
     }
