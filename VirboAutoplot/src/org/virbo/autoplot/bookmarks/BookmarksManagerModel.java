@@ -12,9 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Internal model for managing a set of bookmarks.
  * @author jbf
  */
 public class BookmarksManagerModel {
@@ -41,12 +39,12 @@ public class BookmarksManagerModel {
     protected void doImport(Component c) {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-
+            @Override
             public boolean accept(File f) {
                 if ( f.toString()==null ) return false;
                 return f.isDirectory() || f.getName().endsWith(".xml");
             }
-
+            @Override
             public String getDescription() {
                 return "bookmarks files (*.xml)";
             }
@@ -88,12 +86,12 @@ public class BookmarksManagerModel {
     protected void doExport(Component c, List<Bookmark> list) {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-
+            @Override
             public boolean accept(File f) {
                 if ( f.toString()==null ) return false;
                 return f.isDirectory() || f.getName().endsWith(".xml");
             }
-
+            @Override
             public String getDescription() {
                 return "bookmarks files (*.xml)";
             }
@@ -126,18 +124,20 @@ public class BookmarksManagerModel {
      */
     public static final String PROP_BOOKMARK = "bookmark";
     
-
+    /**
+     * get the bookmarks as a list.  This is a mutable copy of the internal list.
+     * @return the list of bookmarks.
+     */
     public List<Bookmark> getList() {
         return list;
     }
 
+    /**
+     * set the bookmarks list.  This is used as the internal list, without making a copy.
+     * @param the list of bookmarks.
+     */
     public void setList(List<Bookmark> list) {
         logger.log(Level.FINE, "setting list to {0}", list);
-        //if ( list==null ) {
-        //    logger.log( Level.SEVERE, null, new Exception("set list to null") );
-        //}
-        //List<Bookmark> oldList = this.list;
-        //BookmarksManager.printBooks( list, "" );
         this.list = list;
         propertyChangeSupport.firePropertyChange(PROP_LIST, null, list);  //always fire event, since the objects within are mutable.
     }
@@ -160,6 +160,10 @@ public class BookmarksManagerModel {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
+    /**
+     * get a TreeModel of the internal model, so GUIs can show the state.
+     * @return a TreeModel.
+     */
     public TreeModel getTreeModel() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Bookmarks");
         DefaultTreeModel model = new DefaultTreeModel(root);
@@ -285,7 +289,7 @@ public class BookmarksManagerModel {
      * @param dest the list to update.
      */
      public void mergeList( List<Bookmark> src, List<Bookmark> dest ) {
-        if ( src.size()==0 ) return;
+        if ( src.isEmpty() ) return;
 
         for ( int i=0; i<src.size(); i++ ) {
             Bookmark item= src.get(i);
@@ -436,7 +440,7 @@ public class BookmarksManagerModel {
             parent.insert(child, parent.getChildCount());
             if (b instanceof Bookmark.Folder) {
                 List<Bookmark> kids = ((Bookmark.Folder) b).getBookmarks();
-                if (kids.size() == 0) {
+                if (kids.isEmpty()) {
                     child.insert(new DefaultMutableTreeNode("(empty)"), 0);
                 } else {
                     addChildNodes(child, kids);
