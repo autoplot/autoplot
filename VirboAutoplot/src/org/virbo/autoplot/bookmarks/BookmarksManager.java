@@ -141,6 +141,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         initComponents();
         this.setLocationRelativeTo(parent);
         this.model = new BookmarksManagerModel();
+        this.model.setName( name );
         this.jTree1.setModel(model.getTreeModel());
         this.jTree1.addMouseListener( createContextMenuMouseListener() );
         /*this.jTree1.setCellRenderer( new TreeCellRenderer() {

@@ -166,7 +166,7 @@ public class BookmarksManagerModel {
      * @return a TreeModel.
      */
     public TreeModel getTreeModel() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Bookmarks");
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(name);
         DefaultTreeModel model = new DefaultTreeModel(root);
         if (this.list != null) addChildNodes(root, this.list);
         return model;
@@ -552,5 +552,15 @@ public class BookmarksManagerModel {
         mergeList(copy,newList);
         setList(newList);
 
+    }
+
+    private String name;
+    
+    /**
+     * set the name for the bookmarks, such as "Bookmarks" or "Tools".  This is only used to label the root node.
+     * @param name 
+     */
+    protected void setName(String name) {
+        this.name= name;
     }
 }
