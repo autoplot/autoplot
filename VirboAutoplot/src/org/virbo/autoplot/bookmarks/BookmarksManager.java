@@ -1466,6 +1466,16 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
     
     private String defaultUrl= null;
             
+    /**
+     * setting this makes this manager the authority on bookmarks.  For example, 
+     **<blockquote><pre><small>{@code
+     * man.setPrefNode( "bookmarks", "autoplot.default.bookmarks",  "http://autoplot.org/data/bookmarks.xml" );
+     *}</small></pre></blockquote>
+     *
+     * @param nodeName the name for the set of bookmarks.
+     * @param propName property containing the URL for the default bookmarks
+     * @param deft value to use if the propName has not been set.
+     */    
     public void setPrefNode( String nodeName, String propName, String deft ) {
         
         File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
@@ -1500,7 +1510,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
     }
     
     /**
-     * setting this makes the manager the authority on bookmarks.
+     * setting this makes this manager the authority on bookmarks.
      * @param nodeName
      */
     public void setPrefNode( String nodeName ) {
