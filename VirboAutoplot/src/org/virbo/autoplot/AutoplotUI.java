@@ -4797,6 +4797,14 @@ APSplash.checkTime("init 240");
 //    }
     
     /**
+     * run the script, using the reference on the tools menu.  The security is going to be a bit different soon.
+     * @param script 
+     */
+    public void runScriptTools( final String script ) {
+        runScript(script);
+    }
+    
+    /**
      * present the "Run Script" dialog, asking the user to review the 
      * script before running it.
      * @param script 
