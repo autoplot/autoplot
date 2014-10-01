@@ -23,8 +23,12 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-09-25):</p>
+        <p>Bugfixes (2014-10-01):</p>
         <ul>
+            <li>Hanning window had off-by-one error making it asymmetric</li>
+            <li>1270: improve labels for Tools bookmarks.  Improve handling of .jy for tools</li>
+            <li>formatBookmarks formats to temp file then moves result</li>
+            <li>asterisk in new folder of bookmarks tool fixed.</li>
             <li>1229: Apache HTTP automatic unzip/gzip.  Improvements to get this working.</li>
             <li>1266: Jython script editor recent files GUI font increased to 10 to improve legibility.</li>
             <li>trim dataset would fail when trim boundary was after the biggest point</li>
@@ -50,6 +54,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>secret button for switching dataSetSelector/timeRangeSelector</li>
+            <li>improve gap detection in orbitPlot</li>
+            <li>orbitPlot supports renderControls like color and lineThick.</li>
             <li>391: aggregation trims datasets so that result is monotonic</li>
             <li>Internal RBSP Orbits updated to 2014-10-09</li>
             <li>385: tools menu now supports folders</li>
