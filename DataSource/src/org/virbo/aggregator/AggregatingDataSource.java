@@ -127,6 +127,29 @@ public final class AggregatingDataSource extends AbstractDataSource {
     }
 
     /**
+     * check/ensure that no data overlaps from ads0 to ads1.  See 
+     * rfe https://sourceforge.net/p/autoplot/feature-requests/391/
+     * @param slice
+     * @param ads1
+     * @return ads1, possibly trimmed.
+     */
+    private ArrayDataSet trimOverlap(QDataSet ads0, ArrayDataSet ads1) {
+        QDataSet dep0_0= (QDataSet) ads0.property(QDataSet.DEPEND_0);
+        QDataSet dep0_1= (QDataSet) ads1.property(QDataSet.DEPEND_0);
+        if ( dep0_0==null || dep0_1==null ) return ads1;
+        if ( dep0_1.rank()>1 ) throw new IllegalArgumentException("expected rank 1 depend0");
+        if ( Ops.gt( dep0_1.slice(0), dep0_0.slice(dep0_0.length()-1) ).value()==1 ) {
+            return ads1;
+        } else {
+            int i=0;
+            while ( i<dep0_1.length() && Ops.le( dep0_1.slice(i), dep0_0.slice(dep0_0.length()-1) ).value()==1 ) {
+                i=i+1;
+            }
+            return (ArrayDataSet)ads1.trim(i,ads1.length());
+        }
+    }
+
+    /**
      * TimeSeriesBrowse allows users to look up new intervals automatically.
      */
     public class AggTimeSeriesBrowse implements TimeSeriesBrowse {
@@ -456,6 +479,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
                             ArrayDataSet ads1= ArrayDataSet.maybeCopy(result.getComponentType(),ds1);
                             try {
                                 if ( result.canAppend(ads1) ) {
+                                    QDataSet saveAds1= ads1; // note these will be backed by the same data.
+                                    ads1= trimOverlap( result, ads1 );
+                                    if ( ads1.length()!=saveAds1.length() ) {
+                                        QDataSet saveDep0= (QDataSet) saveAds1.property(QDataSet.DEPEND_0);
+                                        logger.log(Level.WARNING, "data trimmed from dataset to avoid overlap at {0}", saveDep0.slice(0));
+                                    }
                                     result.append( ads1 );
                                 } else {
                                     result.grow( result.length() + ads1.length() * (ss.length-i) );
