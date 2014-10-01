@@ -1733,7 +1733,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         
         JMenuItem mi;
 
-        mi= new JMenuItem( new AbstractAction("Manage and Browse...") {
+        mi= new JMenuItem( new AbstractAction("Manage and Browse "+name+"...") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);        
