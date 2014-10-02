@@ -1,3 +1,5 @@
+package org.virbo.cdfdatasource;
+
 
 import gsfc.nssdc.cdf.CDF;
 import gsfc.nssdc.cdf.CDFException;
