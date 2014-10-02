@@ -107,12 +107,22 @@ pro save_cdf, var0, var1, var2, var3, var4, var5, var6, var7, var8, var9, var10c
       
       if ( varname eq '' ) then begin
           HELP, var, output=o 
+          if n_elements(o) gt 1 then o=o[0]
           j= STRPOS(o,'=')
           o= STRMID(o,j+1)
           MESSAGE, 'Expression must be named variable in this context: var'+strtrim(i,2)+'='+o
       endif
       s= SIZE( var )
       type= SIZE( var, /type )
+      
+      if ( type lt 2 or type gt 5 ) then begin
+         HELP, var, output=o 
+         if n_elements(o) gt 1 then o=o[0]
+         j= STRPOS(o,'=')
+         o= STRMID(o,j+1)
+         message, 'unable to write this type: var'+strtrim(i,2)+'='+o, /continue
+         continue
+      endif
       
       types= { $
          cdf_int2: type eq 2,  $
@@ -126,17 +136,13 @@ pro save_cdf, var0, var1, var2, var3, var4, var5, var6, var7, var8, var9, var10c
       endif else if ( s[0] eq 1 ) then begin
            var_id = CDF_VARCREATE( cdf, varname, /zvar, _extra=types )
       endif else if ( s[0] eq 2 ) then begin
-           var_id = CDF_VARCREATE( cdf, varname, [1], dim=[s[2]], /zvar, /rec_vary, _extra=types )
+           var_id = CDF_VARCREATE( cdf, varname, [1], dim=[s[1]], /zvar, /rec_vary, _extra=types )
+      endif else if ( s[0] ge 3 ) then begin
+           var_id = CDF_VARCREATE( cdf, varname, replicate(1,s[0]-1), dim=[s[1:s[0]-1]], /zvar, /rec_vary, _extra=types )
       endif
       CDF_CONTROL, cdf, variable=var_id, /zvar, SET_PADVALUE=0 ; not used, this is just to avoid warning.
-      if ( s[0] eq 2 ) then begin
-         nv= n_elements(var[*,0])
-         for j=0,nv-1 do begin ; TODO: Why can't I figure out how to do this in one call!
-            CDF_VARPUT, cdf, varname, REFORM(var[j,*]), /zvar, rec_start=j
-         endfor
-      endif else begin
-         CDF_VARPUT, cdf, varname, var, /zvar
-      endelse
+      CDF_VARPUT, cdf, varname, var, /zvar     
+
       if ( KEYWORD_SET( verbose ) ) then MESSAGE, 'Saved variable: '+ varname + '.', /cont
       
    endfor
@@ -148,7 +154,10 @@ pro test_suite
    A= indgen(6)+100
    B= indgen(7)+200
    C= indgen(3,4)+300
-   cdfsave, A, B, C, /verbose
-   cdfrestore, /verbose
-   help, A, B, C
+   D= dindgen(2,3,4)+400
+   ;E= { X:2, Y:3, Z:6 }
+   ;F= replicate( { X:2, Y:3, Z:6 }, 10 )
+   save_cdf, A, B, C, D, /verbose
+   restore_cdf, /verbose
+   help, A, B, C, D
 end   
