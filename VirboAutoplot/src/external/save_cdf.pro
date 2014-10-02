@@ -1,5 +1,5 @@
 ;+
-; cdfsave/cdfrestore, replacements for proprietary IDL savesets.  attempts
+; save_cdf/restore_cdf, replacements for proprietary IDL savesets.  attempts
 ; to mimic the save command in IDL, but stores the data in a CDF file
 ; rather than the proprietary IDLsave file.
 ;
