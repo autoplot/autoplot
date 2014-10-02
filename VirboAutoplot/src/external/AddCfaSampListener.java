@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.autoplot.external;
+package external;
 
 import java.util.Map;
 import org.astrogrid.samp.Message;
