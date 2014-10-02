@@ -498,6 +498,8 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
    else:
       raise Exception( 'error encountered!' )
       
+#import pdb; pdb.set_trace()
+applot( [1,2,3,4,5] )
 
 #   # clean up old tmp files more than 10 minutes old.
 #   caldat, systime(1, /julian) - 10/1440., Mon, D, Y, H, Min  # ten minutes ago
