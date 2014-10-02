@@ -415,9 +415,6 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             
             boolean isMaster= fileName.contains("MASTERS");
             parameterDescriptions= CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false, false );
-            if ( parameterDescriptions.isEmpty() ) {
-                throw new IllegalArgumentException("no plottable parameters in CDF file!");
-            }
             
             Map<String,String> allParameterInfo= CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, true, isMaster );
             Map<String,String> dataParameterInfo= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true, isMaster );
@@ -475,10 +472,15 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                     subsetComboBox.setSelectedItem("");
                 }
             } else {
+                if ( !parameterDescriptions.isEmpty() ) {
                     parameter= parameterDescriptions.entrySet().iterator().next().getKey();
                     subsetComboBox.setSelectedItem("");
                     param= parameter;
-                }
+                } else {
+                    param= "";
+                    paramInfo.setText("(no plottable parameters)");
+                }                
+            }
             parameter= param.replaceAll("%3D", "=");
 
             if ( "no".equals( params.get("interpMeta")) ) {

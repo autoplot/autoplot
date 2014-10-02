@@ -403,9 +403,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             
             logger.finest("inspect cdf for plottable parameters");
             parameterDescriptions= CdfUtil.getPlottable( cdf, !showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false );
-            if ( parameterDescriptions.isEmpty() ) {
-                throw new IllegalArgumentException("no plottable parameters in cdf file!");
-            }
+
             Map<String,String> allParameterInfo= CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, true );
             Map<String,String> dataParameterInfo= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true );
             Map<String,String> whereParameterInfo= CdfUtil.getPlottable( cdf, false, 2, false );
@@ -466,9 +464,14 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                     subsetComboBox.setSelectedItem("");
                 }
             } else {
-                parameter= parameterDescriptions.entrySet().iterator().next().getKey();
-                subsetComboBox.setSelectedItem("");
-                param= parameter;
+                if ( !parameterDescriptions.isEmpty() ) {
+                    parameter= parameterDescriptions.entrySet().iterator().next().getKey();
+                    subsetComboBox.setSelectedItem("");
+                    param= parameter;
+                } else {
+                    param= "";
+                    paramInfo.setText("(no plottable parameters)");
+                }
             }
             parameter= param.replaceAll("%3D", "=");
 
