@@ -7,13 +7,6 @@
 ; created on Web Oct 1, 2014.
 ;
 ; This uses SCOPE_VARFETCH and SCOPE_VARNAME to get information from other stack frames.
-; 
-; TODO:
-; 1. Why does IDL documentation say that CDF_CONTROL is only for multi_file CDFs?  How should
-;    I get the number of records?
-; 2. How do you do a multiple-record write, like a hyperput?  I know I've done this before,
-;    but there's something I'm missing...
-; 3. This only works at the MAIN level and test_suite doesn't work.  Its commands can be executed directly.
 ;       
 ;-
 
