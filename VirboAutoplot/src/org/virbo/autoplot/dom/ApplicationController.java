@@ -1770,10 +1770,9 @@ public class ApplicationController extends DomNodeController implements RunLater
      * BeansBinding library is apparently not thread-safe.
      * 
      * Example:
-     *<blockquote><pre><small>{@code
-     * model= getApplicationModel()
-     * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
-     *}</small></pre></blockquote> 
+     *<blockquote><pre><small>{@literal model= getApplicationModel()
+ bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
+}</small></pre></blockquote> 
      * @param src java bean such as model.getPlotDefaults()
      * @param srcProp a property name such as "title"
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
@@ -1878,15 +1877,14 @@ public class ApplicationController extends DomNodeController implements RunLater
      * BeansBinding library is apparently not thread-safe.
      * 
      * Example:
-     *<blockquote><pre><small>{@code
-     * model= getApplicationModel()
-     * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
-     *}</small></pre></blockquote> 
+     *<blockquote><pre><small>{@literal model= getApplicationModel()
+ bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
+}</small></pre></blockquote> 
      * @param src java bean such as model.getPlotDefaults()
      * @param srcProp a property name such as "title"
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
      * @param dstProp a property name such as "label"
-     * @see ScriptContext.bind( Object src, String srcProp, Object dst, String dstProp), which can bind any two objects together.
+     * @see ScriptContext.bind( Object src, String srcProp, Object dst, String dstProp),whichcan bind any two objects together.
      */
     public void bind( DomNode src, String srcProp, Object dst, String dstProp) {
         bind(src, srcProp, dst, dstProp, null );

@@ -1606,6 +1606,8 @@ public class PlotElementController extends DomNodeController {
             bindToEventsRenderer((EventsRenderer)renderer);
         } else if (renderer instanceof DigitalRenderer ) {
             bindToDigitalRenderer((DigitalRenderer)renderer);
+        } else if (renderer instanceof TickCurveRenderer ) {
+            bindToTickCurveRenderer((TickCurveRenderer)renderer);
         } else if (renderer instanceof ContoursRenderer ) {
             bindToContoursRenderer((ContoursRenderer)renderer);
         }
@@ -2709,7 +2711,12 @@ public class PlotElementController extends DomNodeController {
         ac.bind(plotElement.style, "color", renderer, "color");
     }
 
-
+    public void bindToTickCurveRenderer( TickCurveRenderer renderer) {
+        ApplicationController ac = this.dom.controller;
+        ac.bind(plotElement.style, "color", renderer, "color");
+        ac.bind(plotElement.style, "lineWidth", renderer, "lineWidth");
+    }
+    
     public void bindToContoursRenderer(Renderer renderer) {
         ApplicationController ac = this.dom.controller;
         ac.bind(plotElement.style, "color", renderer, "color");
