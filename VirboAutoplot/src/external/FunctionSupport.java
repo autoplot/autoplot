@@ -14,7 +14,7 @@ import org.python.core.PyString;
 import org.python.core.PyTuple;
 
 /**
- *
+ * Code to support writing Python Functions.
  * @author eew
  */
 public final class FunctionSupport {
