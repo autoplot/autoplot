@@ -108,7 +108,7 @@ pro save_cdf, var0, var1, var2, var3, var4, var5, var6, var7, var8, var9, var10c
       s= SIZE( var )
       type= SIZE( var, /type )
       
-      if ( type lt 2 or type gt 5 ) then begin
+      if ( type ne 14 and ( type lt 2 or type gt 5 ) ) then begin
          HELP, var, output=o 
          if n_elements(o) gt 1 then o=o[0]
          j= STRPOS(o,'=')
@@ -121,7 +121,8 @@ pro save_cdf, var0, var1, var2, var3, var4, var5, var6, var7, var8, var9, var10c
          cdf_int2: type eq 2,  $
          cdf_int4: type eq 3,  $
          cdf_real4: type eq 4,  $
-         cdf_real8: type eq 5  $
+         cdf_real8: type eq 5,  $
+         cdf_time_tt2000: type eq 14  $
       }
       
       if ( s[0] eq 0 ) then begin      
@@ -148,9 +149,13 @@ pro test_suite
    B= indgen(7)+200
    C= indgen(3,4)+300
    D= dindgen(2,3,4)+400
+   GS = [ '2005-12-04T20:19:18.176321123',  '2005-12-04T20:20:18.176321123',  '2005-12-04T20:21:18.176321123' ]
+   G64 = CDF_PARSE_TT2000( GS )
+   ;G= [ 186999622360321123,    186999682360321123,    186999742360321123 ]
+
    ;E= { X:2, Y:3, Z:6 }
    ;F= replicate( { X:2, Y:3, Z:6 }, 10 )
-   save_cdf, A, B, C, D, /verbose
+   save_cdf, A, B, C, D, G64, /verbose
    restore_cdf, /verbose
-   help, A, B, C, D
+   help, A, B, C, D, G64
 end   
