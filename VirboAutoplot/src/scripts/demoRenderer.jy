@@ -5,10 +5,11 @@ from org.virbo.dataset import SemanticOps
 from java.lang import IllegalArgumentException
 
 cb= dom.plots[0].zaxis.controller.getDasAxis()
+dom.plots[0].zaxis.visible= True
 
 class MyPCL( java.beans.PropertyChangeListener ):
    def propertyChange(self,e):
-      dom.plots[0].controller.dasPlot.repaint()
+      dom.plots[0].controller.dasPlot.invalidateCacheImage()
 
 cb.addPropertyChangeListener( MyPCL() )  #TODO: there's a jython way to do this
 
