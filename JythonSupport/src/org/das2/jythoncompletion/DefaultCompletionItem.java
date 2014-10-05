@@ -37,7 +37,7 @@ public class DefaultCompletionItem implements CompletionItem  {
     String link;
     int sortPriority;
     
-    final static Logger logger= Logger.getLogger( "pvwave" );
+    final static Logger logger= Logger.getLogger( "jython.editor" );
     
     /**
      * @param text  used for sort and insert prefix.  Typically same as complete.
@@ -138,6 +138,19 @@ public class DefaultCompletionItem implements CompletionItem  {
     public CompletionTask createDocumentationTask() {
         if ( link==null ) {
             return null;
+        } else if ( link.startsWith("inline:") ) {
+            final String flink= link;
+            return new CompletionTask() {
+                public void query(CompletionResultSet resultSet) {
+                    resultSet.setDocumentation( new DefaultDocumentationItem(null,flink.substring(7)) );
+                    resultSet.finish();
+                }
+                public void refresh(CompletionResultSet resultSet) {
+                    query(resultSet);
+                }
+                public void cancel() {
+                }  
+            };
         } else {
             return new CompletionTask( ) {
                 public void query(CompletionResultSet resultSet) {
