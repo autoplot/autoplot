@@ -35,11 +35,13 @@ import org.python.core.PyJavaPackage;
 import org.python.core.PyList;
 import org.python.core.PyMethod;
 import org.python.core.PyMethodPeeker;
+import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PyReflectedFunction;
 import org.python.core.PyReflectedFunctionPeeker;
 import org.python.core.PyString;
 import org.python.core.PyStringMap;
+import org.python.core.PyType;
 import org.python.util.PythonInterpreter;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
@@ -494,12 +496,51 @@ public class JythonCompletionTask implements CompletionTask {
         }
         return s;
     }
+    
+    /**
+     * get the documentation, looking for terminator.  TODO: this should all be redone with Jython AST.
+     * @param line 
+     * @param read continue to read from here.
+     * @return the source containing the documentation.
+     */
+    private static String popDoc( String line, BufferedReader read ) throws IOException {
+        String lin= line.trim();
+        if ( lin.startsWith("\"") && lin.endsWith("\"") ) {
+            return line;
+        } else if ( lin.startsWith("'") && lin.endsWith("'") ) {
+            return line;
+        } else if ( lin.startsWith("\"\"\"" ) || lin.startsWith("'''") ) {
+            String term= lin.substring(0,3);
+            if ( lin.endsWith(term) ) return line;
+            StringBuilder build= new StringBuilder(line);
+            line= read.readLine();
+            while ( line!=null ) {
+                build.append(line).append("\n");
+                lin= line.trim();
+                if ( lin.endsWith(term) ) {
+                    break;
+                }
+                line= read.readLine();
+            }
+            if ( line==null ) {
+                throw new IllegalArgumentException("unterminated string");
+            } else {
+                return build.toString();
+            }
+        } else {
+            return null;
+        }
+
+    }
+    
     /**
      * return the imports for the python script, also the def's are 
      * returned with a trivial definition, and assignments are converted to
      * be a trivial assignment.
-     * @param src
-     * @return
+     * TODO: redo this using syntax tree. See JythonUtil.simplifyScriptToGetParams(src,false);
+     * 
+     * @param src jython source
+     * @return subset sufficient to provide completions
      */
     private static String sanitizeLeaveImports( String src ) {
         StringBuilder buf= new StringBuilder();
@@ -508,12 +549,16 @@ public class JythonCompletionTask implements CompletionTask {
         Matcher m;
         try {
             String s= read.readLine();
+            boolean doAddPass= false;
+            String indent= null;
             while ( s!=null ) {
                 s= popOffComments(s);
                 if ( s.startsWith("from ") || s.startsWith("import ") ) {
                     buf.append(s).append("\n");
                 } else if ( s.startsWith("def ") ) {
-                    buf.append(s).append("\n  pass\n");
+                    buf.append(s).append("\n");
+                    doAddPass= true;
+                    indent= "  ";
                 } else if ( (m=assign.matcher(s)).matches() ) {
                     String safeArg= m.group(2).trim();
                     if ( safeArg.startsWith("\'") && safeArg.endsWith("\'") ) {
@@ -530,6 +575,21 @@ public class JythonCompletionTask implements CompletionTask {
                     buf.append(m.group(1)).append("=").append(safeArg).append("\n");
                 }
                 s= read.readLine();
+                if ( s!=null ) {
+                    String doc= popDoc( s, read );
+                    if ( doc!=null ) {
+                        buf.append( doc ).append("\n");
+                        int ic= 0;
+                        while ( ic<doc.length() && Character.isWhitespace(doc.charAt(ic)) ) {
+                            ic++;
+                        }
+                        indent= doc.substring(0,ic);
+                    }
+                }
+                if ( doAddPass ) {
+                    buf.append(indent).append("pass\n");
+                    doAddPass= false;
+                }
             }
         } catch ( IOException ex ) {
             logger.log( Level.SEVERE, ex.getMessage(), ex );
@@ -778,10 +838,18 @@ public class JythonCompletionTask implements CompletionTask {
                         signatures.add(signature);
                         labels.add(label);
                         argss.add(args);
-                    }
+                    }                    
                 } else if (po.isCallable()) {
                     label = ss + "() ";
-                    signature= "x"; // oh wow we don't use signature anymore...
+                    PyObject doc= interp.eval(ss+".__doc__");
+                    //PyObject doc= po.getDoc(); // doesn't seem to work!
+                    signature= doc instanceof PyNone ? "(No documentation)" : doc.toString();
+                    String[] ss2= signature.split("\n");
+                    if ( ss2.length>1 ) {
+                        signature= "<html>"+join( ss2, "<br>" );
+                    }
+                    signature= "inline:" + signature;
+                    
                 } else if (po.isNumberType()) {
                     if ( po.getType().getFullName().equals("javaclass")  ) {
                         label = ss;
@@ -820,11 +888,12 @@ public class JythonCompletionTask implements CompletionTask {
                     }
                 } else {
                     String link = null;
-                    if (signature != null) {
-                        link= getLinkForJavaSignature(signature);
-                    }
-                    if ( ss.equals("dom") ) {
+                    if ( signature!=null && signature.startsWith("inline:") ) {
+                        link= signature;
+                    } else if ( ss.equals("dom") ) {
                         link= "http://autoplot.org/developer.scripting#DOM";
+                    } else if (signature != null) {
+                        link= getLinkForJavaSignature(signature);
                     }
                     result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link) );
                 }
