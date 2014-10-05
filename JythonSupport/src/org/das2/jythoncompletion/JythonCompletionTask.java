@@ -842,11 +842,12 @@ public class JythonCompletionTask implements CompletionTask {
                 } else if (po.isCallable()) {
                     label = ss + "() ";
                     PyObject doc= interp.eval(ss+".__doc__");
-                    //PyObject doc= po.getDoc(); // doesn't seem to work!
                     signature= doc instanceof PyNone ? "(No documentation)" : doc.toString();
                     String[] ss2= signature.split("\n");
                     if ( ss2.length>1 ) {
-                        signature= "<html>"+join( ss2, "<br>" );
+                        if ( !signature.startsWith("<html>" ) ) {
+                            signature= "<html>"+join( ss2, "<br>" );
+                        }
                     }
                     signature= "inline:" + signature;
                     
