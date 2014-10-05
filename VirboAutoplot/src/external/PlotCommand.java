@@ -44,6 +44,24 @@ import org.virbo.jythonsupport.JythonOps;
 public class PlotCommand extends PyObject {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
+    
+    public static PyString __doc__ =
+        new PyString("<html>plotx is an experimental extension of the plot command that uses Python features like keywords.\n"
+            + "<br>plotx(x,y,z,[keywords])\n"
+            + "<br>keywords:\n"
+            + "<table>"
+            + "<tr><td>xlog ylog zlog </td><td>explicitly set this axis to log (or linear when set equal to 0.).</td></tr>\n"
+            + " <tr><td> xtitle ytitle ztitle  </td><td>set the label for the axis.</td></tr>\n"
+            + " <tr><td> title       </td><td>title for the plot\n</td></tr>"
+            + " <tr><td> renderType  </td><td> explcitly set the render type, to scatter, series, nnSpectrogram, digital, etc\n</td></tr>"
+            + " <tr><td> color      </td><td> the line colors.\n</td></tr>"
+            + " <tr><td> fillColor   </td><td>the color when filling volumes.\n</td></tr>"
+            + "  <tr><td>symsize     </td><td>set the point (pixel) size\n</td></tr>"
+            + " <tr><td> linewidth   </td><td>the line thickness in points (pixels)\n</td></tr>"
+            + " <tr><td> symbol      </td><td>the symbol, e.g. dots triangles cross\n</td></tr>"
+            + " <tr><td> isotropic   </td><td>constrain the ratio between the x and y axes.\n</td></tr>"
+            + " <tr><td> title   </td><td>title for the plot\n</td></tr>"
+            + "</table>");
 
     private static QDataSet coerceIt( PyObject arg0 ) {
         Object o = arg0.__tojava__(QDataSet.class);
