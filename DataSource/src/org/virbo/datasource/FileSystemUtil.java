@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.logging.Logger;
+import org.das2.util.FileUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
@@ -44,20 +45,12 @@ public class FileSystemUtil {
 
     /**
      * return true if the possibleParent is a valid folder tree root, and maybeChild exists within tree.
-     * @param possibleParent
+     * @param possibleParent parent file.
      * @param maybeChild a file or folder which may exist within possibleParent.
      * @return true if possibleParent is a folder containing
      */
     public static boolean isChildOf( File possibleParent, File maybeChild ) {
-        possibleParent= possibleParent.getAbsoluteFile();
-        if ( !possibleParent.exists() || !possibleParent.isDirectory() ) {
-            // this cannot possibly be the parent
-            return false;
-        }
-        maybeChild= maybeChild.getAbsoluteFile();
-        URI parentURI = possibleParent.toURI(),
-        childURI = maybeChild.toURI();
-        return !parentURI.relativize(childURI).isAbsolute();
+        return FileUtil.isParent(possibleParent, maybeChild);
     }
     
     /**
