@@ -708,6 +708,37 @@ public class DataSetURI {
     }
 
     /**
+     * provide standard logic for identifying the cache location for a file.  The file
+     * will not be downloaded, but clients can check to see if such resource has already been loaded.
+     * There is one case where this might be slow, and that's when a zip file must be downloaded to get
+     * the location.
+     * @param suri the uri like http://autoplot.org/data/autoplot.dat
+     * @return the cache file, like /home/jbf/autoplot_data/fscache/http/autoplot.org/data/autoplot.dat
+     */
+    public static File getCacheFilename( URI suri ) {
+        URISplit split = URISplit.parse( suri );
+
+        if ( split.scheme.equals("http") || split.scheme.equals("https") || split.scheme.equals("ftp") || split.scheme.equals("sftp") ) {
+            try {
+                URI root= new URI( split.file ); // from WebFileSystem.
+                File local = FileSystem.settings().getLocalCacheDir();
+
+                logger.log( Level.FINE, "WFS localRoot={0}", local);
+           
+                String s = root.getScheme() + "/" + root.getHost() + "/" + root.getPath(); //TODO: check getPath
+
+                local = new File(local, s);
+               
+                return local;
+                
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return null;
+    }
+    
+    /**
      * return a file reference for the url.  The file must have a nice name
      * on the server, and cannot be the result of a server query with parameters. (Use 
      * downloadResourceAsTempFile for this).
