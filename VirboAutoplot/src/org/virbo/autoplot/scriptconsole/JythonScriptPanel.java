@@ -32,7 +32,9 @@ import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.jythoncompletion.ui.CompletionImpl;
+import org.das2.util.FileUtil;
 import org.das2.util.LoggerManager;
+import org.das2.util.filesystem.FileSystem;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
@@ -269,8 +271,9 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             fileNameTextField.setText( "" + ( dirty ? " *" : "" ) + ( containsTabs ? " TAB" : "" ) );
         } else {
             File lfile= new File(filename);
-            getEditorPanel().setEditable(lfile.canWrite());
-            fileNameTextField.setText( filename + ( lfile.canWrite() ? "" : " (read only)" ) + ( dirty ? " *" : "" ) + ( containsTabs ? " TAB" : "" ) ) ;
+            boolean writable= lfile.canWrite() && !FileUtil.isParent( FileSystem.settings().getLocalCacheDir(), lfile );
+            getEditorPanel().setEditable(writable);
+            fileNameTextField.setText( filename + ( writable ? "" : " (read only)" ) + ( dirty ? " *" : "" ) + ( containsTabs ? " TAB" : "" ) ) ;
         }
     }
 
