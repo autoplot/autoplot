@@ -209,10 +209,16 @@ public class ScriptPanelSupport {
         if (file != null && ! FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) {
             chooser.setSelectedFile(file);
         } else {
-            chooser.setSelectedFile(file);
+            if ( FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) {
+                String home = System.getProperty("user.home");
+                File ff = new File( home + File.separator + file.getName() );
+                chooser.setSelectedFile(ff);
+            } else {
+                chooser.setSelectedFile(file);
+            }
             Preferences prefs = Preferences.userNodeForPackage(ScriptPanelSupport.class);
             String openFile= prefs.get(PREFERENCE_OPEN_FILE, "");
-            if ( !openFile.equals("") ) {
+            if ( !openFile.equals("") && !FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), new File(openFile) )  ) {
                 File dir= new File(openFile).getParentFile();
                 chooser.setCurrentDirectory( dir );
             }
