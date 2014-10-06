@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>HDF file is downloaded with downloadResourceAsTempFile, which will use gzip compression if it's available.</small></p>
+        <p><small>Interactive slicer written in Jython shows the histogram of the points within the box.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,9 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-10-01):</p>
+        <p>Bugfixes (2014-10-06):</p>
         <ul>
+            <li>1265: Don't reload remote scripts into the editor when the local copy is already showing.  Show fscache scripts as read-only.</li>
             <li>Hanning window had off-by-one error making it asymmetric</li>
             <li>1270: improve labels for Tools bookmarks.  Improve handling of .jy for tools</li>
             <li>formatBookmarks formats to temp file then moves result</li>
@@ -54,6 +55,12 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add randu functions.</li>
+            <li>introduce merge command for safely combining datasets</li>
+            <li>improvements to the orbit plot, including properly binding color and thick.</li>
+            <li>Tools bookmarks editor rebranded "Tools", avoid problem where address bar is reset to the script name.</li>
+            <li>introduce save_cdf and restore_cdf intended to replace save and restore commands in IDL with non-proprietary format.</li>
+            <li>jython editor shows python doc blocks in popup completions.</li>
             <li>secret button for switching dataSetSelector/timeRangeSelector</li>
             <li>improve gap detection in orbitPlot</li>
             <li>orbitPlot supports renderControls like color and lineThick.</li>
