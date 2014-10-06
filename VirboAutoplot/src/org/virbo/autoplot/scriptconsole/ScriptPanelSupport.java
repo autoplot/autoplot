@@ -152,9 +152,16 @@ public class ScriptPanelSupport {
                 URI u2= DataSetURI.getURI(sfile);
                 String f2= URISplit.parse(u2).file;
                 if ( f1.startsWith("file:" ) && f2.startsWith("file:") ) {
-                    File ff1= new File( f1.substring(5) );
+                    File ff1= new File( f1.substring(5) ); //TODO: Windows
                     File ff2= new File( f2.substring(5) );
                     if ( ff1.equals(ff2) ) {
+                        return true;
+                    }
+                }
+                File ff3= DataSetURI.getCacheFilename( fsfile );
+                if ( f1.startsWith("file:") && ff3!=null ) {
+                    File ff1= new File( f1.substring(5) ); //TODO: Windows
+                    if ( ff3.equals(ff1) ) {
                         return true;
                     }
                 }
