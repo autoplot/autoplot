@@ -27,6 +27,7 @@ import org.das2.util.LoggerManager;
 import org.python.core.PyClass;
 import org.python.core.PyClassPeeker;
 import org.python.core.PyException;
+import org.python.core.PyFunction;
 import org.python.core.PyInteger;
 import org.python.core.PyJavaClass;
 import org.python.core.PyJavaClassPeeker;
@@ -42,6 +43,7 @@ import org.python.core.PyReflectedFunction;
 import org.python.core.PyReflectedFunctionPeeker;
 import org.python.core.PyString;
 import org.python.core.PyStringMap;
+import org.python.core.PyTableCode;
 import org.python.core.PyType;
 import org.python.util.PythonInterpreter;
 import org.virbo.jythonsupport.JythonOps;
@@ -822,6 +824,35 @@ public class JythonCompletionTask implements CompletionTask {
         return out.toString();
     }
     
+    /**
+     * get the python signature for the function.  I can't figure out how to get defaults for the named keyword parameters.
+     * @param pf the function
+     * @return String like "docDemo8( arg )"
+     */
+    private static String getPyFunctionSignature( PyFunction pf ) {
+        Object[] defaults= pf.func_defaults;
+        String[] vars= ((PyTableCode)pf.func_code).co_varnames;
+        int count= ((PyTableCode)pf.func_code).co_argcount;
+        StringBuilder sig= new StringBuilder( pf.__name__+"(" );
+        if ( count>0 ) {
+            if ( defaults.length==vars.length ) {
+                sig.append(vars[0]).append("=").append(defaults[0]);
+            } else {
+                sig.append(vars[0]);
+            }
+        }
+        int nreq= vars.length-defaults.length;
+        for ( int i=1; i<count; i++ ) {
+            if ( i>=nreq) {
+                sig.append(",").append(vars[i]).append("=").append(defaults[i-nreq]);
+            } else {
+                sig.append(",").append(vars[i]);
+            }
+        }
+        sig.append(")");
+        return sig.toString();
+        
+    }
     
     public static List<DefaultCompletionItem> getLocalsCompletions(PythonInterpreter interp, CompletionContext cc) {
         
@@ -861,7 +892,11 @@ public class JythonCompletionTask implements CompletionTask {
                     }                    
                 } else if (po.isCallable()) {
                     label = ss + "() ";
+                    if ( label.contains("docDemo9") ) {
+                        System.err.println("here9");
+                    }
                     PyObject doc= interp.eval(ss+".__doc__");
+                    String sig= ( po instanceof PyFunction ) ? getPyFunctionSignature((PyFunction)po) : "";
                     signature= doc instanceof PyNone ? "(No documentation)" : doc.toString();
                     String[] ss2= signature.split("\n");
                     if ( ss2.length>1 ) {
@@ -869,7 +904,9 @@ public class JythonCompletionTask implements CompletionTask {
                             ss2[jj]= escapeHtml(ss2[jj]);
                         }
                         if ( !signature.startsWith("<html>" ) ) {
-                            signature= "<html>"+join( ss2, "<br>" )+"</html>";
+                            signature= "<html><b>"+sig+ "</b><br><br>"+join( ss2, "<br>" )+"</html>";
+                        } else {
+                            signature= "<html><b>"+sig+ "</b><br><br>" + signature.substring(6)+"</html>";
                         }
                     }
                     signature= "inline:" + signature;
