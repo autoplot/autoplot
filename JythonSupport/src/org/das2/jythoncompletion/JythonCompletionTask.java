@@ -514,6 +514,7 @@ public class JythonCompletionTask implements CompletionTask {
             String term= lin.substring(0,3);
             if ( lin.endsWith(term) ) return line;
             StringBuilder build= new StringBuilder(line);
+            build.append("\n");
             line= read.readLine();
             while ( line!=null ) {
                 build.append(line).append("\n");
@@ -866,10 +867,9 @@ public class JythonCompletionTask implements CompletionTask {
                     if ( ss2.length>1 ) {
                         for ( int jj= 0; jj< ss2.length; jj++ ){
                             ss2[jj]= escapeHtml(ss2[jj]);
-                            if ( ss2[jj].trim().length()==0 ) ss2[jj]="<br>";
                         }
                         if ( !signature.startsWith("<html>" ) ) {
-                            signature= "<html>"+join( ss2, " " )+"</html>";
+                            signature= "<html>"+join( ss2, "<br>" )+"</html>";
                         }
                     }
                     signature= "inline:" + signature;
