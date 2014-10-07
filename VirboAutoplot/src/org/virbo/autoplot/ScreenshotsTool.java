@@ -318,13 +318,16 @@ public class ScreenshotsTool extends EventQueue {
     }
 
     /**
-     * return the common rectangle to all images in the directory.
-     * @param dir
-     * @return
+     * return the common bounding rectangle to all png images in the directory.  
+     * @param root folder containing png images.
+     * @return the rectangle common to all images.
      * @throws IOException
+     * @see #getTrim(java.awt.image.BufferedImage) 
      */
-    public static Rectangle getTrim( File dir, ProgressMonitor monitor ) throws IOException {
-        File[] ff= dir.listFiles();
+    public static Rectangle getTrim( File root, ProgressMonitor monitor ) throws IOException {
+        if ( !root.canRead() ) throw new IllegalArgumentException("cannot read root: "+root );
+        if ( !root.isDirectory() ) throw new IllegalArgumentException("root should be directory: " +root );
+        File[] ff= root.listFiles();
         Rectangle result= null;
         int c= ff.length;
         int i= 1;
@@ -347,7 +350,8 @@ public class ScreenshotsTool extends EventQueue {
     }
     
     /**
-     * return the rectangle containing the image.  
+     * return the rectangle containing the image.  The background is determined by looking at the upper-left 
+     * pixel, and the rectangle bounding the non-background pixels is returned.
      * Thanks to http://stackoverflow.com/questions/10678015/how-to-auto-crop-an-image-white-border-in-java
      */
     public static Rectangle getTrim( BufferedImage source ) {
@@ -410,6 +414,8 @@ public class ScreenshotsTool extends EventQueue {
      */
     public static void trimAll( File dir, Rectangle r, ProgressMonitor monitor ) throws IOException {
 
+        if ( !dir.exists() ) throw new IllegalArgumentException("directory does not exist: "+dir );
+        if ( !dir.canRead() ) throw new IllegalArgumentException("directory cannot be read: "+dir );
         File[] ff= dir.listFiles();
 
         monitor.started();

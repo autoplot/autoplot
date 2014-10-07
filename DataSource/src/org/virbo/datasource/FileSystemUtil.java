@@ -175,16 +175,15 @@ public class FileSystemUtil {
     /**
      * deletes all files where shouldDelete returns true and empty 
      * folders below root, and root.
-     * @param root the root of the tree to start searching.
+     * @param root the root of the tree to start searching.  If root does not exist, return true!
      * @param shouldDelete return true if the file should be deleted.
      * @throws IllegalArgumentException if it is unable to delete a file
      * @return true if the operation was successful.
      */
     public static boolean deleteFilesInTree( File root, Check shouldDelete ) throws IllegalArgumentException {
-        if (!root.exists()) {
-            return true;
-        }
-        File[] children = root.listFiles();
+        if (!root.exists()) return true;
+        if (!root.canRead()) throw new IllegalArgumentException("cannot read folder: "+root );
+        File[] children = root.listFiles(); // root is known to exist.
         boolean success = true;
         boolean notEmpty= children.length>0;
         for (int i = 0; i < children.length; i++) {

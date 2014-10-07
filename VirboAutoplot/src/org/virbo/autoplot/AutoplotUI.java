@@ -275,6 +275,19 @@ public final class AutoplotUI extends javax.swing.JFrame {
         
         APSplash.checkTime("init 0");
 
+        File toolsDir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "tools" );
+        File booksDir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
+        if ( !toolsDir.exists() ) {
+            if ( !toolsDir.mkdirs() ) {
+                logger.warning("unable to make directory: "+toolsDir );
+            }
+        }
+        if ( !booksDir.exists() ) {
+            if ( !booksDir.mkdirs() ) {
+                logger.warning("unable to make directory: "+booksDir );
+            }
+        }
+
         // Initialize help system now so it's ready for components to register IDs with
         AutoplotHelpSystem.initialize(getRootPane());
         helpSystem = AutoplotHelpSystem.getHelpSystem();
@@ -4545,6 +4558,11 @@ APSplash.checkTime("init 240");
         File toolsDir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "tools" );
         File booksDir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
         
+        if ( !toolsDir.exists() ) {
+            if ( !toolsDir.mkdir() ) {
+                logger.log(Level.WARNING, "unable to mkdir tools folder: {0}", toolsDir);
+            }
+        }
         if ( booksDir.exists() ) {
             File toolsFile= new File( booksDir, "tools.xml" );
             if ( toolsFile.exists() ) {
@@ -4556,6 +4574,10 @@ APSplash.checkTime("init 240");
                 }
             } else {
                 File[] ff= toolsDir.listFiles();
+                if ( ff==null ) {
+                    logger.log(Level.WARNING, "unable to read tools folder: {0}", toolsDir);
+                    ff= new File[0];
+                }
                 for ( int i=0; i<ff.length; i++ ) {
                     if ( ff[i].getName().toLowerCase().endsWith(".jy") ) {
                         Bookmark book= new Bookmark.Item(ff[i].toURI().toString());

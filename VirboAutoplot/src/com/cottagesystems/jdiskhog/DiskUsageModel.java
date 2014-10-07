@@ -43,7 +43,7 @@ public class DiskUsageModel {
         
         if (kids == null) {
             return;
-        }  // c:\System Information?
+        } 
 
         if (depth == 0) {
             mon.setTaskSize(kids.length);

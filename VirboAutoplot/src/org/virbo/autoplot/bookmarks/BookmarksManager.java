@@ -1602,6 +1602,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             }
         }
 
+        prefNode= nodeName;
         final File f = new File( f2, nodeName + ".xml");
         if ( f.exists() )  {
             throw new IllegalArgumentException("bookmarks pref node already exists: "+f);
@@ -1609,12 +1610,11 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             formatToFile( f );
         }
         bookmarksFile= f; // setPrefNode added a listener.
-        prefNode= nodeName;
         
     }
 
     /**
-     * format the bookmarks to
+     * format the bookmarks to file.
      * @param f 
      */
     private void formatToFile( File f ) {

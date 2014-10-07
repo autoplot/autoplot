@@ -157,6 +157,8 @@ public class Util {
         if (!root.exists()) {
             return true;
         }
+        if ( !root.canRead() ) throw new IllegalArgumentException("cannot read root: "+root );
+        if ( !root.isDirectory() ) throw new IllegalArgumentException("root should be directory: " +root );
         File[] children = root.listFiles();
         boolean success = true;
         for (int i = 0; i < children.length; i++) {
@@ -213,6 +215,8 @@ public class Util {
         if (!root.exists()) {
             return false; // doesn't exist
         }
+        if ( !root.canRead() ) throw new IllegalArgumentException("cannot read root: "+root );
+        if ( !root.isDirectory() ) throw new IllegalArgumentException("root should be directory: " +root );
         File[] children = root.listFiles();
         boolean success = true;
 
@@ -251,6 +255,8 @@ public class Util {
         if (!root.exists()) {
             return false; // doesn't exist
         }
+        if ( !root.canRead() ) throw new IllegalArgumentException("cannot read root: "+root );
+        if ( !root.isDirectory() ) throw new IllegalArgumentException("root should be directory: " +root );
         File[] children = root.listFiles();
         boolean success = true;
 
@@ -260,7 +266,6 @@ public class Util {
             }
         }
         
-        children = root.listFiles();
         if ( children.length==0 ) {
             if ( !root.delete() ) {
                 problems.add( "unable to delete "+root );

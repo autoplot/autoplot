@@ -185,8 +185,8 @@ public class FSTreeModel implements TreeModel {
 
         File ff1 = ff[index];
         while (ff1.isDirectory()) {
-            File[] ffs = ff1.listFiles();
-            if (ffs.length == 1 && ffs[0].isDirectory()) {
+            File[] ffs = ff1.listFiles(); 
+            if ( ffs!=null && ffs.length == 1 && ffs[0].isDirectory()) {
                 ff1 = ffs[0];
             } else {
                 break;
