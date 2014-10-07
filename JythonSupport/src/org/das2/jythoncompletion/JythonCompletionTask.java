@@ -9,6 +9,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -803,6 +804,24 @@ public class JythonCompletionTask implements CompletionTask {
         return build.toString();
     }
     
+    public static String escapeHtml( String s ) {
+        StringBuffer out= new StringBuffer();
+        Pattern p= Pattern.compile("([\\<\\>])");
+        Matcher m= p.matcher(s);
+        while ( m.find() ) {
+            m.appendReplacement( out, "" );
+            String ss= m.group(1);
+            if ( ss.equals("<") ) {
+                out.append( "&lt;");
+            } else if ( ss.equals(">") ) {
+                out.append( "&gt;");
+            }
+        }
+        m.appendTail(out);
+        return out.toString();
+    }
+    
+    
     public static List<DefaultCompletionItem> getLocalsCompletions(PythonInterpreter interp, CompletionContext cc) {
         
         List<DefaultCompletionItem> result= new ArrayList();
@@ -845,8 +864,12 @@ public class JythonCompletionTask implements CompletionTask {
                     signature= doc instanceof PyNone ? "(No documentation)" : doc.toString();
                     String[] ss2= signature.split("\n");
                     if ( ss2.length>1 ) {
+                        for ( int jj= 0; jj< ss2.length; jj++ ){
+                            ss2[jj]= escapeHtml(ss2[jj]);
+                            if ( ss2[jj].trim().length()==0 ) ss2[jj]="<br>";
+                        }
                         if ( !signature.startsWith("<html>" ) ) {
-                            signature= "<html>"+join( ss2, "<br>" );
+                            signature= "<html>"+join( ss2, " " )+"</html>";
                         }
                     }
                     signature= "inline:" + signature;
