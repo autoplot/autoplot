@@ -3826,7 +3826,7 @@ private void updateFrameTitle() {
         alm.addOptionalPositionArgument(0, "URI", null, "initial URI to load");
         alm.addOptionalSwitchArgument("position", null, "position", null, "plot position for the URI, an integer indicating which data position to update.");
         alm.addOptionalSwitchArgument("bookmarks", null, "bookmarks", null, "bookmarks to load");
-        alm.addOptionalSwitchArgument("port", "p", "port", "-1", "enable scripting via this port");
+        alm.addOptionalSwitchArgument("port", "p", "port", "-1", "enable scripting via this port (deprecated, use server instead)");
         alm.addBooleanSwitchArgument("scriptPanel", null, "scriptPanel", "enable script panel");
         alm.addBooleanSwitchArgument("logConsole", "l", "logConsole", "enable log console");
         alm.addOptionalSwitchArgument("nativeLAF", "n", "nativeLAF", alm.TRUE, "use the system look and feel (T or F)");
@@ -3841,6 +3841,7 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument( "eventThreadMonitor", null, "eventThreadMonitor", "monitor the event thread for long unresponsive pauses");
 
         alm.addBooleanSwitchArgument( "samp", null, "samp", "enable SAMP connection for use with the Cluster Final Archive");
+        alm.addOptionalSwitchArgument( "server", null, "server", "-1", "start server at the given port listening to commands. (Replaces port)");
         alm.addBooleanSwitchArgument( "nop", null, "nop", "no operation, to be a place holder for jnlp script.");
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
            if ( args[i].equals("-print") ) args[i]="--print";
@@ -3955,7 +3956,7 @@ private void updateFrameTitle() {
                 logger.log( Level.SEVERE, e.getMessage(), e );
             }
         }
-
+       
         logger.fine("invokeLater()");
 
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -4026,8 +4027,10 @@ APSplash.checkTime("init 200");
                 }
 
 APSplash.checkTime("init 210");
-                final boolean server= !alm.getValue("port").equals("-1");
-                if ( server ) {
+                
+                final boolean port= !alm.getValue("port").equals("-1");
+                if ( port ) {
+                    System.err.println("port keyword is deprecated, use --server="+port+" instead");
                     if ( app==null ) {
                         throw new IllegalArgumentException("Server cannot be used in headless mode");
                     }
@@ -4036,6 +4039,18 @@ APSplash.checkTime("init 210");
                     app.setupServer(iport, model);
                     model.getDocumentModel().getOptions().setServerEnabled(true);
                 }
+                
+                final boolean server= !alm.getValue("server").equals("-1");
+                if ( server ) {
+                    if ( app==null ) {
+                        throw new IllegalArgumentException("Server cannot be used in headless mode");
+                    }
+                    int iport;
+                    iport = Integer.parseInt(alm.getValue("server"));
+                    app.setupServer(iport, model);
+                    model.getDocumentModel().getOptions().setServerEnabled(true);
+                }
+                                
 
                 boolean doCatchUncaughtExceptions= true; // for debugging, this can be turned off.  Note the requestProcessor system also catches exceptions.
                 if ( doCatchUncaughtExceptions ) {
