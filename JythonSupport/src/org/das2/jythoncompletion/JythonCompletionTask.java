@@ -317,6 +317,29 @@ public class JythonCompletionTask implements CompletionTask {
                     //PyObject o= context.__dir__();
                     label= ss;
                     signature= null;
+                    if ( po instanceof PyMethod ) {
+                        PyMethod pm= (PyMethod)po;
+                        PyObject pm2= pm.im_func;
+                        if ( pm2 instanceof PyFunction ) {
+                            Object doc= ((PyFunction)pm2).__doc__;
+                            if ( doc!=null ) {
+                                signature= doc instanceof PyNone ? "(No documentation)" : doc.toString();
+                                String[] ss2= signature.split("\n");
+                                if ( ss2.length>1 ) {
+                                    for ( int jj= 0; jj< ss2.length; jj++ ){
+                                        ss2[jj]= escapeHtml(ss2[jj]);
+                                    }
+                                    String sig= getPyFunctionSignature( (PyFunction)pm2 );
+                                    if ( !signature.startsWith("<html>" ) ) {
+                                        signature= "<html><b>"+sig+ "</b><br><br>"+join( ss2, "<br>" )+"</html>";
+                                    } else {
+                                        signature= "<html><b>"+sig+ "</b><br><br>" + signature.substring(6)+"</html>";
+                                    }
+                                }
+                                signature= "inline:"+signature;
+                            }
+                        }
+                    }
                     //String link = "http://docs.python.org/library/"; //TODO: this could probably be done
                 } else {
                     if (po instanceof PyReflectedFunction) {
@@ -331,8 +354,12 @@ public class JythonCompletionTask implements CompletionTask {
                     }
                 }
                 if ( notAlreadyAdded ) {
-                    String link = getLinkForJavaSignature(signature);
-                    rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
+                    if ( signature!=null && signature.startsWith("inline:") ) {
+                        rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, signature));
+                    } else {
+                        String link = getLinkForJavaSignature(signature);
+                        rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
+                    }
                     count++;
                 }
             }
@@ -892,9 +919,6 @@ public class JythonCompletionTask implements CompletionTask {
                     }                    
                 } else if (po.isCallable()) {
                     label = ss + "() ";
-                    if ( label.contains("docDemo9") ) {
-                        System.err.println("here9");
-                    }
                     PyObject doc= interp.eval(ss+".__doc__");
                     String sig= ( po instanceof PyFunction ) ? getPyFunctionSignature((PyFunction)po) : "";
                     signature= doc instanceof PyNone ? "(No documentation)" : doc.toString();
