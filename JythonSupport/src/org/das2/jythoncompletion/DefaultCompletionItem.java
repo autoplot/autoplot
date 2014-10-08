@@ -40,11 +40,13 @@ public class DefaultCompletionItem implements CompletionItem  {
     final static Logger logger= Logger.getLogger( "jython.editor" );
     
     /**
-     * @param text  used for sort and insert prefix.  Typically same as complete.
-     * @param offset  number of chars already typed.
-     * @param complete  complete.substring(offset) is inserted.
-     * @param label  the human readable presentation of this, maybe with html.
-     * @param link  handed over to DefaultDocumentationItem, if non null. 
+     * 
+     * @param text used for sort and insert prefix.  Typically same as complete.
+     * @param offset number of chars already typed.
+     * @param complete complete.substring(offset) is inserted.
+     * @param label the human readable presentation of this, maybe with html.
+     * @param link handed over to DefaultDocumentationItem, if non null.  May be "inline:&lt;html&gt;..."
+     * @param sortPriority 1 is default.
      */
     public DefaultCompletionItem( String text, int offset, String complete, String label, String link, int sortPriority ) {
         this.text= text;
@@ -56,6 +58,14 @@ public class DefaultCompletionItem implements CompletionItem  {
         this.sortPriority= sortPriority;
     }
 
+    /**
+     * 
+     * @param text  used for sort and insert prefix.  Typically same as complete.
+     * @param offset  number of chars already typed.
+     * @param complete  complete.substring(offset) is inserted.
+     * @param label  the human readable presentation of this, maybe with html.
+     * @param link  handed over to DefaultDocumentationItem, if non null.  May be "inline:&lt;html&gt;..."
+     */
     public DefaultCompletionItem( String text, int offset, String complete, String label, String link ) {
         this(text, offset, complete, label, link, 1);
     }
