@@ -932,6 +932,8 @@ public class JythonCompletionTask implements CompletionTask {
                         } else {
                             signature= "<html><b>"+sig+ "</b><br><br>" + signature.substring(6)+"</html>";
                         }
+                    } else {
+                        signature= "<html><b>"+sig+ "</b><br><br>" + signature+"</html>";
                     }
                     signature= "inline:" + signature;
                     
