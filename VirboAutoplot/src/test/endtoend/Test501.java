@@ -190,7 +190,11 @@ public class Test501 {
             // iid index within the test
 
             for ( String id: ids ) {
-
+                int ipipe= id.indexOf("|");
+                if ( ipipe>-1 ) {
+                    id= id.substring(0,ipipe).trim();
+                }
+                
                 System.err.println( String.format( "==== test %03d of %d (%03d) ========================================================", iis, count, iid ) );
 
                 if ( id.contains("/testing/") ) {
