@@ -92,9 +92,9 @@ public class Test_2pt2_ContextOverview implements Scenario {
             if ( tbindings && trange ) {
                 return 0;
             } else {
-                System.err.println("fail because:");
-                System.err.println("tbindings="+tbindings+"\tdom.getBindings().length!=13, instead is "+dom.getBindings().length );
-                System.err.println("trange="+trange+ "\t"+range0+" .equals "+ dom.getPlots(1).getXaxis() );
+                System.err.println("fail because one of the following is not true:");
+                System.err.println("tbindings="+tbindings+"\tdom.getBindings().length should be 13, it is "+dom.getBindings().length );
+                System.err.println("trange="+trange+ "\t"+range0+" should equal "+ dom.getPlots(1).getXaxis().getRange() );
                 return 1;
             }
 
