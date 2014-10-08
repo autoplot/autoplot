@@ -3116,6 +3116,7 @@ private void serverCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent ev
         JOptionPane.showMessageDialog( rootPane, "<html>The server will not be stopped completely.<br>https://sourceforge.net/tracker/?func=detail&aid=3441071&group_id=199733&atid=970682" );
     }
     serverCheckBoxMenuItem.setSelected( rlistener!=null );
+    serverCheckBoxMenuItem.setToolTipText( rlistener==null ? null : ( "listening on port " + rlistener.getPort() ) );
     applicationModel.getDocumentModel().getOptions().setServerEnabled( rlistener!=null );
 }//GEN-LAST:event_serverCheckBoxMenuItemActionPerformed
 
@@ -3548,20 +3549,22 @@ private void updateFrameTitle() {
     final String title0= "Autoplot "+v;
     final String isoffline= FileSystem.settings().isOffline() ? " (offline)" : "";
 
+    final String server= rlistener==null ? "" : ( " (port="+rlistener.getPort()+")" );
+    
     final String theTitle;
     if ( suri==null ) {
-        theTitle=  title0 + isoffline;
+        theTitle=  title0 + isoffline + server;
     } else {
         URISplit split= URISplit.parse(suri);
 
         boolean dirty= undoRedoSupport.getDepth()>1;
         if ( split.path!=null && split.file!=null ) {
             String titleStr= split.file.substring( split.path.length() ) + ( dirty ? "*" : "" );
-            theTitle= titleStr + " - " + title0 + isoffline;
+            theTitle= titleStr + " - " + title0 + isoffline + server;
         } else {
             //I was seeing null pointer exceptions here--see rte_1590234331_20110328_153705_wsk.xml.  I suspect this is Windows.
             logger.log(Level.WARNING, "Unable to get path from: {0}", suri);
-            theTitle= "???" + " - " + title0 + isoffline;
+            theTitle= "???" + " - " + title0 + isoffline + server;
         }
     }
     Runnable run= new Runnable() {
@@ -4291,6 +4294,9 @@ APSplash.checkTime("init 240");
             }
         });
         rlistener.startListening();
+        serverCheckBoxMenuItem.setSelected(true);
+        serverCheckBoxMenuItem.setToolTipText("server listening on port "+port);
+        updateFrameTitle();
     }
 
     /**
