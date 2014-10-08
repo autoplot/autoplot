@@ -1645,6 +1645,7 @@ APSplash.checkTime("init 52.9");
     private void stopServer() {
         if ( rlistener!=null ) rlistener.stopListening();
         rlistener= null;
+        updateFrameTitle();
     }
 
 
