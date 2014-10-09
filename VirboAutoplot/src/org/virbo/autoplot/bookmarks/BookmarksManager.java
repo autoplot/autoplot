@@ -1858,6 +1858,42 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         return false;
     }
 
+    /**
+     * return the first bookmark with the URI that matches the bookmarkURI.  This is introduced
+     * to allow the tools bookmarks to be a set of trusted bookmarks.  
+     * 
+     * See https://sourceforge.net/p/autoplot/bugs/1270/
+     * 
+     * @param list bookmarks list, such as manager.getList();
+     * @param bookmarkURI the URI to find.
+     * @param remoteLimit the number of times we can look at remote files.
+     * @return null if the bookmark is not found.
+     */
+    public static Bookmark findBookmarkByUri( List<Bookmark> list, String bookmarkURI, int remoteLimit ) {
+        for ( Bookmark book: list ) {
+            if ( book instanceof Bookmark.Folder ) {
+                Bookmark.Folder folder= (Bookmark.Folder)book;
+                Bookmark b;
+                if ( folder.remoteUrl!=null && !folder.remoteUrl.equals("") ) {
+                    if ( remoteLimit>0 ) {
+                        b= findBookmarkByUri( folder.getBookmarks(), bookmarkURI, remoteLimit-1 );
+                    } else {
+                        b= null;
+                    }
+                } else {
+                    b= findBookmarkByUri( folder.getBookmarks(), bookmarkURI, remoteLimit );
+                }
+                if ( b!=null ) return b;
+            } else if ( book instanceof Bookmark.Item ) {
+                Bookmark.Item item= (Bookmark.Item)book;
+                if ( item.getUri().equals(bookmarkURI) ) {
+                    return item;
+                }
+            }
+        }
+        return null;
+    }
+    
     /** allow bookmarks to inherit description from parents.
      * @param book
      * @return URL describing bookmark.
