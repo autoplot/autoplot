@@ -113,7 +113,6 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
     }
 
     private void fillBuffer(ProgressMonitor mon) throws IllegalArgumentException, IOException {
-        System.err.println("fillBuffer"+dataBuffer);
         while ( !mon.isCancelled() && dataBuffer.position() < dataBuffer.capacity() ) {
             audioChannel.read(dataBuffer);
             dataBuffer.limit(Math.min(dataBuffer.position() + 2048, dataBuffer.capacity()));
