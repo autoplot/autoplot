@@ -45,6 +45,7 @@ import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.ReferenceCache;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AsciiHeadersParser;
 import org.virbo.dsutil.AsciiParser.FieldParser;
@@ -118,6 +119,33 @@ public class AsciiTableDataSource extends AbstractDataSource {
     }
  
    public QDataSet getDataSet(ProgressMonitor mon) throws IOException, CancelledOperationException, NoDataInIntervalException {
+       
+//        boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
+//
+//        ReferenceCache.ReferenceCacheEntry rcent=null;
+//        if ( useReferenceCache ) {
+//            rcent= ReferenceCache.getInstance().getDataSetOrLock( getURI(), mon);
+//            if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
+//                try {
+//                    logger.log(Level.FINE, "wait for other thread {0}", uri);
+//                    QDataSet result= rcent.park( mon );
+//                    if ( result==null ) { 
+//                        logger.fine("result after parking is null");
+//                        Thread.sleep(100); // experiment with this condition.
+//                        result= rcent.park( mon ); // this is still null
+//                        return getDataSet(mon);    // this is successful.
+//                    } else {
+//                        return result;
+//                    }
+//                } catch ( Exception ex ) {
+//                    throw new RuntimeException(ex);
+//                }
+//            } else {
+//                logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), resourceURI } );
+//            }
+//        }
+//        
+//        try {
 
         ds = doReadFile(mon);
 
@@ -342,6 +370,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if ( title!=null ) {
                 mds.putProperty( QDataSet.TITLE, title );
             }
+            //if ( rcent!=null ) rcent.finished(mds);     
             return mds;
 
         } else {
@@ -383,8 +412,21 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
                 vds.putProperty(QDataSet.RENDER_TYPE,"eventsBar");
             }
+            //if ( rcent!=null ) rcent.finished(vds);            
             return vds;
         }
+        
+//
+//        } catch ( RuntimeException ex ) {
+//            if ( rcent!=null ) rcent.exception(ex);
+//            throw ex;
+//        } catch ( IOException ex ) {
+//            if ( rcent!=null ) rcent.exception(ex);
+//            throw ex;
+//        } finally {
+//            mon.finished();
+//        }
+        
 
     }
 
@@ -850,10 +892,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
             buff.position( tailCount<tailNum ? 0 : ipos+1 );
             InputStream in= new ByteBufferInputStream(buff);
             mon.setProgressMessage("reading "+file);
-            ds1 = (DDataSet) parser.readStream( new InputStreamReader(in), mon); //DANGER
+            ds1 = (DDataSet) parser.readStream( new InputStreamReader(in), mon.getSubtaskMonitor("read file")); //DANGER
         } else {
             mon.setProgressMessage("reading "+file);
-            ds1 = (DDataSet) parser.readFile(file.toString(), mon); //DANGER
+            ds1 = (DDataSet) parser.readFile(file.toString(), mon.getSubtaskMonitor("read file")); //DANGER
         }
 
         return ds1;
