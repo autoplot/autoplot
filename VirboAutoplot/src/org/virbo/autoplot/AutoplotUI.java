@@ -4866,7 +4866,11 @@ APSplash.checkTime("init 240");
                     try {
                         ProgressMonitor mon= new DasProgressPanel("Running script "+ff );
                         File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
-                        boolean isTool= split.path.contains(tools.toString());
+                        
+                        boolean isTool= split.path.contains(tools.toString()); // here is the trust...
+                        Bookmark trust= BookmarksManager.findBookmarkByUri( toolsManager.getModel().getList(), script, 1 );
+                        isTool = isTool || trust!=null;
+                        
                         int res= JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
                                 params, true, !isTool, mon );
                         if ( res==JOptionPane.OK_OPTION ) {
