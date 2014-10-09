@@ -59,6 +59,8 @@ import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.components.DasProgressPanel;
 import org.das2.system.RequestProcessor;
+import org.das2.util.FileUtil;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.datasource.DataSetSelector;
@@ -1442,6 +1444,10 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
      * reload the bookmarks from disk.  Remote bookmarks will be reloaded slightly later.
      */
     public void reload() {
+        File tmp= new File( FileSystem.settings().getLocalCacheDir(), "temp" );
+        if ( !FileUtil.deleteFileTree(tmp) ) {
+            logger.warning("unable to delete temp folder");
+        }
         haveReadRemote= false;
         setPrefNode( prefNode );
     }
