@@ -232,7 +232,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
     }
     
     /**
-     * read the data.
+     * read the data.  This supports reference caching.
      * @param mon
      * @return
      * @throws Exception 
@@ -266,6 +266,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
             DatumRange lviewRange= viewRange;
             Datum lresolution= resolution;
 
+            mon.started();
+            
             String[] ss = getFsm().getBestNamesFor( lviewRange, mon.getSubtaskMonitor(sparams) );
             
             if ( "true".equals( System.getProperty( Version.PROP_ENABLE_CLEAN_CACHE ) ) ) {
@@ -324,7 +326,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             JoinDataSet altResult= null; // used when JoinDataSets are found
 
             if ( ss.length==0 ) {
-                if ( null==getFsm().getRepresentativeFile( mon ) ) {
+                if ( null==getFsm().getRepresentativeFile( mon.getSubtaskMonitor("get representative file") ) ) {
                     throw new FileNotFoundException("Unable to find representative file: No files found matching "+getFsm().toString());
                 } else {
                     throw new FileNotFoundException( MSG_NO_FILES_FOUND+" "+lviewRange );
@@ -332,7 +334,6 @@ public final class AggregatingDataSource extends AbstractDataSource {
             }
             if (ss.length > 1) {
                 mon.setTaskSize(ss.length * 10);
-                mon.started();
             }
 
             DatumRange cacheRange1 = null;
@@ -388,7 +389,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     mon1.started();
                     mon1.setTaskProgress(0);
                 } else {
-                    mon1= mon;
+                    mon1= mon.getSubtaskMonitor("no files found");
                     if ( mon1.isCancelled() ) break;
                 }
 
