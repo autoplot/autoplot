@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.List;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -18,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.ListDataListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import org.das2.util.LoggerManager;
@@ -88,7 +90,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         ));
         jScrollPane1.setViewportView(table);
 
-        addButton.setText("Add");
+        addButton.setText("Add...");
         addButton.setToolTipText("Add a record");
         addButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -168,7 +170,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(examplesButton, javax.swing.GroupLayout.PREFERRED_SIZE, 102, Short.MAX_VALUE))
+                        .addComponent(examplesButton, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE))
                     .addComponent(jScrollPane2))
                 .addContainerGap())
         );
@@ -180,7 +182,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(examplesButton)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -194,23 +196,35 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private static ComboBoxModel getExamplesComboBoxModel() {
+        return new DefaultComboBoxModel( new String[] { 
+            "2014-01-01T01:01Z",
+            "2014-01-01T01:01:01.000Z",
+            "1.23"
+        } );
+    }
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
         JPanel p= new JPanel();
         p.setLayout( new FlowLayout() );
         JTextField[] tfs= new JTextField[tm.getColumnCount()];
         for ( int i=0; i<tm.getColumnCount(); i++ ) {  // load up the last record so it can be edited to make new record
-            JTextField tf1= new JTextField();
+            JComboBox cb1= new JComboBox();
+            cb1.setToolTipText("Examples");
+            cb1.setModel( getExamplesComboBoxModel() );
+            cb1.setEditable(true);
+            JTextField tf1= ((JTextField)cb1.getEditor().getEditorComponent());
             tf1.setColumns(20);
+            //if ( i==0 ) tf1.requestFocusInWindow(); no effect on Linux, probably because of modal dialog.
             int ir= tm.getRowCount()-1;
             if ( tm.getRowCount()>0 ) {
                 tf1.setText( String.valueOf( tm.getValueAt(ir,i) ) );
             }
-            p.add(tf1);
+            p.add(cb1);
             tfs[i]= tf1;
         }
         if ( JOptionPane.showConfirmDialog(schemeComboBox,p,"Enter Data Point", JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION ) {
