@@ -415,6 +415,22 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     String[] sss= ss[rowIndex].split(",");
                     return sss[columnIndex];
                 }
+
+                @Override
+                public boolean isCellEditable( int row, int col ) {
+                    return true;
+                }          
+                
+                @Override
+                public void setValueAt( Object v, int row, int col ) {
+                    String[] sss= ss[row].split(",");
+                    sss[col]= String.valueOf(v);
+                    StringBuilder b= new StringBuilder(sss[0].replaceAll(",",""));
+                    for ( int j=1; j<sss.length; j++ ) {
+                        b.append(',').append(sss[j].replaceAll(",",""));
+                    }
+                    ss[row]= b.toString();
+                }
             };
         return tm;
     }
@@ -435,6 +451,16 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 @Override
                 public Object getValueAt(int rowIndex, int columnIndex) {
                     return s[rowIndex];
+                }
+                
+                @Override
+                public boolean isCellEditable( int row, int col ) {
+                    return true;
+                }
+                
+                @Override
+                public void setValueAt( Object v, int row, int col ) {
+                    s[row]= String.valueOf(v);
                 }
             };
         return tm;
@@ -486,12 +512,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             tf.setEditable(true);
             this.table.setCellEditor(new DefaultCellEditor(tf) );
             
-            
-            PropertyEditorAdapter editor = new PropertyEditorAdapter();
             int cellHeight = 21;  // c.getPreferredSize().height;
 
             table.setRowHeight( cellHeight );
-            table.setDefaultEditor( Object.class, editor );            
+
         } else {
             this.schemeComboBox.setSelectedIndex(0);
             this.jTabbedPane1.setSelectedIndex(1);
