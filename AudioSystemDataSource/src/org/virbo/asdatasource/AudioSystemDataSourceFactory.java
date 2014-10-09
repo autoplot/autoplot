@@ -17,7 +17,8 @@ import org.virbo.datasource.DataSource;
 import org.virbo.datasource.URISplit;
 
 /**
- * Read data directly from the Audiosystem.  This is for demonstration purposes.
+ * Read data directly from the desktop audio system, to create a useful source
+ * of data for demonstration purposes.
  * @author jbf
  */
 public class AudioSystemDataSourceFactory extends AbstractDataSourceFactory {
@@ -42,11 +43,8 @@ public class AudioSystemDataSourceFactory extends AbstractDataSourceFactory {
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             List<CompletionContext> result= new ArrayList<CompletionContext>();
-            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "spec=", "make spectrogram using FFT" ) );
-            return result;
-        } else if(cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
-            List<CompletionContext> result= new ArrayList<CompletionContext>();
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "len=", "sample length in seconds" ) );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "spec=", "make spectrogram using FFT" ) );
             return result;
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String paramName= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
