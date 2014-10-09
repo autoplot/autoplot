@@ -20,7 +20,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
-import org.das2.components.propertyeditor.PropertyEditorAdapter;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSourceEditorPanel;
@@ -460,7 +459,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 
                 @Override
                 public void setValueAt( Object v, int row, int col ) {
-                    s[row]= String.valueOf(v);
+                    s[row]= String.valueOf(v).replaceAll(",","");
                 }
             };
         return tm;
