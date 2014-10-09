@@ -94,7 +94,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
         ds.putProperty( QDataSet.DEPEND_0, t );
         
         if ( spec>-1 ) {
-            ds= (MutablePropertyDataSet)Ops.fftPower( ds, spec, mon );
+            ds= (MutablePropertyDataSet)Ops.fftPower( ds, spec, mon.getSubtaskMonitor("fftPower") );
         }
 
         mon.finished();
