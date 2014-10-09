@@ -23,15 +23,19 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-10-06):</p>
+        <p>Bugfixes (2014-10-09):</p>
         <ul>
-            <li>rte 1771804608: new users would see failure to check for null pointers when creating folders.  Thanks CORYB!</li>
+            <li>catch missing rank and name tags in QStreams</li>
+            <li>1272: (rte 1771804608) new users would see failure to check for null pointers when creating folders.  Thanks CORYB!</li>
             <li>1265: Don't reload remote scripts into the editor when the local copy is already showing.  Show fscache scripts as read-only.</li>
             <li>Hanning window had off-by-one error making it asymmetric</li>
             <li>1270: improve labels for Tools bookmarks.  Improve handling of .jy for tools</li>
             <li>formatBookmarks formats to temp file then moves result</li>
             <li>asterisk in new folder of bookmarks tool fixed.</li>
             <li>1229: Apache HTTP automatic unzip/gzip.  Improvements to get this working.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>1266: Jython script editor recent files GUI font increased to 10 to improve legibility.</li>
             <li>trim dataset would fail when trim boundary was after the biggest point</li>
             <li>completions in jython accept the java code with correct arguments now, was taking the last one.</li>
@@ -40,24 +44,11 @@
             <li>1259: reload all needs to reload the ephemeris (TCA) data.</li>
             <li>1250: Ephemeris (TCAs) from TSBs at the mission beginning and NRT handled poorly.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>1255: slow rendering, flash feedback can basically hang system</li>
-            <li>das2server source uses requiresInterval parameter from dsdf to comply with Juno ephemeris sources.</li>
-            <li>TCAs are reset in reload all data action</li>
-            <li>1255: slow rendering, flash feedback can basically hang system</li>
-            <li>In autoranging, correct the logic that detects when all data bunches into first histogram bin, indicating log should be used.</li>
-            <li>1253: partial loads from daily TSB with pngwalk by orbit </li>
-            <li>kludge in check for "No Data Found" from das2server</li>
-            <li>1254: generateTimeRanges failure found by Sebastian</li>
-            <li>0849786987:  "Attempt to copy non-qube into ArrayDataSet" message when Bill would run into with Juno reader</li>
-            <li>import completions file was missing, resulting in NullPointerException</li>
-            <li>1251: whopping bug (but somehow didn't affect anyone) in monitor management and reference caching, where finished could be called prematurely.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>393: das2server list responses can contain human-readable descriptions.</li>
             <li>--server keyword replaces --port keyword, indicate server status on title bar.</li>
-            <li>add randu functions.</li>
+            <li>add randu functions, since Matlab "rand" is ambiguous.</li>
             <li>introduce merge command for safely combining datasets</li>
             <li>improvements to the orbit plot, including properly binding color and thick.</li>
             <li>Tools bookmarks editor rebranded "Tools", avoid problem where address bar is reset to the script name.</li>
@@ -67,6 +58,9 @@
             <li>improve gap detection in orbitPlot</li>
             <li>orbitPlot supports renderControls like color and lineThick.</li>
             <li>391: aggregation trims datasets so that result is monotonic</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>           
             <li>Internal RBSP Orbits updated to 2014-10-09</li>
             <li>385: tools menu now supports folders</li>
             <li>generalize mean, mode, stddev, and variance to support any rank dataset by using DataSetIterator.  Support fill data.</li>
@@ -74,11 +68,6 @@
             <li>rfe 386: interpolation routines must only extrapolate modestly.</li>
             <li>CDF filtering Rank 2 variables with other Rank 2 variables</li>
             <li>createPlot resurrected to support slicers</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>           
-            <li>stddev and variance routines added</li>
-            <li>import completions improved</li>
         </ul>
 
         <p>Known issues:</p>
