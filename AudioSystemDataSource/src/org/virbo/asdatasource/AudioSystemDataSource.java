@@ -17,7 +17,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
-import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
@@ -61,8 +60,6 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
         dataBuffer = ByteBuffer.allocateDirect(len);
 
-        double now= TimeUtil.now().doubleValue(Units.cdfTT2000);
-
         TargetDataLine targetDataLine;
         AudioInputStream audioInputStream;
 
@@ -89,7 +86,8 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
         dataBuffer.order( ByteOrder.LITTLE_ENDIAN );
 
-        QDataSet t= new TagGenDataSet( nsamples, 1000000000./SAMPLE_RATE, now, Units.cdfTT2000 );
+        TagGenDataSet t= new TagGenDataSet( nsamples, 1./SAMPLE_RATE, 0.0, Units.seconds );
+        t.putProperty( QDataSet.LABEL, "Seconds Offset");
         //startUpdateTimer();
         
         MutablePropertyDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
