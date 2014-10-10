@@ -4875,7 +4875,7 @@ APSplash.checkTime("init 240");
                                 params, true, !isTool, mon );
                         if ( res==JOptionPane.OK_OPTION ) {
                             if ( scriptPanel!=null ) {
-                                if ( ! scriptPanel.isDirty() ) {
+                                if ( ! scriptPanel.isDirty() && !isTool ) {
                                     scriptPanel.loadFile(ff);
                             }
                         }
