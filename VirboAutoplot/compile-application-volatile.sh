@@ -196,6 +196,9 @@ if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotS
 if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/wgetfs/WGetFileSystemFactory.java; then hasErrors=1; fi
 if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/components/DataPointRecorderNew.java; then hasErrors=1; fi  # some scripts use this old name.
 if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/graph/Auralizor.java; then hasErrors=1; fi 
+if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/datum/Ratio.java; then echo "****"; hasErrors=1; fi  
+if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/datum/RationalNumber.java; then echo "****"; hasErrors=1; fi  
+if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/datum/SIUnits.java; then echo "****"; hasErrors=1; fi  
 
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
