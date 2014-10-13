@@ -23,8 +23,11 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.TimeParser;
 import org.das2.fsm.FileStorageModel;
+import org.das2.graph.DataLoader;
+import org.das2.system.RequestProcessor;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.Glob;
@@ -167,6 +170,58 @@ public class Util {
         }
     }
 
+    /**
+     * experiment with multiple, simultaneous reads in Jython codes.  This will read all the data
+     * at once, returning all data or throwing one an exception.
+     * 
+     * UNTESTED!
+     *
+     * @param uris a list of URI strings.
+     * @param mon monitor for the aggregate load.  Each uri is given equal shares of the task.
+     * @return list of loaded data, or the exception.
+     * @throws Exception 
+     */
+    public static List getDataSets( List<String> uris, ProgressMonitor mon ) throws Exception {
+        final ArrayList result= new ArrayList( uris.size() );
+        for ( int i=0; i<uris.size(); i++ ) {
+            final String uri= uris.get(i);
+            final int fi= i;
+            Runnable run= new Runnable() {
+                public void run() {
+                    QDataSet ds;
+                    try {
+                        ds = getDataSet(uri);
+                        if ( ds==null ) {
+                            throw new NoDataInIntervalException("data returned was null");
+                        } else {
+                            result.set(fi,ds);
+                        }
+                    } catch (Exception ex) {
+                        Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+                        result.set(fi,ex);
+                    }
+                }
+            };
+            RequestProcessor.invokeLater(run);
+        }
+        boolean blocking= true;
+        while ( blocking ) {
+            Thread.sleep(250);
+            blocking= false;
+            for ( int i=0; i<uris.size(); i++ ) {
+                if ( result.get(i)==null ) {
+                    blocking= true;
+                }
+            }
+        }
+        for ( int i=0; i<uris.size(); i++ ) {
+            if ( result.get(i) instanceof Exception ) {
+                throw ((Exception)result.get(i));
+            }
+        }
+        return result;
+    }
+            
     /**
      * returns the dataSource for the given URI.  This will include capabilities, like TimeSeriesBrowse.
      * @param suri
