@@ -176,8 +176,8 @@ public class Util {
      *
      * @param uris a list of URI strings.
      * @param mon monitor for the aggregate load.  Each uri is given equal shares of the task.
-     * @return list of loaded data, or the exception.
-     * @throws Exception 
+     * @return list of loaded data
+     * @throws Exception if any of the loads reports an exception
      */
     public static List<QDataSet> getDataSets( List<String> uris, ProgressMonitor mon ) throws Exception {
         final ArrayList result= new ArrayList( uris.size() );
