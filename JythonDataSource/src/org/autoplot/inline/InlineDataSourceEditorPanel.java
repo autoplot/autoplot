@@ -552,7 +552,9 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     s.append(tm.getValueAt(i,0));
                 }
             }
-            s.append("&RENDER_TYPE=eventsBar");
+            if ( tm.getColumnCount()==1 ) {
+                s.append("&RENDER_TYPE=eventsBar");
+            }
             return s.toString();
         } else {
             StringBuilder s= new StringBuilder( "vap+inline:" );
