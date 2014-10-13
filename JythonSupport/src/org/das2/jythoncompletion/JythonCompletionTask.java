@@ -876,6 +876,9 @@ public class JythonCompletionTask implements CompletionTask {
                 sig.append(",").append(vars[i]);
             }
         }
+        if ( count + defaults.length == vars.length-2 ) { // quick kludge for var args see /home/jbf/ct/autoplot/script/demos/operators/synchronizeDemo.jy
+            sig.append(",...");
+        }
         sig.append(")");
         return sig.toString();
         
