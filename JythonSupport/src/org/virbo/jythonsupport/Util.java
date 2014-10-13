@@ -173,19 +173,18 @@ public class Util {
     /**
      * experiment with multiple, simultaneous reads in Jython codes.  This will read all the data
      * at once, returning all data or throwing one an exception.
-     * 
-     * UNTESTED!
      *
      * @param uris a list of URI strings.
      * @param mon monitor for the aggregate load.  Each uri is given equal shares of the task.
      * @return list of loaded data, or the exception.
      * @throws Exception 
      */
-    public static List getDataSets( List<String> uris, ProgressMonitor mon ) throws Exception {
+    public static List<QDataSet> getDataSets( List<String> uris, ProgressMonitor mon ) throws Exception {
         final ArrayList result= new ArrayList( uris.size() );
         for ( int i=0; i<uris.size(); i++ ) {
             final String uri= uris.get(i);
             final int fi= i;
+            result.add(fi,null);
             Runnable run= new Runnable() {
                 public void run() {
                     QDataSet ds;
