@@ -217,6 +217,35 @@ public class EditorAnnotationsSupport {
     }
 
     /**
+     * return the position of the line in chars.  The second is exclusive.
+     * @param line the line number 1 is the first line.
+     * @return [st,en]
+     */
+    public int[] getLinePosition( int line ) {
+        Document doc = editorPanel.getDocument();
+        Element root = editorPanel.getDocument().getDefaultRootElement();
+
+        if ( root.getElementCount()==1 ) { // transitional case where the document is cleared.
+            return new int[] { 0,0 };
+        }
+
+        if ( line>root.getElementCount()+1 ) {
+            throw new IllegalArgumentException( "no such line: "+line );
+        }
+
+        int i0, i1;
+
+        if ( line<=root.getElementCount() ) {
+            i0 = root.getElement(line - 1).getStartOffset();
+            i1 = root.getElement(line - 1).getEndOffset();
+        } else {
+            i0 = Math.max(0, doc.getLength()-2 );
+            i1 = doc.getLength();
+        }
+        return new int[] { i0, i1 };
+    }
+    
+    /**
      * annotate the characters on the line.  This was introduced to highlite the location of symbol names.
      * @param line the line number, where 1 is the first line.
      * @param i0 the column number, where 1 is the first column.
