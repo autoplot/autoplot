@@ -13,14 +13,18 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -30,6 +34,8 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
@@ -554,6 +560,10 @@ public class ScriptPanelSupport {
                                         interp.exec(panel.getEditorPanel().getText());
                                     }
                                 } else {
+                                    boolean experiment= true;
+                                    if ( experiment ) {
+                                        interp.setOut(getOutput());
+                                    }
                                     interp.exec(panel.getEditorPanel().getText());
                                 }
                                 setInterruptible( null );
@@ -593,6 +603,56 @@ public class ScriptPanelSupport {
 
     }
 
+    
+    private class MyOutputStream extends FilterOutputStream {
+        public MyOutputStream(OutputStream out) {
+            super(out);
+        }
+
+        StringBuilder currentLine= new StringBuilder();
+        
+        @Override
+        public void write(byte[] b) throws IOException {
+            for ( int i=0; i<b.length; i++ ) {
+               this.write(b[i]);
+            }
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            if ( b>=0 ) currentLine.append((char)b);
+            if ( b==10 ) {
+                String exec= currentLine.toString().trim();
+                Pattern p= Pattern.compile("\\(Pdb\\) > <string>\\((\\d+)\\)\\?\\(\\)");
+                Matcher m= p.matcher(exec);
+                if ( m.matches() ) {
+                    String line= m.group(1);
+                    annotationsSupport.clearAnnotations();
+                    int[] pos= annotationsSupport.getLinePosition(Integer.parseInt(line)-1);
+                    annotationsSupport.annotateChars( pos[0], pos[1], "programCounter", "pc", interruptible );
+                }
+                currentLine= new StringBuilder();
+            }
+            super.write(b); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            for ( int i=off; i<len; i++ ) {
+                this.write(b[i]);
+            }
+        }
+    } 
+    
+    
+   /**
+     * create special output stream for script panel
+     * @return 
+     */
+    private OutputStream getOutput() {
+        return new MyOutputStream(System.out);
+    }
+    
     private FileFilter getFileFilter() {
         return new FileFilter() {
 
