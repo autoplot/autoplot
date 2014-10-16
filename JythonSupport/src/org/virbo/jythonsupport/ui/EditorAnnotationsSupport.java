@@ -302,7 +302,7 @@ public class EditorAnnotationsSupport {
                 } else if ( name.equals(ANNO_ERROR) ) {
                     mark= new SimpleMarker(Color.PINK);
                 } else if ( name.equals(ANNO_PROGRAM_COUNTER) ){
-                    mark=  new SimpleMarker(Color.GREEN.brighter().brighter() );
+                    mark=  new SimpleMarker( new Color( 0, 255, 0,80 ) );
                 } else {
                     mark=  new SimpleMarker(Color.GRAY );
                 }
