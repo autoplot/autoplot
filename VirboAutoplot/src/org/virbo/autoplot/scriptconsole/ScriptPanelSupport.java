@@ -38,6 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -560,9 +561,15 @@ public class ScriptPanelSupport {
                                         interp.exec(panel.getEditorPanel().getText());
                                     }
                                 } else {
-                                    boolean experiment= true;
+                                    boolean experiment= false;
                                     if ( experiment ) {
-                                        interp.setOut(getOutput());
+                                        DebuggerConsole dc= new DebuggerConsole(interp);
+                                        interp.setOut(getOutput(dc));
+                                        JDialog d= new JDialog( SwingUtilities.getWindowAncestor(panel), "Jython Debugger" );
+                                        d.setModal(false);
+                                        d.getContentPane().add(dc);
+                                        d.pack();
+                                        d.setVisible(true);
                                     }
                                     interp.exec(panel.getEditorPanel().getText());
                                 }
@@ -605,11 +612,37 @@ public class ScriptPanelSupport {
 
     
     private class MyOutputStream extends FilterOutputStream {
-        public MyOutputStream(OutputStream out) {
+        
+        OutputStream sink;
+        DebuggerConsole dc;
+        
+        public MyOutputStream(OutputStream out,DebuggerConsole dc) {
             super(out);
+            this.sink= out;
+            this.dc= dc;
         }
 
         StringBuilder currentLine= new StringBuilder();
+        
+        /**
+         * standard mode output.
+         */
+        private final Object STATE_OPEN="OPEN";
+        /**
+         * collect the prompt so that it is not echoed.
+         */
+        private final Object STATE_FORM_PDB_PROMPT="PROMPT";
+        /**
+         * collect the prompt so that it is not echoed.
+         */
+        private final Object STATE_RETURN_INIT_PROMPT="RETURN";
+        /**
+         * pdb output encountered.
+         */
+        private final Object STATE_PDB="PDB";
+        
+        Object state= STATE_OPEN;
+        
         
         @Override
         public void write(byte[] b) throws IOException {
@@ -620,24 +653,78 @@ public class ScriptPanelSupport {
 
         @Override
         public void write(int b) throws IOException {
-            if ( b>=0 ) currentLine.append((char)b);
-            if ( b==10 ) {
-                String exec= currentLine.toString().trim();
-                Pattern p= Pattern.compile("\\(Pdb\\) > <string>\\((\\d+)\\)\\?\\(\\)");
-                Matcher m= p.matcher(exec);
-                if ( m.matches() ) {
-                    String line= m.group(1);
-                    annotationsSupport.clearAnnotations();
-                    int[] pos= annotationsSupport.getLinePosition(Integer.parseInt(line)-1);
-                    annotationsSupport.annotateChars( pos[0], pos[1], "programCounter", "pc", interruptible );
+            Pattern p= Pattern.compile("\\(Pdb\\) (.*)> <string>\\((\\d+)\\)\\?\\(\\)\\s*");
+            Pattern p2= Pattern.compile("\\(Pdb\\) (.*)--Return--.*> <string>\\((\\d+)\\)\\?\\(\\)\\s*.*");
+
+            dc.print(String.valueOf((char)b));
+            
+            if ( state==STATE_OPEN ) {
+                if ( b>=0 ) currentLine.append((char)b);
+                if ( currentLine.length()==1 && currentLine.substring(0,1).equals("(") ) {
+                    state= STATE_FORM_PDB_PROMPT;
+                } else if ( currentLine.length()>10 && currentLine.substring(0,10).equals("--Return--") ) {
+                    state= STATE_RETURN_INIT_PROMPT;
+                } else if ( currentLine.length()>0 && ( b==10 || b==13 ) ) {
+                    currentLine= new StringBuilder();
                 }
-                currentLine= new StringBuilder();
+            } else if ( state==STATE_RETURN_INIT_PROMPT ) {
+                if ( b>=0 ) currentLine.append((char)b);
+                if ( currentLine.length()==1 && currentLine.substring(0,1).equals("(") ) {
+                    state= STATE_FORM_PDB_PROMPT;
+                } else if ( currentLine.length()>0 && ( b==10 || b==13 ) ) {
+                    currentLine= new StringBuilder();
+                }
+            } else if ( state==STATE_FORM_PDB_PROMPT ) {
+                if ( b>=0 ) currentLine.append((char)b);
+                if ( currentLine.length()>=5 ) {
+                    if ( currentLine.substring(0,5).equals("(Pdb)") ) {
+                        state= STATE_PDB;
+                    } else {
+                        sink.write(currentLine.toString().getBytes());
+                        state= STATE_OPEN;
+                    }
+                } else if ( currentLine.length()>0 && ( b==10 || b==13 ) ) { // newlines should clear the currentLine
+                    sink.write(currentLine.toString().getBytes());
+                    currentLine= new StringBuilder();
+                    state= STATE_OPEN;
+                }
+            } else if ( state==STATE_PDB ) { // the beginning of the currentLine is (Pdb) and we want a terminator
+                int l= currentLine.length();
+                if ( b>=0 && b!=10 && b!=13 ) currentLine.append((char)b);  //TODO: why is my regex not working when newlines get in there?
+                if ( l>2 && currentLine.substring(l-2,l).equals("()") ) {
+                    Matcher m= p.matcher(currentLine);
+                    if ( m.matches() ) {
+                        String linenum= m.group(2);
+                        annotationsSupport.clearAnnotations();
+                        int[] pos= annotationsSupport.getLinePosition(Integer.parseInt(linenum));
+                        annotationsSupport.annotateChars( pos[0], pos[1], "programCounter", "pc", interruptible );
+                        String userOutput= m.group(1);
+                        if ( userOutput.length()>0 ) {
+                            sink.write(userOutput.getBytes());
+                            sink.write(System.lineSeparator().getBytes());
+                        }
+                        state= STATE_OPEN;
+                        currentLine= new StringBuilder();
+                    } else {
+                        Matcher m2= p2.matcher(currentLine);
+                        if ( m2.matches() ) {
+                            annotationsSupport.clearAnnotations();
+                            String userOutput= m2.group(1);
+                            if ( userOutput.length()>0 ) {
+                                sink.write(userOutput.getBytes());
+                                sink.write(System.lineSeparator().getBytes());
+                            }
+                            state= STATE_OPEN;
+                            currentLine= new StringBuilder();
+                        }
+                    }
+                }
             }
-            super.write(b); //To change body of generated methods, choose Tools | Templates.
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
+            String s= new String( b, off, len );
             for ( int i=off; i<len; i++ ) {
                 this.write(b[i]);
             }
@@ -649,8 +736,8 @@ public class ScriptPanelSupport {
      * create special output stream for script panel
      * @return 
      */
-    private OutputStream getOutput() {
-        return new MyOutputStream(System.out);
+    private OutputStream getOutput(DebuggerConsole dc) {
+        return new MyOutputStream(System.out, dc);
     }
     
     private FileFilter getFileFilter() {
