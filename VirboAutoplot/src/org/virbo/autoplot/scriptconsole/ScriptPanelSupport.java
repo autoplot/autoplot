@@ -701,7 +701,7 @@ public class ScriptPanelSupport {
                         String userOutput= m.group(1);
                         if ( userOutput.length()>0 ) {
                             sink.write(userOutput.getBytes());
-                            sink.write(System.lineSeparator().getBytes());
+                            sink.write("\n".getBytes());
                         }
                         state= STATE_OPEN;
                         currentLine= new StringBuilder();
@@ -712,7 +712,7 @@ public class ScriptPanelSupport {
                             String userOutput= m2.group(1);
                             if ( userOutput.length()>0 ) {
                                 sink.write(userOutput.getBytes());
-                                sink.write(System.lineSeparator().getBytes());
+                                sink.write("\n".getBytes());
                             }
                             state= STATE_OPEN;
                             currentLine= new StringBuilder();
