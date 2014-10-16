@@ -32,30 +32,50 @@ public class AddFilterEditorPanel extends javax.swing.JPanel implements FilterEd
     private void initComponents() {
 
         jTextField1 = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        jLabel2 = new javax.swing.JLabel();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
         jTextField1.setText(bundle.getString("AddFilterEditorPanel.jTextField1.text")); // NOI18N
+
+        jLabel1.setText(bundle.getString("AddFilterEditorPanel.jLabel1.text")); // NOI18N
+
+        jLabel2.setText(bundle.getString("AddFilterEditorPanel.jLabel2.text")); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jLabel1)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(298, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .add(12, 12, 12)
+                        .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jLabel2)))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jSeparator1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 19, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(2, 2, 2)
+                .add(jLabel2)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(261, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JLabel jLabel1;
+    public javax.swing.JLabel jLabel2;
+    public javax.swing.JSeparator jSeparator1;
     public javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 
@@ -67,6 +87,8 @@ public class AddFilterEditorPanel extends javax.swing.JPanel implements FilterEd
     @Override
     public void setFilter(String filter) {
         Pattern p= Pattern.compile("\\|add\\((.*)\\)");
+        //Pattern p1= Pattern.compile("\\|butterworth\\((.*,.*,.*,.*)\\)");
+        //Pattern p2= Pattern.compile("\\|butterworth\\((.*,.*,.*)\\)");
         Matcher m= p.matcher(filter);
         if ( m.matches() ) {
             jTextField1.setText(m.group(1));
