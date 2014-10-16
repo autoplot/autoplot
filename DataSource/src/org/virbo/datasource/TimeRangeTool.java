@@ -180,7 +180,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
     }
 
     private String[] getSpacecraft() {
-        return new String[] { "rbspa-pp", "rbspb-pp", "crres", "cassini" };
+        return new String[] { "rbspa-pp", "rbspb-pp", "crres", "cassini", "marsx" };
     }
     private void resetSpacecraft( final String sc  ) {
         resetSpacecraft(sc, null);
