@@ -30,6 +30,7 @@ public class ImageDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "channel=", "channel to extract"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "rotate=", "rotate image clockwise in degrees.  Image size is not affected"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "blur=", "apply boxcar blur square kernel"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "fog=", "apply overlapping white translucent fog percent opaque"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "xaxis=", "apply a linear transform to label each column of the image"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "yaxis=", "apply a linear transform to label each column of the image"));
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
@@ -46,6 +47,8 @@ public class ImageDataSourceFactory implements DataSourceFactory {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0", "rotate image clockwise in degrees" ) );
             } else if ( paramName.equals("blur") ) {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "5", "apply boxcar blur square kernel"));
+            } else if ( paramName.equals("fog") ) {
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "100", "apply fog with this opacity percent, based on 0,0 color"));
             } else if ( paramName.equals("xaxis") ) {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
             } else if ( paramName.equals("yaxis") ) {
