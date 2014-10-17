@@ -129,13 +129,13 @@ public class JythonUtil {
         if ( loadAutoplotStuff ) {
             Py.getAdapter().addPostClass(new PyQDataSetAdapter());
             if ( Util.isLegacyImports() ) {
-                URL imports= JythonOps.class.getResource("/autoplot.py");
+                URL imports= JythonOps.class.getResource("imports.py");
                 if ( imports==null ) {
                     throw new RuntimeException("unable to locate imports.py on classpath");
                 }
                 InputStream in = imports.openStream();
                 try {
-                    interp.execfile(imports.openStream(), "autoplot.py");
+                    interp.execfile(imports.openStream(), "imports.py");
                 } finally {
                     in.close();
                 }
@@ -1023,10 +1023,20 @@ public class JythonUtil {
         interp.exec(prog);
         interp.exec("import autoplot\n");
         PyList sort= (PyList) interp.eval( "autoplot._paramSort" );
-
+        
+        boolean altWhy= false; // I don't know why things are suddenly showing up in this other space.
+        if ( sort.size()==0 ) {
+            logger.warning("things are suddenly in the wrong space...");
+            sort= (PyList) interp.eval( "_paramSort" );
+            altWhy= true;
+        }
+        
         List<Param> result= new ArrayList();
         for ( int i=0; i<sort.__len__(); i++ ) {
             PyList oo= (PyList) interp.eval( "autoplot._paramMap['"+(String)sort.get(i)+"']" );
+            if ( altWhy ) {
+                 oo= (PyList) interp.eval( "_paramMap['"+(String)sort.get(i)+"']" );
+            }
             Param p= new Param();
             p.label= (String) sort.get(i);   // should be name in the script
             if ( p.label.startsWith("__") ) continue;  // __doc__, __main__ symbols defined by Jython.
