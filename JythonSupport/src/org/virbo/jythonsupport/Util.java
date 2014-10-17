@@ -37,12 +37,14 @@ import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.dsops.Ops;
 
 /**
  * Utilities for Jython scripts in both the datasource and application contexts.
@@ -107,7 +109,21 @@ public class Util {
         }
         metadataSurl= suri;
 
-        logger.finer( String.format( "read in %9.2f sec: \n uri: %s\n  ds: %s", (System.currentTimeMillis()-t0)/1000., suri, String.valueOf(rds) ) );
+        if ( logger.isLoggable( Level.FINER ) ) {
+            logger.finer( String.format( "read in %9.2f sec: ", (System.currentTimeMillis()-t0)/1000. ) );
+            logger.finer( String.format( "  uri: %s", suri ) );
+            logger.finer( String.format( "  ds: %s", String.valueOf(rds) ) );
+            if ( logger.isLoggable( Level.FINEST ) ) {
+                if ( rds!=null ) {
+                    QDataSet xds= SemanticOps.xtagsDataSet(rds);
+                    QDataSet xextent= Ops.extent(xds);
+                    QDataSet yextent= Ops.extent(rds);
+                    logger.finest( String.format( "  extent x: %s y: %s", String.valueOf(xextent), String.valueOf(yextent) ) );
+                } else {
+                }
+            }
+        }
+        
         if ( rds==null ) return null;
         if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
             return rds;
