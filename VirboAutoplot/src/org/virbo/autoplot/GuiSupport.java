@@ -94,6 +94,7 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.BindingModel;
+import org.virbo.autoplot.dom.Canvas;
 import org.virbo.autoplot.dom.Connector;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
@@ -727,6 +728,8 @@ public class GuiSupport {
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferencesWithEvents();
                 view.setMessage("ready");
+                Canvas size= parent.applicationModel.dom.getCanvases(0);
+                view.resizeForCanvasSize( size.getWidth(), size.getHeight() );
             }
         };
         try {
