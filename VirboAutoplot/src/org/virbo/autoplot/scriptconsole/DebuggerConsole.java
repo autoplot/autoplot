@@ -7,6 +7,7 @@ package org.virbo.autoplot.scriptconsole;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.python.core.Py;
@@ -19,7 +20,10 @@ import org.python.util.PythonInterpreter;
  */
 public class DebuggerConsole extends javax.swing.JPanel {
 
-    static PipedOutputStream myout;
+    private static PipedOutputStream myout;
+    
+    private static Thread workerThread=null;
+    private static java.util.concurrent.BlockingQueue<Runnable> queue;
     
     /**
      * set this to true to evaluate expressions on event thread.  This fails off the event thread, but I'm not sure why.
@@ -28,11 +32,31 @@ public class DebuggerConsole extends javax.swing.JPanel {
      * The problem is I need to have a single thread that sends messages to the PipedOutputStream.  Ed points out
      * java.util.concurrent.BlockingQueue, which could be used to post "step" and "where" messages to the single thread.
      * 
+     * Ed also proposes that this be rewritten to make an InputStream that you post messages to, and short
+     * of that you would just post messages to an object defined here.
+     * 
      */
-    static boolean eventThread= false;
+    private static boolean eventThread= false;
     
     static {
         try {
+            queue= new LinkedBlockingQueue<Runnable>();
+            Runnable run= new Runnable() {
+                public void run() {
+                    Runnable doRun;
+                    while ( true ) {
+                        try {
+                            doRun= queue.take();
+                            doRun.run();
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
+                    }
+                }
+            };
+            workerThread= new Thread(run,"debuggerConsoleWorker");
+            workerThread.start();
             myout = new PipedOutputStream();
             PipedInputStream pin= new PipedInputStream(myout);
             Py.getSystemState().stdin= new PyFile( pin ); 
@@ -139,7 +163,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         if ( eventThread ) {
             run.run();
         } else {
-            new Thread(run).start();
+            queue.add(run);
         }
     }//GEN-LAST:event_nextButtonActionPerformed
 
@@ -155,7 +179,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         if ( eventThread ) {
             run.run();
         } else {
-            new Thread(run).start();
+            queue.add(run);
         }
     }//GEN-LAST:event_upButtonActionPerformed
 
@@ -171,7 +195,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         if ( eventThread ) {
             run.run();
         } else {
-            new Thread(run).start();
+            queue.add(run);
         }        
     }//GEN-LAST:event_whereButtonActionPerformed
 
