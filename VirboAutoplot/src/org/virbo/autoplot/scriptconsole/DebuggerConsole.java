@@ -62,6 +62,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         continueButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
+        whereButton = new javax.swing.JButton();
 
         stepButton.setText("Step");
         stepButton.addActionListener(new java.awt.event.ActionListener() {
@@ -82,6 +83,13 @@ public class DebuggerConsole extends javax.swing.JPanel {
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
+        whereButton.setText("Where");
+        whereButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                whereButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -91,7 +99,9 @@ public class DebuggerConsole extends javax.swing.JPanel {
                 .addComponent(stepButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(continueButton)
-                .addContainerGap(258, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(whereButton)
+                .addContainerGap(192, Short.MAX_VALUE))
             .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
@@ -99,7 +109,8 @@ public class DebuggerConsole extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(stepButton)
-                    .addComponent(continueButton))
+                    .addComponent(continueButton)
+                    .addComponent(whereButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
@@ -132,10 +143,20 @@ public class DebuggerConsole extends javax.swing.JPanel {
         //new Thread(run).start();
     }//GEN-LAST:event_continueButtonActionPerformed
 
+    private void whereButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_whereButtonActionPerformed
+        try {
+            myout.write("w\n".getBytes());
+            myout.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_whereButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton continueButton;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JButton stepButton;
+    private javax.swing.JButton whereButton;
     // End of variables declaration//GEN-END:variables
 }
