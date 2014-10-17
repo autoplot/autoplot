@@ -791,6 +791,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
             @Override
             public void run() {
                 updateBookmarks();
+                dataSetSelector.setPromptText("Enter data location or select a bookmark");
             }
         };
         invokeLater( 1000, true, run );
@@ -816,7 +817,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
 //            applicationModel.getCanvas().paintImmediately(0,0,1000,1000);
 //        }
         APSplash.checkTime("init 110");
-
+        
         // jython is often slow to start up the first time, so go ahead and do this in the background.
         run= new Runnable() {
             @Override
@@ -1238,7 +1239,7 @@ APSplash.checkTime("init 270");
 
             }
         };
-        invokeLater(-1,true,run);
+        invokeLater(-1,false,run);
 
         this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
             @Override
@@ -2228,7 +2229,7 @@ APSplash.checkTime("init 52.9");
         timeRangePanel.setLayout(new java.awt.CardLayout());
 
         dataSetSelector.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        dataSetSelector.setPromptText("Enter data location or select a bookmark");
+        dataSetSelector.setPromptText("<html><em>Moment...</em></html>");
         dataSetSelector.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dataSetSelectorActionPerformed(evt);
@@ -2844,14 +2845,14 @@ APSplash.checkTime("init 52.9");
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 673, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 681, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(statusLabel)
                     .add(statusTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                     .add(48, 48, 48)
-                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 666, Short.MAX_VALUE)
+                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 674, Short.MAX_VALUE)
                     .add(20, 20, 20)))
         );
 
