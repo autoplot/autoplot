@@ -154,6 +154,22 @@ class ImageDataSource extends AbstractDataSource {
 
             image= blurredImage;
         }
+        
+        String fog= getParam( "fog", "0" );
+        if ( !fog.equals("0") ) {
+            int ifog= Integer.parseInt(fog);
+            if ( ifog<0 || ifog>100 ) throw new IllegalArgumentException("fog must be between 1 and 100");
+            BufferedImage dest= new BufferedImage( image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB );
+            
+            Graphics2D g= ((Graphics2D)dest.getGraphics());
+            g.drawImage( image, new AffineTransform(), null );
+            g.setColor( new Color( 255,255,255,ifog*255/100 ) );
+            g.fillRect(0,0,image.getWidth(), image.getHeight());
+            
+            image= dest;
+        }
+        
+    
         String channel = params.get("channel");
 
         Color c = null;
