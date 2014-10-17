@@ -9,7 +9,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -44,7 +43,6 @@ import org.python.core.PyReflectedFunctionPeeker;
 import org.python.core.PyString;
 import org.python.core.PyStringMap;
 import org.python.core.PyTableCode;
-import org.python.core.PyType;
 import org.python.util.PythonInterpreter;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
@@ -773,7 +771,7 @@ public class JythonCompletionTask implements CompletionTask {
                 interp = new PythonInterpreter();
             }
             if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
-                URL imports = JythonOps.class.getResource("imports.py");
+                URL imports = JythonOps.class.getResource("/autoplot.py");
                 InputStream in= imports.openStream();
                 try {
                     interp.execfile(in);

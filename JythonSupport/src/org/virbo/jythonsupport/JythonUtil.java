@@ -129,13 +129,13 @@ public class JythonUtil {
         if ( loadAutoplotStuff ) {
             Py.getAdapter().addPostClass(new PyQDataSetAdapter());
             if ( Util.isLegacyImports() ) {
-                URL imports= JythonOps.class.getResource("imports.py");
+                URL imports= JythonOps.class.getResource("/autoplot.py");
                 if ( imports==null ) {
                     throw new RuntimeException("unable to locate imports.py on classpath");
                 }
                 InputStream in = imports.openStream();
                 try {
-                    interp.execfile(imports.openStream(), "imports.py");
+                    interp.execfile(imports.openStream(), "autoplot.py");
                 } finally {
                     in.close();
                 }
@@ -177,9 +177,9 @@ public class JythonUtil {
         interp.set("monitor", mon);
         
         try {
-            InputStream in= JythonOps.class.getResource("imports.py").openStream();
+            InputStream in= JythonOps.class.getResource("/autoplot.py").openStream();
             try {
-                interp.execfile( in, "imports.py"); // import everything into default namespace.
+                interp.execfile( in, "/autoplot.py"); // import everything into default namespace.
             } finally {
                 in.close();
             }
