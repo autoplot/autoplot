@@ -373,7 +373,7 @@ public class EditorContextMenu {
                     LoggerManager.logGuiEvent(e);                
                     String doThis= editor.getSelectedText();
                     if ( doThis==null ) return;
-                    editor.plot(doThis);
+                    editor.plotSoon(doThis);
                 }
             } );
             mi.setToolTipText("Plot dataset reference in a second Autoplot with its server port open");
