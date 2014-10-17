@@ -161,9 +161,11 @@ class ImageDataSource extends AbstractDataSource {
             if ( ifog<0 || ifog>100 ) throw new IllegalArgumentException("fog must be between 1 and 100");
             BufferedImage dest= new BufferedImage( image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB );
             
+            int color= image.getRGB(0,0);
+            
             Graphics2D g= ((Graphics2D)dest.getGraphics());
             g.drawImage( image, new AffineTransform(), null );
-            g.setColor( new Color( 255,255,255,ifog*255/100 ) );
+            g.setColor( new Color( ( color & 0xFF0000 ) >> 16, ( color & 0x00FF00)  >> 8, color & 0x0000FF, ifog*255/100 ) );
             g.fillRect(0,0,image.getWidth(), image.getHeight());
             
             image= dest;
