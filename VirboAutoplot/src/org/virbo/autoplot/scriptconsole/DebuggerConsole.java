@@ -4,10 +4,13 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.python.core.Py;
 import org.python.core.PyFile;
-import org.python.core.PyObject;
-import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
 
 /**
@@ -16,8 +19,16 @@ import org.python.util.PythonInterpreter;
  */
 public class DebuggerConsole extends javax.swing.JPanel {
 
+    static PipedOutputStream myout;
+    
     static {
-        Py.getSystemState().stdin= new PyFile( System.in ); // I can't get my mind around this.  How will I insert characters into the stream?
+        try {
+            myout = new PipedOutputStream();
+            PipedInputStream pin= new PipedInputStream(myout);
+            Py.getSystemState().stdin= new PyFile( pin ); 
+        } catch (IOException ex) {
+            Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     /**
@@ -27,7 +38,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         initComponents();
         this.out= out;
     }
-
+    
     PythonInterpreter out;
     
     public void println( String s ) {
@@ -97,16 +108,28 @@ public class DebuggerConsole extends javax.swing.JPanel {
 
     private void stepButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stepButtonActionPerformed
         Runnable run= new Runnable() { public void run() {
-            //out.exec("s\n");
+            try {
+                myout.write("s\n".getBytes());
+                myout.flush();
+            } catch (IOException ex) {
+                Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } };
-        new Thread(run).start();
+        run.run();
+        //new Thread(run).start();
     }//GEN-LAST:event_stepButtonActionPerformed
 
     private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
         Runnable run= new Runnable() { public void run() {
-            //out.exec("c\n");
+            try {
+                myout.write("c\n".getBytes());
+                myout.flush();
+            } catch (IOException ex) {
+                Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } };
-        new Thread(run).start();
+        run.run();
+        //new Thread(run).start();
     }//GEN-LAST:event_continueButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
