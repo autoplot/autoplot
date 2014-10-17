@@ -189,6 +189,14 @@ public class EditorAnnotationsSupport {
         }
         final int line= lline;
         final String text= ltext;
+        
+        Element root = editorPanel.getDocument().getDefaultRootElement();
+        root.getElementCount();
+        if ( line>root.getElementCount()+1 ) {
+            System.err.println("*** can't annotate line: "+lline );
+            return;
+        }
+        
         SwingUtilities.invokeLater( new Runnable() {
             public void run() {
                 Document doc = editorPanel.getDocument();
