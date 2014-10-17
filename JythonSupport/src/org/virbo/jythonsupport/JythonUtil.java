@@ -1026,9 +1026,11 @@ public class JythonUtil {
         
         boolean altWhy= false; // I don't know why things are suddenly showing up in this other space.
         if ( sort.size()==0 ) {
-            logger.warning("things are suddenly in the wrong space...");
             sort= (PyList) interp.eval( "_paramSort" );
-            altWhy= true;
+            if ( sort.size()>0 ) {
+                logger.warning("things are suddenly in the wrong space.  This is because things are incorrectly imported.");
+                altWhy= true;
+            }
         }
         
         List<Param> result= new ArrayList();
