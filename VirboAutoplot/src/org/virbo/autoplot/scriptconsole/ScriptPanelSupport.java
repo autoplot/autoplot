@@ -732,7 +732,7 @@ public class ScriptPanelSupport {
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            String s= new String( b, off, len );
+            //String s= new String( b, off, len );
             for ( int i=off; i<len; i++ ) {
                 this.write(b[i]);
             }
