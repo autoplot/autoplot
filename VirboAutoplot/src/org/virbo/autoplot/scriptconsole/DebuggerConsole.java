@@ -65,12 +65,28 @@ public class DebuggerConsole extends javax.swing.JPanel {
         }
     }
     
+    private static DebuggerConsole instance;
+    
+    public static DebuggerConsole getInstance() {
+        if ( instance==null ) {
+            instance= new DebuggerConsole();
+        }
+        return instance;
+    }
+    
+    /**
+     * set the interpretter we to control.
+     * @param out 
+     */
+    public void setInterp( PythonInterpreter out ) {
+        this.out= out;
+    }
+    
     /**
      * Creates new form DebuggerConsole
      */
-    public DebuggerConsole( PythonInterpreter out ) {
+    private DebuggerConsole( ) {
         initComponents();
-        this.out= out;
     }
     
     PythonInterpreter out;
@@ -146,8 +162,8 @@ public class DebuggerConsole extends javax.swing.JPanel {
                     .addComponent(upButton)
                     .addComponent(whereButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+                .addGap(0, 0, 0))
         );
     }// </editor-fold>//GEN-END:initComponents
 
