@@ -159,13 +159,12 @@ public class EditorTextPane extends JEditorPane {
     }
 
     /**
-     * send the QDataSet resolved from the String doThis to the Autoplot server on port 12345.
-     * @param doThis an expression evaluated by the current interpreter.
+     * this makes the connection to another Autoplot.  This should not be called off the event thread.
+     * @param doThis expression to evaluate
      */
-    void plot(String doThis) {
+    private void plot( String doThis ) {
         if ( support.interp==null ) {
-            JOptionPane.showMessageDialog(this,"Session is not running.  There must be an active debugger to plot variables.");
-            return;
+            throw new IllegalArgumentException("No interpreter available to evaluate expression");
         }
         try {
             PyObject po= support.interp.eval(doThis);
@@ -181,8 +180,11 @@ public class EditorTextPane extends JEditorPane {
                     new org.virbo.qstream.SimpleStreamFormatter().format(mpds, new FileOutputStream(tmpfile), true );
                     Socket s= new Socket("localhost",12345);
                     OutputStream out= s.getOutputStream();
-                    out.write( ( cmd + "\n").getBytes() );
-                    out.close();
+                    try {
+                        out.write( ( cmd + "\n").getBytes() );
+                    } finally {
+                        out.close();
+                    }
                 } catch (StreamException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 } catch (IOException ex) {
@@ -199,7 +201,24 @@ public class EditorTextPane extends JEditorPane {
 
         } catch ( Exception e  ) {
             JOptionPane.showMessageDialog(this,"Selected item caused exception: " + e.toString() );
+        }        
+    }
+    
+    /**
+     * send the QDataSet resolved from the String doThis to the Autoplot server on port 12345.
+     * @param doThis an expression evaluated by the current interpreter.
+     */
+    void plotSoon( final String doThis ) {
+        if ( support.interp==null ) {
+            JOptionPane.showMessageDialog(this,"Session is not running.  There must be an active debugger to plot variables.");
+            return;
         }
+        Runnable run= new Runnable() {
+            public void run() {
+                plot(doThis);
+            }
+        };
+        new Thread(run,"plotExpression").start();
     }
 
     public static String loadFileToString( File f ) throws FileNotFoundException, IOException {
