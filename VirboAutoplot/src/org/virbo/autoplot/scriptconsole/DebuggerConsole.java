@@ -25,6 +25,9 @@ public class DebuggerConsole extends javax.swing.JPanel {
      * set this to true to evaluate expressions on event thread.  This fails off the event thread, but I'm not sure why.
      * On the event thread, things hang when I try to do tooltip lookups.
      * 
+     * The problem is I need to have a single thread that sends messages to the PipedOutputStream.  Ed points out
+     * java.util.concurrent.BlockingQueue, which could be used to post "step" and "where" messages to the single thread.
+     * 
      */
     static boolean eventThread= false;
     
