@@ -771,7 +771,7 @@ public class JythonCompletionTask implements CompletionTask {
                 interp = new PythonInterpreter();
             }
             if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
-                URL imports = JythonOps.class.getResource("/autoplot.py");
+                URL imports = JythonOps.class.getResource("imports.py");
                 InputStream in= imports.openStream();
                 try {
                     interp.execfile(in);
