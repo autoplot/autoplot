@@ -500,7 +500,7 @@ public class Util {
     /**
      * return true if we should do the imports as before, where all of Autoplot is
      * imported with each session.  This is used to ease migration.
-     * @return 
+     * @return true if the old behavior should be used.
      */
     public static boolean isLegacyImports() {
         return true;
