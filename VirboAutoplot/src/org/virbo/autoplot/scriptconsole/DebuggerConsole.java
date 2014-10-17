@@ -21,6 +21,13 @@ public class DebuggerConsole extends javax.swing.JPanel {
 
     static PipedOutputStream myout;
     
+    /**
+     * set this to true to evaluate expressions on event thread.  This fails off the event thread, but I'm not sure why.
+     * On the event thread, things hang when I try to do tooltip lookups.
+     * 
+     */
+    static boolean eventThread= false;
+    
     static {
         try {
             myout = new PipedOutputStream();
@@ -58,23 +65,23 @@ public class DebuggerConsole extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        stepButton = new javax.swing.JButton();
-        continueButton = new javax.swing.JButton();
+        nextButton = new javax.swing.JButton();
+        upButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         whereButton = new javax.swing.JButton();
 
-        stepButton.setText("Step");
-        stepButton.addActionListener(new java.awt.event.ActionListener() {
+        nextButton.setText("Next");
+        nextButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                stepButtonActionPerformed(evt);
+                nextButtonActionPerformed(evt);
             }
         });
 
-        continueButton.setText("Continue");
-        continueButton.addActionListener(new java.awt.event.ActionListener() {
+        upButton.setText("Up");
+        upButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                continueButtonActionPerformed(evt);
+                upButtonActionPerformed(evt);
             }
         });
 
@@ -96,20 +103,20 @@ public class DebuggerConsole extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(stepButton)
+                .addComponent(nextButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(continueButton)
+                .addComponent(upButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(whereButton)
-                .addContainerGap(192, Short.MAX_VALUE))
+                .addContainerGap(237, Short.MAX_VALUE))
             .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(stepButton)
-                    .addComponent(continueButton)
+                    .addComponent(nextButton)
+                    .addComponent(upButton)
                     .addComponent(whereButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -117,46 +124,59 @@ public class DebuggerConsole extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void stepButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stepButtonActionPerformed
+    private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
         Runnable run= new Runnable() { public void run() {
             try {
-                myout.write("s\n".getBytes());
+                myout.write("n\n".getBytes());
                 myout.flush();
             } catch (IOException ex) {
                 Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
             }
         } };
-        run.run();
-        //new Thread(run).start();
-    }//GEN-LAST:event_stepButtonActionPerformed
+        if ( eventThread ) {
+            run.run();
+        } else {
+            new Thread(run).start();
+        }
+    }//GEN-LAST:event_nextButtonActionPerformed
 
-    private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
+    private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButtonActionPerformed
         Runnable run= new Runnable() { public void run() {
             try {
-                myout.write("c\n".getBytes());
+                myout.write("u\n".getBytes());
                 myout.flush();
             } catch (IOException ex) {
                 Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
             }
         } };
-        run.run();
-        //new Thread(run).start();
-    }//GEN-LAST:event_continueButtonActionPerformed
+        if ( eventThread ) {
+            run.run();
+        } else {
+            new Thread(run).start();
+        }
+    }//GEN-LAST:event_upButtonActionPerformed
 
     private void whereButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_whereButtonActionPerformed
-        try {
-            myout.write("w\n".getBytes());
-            myout.flush();
-        } catch (IOException ex) {
-            Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Runnable run= new Runnable() { public void run() {
+            try {
+                myout.write("w\n".getBytes());
+                myout.flush();
+            } catch (IOException ex) {
+                Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } };        
+        if ( eventThread ) {
+            run.run();
+        } else {
+            new Thread(run).start();
+        }        
     }//GEN-LAST:event_whereButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton continueButton;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JButton stepButton;
+    private javax.swing.JButton nextButton;
+    private javax.swing.JButton upButton;
     private javax.swing.JButton whereButton;
     // End of variables declaration//GEN-END:variables
 }
