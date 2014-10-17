@@ -564,15 +564,15 @@ public class ScriptPanelSupport {
                                         interp.exec(panel.getEditorPanel().getText());
                                     }
                                 } else {
-                                    boolean experiment= true;
+                                    boolean experiment= false;
                                     if ( experiment ) {
-                                        DebuggerConsole dc= new DebuggerConsole(interp);
-                                        interp.setOut(getOutput(dc));
-                                        JDialog d= new JDialog( SwingUtilities.getWindowAncestor(panel), "Jython Debugger" );
-                                        d.setModal(false);
-                                        d.getContentPane().add(dc);
-                                        d.pack();
-                                        d.setVisible(true);
+                                        //DebuggerConsole dc= new DebuggerConsole(interp);
+                                        interp.setOut(getOutput(null));
+                                        //JDialog d= new JDialog( SwingUtilities.getWindowAncestor(panel), "Jython Debugger" );
+                                        //d.setModal(false);
+                                        //d.getContentPane().add(dc);
+                                        //d.pack();
+                                        //d.setVisible(true);
                                     }
                                     interp.exec(panel.getEditorPanel().getText());
                                 }
@@ -657,7 +657,7 @@ public class ScriptPanelSupport {
         @Override
         public void write(int b) throws IOException {
 
-            dc.print(String.valueOf((char)b));
+            if ( dc!=null ) dc.print(String.valueOf((char)b));
             
             if ( state==STATE_OPEN ) {
                 if ( b>=0 ) currentLine.append((char)b);
