@@ -23,8 +23,11 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-10-13):</p>
+        <p>Bugfixes (2014-10-17):</p>
         <ul>
+            <li>1277: initial delay caused by bindings</li>
+            <li>getDataSets method for Jython loads multiple datasets in parallel</li>
+            <li>SIUnits class finally included in release to help with maturing that code.</li>
             <li>FileNotFound with HTTP shows file not found from automatic .gz attempt, not the original</li>
             <li>bugfix in concatenate, where join of FDataSets would cause cast exception</li>
             <li>vap+audiosystem now returns elapsed seconds instead of trying to calculate UT time</li>
@@ -50,6 +53,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>marsx orbits added to time range editor.</li>
             <li>vap+inline: data editor table has editable cells</li>
             <li>393: das2server list responses can contain human-readable descriptions.</li>
             <li>--server keyword replaces --port keyword, indicate server status on title bar.</li>
