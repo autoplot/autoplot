@@ -376,10 +376,13 @@ public class ScriptPanelSupport {
 //                        break;
 //                    }
 //                }
-                annotationsSupport.annotateLine(offset + traceback.tb_lineno, "error", ex.toString(),interp);
-                line=  traceback.tb_lineno-1;
-                otraceback= traceback.tb_next;
-                count++;
+                String fn= traceback.tb_frame.f_code.co_filename;
+                if ( fn.equals("<iostream>") || fn.equals("<string>") ) {
+                    annotationsSupport.annotateLine(offset + traceback.tb_lineno, "error", ex.toString(),interp);
+                    line=  traceback.tb_lineno-1;
+                    otraceback= traceback.tb_next;
+                    count++;
+                }
             }
             if ( line<0 ) {
                 logger.warning("no trace information available for error "+ex.getMessage());
@@ -561,7 +564,7 @@ public class ScriptPanelSupport {
                                         interp.exec(panel.getEditorPanel().getText());
                                     }
                                 } else {
-                                    boolean experiment= false;
+                                    boolean experiment= true;
                                     if ( experiment ) {
                                         DebuggerConsole dc= new DebuggerConsole(interp);
                                         interp.setOut(getOutput(dc));
