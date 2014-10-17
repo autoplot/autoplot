@@ -656,8 +656,6 @@ public class ScriptPanelSupport {
 
         @Override
         public void write(int b) throws IOException {
-            Pattern p= Pattern.compile("\\(Pdb\\) (.*)> <string>\\((\\d+)\\)\\?\\(\\)\\s*");
-            Pattern p2= Pattern.compile("\\(Pdb\\) (.*)--Return--.*> <string>\\((\\d+)\\)\\?\\(\\)\\s*.*");
 
             dc.print(String.valueOf((char)b));
             
@@ -692,6 +690,9 @@ public class ScriptPanelSupport {
                     state= STATE_OPEN;
                 }
             } else if ( state==STATE_PDB ) { // the beginning of the currentLine is (Pdb) and we want a terminator
+                Pattern p= Pattern.compile("\\(Pdb\\) (.*)>? <string>\\((\\d+)\\)\\?\\(\\)\\s*");
+                Pattern p2= Pattern.compile("\\(Pdb\\) (.*)--Return--.*>? <string>\\((\\d+)\\)\\?\\(\\)\\s*.*");
+                
                 int l= currentLine.length();
                 if ( b>=0 && b!=10 && b!=13 ) currentLine.append((char)b);  //TODO: why is my regex not working when newlines get in there?
                 if ( l>2 && currentLine.substring(l-2,l).equals("()") ) {
@@ -717,6 +718,9 @@ public class ScriptPanelSupport {
                                 sink.write(userOutput.getBytes());
                                 sink.write("\n".getBytes());
                             }
+                            state= STATE_OPEN;
+                            currentLine= new StringBuilder();
+                        } else {
                             state= STATE_OPEN;
                             currentLine= new StringBuilder();
                         }
