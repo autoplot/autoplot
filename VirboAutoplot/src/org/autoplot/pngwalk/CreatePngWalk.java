@@ -627,7 +627,7 @@ public class CreatePngWalk {
         params.batchUri= alm.getValue("batchUri");
         if ( params.batchUri!=null && params.batchUri.length()>0 ) params.useBatchUri= true;
         params.outputFormat= alm.getValue("outputFormat");
-        String vap= alm.getValue("vap");
+        String vap= alm.makeFileReferenceAbsolute( alm.getValue("vap") );
         ScriptContext.plot(vap);
 
         int status= doIt( ScriptContext.getDocumentModel(), params );
