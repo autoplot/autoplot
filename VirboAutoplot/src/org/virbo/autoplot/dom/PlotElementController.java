@@ -1206,15 +1206,19 @@ public class PlotElementController extends DomNodeController {
      * This is the heart of the PlotElementController, and to some degree Autoplot.  In this routine, we are given
      * dataset and a renderType, and we need to reconfigure Autoplot to implement this.  This will add child elements when
      * children are needed, for example when a Vector time series is plotted, we need to add children for each component.
-     *
-     * preconditions:
-     *   the new renderType has been identified.
-     *   The dataset to be rendered has been identified.
-     * postconditions:
-     *   old child plotElements have been deleted.
-     *   child plotElements have been added when needed.
+     * 
+     * preconditions:<ul>
+     *   <li>the new renderType has been identified.
+     *   <li>The dataset to be rendered has been identified.
+     * </ul>
+     * postconditions:<ul>
+     *   <li>old child plotElements have been deleted.
+     *   <li>child plotElements have been added when needed.
+     * </ul>
      * @param fillDs
      * @param renderType
+     * @param control renderer-type specific controls, see Renderer.setControl.
+     * @see Renderer#setControl(java.lang.String) 
      */
     private synchronized void resetPlotElement( QDataSet fillDs, RenderType renderType, String renderControl ) {
         logger.log(Level.FINEST, "resetPlotElement({0} {1}) ele={2}", new Object[]{fillDs, renderType, plotElement});
