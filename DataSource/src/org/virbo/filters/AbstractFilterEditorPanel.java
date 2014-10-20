@@ -21,4 +21,8 @@ public abstract class AbstractFilterEditorPanel extends JPanel implements Filter
     public void setInput( QDataSet ds ) {
         // do nothing, ignore input
     }
+    @Override
+    public JPanel getPanel() {
+        return this;
+    }
 }
