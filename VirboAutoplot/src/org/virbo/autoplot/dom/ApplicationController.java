@@ -1670,7 +1670,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             application.setTimeRange( Application.DEFAULT_TIME_RANGE );
             application.getPlots(0).setTicksURI("");
-            application.getPlots(0).setContext( application.getPlots(0).getXaxis().getRange() ); //TODO: this will be a timerange soon
+            application.getPlots(0).setContext( application.getPlots(0).getXaxis().getRange() );
 
             resetIdSequenceNumbers();
 
