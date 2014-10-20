@@ -6,6 +6,7 @@ package org.virbo.filters;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.DefaultComboBoxModel;
 import org.virbo.dataset.QDataSet;
 
 /**
@@ -103,9 +104,23 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
 
     @Override
     public void setInput(QDataSet ds) {
-        // get the dimension labels.
-        
+        String[] depNames1= getDimensionNames(ds);
+        sliceDimensionCB.setModel(new DefaultComboBoxModel(depNames1));
     }
     
-    
+    private static String[] getDimensionNames( QDataSet ds ) {
+        String[] depNames = new String[ds.rank()];
+        for (int i = 0; i < ds.rank(); i++) {
+            depNames[i] = "dim" + i;
+            QDataSet dep0 = (QDataSet) ds.property("DEPEND_" + i);
+            if (dep0 != null) {
+                String dname = (String) dep0.property(QDataSet.NAME);
+                if (dname != null) {
+                    depNames[i] = dname + " ("+dep0.length()+" bins)";
+                }
+            }
+        }
+        return depNames;
+    }
+
 }
