@@ -122,7 +122,7 @@ public class AxisController extends DomNodeController {
         ApplicationController ac = dom.controller;
         ac.bind(axis, "range", p, "datumRange");
         ac.bind(axis, "log", p, "log");
-        ac.bind(axis, "label", p, "label", plot.getController().axisLabelContextConverter(axis) );
+        ac.bind(axis, "label", p, "label", plot.getController().labelContextConverter(axis) );
         ac.bind(axis, "drawTickLabels", p, "tickLabelsVisible");
         ac.bind(axis, "flipped", p, "flipped");
         ac.bind(axis, "visible", p, "visible" );
