@@ -13,11 +13,24 @@ import javax.swing.JOptionPane;
  * @author mmclouth
  */
 public class Test {
-    public static void main( String[] args ) {
+    
+    public static void testAdd() {
         FilterEditorPanel p= new AddFilterEditorPanel();
         p.setFilter("|add(50)");
         JOptionPane.showMessageDialog( null, p );
         System.err.println( p.getFilter() );
+    }
+    
+    public static void testSlice() {
+        FilterEditorPanel p= new SliceFilterEditorPanel();
+        p.setFilter("|slice1(50)");
+        JOptionPane.showMessageDialog( null, p );
+        System.err.println( p.getFilter() );
+    }
+    
+    public static void main( String[] args ) {
+        //testAdd();
+        testSlice();
     }
     
     
