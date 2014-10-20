@@ -311,6 +311,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                 StreamTool.readStream(channel, handler);
             } catch ( StreamException ex ) {
                 mon.finished();
+                Throwable cause= ex.getCause();
                 if ( ex.getCause()!=null && ( ex.getCause() instanceof java.io.InterruptedIOException ) ) {
                     logger.log( Level.INFO, ex.getMessage(), ex );
                     if ( ex.getMessage().contains("Operation cancelled") ) { // TODO: nasty getMessage...
@@ -318,6 +319,12 @@ class Das2ServerDataSource extends AbstractDataSource {
                     } else {
                         throw (java.io.InterruptedIOException)ex.getCause();
                     }
+                 }else if ( cause!=null && ( cause instanceof org.das2.dataset.NoDataInIntervalException )) {
+                    throw (org.das2.dataset.NoDataInIntervalException)ex.getCause();
+                } else if ( ex.getMessage().contains("Empty response from reader")  ) {
+                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage()+techContact );
+                } else if ( ex.getMessage().contains("No data found") ) {
+                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage());
                 } else {
                     ex= new StreamException( ex.getMessage()+ "\ndataset request was\n"+url2+techContact );
                     logger.log( Level.INFO, ex.getMessage(), ex );
