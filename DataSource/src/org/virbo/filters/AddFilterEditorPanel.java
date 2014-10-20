@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  *
  * @author mmclouth
  */
-public class AddFilterEditorPanel extends javax.swing.JPanel implements FilterEditorPanel {
+public class AddFilterEditorPanel extends AbstractFilterEditorPanel implements FilterEditorPanel {
 
     /**
      * Creates new form AddFilterEditorPanel

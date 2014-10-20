@@ -6,12 +6,13 @@ package org.virbo.filters;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.virbo.dataset.QDataSet;
 
 /**
  *
  * @author jbf
  */
-public class SliceFilterEditorPanel extends javax.swing.JPanel implements FilterEditorPanel {
+public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements FilterEditorPanel {
 
     /**
      * Creates new form SlicesFilterEditorPanel
@@ -99,4 +100,12 @@ public class SliceFilterEditorPanel extends javax.swing.JPanel implements Filter
             sliceIndexSpinner.setValue( Integer.parseInt(m.group(2)) );
         }
     }
+
+    @Override
+    public void setInput(QDataSet ds) {
+        // get the dimension labels.
+        
+    }
+    
+    
 }

@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  *
  * @author mmclouth
  */
-public class MultiplyFilterEditorPanel extends javax.swing.JFrame {
+public class MultiplyFilterEditorPanel extends AbstractFilterEditorPanel {
 
     /**
      * Creates new form MultiplyFilterEditorPanel
