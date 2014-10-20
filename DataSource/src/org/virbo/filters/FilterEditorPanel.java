@@ -6,6 +6,9 @@
 
 package org.virbo.filters;
 
+import javax.swing.JPanel;
+import org.virbo.dataset.QDataSet;
+
 /**
  * Interface for adding small GUIs to control each of the filters.  For example
  * "|divide(5)" is controlled with a GUI that accepts the float parameter that 
@@ -15,6 +18,27 @@ package org.virbo.filters;
  * @author mmclouth
  */
 public interface FilterEditorPanel {
+    /**
+     * return the filter specified by the GUI
+     * @return 
+     */
     String getFilter();
+    
+    /**
+     * configure the GUI based on this filter.
+     * @param filter 
+     */
     void setFilter( String filter );
+    
+    /**
+     * configure the GUI based on this input
+     * @param ds the data that will be input to the filter
+     */
+    void setInput( QDataSet ds );
+    
+    /**
+     * the panel for this editor.
+     * @return 
+     */
+    JPanel getPanel();
 }
