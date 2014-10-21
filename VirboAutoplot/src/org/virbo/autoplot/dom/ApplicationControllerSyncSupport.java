@@ -66,10 +66,11 @@ public class ApplicationControllerSyncSupport {
             application.plotElements.get(i).setRenderType(elements[i].getRenderType()); // create das2 peers after setting the plotid.
             application.plotElements.get(i).setAutoRenderType(elements[i].isAutoRenderType()); // we still might want to set this automatically.
             application.plotElements.get(i).getController().maybeCreateDasPeer();
+            application.plotElements.get(i).getController().setResetRanges(false);
+            application.plotElements.get(i).getController().setDsfReset(false);
             application.plotElements.get(i).getStyle().syncTo(elements[i].getStyle());
             //application.plotElements.get(i).getController().resetRenderType( plotElements[i].getRenderType() );
             application.plotElements.get(i).setDataSourceFilterId(nameMap.get(elements[i].getDataSourceFilterId()));
-            application.plotElements.get(i).getController().setDsfReset(false);
             application.plotElements.get(i).getController().setResetPlotElement(false);
         }
     }
