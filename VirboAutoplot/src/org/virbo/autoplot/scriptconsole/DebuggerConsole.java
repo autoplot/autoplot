@@ -10,6 +10,9 @@ import java.io.PipedOutputStream;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.python.core.Py;
 import org.python.core.PyFile;
 import org.python.util.PythonInterpreter;
@@ -21,9 +24,12 @@ import org.python.util.PythonInterpreter;
 public class DebuggerConsole extends javax.swing.JPanel {
 
     private static PipedOutputStream myout;
+    private static JDialog dialog;
     
     private static Thread workerThread=null;
-    private static java.util.concurrent.BlockingQueue<Runnable> queue;
+    private static java.util.concurrent.BlockingQueue<String> queue;
+    
+    private static final Logger logger= Logger.getLogger("autoplot.jython.console");
     
     /**
      * set this to true to evaluate expressions on event thread.  This fails off the event thread, but I'm not sure why.
@@ -36,20 +42,28 @@ public class DebuggerConsole extends javax.swing.JPanel {
      * of that you would just post messages to an object defined here.
      * 
      */
-    private static boolean eventThread= false;
     
     static {
         try {
-            queue= new LinkedBlockingQueue<Runnable>();
+            queue= new LinkedBlockingQueue<String>();
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     Runnable doRun;
                     while ( true ) {
                         try {
-                            doRun= queue.take();
+                            final String cmd= queue.take();
+                            doRun= new Runnable() { public void run() {
+                                try {
+                                    myout.write(cmd.getBytes());
+                                    myout.flush();
+                                } catch (IOException ex) {
+                                    logger.log(Level.SEVERE, null, ex);
+                                }
+                            } };                            
                             doRun.run();
                         } catch (InterruptedException ex) {
-                            Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
+                            logger.log(Level.SEVERE, null, ex);
                         }
                         
                     }
@@ -61,21 +75,31 @@ public class DebuggerConsole extends javax.swing.JPanel {
             PipedInputStream pin= new PipedInputStream(myout);
             Py.getSystemState().stdin= new PyFile( pin ); 
         } catch (IOException ex) {
-            Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
     
     private static DebuggerConsole instance;
     
-    public static DebuggerConsole getInstance() {
+    public static DebuggerConsole getInstance( JPanel panel ) {
         if ( instance==null ) {
             instance= new DebuggerConsole();
+            JDialog d= new JDialog( SwingUtilities.getWindowAncestor(panel), "Jython Debugger" );
+            d.setModal(false);
+            d.getContentPane().add(instance);
+            d.pack();
+            d.setVisible(true);
+            d.setDefaultCloseOperation( JDialog.HIDE_ON_CLOSE );
+            dialog= d;
+        } else {
+            dialog.setVisible(true);
         }
+        
         return instance;
     }
     
     /**
-     * set the interpretter we to control.
+     * set the interpreter we to control.
      * @param out 
      */
     public void setInterp( PythonInterpreter out ) {
@@ -168,51 +192,15 @@ public class DebuggerConsole extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
-        Runnable run= new Runnable() { public void run() {
-            try {
-                myout.write("n\n".getBytes());
-                myout.flush();
-            } catch (IOException ex) {
-                Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } };
-        if ( eventThread ) {
-            run.run();
-        } else {
-            queue.add(run);
-        }
+        queue.add("n\n");
     }//GEN-LAST:event_nextButtonActionPerformed
 
     private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButtonActionPerformed
-        Runnable run= new Runnable() { public void run() {
-            try {
-                myout.write("u\n".getBytes());
-                myout.flush();
-            } catch (IOException ex) {
-                Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } };
-        if ( eventThread ) {
-            run.run();
-        } else {
-            queue.add(run);
-        }
+        queue.add("u\n");
     }//GEN-LAST:event_upButtonActionPerformed
 
     private void whereButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_whereButtonActionPerformed
-        Runnable run= new Runnable() { public void run() {
-            try {
-                myout.write("w\n".getBytes());
-                myout.flush();
-            } catch (IOException ex) {
-                Logger.getLogger(DebuggerConsole.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } };        
-        if ( eventThread ) {
-            run.run();
-        } else {
-            queue.add(run);
-        }        
+        queue.add("w\n");
     }//GEN-LAST:event_whereButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
