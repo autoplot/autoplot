@@ -566,14 +566,9 @@ public class ScriptPanelSupport {
                                 } else {
                                     boolean experiment= false;
                                     if ( experiment ) {
-                                        DebuggerConsole dc= DebuggerConsole.getInstance();
+                                        DebuggerConsole dc= DebuggerConsole.getInstance(panel);
                                         dc.setInterp(interp);
                                         interp.setOut(getOutput(dc));
-                                        JDialog d= new JDialog( SwingUtilities.getWindowAncestor(panel), "Jython Debugger" );
-                                        d.setModal(false);
-                                        d.getContentPane().add(dc);
-                                        d.pack();
-                                        d.setVisible(true);
                                     }
                                     interp.exec(panel.getEditorPanel().getText());
                                 }
