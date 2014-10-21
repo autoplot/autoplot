@@ -25,6 +25,8 @@
         to resolve old numbers.
         <p>Bugfixes (2014-10-20):</p>
         <ul>
+            <li>1281: linestyle settings not set properly for pngwalk, clone to new window </li>
+            <li>1282: CDF LABL_PTR_2 when the data is rank 2</li>
             <li>NoDataInInterval exception on das2stream is treated the same as with QStreams.</li>
             <li>autoranging in ImageDataSource didn't account for explicit scaling, which would prevent Pngwalks from being run.</li>
             <li>1277: initial delay caused by bindings</li>
@@ -55,8 +57,8 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>new code for python debugging and new filters dialogs added, but these are still under development</li>
             <li>add setDepend0Cadence to filters</li>
+            <li>new code for python debugging and new filters dialogs added, but these are still under development</li>
             <li>add fog parameter to ImageDataSource, so that an image can provide context competing with overplots</li>
             <li>marsx orbits added to time range editor.</li>
             <li>vap+inline: data editor table has editable cells</li>
