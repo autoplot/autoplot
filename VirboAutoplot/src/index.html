@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Interactive slicer written in Jython shows the histogram of the points within the box.</small></p>
+        <p><small>New fog keyword for the image source allows an image to provide context competing with overplots.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,10 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-10-17):</p>
+        <p>Bugfixes (2014-10-20):</p>
         <ul>
+            <li>NoDataInInterval exception on das2stream is treated the same as with QStreams.</li>
+            <li>autoranging in ImageDataSource didn't account for explicit scaling, which would prevent Pngwalks from being run.</li>
             <li>1277: initial delay caused by bindings</li>
             <li>getDataSets method for Jython loads multiple datasets in parallel</li>
             <li>SIUnits class finally included in release to help with maturing that code.</li>
@@ -53,6 +55,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>new code for python debugging and new filters dialogs added, but these are still under development</li>
+            <li>add setDepend0Cadence to filters</li>
+            <li>add fog parameter to ImageDataSource, so that an image can provide context competing with overplots</li>
             <li>marsx orbits added to time range editor.</li>
             <li>vap+inline: data editor table has editable cells</li>
             <li>393: das2server list responses can contain human-readable descriptions.</li>
