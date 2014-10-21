@@ -31,6 +31,8 @@ public class DebuggerConsole extends javax.swing.JPanel {
     
     private static final Logger logger= Logger.getLogger("autoplot.jython.console");
     
+    private static PipedInputStream pin;
+    
     /**
      * set this to true to evaluate expressions on event thread.  This fails off the event thread, but I'm not sure why.
      * On the event thread, things hang when I try to do tooltip lookups.
@@ -72,7 +74,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
             workerThread= new Thread(run,"debuggerConsoleWorker");
             workerThread.start();
             myout = new PipedOutputStream();
-            PipedInputStream pin= new PipedInputStream(myout);
+            pin= new PipedInputStream(myout);
             Py.getSystemState().stdin= new PyFile( pin ); 
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
@@ -104,6 +106,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
      */
     public void setInterp( PythonInterpreter out ) {
         this.out= out;
+        Py.getSystemState().stdin= new PyFile( pin );
     }
     
     /**
