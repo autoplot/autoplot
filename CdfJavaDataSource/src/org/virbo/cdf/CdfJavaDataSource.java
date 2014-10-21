@@ -514,7 +514,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                         }
                     }
                 }
-                for ( int j=0; j<QDataSet.MAX_RANK; j++ ) {
+                for ( int j=0; j<result.rank(); j++ ) {
                     MutablePropertyDataSet depds= (MutablePropertyDataSet) result.property("DEPEND_"+j);
                     Map<String,Object> depProps= (Map<String, Object>) istpProps.get("DEPEND_"+j);
                     if ( depds!=null && depProps!=null ) {
@@ -877,7 +877,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
         
         int[] qubeDims= DataSetUtil.qubeDims(result);
         if ( depend ) {
-            for (int idep = 0; idep < QDataSet.MAX_RANK; idep++) {
+            for (int idep = 0; idep < result.rank(); idep++) {
                 //int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
                 int sidep= idep;
                 Map dep = (Map) thisAttributes.get( "DEPEND_" + sidep );
