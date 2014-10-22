@@ -495,6 +495,9 @@ public class ScriptPanelSupport {
                             InteractiveInterpreter interp = null;
                             try {
                                 interp= JythonUtil.createInterpreter(true, false);
+                                
+                                EditorAnnotationsSupport.setExpressionLookup(annotationsSupport.getForInterp(interp));
+                
                                 interp.set("dom", model.getDocumentModel() );
                                 interp.set("monitor", mon );
                                 if ( file!=null ) {
@@ -570,23 +573,10 @@ public class ScriptPanelSupport {
                                         final DebuggerConsole dc= DebuggerConsole.getInstance(panel);
                                         dc.setInterp(interp);
                                         interp.setOut(getOutput(dc));
-                                        final PythonInterpreter finterp= interp;
                                         EditorAnnotationsSupport.setExpressionLookup( new EditorAnnotationsSupport.ExpressionLookup() {
                                             @Override
                                             public PyObject lookup( final String expr ) {
-                                                Runnable run= new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        dc.setEval(expr);
-                                                    }
-                                                };
-                                                try {
-                                                    SwingUtilities.invokeAndWait(run);
-                                                } catch (InterruptedException ex) {
-                                                    Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
-                                                } catch (InvocationTargetException ex) {
-                                                    Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
-                                                }
+                                                dc.setEval(expr);
                                                 return dc.getEval();                                                
                                             }
                                         });
