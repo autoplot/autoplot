@@ -201,6 +201,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         jTextArea2 = new javax.swing.JTextArea();
 
         nextButton.setText("Next");
+        nextButton.setEnabled(false);
         nextButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nextButtonActionPerformed(evt);
@@ -208,6 +209,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         });
 
         upButton.setText("Up");
+        upButton.setEnabled(false);
         upButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 upButtonActionPerformed(evt);
@@ -215,6 +217,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         });
 
         whereButton.setText("Where");
+        whereButton.setEnabled(false);
         whereButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 whereButtonActionPerformed(evt);
@@ -286,6 +289,10 @@ public class DebuggerConsole extends javax.swing.JPanel {
     private javax.swing.JButton whereButton;
     // End of variables declaration//GEN-END:variables
 
+    public void next() {
+        queue.add("n\n");
+    }
+    
     void setEval(String expr) {
         expr= expr.trim();
         PyObject lo= out.getLocals();
@@ -307,5 +314,17 @@ public class DebuggerConsole extends javax.swing.JPanel {
 
     PyObject getEval() {
         return printObj;
+    }
+
+    void finished() {
+        nextButton.setEnabled(false);
+        upButton.setEnabled(false);
+        whereButton.setEnabled(false);
+    }
+    
+    void started() {
+        nextButton.setEnabled(true);
+        upButton.setEnabled(true);
+        whereButton.setEnabled(true);
     }
 }

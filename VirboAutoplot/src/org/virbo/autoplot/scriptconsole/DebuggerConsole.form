@@ -46,6 +46,7 @@
     <Component class="javax.swing.JButton" name="nextButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Next"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nextButtonActionPerformed"/>
@@ -54,6 +55,7 @@
     <Component class="javax.swing.JButton" name="upButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Up"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="upButtonActionPerformed"/>
@@ -62,6 +64,7 @@
     <Component class="javax.swing.JButton" name="whereButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Where"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="whereButtonActionPerformed"/>
