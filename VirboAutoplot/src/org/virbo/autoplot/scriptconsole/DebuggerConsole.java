@@ -199,6 +199,8 @@ public class DebuggerConsole extends javax.swing.JPanel {
         jTextArea1 = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
+        stepButton = new javax.swing.JButton();
+        pdbInput = new javax.swing.JTextField();
 
         nextButton.setText("Next");
         nextButton.setEnabled(false);
@@ -240,18 +242,35 @@ public class DebuggerConsole extends javax.swing.JPanel {
 
         jSplitPane1.setRightComponent(jScrollPane2);
 
+        stepButton.setText("Step");
+        stepButton.setEnabled(false);
+        stepButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                stepButtonActionPerformed(evt);
+            }
+        });
+
+        pdbInput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pdbInputActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(stepButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(nextButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(upButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(whereButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(74, 74, 74)
+                .addComponent(pdbInput))
             .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -260,23 +279,33 @@ public class DebuggerConsole extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(nextButton)
                     .addComponent(upButton)
-                    .addComponent(whereButton))
+                    .addComponent(whereButton)
+                    .addComponent(stepButton)
+                    .addComponent(pdbInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
-        queue.add("n\n");
+        queue.add("next\n");
     }//GEN-LAST:event_nextButtonActionPerformed
 
     private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButtonActionPerformed
-        queue.add("u\n");
+        queue.add("up\n");
     }//GEN-LAST:event_upButtonActionPerformed
 
     private void whereButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_whereButtonActionPerformed
-        queue.add("w\n");
+        queue.add("where\n");
     }//GEN-LAST:event_whereButtonActionPerformed
+
+    private void stepButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stepButtonActionPerformed
+        queue.add("step\n");
+    }//GEN-LAST:event_stepButtonActionPerformed
+
+    private void pdbInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pdbInputActionPerformed
+        queue.add(pdbInput.getText()+"\n");
+    }//GEN-LAST:event_pdbInputActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
@@ -285,12 +314,18 @@ public class DebuggerConsole extends javax.swing.JPanel {
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
     private javax.swing.JButton nextButton;
+    private javax.swing.JTextField pdbInput;
+    private javax.swing.JButton stepButton;
     private javax.swing.JButton upButton;
     private javax.swing.JButton whereButton;
     // End of variables declaration//GEN-END:variables
 
     public void next() {
-        queue.add("n\n");
+        queue.add("next\n");
+    }
+    
+    public void up() {
+        queue.add("up\n");
     }
     
     void setEval(String expr) {
@@ -317,14 +352,18 @@ public class DebuggerConsole extends javax.swing.JPanel {
     }
 
     void finished() {
+        stepButton.setEnabled(false);
         nextButton.setEnabled(false);
         upButton.setEnabled(false);
         whereButton.setEnabled(false);
+        pdbInput.setEnabled(false);
     }
     
     void started() {
+        stepButton.setEnabled(true);
         nextButton.setEnabled(true);
         upButton.setEnabled(true);
         whereButton.setEnabled(true);
+        pdbInput.setEnabled(true);
     }
 }
