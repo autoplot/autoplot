@@ -25,6 +25,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -564,11 +565,31 @@ public class ScriptPanelSupport {
                                         interp.exec(panel.getEditorPanel().getText());
                                     }
                                 } else {
-                                    boolean experiment= false;
+                                    boolean experiment= System.getProperty("jythonDebugger","false").equals("true");
                                     if ( experiment ) {
-                                        DebuggerConsole dc= DebuggerConsole.getInstance(panel);
+                                        final DebuggerConsole dc= DebuggerConsole.getInstance(panel);
                                         dc.setInterp(interp);
                                         interp.setOut(getOutput(dc));
+                                        final PythonInterpreter finterp= interp;
+                                        EditorAnnotationsSupport.setExpressionLookup( new EditorAnnotationsSupport.ExpressionLookup() {
+                                            @Override
+                                            public PyObject lookup( final String expr ) {
+                                                Runnable run= new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        dc.setEval(expr);
+                                                    }
+                                                };
+                                                try {
+                                                    SwingUtilities.invokeAndWait(run);
+                                                } catch (InterruptedException ex) {
+                                                    Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                                                } catch (InvocationTargetException ex) {
+                                                    Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                                                }
+                                                return dc.getEval();                                                
+                                            }
+                                        });
                                     }
                                     interp.exec(panel.getEditorPanel().getText());
                                 }
