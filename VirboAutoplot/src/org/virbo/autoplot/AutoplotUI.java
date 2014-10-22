@@ -4888,7 +4888,7 @@ APSplash.checkTime("init 240");
                     }
                 }
             };
-            SwingUtilities.invokeLater(run);
+            RequestProcessor.invokeLater(run);
         } catch (URISyntaxException ex) {
             setMessage(WARNING_ICON,ex.getMessage());
             logger.log(Level.SEVERE, ex.getMessage(), ex);
