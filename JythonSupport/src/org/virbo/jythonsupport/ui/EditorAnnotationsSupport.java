@@ -334,6 +334,7 @@ public class EditorAnnotationsSupport {
                 ann.highlightInfo= highlightInfo;
                 annotations.put(ann.offset, ann);
                 EditorAnnotationsSupport.this.interp= interp;
+                EditorAnnotationsSupport.setExpressionLookup(EditorAnnotationsSupport.this.getForInterp(interp));
             }
         } );
     }
@@ -349,6 +350,35 @@ public class EditorAnnotationsSupport {
         buff.append("</html>");
         return buff.toString();
     }
+    
+    public static interface ExpressionLookup {
+        /**
+         * evaluate the expression, or return null.
+         * @param expr the expression
+         * @return the value or null.
+         */
+        PyObject lookup( String expr );
+    }
+    
+    private static ExpressionLookup expressionLookup;
+    
+    public static void setExpressionLookup( ExpressionLookup l ) {
+        expressionLookup= l;
+    }
+    
+    public static ExpressionLookup getExpressionLookup() {
+        return expressionLookup;
+    }
+    
+    public ExpressionLookup getForInterp( final PythonInterpreter interp ) {
+        return new ExpressionLookup() {
+            public PyObject lookup(String expr) {
+                PyObject po= interp.eval(expr);
+                return po;
+            }
+        };
+    }
+    
     /**
      * The editor component should delegate to these.
      * @param me
@@ -358,15 +388,11 @@ public class EditorAnnotationsSupport {
         int offset= editorPanel.viewToModel(me.getPoint());
         if ( editorPanel.getSelectionStart()<=offset && offset<editorPanel.getSelectionEnd() ) {
             String expr= editorPanel.getSelectedText();
-            if ( interp!=null ) {
-                try {
-                    PyObject po= interp.eval(expr);
-                    String peek;
-                    peek= String.valueOf( po.__str__() );
-                    return peek;
-                } catch ( Exception ex ) {
-                    return ""+ex.toString();
-                }
+            if ( expressionLookup!=null ) {
+                PyObject po= expressionLookup.lookup(expr);
+                String peek;
+                peek= String.valueOf( po.__str__() );
+                return peek;
             } else {
                 return "Interpreter is not active";
             }
