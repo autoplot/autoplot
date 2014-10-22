@@ -16,7 +16,10 @@ import javax.swing.SwingUtilities;
 import org.python.core.Py;
 import org.python.core.PyFile;
 import org.python.core.PyObject;
+import org.python.core.PyString;
+import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
+import org.virbo.dsops.Ops;
 
 /**
  * little GUI for printing the PDB output and sending commands to it.
@@ -130,27 +133,32 @@ public class DebuggerConsole extends javax.swing.JPanel {
         jTextArea1.append(s);
     }
     
-        /**
-         * standard mode output.
-         */
-        protected final Object STATE_OPEN="OPEN";
-        /**
-         * collect the prompt so that it is not echoed.
-         */
-        protected final Object STATE_FORM_PDB_PROMPT="PROMPT";
-        /**
-         * collect the prompt so that it is not echoed.
-         */
-        protected final Object STATE_RETURN_INIT_PROMPT="RETURN";
-        /**
-         * pdb output encountered.
-         */
-        protected final Object STATE_PDB="PDB";
-        
-        /**
-         * pdb response
-         */
-        protected final Object STATE_FORM_PDB_RESPONSE="RESPONSE";
+    /**
+     * standard mode output.  
+     * @see ScriptPanelSupport
+     */
+    protected final Object STATE_OPEN="OPEN";
+    /**
+     * collect the prompt so that it is not echoed.
+     * @see ScriptPanelSupport
+     */
+    protected final Object STATE_FORM_PDB_PROMPT="PROMPT";
+    /**
+     * collect the prompt so that it is not echoed.
+     * @see ScriptPanelSupport
+     */
+    protected final Object STATE_RETURN_INIT_PROMPT="RETURN";
+    /**
+     * pdb output encountered.
+     * @see ScriptPanelSupport
+     */
+    protected final Object STATE_PDB="PDB";
+
+    /**
+     * pdb response
+     * @see ScriptPanelSupport
+     */
+    protected final Object STATE_FORM_PDB_RESPONSE="RESPONSE";
             
     private String getCharsForState( String s, Object state ) {
         StringBuilder result= new StringBuilder();
@@ -223,6 +231,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         jSplitPane1.setLeftComponent(jScrollPane1);
 
         jTextArea2.setColumns(20);
+        jTextArea2.setFont(new java.awt.Font("Ubuntu", 0, 8)); // NOI18N
         jTextArea2.setRows(5);
         jScrollPane2.setViewportView(jTextArea2);
 
@@ -278,7 +287,22 @@ public class DebuggerConsole extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     void setEval(String expr) {
-        printObj= out.eval(expr);
+        expr= expr.trim();
+        PyObject lo= out.getLocals();
+        if ( lo instanceof PyStringMap ) {
+            PyStringMap psm= (PyStringMap)lo;
+            printObj= psm.get(new PyString(expr) );
+        }
+        if ( printObj==null ) {
+            if ( Ops.safeName(expr).equals(expr) ) {
+                printObj= new PyString("Name error: "+expr);
+            } else {
+                printObj= new PyString("expressions cannot be evaluated");
+            }
+        }
+        //if ( printObj==null ) {
+        //    printObj= out.eval(expr);
+        //}
     }
 
     PyObject getEval() {
