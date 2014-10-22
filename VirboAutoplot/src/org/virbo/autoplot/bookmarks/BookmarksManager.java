@@ -1628,6 +1628,9 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         logger.log(Level.FINE, "formatting {0}", f);
         OutputStream out = null;
         try {
+            if ( f.getParentFile()==null ) {
+                throw new NullPointerException("file does not have a parent: "+f);
+            }
             File temp= File.createTempFile( prefNode, ".temp.xml", f.getParentFile() );
             out= new FileOutputStream(temp);
             Bookmark.formatBooks(out,model.getList());
