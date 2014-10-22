@@ -210,9 +210,9 @@ public class EditorTextPane extends JEditorPane {
      * @param doThis an expression evaluated by the current interpreter.
      */
     void plotSoon( final String doThis ) {
-        if ( support.interp==null ) {
-            JOptionPane.showMessageDialog(this,"Session is not running.  There must be an active debugger to plot variables.");
-            return;
+        EditorAnnotationsSupport.ExpressionLookup l= EditorAnnotationsSupport.getExpressionLookup();
+        if ( l==null ) {
+            throw new IllegalArgumentException("Session is not running.  There must be an active debugger to plot variables.");
         }
         Runnable run= new Runnable() {
             public void run() {
