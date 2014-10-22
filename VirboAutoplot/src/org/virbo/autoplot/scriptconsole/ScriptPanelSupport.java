@@ -763,6 +763,7 @@ public class ScriptPanelSupport {
             
         }
        
+        @Override
         public void write(int b) throws IOException {
 
             if ( dc!=null ) dc.print(String.valueOf((char)b),state);
@@ -773,6 +774,8 @@ public class ScriptPanelSupport {
                     state= STATE_FORM_PDB_PROMPT;
                 } else if ( currentLine.length()>10 && currentLine.substring(0,10).equals("--Return--") ) {
                     state= STATE_RETURN_INIT_PROMPT;
+                    dc.started();
+                    dc.next();  // jump out of pdb
                 } else if ( currentLine.length()>0 && ( b==10 || b==13 ) ) {
                     currentLine= new StringBuilder();
                 }
@@ -798,7 +801,7 @@ public class ScriptPanelSupport {
                     state= STATE_OPEN;
                 }
             } else if ( state==STATE_PDB ) { // the beginning of the currentLine is (Pdb) and we want a terminator
-                Pattern p= Pattern.compile("\\(Pdb\\) (.*)>? <string>\\((\\d+)\\)\\?\\(\\)\\s*");
+                Pattern p= Pattern.compile("\\(Pdb\\) (.*)> <string>\\((\\d+)\\)\\?\\(\\)\\s*");
                 Pattern p2= Pattern.compile("\\(Pdb\\) (.*)--Return--.*>? <string>\\((\\d+)\\)\\?\\(\\)\\s*.*");
                 
                 int l= currentLine.length();
@@ -811,7 +814,7 @@ public class ScriptPanelSupport {
                         int[] pos= annotationsSupport.getLinePosition(Integer.parseInt(linenum));
                         annotationsSupport.annotateChars( pos[0], pos[1], "programCounter", "pc", interruptible );
                         String userOutput= m.group(1);
-                        if ( userOutput.length()>0 ) {
+                        if ( userOutput!=null && userOutput.length()>0 ) {
                             sink.write(userOutput.getBytes());
                             sink.write("\n".getBytes());
                         }
@@ -828,6 +831,8 @@ public class ScriptPanelSupport {
                             }
                             state= STATE_OPEN;
                             currentLine= new StringBuilder();
+                            dc.finished();
+                            dc.next();
                         } else {
                             state= STATE_OPEN;
                             currentLine= new StringBuilder();
