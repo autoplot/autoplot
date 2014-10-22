@@ -163,11 +163,12 @@ public class EditorTextPane extends JEditorPane {
      * @param doThis expression to evaluate
      */
     private void plot( String doThis ) {
-        if ( support.interp==null ) {
+        EditorAnnotationsSupport.ExpressionLookup l= EditorAnnotationsSupport.getExpressionLookup();
+        if ( l==null ) {
             throw new IllegalArgumentException("No interpreter available to evaluate expression");
         }
         try {
-            PyObject po= support.interp.eval(doThis);
+            PyObject po= l.lookup(doThis);
             if ( po instanceof PyQDataSet ) {
                 try {
                     PyQDataSet pds = (PyQDataSet) po;
