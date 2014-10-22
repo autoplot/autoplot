@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.python.core.Py;
 import org.python.core.PyFile;
+import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 
 /**
@@ -32,6 +33,8 @@ public class DebuggerConsole extends javax.swing.JPanel {
     private static final Logger logger= Logger.getLogger("autoplot.jython.console");
     
     private static PipedInputStream pin;
+    
+    private static PyObject printObj;
     
     /**
      * set this to true to evaluate expressions on event thread.  This fails off the event thread, but I'm not sure why.
@@ -273,4 +276,12 @@ public class DebuggerConsole extends javax.swing.JPanel {
     private javax.swing.JButton upButton;
     private javax.swing.JButton whereButton;
     // End of variables declaration//GEN-END:variables
+
+    void setEval(String expr) {
+        printObj= out.eval(expr);
+    }
+
+    PyObject getEval() {
+        return printObj;
+    }
 }
