@@ -73,7 +73,6 @@ public class EditorAnnotationsSupport {
     }
 
     private JEditorPane editorPanel;
-    PythonInterpreter interp;
 
     EditorAnnotationsSupport(JEditorPane editorPanel) {
         this.editorPanel = editorPanel;
@@ -333,8 +332,6 @@ public class EditorAnnotationsSupport {
                 ann.marker= mark;
                 ann.highlightInfo= highlightInfo;
                 annotations.put(ann.offset, ann);
-                EditorAnnotationsSupport.this.interp= interp;
-                EditorAnnotationsSupport.setExpressionLookup(EditorAnnotationsSupport.this.getForInterp(interp));
             }
         } );
     }
