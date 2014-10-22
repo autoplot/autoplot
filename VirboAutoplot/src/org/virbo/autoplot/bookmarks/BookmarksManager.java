@@ -1495,6 +1495,8 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
         final File f = new File( f2, nodeName + ".xml");
         bookmarksFile= f;
+               
+        setPrefNode(nodeName);
         
         if ( !bookmarksFile.exists() ) {
             defaultUrl= AutoplotUtil.getProperty( propName, deft );
@@ -1511,7 +1513,6 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             }
         }
         
-        setPrefNode(nodeName);
         defaultUrl= AutoplotUtil.getProperty( propName, deft );
         
     }
@@ -1631,7 +1632,12 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             if ( f.getParentFile()==null ) {
                 throw new NullPointerException("file does not have a parent: "+f);
             }
-            File temp= File.createTempFile( prefNode, ".temp.xml", f.getParentFile() );
+            String p= prefNode;
+            if ( p==null ) {
+                p= f.getName();
+                p= p.replaceAll("\\.xml", "");
+            }
+            File temp= File.createTempFile( p, ".temp.xml", f.getParentFile() );
             out= new FileOutputStream(temp);
             Bookmark.formatBooks(out,model.getList());
             out.close();
