@@ -96,17 +96,17 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     }
     
     /**
-     * 
-     * @param rank
+     * Make a BufferDataSet of the given type.
+     * @param rank the rank (number of indeces) of the data.
      * @param reclen  length in bytes of each record
      * @param recoffs  byte offet of each record
      * @param len0   number of elements in the first index
      * @param len1   number of elements in the second index
      * @param len2   number of elements in the third index
      * @param len3 number of elements in the fourth index
-     * @param buf   ByteBuffer containing the data, which should be at least reclen * len0 bytes long.
+     * @param buf   ByteBuffer containing the data, which should be at least recoffs + reclen * len0 bytes long.
      * @param type   BufferDataSet.INT, BufferDataSet.DOUBLE, etc...
-     * @return
+     * @return BufferDataSet of the given type.
      */
     public static BufferDataSet makeDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, int len3, ByteBuffer buf, Object type ) {
         BufferDataSet result;
@@ -143,6 +143,28 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         return result;
     }
 
+    /**
+     * Make a BufferDataSet of the given type.
+     * @param rank the rank (number of indeces) of the data.
+     * @param reclen  length in bytes of each record
+     * @param recoffs  byte offet of each record
+     * @param qube int array of the number of elements in each index.  If rank is less than the number of elements, then ignore extra trailing elements.
+     * @param buf  ByteBuffer containing the data, which should be at least recoffs + reclen * len0 bytes long.
+     * @param type BufferDataSet.INT, BufferDataSet.DOUBLE, etc...
+     * @return BufferDataSet of the given type.
+     */
+    public static BufferDataSet makeDataSet(  int rank, int reclen, int recoffs, int[] qube, ByteBuffer buf, Object type ) {
+        int len0=1;
+        int len1=1;
+        int len2=1;
+        int len3=1;
+        if ( rank>0 ) len0= qube[0];
+        if ( rank>1 ) len1= qube[1];
+        if ( rank>2 ) len2= qube[2];
+        if ( rank>3 ) len3= qube[3];
+        return makeDataSet(rank, reclen, recoffs, len0, len1, len2, len3, buf, type );
+    }
+    
     /**
      * Create a new BufferDataSet of the given type.  Simple sanity checks are made, including:
      *   rank 1 dataset may not have len1>1.
