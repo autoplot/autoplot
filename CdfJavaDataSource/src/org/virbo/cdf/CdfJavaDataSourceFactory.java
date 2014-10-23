@@ -42,8 +42,13 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
     }    
     
     public DataSource getDataSource(URI uri) throws Exception {
-        //return new org.autoplot.cdf.CdfDataSource( uri );
-        return new CdfJavaDataSource( uri );
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> params= URISplit.parseParams(split.params);
+        if ( "T".equals(params.get("new")) ) {
+            return new org.autoplot.cdf.CdfDataSource( uri );
+        } else {
+            return new CdfJavaDataSource( uri );
+        }
     }
     
     
