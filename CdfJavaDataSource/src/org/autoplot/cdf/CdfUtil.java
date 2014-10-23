@@ -445,40 +445,25 @@ public class CdfUtil {
             qube= nqube;
         }
         
+        Object bbType= byteBufferType( cdf.getType(svariable) );
+        int recLenBytes= BufferDataSet.byteCount(bbType);
+        if ( qube.length>0 ) recLenBytes= recLenBytes * DataSetUtil.product( Arrays.copyOfRange( qube, 1, qube.length ) );
+                        
         if ( cdf.rowMajority()  ) {
             if ( useBuf && buf!=null ) {
                 if ( cdf.getType(svariable)==CDFConstants.CDF_FLOAT || cdf.getType(svariable)==CDFConstants.CDF_REAL4 ) {
-                    int reclen= 1;
-                    for ( int i=1; i<qube.length; i++ ) reclen*= qube[i];
-
-                    Object type;
-                    switch ( cdf.getType(svariable) ) {
-                        case (int)CDFConstants.CDF_FLOAT:
-                            type= BufferDataSet.FLOAT;
-                            break;
-                        case (int)CDFConstants.CDF_REAL4:
-                            type= BufferDataSet.FLOAT;
-                            break;
-                        default: throw new RuntimeException("bad type!");
-                    }
-                    reclen= reclen * BufferDataSet.byteCount(type);
-
-                    ByteBuffer aggBuffer= ByteBuffer.allocate(reclen*qube[0]);
-                    for ( int i=0; i<buf.length; i++ ) {
-                        aggBuffer.put(buf[i]);
-                    }
-                    aggBuffer.flip();
-
-                    result= BufferDataSet.makeDataSet( qube.length, reclen, 0, qube[0],
-                                qube.length < 2 ? 1 : qube[1],
-                                qube.length < 3 ? 1 : qube[2],
-                                qube.length < 4 ? 1 : qube[3],
-                                aggBuffer, type );
+                    result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
+                        qube,
+                        buf[0], bbType );
                 } else {
                     throw new IllegalArgumentException("internal error unimplemented: "+cdf.getType(svariable) );
                 }
             } else {
-                result= ArrayDataSet.wrap( odata, qube, false );
+                result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
+                    qube,
+                    buf[0], bbType );
+                throw new IllegalArgumentException("untested");
+                
             }
         } else {
             if ( recCount==-1 ) {
@@ -499,7 +484,9 @@ public class CdfUtil {
                 qqube[0]= 1;
                 System.arraycopy(qube, 0, qqube, 1, qube.length);
                 //result= TrArrayDataSet.wrap( odata, qqube, false );
-                result= (MutablePropertyDataSet) TrArrayDataSet.wrap( odata, qqube, false ).slice(0);
+                result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
+                        qube,
+                        buf[0], bbType );
             } else {
                 if ( true ) {
                     if ( qube.length==3 ) {
@@ -515,14 +502,8 @@ public class CdfUtil {
                     }
                 }
                 
-                Object bbType= byteBufferType( cdf.getType(svariable) );
-                
-                int recLenBytes= BufferDataSet.byteCount(bbType) * DataSetUtil.product( Arrays.copyOfRange( qube, 1, qube.length ) );
-                        
-                result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, qube[0], 
-                        qube.length>0 ? qube[1]: 1, 
-                        qube.length>1 ? qube[2]: 1, 
-                        qube.length>2 ? qube[3]: 1, 
+                result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
+                        qube,
                         buf[0], bbType );
                 //result= TrArrayDataSet.wrap( odata, qube, false );
             }
@@ -570,7 +551,6 @@ public class CdfUtil {
             if ( qube.length==2 && qube[1]==1 ) {// kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
                 qube= new int[] { qube[0] };
             }
-            result= ArrayDataSet.wrap( odata, qube, false );
             result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
             result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
         } else if ( varType==CDFConstants.CDF_EPOCH16 ) {
