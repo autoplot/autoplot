@@ -572,6 +572,20 @@ public class CdfDataSource extends AbstractDataSource {
         return names.contains(var);
     }
 
+    /**
+     * My version of Nand's library results in a null pointer exception for some cdf files.
+     * @param cdf the reader.
+     * @param attr the attribute
+     * @return null or the attribute value.
+     */
+    private Object getAttribute( CDFReader cdf, String attr ) {
+        try {
+            return cdf.getAttribute(attr);
+        } catch ( NullPointerException ex ) {
+            return null;
+        }
+    }
+    
     /* read all the variable attributes into a Map */
     private synchronized HashMap<String, Object> readAttributes(CDFReader cdf, String var, int depth) {
         LinkedHashMap<String, Object> props = new LinkedHashMap<String, Object>();
@@ -589,12 +603,12 @@ public class CdfDataSource extends AbstractDataSource {
 
         // do two global attr for S/C identification
         Object gattr;
-        gattr= cdf.getAttribute("Source_name");
+        gattr= getAttribute( cdf,"Source_name");
         if ( gattr!=null && gattr.getClass().isArray() && Array.getLength(gattr)>0 ) {
             props.put( "Source_name", String.valueOf( Array.get(gattr,0) ) );
         }
 
-        gattr= cdf.getAttribute("Descriptor");
+        gattr= getAttribute( cdf,"Descriptor");
         if ( gattr!=null && gattr.getClass().isArray() && Array.getLength(gattr)>0 ) {
             props.put( "Descriptor", String.valueOf( Array.get(gattr,0) ) );
         }
