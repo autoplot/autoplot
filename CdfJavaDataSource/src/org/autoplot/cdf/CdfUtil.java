@@ -110,6 +110,25 @@ public class CdfUtil {
         }
     }
     
+    private static Object byteBufferType( int type ) {
+        if ( type==CDFConstants.CDF_DOUBLE || type==CDFConstants.CDF_REAL8 || type==CDFConstants.CDF_EPOCH ) {
+            return BufferDataSet.DOUBLE;
+        } else if ( type==CDFConstants.CDF_FLOAT || type==CDFConstants.CDF_REAL4 ) {
+            return BufferDataSet.FLOAT;
+        } else if ( type==CDFConstants.CDF_INT8 || type==CDFConstants.CDF_UINT4 || type==CDFConstants.CDF_TT2000 ) {
+            return BufferDataSet.LONG;
+        } else if ( type==CDFConstants.CDF_INT4 || type==CDFConstants.CDF_UINT2 ) {
+            return BufferDataSet.INT;
+        } else if ( type==CDFConstants.CDF_INT2 || type==CDFConstants.CDF_UINT1 ) {
+            return BufferDataSet.SHORT;
+        } else if ( type==CDFConstants.CDF_INT1 ) {
+            return BufferDataSet.BYTE;
+        } else if ( type==CDFConstants.CDF_CHAR || type==CDFConstants.CDF_UCHAR ) {
+            return BufferDataSet.USHORT; // TODO: I think...
+        } else {
+            throw new IllegalArgumentException("unsupported type: "+type);
+        }        
+    }
     /**
      * Creates a new instance of CdfUtil
      */
@@ -370,38 +389,13 @@ public class CdfUtil {
         if ( rc==-1 ) rc= 1;  // -1 is used as a flag for a slice, we still really read one record.
 
         logger.log( Level.FINEST, "size of {0}: {1}MB  type: {2}", new Object[]{svariable, sizeOf(dims, dimSizes, varType, rc) / 1024. / 1024., varType});
-
+        
         try {
-            if ( recStart==0 && ( recCount==-1 || recCount==varRecCount ) && recInterval==1 ) {
-                if ( cdf.rowMajority() && ( cdf.getType(svariable)==CDFConstants.CDF_FLOAT || cdf.getType(svariable)==CDFConstants.CDF_REAL4 ) ) {
 
-                    ByteBuffer buff= cdf.getBuffer(svariable); // TODO
-                    
-                } else {
-                    //logger.fine("reading variable "+variable.getName());
-                    //
-                    if ( slice1==-1 ) {
-                        odata= cdf.getOneDArray( svariable, getTargetType( cdf.getType(svariable) ), new int[] { (int)recStart, (int)(recStart+rc*recInterval-1) }, true, false );
-                    } else {
-                        //odata= cdf.getOneDArray( svariable, "double", new int[] { (int)recStart, (int)(recStart+rc*recInterval-1) }, true, false );
-                        odata= getArraySlice( cdf, svariable, getTargetType( cdf.getType(svariable) ), new int[] { (int)recStart, (int)(recStart+rc*recInterval-1) }, true, false, slice1 );
-                        //throw new IllegalArgumentException("NOt supported slice1"); //TODO:
-                        //odata= cdf.get1DSlice1( variable.getName(), slice1, true );
-                    }
-                }
-            } else {
-                if ( cdf.getType(svariable)==CDFConstants.CDF_TT2000 ) { //TODO: other types like Long64?
-                    odata= cdf.get( svariable  );
-                    odata= subsampleTT2000( (long[])odata, (int)recStart, (int)recCount, (int)recInterval );
-                } else {
-                    if ( recInterval>1 ) {
-                        odata= getArrayStride( cdf, svariable, getTargetType( cdf.getType(svariable) ), new int[] { (int)recStart, (int)(recStart+rc*recInterval-1) }, true, false, (int)recInterval );
-                    } else {
-                        odata= cdf.getOneDArray( svariable, getTargetType( cdf.getType(svariable) ), new int[] { (int)recStart, (int)(recStart+rc*recInterval-1) }, true, false );
-                    }                
-                }
-//                odata= cdf.get1D( variable.getName(), (int)recStart, (int)(recStart+(rc-1)*recInterval), stride ); //TODO: I think an extra record is extracted.  Try this with stride sometime.
-            }
+            String stype = getTargetType( cdf.getType(svariable) );
+            ByteBuffer buff2= cdf.getBuffer( svariable, stype, new int[] { 0,(int)rc-1 }, true );
+            buf= new ByteBuffer[] { buff2 };
+            
         } catch ( Throwable ex ) {
             if ( ex instanceof Exception ) {
                 throw (Exception)ex;
@@ -451,9 +445,6 @@ public class CdfUtil {
             qube= nqube;
         }
         
-
-        if ( cdf.rowMajority()==false ) buf= null;   // we won't support this yet.
-
         if ( cdf.rowMajority()  ) {
             if ( useBuf && buf!=null ) {
                 if ( cdf.getType(svariable)==CDFConstants.CDF_FLOAT || cdf.getType(svariable)==CDFConstants.CDF_REAL4 ) {
@@ -523,7 +514,17 @@ public class CdfUtil {
                         throw new IllegalArgumentException("rank limit");
                     }
                 }
-                result= TrArrayDataSet.wrap( odata, qube, false );
+                
+                Object bbType= byteBufferType( cdf.getType(svariable) );
+                
+                int recLenBytes= BufferDataSet.byteCount(bbType) * DataSetUtil.product( Arrays.copyOfRange( qube, 1, qube.length ) );
+                        
+                result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, qube[0], 
+                        qube.length>0 ? qube[1]: 1, 
+                        qube.length>1 ? qube[2]: 1, 
+                        qube.length>2 ? qube[3]: 1, 
+                        buf[0], bbType );
+                //result= TrArrayDataSet.wrap( odata, qube, false );
             }
         }
 
