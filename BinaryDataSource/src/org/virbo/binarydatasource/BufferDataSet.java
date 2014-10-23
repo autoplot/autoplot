@@ -268,8 +268,8 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         
     /**
      * return the offset, in bytes, of the element.
-     * @param i0
-     * @param i1
+     * @param i0 first index
+     * @param i1 second index
      * @return the offset, in bytes, of the element.
      */
     protected int offset(int i0, int i1 ) {
@@ -282,9 +282,9 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
 
     /**
      * return the offset, in bytes, of the element.
-     * @param i0
-     * @param i1
-     * @param i2
+     * @param i0 first index
+     * @param i1 second index
+     * @param i2 third index
      * @return the offset, in bytes, of the element.
      */
     protected int offset(int i0, int i1, int i2) {
@@ -297,9 +297,10 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
 
     /**
      * return the offset, in bytes, of the element.
-     * @param i0
-     * @param i1
-     * @param i2
+     * @param i0 first index
+     * @param i1 second index
+     * @param i2 third index
+     * @param i3 fourth index
      * @return the offset, in bytes, of the element.
      */
     protected int offset(int i0, int i1, int i2, int i3 ) {
@@ -307,7 +308,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         if (RANGE_CHECK) {
             rangeCheck(i0, i1, i2, i3);
         }
-        return recoffset + reclen * i0 + i1 * fieldLen * len2  + i2 * fieldLen ;
+        return recoffset + reclen * i0 + i1 * fieldLen * len2 * len3  + i2 * fieldLen * len3 + i3 * fieldLen ;
     }
 
     @Override
