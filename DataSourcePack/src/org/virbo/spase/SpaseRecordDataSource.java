@@ -150,6 +150,16 @@ public class SpaseRecordDataSource extends AbstractDataSource {
             if ( type==XMLTypeCheck.TYPE_SPASE ) {
                 surl= (String) xpath.evaluate( "//Spase/NumericalData/AccessInformation/AccessURL/URL/text()", document );
                 //surl= findSurl();
+                
+                if ( surl.trim().length()==0 ) {
+                    surl= (String) xpath.evaluate( "//Spase/Granule/Source/URL/text()", document );
+                    if ( surl.trim().length()==0 ) {
+                        throw new IllegalArgumentException("Expected to find URI in //Spase/Granule/Source/URL/text()");
+                    } else {
+                        throw new IllegalArgumentException("Granule is found at: "+surl+", unable to read" );
+                    }
+                }
+                
                 delegate= DataSetURI.getDataSource( DataSetURI.getURIValid( surl ) );
 
                 mon.setProgressMessage("reading "+delegate.getURI() );
