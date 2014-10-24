@@ -32,6 +32,7 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.ArrayDataSet;
+import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -93,6 +94,8 @@ public class CdfUtil {
     private static String getTargetType(int type) {
         if ( type==CDFConstants.CDF_DOUBLE || type==CDFConstants.CDF_REAL8 || type==CDFConstants.CDF_EPOCH ) {
             return "double";
+        } else if ( type==CDFConstants.CDF_EPOCH16 ) {
+            return "double";
         } else if ( type==CDFConstants.CDF_FLOAT || type==CDFConstants.CDF_REAL4 ) {
             return "float";
         } else if ( type==CDFConstants.CDF_INT8 || type==CDFConstants.CDF_UINT4 || type==CDFConstants.CDF_TT2000 ) {
@@ -123,8 +126,12 @@ public class CdfUtil {
             return BufferDataSet.SHORT;
         } else if ( type==CDFConstants.CDF_INT1 ) {
             return BufferDataSet.BYTE;
-        } else if ( type==CDFConstants.CDF_CHAR || type==CDFConstants.CDF_UCHAR ) {
-            return BufferDataSet.USHORT; // TODO: I think...
+        } else if ( type==CDFConstants.CDF_CHAR ) {
+            return BufferDataSet.BYTE; // determined experimentally: vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/ac_k0_mfi_20080602_v01.cdf?BGSEc
+        } else if (type==CDFConstants.CDF_UCHAR ) {
+            return BufferDataSet.BYTE; // TODO: I think...
+        } else if (type==CDFConstants.CDF_EPOCH16 ) {
+            return BufferDataSet.DOUBLE;
         } else {
             throw new IllegalArgumentException("unsupported type: "+type);
         }        
@@ -447,7 +454,6 @@ public class CdfUtil {
         }
 
         //CDFData cdfData= CDFData.get( variable, recStart, Math.max(1, recCount), recInterval, dimIndeces, dimCounts, dimIntervals, false );
-        Object odata=null;
         ByteBuffer[] buf=null;
         boolean useBuf= false;  // switch to turn NIO use on/off
 
@@ -459,7 +465,7 @@ public class CdfUtil {
         try {
 
             String stype = getTargetType( cdf.getType(svariable) );
-            ByteBuffer buff2= cdf.getBuffer( svariable, stype, new int[] { 0,(int)rc-1 }, true );
+            ByteBuffer buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+rc-1) }, true );
             buf= new ByteBuffer[] { buff2 };
             
         } catch ( Throwable ex ) {
@@ -470,37 +476,19 @@ public class CdfUtil {
             }
         }
 
-        if ( ( odata==null && buf==null ) && ( varType != CDFConstants.CDF_CHAR && varType!=CDFConstants.CDF_UCHAR ) ) {
-            String message= "something went wrong when reading "+svariable+", both odata and buf are null";
-            logger.fine(message);
-            throw new NullPointerException(message);
-        }
-
         MutablePropertyDataSet result;
-
-        //kludge: in library, where majority has no effect on dimSizes.  See
-        if ( ! cdf.rowMajority()  ) {
-            int n= dimSizes.length;
-            for ( int i=0; i<n/2; i++ ) {
-                int t= dimSizes[i];
-                dimSizes[i]= dimSizes[n-i-1];
-                dimSizes[n-i-1]= t;
-            }
-        }
         
         int[] qube;
+        qube= new int[ 1+dimSizes.length ];
+        for ( int i=0; i<dimSizes.length; i++ ) {
+            qube[i+1]= (int)dimSizes[i];
+        }
         if ( recCount==-1 ) {
-            qube= new int[ dimSizes.length ];
-            for ( int i=0; i<dimSizes.length; i++ ) {
-                qube[i]= (int)dimSizes[i];
-            }
+            qube[0]= 1;
         } else {
-            qube= new int[ 1+ dimSizes.length ];
-            for ( int i=0; i<dimSizes.length; i++ ) {
-                qube[1+i]= (int)dimSizes[i];
-            }
             qube[0]= (int)recCount;
         }
+
         if ( slice1>-1 ) { 
             if ( recCount==-1 ) throw new IllegalArgumentException("recCount==-1 and slice1>-1");
             int[] nqube= new int[qube.length-1];
@@ -513,56 +501,35 @@ public class CdfUtil {
         
         Object bbType= byteBufferType( cdf.getType(svariable) );
         int recLenBytes= BufferDataSet.byteCount(bbType);
-        if ( recCount==-1 ) {
-            if ( qube.length>1 ) recLenBytes= recLenBytes * DataSetUtil.product( Arrays.copyOfRange( dimSizes,1,dimSizes.length) );            
-        } else {
-            if ( qube.length>0 ) recLenBytes= recLenBytes * DataSetUtil.product( dimSizes );
-        }
+        if ( dimSizes.length>0 ) recLenBytes= recLenBytes * DataSetUtil.product( dimSizes );            
                         
         if ( cdf.rowMajority()  ) {
-            if ( useBuf && buf!=null ) {
-                if ( cdf.getType(svariable)==CDFConstants.CDF_FLOAT || cdf.getType(svariable)==CDFConstants.CDF_REAL4 ) {
-                    result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
+
+            if ( recCount==-1 ) {
+                result= BufferDataSet.makeDataSet( qube.length, recLenBytes, 0, 
                         qube,
                         buf[0], bbType );
-                } else {
-                    throw new IllegalArgumentException("internal error unimplemented: "+cdf.getType(svariable) );
-                }
+                result= (MutablePropertyDataSet)result.slice(0);
+                
             } else {
                 result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
-                    qube,
-                    buf[0], bbType );
-                throw new IllegalArgumentException("untested");
-                
+                        qube,
+                        buf[0], bbType );
             }
         } else {
             if ( recCount==-1 ) {
                 buf[0]= transpose(recLenBytes,qube,buf[0],bbType );
+                
                 result= BufferDataSet.makeDataSet( qube.length, recLenBytes, 0, 
                         qube,
                         buf[0], bbType );
+                result= (MutablePropertyDataSet)result.slice(0);
             } else {
-                if ( true ) {
-                    if ( qube.length==3 ) {
-                        int tr= qube[2];
-                        qube[2]= qube[1];
-                        qube[1]= tr;
-                    } else if ( qube.length==4 ) {
-                        int tr= qube[3];
-                        qube[3]= qube[1];
-                        qube[1]= tr;
-                    } else if ( qube.length>4 ) {
-                        throw new IllegalArgumentException("rank limit");
-                    }
-                }
-                
-                if ( qube.length>2 ) {
-                    buf[0]= transpose(recLenBytes,qube,buf[0],bbType );
-                }
+                buf[0]= transpose(recLenBytes,qube,buf[0],bbType );
+
                 result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
                         qube,
                         buf[0], bbType );
-                //result= TrArrayDataSet.wrap( odata, qube, false );
             }
         }
 
@@ -599,33 +566,31 @@ public class CdfUtil {
                 for ( int i=1; i<varies.length; i++ ) canSlice= canSlice && !varies[i];
             }
             if ( canSlice ) {
-                qube= new int[] { qube[0] };
+                qube= new int[] { qube[1] };
             }
             result= ArrayDataSet.wrap( back, qube, false );
             result.putProperty(QDataSet.UNITS, units);
 
         } else if ( varType == CDFConstants.CDF_EPOCH ) {
-            if ( qube.length==2 && qube[1]==1 ) {// kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
-                qube= new int[] { qube[0] };
-            }
             result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
             result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
+            
         } else if ( varType==CDFConstants.CDF_EPOCH16 ) {
+
+            result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
+            result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
+            
+            DDataSet result1= DDataSet.createRank1(result.length());
+            for ( int i=0; i<result.length(); i++ ) {
+                double t2000 = result.value(i,0) - 6.3113904e+10; // seconds since midnight 2000
+                result1.putValue( i, t2000 * 1e6 + result.value(i,1) / 1000000. );
+            }
+            result1.putProperty( QDataSet.UNITS, Units.us2000 );
+            result= result1;
+            
             // adapt to das2 by translating to Units.us2000, which should be good enough.
             // note when this is not good enough, new units types can be introduced, along with conversions.
-            double[] data = (double[]) odata;
-            double[] dresult = new double[data.length / 2];
-            for (int i = 0; i < dresult.length; i++) {
-                double t2000 = data[i * 2] - 6.3113904e+10; // seconds since midnight 2000
-                dresult[i] = t2000 * 1e6 + data[i * 2 + 1] / 1000000.;
-            }
-            
-            //pop off the 2 from the end of the qube.
-            int[] qube1= new int[qube.length-1];
-            System.arraycopy(qube, 0, qube1, 0, qube.length - 1);
 
-            result= ArrayDataSet.wrap( dresult, qube1, false );
-            result.putProperty(QDataSet.UNITS, Units.us2000);
 
         } else if ( varType==CDFConstants.CDF_TT2000 ) {
             result.putProperty( QDataSet.UNITS, Units.cdfTT2000 );
