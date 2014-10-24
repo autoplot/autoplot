@@ -180,7 +180,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      *   <li>reclen cannot be shorter than the byte length of the field type. 
      *   <li>buffer must have room for the dataset
      * </ul>
-     * @param rank
+     * @param rank dataset rank
      * @param reclen  length in bytes of each record
      * @param recoffs  byte offet of each record
      * @param len0   number of elements in the first index
@@ -188,7 +188,6 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * @param len2   number of elements in the third index
      * @param back   ByteBuffer containing the data, which should be at least reclen * len0 bytes long.
      * @param type   BufferDataSet.INT, BufferDataSet.DOUBLE, etc...
-     * @return
      */
     public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, Object type, ByteBuffer back  ) {
         this( rank, reclen, recoffs, len0, len1, len2, 11, type, back );
@@ -209,9 +208,11 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * @param len3   number of elements in the fourth index
      * @param back   ByteBuffer containing the data, which should be at least reclen * len0 bytes long.
      * @param type   BufferDataSet.INT, BufferDataSet.DOUBLE, etc...
-     * @return
      */
     public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, int len3, Object type, ByteBuffer back  ) {
+        if ( rank<0 ) {
+            throw new IllegalArgumentException("rank cannot be negative");
+        }
         if ( rank==1 && len1>1 ) throw new IllegalArgumentException("rank is 1, but len1 is not 1");
         if ( reclen < byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller that length of type "+type);
         if ( reclen*len0 > back.limit() ) throw new IllegalArgumentException("buffer is too short (len="+back.limit()+") to contain data ("+len0+" "+reclen+" byte records)");
