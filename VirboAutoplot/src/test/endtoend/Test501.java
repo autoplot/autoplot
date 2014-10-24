@@ -178,9 +178,9 @@ public class Test501 {
                     System.err.println("skipping /test/: "+id);
                     continue;
                 }
-                if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) {
-                    skip.add(count);
-                }
+                //if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) {
+                //    skip.add(count);
+                //
                 count++;
             }
 
@@ -207,21 +207,21 @@ public class Test501 {
                     iis++;
                     continue;
                 }
-                if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) {
-                    System.err.println( "Kludge for skipping Chris' Juno stuff: " + id );
-                    iis++;
-                    continue;
-                }
-                if ( id.contains("juno/waves/em/svt") ) {
-                    System.err.println( "Kludge for skipping Chris' Juno stuff (juno/waves/em/svt): " + id );
-                    iis++;
-                    continue;
-                }
-                if ( id.contains("/van_allen_probes/") ) {
-                    System.err.println( "Kludge for skipping Chris' Van Allen stuff " + id );
-                    iis++;
-                    continue;
-                }
+//                if ( id.contains("juno/waves") && id.contains("housekeeping.dsdf") && !id.contains("/juno/waves/flight/housekeeping.dsdf") ) {
+//                    System.err.println( "Kludge for skipping Chris' Juno stuff: " + id );
+//                    iis++;
+//                    continue;
+//                }
+//                if ( id.contains("juno/waves/em/svt") ) {
+//                    System.err.println( "Kludge for skipping Chris' Juno stuff (juno/waves/em/svt): " + id );
+//                    iis++;
+//                    continue;
+//                }
+//                if ( id.contains("/van_allen_probes/") ) {
+//                    System.err.println( "Kludge for skipping Chris' Van Allen stuff " + id );
+//                    iis++;
+//                    continue;
+//                }
                 if ( id.contains("freq/f_") ) {
                     System.err.println( "Kludge for skipping Jeremy's FCE freq stuff, which is redundant and slow " + id );
                     iis++;
