@@ -55,10 +55,15 @@ public class Test032 {
         String uri= "vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Ecounts";
         QDataSet ds1;
         long t0= System.currentTimeMillis();
-        ds1= Util.getDataSet( uri + "[2]" );
 
         QDataSet ds2;
         ds2= Util.getDataSet( uri + "" );
+        ds1= Util.getDataSet( uri + "[2]" );
+
+        QDataSet Ecounts= Util.getDataSet("vap+cdf:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Ecounts");
+        
+        System.err.println("Ecounts[0,0,0,0]= "+Ecounts.value(0,0,0,0) + "    = 2.8333332538604736 at rev 15298" );
+        System.err.println("Ecounts[0,1,0,0]= "+Ecounts.value(0,1,0,0) + "    = 4.833333492279053 at rev 15298" );
 
         // the result should be Ecounts[Epoch=977,40,6,24].  This is what matches cdfedit (note cdfedit indexes start with 1).
         //   Ecounts[0,0,0,0]= 2.83
