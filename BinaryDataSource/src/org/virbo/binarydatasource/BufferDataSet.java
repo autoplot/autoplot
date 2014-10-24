@@ -5,9 +5,11 @@
 package org.virbo.binarydatasource;
 
 import java.nio.ByteBuffer;
+import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.AbstractDataSet;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
@@ -114,7 +116,9 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         int nperRec=  len1 * len2 * len3; // assumes unused params are "1"
         if ( reclen < byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller than length of type "+type); 
         if ( reclen < nperRec * byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller than length of " + nperRec +" type "+type); 
-        if ( reclen * len0 > buf.limit() ) throw new IllegalArgumentException( String.format( "buffer length (%d bytes) is too small to contain data (%d %d-byte records)", buf.limit(), len0, reclen ) );
+        if ( reclen * len0 > buf.limit() ) {
+            throw new IllegalArgumentException( String.format( "buffer length (%d bytes) is too small to contain data (%d %d-byte records)", buf.limit(), len0, reclen ) );
+        }
         if ( type.equals(DOUBLE) ) {
             result=new Double( rank, reclen, recoffs, len0, len1, len2, len3, buf );
         } else if ( type.equals(FLOAT) ) {
@@ -166,9 +170,11 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     }
     
     /**
-     * Create a new BufferDataSet of the given type.  Simple sanity checks are made, including:
-     *   rank 1 dataset may not have len1>1.
-     *   reclen cannot be shorter than the byte length of the field type.
+     * Create a new BufferDataSet of the given type.  Simple sanity checks are made, including:<ul>
+     *   <li>rank 1 dataset may not have len1&gt;1.
+     *   <li>reclen cannot be shorter than the byte length of the field type. 
+     *   <li>buffer must have room for the dataset
+     * </ul>
      * @param rank
      * @param reclen  length in bytes of each record
      * @param recoffs  byte offet of each record
@@ -184,10 +190,12 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     }
 
     /**
-     * Create a new BufferDataSet of the given type.  Simple sanity checks are made, including:
-     *   rank 1 dataset may not have len1>1.
-     *   reclen cannot be shorter than the byte length of the field type. 
-     * @param rank
+     * Create a new BufferDataSet of the given type.  Simple sanity checks are made, including:<ul>
+     *   <li>rank 1 dataset may not have len1&gt;1.
+     *   <li>reclen cannot be shorter than the byte length of the field type. 
+     *   <li>buffer must have room for the dataset
+     * </ul>
+     * @param rank   dataset rank
      * @param reclen  length in bytes of each record
      * @param recoffs  byte offet of each record
      * @param len0   number of elements in the first index
@@ -201,7 +209,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, int len3, Object type, ByteBuffer back  ) {
         if ( rank==1 && len1>1 ) throw new IllegalArgumentException("rank is 1, but len1 is not 1");
         if ( reclen < byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller that length of type "+type);
-
+        if ( reclen*len0 > back.limit() ) throw new IllegalArgumentException("buffer is too short (len="+back.limit()+") to contain data ("+len0+" "+reclen+" byte records)");
         this.back= back;
         this.rank = rank;
         this.reclen= reclen;
@@ -276,12 +284,12 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     }
 
     /**
-     * return the offset, in bytes, of the element.
+     * return the offset, in bytes, of the element.  We do not check
+     * the dataset rank, so that trim and slice may find the location of any record.
      * @param i0
      * @return the offset, in bytes, of the element.
      */
     protected int offset(int i0 ) {
-        if ( this.rank!=1 ) throw new IllegalArgumentException("rank error");
         if (RANGE_CHECK) {
             rangeCheck(i0, 0, 0, 0 );
         }
@@ -359,24 +367,31 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         return result;
     }
 
-    /*public BufferDataSet slice( int i0 ) {
-        if ( rank==0 ) {
-            throw new IllegalArgumentException("rank limit, can't slice rank zero");
-        } else {
-            return makeDataSet( rank-1, reclen, recoffset, len1, len2, 1, back, type );
-        }
-    }*/
+    /**
+     * slice operator based on ArrayDataSet code.
+     * @param i
+     * @return
+     */
+    @Override
+    public QDataSet slice(int i) {
+        BufferDataSet result= makeDataSet( rank-1, byteCount(type)*len2*len3, offset(i), len1, len2, len3, 1, back, type );
+        Map<String,Object> props= DataSetOps.sliceProperties0(i,DataSetUtil.getProperties(this));
+        props= DataSetUtil.sliceProperties( this, i, props );
+        DataSetUtil.putProperties( props, result );
+        return result;
+    }
     
     /**
      * dump the contents to this buffer.
      * @param buf
      */
     public void copyTo( ByteBuffer buf ) {
-        this.back.position( recoffset );
-        this.back.mark();
-        this.back.limit( recoffset + reclen * len0 );
+        ByteBuffer lback= this.back.duplicate(); // duplicate just the indeces, not the data
+        lback.order(back.order());
+        lback.position( recoffset );
+        lback.mark();
+        lback.limit( recoffset + reclen * len0 );
         buf.put( this.back );
-        this.back.reset();
     }
 
     /**
