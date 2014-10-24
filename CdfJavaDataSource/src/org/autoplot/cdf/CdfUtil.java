@@ -374,14 +374,15 @@ public class CdfUtil {
     
     
     /**
-     *
+     * Return the named variable as a QDataSet.
      * @param cdf the value of cdf
-     * @param variable the value of variable
-     * @param recStart the value of recStart
-     * @param recCount the value of recCount
-     * @param recInterval the value of recInterval
-     * @param slice1 the value of slice1
-     * @param mon the value of mon
+     * @param svariable name of the variable
+     * @param recStart the first record to retrieve (0 is the first record in the file).
+     * @param recCount the number of records to retrieve
+     * @param recInterval the number of records to increment, typically 1 (e.g. 2= every other record).
+     * @param slice1 if non-negative, return the slice at this point.
+     * @param mon progress monitor (currently not used), or null.
+     * @return the dataset
      * @throws Exception
      */
     public static MutablePropertyDataSet wrapCdfHyperDataHacked(
