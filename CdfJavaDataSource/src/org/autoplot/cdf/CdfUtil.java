@@ -87,8 +87,8 @@ public class CdfUtil {
 
     /**
      * return the Java type used to store the CDF data type.
-     * @param type
-     * @return 
+     * @param type 45, 44, or 51
+     * @return String like double, float or string
      */
     private static String getTargetType(int type) {
         if ( type==CDFConstants.CDF_DOUBLE || type==CDFConstants.CDF_REAL8 || type==CDFConstants.CDF_EPOCH ) {
@@ -104,7 +104,7 @@ public class CdfUtil {
         } else if ( type==CDFConstants.CDF_INT1 ) {
             return "byte";
         } else if ( type==CDFConstants.CDF_CHAR || type==CDFConstants.CDF_UCHAR ) {
-            return "char";
+            return "string";
         } else {
             throw new IllegalArgumentException("unsupported type: "+type);
         }
@@ -133,14 +133,17 @@ public class CdfUtil {
     /**
      * column major files require a transpose of each record.  This makes a copy of the input, because I'm nervous
      * that this might be backed by a writable cdf file.
-     * @param rank
-     * @param recLenBytes
-     * @param qube
+     * @param recLenBytes length of each record in bytes.  (qube=2,3 bbType=float, then this is 2*4=8.)
+     * @param qube dimensions, a 0,1,..,4 element array.
      * @param byteBuffer
      * @param bbType
      * @return the byte buffer.
      */
-    private static ByteBuffer transpose( int rank, int recLenBytes, int[] qube, ByteBuffer byteBuffer, Object bbType ) {
+    private static ByteBuffer transpose( int recLenBytes, int[] qube, ByteBuffer byteBuffer, Object bbType ) {
+        if ( qube.length<3 ) {
+            return byteBuffer;
+        }
+        
         ByteBuffer temp= ByteBuffer.allocate(recLenBytes);
         ByteBuffer result= ByteBuffer.allocate(recLenBytes * qube[0]);
         result.order(byteBuffer.order());
@@ -184,7 +187,7 @@ public class CdfUtil {
         } else if ( qube.length<3 ) {
             return byteBuffer;
         } else {
-            throw new IllegalArgumentException("rank 3 and rank 4, supported but this is rank "+rank );
+            throw new IllegalArgumentException("number of dimensions must be less than 5: "+qube.length );
         }
         result.flip();
         
@@ -533,7 +536,7 @@ public class CdfUtil {
             }
         } else {
             if ( recCount==-1 ) {
-                buf[0]= transpose(qube.length,recLenBytes,qube,buf[0],bbType );
+                buf[0]= transpose(recLenBytes,qube,buf[0],bbType );
                 result= BufferDataSet.makeDataSet( qube.length, recLenBytes, 0, 
                         qube,
                         buf[0], bbType );
@@ -553,7 +556,7 @@ public class CdfUtil {
                 }
                 
                 if ( qube.length>2 ) {
-                    buf[0]= transpose(qube.length,recLenBytes,qube,buf[0],bbType );
+                    buf[0]= transpose(recLenBytes,qube,buf[0],bbType );
                 }
                 result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
                         qube,
