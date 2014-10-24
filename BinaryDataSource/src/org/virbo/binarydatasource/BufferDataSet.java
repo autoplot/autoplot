@@ -100,7 +100,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     /**
      * Make a BufferDataSet of the given type.
      * @param rank the rank (number of indeces) of the data.
-     * @param reclen  length in bytes of each record
+     * @param reclen  length in bytes of each record.  This may be longer than len1*len2*len3*byteCount(type)
      * @param recoffs  byte offet of each record
      * @param len0   number of elements in the first index
      * @param len1   number of elements in the second index
@@ -114,8 +114,12 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         BufferDataSet result;
         if ( rank==1 && len1>1 ) throw new IllegalArgumentException("rank is 1, but len1 is not 1");
         int nperRec=  len1 * len2 * len3; // assumes unused params are "1"
-        if ( reclen < byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller than length of type "+type); 
-        if ( reclen < nperRec * byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller than length of " + nperRec +" type "+type); 
+        if ( reclen < byteCount(type) ) {
+            throw new IllegalArgumentException("reclen " + reclen + " is smaller than length of type "+type);
+        } 
+        if ( reclen < nperRec * byteCount(type) ) {
+            throw new IllegalArgumentException("reclen " + reclen + " is smaller than length of " + nperRec +" type "+type);
+        } 
         if ( reclen * len0 > buf.limit() ) {
             throw new IllegalArgumentException( String.format( "buffer length (%d bytes) is too small to contain data (%d %d-byte records)", buf.limit(), len0, reclen ) );
         }
