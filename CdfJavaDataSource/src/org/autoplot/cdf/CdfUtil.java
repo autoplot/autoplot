@@ -136,7 +136,7 @@ public class CdfUtil {
             throw new IllegalArgumentException("unsupported type: "+type);
         }        
     }
-
+    
     /**
      * column major files require a transpose of each record.  This makes a copy of the input, because I'm nervous
      * that this might be backed by a writable cdf file.
@@ -460,10 +460,25 @@ public class CdfUtil {
 
         logger.log( Level.FINEST, "size of {0}: {1}MB  type: {2}", new Object[]{svariable, sizeOf(dims, dimSizes, varType, rc) / 1024. / 1024., varType});
         
+        Object bbType= byteBufferType( cdf.getType(svariable) );
+        int recLenBytes= BufferDataSet.byteCount(bbType);
+        if ( dimSizes.length>0 ) recLenBytes= recLenBytes * DataSetUtil.product( dimSizes );            
+        
         try {
 
             String stype = getTargetType( cdf.getType(svariable) );
-            ByteBuffer buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+rc-1) }, true );
+            ByteBuffer buff2;
+            if ( recInterval>1 ) {
+                buff2= ByteBuffer.allocate((int)(recLenBytes*rc));
+                for ( int i=0; i<rc; i++ ) {
+                    int recNum= (int)recStart+(int)recInterval*i;
+                    ByteBuffer buff1= cdf.getBuffer( svariable, stype, new int[] { recNum,recNum }, true );
+                    buff2.put(buff1);
+                    if ( i==0 ) buff2.order(buff1.order());
+                }
+            } else {
+                buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, true );
+            }
             buf= new ByteBuffer[] { buff2 };
             
         } catch ( Throwable ex ) {
@@ -496,11 +511,7 @@ public class CdfUtil {
             }
             qube= nqube;
         }
-        
-        Object bbType= byteBufferType( cdf.getType(svariable) );
-        int recLenBytes= BufferDataSet.byteCount(bbType);
-        if ( dimSizes.length>0 ) recLenBytes= recLenBytes * DataSetUtil.product( dimSizes );            
-                        
+                          
         if ( cdf.rowMajority()  ) {
 
             if ( recCount==-1 ) {
