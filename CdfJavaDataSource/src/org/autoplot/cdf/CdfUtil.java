@@ -129,6 +129,68 @@ public class CdfUtil {
             throw new IllegalArgumentException("unsupported type: "+type);
         }        
     }
+
+    /**
+     * column major files require a transpose of each record.  This makes a copy of the input, because I'm nervous
+     * that this might be backed by a writable cdf file.
+     * @param rank
+     * @param recLenBytes
+     * @param qube
+     * @param byteBuffer
+     * @param bbType
+     * @return the byte buffer.
+     */
+    private static ByteBuffer transpose( int rank, int recLenBytes, int[] qube, ByteBuffer byteBuffer, Object bbType ) {
+        ByteBuffer temp= ByteBuffer.allocate(recLenBytes);
+        ByteBuffer result= ByteBuffer.allocate(recLenBytes * qube[0]);
+        result.order(byteBuffer.order());
+                
+        int fieldBytes= BufferDataSet.byteCount(bbType);
+        if ( qube.length==3 ) {
+            int len1= qube[1];
+            int len2= qube[2];
+            for ( int i0=0; i0<qube[0]; i0++ ) {
+                for ( int i1=0; i1<qube[1]; i1++ ) {
+                    for ( int i2=0; i2<qube[2]; i2++ ) {
+                        int iin= fieldBytes * ( i1 * len2 + i2  );
+                        int iout= fieldBytes * ( i0 * len1 * len2 + i2 * len1 + i1 );
+                        for ( int j=0; j<fieldBytes; j++ ) {
+                            temp.put( iin + j, byteBuffer.get(iout+j) );
+                        }
+                    }
+                }
+                result.put(temp);
+                temp.flip();
+            }
+        } else if ( qube.length==4 ) {
+            int len1= qube[1];
+            int len2= qube[2];
+            int len3= qube[3];            
+            for ( int i0=0; i0<qube[0]; i0++ ) {
+                for ( int i1=0; i1<qube[1]; i1++ ) {
+                    for ( int i2=0; i2<qube[2]; i2++ ) {
+                        for ( int i3=0; i3<qube[3]; i3++ ) {
+                            int iin= fieldBytes * ( i1*len2*len3 + i2*len3 +i3 );
+                            int iout= fieldBytes * ( i0*len1*len2*len3 + i3*len2*len1 + i2*len1 +i1 );
+                            for ( int j=0; j<fieldBytes; j++ ) {
+                                temp.put( iin + j, byteBuffer.get( iout + j ) );
+                            }
+                        }
+                    }
+                }            
+                result.put(temp);
+                temp.flip();
+            }
+        } else if ( qube.length<3 ) {
+            return byteBuffer;
+        } else {
+            throw new IllegalArgumentException("rank 3 and rank 4, supported but this is rank "+rank );
+        }
+        result.flip();
+        
+        return result;
+    }
+    
     /**
      * Creates a new instance of CdfUtil
      */
@@ -447,7 +509,11 @@ public class CdfUtil {
         
         Object bbType= byteBufferType( cdf.getType(svariable) );
         int recLenBytes= BufferDataSet.byteCount(bbType);
-        if ( qube.length>0 ) recLenBytes= recLenBytes * DataSetUtil.product( Arrays.copyOfRange( qube, 1, qube.length ) );
+        if ( recCount==-1 ) {
+            if ( qube.length>1 ) recLenBytes= recLenBytes * DataSetUtil.product( Arrays.copyOfRange( dimSizes,1,dimSizes.length) );            
+        } else {
+            if ( qube.length>0 ) recLenBytes= recLenBytes * DataSetUtil.product( dimSizes );
+        }
                         
         if ( cdf.rowMajority()  ) {
             if ( useBuf && buf!=null ) {
@@ -467,24 +533,8 @@ public class CdfUtil {
             }
         } else {
             if ( recCount==-1 ) {
-                if ( true ) { //TODO: looks to me like there are two transposes here, see above
-                    if ( qube.length==2 ) {
-                        int tr= qube[1];
-                        qube[1]= qube[0];
-                        qube[0]= tr;
-                    } else if ( qube.length==3 ) {
-                        int tr= qube[2];
-                        qube[2]= qube[0];
-                        qube[0]= tr;
-                    } else if ( qube.length>4 ) {
-                        throw new IllegalArgumentException("rank limit");
-                    }
-                }
-                int [] qqube= new int[qube.length+1];
-                qqube[0]= 1;
-                System.arraycopy(qube, 0, qqube, 1, qube.length);
-                //result= TrArrayDataSet.wrap( odata, qqube, false );
-                result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
+                buf[0]= transpose(qube.length,recLenBytes,qube,buf[0],bbType );
+                result= BufferDataSet.makeDataSet( qube.length, recLenBytes, 0, 
                         qube,
                         buf[0], bbType );
             } else {
@@ -502,6 +552,9 @@ public class CdfUtil {
                     }
                 }
                 
+                if ( qube.length>2 ) {
+                    buf[0]= transpose(qube.length,recLenBytes,qube,buf[0],bbType );
+                }
                 result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
                         qube,
                         buf[0], bbType );
