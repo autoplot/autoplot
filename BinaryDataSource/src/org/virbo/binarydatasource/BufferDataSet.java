@@ -15,7 +15,8 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
 
 /**
- * rank 1,2,or 3 dataset backed by double array. 
+ * rank 1,2,or 3 dataset backed by NIO buffers.  These have the advantage that data can be stored outside
+ * of the JVM, and in fact they can be backed by a huge file on disk.  
  *
  * @author jbf
  */
