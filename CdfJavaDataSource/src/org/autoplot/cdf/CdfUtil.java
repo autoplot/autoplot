@@ -453,9 +453,7 @@ public class CdfUtil {
             recStart= 0;
         }
 
-        //CDFData cdfData= CDFData.get( variable, recStart, Math.max(1, recCount), recInterval, dimIndeces, dimCounts, dimIntervals, false );
         ByteBuffer[] buf=null;
-        boolean useBuf= false;  // switch to turn NIO use on/off
 
         long rc= recCount;
         if ( rc==-1 ) rc= 1;  // -1 is used as a flag for a slice, we still really read one record.
