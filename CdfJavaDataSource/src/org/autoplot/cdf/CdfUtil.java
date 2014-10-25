@@ -589,6 +589,8 @@ public class CdfUtil {
         //    result= DataSetOps.slice1(result,slice1);
         //}
         
+        result.makeImmutable(); // this may cause problems with scripts that assume data is mutable.
+        
         return result;
     }
     
