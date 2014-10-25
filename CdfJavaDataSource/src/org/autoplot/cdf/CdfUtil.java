@@ -104,7 +104,7 @@ public class CdfUtil {
             return "int";
         } else if ( type==CDFConstants.CDF_INT2 || type==CDFConstants.CDF_UINT1 ) {
             return "short";
-        } else if ( type==CDFConstants.CDF_INT1 ) {
+        } else if ( type==CDFConstants.CDF_INT1 || type==CDFConstants.CDF_BYTE ) {
             return "byte";
         } else if ( type==CDFConstants.CDF_CHAR || type==CDFConstants.CDF_UCHAR ) {
             return "string";
@@ -124,7 +124,7 @@ public class CdfUtil {
             return BufferDataSet.INT;
         } else if ( type==CDFConstants.CDF_INT2 || type==CDFConstants.CDF_UINT1 ) {
             return BufferDataSet.SHORT;
-        } else if ( type==CDFConstants.CDF_INT1 ) {
+        } else if ( type==CDFConstants.CDF_INT1 || type==CDFConstants.CDF_BYTE ) {
             return BufferDataSet.BYTE;
         } else if ( type==CDFConstants.CDF_CHAR ) {
             return BufferDataSet.BYTE; // determined experimentally: vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/ac_k0_mfi_20080602_v01.cdf?BGSEc
@@ -476,6 +476,7 @@ public class CdfUtil {
                     buff2.put(buff1);
                     if ( i==0 ) buff2.order(buff1.order());
                 }
+                buff2.flip();
             } else {
                 buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, true );
             }
