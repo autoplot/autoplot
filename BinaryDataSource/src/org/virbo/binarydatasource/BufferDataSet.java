@@ -416,4 +416,20 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     public abstract double putValue(int i0, int i1, double d );
 
     public abstract double putValue(int i0, int i1, int i2, double d );     */
+
+    /**
+     * estimate the jvmMemory occupied by this dataset, looking at the NIO buffer
+     * to see if it is direct as has no JVM memory cost, or if it has been made into
+     * an array.
+     * @return the estimated number bytes that the dataSet occupies.
+     */
+    public int jvmMemory() {
+        if ( back.isDirect() ) {
+            return 0;
+        } else if ( back.hasArray() ) {
+            return back.array().length;
+        } else {
+            return 0; // not sure
+        }
+    }
 }
