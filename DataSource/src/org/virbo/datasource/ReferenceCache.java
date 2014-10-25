@@ -336,7 +336,7 @@ public class ReferenceCache {
                 if ( m!=null ) {
                     try {
                         Object r= m.invoke( ds );
-                        System.err.println("     jvmMemory (bytes): "+r);                    
+                        System.err.println("     jvmMemory (bytes): "+r + "  "+dsclass.getName() );                    
                     } catch (SecurityException ex) {
                         Logger.getLogger(ReferenceCache.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (IllegalAccessException ex) {
