@@ -6,6 +6,8 @@
 package org.virbo.datasource;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.beans.BeansUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.ProgressMonitor;
@@ -314,6 +317,37 @@ public class ReferenceCache {
         i=0;
         for ( Entry<String,ReferenceCacheEntry> ent : instance.uris.entrySet() ) {
             System.err.printf( "%3d %s\n", ++i, String.valueOf(ent.getValue()) );
+            ReferenceCacheEntry ent1= ent.getValue();
+            QDataSet ds= ent1.qds.get();
+            if ( ds!=null ) {
+                Class dsclass= ds.getClass();
+                Method m=null;
+                try {
+                    m= dsclass.getDeclaredMethod( "jvmMemory" );
+                } catch ( NoSuchMethodException ex) {
+                    try {
+                        m= dsclass.getSuperclass().getDeclaredMethod( "jvmMemory" );
+                    } catch (NoSuchMethodException ex1) {
+                        Logger.getLogger(ReferenceCache.class.getName()).log(Level.SEVERE, null, ex1);
+                    } catch (SecurityException ex1) {
+                        Logger.getLogger(ReferenceCache.class.getName()).log(Level.SEVERE, null, ex1);
+                    }
+                }
+                if ( m!=null ) {
+                    try {
+                        Object r= m.invoke( ds );
+                        System.err.println("     jvmMemory (bytes): "+r);                    
+                    } catch (SecurityException ex) {
+                        Logger.getLogger(ReferenceCache.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IllegalAccessException ex) {
+                        Logger.getLogger(ReferenceCache.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IllegalArgumentException ex) {
+                        Logger.getLogger(ReferenceCache.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InvocationTargetException ex) {
+                        Logger.getLogger(ReferenceCache.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
         }
 
         System.err.println("== locks ==");
