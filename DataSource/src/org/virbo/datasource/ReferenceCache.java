@@ -112,7 +112,8 @@ public class ReferenceCache {
                 throw this.exception;
             } else {
                 logger.log( Level.FINE, "park if {0} {1} resulted in {2}", new Object[]{Thread.currentThread(), uri, this.qds.get() } );
-                return this.qds.get();
+                QDataSet result= this.qds.get();
+                return result;
             }
         }
         
