@@ -49,43 +49,6 @@ public class CdfUtil {
 
     private final static Logger logger= LoggerManager.getLogger("apdss.cdfjava");
 
-    private static Object getArraySlice( CDFReader cdf, String svariable, String type, int[] recordRange, boolean preserve, boolean columnMajor, int slice1 ) throws Throwable {
-        Object odata= cdf.getOneDArray( svariable, "double", recordRange, preserve, columnMajor );
-        double[] ddata= (double[])odata;
-        int[] dims= cdf.getDimensions(svariable);
-        int dims0= dims[0];
-        dims[0]= 1;
-        int nrec= (recordRange[1]-recordRange[0]+1);
-        double[] result= new double[ DataSetUtil.product(dims) * nrec ];
-        int i2=0;
-        int outside= DataSetUtil.product(dims)*dims0;
-        int inside= DataSetUtil.product(dims);
-        for ( int i=0; i<ddata.length; i++ ) {
-            if ( ( i % outside ) / inside == slice1 ) {
-                result[ i2 ] = ddata[i];
-                i2++;
-            }
-        }
-        return result;
-    }
-
-    private static Object getArrayStride( CDFReader cdf, String svariable, String type, int[] recordRange, boolean preserve, boolean columnMajor, int stride ) throws Throwable {
-        Object odata= cdf.getOneDArray( svariable, "double", recordRange, preserve, columnMajor );
-        double[] ddata= (double[])odata;
-        int[] dims= cdf.getDimensions(svariable);
-        int nrec= (recordRange[1]-recordRange[0]+1);
-        double[] result= new double[ DataSetUtil.product(dims) * nrec / stride ];
-        int i2=0;
-        int outside= DataSetUtil.product(dims);
-        for ( int i=0; i<ddata.length; i++ ) {
-            if ( ( i / outside ) % stride == 0 ) {
-                result[ i2 ] = ddata[i];
-                i2++;
-            }
-        }
-        return result;
-    }    
-
     /**
      * return the Java type used to store the CDF data type.
      * @param type 45, 44, or 51
@@ -634,7 +597,7 @@ public class CdfUtil {
      * returns the amount of JVM memory in bytes occupied by the dataset. This is an approximation,
      * calculated by taking the element type size (e.g. float=4 bytes) times the number of elements for
      * the dataset.
-     * @param ds the ArrayDataSet, or TrArrayDataSet.
+     * @param ds the ArrayDataSet, or TrArrayDataSet, or BufferDataSet.
      * @return the approximate memory consumption in bytes
      */
     public static int jvmMemory( QDataSet ds ) {
@@ -643,7 +606,9 @@ public class CdfUtil {
         } else if ( ds instanceof TrArrayDataSet ) {
             return ((TrArrayDataSet)ds).jvmMemory();
         } else if ( ds instanceof Slice0DataSet ) {
-            return 0; // TODO: not worth chasing after
+            return 0; // TODO: not worth chasing after.  TODO: really?  these are often backed by the original data.
+        } else if ( ds instanceof BufferDataSet ) {
+           return ((BufferDataSet)ds).jvmMemory();
         } else {
             throw new IllegalArgumentException("not supported type of QDataSet: "+ds);
         }
