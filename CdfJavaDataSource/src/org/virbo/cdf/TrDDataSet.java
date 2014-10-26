@@ -10,11 +10,9 @@ package org.virbo.cdf;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
-import org.virbo.dataset.Slice0DataSet;
 import org.virbo.dataset.WritableDataSet;
 
 /**
@@ -27,6 +25,9 @@ import org.virbo.dataset.WritableDataSet;
  * rest of the system.  This would require clients make defensive copies which would 
  * seriously degrade performance.  
  *
+ * TODO: This wasn't modified with the makeImmutable changes.  See ArrayDataSet.  Note this class may be deprecated after 
+ * the NIO-based reader is released.
+ * 
  * @author jbf
  */
 public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet, RankZeroDataSet {
