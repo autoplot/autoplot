@@ -36,6 +36,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.WritableDataSet;
@@ -72,6 +73,20 @@ public class Util {
         return getDataSet( suri, timeRange, mon );
     }
 
+    /**
+     * return a dataset that we know is writable.  If the dataset is Writable and isImmutable is false, then 
+     * the dataset is returned.
+     * @param rds any dataset.
+     * @return a writeable dataset that is either the original one 
+     */
+    private static WritableDataSet ensureWritable( QDataSet rds ) {
+        if ( rds instanceof WritableDataSet && (((WritableDataSet)rds).isImmutable()==false) ) {
+            return ((WritableDataSet)rds);
+        } else {
+            return Ops.copy(rds);
+        }
+    }
+    
     /**
      * load the data specified by URI into Autoplot's internal data model.  This will
      * block until the load is complete, and a ProgressMonitor object can be used to
@@ -125,21 +140,9 @@ public class Util {
         }
         
         if ( rds==null ) return null;
-        if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
-            return rds;
-        } else {
-            if ( DataSetUtil.isQube(rds) ) {
-                return DDataSet.copy(rds); // fixes a bug where a MutablePropertiesDataSet and WritableDataSet copy in coerce
-            } else {
-                //return JoinDataSet.deepCopy(rds); // Note, Operators assume qubes as well, so there's no point to this.
-                logger.info("unable to copy read-only dataset, which may cause problems elsewhere.");
-                //TODO: document this.
-                //TODO: fix this.
-                return rds;                
-            }
-        }
+        rds= ensureWritable(rds);
+        return rds;
     }
-
     
     /**
      * load the data specified by URL into Autoplot's internal data model.  This will
@@ -168,22 +171,26 @@ public class Util {
         }
         metadataSurl= suri;
 
-        logger.finer( String.format( "read in %9.2f sec: \n uri: %s\n  ds: %s", (System.currentTimeMillis()-t0)/1000., suri, String.valueOf(rds) ) );
-        
-        if ( rds==null ) return null;
-        if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
-            return rds;
-        } else {
-            if ( DataSetUtil.isQube(rds) ) {
-                return DDataSet.copy(rds); // fixes a bug where a MutablePropertiesDataSet and WritableDataSet copy in coerce
-            } else {
-                //return JoinDataSet.deepCopy(rds); // Note, Operators assume qubes as well, so there's no point to this.
-                logger.info("unable to copy read-only dataset, which may cause problems elsewhere.");
-                //TODO: document this.
-                //TODO: fix this.
-                return rds;            
+        if ( logger.isLoggable( Level.FINER ) ) {
+            logger.finer( String.format( "read in %9.2f sec: ", (System.currentTimeMillis()-t0)/1000. ) );
+            logger.finer( String.format( "  uri: %s", suri ) );
+            logger.finer( String.format( "  ds: %s", String.valueOf(rds) ) );
+            if ( logger.isLoggable( Level.FINEST ) ) {
+                if ( rds!=null ) {
+                    QDataSet xds= SemanticOps.xtagsDataSet(rds);
+                    QDataSet xextent= Ops.extent(xds);
+                    QDataSet yextent= Ops.extent(rds);
+                    logger.finest( String.format( "  extent x: %s y: %s", String.valueOf(xextent), String.valueOf(yextent) ) );
+                } else {
+                }
             }
         }
+        
+        if ( rds==null ) return null;
+        
+        rds= ensureWritable(rds);
+        return rds;
+        
     }
 
     /**
