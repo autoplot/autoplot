@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumUtil;
 import org.virbo.dsops.Ops;
@@ -52,19 +53,23 @@ public class PyQDataSet extends PyJavaInstance {
     WritableDataSet ds;
     QDataSet rods; // read-only dataset
 
+    /**
+     * Note getDataSet will always provide a writable dataset.
+     * @param ds 
+     */
     PyQDataSet(QDataSet ds) {
         super(ds);
-        if (ds instanceof WritableDataSet) {
+        if (ds instanceof WritableDataSet && !((WritableDataSet)ds).isImmutable() ) {
             this.ds = (WritableDataSet) ds;
+            this.rods= this.ds;
         } else if (ds.rank() == 0) {
             this.ds = null;
-        } else if ( DataSetUtil.isQube(ds) ) {
-            this.ds = DDataSet.copy(ds);
+            this.rods = ds;
         } else {
+            logger.fine("read-only dataset will not support writing.");
             this.ds= null;
+            this.rods= this.ds;
         }
-        this.rods = ds;
-
     }
 
     public QDataSet getQDataSet() {
@@ -577,7 +582,7 @@ public class PyQDataSet extends PyJavaInstance {
     @Override
     public void __setitem__(PyObject arg0, PyObject arg1) {
         if ( ds==null ) {
-            throw new RuntimeException("__setitem__ on dataset that could not be made into mutable.");
+            throw new RuntimeException("__setitem__ on dataset that could not be made into mutable, use copy to make a mutable copy.");
         }
         DataSetIterator iter = new QubeDataSetIterator(ds);
 
@@ -707,31 +712,31 @@ public class PyQDataSet extends PyJavaInstance {
 
     /* we need to wrap put methods as well... */
     public void putProperty( String prop, Object value ) {
-        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
         ds.putProperty(prop,value);
     }
     public void putProperty( String prop, int index, Object value ) {
-        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
         ds.putProperty(prop,index,value);
     }
     public void putValue( double value ) {
-        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
         ds.putValue(value);
     }
     public void putValue( int i0, double value ) {
-        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
         ds.putValue(i0,value);
     }
     public void putValue( int i0, int i1, double value ) {
-        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
         ds.putValue(i0,i1,value);
     }
     public void putValue( int i0, int i1, int i2, double value ) {
-        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
         ds.putValue(i0,i1,i2,value);
     }
     public void putValue( int i0, int i1, int i2, int i3, double value ) {
-        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable.");
+        if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
         ds.putValue(i0,i1,i2,i3,value);
     }
 
