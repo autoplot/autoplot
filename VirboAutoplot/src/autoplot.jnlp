@@ -46,7 +46,7 @@
         <jar href="AutoplotVolatile.jar" />
         <jar href="AutoplotStable.jar" />
         <!--
-        <jar href="../lib/AutoplotStable.20140510.jar" />
+        <jar href="../lib/AutoplotStable.20141027.jar" />
         -->
 
         <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-latest.jnlp" />
