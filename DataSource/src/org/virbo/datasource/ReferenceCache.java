@@ -130,7 +130,7 @@ public class ReferenceCache {
                 if ( mpds.isImmutable() ) {
 
                 } else {
-                    WritableDataSet wds= Ops.copy(ds);
+                    WritableDataSet wds= Ops.copy(ds); //TODO: This extaneous copy will be removed once mutability concerns lessen.
                     wds.makeImmutable();
                     ds= wds;
                 }
