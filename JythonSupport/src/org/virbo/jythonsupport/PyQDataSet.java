@@ -582,7 +582,7 @@ public class PyQDataSet extends PyJavaInstance {
     @Override
     public void __setitem__(PyObject arg0, PyObject arg1) {
         if ( ds==null ) {
-            throw new RuntimeException("__setitem__ on dataset that could not be made into mutable, use copy to make a mutable copy.");
+            throw new RuntimeException("__setitem__ on dataset that is read-only, use copy(ds) to make a mutable copy.");
         }
         DataSetIterator iter = new QubeDataSetIterator(ds);
 
