@@ -1220,11 +1220,7 @@ public class DataSetURI {
         public boolean maybePlot;
 
         protected CompletionResult(String completion, String doc) {
-            this(completion, doc, null, false);
-        }
-
-        protected CompletionResult(String completion, String doc, boolean maybePlot) {
-            this(completion, null, doc, null, maybePlot);
+            this(completion, null, doc, "", false);
         }
 
         protected CompletionResult(String completion, String doc, String completable, boolean maybePlot) {
@@ -1241,7 +1237,7 @@ public class DataSetURI {
         protected CompletionResult(String completion, String label, String doc, String completable, boolean maybePlot) {
             this.completion = completion;
             this.completable = completable;
-            this.label = label != null ? label : ( completable!= null ? completable : completion );
+            this.label = label != null ? label : ( completion!= null ? completion : completable );
             this.doc = doc;
             this.maybePlot = maybePlot;
         }
@@ -1268,17 +1264,29 @@ public class DataSetURI {
 
 
         URISplit split = URISplit.parse(surl, carotpos, true);
-        if (split.file == null || (split.resourceUriCarotPos > split.file.length()) && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURI.getExt(surl))) {
+        if ( ( split.vapScheme!=null && split.file == null ) || ( split.file!=null && split.resourceUriCarotPos > split.file.length()) && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURI.getExt(surl))) {
             return getFactoryCompletions(URISplit.format(split), split.formatCarotPos, mon);
         } else {
-            int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
-            if (split.resourceUriCarotPos <= firstSlashAfterHost) {
-                return getHostCompletions(URISplit.format(split), split.formatCarotPos, mon);
+            if ( split.vapScheme==null && split.scheme==null ) {
+                String[] types= new String[] { "ftp://", "http://", "https://", "file:/", "sftp://" };
+                List<CompletionResult> result= new ArrayList<CompletionResult>();
+                String completable= surl.substring(0, carotpos);
+                for ( int i=0; i<types.length; i++ ) {
+                    if ( types[i].length()>= carotpos &&
+                            types[i].startsWith( completable ) ) {
+                        result.add( new CompletionResult(types[i],null,types[i],completable,false) );
+                    }    
+                }
+                return result;
             } else {
-                return getFileSystemCompletions(URISplit.format(split), split.formatCarotPos, true, true, null, mon);
+                int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
+                if (split.resourceUriCarotPos <= firstSlashAfterHost) {
+                    return getHostCompletions(URISplit.format(split), split.formatCarotPos, mon);
+                } else {
+                    return getFileSystemCompletions(URISplit.format(split), split.formatCarotPos, true, true, null, mon);
+                }
             }
-
-        }
+        }        
     }
 
     /**
@@ -1358,7 +1366,8 @@ public class DataSetURI {
     }
 
     /**
-     * get completions within the filesystem that appear to form aggregations.
+     * get completions within the filesystem that appear to form aggregations.  Note this does not appear
+     * to be used, having no Java references.
      * @param surl
      * @param carotpos
      * @param mon
@@ -1394,7 +1403,7 @@ public class DataSetURI {
             List<String> saggs= DataSourceUtil.findAggregations( files, true );
             for ( String sagg: saggs ) {
                 sagg= URISplit.removeParam( sagg, "timerange" );
-                completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation", true ) );
+                completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation", "", true ) );
             }
         }
         return completions;
@@ -1658,7 +1667,7 @@ public class DataSetURI {
                     while ( ie<surl.length() && ie<sagg.length() && surl.charAt(ie)==sagg.charAt(ie) ) ie++;
                     int islash= sagg.lastIndexOf("/",ie);
                     islash= islash+1;
-                    completions.add( new DataSetURI.CompletionResult( sagg, sagg.substring(islash), "Use aggregation ("+tr+" available)", null, true ) );
+                    completions.add( new DataSetURI.CompletionResult( sagg.substring(islash), null, "Use aggregation ("+tr+" available)", prefix, true ) );
                 }
             }
         }
@@ -1755,13 +1764,13 @@ public class DataSetURI {
         for ( String ext: dexts ) {
             String vapext= "vap+"+ext.substring(1);
             if ( vapext.startsWith(prefix) ) {
-                completions.add( new CompletionResult( vapext + ":", DataSourceRegistry.getDescriptionFor( vapext ), true ) );
+                completions.add( new CompletionResult( vapext + ":", DataSourceRegistry.getDescriptionFor( vapext ), prefix, true ) );
             }
         }
 
-        if ( "http://".startsWith(prefix) ) completions.add( new CompletionResult( "http://", null, true ) );
-        if ( "ftp://".startsWith(prefix) ) completions.add( new CompletionResult( "ftp://", null, true ) );
-        if ( "file://".startsWith(prefix) ) completions.add( new CompletionResult( "file:///", null, true ) );
+        if ( "http://".startsWith(prefix) ) completions.add( new CompletionResult( "http://", null, prefix, true ) );
+        if ( "ftp://".startsWith(prefix) ) completions.add( new CompletionResult( "ftp://", null, prefix, true ) );
+        if ( "file://".startsWith(prefix) ) completions.add( new CompletionResult( "file:///", null, prefix, true ) );
 
         return completions;
     }
@@ -1990,9 +1999,9 @@ public class DataSetURI {
                     }
                 }
             } catch (MalformedURLException ex) {
-                result = Collections.singletonList(new CompletionResult("Malformed URI", "Something in the URL prevents processing", surl1.substring(0, carotPos), false));
+                result = Collections.singletonList(new CompletionResult("Malformed URI", "Something in the URL prevents processing "+ surl1.substring(0, carotPos), "", false));
             } catch (FileSystem.FileSystemOfflineException ex) {
-                result = Collections.singletonList(new CompletionResult("FileSystem offline", "FileSystem is offline.", surl1.substring(0, carotPos), false));
+                result = Collections.singletonList(new CompletionResult("FileSystem offline", "FileSystem is offline." + surl1.substring(0, carotPos), "", false));
             } finally {
                 mon.finished();
             }
