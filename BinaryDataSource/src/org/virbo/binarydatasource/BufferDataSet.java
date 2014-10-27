@@ -404,6 +404,9 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * copy the data to a writable buffer if it's not already writable.
      */
     protected synchronized void ensureWritable() {
+        if ( this.isImmutable() ) {
+            logger.warning("dataset has been marked as immutable, this will soon throw an exception");
+        }
         if ( back.isReadOnly() ) {
             ByteBuffer wback= ByteBuffer.allocateDirect( back.capacity() );
             wback.put(back);
