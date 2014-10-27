@@ -68,7 +68,7 @@ public class PyQDataSet extends PyJavaInstance {
         } else {
             logger.fine("read-only dataset will not support writing.");
             this.ds= null;
-            this.rods= this.ds;
+            this.rods= ds;
         }
     }
 
