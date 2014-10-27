@@ -23,8 +23,10 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-10-20):</p>
+        <p>Bugfixes (2014-10-27):</p>
         <ul>
+            <li>rte_1930845582: xds.length()!=yds.length() in odd branch of SeriesRenderer guess cadence.</li>
+            <li>rte_1635938883: NullPointerException for new users when entering pngwalk</li>
             <li>1281: linestyle settings not set properly for pngwalk, clone to new window </li>
             <li>1282: CDF LABL_PTR_2 when the data is rank 2</li>
             <li>NoDataInInterval exception on das2stream is treated the same as with QStreams.</li>
@@ -57,7 +59,10 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>add setDepend0Cadence to filters</li>
+            <li>initial coding to use NIO for CDF reads, which will be faster and take less JVM memory.</li>
+            <li>add setDepend0Cadence to filters</li> 
+            <li>introduce trim( ds, dataset('2013-03-03'), dataset('2013-03-04') ) and in filters</li>
+            <li>display URL in SPASE record Space/Granule/Source/URL/text node.</li>
             <li>new code for python debugging and new filters dialogs added, but these are still under development</li>
             <li>add fog parameter to ImageDataSource, so that an image can provide context competing with overplots</li>
             <li>marsx orbits added to time range editor.</li>
