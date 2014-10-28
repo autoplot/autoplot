@@ -20,7 +20,7 @@ public class Test {
     
     public static void testAdd() {
         FilterEditorPanel p= new AddFilterEditorPanel();
-        p.setFilter("|add(50)");
+        p.setFilter("|subtract(50)");
         JOptionPane.showMessageDialog( null, p );
         System.err.println( p.getFilter() );
     }

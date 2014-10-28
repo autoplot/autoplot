@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * 
  * @author mmclouth
  */
-public class DivideFilterEditorPanel extends javax.swing.JPanel {
+public class DivideFilterEditorPanel extends AbstractFilterEditorPanel implements FilterEditorPanel {
 
     /**
      * Creates new form DivideFilterEditorPanel
@@ -30,69 +30,66 @@ public class DivideFilterEditorPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
         jLabel2 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        scalar = new javax.swing.JTextField();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
-        jLabel1.setText(bundle.getString("DivideFilterEditorPanel_X.jLabel1.text")); // NOI18N
-
         jLabel2.setText(bundle.getString("DivideFilterEditorPanel_X.jLabel2.text")); // NOI18N
 
-        jTextField1.setText(bundle.getString("DivideFilterEditorPanel_X.jTextField1.text")); // NOI18N
+        scalar.setText(bundle.getString("DivideFilterEditorPanel_X.jTextField1.text")); // NOI18N
+        scalar.setMaximumSize(new java.awt.Dimension(75, 27));
+        scalar.setMinimumSize(new java.awt.Dimension(75, 27));
+        scalar.setPreferredSize(new java.awt.Dimension(75, 27));
+        scalar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                scalarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addGap(0, 47, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(12, 12, 12)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSeparator1))))
+                        .addComponent(scalar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel2)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
+                .addContainerGap()
+                .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 12, Short.MAX_VALUE))
+                .addComponent(scalar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void scalarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scalarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_scalarActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField scalar;
     // End of variables declaration//GEN-END:variables
+    @Override
     public String getFilter() {
-        return "|divide("+jTextField1.getText()+")";
+        return "|divide("+scalar.getText()+")";
     }
 
+    @Override
     public void setFilter(String filter) {
         Pattern p= Pattern.compile("\\|divide\\((.*)\\)");
-        //Pattern p1= Pattern.compile("\\|butterworth\\((.*,.*,.*,.*)\\)");
-        //Pattern p2= Pattern.compile("\\|butterworth\\((.*,.*,.*)\\)");
         Matcher m= p.matcher(filter);
         if ( m.matches() ) {
-            jTextField1.setText(m.group(1));
+            scalar.setText(m.group(1));
         } else {
-            jTextField1.setText("1");
+            scalar.setText("1");
         }
         
     }

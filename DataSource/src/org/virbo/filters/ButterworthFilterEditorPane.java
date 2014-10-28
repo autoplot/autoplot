@@ -6,11 +6,14 @@
 
 package org.virbo.filters;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author mmclouth
  */
-public class ButterworthFilterEditorPane extends javax.swing.JFrame {
+public class ButterworthFilterEditorPane extends AbstractFilterEditorPanel {
 
     /**
      * Creates new form ButterworthFilterEditorPane
@@ -30,35 +33,33 @@ public class ButterworthFilterEditorPane extends javax.swing.JFrame {
 
         mainPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
+        orderCB = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
-        jComboBox2 = new javax.swing.JComboBox();
-        subPanel = new javax.swing.JPanel();
+        typeCB = new javax.swing.JComboBox();
+        subPanel1 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         cutoffFreq = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
+        subPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         lowFreq = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         highFreq = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        FormListener formListener = new FormListener();
 
         mainPanel.setBorder(null);
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("ButterworthFilterEditorPane.jLabel1.text_1")); // NOI18N
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4" }));
+        orderCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4" }));
 
         jLabel2.setText(bundle.getString("ButterworthFilterEditorPane.jLabel2.text_1")); // NOI18N
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "High-Pass", "Low-Pass", "Band-Pass", "Band-Reject" }));
+        typeCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "High-Pass", "Low-Pass", "Band-Pass", "Band-Reject" }));
 
         org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
@@ -72,8 +73,8 @@ public class ButterworthFilterEditorPane extends javax.swing.JFrame {
                     .add(mainPanelLayout.createSequentialGroup()
                         .add(12, 12, 12)
                         .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jComboBox2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                            .add(orderCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(typeCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(39, Short.MAX_VALUE))
         );
         mainPanelLayout.setVerticalGroup(
@@ -82,30 +83,33 @@ public class ButterworthFilterEditorPane extends javax.swing.JFrame {
                 .add(20, 20, 20)
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(orderCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jComboBox2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(typeCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(78, Short.MAX_VALUE))
         );
 
-        subPanel.setBorder(null);
+        subPanel1.setBorder(null);
 
         jLabel3.setText(bundle.getString("ButterworthFilterEditorPane.jLabel3.text_1")); // NOI18N
 
         cutoffFreq.setText(bundle.getString("ButterworthFilterEditorPane.cutoffFreq.text_1")); // NOI18N
+        cutoffFreq.setMinimumSize(new java.awt.Dimension(50, 27));
+        cutoffFreq.setPreferredSize(new java.awt.Dimension(50, 27));
+        cutoffFreq.addActionListener(formListener);
 
         jLabel4.setText(bundle.getString("ButterworthFilterEditorPane.jLabel4.text_1")); // NOI18N
 
-        org.jdesktop.layout.GroupLayout subPanelLayout = new org.jdesktop.layout.GroupLayout(subPanel);
-        subPanel.setLayout(subPanelLayout);
-        subPanelLayout.setHorizontalGroup(
-            subPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(subPanelLayout.createSequentialGroup()
+        org.jdesktop.layout.GroupLayout subPanel1Layout = new org.jdesktop.layout.GroupLayout(subPanel1);
+        subPanel1.setLayout(subPanel1Layout);
+        subPanel1Layout.setHorizontalGroup(
+            subPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(subPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(subPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(subPanelLayout.createSequentialGroup()
+                .add(subPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(subPanel1Layout.createSequentialGroup()
                         .add(12, 12, 12)
                         .add(cutoffFreq, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(2, 2, 2)
@@ -113,13 +117,13 @@ public class ButterworthFilterEditorPane extends javax.swing.JFrame {
                     .add(jLabel3))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        subPanelLayout.setVerticalGroup(
-            subPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(subPanelLayout.createSequentialGroup()
+        subPanel1Layout.setVerticalGroup(
+            subPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(subPanel1Layout.createSequentialGroup()
                 .add(23, 23, 23)
                 .add(jLabel3)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(subPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                .add(subPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(cutoffFreq, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel4))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -128,91 +132,106 @@ public class ButterworthFilterEditorPane extends javax.swing.JFrame {
         jLabel5.setText(bundle.getString("ButterworthFilterEditorPane.jLabel5.text_1")); // NOI18N
 
         lowFreq.setText(bundle.getString("ButterworthFilterEditorPane.lowFreq.text")); // NOI18N
+        lowFreq.setPreferredSize(new java.awt.Dimension(50, 27));
+        lowFreq.addActionListener(formListener);
 
         jLabel6.setText(bundle.getString("ButterworthFilterEditorPane.jLabel6.text")); // NOI18N
 
         highFreq.setText(bundle.getString("ButterworthFilterEditorPane.highFreq.text")); // NOI18N
+        highFreq.setPreferredSize(new java.awt.Dimension(50, 27));
 
         jLabel7.setText(bundle.getString("ButterworthFilterEditorPane.jLabel7.text")); // NOI18N
 
         jLabel8.setText(bundle.getString("ButterworthFilterEditorPane.jLabel8.text")); // NOI18N
 
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
+        org.jdesktop.layout.GroupLayout subPanel2Layout = new org.jdesktop.layout.GroupLayout(subPanel2);
+        subPanel2.setLayout(subPanel2Layout);
+        subPanel2Layout.setHorizontalGroup(
+            subPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(subPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(subPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jLabel5)
                     .add(jLabel6)
-                    .add(jPanel1Layout.createSequentialGroup()
+                    .add(subPanel2Layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jPanel1Layout.createSequentialGroup()
+                        .add(subPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(subPanel2Layout.createSequentialGroup()
                                 .add(highFreq, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(jLabel8))
-                            .add(jPanel1Layout.createSequentialGroup()
+                            .add(subPanel2Layout.createSequentialGroup()
                                 .add(lowFreq, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(jLabel7)))))
                 .addContainerGap(33, Short.MAX_VALUE))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
+        subPanel2Layout.setVerticalGroup(
+            subPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(subPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel5)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                .add(subPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(lowFreq, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel7))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel6)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                .add(subPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(highFreq, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel8))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
-        jLabel9.setText(bundle.getString("ButterworthFilterEditorPane.jLabel9.text")); // NOI18N
-
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
+        this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(mainPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                            .add(subPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .add(jLabel9))
+                .add(6, 6, 6)
+                .add(mainPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(subPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(subPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .add(jSeparator1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(jLabel9)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                .addContainerGap()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(subPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 74, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(subPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 74, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(subPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(mainPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+    }
 
-        pack();
+    // Code for dispatching events from components to event handlers.
+
+    private class FormListener implements java.awt.event.ActionListener {
+        FormListener() {}
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            if (evt.getSource() == lowFreq) {
+                ButterworthFilterEditorPane.this.lowFreqActionPerformed(evt);
+            }
+            else if (evt.getSource() == cutoffFreq) {
+                ButterworthFilterEditorPane.this.cutoffFreqActionPerformed(evt);
+            }
+        }
     }// </editor-fold>//GEN-END:initComponents
+
+    private void lowFreqActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lowFreqActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lowFreqActionPerformed
+
+    private void cutoffFreqActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cutoffFreqActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cutoffFreqActionPerformed
 
     /**
      * @param args the command line arguments
@@ -252,8 +271,6 @@ public class ButterworthFilterEditorPane extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JTextField cutoffFreq;
     public javax.swing.JTextField highFreq;
-    public javax.swing.JComboBox jComboBox1;
-    public javax.swing.JComboBox jComboBox2;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
@@ -262,11 +279,35 @@ public class ButterworthFilterEditorPane extends javax.swing.JFrame {
     public javax.swing.JLabel jLabel6;
     public javax.swing.JLabel jLabel7;
     public javax.swing.JLabel jLabel8;
-    public javax.swing.JLabel jLabel9;
-    public javax.swing.JPanel jPanel1;
-    public javax.swing.JSeparator jSeparator1;
     public javax.swing.JTextField lowFreq;
     public javax.swing.JPanel mainPanel;
-    public javax.swing.JPanel subPanel;
+    public javax.swing.JComboBox orderCB;
+    public javax.swing.JPanel subPanel1;
+    public javax.swing.JPanel subPanel2;
+    public javax.swing.JComboBox typeCB;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void setFilter(String filter) {
+        Pattern p1= Pattern.compile("\\|butterworth\\((.*,.*,.*,.*)\\)");
+        Pattern p2= Pattern.compile("\\|butterworth\\((.*,.*,.*)\\)");
+        Matcher m= p1.matcher(filter);
+        Matcher n= p2.matcher(filter);
+        if ( m.matches() ) {
+            subPanel1.setVisible(true);
+            subPanel2.setVisible(false);
+        }
+        else {
+            subPanel2.setVisible(true);
+            subPanel1.setVisible(false);
+        }
+    }
+
+    @Override
+    public String getFilter() {
+        return "|butterworth";
+    }
+
+            
+    
 }
