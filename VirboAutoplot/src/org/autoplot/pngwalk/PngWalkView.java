@@ -193,18 +193,18 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
 
     }
 
-    protected void paintImageCentered(BufferedImage i, Graphics2D g2) {
-        paintImageCentered(i, g2, null);
+    protected Rectangle paintImageCentered(BufferedImage i, Graphics2D g2) {
+        return paintImageCentered(i, g2, null);
     }
 
-    protected void paintImageCentered(BufferedImage i, Graphics2D g2, String caption) {
+    protected Rectangle paintImageCentered(BufferedImage i, Graphics2D g2, String caption) {
         FontMetrics fm = this.getFontMetrics(this.getFont());
         double captionHeight=  ( showCaptions && caption!=null ) ? ( fm.getHeight() + fm.getDescent() ) : 0 ;
         double imageHeight= i.getHeight();
         double xfactor = (double) getWidth() / (double) i.getWidth(null);
         double yfactor = (double) ( getHeight()-captionHeight ) / (double) imageHeight;
         double s = Math.min(xfactor, yfactor);
-        if ( s<=0 ) return; 
+        if ( s<=0 ) return null; 
         s = Math.min(1.0, s);
         int xpos = (int) (this.getWidth() - i.getWidth(null) * s) / 2;
         int ypos = (int) ((this.getHeight()-captionHeight) - imageHeight * s) / 2;
@@ -228,6 +228,7 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
             paintQualityControlIcon( seq.getIndex(), g2, xpos, ypos, true );
         }
+        return new Rectangle( xpos, ypos, xs, ys );
     }
 
     private static BufferedImage initLoadingImage() {
