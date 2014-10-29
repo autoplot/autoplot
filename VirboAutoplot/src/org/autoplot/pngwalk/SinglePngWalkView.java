@@ -7,8 +7,9 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.net.MalformedURLException;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.logging.Level;
 
 /**
  * An implementation of PngWalkView to display a single image.
@@ -21,8 +22,12 @@ public class SinglePngWalkView extends PngWalkView {
 
     Rectangle imageLocation= null;
     
+    ClickDigitizer clickDigitizer;
+    
     public SinglePngWalkView(WalkImageSequence s) {
         super(s);
+        clickDigitizer= new ClickDigitizer( this );
+        
         setShowCaptions(true);
         addMouseWheelListener( getMouseWheelListener() );
         addMouseListener( new MouseAdapter() {
@@ -45,12 +50,17 @@ public class SinglePngWalkView extends PngWalkView {
                 if ( imageLocation==null ) return;
                 BufferedImage i = seq.currentImage().getImage();
                 double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
-                System.err.println( lrect );
-                //TODO: this assume x is limiting. paintImageCentered might return the scaling.
+                
                 int imageX= (int)( ( e.getX() - lrect.x ) / factor );
                 int imageY= (int)( ( e.getY() - lrect.y ) / factor );
                 
-                doLookupMetadata( imageX, imageY );
+                try {
+                    clickDigitizer.doLookupMetadata( imageX, imageY );
+                } catch ( IOException ex ) {
+                    logger.log(Level.SEVERE, null, ex);
+                } catch (ParseException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
                 
             }
             
@@ -58,16 +68,7 @@ public class SinglePngWalkView extends PngWalkView {
 
     }
     
-    /**
-     * look up the richPng metadata within the png images.
-     * @param x
-     * @param y 
-     */
-    private void doLookupMetadata( int x, int y ) {
-        System.err.println( String.format( "%d %d ", x, y ) );
-        
-    }
-
+    
     @Override
     protected synchronized void paintComponent(Graphics g1) {
         super.paintComponent(g1);
