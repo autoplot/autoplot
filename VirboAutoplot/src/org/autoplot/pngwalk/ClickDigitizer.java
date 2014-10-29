@@ -33,16 +33,21 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- *
+ * Quick-n-dirty class for picking off points from images.
  * @author jbf
  */
 public class ClickDigitizer {
     
     //WalkImageSequence seq;
     PngWalkView view;
+    PngWalkTool1 viewer;
     
     public ClickDigitizer( PngWalkView view ) {
         this.view= view;
+    }
+    
+    void setViewer( PngWalkTool1 viewer ) {
+        this.viewer= viewer;
     }
     
     /**
@@ -163,6 +168,11 @@ public class ClickDigitizer {
                     JSONObject yaxis= plot.getJSONObject("yaxis");
                     QDataSet yy= lookupDatum( yaxis, y, "bottom", "top" );
                     view.seq.setStatus(  "" + xx + ", "+ yy );
+                    if ( viewer!=null ) {
+                        if ( viewer.digitizer!=null ) {
+                            viewer.digitizer.addDataPoint( DataSetUtil.asDatum(xx), DataSetUtil.asDatum(yy) );
+                        }
+                    }
                 }
             } catch (JSONException ex) {
                 Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);

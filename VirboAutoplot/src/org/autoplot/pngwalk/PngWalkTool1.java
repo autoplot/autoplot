@@ -609,7 +609,8 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             }
         });
         qc.setToolTipText("Start up the Quality Control tool that adds documentation to images.");
-
+        optionsMenu.add( qc );
+        
         final JMenuItem dg= new JMenuItem( new AbstractAction( "Start Digitizer" ) {
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
@@ -618,9 +619,8 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                 }
             }
         });
-        qc.setToolTipText("Start up the Quality Control tool that adds documentation to images.");
-        
-        optionsMenu.add( qc );
+        dg.setToolTipText("Start up the Digitizer that receives pairs from the single view..");
+        optionsMenu.add( dg );
         
         result.add( optionsMenu );
 
@@ -1103,6 +1103,11 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         if ( digitizer==null ) {
             digitizer= new DataPointRecorder();
             tabs.add( "Digitizer" , digitizer );
+            for (PngWalkView v : views) {
+               if ( v instanceof SinglePngWalkView ) {
+                   ((SinglePngWalkView)v).clickDigitizer.setViewer(this);
+               }
+            }
         }
     }
 
