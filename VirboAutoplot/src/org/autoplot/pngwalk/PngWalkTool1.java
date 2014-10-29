@@ -59,6 +59,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import org.das2.components.DataPointRecorder;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -609,6 +610,16 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         });
         qc.setToolTipText("Start up the Quality Control tool that adds documentation to images.");
 
+        final JMenuItem dg= new JMenuItem( new AbstractAction( "Start Digitizer" ) {
+            public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);        
+                if ( !tool.isDigitizerEnabled() ) {
+                    tool.startDigitizer();
+                }
+            }
+        });
+        qc.setToolTipText("Start up the Quality Control tool that adds documentation to images.");
+        
         optionsMenu.add( qc );
         
         result.add( optionsMenu );
@@ -1084,6 +1095,19 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             throw new RuntimeException("Quality Control is already running.");
         }
 
+    }
+
+    protected DataPointRecorder digitizer= null;
+    
+    private void startDigitizer() {
+        if ( digitizer==null ) {
+            digitizer= new DataPointRecorder();
+            tabs.add( "Digitizer" , digitizer );
+        }
+    }
+
+    private boolean isDigitizerEnabled() {
+        return digitizer!=null;
     }
 
     public static interface ActionEnabler {
