@@ -1211,16 +1211,41 @@ public class DataSetURI {
         }
     }
 
+    /**
+     * Represents a single suggestion in a completion list.  For example,
+     * http://autoplot.org/data/versioning/data_&lt;C&gt; would result in completions for each file in the folder,
+     * and the aggregation, and each is represented by one completion result.  The completion result contains
+     * the human-readable label and a documentation string, as well as the replacement text.  
+     */
     public static class CompletionResult {
 
+        /**
+         * the suggestion to replace the completeable string.
+         */
         public String completion;
+        
+        /**
+         * human-readable documentation.
+         */
         public String doc;
-        public String completable;
+        
+        /**
+         * human-readable label.
+         */
         public String label;
+        
+        /**
+         * the string that will be replaced, or null.
+         */
+        public String completable;
+        
+        /**
+         * If true then the service-provider code believes this completion should be usable after the completion.
+         */
         public boolean maybePlot;
 
         protected CompletionResult(String completion, String doc) {
-            this(completion, null, doc, "", false);
+            this(completion, null, doc, null, false);
         }
 
         protected CompletionResult(String completion, String doc, String completable, boolean maybePlot) {
