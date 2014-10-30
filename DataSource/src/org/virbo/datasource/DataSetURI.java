@@ -1231,8 +1231,9 @@ public class DataSetURI {
          * @param completion
          * @param label the presentation string
          * @param doc a descriptive string, for example used in a tooltip
-         * @param completable the string that is being completed. (not used)
+         * @param completable the string that is being completed.  (Not really used, but see DataSetUrlCompletionItem)
          * @param maybePlot true indicates accepting the completion should result in a valid URI.
+         * @see org.das2.jythoncompletion.DataSetUrlCompletionItem
          */
         protected CompletionResult(String completion, String label, String doc, String completable, boolean maybePlot) {
             this.completion = completion;
@@ -1510,14 +1511,14 @@ public class DataSetURI {
     }
 
     /**
-     *
-     * @param surl
-     * @param carotpos
+     * Get the completions from the FileSystem, including aggregation suggestions.
+     * @param surl the URI, e.g. file:/home/jbf/pngwalk/product_$Y$m.png
+     * @param carotpos the position of the editor carot (cursor) where the completions
      * @param inclAgg include aggregations it sees.  These are a guess.
      * @param inclFiles if null, list files, but is non-null, then only include files in the list of regex.
      * @param acceptPattern  if non-null, files and aggregations much match this.
      * @param mon
-     * @return
+     * @return list of results.
      * @throws IOException
      * @throws URISyntaxException
      */
@@ -1663,11 +1664,8 @@ public class DataSetURI {
                 //sagg= URISplit.removeParam( sagg, "timerange" );
                 scomp= scomp.substring(surlDir.length());
                 if ( scomp.startsWith(prefix) ) {
-                    int ie= 0;
-                    while ( ie<surl.length() && ie<sagg.length() && surl.charAt(ie)==sagg.charAt(ie) ) ie++;
-                    int islash= sagg.lastIndexOf("/",ie);
-                    islash= islash+1;
-                    completions.add( new DataSetURI.CompletionResult( sagg.substring(islash), null, "Use aggregation ("+tr+" available)", prefix, true ) );
+                    String doc= "Use aggregation ("+tr+" available)";
+                    completions.add( new DataSetURI.CompletionResult( sagg, null, doc, prefix, true ) );
                 }
             }
         }
