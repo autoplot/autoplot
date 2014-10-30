@@ -16,6 +16,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageInputStream;
+import javax.swing.JOptionPane;
 import static org.autoplot.pngwalk.PngWalkView.logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -170,7 +171,11 @@ public class ClickDigitizer {
                     view.seq.setStatus(  "" + xx + ", "+ yy );
                     if ( viewer!=null ) {
                         if ( viewer.digitizer!=null ) {
-                            viewer.digitizer.addDataPoint( DataSetUtil.asDatum(xx), DataSetUtil.asDatum(yy) );
+                            try {
+                                viewer.digitizer.addDataPoint( DataSetUtil.asDatum(xx), DataSetUtil.asDatum(yy) );
+                            } catch ( RuntimeException ex ) { // units conversion
+                                JOptionPane.showMessageDialog( viewer,ex.getMessage());
+                            }
                         }
                     }
                 }
