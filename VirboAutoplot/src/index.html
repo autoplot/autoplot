@@ -25,6 +25,8 @@
         to resolve old numbers.
         <p>Bugfixes (2014-10-27):</p>
         <ul>
+            <li>bugfix: restore ctrl+mouse wheel pan behavior.</li>
+            <li>bugfix in aggregation completion, where the path is not part of the completion.</li>
             <li>rte_1930845582: xds.length()!=yds.length() in odd branch of SeriesRenderer guess cadence.</li>
             <li>rte_1635938883: NullPointerException for new users when entering pngwalk</li>
             <li>1281: linestyle settings not set properly for pngwalk, clone to new window </li>
@@ -59,7 +61,8 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>pngwalk tool digitizer</li>
+            <li>add shift+mousewheel nudge behavior</li>
+            <li>pngwalk tool digitizer looks up plot coordinates when axis metadata is found.</li>
             <li>initial coding to use NIO for CDF reads, which will be faster and take less JVM memory.</li>
             <li>add setDepend0Cadence to filters</li> 
             <li>introduce trim( ds, dataset('2013-03-03'), dataset('2013-03-04') ) and in filters</li>
