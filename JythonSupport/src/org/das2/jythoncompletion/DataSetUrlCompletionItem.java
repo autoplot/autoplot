@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.das2.jythoncompletion;
 
 import java.awt.Color;
@@ -20,31 +19,31 @@ import org.virbo.datasource.DataSetURI.CompletionResult;
 
 /**
  * adapts CompletionResult to Netbeans model.
+ *
  * @author jbf
  */
 public class DataSetUrlCompletionItem implements CompletionItem {
 
-    private static final Logger logger= Logger.getLogger("jython.editor");
-
+    private static final Logger logger = Logger.getLogger("jython.editor");
     CompletionResult rs;
-    
-    DataSetUrlCompletionItem( CompletionResult rs ) {
-        this.rs= rs;
+
+    DataSetUrlCompletionItem(CompletionResult rs) {
+        this.rs = rs;
     }
-    
+
     public CompletionTask createDocumentationTask() {
         return null;
-       /* if ( rs.doc!=null ) return new DocCompletionTask() {
-            public void query(CompletionResultSet resultSet) {
-                resultSet.addItem( new DefaultDocumentationItem(rs.doc) );
-            }
-            public void refresh(CompletionResultSet resultSet) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-            public void cancel() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }   
-        };*/
+        /* if ( rs.doc!=null ) return new DocCompletionTask() {
+         public void query(CompletionResultSet resultSet) {
+         resultSet.addItem( new DefaultDocumentationItem(rs.doc) );
+         }
+         public void refresh(CompletionResultSet resultSet) {
+         throw new UnsupportedOperationException("Not supported yet.");
+         }
+         public void cancel() {
+         throw new UnsupportedOperationException("Not supported yet.");
+         }   
+         };*/
     }
 
     public CompletionTask createToolTipTask() {
@@ -56,18 +55,18 @@ public class DataSetUrlCompletionItem implements CompletionItem {
             logger.fine("defaultAction of DataSetUrlCompletionItem");
             int pos = jTextComponent.getCaretPosition();
             Document d = jTextComponent.getDocument();
-	    if ( rs.completion.startsWith(rs.completable) ) {
-                String txt= d.getText(pos,d.getLength()-pos);
-                int ii= txt.indexOf("'");
-                int jj= txt.indexOf("\n");
-                if ( ii>-1 && ii<jj ) {
-                    logger.fine("ii="+ii);
-                    d.remove( pos, ii );
+            if (rs.completion.startsWith(rs.completable)) {
+                String txt = d.getText(pos, d.getLength() - pos);
+                int ii = txt.indexOf("'");
+                int jj = txt.indexOf("\n");
+                if (ii > -1 && ii < jj) {
+                    logger.fine("ii=" + ii);
+                    d.remove(pos, ii);
                 }
-		d.insertString(pos, rs.completion.substring(rs.completable.length()), null);
-	    } else {
-		throw new IllegalArgumentException("implementation problem, completion ("+rs.completion+") must start with completable ("+rs.completable+")");
-	    }
+                d.insertString(pos, rs.completion.substring(rs.completable.length()), null);
+            } else {
+                throw new IllegalArgumentException("implementation problem, completion (" + rs.completion + ") must start with completable (" + rs.completable + ")");
+            }
         } catch (BadLocationException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -78,12 +77,12 @@ public class DataSetUrlCompletionItem implements CompletionItem {
     }
 
     public int getPreferredWidth(Graphics graphics, Font font) {
-        int n= rs.label.length();
+        int n = rs.label.length();
         String label;
-        if ( n>80 ) {
-           label= rs.label.substring(n-80,n);
+        if (n > 80) {
+            label = rs.label.substring(n - 80, n);
         } else {
-            label= rs.label;
+            label = rs.label;
         }
         return graphics.getFontMetrics(font).stringWidth(label);
     }
@@ -105,18 +104,17 @@ public class DataSetUrlCompletionItem implements CompletionItem {
     }
 
     public void render(Graphics graphics, Font font, Color color, Color color0, int i, int i0, boolean b) {
-        int n= rs.label.length();
+        int n = rs.label.length();
         String label;
-        if ( n>80 ) {
-           label= rs.label.substring(n-80,n);
+        if (n > 80) {
+            label = rs.label.substring(n - 80, n);
         } else {
-            label= rs.label;
+            label = rs.label;
         }
-        graphics.drawString( label, 0, graphics.getFontMetrics().getHeight() );
+        graphics.drawString(label, 0, graphics.getFontMetrics().getHeight());
     }
 
     public String getLabel() {
         return rs.completion;
     }
-
 }
