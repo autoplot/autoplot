@@ -71,15 +71,19 @@ public class ClickDigitizer {
 
             // read metadata of first image
             IIOMetadata metadata = reader.getImageMetadata(0);
-            //PNGMetadata m= (PNGMetadata)metadata;
-            IIOMetadataNode n= (IIOMetadataNode)metadata.getAsTree("javax_imageio_png_1.0");
-            NodeList nl= n.getElementsByTagName("tEXtEntry");
-            for ( int i=0; i<nl.getLength(); i++ ) {
-                Element e= (Element)nl.item(i);
-                String n3= e.getAttribute("keyword");
-                if ( n3.equals("plotInfo") ) {
-                    return e.getAttribute("value");
+            try {
+                IIOMetadataNode n= (IIOMetadataNode)metadata.getAsTree("javax_imageio_png_1.0");
+                NodeList nl= n.getElementsByTagName("tEXtEntry");
+                for ( int i=0; i<nl.getLength(); i++ ) {
+                    Element e= (Element)nl.item(i);
+                    String n3= e.getAttribute("keyword");
+                    if ( n3.equals("plotInfo") ) {
+                        return e.getAttribute("value");
+                    }
                 }
+            } catch ( IllegalArgumentException ex ) {
+                logger.log( Level.FINE, ex.getMessage() );
+                return null;
             }
         }
         return null;
@@ -183,7 +187,7 @@ public class ClickDigitizer {
                 Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            logger.log(Level.SEVERE, null, "no json available");
+            logger.log( Level.SEVERE, "no JSON metadata available" );
         }
         
     }
