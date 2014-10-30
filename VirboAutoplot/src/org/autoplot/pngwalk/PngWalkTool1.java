@@ -23,6 +23,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -63,14 +66,11 @@ import org.das2.components.DataPointRecorder;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.util.ArgumentList;
-import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.datasource.DataSetSelector;
-import org.xml.sax.SAXException;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.format.TimeDatumFormatter;
+import org.das2.util.ArgumentList;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -84,14 +84,17 @@ import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.ScriptContext;
+import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
-import org.virbo.autoplot.bookmarks.Util;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
+import org.virbo.autoplot.bookmarks.Util;
 import org.virbo.autoplot.transferrable.ImageSelection;
+import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
+import org.xml.sax.SAXException;
 
 /**
  * GUI for browsing PNGWalks, or sets of PNG images.  These typically contain files named to make a time series, such as
@@ -725,6 +728,8 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             });
         }
 
+        tabs.setFocusable(false);
+        
         nextButton.requestFocus();
 
         if (isQualityControlEnabled()) {
@@ -745,6 +750,15 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             bc.addBinding( b );
         }
         bc.bind();
+        
+        addMouseWheelListener( new MouseWheelListener() {
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                 if ( seq!=null && seq.size()!=0 ) seq.skipBy(e.getWheelRotation());
+            }
+
+        });
 
         setStatus("ready");
 
@@ -1204,7 +1218,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         actionButtonsPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        prevSetButton.setText("<<<");
+        prevSetButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/prevPrevPrev.png"))); // NOI18N
         prevSetButton.setToolTipText("Skip 7");
         prevSetButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1212,7 +1226,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             }
         });
 
-        prevButton.setText("<");
+        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/prevPrev.png"))); // NOI18N
         prevButton.setToolTipText("previous");
         prevButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1220,7 +1234,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             }
         });
 
-        nextButton.setText(">");
+        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/nextNext.png"))); // NOI18N
         nextButton.setToolTipText("next");
         nextButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1228,7 +1242,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             }
         });
 
-        nextSetButton.setText(">>>");
+        nextSetButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/nextNextNext.png"))); // NOI18N
         nextSetButton.setToolTipText("Skip 7");
         nextSetButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1236,7 +1250,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             }
         });
 
-        jumpToFirstButton.setText("|<");
+        jumpToFirstButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/prevPrevPrevStop.png"))); // NOI18N
         jumpToFirstButton.setToolTipText("jump to first");
         jumpToFirstButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1244,7 +1258,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             }
         });
 
-        jumpToLastButton.setText(">|");
+        jumpToLastButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/nextNextNextStop.png"))); // NOI18N
         jumpToLastButton.setToolTipText("jump to last");
         jumpToLastButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1257,13 +1271,13 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(112, Short.MAX_VALUE)
                 .add(jumpToFirstButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(prevSetButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(prevButton)
-                .add(139, 139, 139)
+                .add(39, 39, 39)
                 .add(nextButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(nextSetButton)
@@ -1329,34 +1343,33 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1078, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 108, Short.MAX_VALUE)
-                .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 463, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(useRangeCheckBox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 236, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(12, 12, 12)
-                        .add(editRangeButton)
-                        .add(18, 18, 18)
-                        .add(showMissingCheckBox))
-                    .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 894, Short.MAX_VALUE))
+                        .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 228, Short.MAX_VALUE)
+                        .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 463, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(12, 12, 12)
+                                .add(useRangeCheckBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 236, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(12, 12, 12)
+                                .add(editRangeButton)
+                                .add(18, 18, 18)
+                                .add(showMissingCheckBox))
+                            .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1054, Short.MAX_VALUE)))
+                    .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1066, Short.MAX_VALUE))
                 .addContainerGap())
-            .add(layout.createSequentialGroup()
-                .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 906, Short.MAX_VALUE)
-                .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 918, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
+                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 638, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)

@@ -16,12 +16,12 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="pngsPanel" alignment="1" pref="918" max="32767" attributes="0"/>
+          <Component id="pngsPanel" alignment="1" pref="1078" max="32767" attributes="0"/>
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jPanel1" min="-2" max="-2" attributes="1"/>
-                      <EmptySpace pref="108" max="32767" attributes="0"/>
+                      <EmptySpace pref="228" max="32767" attributes="0"/>
                       <Component id="actionButtonsPanel" min="-2" pref="463" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
@@ -37,10 +37,10 @@
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="showMissingCheckBox" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="dataSetSelector1" alignment="0" pref="894" max="32767" attributes="0"/>
+                          <Component id="dataSetSelector1" alignment="0" pref="1054" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-                  <Component id="statusLabel" alignment="0" pref="906" max="32767" attributes="1"/>
+                  <Component id="statusLabel" alignment="0" pref="1066" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -49,7 +49,7 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="pngsPanel" pref="636" max="32767" attributes="0"/>
+              <Component id="pngsPanel" pref="638" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="dataSetSelector1" min="-2" pref="27" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -104,13 +104,13 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="112" max="32767" attributes="0"/>
                   <Component id="jumpToFirstButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="prevSetButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="prevButton" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="139" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
                   <Component id="nextButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="nextSetButton" min="-2" max="-2" attributes="0"/>
@@ -122,11 +122,11 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="prevButton" linkSize="1" min="-2" max="-2" attributes="0"/>
+                  <Component id="prevButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="nextButton" linkSize="1" min="-2" max="-2" attributes="0"/>
                   <Component id="nextSetButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="prevSetButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jumpToFirstButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="prevSetButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="jumpToFirstButton" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jumpToLastButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -135,7 +135,9 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="prevSetButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&lt;&lt;&lt;"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/resources/prevPrevPrev.png"/>
+            </Property>
             <Property name="toolTipText" type="java.lang.String" value="Skip 7"/>
           </Properties>
           <Events>
@@ -144,7 +146,9 @@
         </Component>
         <Component class="javax.swing.JButton" name="prevButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&lt;"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/resources/prevPrev.png"/>
+            </Property>
             <Property name="toolTipText" type="java.lang.String" value="previous"/>
           </Properties>
           <Events>
@@ -153,7 +157,9 @@
         </Component>
         <Component class="javax.swing.JButton" name="nextButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&gt;"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/resources/nextNext.png"/>
+            </Property>
             <Property name="toolTipText" type="java.lang.String" value="next"/>
           </Properties>
           <Events>
@@ -162,7 +168,9 @@
         </Component>
         <Component class="javax.swing.JButton" name="nextSetButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&gt;&gt;&gt;"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/resources/nextNextNext.png"/>
+            </Property>
             <Property name="toolTipText" type="java.lang.String" value="Skip 7"/>
           </Properties>
           <Events>
@@ -171,7 +179,9 @@
         </Component>
         <Component class="javax.swing.JButton" name="jumpToFirstButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="|&lt;"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/resources/prevPrevPrevStop.png"/>
+            </Property>
             <Property name="toolTipText" type="java.lang.String" value="jump to first"/>
           </Properties>
           <Events>
@@ -180,7 +190,9 @@
         </Component>
         <Component class="javax.swing.JButton" name="jumpToLastButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&gt;|"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/resources/nextNextNextStop.png"/>
+            </Property>
             <Property name="toolTipText" type="java.lang.String" value="jump to last"/>
           </Properties>
           <Events>
