@@ -985,7 +985,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     private void calcAndShowCompletions( Runnable run ) {
-                if (completionsRunnable != null) {
+        if (completionsRunnable != null) {
             completionsMonitor.cancel();
             completionsRunnable = null;
         }
