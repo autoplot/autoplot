@@ -49,6 +49,7 @@ public class SinglePngWalkView extends PngWalkView {
                 Rectangle lrect= imageLocation;
                 if ( imageLocation==null ) return;
                 BufferedImage i = seq.currentImage().getImage();
+                if ( i==null ) return;
                 double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
                 
                 int imageX= (int)( ( e.getX() - lrect.x ) / factor );
