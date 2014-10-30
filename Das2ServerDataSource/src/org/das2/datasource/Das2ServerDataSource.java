@@ -16,6 +16,7 @@ import org.das2.stream.StreamException;
 import org.das2.stream.StreamTool;
 import org.das2.util.DasProgressMonitorInputStream;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
@@ -37,6 +38,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.stream.MIME;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DataSetOps;
@@ -247,8 +249,28 @@ class Das2ServerDataSource extends AbstractDataSource {
         boolean qds= "1".equals( dsdfParams.get("qstream") );
         
         logger.log( Level.FINE, "opening {0} {1}", new Object[]{ qds ? "as qstream" : "as das2stream", url2 });
-        InputStream in = url2.openStream();
-
+        
+		  // Allow response bodies that are Das2 streams or QStreams to be processed
+		  // normally even when the HTTP Status code indicates an error.  This is to handle
+		  // errors that are packaged properly.
+		  InputStream in = null;
+		  URLConnection conn = url2.openConnection();
+		  if(conn instanceof HttpURLConnection){
+		     HttpURLConnection httpConn = (HttpURLConnection) conn;
+			  int nStatus = httpConn.getResponseCode();
+			  if(nStatus >= 400){
+			     String sMime = httpConn.getContentType();
+				  
+				  // if this isn't a Das2 stream or QStream, go ahead and throw
+			     if( ! MIME.isDataStream(sMime)) 
+					  throw new java.io.IOException("Server returned HTTP response code: "+
+					  nStatus + " for URL: " + url2);
+				  else
+				     in = httpConn.getErrorStream();
+				}
+		   }
+		   if(in == null) in = conn.getInputStream();
+		  
         final DasProgressMonitorInputStream mpin = new DasProgressMonitorInputStream(in, mon);
 
         ReadableByteChannel channel = Channels.newChannel(mpin);
