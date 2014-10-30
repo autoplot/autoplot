@@ -64,6 +64,7 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
 
     protected PngWalkView(WalkImageSequence sequence) {
         setSequence(sequence);
+        setFocusable(true);
     }
 
     public final void setSequence(WalkImageSequence sequence) {
