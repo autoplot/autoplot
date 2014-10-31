@@ -11,8 +11,7 @@
 
 package org.virbo.cdf;
 
-import gov.nasa.gsfc.voyager.cdf.CDF;
-import gov.nasa.gsfc.voyager.cdf.Variable;
+import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -31,6 +30,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.autoplot.cdf.CdfDataSource;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.util.DasExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
@@ -340,7 +340,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     long subsetMaxRec=-1;
 
     File cdfFile;
-    CDF cdf;
+    CDFReader cdf;
     Throwable cdfException;
 
     /**
@@ -371,7 +371,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
         logger.log(Level.FINE, "opening cdf file {0}", cdfFile.toString());
         try {
-            cdf = CdfJavaDataSource.getCdfFile(cdfFile.toString());
+            cdf = CdfDataSource.getCdfFile(cdfFile.toString());
             if ( cdf==null ) {
                 throw new IllegalArgumentException("file is not a CDF file");
             }
@@ -398,7 +398,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             logger.log(Level.FINE, "opening cdf file {0}", fileName);
             if ( cdf==null && cdfException==null ) {
                 try {
-                    cdf = CdfJavaDataSource.getCdfFile(fileName);
+                    cdf = CdfDataSource.getCdfFile(fileName);
                 } catch (Throwable ex) {
                     throw new RuntimeException(ex);
                 }
@@ -414,11 +414,11 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             logger.finest("inspect cdf for plottable parameters");
             
             boolean isMaster= fileName.contains("MASTERS");
-            parameterDescriptions= CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false, false );
+            parameterDescriptions= org.autoplot.cdf.CdfUtil.getPlottable( cdf, !this.showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false, false );
             
-            Map<String,String> allParameterInfo= CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, true, isMaster );
-            Map<String,String> dataParameterInfo= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true, isMaster );
-            Map<String,String> whereParameterInfo= CdfUtil.getPlottable( cdf, false, 2, false, isMaster );
+            Map<String,String> allParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, true, isMaster );
+            Map<String,String> dataParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true, isMaster );
+            Map<String,String> whereParameterInfo= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 2, false, isMaster );
 
             String label;
             if ( this.showAllVarTypeCB.isSelected() ) {
@@ -567,7 +567,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         
     }
 
-    private void fillTree( JTree parameterTree, Map<String,String> mm, CDF cdf, String param, String slice1 ) {
+    private void fillTree( JTree parameterTree, Map<String,String> mm, gov.nasa.gsfc.spdf.cdfj.CDFReader cdf, String param, String slice1 ) {
 
         DefaultMutableTreeNode root= new DefaultMutableTreeNode("");
 
@@ -575,9 +575,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         for ( Entry<String,String> e: mm.entrySet() ) {
 
            try {
-                Variable v= cdf.getVariable(e.getKey());
-
-                Object oattr= cdf.getAttribute( v.getName(), "LABL_PTR_1");
+                Object oattr= cdf.getAttribute( e.getKey(), "LABL_PTR_1");
                 String lablPtr1=null;
                 if ( oattr!=null && oattr instanceof Vector ) {
                     Vector voattr= (Vector)oattr;
@@ -588,7 +586,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                     }
                 }
 
-                boolean doComponents= oattr!=null && v.getDimensions().length==1 && v.getDimensions()[0]<=MAX_SLICE1_OFFER;
+                int[] dimensions= cdf.getDimensions( e.getKey() );
+                boolean doComponents= oattr!=null && dimensions.length==1 && dimensions[0]<=MAX_SLICE1_OFFER;
                 if ( doComponents ) {
                     String s= lablPtr1;
                     DefaultMutableTreeNode node= new DefaultMutableTreeNode( e.getKey() );
