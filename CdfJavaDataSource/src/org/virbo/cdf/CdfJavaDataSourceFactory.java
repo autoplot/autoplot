@@ -9,8 +9,7 @@
 
 package org.virbo.cdf;
 
-import gov.nasa.gsfc.voyager.cdf.CDF;
-import gov.nasa.gsfc.voyager.cdf.CDFFactory;
+import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.autoplot.cdf.CdfDataSource;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
@@ -65,15 +65,15 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
             
             logger.log(Level.FINEST, "opening cdf file {0}", fileName);
 
-            CDF cdf;
+            CDFReader cdf;
             try {
-                cdf = CdfJavaDataSource.getCdfFile(fileName);
+                cdf = CdfDataSource.getCdfFile(fileName);
             } catch (Throwable ex) {
                 throw new Exception(ex);
             }
 
             logger.finest("inspect cdf for plottable parameters");
-            Map<String,String> result= CdfUtil.getPlottable( cdf, false, 4 );
+            Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 4 );
             
             logger.finest("close cdf");
             //cdf.close();
@@ -101,13 +101,13 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 String fileName= cdfFile.toString();
                 //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 
-                CDF cdf;
+                CDFReader cdf;
                 try {
-                    cdf = CdfJavaDataSource.getCdfFile(fileName);
+                    cdf = CdfDataSource.getCdfFile(fileName);
                 } catch (Throwable ex) {
                     throw new RuntimeException(ex);
                 }
-                Map<String,String> result= CdfUtil.getPlottable( cdf, false, 4 );
+                Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 4 );
                 //cdf.close();
                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
@@ -134,13 +134,13 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
 
                 String fileName= cdfFile.toString();
                 
-                CDF cdf;
+                CDFReader cdf;
                 try {
-                    cdf = CdfJavaDataSource.getCdfFile(fileName);
+                    cdf = org.autoplot.cdf.CdfDataSource.getCdfFile(fileName);
                 } catch (Throwable ex) {
                     throw new RuntimeException(ex);
                 }
-                Map<String,String> result= CdfUtil.getPlottable( cdf, false, 2 );
+                Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 2 );
                                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                 for ( Map.Entry<String,String> e:result.entrySet() ) {
@@ -187,13 +187,13 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
             if (!file.isFile()) {
                 return true;
             } else {
-                CDF cdf;
+                CDFReader cdf;
                 try {
-                    cdf = CdfJavaDataSource.getCdfFile( file.getPath() );
+                    cdf = CdfDataSource.getCdfFile( file.getPath() );
                 } catch ( Throwable ex ) {
                     throw new RuntimeException(ex);
                 }
-                Map<String,String> result= CdfUtil.getPlottable( cdf, false, 4 );
+                Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 4 );
                 //cdf.close();
                 int i= param.indexOf("[");
                 if ( i>-1 ) {
