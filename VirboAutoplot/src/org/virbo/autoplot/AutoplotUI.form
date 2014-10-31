@@ -750,6 +750,12 @@
           <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
               <Component id="tabbedPanelContainer" alignment="1" pref="732" max="32767" attributes="0"/>
           </Group>
+          <Group type="103" rootIndex="2" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <Component id="uriTimeRangeToggleButton1" min="-2" pref="10" max="-2" attributes="0"/>
+                  <EmptySpace min="0" pref="722" max="32767" attributes="0"/>
+              </Group>
+          </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -768,6 +774,13 @@
                   <EmptySpace min="-2" pref="48" max="-2" attributes="0"/>
                   <Component id="tabbedPanelContainer" pref="678" max="32767" attributes="0"/>
                   <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+              </Group>
+          </Group>
+          <Group type="103" rootIndex="2" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="uriTimeRangeToggleButton1" min="-2" pref="28" max="-2" attributes="0"/>
+                  <EmptySpace pref="690" max="32767" attributes="0"/>
               </Group>
           </Group>
       </Group>
@@ -847,6 +860,21 @@
           </Constraints>
         </Component>
       </SubComponents>
+    </Container>
+    <Container class="org.virbo.autoplot.UriTimeRangeToggleButton" name="uriTimeRangeToggleButton1">
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <EmptySpace min="0" pref="28" max="32767" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+      </Layout>
     </Container>
   </SubComponents>
 </Form>

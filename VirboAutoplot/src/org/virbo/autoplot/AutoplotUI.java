@@ -57,6 +57,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
@@ -2108,6 +2109,7 @@ APSplash.checkTime("init 52.9");
         statusTextField = new javax.swing.JTextField();
         timeRangePanel = new javax.swing.JPanel();
         dataSetSelector = new org.virbo.datasource.DataSetSelector();
+        uriTimeRangeToggleButton1 = new org.virbo.autoplot.UriTimeRangeToggleButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         editMenu = new javax.swing.JMenu();
@@ -2236,6 +2238,17 @@ APSplash.checkTime("init 52.9");
             }
         });
         timeRangePanel.add(dataSetSelector, "card2");
+
+        org.jdesktop.layout.GroupLayout uriTimeRangeToggleButton1Layout = new org.jdesktop.layout.GroupLayout(uriTimeRangeToggleButton1);
+        uriTimeRangeToggleButton1.setLayout(uriTimeRangeToggleButton1Layout);
+        uriTimeRangeToggleButton1Layout.setHorizontalGroup(
+            uriTimeRangeToggleButton1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 0, Short.MAX_VALUE)
+        );
+        uriTimeRangeToggleButton1Layout.setVerticalGroup(
+            uriTimeRangeToggleButton1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 28, Short.MAX_VALUE)
+        );
 
         fileMenu.setText("File");
         jMenuBar1.add(fileMenu);
@@ -2839,6 +2852,10 @@ APSplash.checkTime("init 52.9");
                 .addContainerGap())
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(org.jdesktop.layout.GroupLayout.TRAILING, tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE))
+            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(layout.createSequentialGroup()
+                    .add(uriTimeRangeToggleButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(0, 722, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -2854,6 +2871,11 @@ APSplash.checkTime("init 52.9");
                     .add(48, 48, 48)
                     .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
                     .add(20, 20, 20)))
+            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .add(uriTimeRangeToggleButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(690, Short.MAX_VALUE)))
         );
 
         bindingGroup.bind();
@@ -2994,12 +3016,16 @@ APSplash.checkTime("init 52.9");
             String tmem= nf.format(Runtime.getRuntime().totalMemory() / 1000000 );
             String fmem= nf.format(Runtime.getRuntime().freeMemory()  / 1000000 );
             String pwd= new File("foo.txt").getAbsoluteFile().getParent();
+            String pid= getProcessId("???");
+            String host= InetAddress.getLocalHost().getHostName();
             String aboutContent = "<ul>" +
                 "<li>Java version: " + javaVersion +
-                "<li>max memory (Mb): " + mem +
-                "<li>total memory (Mb): " + tmem +
-                "<li>free memory (Mb): " + fmem +
+                "<li>max memory (Mb): " + mem + " (memory available to process)" +
+                "<li>total memory (Mb): " + tmem + " (amount allocated to the process)" +
+                "<li>free memory (Mb): " + fmem + " (amount available before more must be allocated)" + 
                 "<li>arch: " + arch +
+                "<li>hostname: "+ host +
+                "<li>pid: " + pid +
                 "<li>pwd: " + pwd +
                 "</ul>";
             buffy.append( aboutContent );
@@ -3467,7 +3493,6 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
                 ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR );
             }
         }
-
     }//GEN-LAST:event_formMouseClicked
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
@@ -4440,6 +4465,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JPopupMenu.Separator toolsUserSep;
     private javax.swing.JMenuItem undoMenuItem;
     private javax.swing.JMenu undoMultipleMenu;
+    private org.virbo.autoplot.UriTimeRangeToggleButton uriTimeRangeToggleButton1;
     private javax.swing.JMenu viewMenu;
     private javax.swing.JCheckBoxMenuItem workOfflineCheckBoxMenuItem;
     private javax.swing.JMenuItem zoomInMenuItem;
