@@ -1583,6 +1583,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             t= readPngwalkFile(t);
         }
         setTemplate( t );
+        nextButton.requestFocus();
     }//GEN-LAST:event_dataSetSelector1ActionPerformed
 
     private void showMissingCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_showMissingCheckBoxItemStateChanged
