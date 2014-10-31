@@ -40,6 +40,7 @@ import org.das2.dataset.DataSetAdapter;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.stream.MIME;
 import org.das2.util.LoggerManager;
+import org.das2.util.filesystem.FileSystem;
 import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -52,7 +53,7 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.qstream.QDataSetStreamHandler;
 
 /**
- *
+ * DataSource for communicating with Das2servers.
  * @author jbf
  */
 class Das2ServerDataSource extends AbstractDataSource {
@@ -255,6 +256,7 @@ class Das2ServerDataSource extends AbstractDataSource {
 		  // errors that are packaged properly.
 		  InputStream in = null;
 		  URLConnection conn = url2.openConnection();
+                  conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
 		  if(conn instanceof HttpURLConnection){
 		     HttpURLConnection httpConn = (HttpURLConnection) conn;
 			  int nStatus = httpConn.getResponseCode();
