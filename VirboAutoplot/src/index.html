@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New fog keyword for the image source allows an image to provide context competing with overplots.</small></p>
+        <p><small>The PNGWalk Tool got a bit of clean up today.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,9 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-10-27):</p>
+        <p>Bugfixes (2014-10-30):</p>
         <ul>
+            <li>1284: round of cleanup with PNGWalkTool</li>
             <li>bugfix: restore ctrl+mouse wheel pan behavior.</li>
             <li>bugfix in aggregation completion, where the path is not part of the completion.</li>
             <li>rte_1930845582: xds.length()!=yds.length() in odd branch of SeriesRenderer guess cadence.</li>
@@ -62,7 +63,8 @@
         <p>Features:</p>
         <ul>
             <li>add shift+mousewheel nudge behavior</li>
-            <li>pngwalk tool digitizer looks up plot coordinates when axis metadata is found.</li>
+            <li>das2servers can return non-200 error codes.</li>
+            <li>PNGWalkToo digitizer looks up plot coordinates when axis metadata is found.</li>
             <li>initial coding to use NIO for CDF reads, which will be faster and take less JVM memory.</li>
             <li>add setDepend0Cadence to filters</li> 
             <li>introduce trim( ds, dataset('2013-03-03'), dataset('2013-03-04') ) and in filters</li>
