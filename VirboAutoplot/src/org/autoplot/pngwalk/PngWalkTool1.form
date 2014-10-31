@@ -121,12 +121,12 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="prevButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
+              <Component id="prevSetButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
+              <Component id="jumpToFirstButton" alignment="0" min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="prevButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="nextButton" linkSize="1" min="-2" max="-2" attributes="0"/>
                   <Component id="nextSetButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="prevSetButton" linkSize="1" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jumpToFirstButton" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="jumpToLastButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -138,7 +138,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/resources/prevPrevPrev.png"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" value="Skip 7"/>
+            <Property name="toolTipText" type="java.lang.String" value="Skip to previous interval"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prevSetButtonActionPerformed"/>
@@ -171,7 +171,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/resources/nextNextNext.png"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" value="Skip 7"/>
+            <Property name="toolTipText" type="java.lang.String" value="Skip to next interval"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nextSetButtonActionPerformed"/>

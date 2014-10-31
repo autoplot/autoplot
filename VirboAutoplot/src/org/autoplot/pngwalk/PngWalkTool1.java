@@ -463,6 +463,93 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * return the interval size (up/down)
+     * @return 
+     */
+    int nextInterval( int index ) {
+        Component c= tabs.getSelectedComponent();
+        if ( c instanceof PngWalkView ) {
+            PngWalkView v= (PngWalkView)c;
+            return v.getNextInterval( index );
+        } else if ( c instanceof JSplitPane ) {
+            c= ((JSplitPane)c).getTopComponent();
+            if ( c instanceof PngWalkView ) {
+                PngWalkView v= (PngWalkView)c;
+                return v.getNextInterval( index );
+            } else {
+                return index+7;
+            }
+        } else {
+            return index+7;
+        }
+    }    
+
+    /**
+     * return the page size (page up/down)
+     * @return 
+     */
+    int nextPage( int index) {
+        Component c= tabs.getSelectedComponent();
+        if ( c instanceof PngWalkView ) {
+            PngWalkView v= (PngWalkView)c;
+            return v.getNextPage( index );
+        } else if ( c instanceof JSplitPane ) {
+            c= ((JSplitPane)c).getTopComponent();
+            if ( c instanceof PngWalkView ) {
+                PngWalkView v= (PngWalkView)c;
+                return v.getNextPage( index );
+            } else {
+                return index+7;
+            }            
+        } else {
+            return index+28;
+        }
+    }
+    
+    /**
+     * return the interval size (up/down)
+     * @return 
+     */
+    int prevInterval( int index ) {
+        Component c= tabs.getSelectedComponent();
+        if ( c instanceof PngWalkView ) {
+            PngWalkView v= (PngWalkView)c;
+            return v.getPrevInterval( index );
+        } else if ( c instanceof JSplitPane ) {
+            c= ((JSplitPane)c).getTopComponent();
+            if ( c instanceof PngWalkView ) {
+                PngWalkView v= (PngWalkView)c;
+                return v.getPrevInterval( index );
+            } else {
+                return index+7;
+            }            
+        } else {
+            return index-7;
+        }
+    }    
+
+    /**
+     * return the page size (page up/down)
+     * @return 
+     */
+    int prevPage( int index) {
+        Component c= tabs.getSelectedComponent();
+        if ( c instanceof PngWalkView ) {
+            PngWalkView v= (PngWalkView)c;
+            return v.getPrevPage( index );
+        } else if ( c instanceof JSplitPane ) {
+            c= ((JSplitPane)c).getTopComponent();
+            if ( c instanceof PngWalkView ) {
+                PngWalkView v= (PngWalkView)c;
+                return v.getPrevPage( index );
+            } else {
+                return index+7;
+            }
+        } else {
+            return index-28;
+        }
+    }
 
     private static JMenuBar createMenuBar( final PngWalkTool1 tool, final JFrame frame ) {
         JMenuBar result= new JMenuBar();
@@ -553,6 +640,29 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
             }
         } );
+        
+        navMenu.add( new AbstractAction( "First" ) {
+            public void actionPerformed( ActionEvent e ) {
+               LoggerManager.logGuiEvent(e);        
+               tool.seq.setIndex( 0 );
+            }
+        } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_HOME, 0 ));
+        
+
+        navMenu.add( new AbstractAction( "Previous Page" ) {
+            public void actionPerformed( ActionEvent e ) {
+               LoggerManager.logGuiEvent(e);        
+               tool.seq.setIndex( tool.prevPage(tool.seq.getIndex()) );
+            }
+        } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_PAGE_UP, 0 ));
+        
+
+        navMenu.add( new AbstractAction( "Previous Interval" ) {
+            public void actionPerformed( ActionEvent e ) {
+               LoggerManager.logGuiEvent(e);        
+               tool.seq.setIndex( tool.prevInterval(tool.seq.getIndex()) );
+            }
+        } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_UP, 0 ));
 
         navMenu.add( new AbstractAction( "Previous Item" ) {
             public void actionPerformed( ActionEvent e ) {
@@ -568,6 +678,28 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                tool.seq.skipBy( 1 );
             }
         } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_RIGHT, 0 ));
+
+        navMenu.add( new AbstractAction( "Next Interval" ) {
+            public void actionPerformed( ActionEvent e ) {
+               LoggerManager.logGuiEvent(e);        
+               tool.seq.setIndex(tool.nextInterval(tool.seq.getIndex()) );
+            }
+        } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_DOWN, 0 ));
+
+
+        navMenu.add( new AbstractAction( "Next Page" ) {
+            public void actionPerformed( ActionEvent e ) {
+               LoggerManager.logGuiEvent(e);        
+               tool.seq.setIndex( tool.nextPage(tool.seq.getIndex()) );
+            }
+        } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_PAGE_DOWN, 0 ));
+
+        navMenu.add( new AbstractAction( "Last" ) {
+            public void actionPerformed( ActionEvent e ) {
+               LoggerManager.logGuiEvent(e);        
+               tool.seq.setIndex( tool.seq.size()-1 );
+            }
+        } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_END, 0 ));
 
         result.add( navMenu );
         tool.navMenu= navMenu;
@@ -1219,7 +1351,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         actionButtonsPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         prevSetButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/prevPrevPrev.png"))); // NOI18N
-        prevSetButton.setToolTipText("Skip 7");
+        prevSetButton.setToolTipText("Skip to previous interval");
         prevSetButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 prevSetButtonActionPerformed(evt);
@@ -1243,7 +1375,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         });
 
         nextSetButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/nextNextNext.png"))); // NOI18N
-        nextSetButton.setToolTipText("Skip 7");
+        nextSetButton.setToolTipText("Skip to next interval");
         nextSetButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nextSetButtonActionPerformed(evt);
@@ -1286,12 +1418,12 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(prevButton)
+            .add(prevSetButton)
+            .add(jumpToFirstButton)
             .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                .add(prevButton)
                 .add(nextButton)
                 .add(nextSetButton)
-                .add(prevSetButton)
-                .add(jumpToFirstButton)
                 .add(jumpToLastButton))
         );
 
@@ -1399,12 +1531,12 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
     private void nextSetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextSetButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
-        seq.skipBy( 7 );
+        seq.setIndex( nextInterval( seq.getIndex() ) );
 }//GEN-LAST:event_nextSetButtonActionPerformed
 
     private void prevSetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevSetButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
-        seq.skipBy( -7 );
+        seq.setIndex( prevInterval( seq.getIndex() ) );
 }//GEN-LAST:event_prevSetButtonActionPerformed
 
     private void timeFilterTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeFilterTextFieldActionPerformed
