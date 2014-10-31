@@ -89,6 +89,11 @@ public class DebuggerConsole extends javax.swing.JPanel {
     
     private static DebuggerConsole instance;
     
+    /**
+     * get the single instance of the DebuggerConsole.
+     * @param panel panel to use for the focus of the JDialog created the first time.
+     * @return the DebuggerConsole.
+     */
     public static DebuggerConsole getInstance( JPanel panel ) {
         if ( instance==null ) {
             instance= new DebuggerConsole();
@@ -328,7 +333,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         queue.add("up\n");
     }
     
-    void setEval(String expr) {
+    synchronized void setEval(String expr) {
         expr= expr.trim();
         PyObject lo= out.getLocals();
         if ( lo instanceof PyStringMap ) {
