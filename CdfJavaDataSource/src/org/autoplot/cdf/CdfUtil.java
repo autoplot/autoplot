@@ -263,7 +263,7 @@ public class CdfUtil {
 
         if ( u instanceof EnumerationUnits  )  {
             EnumerationUnits eu= (EnumerationUnits)u;
-            if ( nmax.intValue()<=eu.getHighestOrdinal() ) {
+            if ( nmax!=null && nmax.intValue()<=eu.getHighestOrdinal() ) {
                 nmax= Integer.valueOf(eu.getHighestOrdinal()+1); // rbsp-e_L1_mageisLOW-sp_20110922_V.06.0.0.cdf?channel_num
             }
         }
@@ -360,23 +360,22 @@ public class CdfUtil {
         logger.log( Level.FINE, "wrapCdfHyperDataSetHacked {0}[{1}:{2}:{3}]", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
                  ""+(recCount+recStart), recInterval } );
         {
-            String cdfFile;
-            synchronized ( CdfDataSource.lock ) {
-                cdfFile= CdfDataSource.openFilesRev.get(cdf);
-            }
-            
-            if ( false && cdfFile!=null ) { //TODO: explore why enabling the cache causes problems with test autoplot-test034.
-                String uri= cdfFile + "?" + svariable;
-                if ( recStart!=0 || recCount!=cdf.getNumberOfValues(svariable) || recInterval>1 ) {
-                    uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
-                }
-                synchronized ( CdfDataSource.dslock ) {
-                    MutablePropertyDataSet result= CdfDataSource.dsCache.get( uri );
-                    if ( result!=null ) return result;
-                }
-            }
+//            String cdfFile;
+//            synchronized ( CdfDataSource.lock ) {
+//                cdfFile= CdfDataSource.openFilesRev.get(cdf);
+//            }
+//            
+//            if ( false && cdfFile!=null ) { //TODO: explore why enabling the cache causes problems with test autoplot-test034.
+//                String uri= cdfFile + "?" + svariable;
+//                if ( recStart!=0 || recCount!=cdf.getNumberOfValues(svariable) || recInterval>1 ) {
+//                    uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
+//                }
+//                synchronized ( CdfDataSource.dslock ) {
+//                    MutablePropertyDataSet result= CdfDataSource.dsCache.get( uri );
+//                    if ( result!=null ) return result;
+//                }
+//            }
         }
-        if ( mon==null ) mon= new org.das2.util.monitor.NullProgressMonitor();
         
         long varType = cdf.getType(svariable);
 
