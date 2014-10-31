@@ -410,8 +410,11 @@ public class WalkImageSequence implements PropertyChangeListener  {
             // do nothing and fire no event
             return;
         }
-        if (index < 0 || index >= displayImages.size()) {
-            throw new IndexOutOfBoundsException();
+        if ( index<0 ) {
+            index= 0;
+        }
+        if ( index>= displayImages.size() ) {
+            index= displayImages.size()-1;
         }
         int oldIndex = this.index;
         this.index = index;

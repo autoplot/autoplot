@@ -311,4 +311,20 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         }
     }
 
+    int getNextInterval(int index) {
+        return index+7;
+    }
+
+    int getNextPage(int index) {
+        return index+28;
+    }
+
+    int getPrevInterval(int index) {
+        return index-7;
+    }
+
+    int getPrevPage(int index) {
+        return index-28;
+    }
+    
 }

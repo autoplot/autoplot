@@ -170,6 +170,26 @@ public class RowPngWalkView extends PngWalkView {
         seq.setIndex(n);
     }
 
+    int getNextInterval(int index) {
+        int i= getVisibleRect().width / cellSize;
+        return index+i;
+    }
+
+    int getNextPage(int index) {
+        int i= getVisibleRect().width / cellSize;
+        return index+i*4;
+    }
+
+    int getPrevInterval(int index) {
+        int i= getVisibleRect().width / cellSize;
+        return index-i;
+    }
+
+    int getPrevPage(int index) {
+        int i= getVisibleRect().width / cellSize;
+        return index-i*4;
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent e) {
         if (e.getPropertyName().equals(WalkImageSequence.PROP_INDEX)) {

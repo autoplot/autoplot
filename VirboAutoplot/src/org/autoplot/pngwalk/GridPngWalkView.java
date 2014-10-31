@@ -1,13 +1,11 @@
 package org.autoplot.pngwalk;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -19,14 +17,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -282,6 +274,25 @@ public class GridPngWalkView extends PngWalkView {
         }
     }
 
+    @Override
+    int getNextInterval(int index) {
+        return index+nCols;
+    }
+
+    @Override
+    int getNextPage(int index) {
+        return index+nCols*4;
+    }
+
+    @Override
+    int getPrevInterval(int index) {
+        return index-nCols;
+    }
+
+    @Override
+    int getPrevPage(int index) {
+        return index-nCols*4;
+    }
 
     private class GridViewCanvas extends JPanel implements Scrollable {
         private Font smallFont = new Font("Dialog", Font.PLAIN, 6);  //for use with small thumbnails
