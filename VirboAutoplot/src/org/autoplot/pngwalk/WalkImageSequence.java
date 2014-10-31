@@ -109,6 +109,12 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
                 setStatus("error: Error listing " + template+", "+ex.getMessage() );
                 throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
+            } catch ( IllegalArgumentException ex) {
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
+                setStatus("error: Error listing " + template+", "+ex.getMessage() );
+                throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
+            } finally {
+                setStatus( " " );
             }
         }
 
