@@ -5,7 +5,7 @@
 
 package org.autoplot.cdaweb;
 
-import gov.nasa.gsfc.voyager.cdf.CDFFactory;
+import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import java.io.File;
 import java.net.URI;
 import java.text.ParseException;
@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.autoplot.cdf.CdfDataSource;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.fsm.FileStorageModel;
@@ -96,21 +97,14 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
                     File f= FileSystemUtil.doDownload( master, mon );
 
                     Map<String,String> result;
-                    //boolean useNewLibrary= true; // Use Nand's Java library
-                    //if ( useNewLibrary ) {
-                        gov.nasa.gsfc.voyager.cdf.CDF cdf;
-                        try {
-                            cdf = CDFFactory.getCDF(f.toString());
-                        } catch (Throwable ex) {
-                            throw new RuntimeException(ex);
-                        }
-                        result= org.virbo.cdf.CdfUtil.getPlottable( cdf, true, 4);
-                    //} else {
-                        // This code is for the C-based Java library
-                        //CDF cdf= CDF.open( f.toString(), CDF.READONLYoff );
-                        //result= CdfUtil.getPlottable( cdf, true, 4);
-                        //cdf.close();
-                    //}
+
+                    CDFReader cdf;
+                    try {
+                        cdf = CdfDataSource.getCdfFile(f.toString());
+                    } catch (Throwable ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, true, 4);
                     
 
                     List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
