@@ -560,6 +560,8 @@ public class CdfDataSource extends AbstractDataSource {
                 }
             }
 
+            result.makeImmutable(); // this may cause problems with scripts that assume data is mutable.        
+
             return result;
         } catch ( Exception e ) {
             throw e;
