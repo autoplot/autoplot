@@ -53,8 +53,8 @@ public class ClickDigitizer {
     
     /**
      * return the node containing JSON metadata showing where the plots are.
-     * @param file
-     * @return null or the JSON describing the image.  See 
+     * @param file the png file.
+     * @return null or the JSON describing the image.  See http://autoplot.org/developer.richPng
      * @throws IOException 
      */
     private String getJSONMetadata( File file ) throws IOException {
@@ -172,8 +172,9 @@ public class ClickDigitizer {
                     QDataSet xx= lookupDatum( xaxis, x, "left", "right" );
                     JSONObject yaxis= plot.getJSONObject("yaxis");
                     QDataSet yy= lookupDatum( yaxis, y, "bottom", "top" );
-                    view.seq.setStatus(  "" + xx + ", "+ yy );
+                    
                     if ( viewer!=null ) {
+                        view.seq.setStatus(  "Plot Coordinates: " + xx + ", "+ yy );
                         if ( viewer.digitizer!=null ) {
                             try {
                                 viewer.digitizer.addDataPoint( DataSetUtil.asDatum(xx), DataSetUtil.asDatum(yy) );
@@ -181,13 +182,34 @@ public class ClickDigitizer {
                                 JOptionPane.showMessageDialog( viewer,ex.getMessage());
                             }
                         }
+                    } else {
+                        view.seq.setStatus(  "Plot Coordinates: " + xx + ", "+ yy + "  (Options->Start Digitizer to record)");
                     }
                 }
             } catch (JSONException ex) {
                 Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
+                Datum xx= Units.dimensionless.createDatum(x);
+                Datum yy= Units.dimensionless.createDatum(y);
+                view.seq.setStatus(  "Pixel Coordinates: " + xx + ", "+ yy + " (unable to use JSON) " );
+                
             }
         } else {
-            logger.log( Level.SEVERE, "no JSON metadata available" );
+            Datum xx= Units.dimensionless.createDatum(x);
+            Datum yy= Units.dimensionless.createDatum(y);
+            if ( viewer!=null ) {
+                view.seq.setStatus( "Pixel Coordinates: " + xx + ", "+ yy );                
+                if ( viewer.digitizer!=null ) {
+                    try {
+                        viewer.digitizer.addDataPoint( xx, yy );
+                    } catch ( RuntimeException ex ) { // units conversion
+                        JOptionPane.showMessageDialog( viewer,ex.getMessage());
+                    }
+                } else {
+                    
+                }
+            } else {
+                view.seq.setStatus(  "Pixel Coordinates: " + xx + ", "+ yy + "  (Options->Start Digitizer to record)");
+            }
         }
         
     }
