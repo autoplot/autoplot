@@ -1133,8 +1133,8 @@ public class ApplicationController extends DomNodeController implements RunLater
     /**
      * adds a block of plots to the canvas below the focus plot.  A plotElement
      * is added for each plot as well.
-     * @param nrow
-     * @param ncol
+     * @param nrow number of rows
+     * @param ncol number of columns
      * @param dir LayoutConstants.ABOVE or LayoutConstants.BELOW or null.  Null means use the current row.
      * @return a list of the newly added plots.
      */
