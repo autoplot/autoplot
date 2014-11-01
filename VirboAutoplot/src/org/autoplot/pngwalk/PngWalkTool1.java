@@ -754,7 +754,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                 }
             }
         });
-        dg.setToolTipText("Start up the Digitizer that receives pairs from the single view..");
+        dg.setToolTipText("Start up the Digitizer that receives pairs from the single view.  See http://autoplot.org/richPng.");
         optionsMenu.add( dg );
         
         result.add( optionsMenu );
