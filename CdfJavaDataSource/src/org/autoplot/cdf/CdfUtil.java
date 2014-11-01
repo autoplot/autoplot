@@ -8,6 +8,7 @@
  */
 package org.autoplot.cdf;
 
+import gov.nasa.gsfc.spdf.cdfj.CDFException;
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import org.virbo.cdf.*;
 import java.util.logging.Level;
@@ -359,6 +360,9 @@ public class CdfUtil {
             CDFReader cdf, String svariable, long recStart, long recCount, long recInterval, int slice1, ProgressMonitor mon) throws Exception {
         logger.log( Level.FINE, "wrapCdfHyperDataSetHacked {0}[{1}:{2}:{3}]", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
                  ""+(recCount+recStart), recInterval } );
+        
+        try {
+            
         {
 //            String cdfFile;
 //            synchronized ( CdfDataSource.lock ) {
@@ -589,6 +593,9 @@ public class CdfUtil {
         //}
                 
         return result;
+        } catch ( CDFException ex ) {
+            throw new Exception( ex.getMessage(), ex );
+        }
     }
     
 
@@ -650,20 +657,29 @@ public class CdfUtil {
      * @param cdf
      * @param var
      * @param attrname
-     * @return
+     * @return null if there was a problem
      */
     private static Object getAttribute( CDFReader cdf, String var, String attrname ) {
-        Object att= cdf.getAttribute( var,attrname );
-        if ( att==null ) return null;
-        if ( ((Vector)att).isEmpty() ) return null;
-        att= ((Vector)att).get(0);
-        return att;
+        try {
+            Object att= cdf.getAttribute( var,attrname );
+            if ( att==null ) return null;
+            if ( ((Vector)att).isEmpty() ) return null;
+            att= ((Vector)att).get(0);
+            return att;
+        } catch ( CDFException ex ) {
+            logger.fine(ex.getMessage());
+            return null;
+        }
     }
 
 
     public static boolean hasAttribute( CDFReader cdf, String var, String attrname ) {
-        Object att= cdf.getAttribute( var,attrname );
-        return !( att==null );
+        try {
+            Object att= cdf.getAttribute( var,attrname );
+            return !( att==null );
+        } catch ( CDFException ex ) {
+            return false;
+        }
     }
 
     //container for description of depend
@@ -718,7 +734,9 @@ public class CdfUtil {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch ( CDFException e) {
+            warn.add( "problem with DEPEND_"+dim+": " + e.getMessage() );//e.printStackTrace();
+        } catch ( Exception e) {
             warn.add( "problem with DEPEND_"+dim+": " + e.getMessage() );//e.printStackTrace();
         }
 
@@ -755,6 +773,8 @@ public class CdfUtil {
                     }
                 }
             }
+        } catch (CDFException e) {
+            warn.add( "problem with LABL_PTR_"+dim+": " + e.getMessage() );//e.printStackTrace();
         } catch (Exception e) {
             warn.add( "problem with LABL_PTR_"+dim+": " + e.getMessage() );//e.printStackTrace();
         }
@@ -793,8 +813,8 @@ public class CdfUtil {
         for (int i=0; i<v.length; i++ ) {
             String svar = v[i];
             if ( dataOnly ) {
-               Object varType= getAttribute( cdf, svar, "VAR_TYPE" );
-               if ( varType==null || !varType.equals("data") ) {
+               Object attr= getAttribute( cdf, svar, "VAR_TYPE" );
+               if ( attr==null || !attr.equals("data") ) {
                    skipCount++;
                }
             }
@@ -805,66 +825,74 @@ public class CdfUtil {
         }
 
         for (int i = 0; i < v.length; i++) {
-            StringBuilder vdescr=null;
-            String svar = v[i];
 
-            // reject variables that are ordinal data that do not have DEPEND_0.
-            Object dep0= cdf.getAttribute("DEPEND_0");
-            boolean hasDep0= false;
-            if ( dep0!=null ) {
-                hasDep0= true;
-            }
-            if ( ( cdf.getType(svar) == CDFConstants.CDF_CHAR || cdf.getType(svar)==CDFConstants.CDF_UCHAR ) && ( !hasDep0 ) ) {
-                logger.log(Level.FINER, "skipping becuase ordinal and no depend_0: {0}", svar );
-                continue;
-            }
-
-
+            String svar=null;
             List<String> warn= new ArrayList();
-
-            long maxRec = cdf.getNumberOfValues(svar); 
-            long recCount= maxRec;
-
-            int rank;
-            int[] dims = cdf.getDimensions(svar);
-
-            boolean[] dimVary= cdf.getVarys(svar);
-
-            // cdf java Nand
-            if ( dimVary.length>0 && dimVary[0]==false ) {
-                dims= new int[0];
-            }
-
-            if (dims == null) {
-                rank = 1;
-            } else {
-                rank = dims.length + 1;
-            }
-
-            if (rank > rankLimit) {
-                continue;
-            }
-
-            if ( svar.equals("Time_PB5") ) {
-                logger.log(Level.FINE, "skipping {0} because we always skip Time_PB5", svar );
-                continue;
-            }
-
+            String xDependVariable=null;
             boolean isVirtual= false;
-
-            if ( dataOnly ) {
-                Object varType= getAttribute( cdf, svar, "VAR_TYPE" );
-                if ( varType==null || !varType.equals("data") ) {
+            long xMaxRec = -1;
+            long maxRec= -1;
+            long recCount= -1;
+            String scatDesc = null;
+            String svarNotes = null;                
+            StringBuilder vdescr=null;
+            int rank=-1;
+            int[] dims=new int[0];
+                    
+            try {
+                svar = v[i];
+                int varType;
+                try {
+                    varType= cdf.getType(svar);
+                } catch ( CDFException ex ) {
+                    throw new RuntimeException(ex);
+                }
+                
+                // reject variables that are ordinal data that do not have DEPEND_0.
+                Object dep0= cdf.getAttribute("DEPEND_0");
+                boolean hasDep0= false;
+                if ( dep0!=null ) {
+                    hasDep0= true;
+                }
+                if ( ( varType == CDFConstants.CDF_CHAR || varType==CDFConstants.CDF_UCHAR ) && ( !hasDep0 ) ) {
+                    logger.log(Level.FINER, "skipping becuase ordinal and no depend_0: {0}", svar );
                     continue;
                 }
-            }
 
-            String xDependVariable = null;
-            long xMaxRec = -1;
+                maxRec = cdf.getNumberOfValues(svar); 
+                recCount= maxRec;
 
-            String scatDesc = null;
-            String svarNotes = null;
-            try {
+                dims = cdf.getDimensions(svar);
+
+                boolean[] dimVary= cdf.getVarys(svar);
+
+                // cdf java Nand
+                if ( dimVary.length>0 && dimVary[0]==false ) {
+                    dims= new int[0];
+                }
+
+                if (dims == null) {
+                    rank = 1;
+                } else {
+                    rank = dims.length + 1;
+                }
+
+                if (rank > rankLimit) {
+                    continue;
+                }
+
+                if ( svar.equals("Time_PB5") ) {
+                    logger.log(Level.FINE, "skipping {0} because we always skip Time_PB5", svar );
+                    continue;
+                }
+
+                if ( dataOnly ) {
+                    Object attr= getAttribute( cdf, svar, "VAR_TYPE" );
+                    if ( attr==null || !attr.equals("data") ) {
+                        continue;
+                    }
+                }
+
                 Object att= getAttribute( cdf, svar, "VIRTUAL" );
                 if ( att!=null ) {
                     logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", svar );
@@ -898,9 +926,12 @@ public class CdfUtil {
                         isVirtual= true;
                     }
                 }
+            } catch (CDFException e) {
+                logger.fine(e.getMessage());
             } catch (Exception e) {
-                //e.printStackTrace();
+                logger.fine(e.getMessage());
             }
+            
             try {
                 if ( hasAttribute( cdf, svar, "DEPEND_0" )) {  // check for metadata for DEPEND_0
                     Object att= getAttribute( cdf, svar, "DEPEND_0" );
@@ -924,8 +955,10 @@ public class CdfUtil {
                         }
                     }
                 }
+            } catch (CDFException e) {
+                warn.add( "problem with DEPEND_0: " + e.getMessage() );
             } catch (Exception e) {
-                warn.add( "problem with DEPEND_0: " + e.getMessage() );//e.printStackTrace();
+                warn.add( "problem with DEPEND_0: " + e.getMessage() );
             }
 
             DepDesc dep1desc= getDepDesc( cdf, svar, rank, dims, 1, warn );
@@ -970,7 +1003,13 @@ public class CdfUtil {
             if (deep) {
                 StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
 
-                String recDesc= ""+ CdfUtil.getStringDataType( cdf.getType(svar) );
+                int itype= -1;
+                try { 
+                    //assert svar is valid.
+                    itype= cdf.getType(svar);
+                } catch ( CDFException ex ) {} ;
+                
+                String recDesc= ""+ CdfUtil.getStringDataType( itype );
                 if ( dims!=null ) {
                     recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
                 }
