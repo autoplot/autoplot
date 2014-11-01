@@ -154,9 +154,11 @@ public class ClickDigitizer {
     }
     
     /**
-     * look up the richPng metadata within the png images.
-     * @param x
-     * @param y 
+     * look up the richPng metadata within the png images.  If the metadata is not
+     * available, then the x and y coordinates, with 0,0 in the lower-left corner, are used.
+     * Note the output has y=0 at the bottom to be consistent with the ImageDataSource.
+     * @param x x coordinate in image where 0 is the left side.
+     * @param y y coordinate in image where 0 is the top.  Note the output has y=0 at the bottom.
      */
     protected void doLookupMetadata( int x, int y ) throws IOException, ParseException {
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
@@ -188,14 +190,16 @@ public class ClickDigitizer {
                 }
             } catch (JSONException ex) {
                 Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
+                int h= view.seq.imageAt( view.seq.getIndex() ).getImage().getHeight();
                 Datum xx= Units.dimensionless.createDatum(x);
-                Datum yy= Units.dimensionless.createDatum(y);
+                Datum yy= Units.dimensionless.createDatum(h-y);
                 view.seq.setStatus(  "Pixel Coordinates: " + xx + ", "+ yy + " (unable to use JSON) " );
                 
             }
         } else {
+            int h= view.seq.imageAt( view.seq.getIndex() ).getImage().getHeight();
             Datum xx= Units.dimensionless.createDatum(x);
-            Datum yy= Units.dimensionless.createDatum(y);
+            Datum yy= Units.dimensionless.createDatum(h-y);
             if ( viewer!=null ) {
                 view.seq.setStatus( "Pixel Coordinates: " + xx + ", "+ yy );                
                 if ( viewer.digitizer!=null ) {
