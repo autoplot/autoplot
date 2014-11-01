@@ -11,7 +11,7 @@ package org.virbo.autoplot.layout;
  */
 public class LayoutConstants {
     public static final Object ABOVE= "above";
-    public static final Object BELOW= "below";
+    public static final Object BELOW= "below"; // Jython code uses this value.  See ScriptContext.
     public static final Object RIGHT="right";
     public static final Object LEFT="left";
 }
