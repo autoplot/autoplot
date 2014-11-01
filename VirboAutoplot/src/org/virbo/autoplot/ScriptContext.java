@@ -1153,6 +1153,18 @@ public class ScriptContext extends PyJavaInstance {
     }
     
     /**
+     * adds a block of plots to the canvas below the focus plot. 
+     * A plotElement is added for each plot as well. 
+     * @param nrows number of rows
+     * @param ncolumns number of columns
+     * @param dir below or above
+     */
+    public static List<Plot> addPlots( int nrows, int ncolumns, String dir ) {
+        return dom.getController().addPlots( nrows, ncolumns, dir );
+    }
+    
+    public static
+    /**
      * make a single plot with so many plot elements.
      */
     public static void setLayoutOverplot( int nplotElement ) {
