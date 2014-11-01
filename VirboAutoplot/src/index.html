@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The PNGWalk Tool got a bit of clean up today.</small></p>
+        <p><small>The PNGWalk Tool with recent cleanup including keybindings.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -62,6 +62,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>any URI ending in .png .jpg or .gif that contains an asterisk is handled by the pngwalk tool</li>
             <li>add shift+mousewheel nudge behavior</li>
             <li>das2servers can return non-200 error codes.</li>
             <li>PNGWalkToo digitizer looks up plot coordinates when axis metadata is found.</li>
