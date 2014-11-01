@@ -502,7 +502,16 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 PngWalkTool1.start( pngwalk, AutoplotUI.this);
             }
         });
-
+        dataSetSelector.registerActionTrigger( ".*(\\*).*\\.(png|jpg|gif)", new AbstractAction( "pngwalk") {
+            @Override
+            public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
+                applicationModel.addRecent(dataSetSelector.getValue());
+                String pngwalk= dataSetSelector.getValue();
+                PngWalkTool1.start( pngwalk, AutoplotUI.this);
+            }
+        });
+        
         dataSetSelector.registerActionTrigger( "(.*)\\.jy(\\?.*)?", new AbstractAction( TAB_SCRIPT) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
