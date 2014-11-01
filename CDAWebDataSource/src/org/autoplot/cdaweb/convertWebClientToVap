@@ -1,0 +1,25 @@
+The thin client at http://cdaweb.gsfc.nasa.gov/cgi-bin/eval3.cgi has in its source code, the following reference:
+
+cgi-bin/eval3.cgi?dataset=+RBSP-A-RBSPICE_LEV-2_TOFXEION+RBSP-A_MAGNETOMETER_4SEC-SM_EMFISIS-L3
+   &events=2005%2F09%2F07+00%3A00%3A00%092005%2F09%2F20+00%3A00%3A00
+   &select=custom
+   &start=2014%2F02%2F28+18%3A00%3A00.000
+   &stop=2014%2F03%2F01+18%3A00%3A00.000
+   &index=istp_public
+   &action=plot
+   &var=RBSP-A-RBSPICE_LEV-2_TOFXEION+FIDU
+   &var=RBSP-A_MAGNETOMETER_4SEC-SM_EMFISIS-L3+Mag
+   &var=RBSP-A_MAGNETOMETER_4SEC-SM_EMFISIS-L3+coordinates
+
+This was from a requested plot having two sources (RBSP-A-RBSPICE_LEV-2_TOFXEION and RBSP-A_MAGNETOMETER_4SEC-SM_EMFISIS-L3).  The sources:
+  RBSP-A-RBSPICE_LEV-2_TOFXEION             FIDU
+  RBSP-A_MAGNETOMETER_4SEC-SM_EMFISIS-L3    Mag
+  RBSP-A_MAGNETOMETER_4SEC-SM_EMFISIS-L3    coordinates
+
+And the timerange here is 
+  start=2014%2F02%2F28+18%3A00%3A00.000
+  stop=2014%2F03%2F01+18%3A00%3A00.000
+which when expressed as ISO8601 range is:
+  2014-02-28T18:00:00.000/2014-03-01T18:00:00.000
+
+This is expressed as a minimal vap:
