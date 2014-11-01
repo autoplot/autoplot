@@ -1163,7 +1163,6 @@ public class ScriptContext extends PyJavaInstance {
         return dom.getController().addPlots( nrows, ncolumns, dir );
     }
     
-    public static
     /**
      * make a single plot with so many plot elements.
      */
