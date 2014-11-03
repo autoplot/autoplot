@@ -147,6 +147,7 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
         jLabel10.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel10.text")); // NOI18N
 
         cutoffFreq.setText(bundle.getString("ButterworthFilterEditorPanel.cutoffFreq.text")); // NOI18N
+        cutoffFreq.setPreferredSize(new java.awt.Dimension(75, 27));
 
         jLabel3.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel3.text")); // NOI18N
 
@@ -205,14 +206,14 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
                             .add(subPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                 .add(subPanel4Layout.createSequentialGroup()
                                     .add(lowFreq, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 13, Short.MAX_VALUE)
                                     .add(jLabel5))
                                 .add(subPanel4Layout.createSequentialGroup()
                                     .add(highFreq, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(3, 3, 3)
+                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .add(jLabel7))))
                         .add(jLabel4)))
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         subPanel4Layout.setVerticalGroup(
             subPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -350,7 +351,7 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
         }
         else {
             if (type2CB.getSelectedItem().equals("Band-Pass")) {
-                String tf = "True";
+                tf = "True";
             }
             else {
                 tf = "False";
@@ -359,9 +360,16 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
         }
 
     }
+    
+    public String getHighFreq() {
+        return highFreq.getText();
+    }
+    
+    public String getLowFreq()  {
+        return lowFreq.getText();
+    }
 }
          
 
             
     
-
