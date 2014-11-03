@@ -62,7 +62,9 @@ public class CdfUtil {
             return "double";
         } else if ( type==CDFConstants.CDF_FLOAT || type==CDFConstants.CDF_REAL4 ) {
             return "float";
-        } else if ( type==CDFConstants.CDF_INT8 || type==CDFConstants.CDF_UINT4 || type==CDFConstants.CDF_TT2000 ) {
+        } else if ( type==CDFConstants.CDF_UINT4 ) {
+            return "double";
+        } else if ( type==CDFConstants.CDF_INT8 || type==CDFConstants.CDF_TT2000 ) {
             return "long";
         } else if ( type==CDFConstants.CDF_INT4 || type==CDFConstants.CDF_UINT2 ) {
             return "int";
@@ -82,7 +84,9 @@ public class CdfUtil {
             return BufferDataSet.DOUBLE;
         } else if ( type==CDFConstants.CDF_FLOAT || type==CDFConstants.CDF_REAL4 ) {
             return BufferDataSet.FLOAT;
-        } else if ( type==CDFConstants.CDF_INT8 || type==CDFConstants.CDF_UINT4 || type==CDFConstants.CDF_TT2000 ) {
+        } else if ( type==CDFConstants.CDF_UINT4) {
+            return BufferDataSet.DOUBLE;
+        } else if ( type==CDFConstants.CDF_INT8 || type==CDFConstants.CDF_TT2000 ) {
             return BufferDataSet.LONG;
         } else if ( type==CDFConstants.CDF_INT4 || type==CDFConstants.CDF_UINT2 ) {
             return BufferDataSet.INT;
