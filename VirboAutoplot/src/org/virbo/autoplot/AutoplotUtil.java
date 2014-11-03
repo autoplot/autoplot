@@ -42,6 +42,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
@@ -52,6 +53,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Properties;
@@ -2224,20 +2226,20 @@ public class AutoplotUtil {
      * @param message
      * @param title
      * @param optionType.  This must be OK_CANCEL_OPTION.
-     * @return 
+     * @return JOptionPane.OK_OPTION, JOptionPane.CANCEL_OPTION.
      */
-    public static int showConfirmDialog2( Component parent, Object message, String title, int optionType ) {
+    public static int showConfirmDialog2( Component parent, final Object message, final String title, int optionType ) {
         if ( optionType!=JOptionPane.OK_CANCEL_OPTION ) {
             throw new IllegalArgumentException("must be OK_CANCEL_OPTION");
         }
         if ( !( message instanceof Component ) ) {
             throw new IllegalArgumentException("message must be component for now.");
         }
-        Window p= ( parent instanceof Window ) ? ((Window)parent) : SwingUtilities.getWindowAncestor(parent);
+        final Window p= ( parent instanceof Window ) ? ((Window)parent) : SwingUtilities.getWindowAncestor(parent);
         final JDialog dia= new JDialog( p, Dialog.ModalityType.APPLICATION_MODAL );
         
         dia.setLayout( new BorderLayout() );
-        JPanel pc= new JPanel();
+        final JPanel pc= new JPanel();
         final List<Integer> result= new ArrayList(1);
         BoxLayout b= new BoxLayout(pc,BoxLayout.X_AXIS);
         pc.setLayout( b );
@@ -2261,15 +2263,32 @@ public class AutoplotUtil {
         }) );
         pc.add( Box.createHorizontalStrut(7) );
         
-        dia.setResizable(true);
-        dia.add( (Component)message );
-        dia.add( pc, BorderLayout.SOUTH );
-        dia.setTitle(title);
-        dia.setMinimumSize( new Dimension(300,300) );
-        dia.pack();
-        dia.setLocationRelativeTo(p);
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                dia.setResizable(true);
+                dia.add( (Component)message );
+                dia.add( pc, BorderLayout.SOUTH );
+                dia.setTitle(title);
+                dia.setMinimumSize( new Dimension(300,300) );
+                dia.pack();
+                dia.setLocationRelativeTo(p);
 
-        dia.setVisible(true);
+                dia.setVisible(true);
+                
+            }
+        };
+        if ( EventQueue.isDispatchThread() ) {
+            run.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch (InterruptedException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
         return result.get(0);
     }
 
