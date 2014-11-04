@@ -3795,11 +3795,11 @@ private void updateFrameTitle() {
     /**
      * get the runnable for the script.
      * @param app the application UI, if not headless.
-     * @param model
-     * @param script
-     * @param scriptArgs
-     * @param quit
-     * @return 
+     * @param model the application model containing the dom.
+     * @param script the name of the script, which can be relative to PWD.
+     * @param scriptArgs arguments passed to the script, each is name=value.
+     * @param quit if true then quit this application.
+     * @return the runnable.
      */
     private static Runnable getRunScriptRunnable( final AutoplotUI app, 
             final ApplicationModel model, final String script, 
@@ -4154,7 +4154,6 @@ APSplash.checkTime("init 230");
 
                 final String script= alm.getValue("script");
                 if ( !script.equals("") ) {
-                    if ( app!=null ) app.setStatus("running script "+script);
                     if ( headless ) {
                         model.setExceptionHandler( new ExceptionHandler() {
                             @Override
@@ -4168,7 +4167,17 @@ APSplash.checkTime("init 230");
                             }
                         } );
                     }
-                    Runnable run= getRunScriptRunnable( app, model, script, scriptArgs, headless && !server );
+                    String s= script;
+                    File f= new File( script );
+                    if ( !f.isAbsolute() ) {
+                        try {
+                            s= f.getAbsoluteFile().getCanonicalPath();
+                        } catch (IOException ex) {
+                            Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    if ( app!=null ) app.setStatus("running script "+s);
+                    Runnable run= getRunScriptRunnable( app, model, s, scriptArgs, headless && !server );
                     new Thread(run,"batchRunScriptThread").start();
                 } else {
 APSplash.checkTime("init 240");
