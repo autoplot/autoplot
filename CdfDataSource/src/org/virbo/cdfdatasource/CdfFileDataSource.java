@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.dataset.NoDataInIntervalException;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.UnitsConverter;
@@ -219,31 +220,34 @@ public class CdfFileDataSource extends AbstractDataSource {
                     String sparm= w.substring(0,ieq);
                     QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, new NullProgressMonitor() );
                     QDataSet r;
-                    double d;
+                    Datum d;
                     if ( parm.rank()==2 ) {
                         if ( sval.equals("mode") && ( op.equals("eq") || op.equals("ne") ) ) {
                             QDataSet hash= Ops.hashcodes(parm);
                             QDataSet mode= Ops.mode(hash);
-                            d= mode.value();
+                            d= DataSetUtil.asDatum( mode );
                             parm= hash;
                         } else {
-                            d= Double.parseDouble(sval);
+                            Units du= SemanticOps.getUnits(parm);
+                            d= du.parse(sval);
                         }
                     } else if ( parm.rank()==1 ) {
                         if ( sval.equals("mode") ) {
                             QDataSet mode= Ops.mode(parm);
-                            d= mode.value();
+                            d= DataSetUtil.asDatum(mode);
                         } else if ( sval.equals("mode") ) {
                             QDataSet mode= Ops.mode(parm);
-                            d= mode.value();
+                            d= DataSetUtil.asDatum(mode);
                         } else if ( sval.equals("median") ) {
                             QDataSet median= Ops.median(parm);
-                            d= median.value();
+                            d= DataSetUtil.asDatum(median);
                         } else if ( sval.equals("mean") ) {
                             QDataSet mean= Ops.mean(parm);
-                            d= mean.value();                            
+                            d= DataSetUtil.asDatum(mean);                            
                         } else {
-                            d= Double.parseDouble(sval);
+                            Units du= SemanticOps.getUnits(parm);
+                            d= du.parse(sval);
+                            //d= Double.parseDouble(sval);
                         }
                     } else {
                         throw new IllegalArgumentException("param is rank>2");
@@ -422,6 +426,9 @@ public class CdfFileDataSource extends AbstractDataSource {
             if ( rcent!=null ) rcent.exception(ex);
             throw ex;
         } catch ( IOException ex ) {
+            if ( rcent!=null ) rcent.exception(ex);
+            throw ex;
+        } catch ( ParseException ex ) {
             if ( rcent!=null ) rcent.exception(ex);
             throw ex;
         } finally {
