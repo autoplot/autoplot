@@ -23,8 +23,9 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-10-30):</p>
+        <p>Bugfixes (2014-11-04):</p>
         <ul>
+            <li>script name appears in stack traces now, to aid in debugging</li>
             <li>Improve support for ordinal data in CDF where keyword.</li>
             <li>legend plot symbol for dotdash linestyle was barely visible.  Thanks Kristoff!</li>
             <li>1284: round of cleanup with PNGWalkTool</li>
@@ -64,10 +65,12 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>script parameter can now be relative path (e.g. --script=myscript.jy)</li>
+            <li>addPlots(2,'below') in jython scripts</li>
             <li>any URI ending in .png .jpg or .gif that contains an asterisk is handled by the pngwalk tool</li>
             <li>add shift+mousewheel nudge behavior</li>
             <li>das2servers can return non-200 error codes.</li>
-            <li>PNGWalkToo digitizer looks up plot coordinates when axis metadata is found.</li>
+            <li>PNGWalkTool digitizer looks up plot coordinates when axis metadata is found.</li>
             <li>initial coding to use NIO for CDF reads, which will be faster and take less JVM memory.</li>
             <li>add setDepend0Cadence to filters</li> 
             <li>introduce trim( ds, dataset('2013-03-03'), dataset('2013-03-04') ) and in filters</li>
