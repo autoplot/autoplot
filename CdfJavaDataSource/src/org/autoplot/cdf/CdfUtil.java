@@ -858,10 +858,6 @@ public class CdfUtil {
                 if ( dep0!=null ) {
                     hasDep0= true;
                 }
-                if ( ( varType == CDFConstants.CDF_CHAR || varType==CDFConstants.CDF_UCHAR ) && ( !hasDep0 ) ) {
-                    logger.log(Level.FINER, "skipping becuase ordinal and no depend_0: {0}", svar );
-                    continue;
-                }
 
                 maxRec = cdf.getNumberOfValues(svar); 
                 recCount= maxRec;
