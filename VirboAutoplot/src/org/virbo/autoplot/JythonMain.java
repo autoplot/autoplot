@@ -38,13 +38,15 @@ public class JythonMain {
 
         ApplicationModel model= ScriptContext.getApplicationModel();
 
-        InputStream in= null;
+        InputStream in;
+        String name= null;
         if ( args.length==0 ) {
             in= System.in;
         } else {
             in= new FileInputStream( new File( args[0] ) );
+            name= new File( args[0] ).getName();
         }
-        JythonUtil.runScript( model, in, argv );
+        JythonUtil.runScript( model, in, name, argv );
 
         in.close();
         System.exit(0);
