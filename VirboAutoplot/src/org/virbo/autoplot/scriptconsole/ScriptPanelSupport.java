@@ -14,6 +14,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -58,6 +59,7 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import org.das2.components.DasProgressPanel;
+import org.das2.util.ByteBufferInputStream;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -378,11 +380,13 @@ public class ScriptPanelSupport {
 //                    }
 //                }
                 String fn= traceback.tb_frame.f_code.co_filename;
-                if ( fn.equals("<iostream>") || fn.equals("<string>") ) {
+                if ( fn.equals("<iostream>") || fn.equals("<string>") || fn.equals( file.getName() ) ) { 
                     annotationsSupport.annotateLine(offset + traceback.tb_lineno, "error", ex.toString(),interp);
                     line=  traceback.tb_lineno-1;
                     otraceback= traceback.tb_next;
                     count++;
+                } else {
+                    otraceback= traceback.tb_next;
                 }
             }
             if ( line<0 ) {
@@ -581,7 +585,14 @@ public class ScriptPanelSupport {
                                             }
                                         });
                                     }
-                                    interp.exec(panel.getEditorPanel().getText());
+                                    String code= panel.getEditorPanel().getText();
+                                    if ( file!=null ) {
+                                        InputStream in= new ByteArrayInputStream( code.getBytes() );
+                                        interp.execfile(in,file.getName());
+                                        in.close();
+                                    } else {
+                                        interp.exec(code);
+                                    }
                                 }
                                 setInterruptible( null );
                                 if ( !mon.isFinished() ) mon.finished(); // bug1251: in case script didn't call finished
