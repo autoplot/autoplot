@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.dataset.NoDataInIntervalException;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
@@ -379,28 +380,34 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     String sparm= w.substring(0,ieq);
                     QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, null );
                     QDataSet r;
-                    double d;
+                    Datum d;
                     if ( parm.rank()==2 ) {
                         if ( sval.equals("mode") && ( op.equals("eq") || op.equals("ne") ) ) {
                             QDataSet hash= Ops.hashcodes(parm);
                             QDataSet mode= Ops.mode(hash);
-                            d= mode.value();
+                            d= DataSetUtil.asDatum( mode );
                             parm= hash;
                         } else { 
-                            d= Double.parseDouble(sval);
+                            Units du= SemanticOps.getUnits(parm);
+                            d= du.parse(sval);
                         }
                     } else if ( parm.rank()==1 ) {
                         if ( sval.equals("mode") ) {
                             QDataSet mode= Ops.mode(parm);
-                            d= mode.value();
+                            d= DataSetUtil.asDatum(mode);
+                        } else if ( sval.equals("mode") ) {
+                            QDataSet mode= Ops.mode(parm);
+                            d= DataSetUtil.asDatum(mode);
                         } else if ( sval.equals("median") ) {
                             QDataSet median= Ops.median(parm);
-                            d= median.value();
+                            d= DataSetUtil.asDatum(median);
                         } else if ( sval.equals("mean") ) {
                             QDataSet mean= Ops.mean(parm);
-                            d= mean.value();
+                            d= DataSetUtil.asDatum(mean);                            
                         } else {
-                            d= Double.parseDouble(sval);
+                            Units du= SemanticOps.getUnits(parm);
+                            d= du.parse(sval);
+                            //d= Double.parseDouble(sval);
                         }
                     } else {
                         throw new IllegalArgumentException("param is rank>2");
@@ -503,17 +510,26 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     result.putProperty(QDataSet.RENDER_TYPE, renderType );
                 }
                 
-                if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
-                    if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
-                        String rt= (String)istpProps.get("RENDER_TYPE" );
-                        if ( rt!=null ) result.putProperty(QDataSet.RENDER_TYPE, rt );
-                        if ( istpProps.get("RENDER_TYPE")==null ) { //goes11_k0s_mag
-                            if ( result.property("DEPEND_1")==null ) {
-                                result.putProperty(QDataSet.RENDER_TYPE, "time_series" );
+                if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
+                    if ( result.property(QDataSet.DEPEND_0)==null ) {
+                        result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_DIGITAL );
+                    } else {
+                        result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_EVENTS_BAR );
+                    }
+                } else {
+                    if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
+                        if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
+                            String rt= (String)istpProps.get("RENDER_TYPE" );
+                            if ( rt!=null ) result.putProperty(QDataSet.RENDER_TYPE, rt );
+                            if ( istpProps.get("RENDER_TYPE")==null ) { //goes11_k0s_mag
+                                if ( result.property("DEPEND_1")==null ) {
+                                    result.putProperty(QDataSet.RENDER_TYPE, "time_series" );
+                                }
                             }
                         }
                     }
                 }
+
                 for ( int j=0; j<result.rank(); j++ ) {
                     MutablePropertyDataSet depds= (MutablePropertyDataSet) result.property("DEPEND_"+j);
                     Map<String,Object> depProps= (Map<String, Object>) istpProps.get("DEPEND_"+j);
