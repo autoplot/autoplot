@@ -1,0 +1,12 @@
+angle= linspace( -PI,PI,32 )
+rad= linspace( 1, 5, 30 )
+dist= copy(ripples( 400,32, 30 ))
+tt= timegen( '2014-001T00:00', '1 min', 400 )
+
+dist= putProperty( dist, QDataSet.DEPEND_0, tt )
+dist= putProperty( dist, QDataSet.DEPEND_1, angle )
+dist= putProperty( dist, QDataSet.DEPEND_2, rad )
+
+result= dist
+
+result.putProperty( QDataSet.RENDER_TYPE, 'pitchAngleDistribution' )
