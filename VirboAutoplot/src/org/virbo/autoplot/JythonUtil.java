@@ -90,7 +90,7 @@ public class JythonUtil {
         URL url= DataSetURI.getURL(script);
         InputStream in= url.openStream();
         try {
-            runScript( model, in, argv );
+            runScript( model, in, null, argv );
         } finally {
             in.close();
         }
@@ -98,12 +98,13 @@ public class JythonUtil {
 
     /**
      * Run the script in the input stream.
-     * @param model
+     * @param model provides the dom to the environment.
      * @param in stream containing script. This will be left open.
-     * @param argv
+     * @param name the name of the file for human reference, or null.
+     * @param argv parameters passed into the script, each should be name=value.
      * @throws IOException
      */
-    protected static void runScript( ApplicationModel model, InputStream in, String[] argv ) throws IOException {
+    protected static void runScript( ApplicationModel model, InputStream in, String name, String[] argv) throws IOException {
         if ( argv==null ) argv= new String[] {""};
         PySystemState.initialize( PySystemState.getBaseProperties(), null, argv ); // legacy support sys.argv. now we use getParam
         PythonInterpreter interp = JythonUtil.createInterpreter(true, false, model.getDocumentModel(), new NullProgressMonitor() );
@@ -134,7 +135,11 @@ public class JythonUtil {
             }
         }
         
-        interp.execfile(in);
+        if ( name==null ) {
+            interp.execfile(in);
+        } else {
+            interp.execfile(in,name);
+        }
 
     }
 
