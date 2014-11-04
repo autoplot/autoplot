@@ -257,14 +257,14 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     } else {
                         FileInputStream in = new FileInputStream( jythonScript );
                         try {
-                            interp.execfile(in);
+                            interp.execfile(in,jythonScript.getName());
                         } catch ( PyException ex ) {
                             if ( ex.toString().contains("checkForComodification") ) {
                                 in.close();
                                 in = new FileInputStream( jythonScript );
                                 logger.warning("avoiding second strange concurrent modification bug that occurs within Jython on the server.  Run the whole thing again.");
                                 Thread.sleep(200);
-                                interp.execfile(in);
+                                interp.execfile(in,jythonScript.getName());
                             } else {
                                 throw ex; // This exception is caught again 6 lines down
                             }
