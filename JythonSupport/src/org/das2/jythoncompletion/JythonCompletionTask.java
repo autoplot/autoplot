@@ -774,7 +774,7 @@ public class JythonCompletionTask implements CompletionTask {
                 URL imports = JythonOps.class.getResource("imports.py");
                 InputStream in= imports.openStream();
                 try {
-                    interp.execfile(in);
+                    interp.execfile(in,"imports.py");
                 } finally {
                     in.close();
                 }
