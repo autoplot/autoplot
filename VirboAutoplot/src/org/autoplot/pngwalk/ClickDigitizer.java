@@ -120,7 +120,7 @@ public class ClickDigitizer {
      * @param xaxis the axis
      * @return 
      */
-    private QDataSet lookupDatum( JSONObject xaxis, int p, String smaller, String bigger ) throws JSONException, ParseException {
+    private QDataSet transform( JSONObject xaxis, int p, String smaller, String bigger ) throws JSONException, ParseException {
         boolean xlog= xaxis.get("type").equals("log");
         DatumRange xrange;
 
@@ -154,6 +154,49 @@ public class ClickDigitizer {
     }
     
     /**
+     * from data to pixel space.
+     * @param xaxis
+     * @param x
+     * @param smaller
+     * @param bigger
+     * @return Integer.MAX_VALUE or the valid transform.
+     * @throws JSONException
+     * @throws ParseException 
+     * @throws 
+     */
+    int invTransform( JSONObject xaxis, Datum x, String smaller, String bigger ) throws JSONException, ParseException  {
+        boolean xlog= xaxis.get("type").equals("log");
+        DatumRange xrange;
+        
+        if ( "UTC".equals( xaxis.getString("units") ) ) {
+            xrange= DatumRangeUtil.parseISO8601Range( xaxis.getString("min")+"/"+xaxis.getString("max") );
+
+        } else {
+            String sunits= "";
+            sunits= xaxis.getString("units"); 
+            Units units= Units.lookupUnits(sunits);
+            xrange= new DatumRange(units.parse(xaxis.getString("min")),
+                  units.parse(xaxis.getString("max")) );
+            
+        }        
+        
+        if ( xrange.getUnits().isConvertableTo(x.getUnits()) && xrange.contains(x) ) {
+            if ( xlog ) {
+                double d= DatumRangeUtil.normalize( xrange, x );
+                return (int)d;
+            } else {
+                double d= DatumRangeUtil.normalizeLog( xrange, x );
+                return (int)d;
+            }
+        } else {
+            return Integer.MAX_VALUE;
+        }
+        
+    }
+    
+    
+    
+    /**
      * look up the richPng metadata within the png images.  If the metadata is not
      * available, then the x and y coordinates, with 0,0 in the lower-left corner, are used.
      * Note the output has y=0 at the bottom to be consistent with the ImageDataSource.
@@ -171,9 +214,9 @@ public class ClickDigitizer {
                 JSONObject plot= getPlotContaining( plots, x, y );
                 if ( plot!=null ) {
                     JSONObject xaxis= plot.getJSONObject("xaxis");
-                    QDataSet xx= lookupDatum( xaxis, x, "left", "right" );
+                    QDataSet xx= transform( xaxis, x, "left", "right" );
                     JSONObject yaxis= plot.getJSONObject("yaxis");
-                    QDataSet yy= lookupDatum( yaxis, y, "bottom", "top" );
+                    QDataSet yy= transform( yaxis, y, "bottom", "top" );
                     
                     if ( viewer!=null ) {
                         view.seq.setStatus(  "Plot Coordinates: " + xx + ", "+ yy );
@@ -216,6 +259,41 @@ public class ClickDigitizer {
             }
         }
         
+    }
+
+    /**
+     * return rank 2 bundle dataset that is ds[n;i,j]
+     */
+    QDataSet doTransform() throws IOException {
+        URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
+        File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
+        String json= getJSONMetadata( file );
+        QDataSet ds = viewer.digitizer.getDataSet();
+        if ( ds==null ) return null;
+        if ( ds.length()==0 ) return null;
+        Datum x= DataSetUtil.asDatum( ds.slice(0).slice(0) );
+        Datum y= DataSetUtil.asDatum( ds.slice(0).slice(1) );
+        
+        if ( json!=null ) {
+            try {
+                JSONObject jo = new JSONObject( json );
+                JSONArray plots= jo.getJSONArray("plots");
+                for ( int i= 0; i<plots.length(); i++ ) {
+                    JSONObject plot= plots.getJSONObject(i);
+                    int ix= invTransform( plot, x, "left", "right");
+                    int iy= invTransform( plot, y, "bottom", "top" );
+                    if ( ix!=Integer.MAX_VALUE && iy!=Integer.MAX_VALUE ) {
+                        return Ops.join( null, Ops.bundle( DataSetUtil.asDataSet(x), DataSetUtil.asDataSet(y) ) );
+                    }
+                }
+            } catch ( ParseException ex ){
+                
+            } catch ( JSONException ex ){
+            }                
+        } else {
+            return ds;
+        }
+        return null;
     }
 
 

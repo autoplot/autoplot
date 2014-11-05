@@ -64,6 +64,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.das2.components.DataPointRecorder;
 import org.das2.components.TearoffTabbedPane;
+import org.das2.dataset.DataSetUpdateEvent;
+import org.das2.dataset.DataSetUpdateListener;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeParser;
@@ -90,6 +92,7 @@ import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.autoplot.bookmarks.Util;
 import org.virbo.autoplot.transferrable.ImageSelection;
+import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.FileSystemUtil;
@@ -1248,6 +1251,16 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     private void startDigitizer() {
         if ( digitizer==null ) {
             digitizer= new DataPointRecorder();
+            digitizer.addDataSetUpdateListener( new DataSetUpdateListener() {
+                @Override
+                public void dataSetUpdated(DataSetUpdateEvent e) {
+                    for (PngWalkView v : views) {
+                       if ( v instanceof SinglePngWalkView ) {
+                           v.repaint();
+                        }
+                    }
+                }
+            });
             tabs.add( "Digitizer" , digitizer );
             for (PngWalkView v : views) {
                if ( v instanceof SinglePngWalkView ) {

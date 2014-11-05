@@ -10,6 +10,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.virbo.dataset.QDataSet;
 
 /**
  * An implementation of PngWalkView to display a single image.
@@ -92,5 +94,28 @@ public class SinglePngWalkView extends PngWalkView {
             paintImageCentered(loadingImage, g2);
         }
 
+        if ( clickDigitizer.viewer!=null && clickDigitizer.viewer.digitizer!=null ) {
+            try {
+                QDataSet ids= clickDigitizer.doTransform( );
+                if ( ids!=null ) {
+                    for ( int j=0; j<ids.length(); j++ ) {
+                        int ix= (int) ids.value(j,0);
+                        int iy= (int) ids.value(j,1);
+                        Rectangle lrect= imageLocation;
+                        if ( imageLocation==null ) return;
+
+                        if ( i==null ) return;
+                        double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
+
+                        int imageX= (int)( ( ix + lrect.x ) * factor );
+                        int imageY= (int)( ( iy + lrect.y ) * factor );                    
+                        g2.drawLine( 0,100, imageY,imageY);
+                        g2.drawLine( imageX,imageX,0,100 );
+                    }
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }
