@@ -40,9 +40,6 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
         subPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         type1CB = new javax.swing.JComboBox();
-        subPanel2 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
-        type2CB = new javax.swing.JComboBox();
         subPanel3 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         cutoffFreq = new javax.swing.JTextField();
@@ -55,6 +52,8 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
         highFreq = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
 
+        FormListener formListener = new FormListener();
+
         orderPanel.setBorder(null);
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
@@ -64,7 +63,8 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
 
         jLabel2.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel2.text_1")); // NOI18N
 
-        type1CB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "High-Pass", "Low-Pass" }));
+        type1CB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "--------------", "High-Pass", "Low-Pass", "Band-Pass", "Band-Reject" }));
+        type1CB.addActionListener(formListener);
 
         org.jdesktop.layout.GroupLayout subPanel1Layout = new org.jdesktop.layout.GroupLayout(subPanel1);
         subPanel1.setLayout(subPanel1Layout);
@@ -87,33 +87,6 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
                 .add(type1CB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
-        jLabel9.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel9.text")); // NOI18N
-
-        type2CB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Band-Pass", "Band-Reject" }));
-
-        org.jdesktop.layout.GroupLayout subPanel2Layout = new org.jdesktop.layout.GroupLayout(subPanel2);
-        subPanel2.setLayout(subPanel2Layout);
-        subPanel2Layout.setHorizontalGroup(
-            subPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(subPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(subPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(subPanel2Layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(type2CB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(jLabel9))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        subPanel2Layout.setVerticalGroup(
-            subPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(subPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jLabel9)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(type2CB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(0, 0, Short.MAX_VALUE))
-        );
-
         org.jdesktop.layout.GroupLayout orderPanelLayout = new org.jdesktop.layout.GroupLayout(orderPanel);
         orderPanel.setLayout(orderPanelLayout);
         orderPanelLayout.setHorizontalGroup(
@@ -127,9 +100,8 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
                                 .add(12, 12, 12)
                                 .add(orderCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(jLabel1)))
-                    .add(subPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(subPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(subPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         orderPanelLayout.setVerticalGroup(
             orderPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -139,9 +111,7 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
                 .add(orderCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(subPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(subPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(0, 18, Short.MAX_VALUE))
+                .add(0, 86, Short.MAX_VALUE))
         );
 
         jLabel10.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel10.text")); // NOI18N
@@ -253,7 +223,36 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(subPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
+    }
+
+    // Code for dispatching events from components to event handlers.
+
+    private class FormListener implements java.awt.event.ActionListener {
+        FormListener() {}
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            if (evt.getSource() == type1CB) {
+                ButterworthFilterEditorPanel.this.type1CBActionPerformed(evt);
+            }
+        }
     }// </editor-fold>//GEN-END:initComponents
+
+    private void type1CBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_type1CBActionPerformed
+     
+        if ( type1CB.getSelectedIndex()==1 ) {
+            subPanel3.setVisible(true);
+            subPanel4.setVisible(false);
+        } else if ( type1CB.getSelectedIndex() == 2) {
+            subPanel3.setVisible(true);
+            subPanel4.setVisible(false);
+        } else if (type1CB.getSelectedIndex() == 3) {
+            subPanel3.setVisible(false);
+            subPanel4.setVisible(true);
+        } else if (type1CB.getSelectedIndex() == 4) {
+            subPanel3.setVisible(false);
+            subPanel4.setVisible(true);
+        }
+        
+    }//GEN-LAST:event_type1CBActionPerformed
 
     /**
      * @param args the command line arguments
@@ -301,64 +300,44 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
     public javax.swing.JLabel jLabel5;
     public javax.swing.JLabel jLabel6;
     public javax.swing.JLabel jLabel7;
-    public javax.swing.JLabel jLabel9;
     public javax.swing.JTextField lowFreq;
     public javax.swing.JComboBox orderCB;
     public javax.swing.JPanel orderPanel;
     public javax.swing.JPanel subPanel1;
-    public javax.swing.JPanel subPanel2;
     public javax.swing.JPanel subPanel3;
     public javax.swing.JPanel subPanel4;
     public javax.swing.JComboBox type1CB;
-    public javax.swing.JComboBox type2CB;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void setFilter(String filter) {
-        Pattern p1= Pattern.compile("\\|butterworth\\((.*,.*,.*,.*)\\)");
-        Pattern p2= Pattern.compile("\\|butterworth\\((.*,.*,.*)\\)");
-        Matcher m= p1.matcher(filter);
-        Matcher n= p2.matcher(filter);
-        if ( m.matches() ) {
-            subPanel1.setVisible(false);
-            subPanel2.setVisible(true);
-            subPanel3.setVisible(false);
-            subPanel4.setVisible(true);
-        }
-        else if ( n.matches() ) {
-            subPanel1.setVisible(true);
-            subPanel2.setVisible(false);
-            subPanel3.setVisible(true);
-            subPanel4.setVisible(false);
-        }
         }
 
     
 
     @Override
     public String getFilter() {
-        
-        if ( subPanel3.isVisible() ) {
-            
-            if (type1CB.getSelectedItem().equals("Low-Pass")) {
-                tf = "True";
-            }
-            else {
-                tf = "False";
-            }
+         
+        if (type1CB.getSelectedItem().equals("Low-Pass")) {
+            tf = "True";
             return "|butterworth(" + orderCB.getSelectedItem() + "," + cutoffFreq.getText() + "," + tf + ")";
-                    
         }
-        else {
-            if (type2CB.getSelectedItem().equals("Band-Pass")) {
-                tf = "True";
-            }
-            else {
-                tf = "False";
-            }
-            return "|butterworth(" + orderCB.getSelectedItem() + "," + lowFreq.getText() + "," + highFreq.getText() + "," + tf + ")";
+        else if (type1CB.getSelectedItem().equals("High-Pass")) {
+            tf = "False";
+            return "|butterworth(" + orderCB.getSelectedItem() + "," + cutoffFreq.getText() + "," + tf + ")";
         }
 
+        else if (type1CB.getSelectedItem().equals("Band-Pass")) {
+            tf = "True";
+            return "|butterworth(" + orderCB.getSelectedItem() + "," + lowFreq.getText() + "," + highFreq.getText() + "," + tf + ")";
+        }
+        else if (type1CB.getSelectedItem().equals("Band-Reject")) {
+            tf = "False";
+            return "|butterworth(" + orderCB.getSelectedItem() + "," + lowFreq.getText() + "," + highFreq.getText() + "," + tf + ")";
+        }
+        else {
+            return "error";
+        }
     }
     
     public String getHighFreq() {
