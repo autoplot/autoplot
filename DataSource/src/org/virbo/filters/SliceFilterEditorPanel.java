@@ -34,14 +34,11 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
         sliceDimensionCB = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         sliceIndexSpinner = new javax.swing.JSpinner();
-        jCheckBox2 = new javax.swing.JCheckBox();
         jLabel2 = new javax.swing.JLabel();
 
         sliceDimensionCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jLabel1.setText("Slice Index:");
-
-        jCheckBox2.setText("Slice Index Change Autoranges");
 
         jLabel2.setText("Slice Dimension:");
 
@@ -54,14 +51,12 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(sliceIndexSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBox2)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sliceDimensionCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(sliceDimensionCB, 0, 291, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -74,13 +69,11 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(sliceIndexSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jCheckBox2))
+                    .addComponent(sliceIndexSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JComboBox sliceDimensionCB;
@@ -104,23 +97,9 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
 
     @Override
     public void setInput(QDataSet ds) {
-        String[] depNames1= getDimensionNames(ds);
+        String[] depNames1= FilterEditorPanelUtil.getDimensionNames(ds);
         sliceDimensionCB.setModel(new DefaultComboBoxModel(depNames1));
     }
     
-    private static String[] getDimensionNames( QDataSet ds ) {
-        String[] depNames = new String[ds.rank()];
-        for (int i = 0; i < ds.rank(); i++) {
-            depNames[i] = "dim" + i;
-            QDataSet dep0 = (QDataSet) ds.property("DEPEND_" + i);
-            if (dep0 != null) {
-                String dname = (String) dep0.property(QDataSet.NAME);
-                if (dname != null) {
-                    depNames[i] = dname + " ("+dep0.length()+" bins)";
-                }
-            }
-        }
-        return depNames;
-    }
 
 }
