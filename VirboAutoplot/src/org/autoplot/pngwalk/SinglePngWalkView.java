@@ -1,5 +1,6 @@
 package org.autoplot.pngwalk;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -114,9 +115,20 @@ public class SinglePngWalkView extends PngWalkView {
                         double factor = (double) lrect.getWidth() / (double) w;
 
                         int imageX= (int)( ( ix * factor + lrect.x ) );
-                        int imageY= (int)( ( iy * factor + lrect.y ) );                    
-                        g2.drawLine( 0,imageY,getWidth(),imageY );
-                        g2.drawLine( imageX,0,imageX,getHeight() );
+                        int imageY= (int)( ( iy * factor + lrect.y ) );
+                        if ( clickDigitizer.viewer.annoTypeChar=='+' ) {                            
+                            g2.drawLine( 0,imageY,getWidth(),imageY );
+                            g2.drawLine( imageX,0,imageX,getHeight() );
+                        } else if ( clickDigitizer.viewer.annoTypeChar=='|' ) { 
+                            g2.drawLine( imageX,0,imageX,getHeight() );                            
+                        } else if ( clickDigitizer.viewer.annoTypeChar=='.' ) {
+                            g2.drawOval( imageX-2, imageY-2, 5, 5 );
+                            Color c0= g2.getColor();
+                            g2.setColor( g2.getBackground() );
+                            g2.drawOval( imageX-1, imageY-1, 3, 3 );
+                            g2.setColor( c0 );
+                        }
+                        
                     }
                 }
             } catch (IOException ex) {
