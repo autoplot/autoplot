@@ -94,23 +94,29 @@ public class SinglePngWalkView extends PngWalkView {
             paintImageCentered(loadingImage, g2);
         }
 
-        if ( clickDigitizer.viewer!=null && clickDigitizer.viewer.digitizer!=null ) {
+        if ( i!=null && clickDigitizer.viewer!=null && clickDigitizer.viewer.digitizer!=null ) {
+            int h= i.getHeight();
+            int w= i.getWidth();
             try {
                 QDataSet ids= clickDigitizer.doTransform( );
                 if ( ids!=null ) {
                     for ( int j=0; j<ids.length(); j++ ) {
-                        int ix= (int) ids.value(j,0);
-                        int iy= (int) ids.value(j,1);
+                        QDataSet ids1= ids.slice(j);
+                        int ix= (int) ids1.value(0);
+                        int iy= (int) ids1.value(1);
+                        
+                        if ( ix<0 || iy<0 ) continue;
+                        if ( ix>=w || iy>=h ) continue;
+                        
                         Rectangle lrect= imageLocation;
                         if ( imageLocation==null ) return;
 
-                        if ( i==null ) return;
-                        double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
+                        double factor = (double) lrect.getWidth() / (double) w;
 
-                        int imageX= (int)( ( ix + lrect.x ) * factor );
-                        int imageY= (int)( ( iy + lrect.y ) * factor );                    
-                        g2.drawLine( 0,100, imageY,imageY);
-                        g2.drawLine( imageX,imageX,0,100 );
+                        int imageX= (int)( ( ix * factor + lrect.x ) );
+                        int imageY= (int)( ( iy * factor + lrect.y ) );                    
+                        g2.drawLine( 0,imageY,getWidth(),imageY );
+                        g2.drawLine( imageX,0,imageX,getHeight() );
                     }
                 }
             } catch (IOException ex) {

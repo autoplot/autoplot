@@ -27,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
@@ -182,10 +183,10 @@ public class ClickDigitizer {
         
         if ( xrange.getUnits().isConvertableTo(x.getUnits()) && xrange.contains(x) ) {
             if ( xlog ) {
-                double d= DatumRangeUtil.normalize( xrange, x );
+                double d= DatumRangeUtil.normalizeLog( xrange, x );
                 return (int)( xaxis.getInt(smaller) + d * (xaxis.getInt(bigger)-xaxis.getInt(smaller)) );
             } else {
-                double d= DatumRangeUtil.normalizeLog( xrange, x );
+                double d= DatumRangeUtil.normalize( xrange, x );
                 return (int)( xaxis.getInt(smaller) + d * (xaxis.getInt(bigger)-xaxis.getInt(smaller)) );
             }
         } else {
@@ -278,31 +279,34 @@ public class ClickDigitizer {
         if (dep0.rank()>1 ){
             dep0= dep0.slice(0);
         }
-        Datum x= DataSetUtil.asDatum( dep0.slice(0) ); //TODO: make this a bundle!
-        Datum y= DataSetUtil.asDatum( ds.slice(0) );
         
-        if ( json!=null ) {
-            try {
-                JSONObject jo = new JSONObject( json );
-                JSONArray plots= jo.getJSONArray("plots");
-                for ( int i= 0; i<plots.length(); i++ ) {
-                    JSONObject plot= plots.getJSONObject(i);
-                    JSONObject xaxis= plot.getJSONObject("xaxis");
-                    JSONObject yaxis= plot.getJSONObject("yaxis");
-                    int ix= invTransform( xaxis, x, "left", "right");
-                    int iy= invTransform( yaxis, y, "bottom", "top" );
-                    if ( ix!=Integer.MAX_VALUE && iy!=Integer.MAX_VALUE ) {
-                        return Ops.join( null, Ops.join( DataSetUtil.asDataSet(x), DataSetUtil.asDataSet(y) ) );
-                    }
-                }
-            } catch ( ParseException ex ){
-                
-            } catch ( JSONException ex ){
-            }                
-        } else {
+        if ( json==null ) {
             return ds;
+        } else {
+            QDataSet result=null;
+            for ( int ii= 0; ii<ds.length(); ii++ ) {
+                Datum x= DataSetUtil.asDatum( dep0.slice(ii) ); //TODO: make this a bundle!
+                Datum y= DataSetUtil.asDatum( ds.slice(ii) );
+                try {
+                    JSONObject jo = new JSONObject( json );
+                    JSONArray plots= jo.getJSONArray("plots");
+                    for ( int i= 0; i<plots.length(); i++ ) {
+                        JSONObject plot= plots.getJSONObject(i);
+                        JSONObject xaxis= plot.getJSONObject("xaxis");
+                        JSONObject yaxis= plot.getJSONObject("yaxis");
+                        int ix= invTransform( xaxis, x, "left", "right");
+                        int iy= invTransform( yaxis, y, "bottom", "top" );
+                        if ( ix!=Integer.MAX_VALUE && iy!=Integer.MAX_VALUE ) {
+                            result= Ops.join( result, Ops.join( DataSetUtil.asDataSet(ix), DataSetUtil.asDataSet(iy) ) );
+                        }
+                    }
+                } catch ( ParseException ex ){
+
+                } catch ( JSONException ex ){
+                }                
+            }
+            return result;
         }
-        return null;
     }
 
 
