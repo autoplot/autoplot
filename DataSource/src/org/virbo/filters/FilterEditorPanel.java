@@ -19,14 +19,16 @@ import org.virbo.dataset.QDataSet;
  */
 public interface FilterEditorPanel {
     /**
-     * return the filter specified by the GUI
-     * @return 
+     * return the filter specified by the GUI.  The filter string will
+     * start with the pipe character.
+     * @return the filter string
      */
     String getFilter();
     
     /**
-     * configure the GUI based on this filter.
-     * @param filter 
+     * configure the GUI based on this filter.  The filter string will
+     * start with the pipe character.
+     * @param the filter string
      */
     void setFilter( String filter );
     
