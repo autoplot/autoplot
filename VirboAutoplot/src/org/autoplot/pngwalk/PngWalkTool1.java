@@ -20,6 +20,8 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -52,6 +54,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -1247,7 +1250,8 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     }
 
     protected DataPointRecorder digitizer= null;
-    
+    protected char annoTypeChar= '+';
+            
     private void startDigitizer() {
         if ( digitizer==null ) {
             digitizer= new DataPointRecorder();
@@ -1267,6 +1271,21 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                    ((SinglePngWalkView)v).clickDigitizer.setViewer(this);
                }
             }
+            
+            JComboBox annoType= new JComboBox( new String[] { "+ cross hairs", "| vertical line", ". dots" } );
+            digitizer.addAccessory( annoType );
+            annoType.addItemListener( new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    annoTypeChar= e.getItem().toString().charAt(0);
+                    for (PngWalkView v : views) {
+                       if ( v instanceof SinglePngWalkView ) {
+                           v.repaint();
+                        }
+                    }
+                }
+                
+            });
         }
     }
 
