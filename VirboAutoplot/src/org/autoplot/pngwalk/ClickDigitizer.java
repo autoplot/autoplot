@@ -183,10 +183,10 @@ public class ClickDigitizer {
         if ( xrange.getUnits().isConvertableTo(x.getUnits()) && xrange.contains(x) ) {
             if ( xlog ) {
                 double d= DatumRangeUtil.normalize( xrange, x );
-                return (int)d;
+                return (int)( xaxis.getInt(smaller) + d * (xaxis.getInt(bigger)-xaxis.getInt(smaller)) );
             } else {
                 double d= DatumRangeUtil.normalizeLog( xrange, x );
-                return (int)d;
+                return (int)( xaxis.getInt(smaller) + d * (xaxis.getInt(bigger)-xaxis.getInt(smaller)) );
             }
         } else {
             return Integer.MAX_VALUE;
@@ -271,8 +271,15 @@ public class ClickDigitizer {
         QDataSet ds = viewer.digitizer.getDataSet();
         if ( ds==null ) return null;
         if ( ds.length()==0 ) return null;
-        Datum x= DataSetUtil.asDatum( ds.slice(0).slice(0) );
-        Datum y= DataSetUtil.asDatum( ds.slice(0).slice(1) );
+        QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+        if ( ds.rank()>1 ) {
+            ds= ds.slice(0);
+        }
+        if (dep0.rank()>1 ){
+            dep0= dep0.slice(0);
+        }
+        Datum x= DataSetUtil.asDatum( dep0.slice(0) ); //TODO: make this a bundle!
+        Datum y= DataSetUtil.asDatum( ds.slice(0) );
         
         if ( json!=null ) {
             try {
@@ -280,10 +287,12 @@ public class ClickDigitizer {
                 JSONArray plots= jo.getJSONArray("plots");
                 for ( int i= 0; i<plots.length(); i++ ) {
                     JSONObject plot= plots.getJSONObject(i);
-                    int ix= invTransform( plot, x, "left", "right");
-                    int iy= invTransform( plot, y, "bottom", "top" );
+                    JSONObject xaxis= plot.getJSONObject("xaxis");
+                    JSONObject yaxis= plot.getJSONObject("yaxis");
+                    int ix= invTransform( xaxis, x, "left", "right");
+                    int iy= invTransform( yaxis, y, "bottom", "top" );
                     if ( ix!=Integer.MAX_VALUE && iy!=Integer.MAX_VALUE ) {
-                        return Ops.join( null, Ops.bundle( DataSetUtil.asDataSet(x), DataSetUtil.asDataSet(y) ) );
+                        return Ops.join( null, Ops.join( DataSetUtil.asDataSet(x), DataSetUtil.asDataSet(y) ) );
                     }
                 }
             } catch ( ParseException ex ){
