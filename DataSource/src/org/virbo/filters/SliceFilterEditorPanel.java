@@ -7,6 +7,7 @@ package org.virbo.filters;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.SwingUtilities;
 import org.virbo.dataset.QDataSet;
 
 /**
@@ -37,6 +38,11 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
         jLabel2 = new javax.swing.JLabel();
 
         sliceDimensionCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        sliceDimensionCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sliceDimensionCBActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Slice Index:");
 
@@ -73,6 +79,17 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void sliceDimensionCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceDimensionCBActionPerformed
+        final String ff= getFilter();
+        Runnable run= new Runnable() { 
+            public void run() {
+                firePropertyChange( PROP_FILTER, null, ff );
+            }
+        };
+        SwingUtilities.invokeLater(run);
+    }//GEN-LAST:event_sliceDimensionCBActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

@@ -43,4 +43,7 @@ public interface FilterEditorPanel {
      * @return 
      */
     JPanel getPanel();
+    
+    public static String PROP_FILTER= "filter";
+    
 }

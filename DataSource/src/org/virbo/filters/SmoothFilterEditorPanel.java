@@ -6,6 +6,9 @@
 
 package org.virbo.filters;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author mmclouth
@@ -67,7 +70,13 @@ public class SmoothFilterEditorPanel extends AbstractFilterEditorPanel {
 
     @Override
     public void setFilter(String filter) {
-        
+        Pattern p= Pattern.compile("\\|smooth\\((\\d+)\\)");
+        Matcher m= p.matcher(filter);
+        if ( m.matches() ) {
+            sizeTF.setText( m.group(1) );
+        } else {
+            sizeTF.setText( "3" );
+        }
     }
 
     @Override
