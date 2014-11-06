@@ -21,10 +21,6 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
-import org.virbo.filters.CollapseFilterEditorPanel;
-import org.virbo.filters.FilterEditorPanel;
-import org.virbo.filters.SliceFilterEditorPanel;
-import org.virbo.filters.SmoothFilterEditorPanel;
 
 /**
  * Aggregate a number of sub panels to one long filter chain.  For example,
@@ -112,12 +108,11 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      * 
      */
     private void updateSoon() {
-        final String filter= getFilter();        
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                System.err.println("1: "+filter);
-                System.err.println("2: "+getFilter());
+                System.err.println( "1: " + getFilter() + "  " + editors.get(0).getPanel().getName() );
+                
                 setFilter( getFilter() );
                 setInput( inputDs );
             }
