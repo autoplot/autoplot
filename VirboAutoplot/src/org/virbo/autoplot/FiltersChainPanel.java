@@ -15,10 +15,7 @@ import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
-import org.virbo.filters.ButterworthFilterEditorPanel;
 import org.virbo.filters.CollapseFilterEditorPanel;
 import org.virbo.filters.FilterEditorPanel;
 import org.virbo.filters.SliceFilterEditorPanel;
@@ -96,6 +93,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             s= s.trim();
             if ( s.length()>0 ) {
                 FilterEditorPanel p = getEditorFor(s);
+                p.setFilter("|"+s);
                 editors.add(p);
                 this.add(p.getPanel());
                 this.add(new JSeparator());
@@ -109,11 +107,13 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      * 
      */
     private void updateSoon() {
-        final String filter= getFilter();
+        final String filter= getFilter();        
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                setFilter( filter );
+                System.err.println("1: "+filter);
+                System.err.println("2: "+getFilter());
+                setFilter( getFilter() );
                 setInput( inputDs );
             }
         };
