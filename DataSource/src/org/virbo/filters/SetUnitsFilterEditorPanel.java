@@ -6,10 +6,12 @@
 
 package org.virbo.filters;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultComboBoxModel;
 import org.das2.datum.Units;
+import static org.das2.datum.Units.getAllUnits;
 import org.virbo.dataset.QDataSet;
 import static org.virbo.dataset.SemanticOps.getUnits;
 
@@ -42,8 +44,10 @@ public class SetUnitsFilterEditorPanel extends AbstractFilterEditorPanel {
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("SetUnitsFilterEditorPanel.jLabel1.text")); // NOI18N
 
-        unitsCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        unitsCB.setPreferredSize(new java.awt.Dimension(100, 27));
+        List<Units> units = getAllUnits();
+        String[] array = units.toArray(new String[units.size()]);
+        unitsCB.setModel(new javax.swing.DefaultComboBoxModel(array));
+        unitsCB.setPreferredSize(new java.awt.Dimension(200, 27));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -54,7 +58,7 @@ public class SetUnitsFilterEditorPanel extends AbstractFilterEditorPanel {
                 .add(jLabel1)
                 .add(2, 2, 2)
                 .add(unitsCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(111, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -86,6 +90,6 @@ public class SetUnitsFilterEditorPanel extends AbstractFilterEditorPanel {
         
     @Override
     public String getFilter() {
-        return "|setUnits(" + unitsCB.getSelectedItem() + ")";
+        return "|setUnits('" + unitsCB.getSelectedItem() + "')";
     }
 }
