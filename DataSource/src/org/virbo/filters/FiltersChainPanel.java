@@ -9,6 +9,8 @@ import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
@@ -16,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -30,12 +33,17 @@ import org.virbo.dsops.Ops;
  * @author jbf
  */
 public class FiltersChainPanel extends javax.swing.JPanel implements FilterEditorPanel {
+    
     private QDataSet inputDs;
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.filters");
+    private static final String CLASS_NAME = FiltersChainPanel.class.getName();
+    
     /**
      * Creates new form FiltersChainPanel
      */
     public FiltersChainPanel() {
+        logger.entering( CLASS_NAME, "<init>" );
         initComponents();
         setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ));
     }
@@ -58,25 +66,31 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     // End of variables declaration//GEN-END:variables
 
     /**
-     * this should return a delegate editor for the given filter.  
+     * this should return a delegate editor for the given filter.  This component
+     * will be configured as specified in f.
      * @param f the filter, which may or may not start with a pipe.
      * @return the filter.
      */
     private FilterEditorPanel getEditorFor(String f) {
+        logger.entering( CLASS_NAME, "getEditorFor", f );
         while ( f.startsWith("|") ) f= f.substring(1);
+        FilterEditorPanel result;
         if ( f.matches("slice\\d\\(.*\\)") ) {
-            return new SliceFilterEditorPanel();
+            result= new SliceFilterEditorPanel();
         } else if ( f.matches("collapse\\d\\(\\)") ) {
-            return new CollapseFilterEditorPanel();
+            result= new CollapseFilterEditorPanel();
         } else if ( f.matches("smooth\\(\\d+\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
-            return new SmoothFilterEditorPanel();
+            result= new SmoothFilterEditorPanel();
         } else {
             throw new IllegalArgumentException("filter editor not found.");
         }
+        result.setFilter("|"+f);
+        return result;
     }
     
     @Override
     public String getFilter() {
+        logger.entering( CLASS_NAME, "getFilter" );
         StringBuilder b= new StringBuilder();
         for ( FilterEditorPanel p: editors ) {
             b.append(p.getFilter());
@@ -86,6 +100,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
 
     @Override
     public void setFilter(String filter) {
+        logger.entering( CLASS_NAME, "setFilter", filter );
         editors.clear();
         this.removeAll();
         String[] ss= filter.split("\\|");
@@ -94,7 +109,6 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             s= s.trim();
             if ( s.length()>0 ) {
                 FilterEditorPanel p = getEditorFor(s);
-                p.setFilter("|"+s);
                 editors.add(p);
                 this.add(p.getPanel());
                 this.add(new JSeparator());
@@ -108,6 +122,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      * 
      */
     private void updateSoon() {
+        logger.entering( CLASS_NAME, "updateSoon" );
         Runnable run= new Runnable() {
             @Override
             public void run() {
@@ -126,19 +141,18 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      */
     @Override
     public void setInput( QDataSet ds) {
+        logger.entering( CLASS_NAME, "setInput", ds );
         this.inputDs= ds;
         
-        this.removeAll();
         String filter= getFilter();
         System.err.println("filter: "+filter);
         
         String[] ss= filter.split("\\|");
+        int i=0;
         for (String s : ss) {
             s= s.trim();
             if ( s.length()>0 ) {
-                FilterEditorPanel p = getEditorFor(s);
-                p.setFilter("|"+s);
-                
+                FilterEditorPanel p = editors.get(i);
                 if ( ds!=null ) {
                     p.setInput(ds);
                     try {
@@ -157,8 +171,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                         }
                     });
                 }
-                this.add(p.getPanel());
-                this.add(new JSeparator());
+                i=i+1;
             }
         }
         this.revalidate();        
@@ -166,6 +179,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
 
     @Override
     public JPanel getPanel() {
+        logger.entering( CLASS_NAME, "getPanel" );        
         return this;
     }
     
@@ -189,6 +203,12 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     }
     
     public static void main( String[] args ) throws Exception {
+        logger.setLevel(Level.ALL);
+        Handler h= new ConsoleHandler();
+        h.setLevel(Level.ALL);
+        
+        logger.addHandler( h );
+        
         FiltersChainPanel ff= new FiltersChainPanel();
 
         QDataSet ds= getDataSet();
