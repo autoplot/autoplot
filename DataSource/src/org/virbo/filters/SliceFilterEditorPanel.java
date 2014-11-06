@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingUtilities;
 import org.virbo.dataset.QDataSet;
+import static org.virbo.filters.FilterEditorPanel.PROP_FILTER;
 
 /**
  *
@@ -16,11 +17,14 @@ import org.virbo.dataset.QDataSet;
  */
 public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements FilterEditorPanel {
 
+    static final long t0= System.currentTimeMillis();
+    
     /**
      * Creates new form SlicesFilterEditorPanel
      */
     public SliceFilterEditorPanel() {
         initComponents();
+        setName("cb"+String.format( "%04d", (System.currentTimeMillis()-t0)/100 ));
     }
 
     /**
@@ -82,12 +86,8 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
 
     private void sliceDimensionCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceDimensionCBActionPerformed
         final String ff= getFilter();
-        Runnable run= new Runnable() { 
-            public void run() {
-                firePropertyChange( PROP_FILTER, null, ff );
-            }
-        };
-        SwingUtilities.invokeLater(run);
+        System.err.println("0: "+ff + this.getName());
+        firePropertyChange( PROP_FILTER, null, ff );
     }//GEN-LAST:event_sliceDimensionCBActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
