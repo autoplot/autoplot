@@ -129,7 +129,9 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                 System.err.println( "1: " + getFilter() + "  " + editors.get(0).getPanel().getName() );
                 
                 setFilter( getFilter() );
+                System.err.println("here1");
                 setInput( inputDs );
+                System.err.println("here2");
             }
         };
         SwingUtilities.invokeLater(run);
@@ -145,7 +147,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         this.inputDs= ds;
         
         String filter= getFilter();
-        System.err.println("filter: "+filter);
+        logger.log(Level.FINE, "filter: {0}", filter);
         
         String[] ss= filter.split("\\|");
         int i=0;
