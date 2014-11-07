@@ -2118,9 +2118,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     public static final String PROP_STATUS = "status";
 
     /**
-     * clients can get status here.  The message may be conventionally 
-     * prefixed with "busy:" "error:" or "warning:" (And these will be displayed
-     * as icons, for example, in the view.)
+     * clients can get status here.  
      *
      */
     public String getStatus() {
