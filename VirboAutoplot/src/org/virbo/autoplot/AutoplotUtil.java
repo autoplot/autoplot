@@ -114,6 +114,7 @@ import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
@@ -405,17 +406,34 @@ public class AutoplotUtil {
 
     /**
      * Replace filename references within the DOM, and reset xrange.  This was 
-     * the often-used ReplaceFile script.  
-     * @param dom
+     * the often-used ReplaceFile script.  This now follows focus.
+     * @param parent focus for response dialogs.
+     * @param dom the application
      */
     public static void replaceFile( Component parent, Application dom ) {
 
-        if ( dom.getDataSourceFilters(0).getUri()==null ) {
-           JOptionPane.showMessageDialog( parent, "Nothing plotted" );
+        DataSourceFilter dsf= dom.getController().getDataSourceFilter();
+        
+        if ( dsf.getUri()==null || dsf.getUri().equals("") ) {
+           JOptionPane.showMessageDialog( parent, "Focus plot element has no data" );
         } else {
 
-           DataSourceFilter dsf= dom.getDataSourceFilters(0);
+           if ( dsf.getUri().startsWith("vap+internal:") ){
+               List<DataSourceFilter> pes= DomUtil.getParentsFor(dom, dsf.getUri());
+               if ( pes.isEmpty() ) {
+                   JOptionPane.showMessageDialog( parent, "Unable to resolve parents" );
+                   return;
+               }
+               dsf= pes.get(0);
+           }
+           
+           
            URISplit split= URISplit.parse( dsf.getUri() );
+           
+           if ( split.file==null || split.file.length()==0 ) {
+               JOptionPane.showMessageDialog( parent, "<html>URI should refer to a file, but this doesn't: <br>"+dsf.getUri() );
+               return;
+           }
 
            Application dom2= (Application) dom.copy();
             
