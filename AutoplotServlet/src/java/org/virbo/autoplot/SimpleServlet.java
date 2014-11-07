@@ -358,6 +358,10 @@ public class SimpleServlet extends HttpServlet {
                     throw new IllegalArgumentException("vap+inline URI cannot contain getDataSet.");
                 }
                 
+                if ( split.file!=null && split.file.contains("jyds") || ( split.vapScheme!=null && split.vapScheme.equals("jyds") ) ) {
+                    throw new IllegalArgumentException("jyds scripts are temporarily disabled.");
+                }
+                
                 DataSource dsource;
                 try {
                     dsource = DataSetURI.getDataSource(surl);
