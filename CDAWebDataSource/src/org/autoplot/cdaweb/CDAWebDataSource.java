@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.autoplot.cdf.CdfDataSource;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -28,7 +29,6 @@ import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
-import org.virbo.cdf.CdfJavaDataSource;
 import org.virbo.cdf.CdfVirtualVars;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
@@ -198,7 +198,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                                 } else {
                                     file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
                                 }
-                                CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
+                                DataSource dataSource= cdfFileDataSourceFactory.getDataSource( file1 );
                                 try {
                                     ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
                                 } catch ( Exception ex ) {
@@ -236,7 +236,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                             file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
                         }
                         logger.log( Level.FINE, "loading {0}", file1);
-                        CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
+                        CdfDataSource dataSource= (CdfDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
                         ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
                     }
                 } catch ( NoDataInIntervalException ex ) {
@@ -289,7 +289,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 if ( dep1p!=null && dep1p.containsKey("NAME") && result.rank()>1 ) {
                     String dep1= (String)dep1p.get("NAME");
                     String master= db.getMasterFile( ds.toUpperCase(), new NullProgressMonitor() );
-                    CdfJavaDataSource masterSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( new URI( master+"?"+dep1+"[0]&doDep=no" ) );
+                    DataSource masterSource= cdfFileDataSourceFactory.getDataSource( new URI( master+"?"+dep1+"[0]&doDep=no" ) );
                     QDataSet ds1= (MutablePropertyDataSet)masterSource.getDataSet( new NullProgressMonitor() );
                     result.putProperty( QDataSet.DEPEND_1, ds1 );
                 }
