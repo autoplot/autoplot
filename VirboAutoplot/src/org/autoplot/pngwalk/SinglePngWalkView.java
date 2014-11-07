@@ -1,10 +1,12 @@
 package org.autoplot.pngwalk;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -102,7 +104,7 @@ public class SinglePngWalkView extends PngWalkView {
                 QDataSet ids= clickDigitizer.doTransform( );
                 if ( ids!=null ) {
                     for ( int j=0; j<ids.length(); j++ ) {
-                        QDataSet ids1= ids.slice(j);
+                        QDataSet ids1= ids.rank()==2 ? ids.slice(j) : ids;
                         int ix= (int) ids1.value(0);
                         int iy= (int) ids1.value(1);
                         
@@ -119,13 +121,28 @@ public class SinglePngWalkView extends PngWalkView {
                         if ( clickDigitizer.viewer.annoTypeChar=='+' ) {                            
                             g2.drawLine( 0,imageY,getWidth(),imageY );
                             g2.drawLine( imageX,0,imageX,getHeight() );
+                            Color c0= g2.getColor();
+                            Stroke stroke0= g2.getStroke();
+                            g2.setColor( g2.getBackground() );
+                            g2.setStroke( new BasicStroke( 1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1.0f, new float[] { 1.f,3.f }, 0.f ) );
+                            g2.drawLine( 0,imageY,getWidth(),imageY );
+                            g2.drawLine( imageX,0,imageX,getHeight() );
+                            g2.setStroke( stroke0 );
+                            g2.setColor( c0 );
                         } else if ( clickDigitizer.viewer.annoTypeChar=='|' ) { 
                             g2.drawLine( imageX,0,imageX,getHeight() );                            
+                            Color c0= g2.getColor();
+                            Stroke stroke0= g2.getStroke();
+                            g2.setColor( g2.getBackground() );
+                            g2.setStroke( new BasicStroke( 1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 1.0f, new float[] { 1.f,3.f }, 0.f ) );
+                            g2.drawLine( imageX,0,imageX,getHeight() );
+                            g2.setStroke( stroke0 );
+                            g2.setColor( c0 );
                         } else if ( clickDigitizer.viewer.annoTypeChar=='.' ) {
                             g2.drawOval( imageX-2, imageY-2, 5, 5 );
                             Color c0= g2.getColor();
                             g2.setColor( g2.getBackground() );
-                            g2.drawOval( imageX-1, imageY-1, 3, 3 );
+                            g2.fillOval( imageX-1, imageY-1, 3, 3 );
                             g2.setColor( c0 );
                         }
                         
