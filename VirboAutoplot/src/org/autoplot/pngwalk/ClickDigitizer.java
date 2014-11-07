@@ -4,6 +4,7 @@
  */
 package org.autoplot.pngwalk;
 
+import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -35,7 +36,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * Quick-n-dirty class for picking off points from images.  The ClickDigitizer knows how to 
- * grab JSON metadata from the image (http://autoplot.org/richPng) and transform the pixel
+ * grab JSON metadata from the image (http://autoplot.org/richPng) and invTransform the pixel
  * location to a dataset.
  * @author jbf
  */
@@ -118,11 +119,15 @@ public class ClickDigitizer {
     }
     
     /**
+     * invTransform from pixel space to data space.
      * returns rank 0 datum, with SCALE_TYPE and LABEL set.
      * @param axis the axis
-     * @return rank 0 dataset containing the point.
+     * @param p the pixel location
+     * @param smaller the location of the smaller pixel row/column (e.g. "top" or "right" )
+     * @param bigger the location of the bigger pixel row/column (e.g. "bottom" or "left" )
+     * @return rank 0 dataset containing the point, and labels and scale type.
      */
-    private QDataSet transform( JSONObject axis, int p, String smaller, String bigger ) throws JSONException, ParseException {
+    private QDataSet invTransform( JSONObject axis, int p, String smaller, String bigger ) throws JSONException, ParseException {
         boolean log= axis.get("type").equals("log");
         DatumRange range;
 
@@ -157,16 +162,15 @@ public class ClickDigitizer {
     
     /**
      * from data to pixel space.
-     * @param axis
-     * @param datum
-     * @param smaller
-     * @param bigger
-     * @return Integer.MAX_VALUE or the valid transform.
+     * @param axis axis description in JSON
+     * @param datum the point in data space of the axis.
+     * @param smaller the location of the smaller pixel row/column (e.g. "top" or "right" )
+     * @param bigger the location of the bigger pixel row/column (e.g. "bottom" or "left" )
+     * @return Integer.MAX_VALUE or the valid transform
      * @throws JSONException
      * @throws ParseException 
-     * @throws 
      */
-    int invTransform( JSONObject axis, Datum datum, String smaller, String bigger ) throws JSONException, ParseException  {
+    private int transform1D( JSONObject axis, Datum datum, String smaller, String bigger ) throws JSONException, ParseException  {
         boolean log= axis.get("type").equals("log");
         DatumRange range;
         
@@ -218,9 +222,9 @@ public class ClickDigitizer {
                 JSONObject plot= getPlotContaining( plots, x, y );
                 if ( plot!=null ) {
                     JSONObject xaxis= plot.getJSONObject("xaxis");
-                    QDataSet xx= transform( xaxis, x, "left", "right" );
+                    QDataSet xx= invTransform( xaxis, x, "left", "right" );
                     JSONObject yaxis= plot.getJSONObject("yaxis");
-                    QDataSet yy= transform( yaxis, y, "bottom", "top" );
+                    QDataSet yy= invTransform( yaxis, y, "bottom", "top" );
                     
                     if ( viewer!=null ) {
                         view.seq.setStatus(  "Plot Coordinates: " + xx + ", "+ yy );
@@ -265,6 +269,37 @@ public class ClickDigitizer {
         
     }
 
+    private QDataSet doTransformPoint( String json, int x, int y ) throws IOException, ParseException {
+
+        if ( json!=null ) {
+            try {
+                JSONObject jo = new JSONObject( json );
+                JSONArray plots= jo.getJSONArray("plots");
+                JSONObject plot= getPlotContaining( plots, x, y );
+                if ( plot!=null ) {
+                    JSONObject xaxis= plot.getJSONObject("xaxis");
+                    QDataSet xx= invTransform( xaxis, x, "left", "right" );
+                    JSONObject yaxis= plot.getJSONObject("yaxis");
+                    QDataSet yy= invTransform( yaxis, y, "bottom", "top" );
+                    return Ops.bundle( xx, yy );
+                } else {
+                    return null;
+                }
+             } catch (JSONException ex) {
+                Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
+                int h= view.seq.imageAt( view.seq.getIndex() ).getImage().getHeight();
+                Datum xx= Units.dimensionless.createDatum(x);
+                Datum yy= Units.dimensionless.createDatum(h-y);
+                return Ops.link( xx, yy );
+             }
+        } else {
+            int h= view.seq.imageAt( view.seq.getIndex() ).getImage().getHeight();
+            Datum xx= Units.dimensionless.createDatum(x);
+            Datum yy= Units.dimensionless.createDatum(h-y);
+            return Ops.link( xx, yy );
+        }
+    }
+            
     /**
      * return rank 2 bundle dataset that is ds[n;i,j]
      */
@@ -297,8 +332,8 @@ public class ClickDigitizer {
                         JSONObject plot= plots.getJSONObject(i);
                         JSONObject xaxis= plot.getJSONObject("xaxis");
                         JSONObject yaxis= plot.getJSONObject("yaxis");
-                        int ix= invTransform( xaxis, x, "left", "right");
-                        int iy= invTransform( yaxis, y, "bottom", "top" );
+                        int ix= transform1D( xaxis, x, "left", "right");
+                        int iy= transform1D( yaxis, y, "bottom", "top" );
                         if ( ix!=Integer.MAX_VALUE && iy!=Integer.MAX_VALUE ) {
                             result= Ops.join( result, Ops.join( DataSetUtil.asDataSet(ix), DataSetUtil.asDataSet(iy) ) );
                         }
@@ -310,6 +345,45 @@ public class ClickDigitizer {
             }
             return result;
         }
+    }
+
+    /**
+     * select the datapoint that is 
+     * @param p
+     * @return
+     * @throws IOException
+     * @throws ParseException 
+     */
+    protected int maybeSelect(Point p) throws IOException, ParseException {
+        
+        if ( viewer==null ) {
+            return -1;
+        }
+        
+        URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
+        File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
+        String json= getJSONMetadata( file );
+        QDataSet ds1= doTransformPoint(json, p.x-1, p.y-1 );
+        QDataSet ds2= doTransformPoint(json, p.x+1, p.y+1 );
+        if ( ds1==null ) return -1;
+        
+        DatumRange xrange= DatumRangeUtil.union( DataSetUtil.asDatum(ds1.slice(0)), DataSetUtil.asDatum(ds2.slice(0)) );
+        DatumRange yrange= DatumRangeUtil.union( DataSetUtil.asDatum(ds1.slice(1)), DataSetUtil.asDatum(ds2.slice(1)) );
+
+        int isel;
+        
+        if ( viewer.annoTypeChar=='.' ) {
+            isel= viewer.digitizer.select(xrange, yrange );
+            
+        } else if ( viewer.annoTypeChar=='+' ) {
+            isel= viewer.digitizer.select(xrange, yrange, true );
+
+        } else { // if ( viewer.annoTypeChar=='|' ) {
+            isel= viewer.digitizer.select(xrange, null);
+        } 
+        
+        return isel;
+
     }
 
 
