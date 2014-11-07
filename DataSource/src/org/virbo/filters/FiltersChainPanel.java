@@ -26,7 +26,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 
 /**
- * Aggregate a number of sub panels to one long filter chain.  For example,
+ * Chain together a number of FilterEditorPanels to one long filter chain.  For example,
  * |slice1(0)|smooth(5) would add two of the FilterEditorPanel to control each
  * filter.  Additionally, this adds and removes filters from the chain.
  * 
