@@ -1250,7 +1250,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     }
 
     protected DataPointRecorder digitizer= null;
-    protected char annoTypeChar= '+';
+    protected char annoTypeChar= '|';
             
     private void startDigitizer() {
         if ( digitizer==null ) {
@@ -1272,8 +1272,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                }
             }
             
-            JComboBox annoType= new JComboBox( new String[] { "+ cross hairs", "| vertical line", ". dots" } );
+            JComboBox annoType= new JComboBox( new String[] { "| vertical line", "+ cross hairs", ". dots" } );
             digitizer.addAccessory( annoType );
+            
             annoType.addItemListener( new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
