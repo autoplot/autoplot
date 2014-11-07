@@ -48,6 +48,8 @@
         
         <p>The source for all of these is found at <a href="http://sourceforge.net/p/autoplot/code/12695/tree/autoplot/trunk/AutoplotServlet/">SourceForge</a>.</p>
         
+        
+        <p><b>Note: These are provided as examples and there is no guarantee of security.  Data providers interested in using this software on their servers must do so at their own risk.</b></p>
         <hr>
         
         <p>
