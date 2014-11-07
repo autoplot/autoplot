@@ -66,7 +66,7 @@ public class CanvasController extends DomNodeController {
 
     /**
      * support legacy column property of canvas
-     * @param row
+     * @param column
      */
     public void setColumn(String column) {
         String[] ss = column.split(",");
@@ -545,6 +545,7 @@ public class CanvasController extends DomNodeController {
     /**
      * add rows below the current plot.
      * @param count
+     * @param dir
      * @return
      */
     public List<Row> addRows(int count, Object dir ) {
@@ -565,9 +566,8 @@ public class CanvasController extends DomNodeController {
     }
 
     /**
-     * insert the row into the other rows by shrinking them to make room.
-     * @param trow row to position above or below, or null if we don't care.
-     * @param position LayoutConstants.RIGHT, LayoutConstants.LEFT
+     * add columns to the current plot.
+     * @param count number of columns to add
      */
     public List<Column> addColumns(int count) {
         List<Column> result = new ArrayList();

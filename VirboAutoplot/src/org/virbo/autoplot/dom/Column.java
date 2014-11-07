@@ -20,7 +20,7 @@ public class Column extends DomNode {
      * the parent Column, or the canvas id.
      */
     public static final String PROP_PARENT = "parent";
-
+    
     public String getParent() {
         return parent;
     }

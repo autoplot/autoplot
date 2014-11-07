@@ -2117,6 +2117,12 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected String status = "";
     public static final String PROP_STATUS = "status";
 
+    /**
+     * clients can get status here.  The message may be conventionally 
+     * prefixed with "busy:" "error:" or "warning:" (And these will be displayed
+     * as icons, for example, in the view.)
+     *
+     */
     public String getStatus() {
         return status;
     }
@@ -2390,16 +2396,19 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /** focus **/
-    /**
-     * focus plot element
-     */
     protected PlotElement plotElement;
     public static final String PROP_PLOT_ELEMENT = "plotElement";
 
+    /**
+     * focus plot element
+     */
     public PlotElement getPlotElement() {
         return plotElement;
     }
 
+    /**
+     * focus plot element
+     */
     public void setPlotElement(PlotElement plotElement) {
         PlotElement oldPlotElement = this.plotElement;
         if ( plotElement==null ) {
@@ -2448,10 +2457,16 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected Canvas canvas;
     public static final String PROP_CANVAS = "canvas";
 
+    /**
+     * focus canvas.
+     */
     public Canvas getCanvas() {
         return canvas;
     }
 
+    /**
+     * focus canvas.
+     */
     public void setCanvas(Canvas canvas) {
         Canvas oldCanvas = getCanvas();
         if ( SwingUtilities.isEventDispatchThread() && ( oldCanvas!=canvas ) ) {

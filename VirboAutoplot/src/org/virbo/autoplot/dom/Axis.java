@@ -74,10 +74,16 @@ public class Axis extends DomNode {
      */
     public static final String PROP_LABEL = "label";
 
+    /**
+     * concise label for the axis.
+     */
     public String getLabel() {
         return label;
     }
 
+    /**
+     * concise label for the axis.
+     */
     public void setLabel(String label) {
         String oldLabel = this.label;
         this.label = label;

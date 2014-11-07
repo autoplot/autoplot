@@ -36,6 +36,10 @@ public class Canvas extends DomNode {
         return height;
     }
 
+    /**
+     * set height before firing off changes
+     * @param height 
+     */
     public void setHeight(int height) {
         int oldHeight = this.height;
         this.height = height;
@@ -48,6 +52,10 @@ public class Canvas extends DomNode {
         return width;
     }
 
+   /**
+    * set width before firing off changes
+    * @param width 
+    */
     public void setWidth(int width) {
         int oldWidth = this.width;
         this.width = width;
