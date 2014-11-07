@@ -6,6 +6,9 @@
 
 package org.virbo.filters;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author mmclouth
@@ -29,14 +32,14 @@ public class dbAboveBackgroundDim1FilterEditorPanel extends AbstractFilterEditor
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        percentTB = new javax.swing.JTextField();
+        percentTF = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("dbAboveBackgroundDim1FilterEditorPanel.jLabel1.text")); // NOI18N
 
-        percentTB.setText(bundle.getString("dbAboveBackgroundDim1FilterEditorPanel.percentTB.text")); // NOI18N
-        percentTB.setPreferredSize(new java.awt.Dimension(40, 27));
+        percentTF.setText(bundle.getString("dbAboveBackgroundDim1FilterEditorPanel.percentTF.text")); // NOI18N
+        percentTF.setPreferredSize(new java.awt.Dimension(40, 27));
 
         jLabel2.setText(bundle.getString("dbAboveBackgroundDim1FilterEditorPanel.jLabel2.text")); // NOI18N
 
@@ -48,7 +51,7 @@ public class dbAboveBackgroundDim1FilterEditorPanel extends AbstractFilterEditor
                 .addContainerGap()
                 .add(jLabel1)
                 .add(1, 1, 1)
-                .add(percentTB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(percentTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(3, 3, 3)
                 .add(jLabel2)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -59,7 +62,7 @@ public class dbAboveBackgroundDim1FilterEditorPanel extends AbstractFilterEditor
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
-                    .add(percentTB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(percentTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel2))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -69,16 +72,23 @@ public class dbAboveBackgroundDim1FilterEditorPanel extends AbstractFilterEditor
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel2;
-    public javax.swing.JTextField percentTB;
+    public javax.swing.JTextField percentTF;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void setFilter(String filter) {
+        Pattern p= Pattern.compile("\\|dbAboveBackgroundDim1\\((\\d+)\\)");
+        Matcher m= p.matcher(filter);
+        if ( m.matches() ) {
+            percentTF.setText(m.group(1));
+        } else {
+            percentTF.setText("100");
+        }
         
     }
 
     @Override
     public String getFilter() {
-        return "|dbAboveBackgroundDim1(" + percentTB.getText() + ")";
+        return "|dbAboveBackgroundDim1(" + percentTF.getText() + ")";
     }
 }

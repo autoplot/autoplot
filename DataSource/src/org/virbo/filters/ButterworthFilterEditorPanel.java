@@ -59,6 +59,7 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel1.text_1")); // NOI18N
 
+        orderCB.setEditable(true);
         orderCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4" }));
 
         jLabel2.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel2.text_1")); // NOI18N
@@ -101,7 +102,7 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
                                 .add(orderCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(jLabel1)))
                     .add(subPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         orderPanelLayout.setVerticalGroup(
             orderPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -311,6 +312,46 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
 
     @Override
     public void setFilter(String filter) {
+        Pattern p= Pattern.compile("\\|butterworth\\((\\d),(\\d+),(\\w+)\\)");
+        Pattern p1= Pattern.compile("\\|butterworth\\((\\d),(\\d+),(\\d+),(\\w+)\\)");
+        Matcher m= p.matcher(filter);
+        Matcher n= p1.matcher(filter);
+        if ( m.matches() ) {
+            //System.out.println("M matches");
+            orderCB.setSelectedItem( m.group(1) );
+            cutoffFreq.setText( m.group(2) );
+            if ( m.group(3).equals("True")) {
+                type1CB.setSelectedIndex(2);
+            }
+            else if (m.group(3).equals("False")) {
+                type1CB.setSelectedIndex(1);
+            }
+            else {
+                type1CB.setSelectedIndex(1);
+            }
+        }
+        else if (n.matches()) {
+            //System.out.println("N matches");
+            orderCB.setSelectedItem( n.group(1) );
+            lowFreq.setText( n.group(2) );
+            highFreq.setText( n.group(3) );
+            if ( n.group(4).equals("True")) {
+                type1CB.setSelectedIndex(3);
+            }
+            else if (n.group(4).equals("False")) {
+                type1CB.setSelectedIndex(4);
+            }
+            else {
+                type1CB.setSelectedIndex(0);
+            }
+        }
+        else {
+            orderCB.setSelectedIndex( 0 );
+            lowFreq.setText( "0" );
+            highFreq.setText( "50" );
+            cutoffFreq.setText("10");
+            type1CB.setSelectedIndex(0);
+        }
         }
 
     

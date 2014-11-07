@@ -6,6 +6,9 @@
 
 package org.virbo.filters;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author mmclouth
@@ -28,12 +31,12 @@ public class ContourFilterEditorPanel extends AbstractFilterEditorPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        contourPtsTB = new javax.swing.JTextField();
+        contourPtsTF = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
-        contourPtsTB.setText(bundle.getString("ContourFilterEditorPanel.contourPtsTB.text")); // NOI18N
-        contourPtsTB.setPreferredSize(new java.awt.Dimension(150, 27));
+        contourPtsTF.setText(bundle.getString("ContourFilterEditorPanel.contourPtsTF.text")); // NOI18N
+        contourPtsTF.setPreferredSize(new java.awt.Dimension(150, 27));
 
         jLabel1.setText(bundle.getString("ContourFilterEditorPanel.jLabel1.text")); // NOI18N
 
@@ -45,30 +48,38 @@ public class ContourFilterEditorPanel extends AbstractFilterEditorPanel {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(contourPtsTB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(contourPtsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                .add(contourPtsTB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(contourPtsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(jLabel1))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public javax.swing.JTextField contourPtsTB;
+    public javax.swing.JTextField contourPtsTF;
     public javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void setFilter(String filter) {
+        Pattern p= Pattern.compile("\\|contour\\((.*)\\)");
+        Matcher m= p.matcher(filter);
+        if ( m.matches() ) {
+            contourPtsTF.setText( m.group(1) );
+        }
+        else {
+            contourPtsTF.setText("1");
+        }
     }
 
     @Override
     public String getFilter() {
-        String pts = contourPtsTB.getText().replaceAll("\\s","");
+        String pts = contourPtsTF.getText().replaceAll("\\s","");
         return "|contour(" + pts + ")";
     }
 }

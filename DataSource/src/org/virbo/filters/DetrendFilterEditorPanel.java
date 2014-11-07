@@ -6,6 +6,9 @@
 
 package org.virbo.filters;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author mmclouth
@@ -67,6 +70,14 @@ public class DetrendFilterEditorPanel extends AbstractFilterEditorPanel {
 
     @Override
     public void setFilter(String filter) {
+        Pattern p= Pattern.compile("\\|detrend\\((.*)\\)");
+        Matcher m= p.matcher(filter);
+        if ( m.matches() ) {
+            scalarTF.setText( m.group(1) );
+        }
+        else {
+            scalarTF.setText("1");
+        }
     }
 
     @Override

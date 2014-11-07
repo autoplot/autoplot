@@ -6,6 +6,9 @@
 
 package org.virbo.filters;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author mmclouth
@@ -101,6 +104,29 @@ public class FftPowerFilterEditorPanel extends AbstractFilterEditorPanel {
 
     @Override
     public void setFilter(String filter) {
+        Pattern p= Pattern.compile("\\|fftPower\\((\\d+),(\\d),'(\\w+)\\'\\)");
+        Matcher m= p.matcher(filter);
+        if ( m.matches() ) {
+            sizeTF.setText( m.group(1) );
+            if (m.group(2).equals("1")) {
+                slideCB.setSelectedIndex(0);
+            }
+            else if (m.group(2).equals("2")) {
+                slideCB.setSelectedIndex(1);
+            }
+            else if (m.group(2).equals("4")) {
+                slideCB.setSelectedIndex(2);
+            }
+            else {
+                slideCB.setSelectedIndex(0);
+            }
+            windowCB.setSelectedItem( m.group(3) );
+        }
+        else {
+            sizeTF.setText("1");
+            slideCB.setSelectedIndex( 0 );
+            windowCB.setSelectedIndex( 0 );
+        }
         
     }
 

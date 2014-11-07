@@ -86,11 +86,16 @@ public class SetDepend0CadenceFilterEditorPanel extends AbstractFilterEditorPane
 
     @Override
     public void setFilter(String filter) {
-        Pattern p= Pattern.compile("\\|setDepend0Cadence(\\d)\\((\\s+)\\)");
+        Pattern p= Pattern.compile("\\|setDepend0Cadence\\('(\\d+)(\\w+)'\\)");
         Matcher m= p.matcher(filter);
         if ( m.matches() ) {
+            System.out.println( "M matches");
             scalarTF.setText( m.group(1) );
             unitsCB.setSelectedItem( m.group(2) );
+        }
+        else {
+            scalarTF.setText("1");
+            unitsCB.setSelectedItem( "s" );
         }
     }
        

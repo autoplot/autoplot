@@ -7,6 +7,8 @@
 package org.virbo.filters;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.das2.datum.Units;
 import static org.das2.datum.Units.getAllUnits;
 
@@ -39,6 +41,7 @@ public class SetDepend0UnitsFilterEditorPanel extends AbstractFilterEditorPanel 
 
         List<Units> units = getAllUnits();
         String[] array = units.toArray(new String[units.size()]);
+        unitsCB.setEditable(true);
         unitsCB.setModel(new javax.swing.DefaultComboBoxModel(array));
         unitsCB.setPreferredSize(new java.awt.Dimension(200, 27));
 
@@ -72,6 +75,14 @@ public class SetDepend0UnitsFilterEditorPanel extends AbstractFilterEditorPanel 
 
     @Override
     public void setFilter(String filter) {
+        Pattern p= Pattern.compile("\\|setDepend0Units\\('(\\w+)'\\)");
+        Matcher m= p.matcher(filter);
+        if ( m.matches() ) {
+            unitsCB.setSelectedItem( m.group(1) );
+        }
+        else {
+            unitsCB.setSelectedItem( "s" );
+        }
         
     }
 
