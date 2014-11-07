@@ -559,6 +559,21 @@ public class DomUtil {
         if ( elements.isEmpty() ) return true; else return false;
 
     }
+    
+    /**
+     * return the parent DataSourceFilters for uris like vap+internal:data_1
+     * @param dom the dom
+     * @param uri the uri, like vap+internal:data_1,data_2
+     * @return the DataSourceFilters
+     */
+    public static List<DataSourceFilter> getParentsFor( Application dom, String uri ) {
+        String[] dep= uri.substring(13).split(",");
+        List<DataSourceFilter> result= new ArrayList();
+        for ( int j=0; j<dep.length; j++ ) {
+            result.add( (DataSourceFilter)getElementById( dom,dep[j]) );
+        }
+        return result;
+    }
 
     /**
      * returns true if the dom is valid, throws a runtime exception otherwise
