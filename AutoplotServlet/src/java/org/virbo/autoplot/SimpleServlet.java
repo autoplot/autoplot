@@ -354,6 +354,11 @@ public class SimpleServlet extends HttpServlet {
                     throw new IllegalArgumentException("local resources cannot be served, except via local vap file.  ");
                 }
                 
+                URISplit split = URISplit.parse(surl);
+                if ( split.vapScheme!=null && split.vapScheme.equals("vap+inline") && split.surl.contains("getDataSet") ) { // this list could go on forever...
+                    throw new IllegalArgumentException("vap+inline URI cannot contain getDataSet.");
+                }
+                
                 DataSource dsource;
                 try {
                     dsource = DataSetURI.getDataSource(surl);
