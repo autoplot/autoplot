@@ -285,6 +285,7 @@ public class CdfUtil {
 
     /**
      * returns the size of the variable in bytes.
+     * TODO: this needs to be verified.  Unsigned numbers may come back as next larger size.
      * @param dims number of dimensions in each record
      * @param dimSizes dimensions of each record
      * @param itype type of data, such as CDFConstants.CDF_FLOAT
@@ -309,27 +310,6 @@ public class CdfUtil {
         }
         size= size*sizeBytes;
         return size;
-    }
-
-    /**
-     * subsample the array in-situ to save memory.  Be careful, this clobbers
-     * the old array to save memory!  (Note Java5 doesn't save memory, but it will in Java6.)
-     * Note too that this is a kludge, and the CDF library must be changed to support subsampling non-double arrays.
-     * @param array the input array, which is clobbered
-     * @param recStart
-     * @param recCount
-     * @param recInterval
-     * @return
-     */
-    private static long[] subsampleTT2000( long[] array, int recStart, int recCount, int recInterval ) {
-        int n= recCount;
-        for ( int i=0; i<n; i++ ) {
-            array[i]= array[ i*recInterval + recStart ];
-        }
-        //long[] result= Arrays.copyOfRange( array, 0, n ); //TODO: Java6. NOTE: I don't think Java6 improves anything.
-        long[] result= new long[n];
-        System.arraycopy( array, 0, result, 0, n );
-        return result;
     }
 
     /**
@@ -530,8 +510,9 @@ public class CdfUtil {
                     sdata[j]= (String) Array.get(o0, j);
                 }
             } else if ( o0.getClass()==String.class ) {
-                sdata= new String[ 1 ]; //vap+cdaweb:ds=ALOUETTE2_AV_LIM&id=freq_mark&timerange=1967-01-15+12:59:00+to+12:59:01
-                sdata[0]= String.valueOf( o0 );
+                //sdata= new String[ 1 ]; //vap+cdaweb:ds=ALOUETTE2_AV_LIM&id=freq_mark&timerange=1967-01-15+12:59:00+to+12:59:01
+                //sdata[0]= String.valueOf( o0 );
+                sdata= ((String[])o);
             } else {
                 throw new IllegalArgumentException("not handled single array where expected double array");
             }
