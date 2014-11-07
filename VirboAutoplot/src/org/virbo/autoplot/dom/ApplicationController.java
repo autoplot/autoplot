@@ -2464,12 +2464,21 @@ public class ApplicationController extends DomNodeController implements RunLater
      * focus dataSourceFilter.
      */
     protected DataSourceFilter dataSourceFilter;
+    /**
+     * focus dataSourceFilter.
+     */
     public static final String PROP_DATASOURCEFILTER = "dataSourceFilter";
 
+    /**
+     * focus dataSourceFilter.
+     */
     public DataSourceFilter getDataSourceFilter() {
         return dataSourceFilter;
     }
 
+    /**
+     * focus dataSourceFilter.
+     */
     public void setDataSourceFilter(DataSourceFilter dataSourceFilter) {
         DataSourceFilter oldDataSourceFilter = this.dataSourceFilter;
         this.dataSourceFilter = dataSourceFilter;
