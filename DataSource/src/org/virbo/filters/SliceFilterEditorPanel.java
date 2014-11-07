@@ -4,6 +4,10 @@
  */
 package org.virbo.filters;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultComboBoxModel;
@@ -24,7 +28,14 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
      */
     public SliceFilterEditorPanel() {
         initComponents();
+        sliceDimensionCB.addItemListener( new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                System.err.println( " " + SliceFilterEditorPanel.this.getName() + " " + ( e.getStateChange()==ItemEvent.SELECTED ) + " " +e.getItem());
+            }
+        });
         setName("cb"+String.format( "%04d", (System.currentTimeMillis()-t0)/100 ));
+        setToolTipText( getName() );
     }
 
     /**
@@ -115,7 +126,13 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
     @Override
     public void setInput(QDataSet ds) {
         String[] depNames1= FilterEditorPanelUtil.getDimensionNames(ds);
+        int idx= sliceDimensionCB.getSelectedIndex();
         sliceDimensionCB.setModel(new DefaultComboBoxModel(depNames1));
+        try {
+            sliceDimensionCB.setSelectedIndex(idx);
+        } catch ( IllegalArgumentException ex ) {
+            sliceDimensionCB.setSelectedIndex(0);
+        }
     }
     
 
