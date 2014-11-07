@@ -27,7 +27,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
@@ -35,7 +34,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * Quick-n-dirty class for picking off points from images.
+ * Quick-n-dirty class for picking off points from images.  The ClickDigitizer knows how to 
+ * grab JSON metadata from the image (http://autoplot.org/richPng) and transform the pixel
+ * location to a dataset.
  * @author jbf
  */
 public class ClickDigitizer {
@@ -118,37 +119,37 @@ public class ClickDigitizer {
     
     /**
      * returns rank 0 datum, with SCALE_TYPE and LABEL set.
-     * @param xaxis the axis
-     * @return 
+     * @param axis the axis
+     * @return rank 0 dataset containing the point.
      */
-    private QDataSet transform( JSONObject xaxis, int p, String smaller, String bigger ) throws JSONException, ParseException {
-        boolean xlog= xaxis.get("type").equals("log");
-        DatumRange xrange;
+    private QDataSet transform( JSONObject axis, int p, String smaller, String bigger ) throws JSONException, ParseException {
+        boolean log= axis.get("type").equals("log");
+        DatumRange range;
 
-        if ( "UTC".equals( xaxis.getString("units") ) ) {
-            xrange= DatumRangeUtil.parseISO8601Range( xaxis.getString("min")+"/"+xaxis.getString("max") );
+        if ( "UTC".equals( axis.getString("units") ) ) {
+            range= DatumRangeUtil.parseISO8601Range( axis.getString("min")+"/"+axis.getString("max") );
 
         } else {
             String sunits= "";
-            sunits= xaxis.getString("units"); 
+            sunits= axis.getString("units"); 
             Units units= Units.lookupUnits(sunits);
-            xrange= new DatumRange(units.parse(xaxis.getString("min")),
-                  units.parse(xaxis.getString("max")) );
+            range= new DatumRange(units.parse(axis.getString("min")),
+                  units.parse(axis.getString("max")) );
             
         }
-        double nn= ( p - xaxis.getInt(smaller) ) / ((double) ( xaxis.getInt(bigger) - xaxis.getInt(smaller) ) );
+        double nn= ( p - axis.getInt(smaller) ) / ((double) ( axis.getInt(bigger) - axis.getInt(smaller) ) );
         
         Datum result;
-        if ( xlog ) {
-            DatumRange rr= DatumRangeUtil.rescaleLog( xrange, nn, nn );
+        if ( log ) {
+            DatumRange rr= DatumRangeUtil.rescaleLog( range, nn, nn );
             result= rr.min();
         } else {
-            DatumRange rr= DatumRangeUtil.rescale( xrange, nn, nn );
+            DatumRange rr= DatumRangeUtil.rescale( range, nn, nn );
             result= rr.min();            
         }
         QDataSet r= DataSetUtil.asDataSet(result);
-        r= Ops.putProperty( r, QDataSet.LABEL, xaxis.getString("label") );
-        r= Ops.putProperty( r, QDataSet.SCALE_TYPE, xlog ? "log" : "linear" );
+        r= Ops.putProperty( r, QDataSet.LABEL, axis.getString("label") );
+        r= Ops.putProperty( r, QDataSet.SCALE_TYPE, log ? "log" : "linear" );
         
         return r;
         
@@ -156,8 +157,8 @@ public class ClickDigitizer {
     
     /**
      * from data to pixel space.
-     * @param xaxis
-     * @param x
+     * @param axis
+     * @param datum
      * @param smaller
      * @param bigger
      * @return Integer.MAX_VALUE or the valid transform.
@@ -165,29 +166,29 @@ public class ClickDigitizer {
      * @throws ParseException 
      * @throws 
      */
-    int invTransform( JSONObject xaxis, Datum x, String smaller, String bigger ) throws JSONException, ParseException  {
-        boolean xlog= xaxis.get("type").equals("log");
-        DatumRange xrange;
+    int invTransform( JSONObject axis, Datum datum, String smaller, String bigger ) throws JSONException, ParseException  {
+        boolean log= axis.get("type").equals("log");
+        DatumRange range;
         
-        if ( "UTC".equals( xaxis.getString("units") ) ) {
-            xrange= DatumRangeUtil.parseISO8601Range( xaxis.getString("min")+"/"+xaxis.getString("max") );
+        if ( "UTC".equals( axis.getString("units") ) ) {
+            range= DatumRangeUtil.parseISO8601Range( axis.getString("min")+"/"+axis.getString("max") );
 
         } else {
-            String sunits= "";
-            sunits= xaxis.getString("units"); 
+            String sunits;
+            sunits= axis.getString("units"); 
             Units units= Units.lookupUnits(sunits);
-            xrange= new DatumRange(units.parse(xaxis.getString("min")),
-                  units.parse(xaxis.getString("max")) );
+            range= new DatumRange(units.parse(axis.getString("min")),
+                  units.parse(axis.getString("max")) );
             
         }        
         
-        if ( xrange.getUnits().isConvertableTo(x.getUnits()) && xrange.contains(x) ) {
-            if ( xlog ) {
-                double d= DatumRangeUtil.normalizeLog( xrange, x );
-                return (int)( xaxis.getInt(smaller) + d * (xaxis.getInt(bigger)-xaxis.getInt(smaller)) );
+        if ( range.getUnits().isConvertableTo(datum.getUnits()) && range.contains(datum) ) {
+            if ( log ) {
+                double d= DatumRangeUtil.normalizeLog( range, datum );
+                return (int)( axis.getInt(smaller) + d * (axis.getInt(bigger)-axis.getInt(smaller)) );
             } else {
-                double d= DatumRangeUtil.normalize( xrange, x );
-                return (int)( xaxis.getInt(smaller) + d * (xaxis.getInt(bigger)-xaxis.getInt(smaller)) );
+                double d= DatumRangeUtil.normalize( range, datum );
+                return (int)( axis.getInt(smaller) + d * (axis.getInt(bigger)-axis.getInt(smaller)) );
             }
         } else {
             return Integer.MAX_VALUE;
@@ -203,6 +204,8 @@ public class ClickDigitizer {
      * Note the output has y=0 at the bottom to be consistent with the ImageDataSource.
      * @param x x coordinate in image where 0 is the left side.
      * @param y y coordinate in image where 0 is the top.  Note the output has y=0 at the bottom.
+     * @throws ParseException when the JSON cannot be parsed.
+     * @throws IOException when the file cannot be read.
      */
     protected void doLookupMetadata( int x, int y ) throws IOException, ParseException {
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
