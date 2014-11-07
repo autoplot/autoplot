@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1077,16 +1078,23 @@ public class ScriptContext extends PyJavaInstance {
      * return a list of completions.  I was talking to Tom N. who was looking for this
      * to get a list of CDF variables, and realized this would be useful in the IDL context
      * as well as python scripts.  This will perform the completion for where the carot is
-     * at the end of the string.
+     * at the end of the string.  Only completions where maybePlot indicates the URI is now 
+     * valid are returned.
      * @param file, for example http://autoplot.org/data/somedata.cdf?
      * @return list of completions, containing the entire URI.
      */
     public static String[] getCompletions( String file ) throws Exception {
         List<CompletionResult> cc= DataSetURI.getCompletions( file, file.length(), new NullProgressMonitor() );
-
-        String[] result= new String[cc.size()];
+        List<CompletionResult> resultList= new ArrayList<CompletionResult>();
         for ( int i=0; i<cc.size(); i++ ) {
-            result[i]= cc.get(i).completion;
+            if ( cc.get(i).maybePlot==true ) {
+                resultList.add(cc.get(i));
+            }
+        }
+
+        String[] result= new String[resultList.size()];
+        for ( int i=0; i<resultList.size(); i++ ) {
+            result[i]= resultList.get(i).completion;
         }
 
         return result;
