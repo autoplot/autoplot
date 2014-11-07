@@ -41,8 +41,7 @@ public class SetUnitsFilterEditorPanel extends AbstractFilterEditorPanel {
         jLabel1 = new javax.swing.JLabel();
         unitsCB = new javax.swing.JComboBox();
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
-        jLabel1.setText(bundle.getString("SetUnitsFilterEditorPanel.jLabel1.text")); // NOI18N
+        jLabel1.setText("Units:  ");
 
         List<Units> units = getAllUnits();
         String[] array = units.toArray(new String[units.size()]);

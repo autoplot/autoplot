@@ -34,11 +34,10 @@ public class AddFilterEditorPanel extends AbstractFilterEditorPanel implements F
         scalar = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
-        scalar.setText(bundle.getString("AddFilterEditorPanel.scalar.text")); // NOI18N
+        scalar.setText("0");
         scalar.setPreferredSize(new java.awt.Dimension(75, 27));
 
-        jLabel2.setText(bundle.getString("AddFilterEditorPanel.jLabel2.text")); // NOI18N
+        jLabel2.setText("Scalar to add:");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);

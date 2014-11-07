@@ -39,18 +39,16 @@ public class FftPowerFilterEditorPanel extends AbstractFilterEditorPanel {
         sizeTF = new javax.swing.JTextField();
         windowCB = new javax.swing.JComboBox();
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
-        jLabel1.setText(bundle.getString("FftPowerFilterEditorPanel.jLabel1.text")); // NOI18N
+        jLabel1.setText("Size: ");
 
-        jLabel2.setText(bundle.getString("FftPowerFilterEditorPanel.jLabel2.text")); // NOI18N
+        jLabel2.setText("Slide: ");
 
-        jLabel3.setText(bundle.getString("FftPowerFilterEditorPanel.jLabel3.text")); // NOI18N
+        jLabel3.setText("Window: ");
 
         slideCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No Overlap", "1/2 Overlap", "3/4 Overlap" }));
         slideCB.setMinimumSize(new java.awt.Dimension(125, 27));
         slideCB.setPreferredSize(new java.awt.Dimension(125, 27));
 
-        sizeTF.setText(bundle.getString("FftPowerFilterEditorPanel.sizeTF.text")); // NOI18N
         sizeTF.setPreferredSize(new java.awt.Dimension(90, 27));
 
         windowCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Hanning", "Unity" }));

@@ -6,19 +6,16 @@
 
 package org.virbo.filters;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  *
  * @author mmclouth
  */
-public class DetrendFilterEditorPanel extends AbstractFilterEditorPanel {
+public class ReducexFilterEditorPanel extends javax.swing.JPanel {
 
     /**
-     * Creates new form DetrendFilterEditorPanel
+     * Creates new form ReducexFilterEditorPanel
      */
-    public DetrendFilterEditorPanel() {
+    public ReducexFilterEditorPanel() {
         initComponents();
     }
 
@@ -32,12 +29,15 @@ public class DetrendFilterEditorPanel extends AbstractFilterEditorPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        scalarTF = new javax.swing.JTextField();
+        jTextField1 = new javax.swing.JTextField();
+        jComboBox1 = new javax.swing.JComboBox();
 
-        jLabel1.setText("Boxcar size to 'detrend' : ");
+        jLabel1.setText("Reduce data to intervals of:  ");
 
-        scalarTF.setText("5");
-        scalarTF.setPreferredSize(new java.awt.Dimension(55, 27));
+        jTextField1.setText("1");
+        jTextField1.setPreferredSize(new java.awt.Dimension(30, 27));
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -46,8 +46,10 @@ public class DetrendFilterEditorPanel extends AbstractFilterEditorPanel {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel1)
-                .add(4, 4, 4)
-                .add(scalarTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -56,31 +58,16 @@ public class DetrendFilterEditorPanel extends AbstractFilterEditorPanel {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
-                    .add(scalarTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JComboBox jComboBox1;
     public javax.swing.JLabel jLabel1;
-    public javax.swing.JTextField scalarTF;
+    public javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public void setFilter(String filter) {
-        Pattern p= Pattern.compile("\\|detrend\\((.*)\\)");
-        Matcher m= p.matcher(filter);
-        if ( m.matches() ) {
-            scalarTF.setText( m.group(1) );
-        }
-        else {
-            scalarTF.setText("1");
-        }
-    }
-
-    @Override
-    public String getFilter() {
-        return "|detrend(" + scalarTF.getText() + ")";
-    }
 }

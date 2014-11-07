@@ -13,12 +13,12 @@ import java.util.regex.Pattern;
  *
  * @author mmclouth
  */
-public class DetrendFilterEditorPanel extends AbstractFilterEditorPanel {
+public class HanningFilterEditorPanel extends AbstractFilterEditorPanel {
 
     /**
-     * Creates new form DetrendFilterEditorPanel
+     * Creates new form HanningFilterEditorPanel
      */
-    public DetrendFilterEditorPanel() {
+    public HanningFilterEditorPanel() {
         initComponents();
     }
 
@@ -34,10 +34,10 @@ public class DetrendFilterEditorPanel extends AbstractFilterEditorPanel {
         jLabel1 = new javax.swing.JLabel();
         scalarTF = new javax.swing.JTextField();
 
-        jLabel1.setText("Boxcar size to 'detrend' : ");
+        jLabel1.setText("Size of Hanning Window:  ");
 
-        scalarTF.setText("5");
-        scalarTF.setPreferredSize(new java.awt.Dimension(55, 27));
+        scalarTF.setText("120");
+        scalarTF.setPreferredSize(new java.awt.Dimension(60, 27));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -46,7 +46,7 @@ public class DetrendFilterEditorPanel extends AbstractFilterEditorPanel {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel1)
-                .add(4, 4, 4)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(scalarTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -69,18 +69,18 @@ public class DetrendFilterEditorPanel extends AbstractFilterEditorPanel {
 
     @Override
     public void setFilter(String filter) {
-        Pattern p= Pattern.compile("\\|detrend\\((.*)\\)");
+        Pattern p= Pattern.compile("\\|hanning\\((.*)\\)");
         Matcher m= p.matcher(filter);
-        if ( m.matches() ) {
-            scalarTF.setText( m.group(1) );
+        if (m.matches() ) {
+            scalarTF.setText(m.group(1));
         }
         else {
-            scalarTF.setText("1");
+            scalarTF.setText("10");
         }
     }
 
     @Override
     public String getFilter() {
-        return "|detrend(" + scalarTF.getText() + ")";
+        return "|hanning(" + scalarTF.getText() + ")";
     }
 }

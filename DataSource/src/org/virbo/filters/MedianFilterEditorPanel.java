@@ -34,10 +34,9 @@ public class MedianFilterEditorPanel extends AbstractFilterEditorPanel {
         jLabel1 = new javax.swing.JLabel();
         sizeTF = new javax.swing.JTextField();
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
-        jLabel1.setText(bundle.getString("MedianFilterEditorPanel.jLabel1.text")); // NOI18N
+        jLabel1.setText("Median Boxcar Size:  ");
 
-        sizeTF.setText(bundle.getString("MedianFilterEditorPanel.sizeTF.text")); // NOI18N
+        sizeTF.setText("3");
         sizeTF.setPreferredSize(new java.awt.Dimension(50, 27));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);

@@ -56,13 +56,12 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
 
         orderPanel.setBorder(null);
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
-        jLabel1.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel1.text_1")); // NOI18N
+        jLabel1.setText("Order:  ");
 
         orderCB.setEditable(true);
         orderCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4" }));
 
-        jLabel2.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel2.text_1")); // NOI18N
+        jLabel2.setText("Type:");
 
         type1CB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "--------------", "High-Pass", "Low-Pass", "Band-Pass", "Band-Reject" }));
         type1CB.addActionListener(formListener);
@@ -115,12 +114,11 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
                 .add(0, 86, Short.MAX_VALUE))
         );
 
-        jLabel10.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel10.text")); // NOI18N
+        jLabel10.setText("Cutoff Frequency:");
 
-        cutoffFreq.setText(bundle.getString("ButterworthFilterEditorPanel.cutoffFreq.text")); // NOI18N
         cutoffFreq.setPreferredSize(new java.awt.Dimension(75, 27));
 
-        jLabel3.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel3.text")); // NOI18N
+        jLabel3.setText("Hz");
 
         org.jdesktop.layout.GroupLayout subPanel3Layout = new org.jdesktop.layout.GroupLayout(subPanel3);
         subPanel3.setLayout(subPanel3Layout);
@@ -149,19 +147,17 @@ public class ButterworthFilterEditorPanel extends AbstractFilterEditorPanel {
                     .add(jLabel3)))
         );
 
-        jLabel4.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel4.text")); // NOI18N
+        jLabel4.setText("Low Frequency:");
 
-        lowFreq.setText(bundle.getString("ButterworthFilterEditorPanel.lowFreq.text")); // NOI18N
         lowFreq.setPreferredSize(new java.awt.Dimension(75, 27));
 
-        jLabel5.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel5.text")); // NOI18N
+        jLabel5.setText("Hz");
 
-        jLabel6.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel6.text")); // NOI18N
+        jLabel6.setText("High Frequency:");
 
-        highFreq.setText(bundle.getString("ButterworthFilterEditorPanel.highFreq.text")); // NOI18N
         highFreq.setPreferredSize(new java.awt.Dimension(75, 27));
 
-        jLabel7.setText(bundle.getString("ButterworthFilterEditorPanel.jLabel7.text")); // NOI18N
+        jLabel7.setText("Hz");
 
         org.jdesktop.layout.GroupLayout subPanel4Layout = new org.jdesktop.layout.GroupLayout(subPanel4);
         subPanel4.setLayout(subPanel4Layout);

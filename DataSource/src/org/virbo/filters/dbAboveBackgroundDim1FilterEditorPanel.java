@@ -35,13 +35,12 @@ public class dbAboveBackgroundDim1FilterEditorPanel extends AbstractFilterEditor
         percentTF = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
-        jLabel1.setText(bundle.getString("dbAboveBackgroundDim1FilterEditorPanel.jLabel1.text")); // NOI18N
+        jLabel1.setText("Show data as decibels above the ");
 
-        percentTF.setText(bundle.getString("dbAboveBackgroundDim1FilterEditorPanel.percentTF.text")); // NOI18N
+        percentTF.setText("10");
         percentTF.setPreferredSize(new java.awt.Dimension(40, 27));
 
-        jLabel2.setText(bundle.getString("dbAboveBackgroundDim1FilterEditorPanel.jLabel2.text")); // NOI18N
+        jLabel2.setText("% level.");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);

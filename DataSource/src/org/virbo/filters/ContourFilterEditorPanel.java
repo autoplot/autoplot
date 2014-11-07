@@ -34,11 +34,10 @@ public class ContourFilterEditorPanel extends AbstractFilterEditorPanel {
         contourPtsTF = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/virbo/filters/Bundle"); // NOI18N
-        contourPtsTF.setText(bundle.getString("ContourFilterEditorPanel.contourPtsTF.text")); // NOI18N
+        contourPtsTF.setText("1,5,10");
         contourPtsTF.setPreferredSize(new java.awt.Dimension(150, 27));
 
-        jLabel1.setText(bundle.getString("ContourFilterEditorPanel.jLabel1.text")); // NOI18N
+        jLabel1.setText("Convert to contours at:");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
