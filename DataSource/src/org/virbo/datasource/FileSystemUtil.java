@@ -144,6 +144,7 @@ public class FileSystemUtil {
         if ( split.path==null ) return false;
         URI resource= DataSetURI.toUri( split.path );
         String scheme= resource.getScheme();
+        if ( scheme==null ) return false;
         if ( scheme.equals("file") || scheme.equals("sftp") ) {
             if ( resource.getPath().contains( FileSystem.settings().getLocalCacheDir().toString() ) ) {
                 logger.info( "path within local cache dir is considered non-local" );
