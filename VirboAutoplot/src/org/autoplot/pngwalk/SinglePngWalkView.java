@@ -4,6 +4,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
@@ -28,6 +29,7 @@ public class SinglePngWalkView extends PngWalkView {
     Rectangle imageLocation= null;
     
     ClickDigitizer clickDigitizer;
+    int clickDigitizerSelect= -1;
     
     public SinglePngWalkView(WalkImageSequence s) {
         super(s);
@@ -35,10 +37,18 @@ public class SinglePngWalkView extends PngWalkView {
         
         setShowCaptions(true);
         addMouseWheelListener( getMouseWheelListener() );
-        addMouseListener( new MouseAdapter() {
+        MouseAdapter ma= new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if ( e.isPopupTrigger() ) {
                     getPopup().show(e.getComponent(),e.getX(), e.getY());
+                }
+                Point p= getImagePosition( e.getX(), e.getY() );
+                if ( p!=null ) try {
+                    clickDigitizerSelect= clickDigitizer.maybeSelect(p);
+                } catch (IOException ex) {
+                    Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ParseException ex) {
+                    Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
@@ -47,6 +57,7 @@ public class SinglePngWalkView extends PngWalkView {
                 if ( e.isPopupTrigger() ) {
                     getPopup().show(e.getComponent(),e.getX(), e.getY());
                 }
+                
             }
             
             @Override
@@ -61,7 +72,9 @@ public class SinglePngWalkView extends PngWalkView {
                 int imageY= (int)( ( e.getY() - lrect.y ) / factor );
                 
                 try {
-                    clickDigitizer.doLookupMetadata( imageX, imageY );
+                    if ( clickDigitizerSelect==-1 ) {
+                        clickDigitizer.doLookupMetadata( imageX, imageY );
+                    }
                 } catch ( IOException ex ) {
                     logger.log(Level.SEVERE, null, ex);
                 } catch (ParseException ex) {
@@ -69,11 +82,37 @@ public class SinglePngWalkView extends PngWalkView {
                 }
                 
             }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                System.err.println(e);
+            }
             
-        } );
+            
+            
+        };
+        addMouseListener( ma );
+        addMouseMotionListener( ma );
 
     }
     
+    /**
+     * return the position in the image's coordinates.
+     * @param x the x location in the component.
+     * @param y the y location in the component.
+     * @return null or the Point location.
+     */
+    Point getImagePosition( int x, int y ) {
+        Rectangle lrect= imageLocation;
+        if ( imageLocation==null ) return null;
+        BufferedImage i = seq.currentImage().getImage();
+        if ( i==null ) return null;
+        double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
+
+        int imageX= (int)( ( x - lrect.x ) / factor );
+        int imageY= (int)( ( y - lrect.y ) / factor );        
+        return new Point(imageX,imageY);
+    }
     
     @Override
     protected synchronized void paintComponent(Graphics g1) {
