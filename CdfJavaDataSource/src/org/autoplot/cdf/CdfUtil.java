@@ -462,6 +462,18 @@ public class CdfUtil {
             }
             qube= nqube;
         }
+        
+        if ( varType == CDFConstants.CDF_EPOCH && qube.length>0 ) {
+            boolean reform= true;
+            for ( int i=1; i<qube.length; i++ ) {
+                if ( qube[i]!=1 ) {
+                    reform= false;
+                }
+            }
+            if ( reform ) {
+                qube= Arrays.copyOf(qube,1);
+            }
+        }
                           
         if ( cdf.rowMajority()  ) {
 
