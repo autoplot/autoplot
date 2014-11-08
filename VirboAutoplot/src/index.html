@@ -23,11 +23,12 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-11-04):</p>
+        <p>Bugfixes (2014-11-07):</p>
         <ul>
             <li>script name appears in stack traces now, to aid in debugging</li>
             <li>Improve support for ordinal data in CDF where keyword.</li>
             <li>legend plot symbol for dotdash linestyle was barely visible.  Thanks Kristoff!</li>
+            <li>das2server with stream defect could leave client in endless loop</li>
             <li>1284: round of cleanup with PNGWalkTool</li>
             <li>bugfix: restore ctrl+mouse wheel pan behavior.</li>
             <li>bugfix in aggregation completion, where the path is not part of the completion.</li>
@@ -65,6 +66,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>New Pure-Java CDF library is in production, improving speed and memory use</li>
+            <li>PNGWalkTool supports digitizing</li>
             <li>script parameter can now be relative path (e.g. --script=myscript.jy)</li>
             <li>addPlots(2,'below') in jython scripts</li>
             <li>any URI ending in .png .jpg or .gif that contains an asterisk is handled by the pngwalk tool</li>
