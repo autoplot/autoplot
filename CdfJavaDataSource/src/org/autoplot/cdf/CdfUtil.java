@@ -463,8 +463,8 @@ public class CdfUtil {
             qube= nqube;
         }
         
-        if ( varType == CDFConstants.CDF_EPOCH && qube.length>0 ) {
-            boolean reform= true;
+        if ( varType == CDFConstants.CDF_EPOCH && qube.length>0 ) {  // vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
+            boolean reform= true; 
             for ( int i=1; i<qube.length; i++ ) {
                 if ( qube[i]!=1 ) {
                     reform= false;
