@@ -49,6 +49,7 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.ReferenceCache;
+import org.virbo.dsops.CoerceUtil;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 
@@ -378,6 +379,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
                     String sparm= w.substring(0,ieq);
                     QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, null );
+                    parm= Ops.reform(parm); // TODO: Nasty kludge why did we see it in the first place vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN&where=range__C4_CP_FGM_SPIN.eq(3)
                     QDataSet r;
                     Datum d;
                     if ( parm.rank()==2 ) {
@@ -411,6 +413,11 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     } else {
                         throw new IllegalArgumentException("param is rank>2");
                     }
+                    if ( parm.rank()<result.rank() ) {
+                        QDataSet[] operands= new QDataSet[2];
+                        CoerceUtil.coerce( result, parm, false, operands );
+                        parm= operands[1];
+                    }                    
                     if ( parm.rank()>1 ) {
                         if ( op.equals("gt" ) ){
                             r= Ops.where( Ops.le( parm,d ) );
