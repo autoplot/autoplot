@@ -187,8 +187,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
     }
 
     /**
-     * show the datumRange requested by selecting it.  If the datum range is
-     * within a gap, then select the range immediately following.
+     * show the datumRange requested by selecting it.  The range that intersects is selected.
+     * If the datum range is within a gap in time, then select the time range immediately following.
      * 
      * @param ds
      */
