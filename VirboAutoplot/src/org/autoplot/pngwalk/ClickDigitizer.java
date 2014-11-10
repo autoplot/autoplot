@@ -142,7 +142,7 @@ public class ClickDigitizer {
                   units.parse(axis.getString("max")) );
             
         }
-        double nn= ( p - axis.getInt(smaller) ) / ((double) ( axis.getInt(bigger) - axis.getInt(smaller) ) );
+        double nn= ( ( p + 0.5 ) - axis.getInt(smaller) ) / ((double) ( axis.getInt(bigger) - axis.getInt(smaller) ) );
         
         Datum result;
         if ( log ) {
@@ -363,8 +363,8 @@ public class ClickDigitizer {
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
         File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
         String json= getJSONMetadata( file );
-        QDataSet ds1= doTransformPoint(json, p.x-1, p.y-1 );
-        QDataSet ds2= doTransformPoint(json, p.x+1, p.y+1 );
+        QDataSet ds1= doTransformPoint(json, p.x-2, p.y-2 );
+        QDataSet ds2= doTransformPoint(json, p.x+2, p.y+2 );
         if ( ds1==null ) return -1;
         
         DatumRange xrange= DatumRangeUtil.union( DataSetUtil.asDatum(ds1.slice(0)), DataSetUtil.asDatum(ds2.slice(0)) );
