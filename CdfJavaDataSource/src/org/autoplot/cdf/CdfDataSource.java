@@ -48,10 +48,12 @@ import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.ReplicateDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.ReferenceCache;
+import org.virbo.dsops.CoerceUtil;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 
@@ -388,6 +390,7 @@ public class CdfDataSource extends AbstractDataSource {
                     if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
                     String sparm= w.substring(0,ieq);
                     QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, null );
+                    parm= Ops.reform(parm); // TODO: Nasty kludge why did we see it in the first place vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN&where=range__C4_CP_FGM_SPIN.eq(3)
                     QDataSet r;
                     Datum d;
                     if ( parm.rank()==2 ) {
@@ -417,6 +420,11 @@ public class CdfDataSource extends AbstractDataSource {
                     } else {
                         throw new IllegalArgumentException("param is rank>2");
                     }
+                    if ( parm.rank()<result.rank() ) {
+                        QDataSet[] operands= new QDataSet[2];
+                        CoerceUtil.coerce( result, parm, false, operands );
+                        parm= operands[1];
+                    }
                     if ( parm.rank()>1 ) {
                         if ( op.equals("gt" ) ){
                             r= Ops.where( Ops.le( parm,d ) );
@@ -444,31 +452,31 @@ public class CdfDataSource extends AbstractDataSource {
                         }
                     } else if ( parm.rank()<2 ) {
                         if ( op.equals("gt" ) ){
-                        r= Ops.where( Ops.gt( parm,d ) );
-                    } else if ( op.equals("lt") ) {
-                        r= Ops.where( Ops.lt( parm,d ) );
-                    } else if ( op.equals("eq") ) {
-                        r= Ops.where( Ops.eq( parm,d ) );
-                    } else if ( op.equals("ne") ) {
-                        r= Ops.where( Ops.ne( parm,d ) );
-                    } else {
-                            throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
-                    }
-                    if ( r.length()==0 ) {
-                        throw new NoDataInIntervalException("'where' argument removes all data");
-                    } else {
-                        result= DataSetOps.applyIndex( result, 0, r, true );
-                        // check to see if rank 2 depend can now be rank 1.  This might be the reason we used where...
-                        for ( int ii=1; ii<result.rank(); ii++ ) {
-                            String sdep= "DEPEND_"+ii;
-                            QDataSet dep= (QDataSet) result.property(sdep);
-                            if ( dep!=null && dep.rank()==2 && DataSetUtil.isConstant(dep) ) {
-                                result.putProperty(sdep,dep.slice(0) );
+                            r= Ops.where( Ops.gt( parm,d ) );
+                        } else if ( op.equals("lt") ) {
+                            r= Ops.where( Ops.lt( parm,d ) );
+                        } else if ( op.equals("eq") ) {
+                            r= Ops.where( Ops.eq( parm,d ) );
+                        } else if ( op.equals("ne") ) {
+                            r= Ops.where( Ops.ne( parm,d ) );
+                        } else {
+                                throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
+                        }
+                        if ( r.length()==0 ) {
+                            throw new NoDataInIntervalException("'where' argument removes all data");
+                        } else {
+                            result= DataSetOps.applyIndex( result, 0, r, true );
+                            // check to see if rank 2 depend can now be rank 1.  This might be the reason we used where...
+                            for ( int ii=1; ii<result.rank(); ii++ ) {
+                                String sdep= "DEPEND_"+ii;
+                                QDataSet dep= (QDataSet) result.property(sdep);
+                                if ( dep!=null && dep.rank()==2 && DataSetUtil.isConstant(dep) ) {
+                                    result.putProperty(sdep,dep.slice(0) );
+                                }
                             }
                         }
                     }
                 }
-            }
             }
                         
             if ( !doDep ) {
