@@ -11,11 +11,13 @@
 
 package org.autoplot.pngwalk;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
@@ -69,12 +71,16 @@ import org.das2.components.DataPointRecorder;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.dataset.DataSetUpdateEvent;
 import org.das2.dataset.DataSetUpdateListener;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.TimeDatumFormatter;
+import org.das2.event.DataPointSelectionEvent;
+import org.das2.event.DataPointSelectionListener;
 import org.das2.util.ArgumentList;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
@@ -1262,6 +1268,15 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
                        if ( v instanceof SinglePngWalkView ) {
                            v.repaint();
                         }
+                    }
+                }
+            });
+            digitizer.addDataPointSelectionListener( new DataPointSelectionListener() {
+                @Override
+                public void dataPointSelected(DataPointSelectionEvent e) {
+                    Datum x= e.getX();
+                    if ( UnitsUtil.isTimeLocation( x.getUnits() ) ) {
+                        seq.gotoSubrange( new DatumRange( x,x ) );
                     }
                 }
             });
