@@ -957,6 +957,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                    actionButtons.get(i).setActionCommand(actionCommand+" "+item);
                 }
             }
+            firePropertyChange( PROP_SELECTED_NAME, null, seq.getSelectedName() );
             if (qcPanel != null && seq.getQualityControlSequence()!=null ) {
                 qcPanel.displayRecord( seq.getQualityControlSequence().getQualityControlRecord( seq.getIndex() ));
             }
@@ -1349,6 +1350,32 @@ public final class PngWalkTool extends javax.swing.JPanel {
     public String getSelectedFile() {
         if ( seq==null ) return null;
         return DataSetURI.fromUri( seq.currentImage().getUri() );
+    }
+
+    public static final String PROP_SELECTED_NAME = "selectedName";
+
+    /**
+     * return the name of the current selection, which is just the globbed or aggregated part of the names.
+     * This is introduced to support tying two pngwalks together.
+     * @return the name of the currently selected file.
+     */
+    public String getSelectedName() {
+        return seq.getSelectedName();
+    }
+
+    /**
+     * set the name of the file to select, which is just the globber or aggregated part of the name.  For example, 
+     * if getTemplate is file:/tmp/$Y$m$d.gif, then the setSelectedName might be 20141111.gif.  If the name is not found in the 
+     * pngwalk, then this has no effect.
+     * @param name the new name
+     */
+    public void setSelectedName(String name) {
+        String oldName= getSelectedName();
+        int i= seq.findIndex( name );
+        if ( i!=-1 ) {
+            seq.setIndex(i);
+        }
+        firePropertyChange( PROP_SELECTED_NAME, oldName, name );
     }
 
     DataSetSelector getSelector() {

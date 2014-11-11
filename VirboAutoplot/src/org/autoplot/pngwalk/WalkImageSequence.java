@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static org.autoplot.pngwalk.WalkUtil.splitIndex;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
@@ -605,6 +606,42 @@ public class WalkImageSequence implements PropertyChangeListener  {
                     + loadingCount + " are loading and "+ thumbLoadingCount + " thumbs are loading.");
         }
         
+    }
+
+    /**
+     * returns the index of the name, or -1 if the name is not found.  This is not the full 
+     * filename, but instead just the part of the name within the walk.  For example,
+     * For example if getTemplate is file:/tmp/$Y$m$d.gif, then the setSelectedName might be 20141111.gif.  
+     * @param name the file name.
+     * @return the index, or -1 if the name is not found.
+     */
+    int findIndex( String name ) {
+        for ( int i=0; i<existingImages.size(); i++ ) {
+            WalkImage img= existingImages.get(i);
+            if ( img.getUri().toString().endsWith(name) ) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * return the name of the selected image.  This is not the full 
+     * filename, but instead just the part of the name within the walk.  For example,
+     * For example if getTemplate is file:/tmp/$Y$m$d.gif, then the setSelectedName might be 20141111.gif.  
+     * @return the name of the selected image.
+     */
+    public String getSelectedName() {
+        WalkImage img= existingImages.get( getIndex() );
+        String surl= img.getUri().toString();
+        
+        int i = surl.indexOf('?');
+
+        String sansArgs = i == -1 ? surl : surl.substring(0, i);
+
+        i = splitIndex(sansArgs);
+        String spec= sansArgs.substring(i+1);        
+        return spec;
     }
 
 }
