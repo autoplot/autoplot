@@ -101,7 +101,7 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.DefaultEditorKit;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.autoplot.pngwalk.CreatePngWalk;
-import org.autoplot.pngwalk.PngWalkTool1;
+import org.autoplot.pngwalk.PngWalkTool;
 import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.Datum;
@@ -479,7 +479,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     DataSetSelector source= (DataSetSelector)ev.getSource();
                     source.showFileSystemCompletions( true, false, "[^\\s]+(\\.(?i)(jpg|png|gif))$" ); // we can't easily search for .pngwalk here because of inclfiles
                 } else {
-                    PngWalkTool1.start( pngwalk, AutoplotUI.this);
+                    PngWalkTool.start( pngwalk, AutoplotUI.this);
                     applicationModel.addRecent(dataSetSelector.getValue());
                 }
             }
@@ -499,7 +499,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 org.das2.util.LoggerManager.logGuiEvent(ev);                
                 applicationModel.addRecent(dataSetSelector.getValue());
                 String pngwalk= dataSetSelector.getValue();
-                PngWalkTool1.start( pngwalk, AutoplotUI.this);
+                PngWalkTool.start( pngwalk, AutoplotUI.this);
             }
         });
         dataSetSelector.registerActionTrigger( ".*(\\*).*\\.(png|jpg|gif)", new AbstractAction( "pngwalk") {
@@ -508,7 +508,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 org.das2.util.LoggerManager.logGuiEvent(ev);                
                 applicationModel.addRecent(dataSetSelector.getValue());
                 String pngwalk= dataSetSelector.getValue();
-                PngWalkTool1.start( pngwalk, AutoplotUI.this);
+                PngWalkTool.start( pngwalk, AutoplotUI.this);
             }
         });
         
@@ -3238,7 +3238,7 @@ private void autoplotHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt)
 
 private void pngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pngWalkMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
-   PngWalkTool1.start( null, this);
+    PngWalkTool.start( null, this);
 }//GEN-LAST:event_pngWalkMenuItemActionPerformed
 
 private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createPngWalkMenuItemActionPerformed
@@ -3700,7 +3700,7 @@ private void updateFrameTitle() {
         
         if ( suri!=null && ( suri.startsWith("pngwalk:") || suri.endsWith(".pngwalk") || suri.contains(".pngwalk?") ) ) {
             //TODO: check other prefixes...
-            PngWalkTool1.start( suri, app );
+            PngWalkTool.start( suri, app );
             app.applicationModel.addRecent(app.dataSetSelector.getValue());
             return;
         }
