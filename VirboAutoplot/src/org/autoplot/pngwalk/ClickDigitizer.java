@@ -23,6 +23,7 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
+import org.das2.util.ImageUtil;
 import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -214,7 +215,7 @@ public class ClickDigitizer {
     protected void doLookupMetadata( int x, int y ) throws IOException, ParseException {
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
         File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
-        String json= getJSONMetadata( file );
+        String json= ImageUtil.getJSONMetadata( file );
         if ( json!=null ) {
             try {
                 JSONObject jo = new JSONObject( json );
@@ -269,6 +270,15 @@ public class ClickDigitizer {
         
     }
 
+    /**
+     * 
+     * @param json null or the JSON
+     * @param x x in the canvas frame.
+     * @param y y in the canvas frame.
+     * @return rank 1 bundle x,y.
+     * @throws IOException
+     * @throws ParseException 
+     */
     private QDataSet doTransformPoint( String json, int x, int y ) throws IOException, ParseException {
 
         if ( json!=null ) {
@@ -306,7 +316,7 @@ public class ClickDigitizer {
     QDataSet doTransform() throws IOException {
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
         File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
-        String json= getJSONMetadata( file );
+        String json= ImageUtil.getJSONMetadata( file ); // json might be null after
         QDataSet ds = viewer.digitizer.getDataSet();
         if ( ds==null ) return null;
         if ( ds.length()==0 ) return null;
@@ -362,7 +372,7 @@ public class ClickDigitizer {
         
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
         File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
-        String json= getJSONMetadata( file );
+        String json= ImageUtil.getJSONMetadata( file );
         QDataSet ds1= doTransformPoint(json, p.x-2, p.y-2 );
         QDataSet ds2= doTransformPoint(json, p.x+2, p.y+2 );
         if ( ds1==null ) return -1;
