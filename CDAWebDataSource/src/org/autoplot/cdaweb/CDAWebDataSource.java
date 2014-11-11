@@ -29,6 +29,7 @@ import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
+import org.virbo.cdf.CdfJavaDataSource;
 import org.virbo.cdf.CdfVirtualVars;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
@@ -236,8 +237,16 @@ public class CDAWebDataSource extends AbstractDataSource {
                             file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
                         }
                         logger.log( Level.FINE, "loading {0}", file1);
-                        CdfDataSource dataSource= (CdfDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
-                        ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
+                        //CdfDataSource dataSource= (CdfDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
+                        DataSource dss=  cdfFileDataSourceFactory.getDataSource( file1 );
+                        if ( dss instanceof CdfJavaDataSource ) {
+                            CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 ); //TODO: bug1286 remove me
+                            ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
+                        } else {
+                            CdfDataSource dataSource= (CdfDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
+                            ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
+                        }
+                        
                     }
                 } catch ( NoDataInIntervalException ex ) {
                     // thrown by where clause...
