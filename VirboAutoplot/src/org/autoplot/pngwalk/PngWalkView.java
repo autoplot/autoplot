@@ -164,14 +164,14 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
             public void actionPerformed(ActionEvent e) {
                 if ( PngWalkView.this.seq==null ) return;
                 String file= DataSetURI.fromUri( seq.currentImage().getUri() );
-                PngWalkTool1.saveLocalCopy(PngWalkView.this,file);
+                PngWalkTool.saveLocalCopy(PngWalkView.this,file);
             }
         } ) );
         m.add( new JMenuItem( new AbstractAction( "Copy to clipboard..." ) {
             public void actionPerformed(ActionEvent e) {
                 if ( PngWalkView.this.seq==null ) return;
                 String file= DataSetURI.fromUri( seq.currentImage().getUri() );
-                PngWalkTool1.copyToClipboard(PngWalkView.this,file);
+                PngWalkTool.copyToClipboard(PngWalkView.this,file);
             }
         } ) );
         
@@ -226,7 +226,7 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
             int cy = ypos + ys + fm.getHeight();
             g2.drawString(caption, cx, cy);
         }
-        if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+        if (PngWalkTool.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
             paintQualityControlIcon( seq.getIndex(), g2, xpos, ypos, true );
         }
         return new Rectangle( xpos, ypos, xs, ys );

@@ -307,7 +307,7 @@ public class RowPngWalkView extends PngWalkView {
                 int imgX = i * cellSize + (cellSize - thumb.getWidth()) / 2;
                 int imgY = (cellSize - thumb.getHeight() - fm.getHeight()) / 2;
                 g2.drawImage(thumb, imgX , imgY, null);
-                if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+                if (PngWalkTool.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
                     paintQualityControlIcon( i, g2, imgX, imgY, true );
                 }
                 int ds=6;

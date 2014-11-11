@@ -255,7 +255,7 @@ public class ContextFlowView extends PngWalkView {
 
                 g.drawImage(cacheImage, bounds.x, bounds.y, this);
                 //g.draw(op.getOutline(bounds.x, bounds.y));
-                if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+                if (PngWalkTool.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
                     //System.err.println(bounds);
                     paintQualityControlIcon( index, g, bounds.x + bounds.width/2 - 4, bounds.y-10, false );
                 }
@@ -309,7 +309,7 @@ public class ContextFlowView extends PngWalkView {
                         0., true);
                 g.drawImage(image, op, bounds.x, bounds.y);
                 //lastImage = image;
-                if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+                if (PngWalkTool.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
                     paintQualityControlIcon( index, g, bounds.x, bounds.y, true );
                 }
                 maybeTimeStamp(g, bounds, seq.imageAt(index).getCaption());
@@ -330,7 +330,7 @@ public class ContextFlowView extends PngWalkView {
                 //g.draw(op.getOutline(bounds.x, bounds.y));
                 //if (usedLastImage) drawMomentStr(g, bounds);
 
-                if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+                if (PngWalkTool.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
                     paintQualityControlIcon( index, g, bounds.x + bounds.width/2 - 4, bounds.y - 10, false );
                 }
             }

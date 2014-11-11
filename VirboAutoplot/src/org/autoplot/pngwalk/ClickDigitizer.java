@@ -44,13 +44,13 @@ public class ClickDigitizer {
     
     //WalkImageSequence seq;
     PngWalkView view;
-    PngWalkTool1 viewer;
+    PngWalkTool viewer;
     
     public ClickDigitizer( PngWalkView view ) {
         this.view= view;
     }
     
-    void setViewer( PngWalkTool1 viewer ) {
+    void setViewer( PngWalkTool viewer ) {
         this.viewer= viewer;
     }
     

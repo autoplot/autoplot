@@ -64,7 +64,7 @@ public class QualityControlSequence {
     }
 
     public QualityControlRecord getQualityControlRecord(int forIndex) {
-        if (!PngWalkTool1.isQualityControlEnabled()) {
+        if (!PngWalkTool.isQualityControlEnabled()) {
             throw new IllegalStateException();
         }
         QualityControlRecord rec;

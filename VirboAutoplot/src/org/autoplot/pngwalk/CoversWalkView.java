@@ -301,7 +301,7 @@ public class CoversWalkView extends PngWalkView  {
                 int imgX= i * cellWidth + (cellWidth - thumb.getWidth()) / 2;
                 int imgY= (cellSize - thumb.getHeight()) / 2;
                 g2.drawImage(thumb, imgX, imgY, null);
-                if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+                if (PngWalkTool.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
                     paintQualityControlIcon( i, g2, imgX, imgY, cellSize>300 );
                 }
             }

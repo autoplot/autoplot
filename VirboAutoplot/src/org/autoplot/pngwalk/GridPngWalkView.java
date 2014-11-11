@@ -402,7 +402,7 @@ public class GridPngWalkView extends PngWalkView {
                     int imgY= row * thumbSize + (thumbSize - thumb.getHeight() - fm.getHeight()) / 2;
                     g2.drawImage(thumb, imgX, imgY, null);
 
-                    if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+                    if (PngWalkTool.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
                         paintQualityControlIcon( i, g2, imgX, imgY, true );
                     }
 

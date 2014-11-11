@@ -112,7 +112,7 @@ import org.xml.sax.SAXException;
  * 
  * @author jbf
  */
-public final class PngWalkTool1 extends javax.swing.JPanel {
+public final class PngWalkTool extends javax.swing.JPanel {
     private static boolean ENABLE_QUALITY_CONTROL;
     private QualityControlPanel qcPanel=null;
 
@@ -150,7 +150,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         DataSetURI.init();  // for FtpFileSystem implementation
 
         System.err.println("autoplot pngwalk 20141111");
-        final ArgumentList alm = new ArgumentList("PngWalkTool1");
+        final ArgumentList alm = new ArgumentList("PngWalkTool");
         alm.addOptionalSwitchArgument("nativeLAF", "n", "nativeLAF", alm.TRUE, "use the system look and feel (T or F)");
         alm.addOptionalSwitchArgument( "mode", "m", "mode", "filmStrip", "initial display mode: grid, filmStrip, covers, contextFlow, etc");
         alm.addOptionalSwitchArgument( "goto", "g", "goto", "", "start display at the beginning of this range, e.g. 2010-01-01" );
@@ -186,7 +186,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         //final String template= "file:///net/spot3/home/jbf/fun/pics/20080315_tenerife_masca_hike/IMG_.*.JPG";
         //final String template= "http://www.swpc.noaa.gov/ftpdir/lists/hpi/plots/pmap_$Y_$m_$d_...._S_.*_.*_.*_.*.gif";
 
-        PngWalkTool1 pngWalkTool= start( template, null );
+        PngWalkTool pngWalkTool= start( template, null );
 
         pngWalkTool.processArguments(alm);
 
@@ -235,9 +235,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         SwingUtilities.invokeLater(run);
     }
     
-    public static PngWalkTool1 start( String template, final Window parent ) {
+    public static PngWalkTool start( String template, final Window parent ) {
 
-        final PngWalkTool1 tool = new PngWalkTool1();
+        final PngWalkTool tool = new PngWalkTool();
 
         if ( template!=null ) {
             if ( template.endsWith(".pngwalk") ) {
@@ -287,7 +287,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         Util.loadRecent( "pngwalkRecent", tool.dataSetSelector1, deft );
 
 
-        PngWalkTool1.ActionEnabler enabler= new PngWalkTool1.ActionEnabler() {
+        PngWalkTool.ActionEnabler enabler= new PngWalkTool.ActionEnabler() {
             public boolean isActionEnabled(String filename) {
                 String s = filename;
                 String template = tool.getTemplate();
@@ -444,8 +444,8 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
      * save a copy of the current selection to a local disk.
      */
     protected static void saveLocalCopy( Component parent, String ssrc ) {
-        Preferences prefs = Preferences.userNodeForPackage(PngWalkTool1.class);
-        String srecent = prefs.get( PngWalkTool1.PREF_RECENT, System.getProperty("user.home") );
+        Preferences prefs = Preferences.userNodeForPackage(PngWalkTool.class);
+        String srecent = prefs.get( PngWalkTool.PREF_RECENT, System.getProperty("user.home") );
         if ( ssrc==null ) {
             JOptionPane.showMessageDialog( parent, "No image is selected." );
             return;
@@ -463,7 +463,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         chooser.setSelectedFile( new File( chooser.getCurrentDirectory(), src.getName() ) );
         int r= chooser.showSaveDialog(parent);
         if ( r==JFileChooser.APPROVE_OPTION ) {
-            prefs.put( PngWalkTool1.PREF_RECENT, chooser.getSelectedFile().getParent() );
+            prefs.put( PngWalkTool.PREF_RECENT, chooser.getSelectedFile().getParent() );
             try {
                 if ( ! org.virbo.autoplot.Util.copyFile( src, chooser.getSelectedFile()) ) {
                     JOptionPane.showMessageDialog( parent, "<html>Unable to save image to: <br>" + chooser.getSelectedFile() );
@@ -562,7 +562,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         }
     }
 
-    private static JMenuBar createMenuBar( final PngWalkTool1 tool, final JFrame frame ) {
+    private static JMenuBar createMenuBar( final PngWalkTool tool, final JFrame frame ) {
         JMenuBar result= new JMenuBar();
         JMenu fileMenu= new JMenu("File");
 
@@ -790,7 +790,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
 
     /** Creates new form PngWalkTool */
-    public PngWalkTool1() {
+    public PngWalkTool() {
         initComponents();
         setNavButtonsEnabled(false);
         dataSetSelector1.setEnableDataSource(false);

@@ -546,7 +546,7 @@ public class CreatePngWalk {
                         SwingUtilities.invokeLater( new Runnable() {
                             @Override
                             public void run() {
-                                PngWalkTool1.start( st, ScriptContext.getViewWindow() );
+                                PngWalkTool.start( st, ScriptContext.getViewWindow() );
                             }
                         } );
                     } else if ( ScriptContext.getViewWindow() != null ) {

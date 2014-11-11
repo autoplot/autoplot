@@ -14,12 +14,12 @@ import java.awt.Window;
 public class PngWalkTool2 {
     
     public static PngWalkTool2 start( String template, final Window parent ) {
-        PngWalkTool1.start(template, parent);
+        PngWalkTool.start(template, parent);
         return null;
     }
 
     public static void main( String[] args ) {
-        PngWalkTool1.main(args);
+        PngWalkTool.main(args);
     }
 
 }
