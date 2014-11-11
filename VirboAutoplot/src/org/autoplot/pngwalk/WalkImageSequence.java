@@ -524,6 +524,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
     }
 
 
+    /**
+     * return the template representing the sequence.
+     * @return the template
+     */
     public String getTemplate() {
         return this.template;
     }
@@ -531,11 +535,18 @@ public class WalkImageSequence implements PropertyChangeListener  {
     protected String status = "idle";
     public static final String PROP_STATUS = "status";
 
+    /**
+     * get the current status
+     * @return 
+     */
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    /**
+     * set the current status
+     */
+    protected void setStatus(String status) {
         String oldStatus = this.status;
         this.status = status;
         pcs.firePropertyChange(PROP_STATUS, oldStatus, status);
@@ -615,7 +626,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * @param name the file name.
      * @return the index, or -1 if the name is not found.
      */
-    int findIndex( String name ) {
+    public int findIndex( String name ) {
         for ( int i=0; i<existingImages.size(); i++ ) {
             WalkImage img= existingImages.get(i);
             if ( img.getUri().toString().endsWith(name) ) {
