@@ -25,6 +25,8 @@
         to resolve old numbers.
         <p>Bugfixes (2014-11-07):</p>
         <ul>
+            <li>Back off new CDF library after some of the Hudson tests are failing.</li>
+            <li>CDF where supports rank 1 where with rank 2 data.</li>
             <li>script name appears in stack traces now, to aid in debugging</li>
             <li>Improve support for ordinal data in CDF where keyword.</li>
             <li>legend plot symbol for dotdash linestyle was barely visible.  Thanks Kristoff!</li>
@@ -67,7 +69,7 @@
         <p>Features:</p>
         <ul>
             <li>New Pure-Java CDF library is in production, improving speed and memory use</li>
-            <li>PNGWalkTool supports digitizing</li>
+            <li>PNGWalkTool supports digitizing, add jump to selected and white/black lines</li>
             <li>script parameter can now be relative path (e.g. --script=myscript.jy)</li>
             <li>addPlots(2,'below') in jython scripts</li>
             <li>any URI ending in .png .jpg or .gif that contains an asterisk is handled by the pngwalk tool</li>
