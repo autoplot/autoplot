@@ -11,13 +11,11 @@
 
 package org.autoplot.pngwalk;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
@@ -27,7 +25,6 @@ import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
@@ -101,7 +98,6 @@ import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.autoplot.bookmarks.Util;
 import org.virbo.autoplot.transferrable.ImageSelection;
-import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.FileSystemUtil;
@@ -139,11 +135,11 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
     static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
     private static final String RESOURCES= "/org/virbo/autoplot/resources/";
-    public static final Icon WARNING_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"warning-icon.png") );
-    public static final Icon ERROR_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"error-icon.png") );
-    public static final Icon BUSY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"spinner.gif") );
-    public static final Icon READY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"indProgress0.png") );
-    public static final Icon IDLE_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"idle-icon.png") );
+    private static final Icon WARNING_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"warning-icon.png") );
+    private static final Icon ERROR_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"error-icon.png") );
+    private static final Icon BUSY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"spinner.gif") );
+    private static final Icon READY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"indProgress0.png") );
+    private static final Icon IDLE_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"idle-icon.png") );
         
     int returnTabIndex=0; // index of the tab we left to look at the single panel view.  TODO: account for tear off.
 
@@ -153,7 +149,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         DataSetURI.init();  // for FtpFileSystem implementation
 
-        System.err.println("autoplot pngwalk 20140214");
+        System.err.println("autoplot pngwalk 20141111");
         final ArgumentList alm = new ArgumentList("PngWalkTool1");
         alm.addOptionalSwitchArgument("nativeLAF", "n", "nativeLAF", alm.TRUE, "use the system look and feel (T or F)");
         alm.addOptionalSwitchArgument( "mode", "m", "mode", "filmStrip", "initial display mode: grid, filmStrip, covers, contextFlow, etc");
@@ -173,14 +169,15 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             try {
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.log( Level.WARNING, e.getMessage(), e );
             }
         }
 
-        if (alm.getBooleanValue("qualityControl"))
+        if (alm.getBooleanValue("qualityControl")) {
             ENABLE_QUALITY_CONTROL = true;
-        else
+        } else {
             ENABLE_QUALITY_CONTROL = false;
+        }
 
         String template = alm.getValue("template"); // One Slash!!
         //final String template=  "file:/home/jbf/temp/product_$Y$m$d.png" ; // One Slash!!
@@ -214,12 +211,14 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         } catch (FileNotFoundException ex) {
             throw new IllegalArgumentException("File does not exist: "+template);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            logger.log( Level.WARNING, ex.getMessage(), ex );
             throw new RuntimeException(ex);
         } finally {
             try {
                 if ( in!=null ) in.close();
-            } catch ( IOException ex ) { }
+            } catch ( IOException ex ) { 
+                logger.log( Level.WARNING, ex.getMessage(), ex );
+            }
         }
         return template;
 
@@ -316,7 +315,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
 
         final String lap= "View in Autoplot";
 
-        tool.addFileAction( enabler, "autoplot", new AbstractAction(lap) {
+        tool.addFileAction( enabler, new AbstractAction(lap) {
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);                        
                 final String suri;
@@ -998,6 +997,10 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         prevSetButton.setEnabled(enabled);
     }
     
+    /**
+     * set the template which the PNGWalk Tool will display.
+     * @param template file template, like /tmp/$Y$m$d.png
+     */
     public void setTemplate( String template ) {
 
         if ( template.contains("%") && !template.contains("$") ) {
@@ -1026,7 +1029,7 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
             seq= null;
             setNavButtonsEnabled(false);
             if ( navMenu!=null ) navMenu.setEnabled(false);
-            ex.printStackTrace();
+            logger.log( Level.WARNING, ex.getMessage(), ex );
         }
 
         if ( oldseq!=null ) {
@@ -1313,6 +1316,9 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         boolean isActionEnabled( String filename );
     }
 
+    /**
+     * Enabler that returns true for local files.
+     */
     public static final ActionEnabler LOCAL_FILE_ENABLER = new ActionEnabler() {
         public boolean isActionEnabled( String filename ) {
             return DataSetURI.getResourceURI(filename).toString().startsWith("file:" );
@@ -1320,29 +1326,27 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
     };
 
     transient List<ActionEnabler> actionEnablers= new ArrayList<ActionEnabler>();
-    List<String> actionCommands= new ArrayList<String>();
     List<JButton> actionButtons= new ArrayList<JButton>();
 
     /**
-     * Add a file action button to the GUI.
-     * @param match
-     * @param actionCommand
-     * @param abstractAction
-     */
-    public void addFileAction( ActionEnabler match, String actionCommand, Action abstractAction ) {
+     * Add a file action button to the GUI.  
+     * @param match returns true when the action can be applied to the current image.
+     * @param abstractAction the action.
+     * @see #LOCAL_FILE_ENABLER which returns true for local files.
+     */    
+    public void addFileAction( ActionEnabler match, Action abstractAction ) {
         this.actionEnablers.add( match );
-        this.actionCommands.add( actionCommand );
         JButton b= new JButton( abstractAction );
         this.actionButtons.add( b );
         actionButtonsPanel.add( b );
         this.revalidate();
     }
-
+    
     /**
-     * returns the current selection, or null if no sequence has been selected.
-     * @return
+     * returns the current selection, which may be a URL on a remote site, or null if no sequence has been selected.
+     * @return the current selection.
      */
-    String getSelectedFile() {
+    public String getSelectedFile() {
         if ( seq==null ) return null;
         return DataSetURI.fromUri( seq.currentImage().getUri() );
     }
@@ -1351,6 +1355,10 @@ public final class PngWalkTool1 extends javax.swing.JPanel {
         return this.dataSetSelector1;
     }
 
+    /**
+     * return true of the quality control panel is enabled.
+     * @return return true of the quality control panel is enabled.
+     */
     public static boolean isQualityControlEnabled() {
         return ENABLE_QUALITY_CONTROL;
     }
