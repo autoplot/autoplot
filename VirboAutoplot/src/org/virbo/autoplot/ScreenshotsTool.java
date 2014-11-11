@@ -52,6 +52,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import org.autoplot.pngwalk.PngWalkTool;
 import org.autoplot.pngwalk.PngWalkTool1;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.LoggerManager;
@@ -693,7 +694,7 @@ public class ScreenshotsTool extends EventQueue {
 
                 }
             }
-            PngWalkTool1 tool= PngWalkTool1.start( "file:"+outLocationFolder+ "/*.png", null );
+            PngWalkTool tool= PngWalkTool.start( "file:"+outLocationFolder+ "/*.png", null );
             if ( !tool.isQualityControlEnabled() ) {
                 tool.startQC();
             }
