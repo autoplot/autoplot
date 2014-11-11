@@ -6,11 +6,18 @@
 
 package org.virbo.filters;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.List;
+import org.das2.datum.Units;
+import static org.das2.datum.Units.getAllUnits;
+
+
 /**
  *
  * @author mmclouth
  */
-public class ReducexFilterEditorPanel extends javax.swing.JPanel {
+public class ReducexFilterEditorPanel extends AbstractFilterEditorPanel {
 
     /**
      * Creates new form ReducexFilterEditorPanel
@@ -29,15 +36,18 @@ public class ReducexFilterEditorPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox();
+        scalarTF = new javax.swing.JTextField();
+        unitsCB = new javax.swing.JComboBox();
 
         jLabel1.setText("Reduce data to intervals of:  ");
 
-        jTextField1.setText("1");
-        jTextField1.setPreferredSize(new java.awt.Dimension(30, 27));
+        scalarTF.setText("1");
+        scalarTF.setPreferredSize(new java.awt.Dimension(30, 27));
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        unitsCB.setEditable(true);
+        List<Units> units = getAllUnits();
+        String[] array = units.toArray(new String[units.size()]);
+        unitsCB.setModel(new javax.swing.DefaultComboBoxModel(array));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -47,9 +57,9 @@ public class ReducexFilterEditorPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(scalarTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(unitsCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -58,16 +68,34 @@ public class ReducexFilterEditorPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
-                    .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(scalarTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(unitsCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public javax.swing.JComboBox jComboBox1;
     public javax.swing.JLabel jLabel1;
-    public javax.swing.JTextField jTextField1;
+    public javax.swing.JTextField scalarTF;
+    public javax.swing.JComboBox unitsCB;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void setFilter(String filter) {
+        Pattern p= Pattern.compile("\\|reducex\\('(\\d+)\\s(\\w+)'\\)");
+        Matcher m= p.matcher(filter);
+        if ( m.matches() ) {
+            scalarTF.setText(m.group(1));
+            unitsCB.setSelectedItem(m.group(2));
+        } else {
+            scalarTF.setText("1");
+            unitsCB.setSelectedItem("hr");
+        }
+    }
+
+    @Override
+    public String getFilter() {
+        return "|reducex('" + scalarTF.getText() + " " + unitsCB.getSelectedItem() + "')";
+    }
 }
