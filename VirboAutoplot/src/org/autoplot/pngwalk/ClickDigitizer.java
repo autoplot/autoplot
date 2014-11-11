@@ -54,45 +54,7 @@ public class ClickDigitizer {
     void setViewer( PngWalkTool viewer ) {
         this.viewer= viewer;
     }
-    
-    /**
-     * return the node containing JSON metadata showing where the plots are.
-     * @param file the png file.
-     * @return null or the JSON describing the image.  See http://autoplot.org/developer.richPng
-     * @throws IOException 
-     */
-    private String getJSONMetadata( File file ) throws IOException {
-        ImageInputStream iis = ImageIO.createImageInputStream(file);
-        Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
-
-        if (readers.hasNext()) {
-
-            // pick the first available ImageReader
-            ImageReader reader = readers.next();
-
-            // attach source to the reader
-            reader.setInput(iis, true);
-
-            // read metadata of first image
-            IIOMetadata metadata = reader.getImageMetadata(0);
-            try {
-                IIOMetadataNode n= (IIOMetadataNode)metadata.getAsTree("javax_imageio_png_1.0");
-                NodeList nl= n.getElementsByTagName("tEXtEntry");
-                for ( int i=0; i<nl.getLength(); i++ ) {
-                    Element e= (Element)nl.item(i);
-                    String n3= e.getAttribute("keyword");
-                    if ( n3.equals("plotInfo") ) {
-                        return e.getAttribute("value");
-                    }
-                }
-            } catch ( IllegalArgumentException ex ) {
-                logger.log( Level.FINE, ex.getMessage() );
-                return null;
-            }
-        }
-        return null;
-    }
-    
+        
     private JSONObject getPlotContaining( JSONArray plots, int x, int y ) throws JSONException {
         for ( int i=0; i<plots.length(); i++ ) {
             JSONObject plot= plots.getJSONObject(i);
