@@ -11,9 +11,9 @@ import java.awt.Window;
  * Launcher for PngWalkTool1.  The "1" in PngWalkTool1 was to indicate it was provisional.  Now it's official.
  * @author jbf
  */
-public class PngWalkTool2 {
+public class PngWalkTool1 {
     
-    public static PngWalkTool2 start( String template, final Window parent ) {
+    public static PngWalkTool1 start( String template, final Window parent ) {
         PngWalkTool.start(template, parent);
         return null;
     }
