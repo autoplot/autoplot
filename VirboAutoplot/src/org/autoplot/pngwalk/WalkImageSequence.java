@@ -376,6 +376,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
         }
     }
 
+    /**
+     * return the active subrange of the sequence.  This is the portion of the pngwalk being used.
+     * @return the subrange of the sequence.
+     */
     public List<DatumRange> getActiveSubrange() {
         return subRange;
     }
@@ -383,8 +387,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
     /** Return the time range covered by this sequence.  This is the total range
      * of available images, not any currently displayed subrange.  Will be null
      * if no date template was used to create the sequence.
-     * TODO: Is this needed?
-     * @return
+     * @return the time range covered by this sequence.
      */
     public DatumRange getTimeSpan() {
         return timeSpan;
@@ -489,6 +492,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
         }
     }
 
+    /**
+     * return the number of images in the sequence.
+     * @return the number of images in the sequence.
+     */
     public int size() {
         return displayImages.size();
     }
