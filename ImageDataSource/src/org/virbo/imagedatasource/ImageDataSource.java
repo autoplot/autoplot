@@ -28,8 +28,11 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
+import org.das2.util.ImageUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -120,7 +123,7 @@ class ImageDataSource extends AbstractDataSource {
         
         BufferedImage image = ImageIO.read(ff);
         //BufferedImage image = ImageIO.read(DataSetURI.getInputStream(uri, mon));
-
+ 
         String rot= getParam( "rotate", "0" );
         if ( !rot.equals("0") ) {
 
@@ -261,6 +264,46 @@ class ImageDataSource extends AbstractDataSource {
             result.putProperty( QDataSet.DEPEND_1, yy );
         }
         
+        String plotInfo= getParam( "plotInfo", "" );
+        if ( !plotInfo.equals("") ) {
+            String json= ImageUtil.getJSONMetadata(ff);
+            if ( json!=null ) {
+                JSONObject jo = new JSONObject( json );
+                JSONArray plots= jo.getJSONArray("plots");
+                JSONObject plot= plots.getJSONObject( Integer.parseInt(plotInfo) );
+                
+                JSONObject x= plot.getJSONObject("xaxis");
+                QDataSet xx= Ops.findgen(result.length());
+                double dxmin= x.getDouble("min");
+                double dxmax= x.getDouble("max");
+                boolean xlog= x.has("type") && x.get("type").equals("log");
+                if ( xlog ) dxmin= Math.log10(dxmin);
+                if ( xlog ) dxmax= Math.log10(dxmax);
+                xx= Ops.subtract( xx, x.getDouble("left") );
+                xx= Ops.multiply( xx, ( dxmax-dxmin ) / ( x.getInt("right") -x.getInt("left") ) );
+                xx= Ops.add( xx, dxmin );
+                if ( xlog ) xx= Ops.exp10(xx);
+                ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,dxmin );
+                ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,dxmax );
+                result.putProperty( QDataSet.DEPEND_0, xx );
+
+                JSONObject y= plot.getJSONObject("yaxis");
+                QDataSet yy= Ops.findgen(result.length(0));
+                double dymin= y.getDouble("min");
+                double dymax= y.getDouble("max");
+                boolean ylog= y.has("type") && y.get("type").equals("log");
+                if ( ylog ) dymin= Math.log10(dymin);
+                if ( ylog ) dymax= Math.log10(dymax);
+                yy= Ops.subtract( yy, y.getDouble("top") );
+                yy= Ops.multiply( yy, ( dymax-dymin ) / ( y.getInt("bottom") -y.getInt("top") ) );
+                yy= Ops.add( yy, dymin );
+                if ( ylog ) yy= Ops.exp10(yy);
+                ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,dymin );
+                ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,dymax );
+                result.putProperty( QDataSet.DEPEND_1, yy );
+            }
+        }
+               
         mon.finished();
 
         return result;
