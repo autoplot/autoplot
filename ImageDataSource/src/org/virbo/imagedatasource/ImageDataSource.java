@@ -314,6 +314,8 @@ class ImageDataSource extends AbstractDataSource {
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,yrange.value(1) );
                 ((MutablePropertyDataSet)yy).putProperty( QDataSet.UNITS,yunits );
                 result.putProperty( QDataSet.DEPEND_1, yy );
+            } else {
+                throw new IllegalArgumentException("png contains no rich metadata.");
             }
         }
                
