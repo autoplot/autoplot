@@ -21,6 +21,7 @@ import java.awt.image.Kernel;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -28,14 +29,20 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
 import org.das2.util.ImageUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
@@ -273,9 +280,11 @@ class ImageDataSource extends AbstractDataSource {
                 JSONObject plot= plots.getJSONObject( Integer.parseInt(plotInfo) );
                 
                 JSONObject x= plot.getJSONObject("xaxis");
+                QDataSet xrange= getRange(x);
+                Units xunits= SemanticOps.getUnits(xrange);
+                double dxmin= xrange.value(0);
+                double dxmax= xrange.value(1);
                 QDataSet xx= Ops.findgen(result.length());
-                double dxmin= x.getDouble("min");
-                double dxmax= x.getDouble("max");
                 boolean xlog= x.has("type") && x.get("type").equals("log");
                 if ( xlog ) dxmin= Math.log10(dxmin);
                 if ( xlog ) dxmax= Math.log10(dxmax);
@@ -283,14 +292,17 @@ class ImageDataSource extends AbstractDataSource {
                 xx= Ops.multiply( xx, ( dxmax-dxmin ) / ( x.getInt("right") -x.getInt("left") ) );
                 xx= Ops.add( xx, dxmin );
                 if ( xlog ) xx= Ops.exp10(xx);
-                ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,dxmin );
-                ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,dxmax );
+                ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,xrange.value(0) );
+                ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,xrange.value(1) );
+                ((MutablePropertyDataSet)xx).putProperty( QDataSet.UNITS,xunits );
                 result.putProperty( QDataSet.DEPEND_0, xx );
 
                 JSONObject y= plot.getJSONObject("yaxis");
+                QDataSet yrange= getRange(y);
+                Units yunits= SemanticOps.getUnits(yrange);
                 QDataSet yy= Ops.findgen(result.length(0));
-                double dymin= y.getDouble("min");
-                double dymax= y.getDouble("max");
+                double dymin= yrange.value(0);
+                double dymax= yrange.value(1);
                 boolean ylog= y.has("type") && y.get("type").equals("log");
                 if ( ylog ) dymin= Math.log10(dymin);
                 if ( ylog ) dymax= Math.log10(dymax);
@@ -298,8 +310,9 @@ class ImageDataSource extends AbstractDataSource {
                 yy= Ops.multiply( yy, ( dymax-dymin ) / ( y.getInt("bottom") -y.getInt("top") ) );
                 yy= Ops.add( yy, dymin );
                 if ( ylog ) yy= Ops.exp10(yy);
-                ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,dymin );
-                ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,dymax );
+                ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,yrange.value(0) );
+                ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,yrange.value(1) );
+                ((MutablePropertyDataSet)yy).putProperty( QDataSet.UNITS,yunits );
                 result.putProperty( QDataSet.DEPEND_1, yy );
             }
         }
@@ -308,6 +321,31 @@ class ImageDataSource extends AbstractDataSource {
 
         return result;
 
+    }
+    
+    public QDataSet getRange( JSONObject axis ) throws JSONException, ParseException {
+        String sxmin= axis.getString("min");
+        String sxmax= axis.getString("max");
+        boolean xlog= axis.has("type") && axis.get("type").equals("log");
+        Units units;
+        
+        if ( axis.has("units") ) {
+            if ( axis.get("units").equals("UTC") ) {
+                units= Units.us2000;
+            } else {
+                units= Units.lookupUnits(axis.getString("units"));
+            } 
+        } else {
+            units= Units.dimensionless;
+        }
+        DatumRange result= DatumRangeUtil.union( units.parse(sxmin), units.parse(sxmax) );
+        QDataSet ds= DataSetUtil.asDataSet(result);
+        if ( xlog ) {
+            ds= Ops.putProperty( ds, QDataSet.SCALE_TYPE, "log" );
+        }
+        
+        return ds;
+                
     }
 
     public double[] tryParseArray( String s ) {
