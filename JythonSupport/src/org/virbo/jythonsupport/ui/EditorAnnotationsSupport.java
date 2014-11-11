@@ -23,6 +23,7 @@ import javax.swing.text.Element;
 import jsyntaxpane.components.Markers;
 import jsyntaxpane.components.Markers.SimpleMarker;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 import org.python.util.PythonInterpreter;
 
 /**
@@ -370,8 +371,14 @@ public class EditorAnnotationsSupport {
     public ExpressionLookup getForInterp( final PythonInterpreter interp ) {
         return new ExpressionLookup() {
             public PyObject lookup(String expr) {
-                PyObject po= interp.eval(expr);
-                return po;
+                try {
+                    PyObject po= interp.eval(expr);
+                    return po;
+                } catch ( Exception e ) {
+                    String msg= e.getMessage();
+                    if ( msg==null ) msg="";
+                    return new PyString("<html>highlite an expression<br>"+msg);
+                }
             }
         };
     }
