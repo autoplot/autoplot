@@ -309,11 +309,11 @@ public class CDAWebDB {
             }
             if ( url.startsWith("/tower3/private/cdaw_data/cluster_private/st") ) {  //get all the cluster stuff
                 url= "ftp://cdaweb.gsfc.nasa.gov/" + url.substring("/tower3/private/".length() );
-            }
+            }            
             String lookfor= "ftp://cdaweb.gsfc.nasa.gov/pub/";
             if ( url.startsWith(lookfor) ) {
-                url= "http://cdaweb.gsfc.nasa.gov/sp_phys/" + url.substring(lookfor.length());
-            }
+                url= "http://cdaweb.gsfc.nasa.gov/pub/" + url.substring(lookfor.length());
+            }            
             return url;
 
         } catch (XPathExpressionException ex) {
