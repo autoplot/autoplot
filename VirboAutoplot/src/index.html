@@ -23,19 +23,22 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-11-07):</p>
-        <ul>
+        <p>Bugfixes (2014-11-12):</p>
+        <ul> 
+            <li>rte_0253344792: catch code fragment unintentionally evaluated with highlite in Jython editor.  Thanks Kristoff!</li>
             <li>Back off new CDF library after some of the Hudson tests are failing.</li>
             <li>CDF where supports rank 1 where with rank 2 data.</li>
             <li>script name appears in stack traces now, to aid in debugging</li>
             <li>Improve support for ordinal data in CDF where keyword.</li>
+            <li>get completions only returns completions where plottable=true, so scripts can once again verify contents of CDF files.</li>
             <li>legend plot symbol for dotdash linestyle was barely visible.  Thanks Kristoff!</li>
             <li>das2server with stream defect could leave client in endless loop</li>
             <li>1284: round of cleanup with PNGWalkTool</li>
+            <li>1288: setDepend0Cadence supports join-of-qubes datasets</li>
             <li>bugfix: restore ctrl+mouse wheel pan behavior.</li>
             <li>bugfix in aggregation completion, where the path is not part of the completion.</li>
-            <li>rte_1930845582: xds.length()!=yds.length() in odd branch of SeriesRenderer guess cadence.</li>
-            <li>rte_1635938883: NullPointerException for new users when entering pngwalk</li>
+            <li>rte_1930845582: xds.length()!=yds.length() in odd branch of SeriesRenderer guess cadence. Thanks Jeremy!</li>
+            <li>rte_1635938883: NullPointerException for new users when entering pngwalk.  Thanks Chris!</li>
             <li>1281: linestyle settings not set properly for pngwalk, clone to new window </li>
             <li>1282: CDF LABL_PTR_2 when the data is rank 2</li>
             <li>NoDataInInterval exception on das2stream is treated the same as with QStreams.</li>
@@ -69,6 +72,9 @@
         <p>Features:</p>
         <ul>
             <li>ImageDataSource keyword plotInfo=1 leverages JSON metadata to extract plots from images with lost data or vap files.</li>
+            <li>Two PngWalkTools can be bound together to make comparisons of like filenames.</li>
+            <li>PngWalkTool1 is finally renamed PngWalkTool</li>
+            <li>SimpleServlet supports non-file resources like vap+inline, vap+jyds is disabled.</li>
             <li>New Pure-Java CDF library is in production, improving speed and memory use</li>
             <li>PNGWalkTool supports digitizing, add jump to selected and white/black lines</li>
             <li>script parameter can now be relative path (e.g. --script=myscript.jy)</li>
