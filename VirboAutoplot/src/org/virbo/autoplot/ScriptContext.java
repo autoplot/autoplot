@@ -47,6 +47,7 @@ import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.datum.InconvertibleUnitsException;
+import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
@@ -875,21 +876,48 @@ public class ScriptContext extends PyJavaInstance {
      * dom.getController().bind so that the vap will contain the binding.
      * 
      * Example:
+     *<blockquote><pre><small>{@code
      * model= getApplicationModel()
      * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
+     *}</small></pre></blockquote>
      * 
-     * @see ApplicationController.bind( DomNode src, String srcProp, Object dst, String dstProp), 
-     *    which will save the binding to a vap.
+     * @see org.virbo.autoplot.dom.ApplicationController#bind(org.virbo.autoplot.dom.DomNode, java.lang.String, java.lang.Object, java.lang.String) which will save the binding to a vap.
      * @param src java bean such as model.getPlotDefaults()
      * @param srcProp a property name such as "title"
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
      * @param dstProp a property name such as "label"
      */
     public static void bind( Object src, String srcProp, Object dst, String dstProp ) {
+        bind( src, srcProp, dst, dstProp, null );
+    }
+
+    /**
+     * binds two bean properties together.  Bindings are bidirectional, but
+     * the initial copy is from src to dst.  In MVC terms, src should be the model
+     * and dst should be a view.  The properties must fire property
+     * change events for the binding mechanism to work.
+     * 
+     * As of v2014a_10, if the src is a DomNode and a child of the application, then use
+     * dom.getController().bind so that the vap will contain the binding.
+     * 
+     * Example:
+     *<blockquote><pre><small>{@code
+     * model= getApplicationModel()
+     * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
+     *}</small></pre></blockquote>
+     * 
+     * @see org.virbo.autoplot.dom.ApplicationController#bind(org.virbo.autoplot.dom.DomNode, java.lang.String, java.lang.Object, java.lang.String, org.jdesktop.beansbinding.Converter) which will save the binding to a vap.
+     * @param src java bean such as model.getPlotDefaults()
+     * @param srcProp a property name such as "title"
+     * @param dst java bean such as model.getPlotDefaults().getXAxis()
+     * @param dstProp a property name such as "label"
+     * @param c converter for the binding, or null.
+     */    
+    public static void bind( Object src, String srcProp, Object dst, String dstProp, Converter c ) {
         if ( DasApplication.hasAllPermission() ) {
             if ( src instanceof DomNode && dom.getController().getElementById(((DomNode)src).getId())==src ) {
                 DomNode srcNode= (DomNode)src;
-                dom.getController().bind( srcNode, srcProp, dst, dstProp );
+                dom.getController().bind( srcNode, srcProp, dst, dstProp, c );
                 return;
             }
             BeanProperty srcbp= BeanProperty.create(srcProp);
@@ -901,13 +929,12 @@ public class ScriptContext extends PyJavaInstance {
             dstbp.setValue(dst, value );
             dstbp.getValue(dst);
             Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, srcbp, dst, dstbp );
+            if ( c!=null ) b.setConverter(c);
             b.bind();
         } else {
             System.err.println("bindings disabled in applet environment");
         }
     }
-
-
 
     /**
      * serializes the dataset to a QStream, a self-documenting, streaming format
