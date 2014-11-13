@@ -39,6 +39,7 @@ import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.dataset.SortDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
@@ -232,6 +233,32 @@ public final class AggregatingDataSource extends AbstractDataSource {
     }
     
     /**
+     * ensure that there are no non-monotonic or repeat records, by removing
+     * the first N-1 records of N repeated records.
+     * @param ds ArrayDataSet
+     * @return dataset, possibly with records removed.
+     */
+    private ArrayDataSet ensureMono( ArrayDataSet ds ) {
+        
+        QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+        if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(dep0) ) ) {
+            return ds;
+        }
+        QDataSet r= Ops.where( Ops.gt( dep0.trim(1,dep0.length()), dep0.trim(0,dep0.length()-1) ) );
+        int nrm= dep0.length()-1 - r.length();
+        if ( nrm>0 ) {
+            logger.log(Level.FINE, "ensureMono removes {0} points", nrm);
+            Class c= ds.getComponentType();
+            int[] idx= new int[r.length()+1];
+            for ( int i=0; i<r.length(); i++ ) idx[i]= (int)r.value(i);
+            idx[r.length()]= (int)dep0.length()-1;
+            ds= ArrayDataSet.copy( c, new SortDataSet( ds, Ops.dataset(idx) ) );
+        }
+        return ds;
+    }
+     
+    
+    /**
      * read the data.  This supports reference caching.
      * @param mon
      * @return
@@ -408,6 +435,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         ds1 = delegateDataSource.getDataSet(mon1);
                         if ( ds1==null ) continue;
                     }
+                    
                     QDataSet xds= SemanticOps.xtagsDataSet(ds1);
                     if ( xds!=null && UnitsUtil.isTimeLocation( SemanticOps.getUnits(xds) )) {
                         if ( SemanticOps.isJoin(xds) ) {
@@ -467,6 +495,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                 result = ArrayDataSet.copy(ds1);
                                 result.grow(result.length()*ss.length*11/10);  //110%
                             }
+                            result= ensureMono(result);
                         }
                         this.metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
                         cacheRange1 = dr1;
@@ -478,6 +507,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         } else {
                             assert result!=null;
                             ArrayDataSet ads1= ArrayDataSet.maybeCopy(result.getComponentType(),ds1);
+                            result= ensureMono(ads1);
                             try {
                                 if ( result.canAppend(ads1) ) {
                                     QDataSet saveAds1= ads1; // note these will be backed by the same data.
