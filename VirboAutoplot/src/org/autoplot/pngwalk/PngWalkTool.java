@@ -1360,7 +1360,11 @@ public final class PngWalkTool extends javax.swing.JPanel {
      * @return the name of the currently selected file.
      */
     public String getSelectedName() {
-        return seq.getSelectedName();
+        if ( seq.size()>0 ) {
+            return seq.getSelectedName();
+        } else {
+            return "";
+        }
     }
 
     /**
