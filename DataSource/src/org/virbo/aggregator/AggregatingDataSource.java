@@ -130,8 +130,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
     /**
      * check/ensure that no data overlaps from ads0 to ads1.  See 
      * rfe https://sourceforge.net/p/autoplot/feature-requests/391/
-     * @param slice
-     * @param ads1
+     * @param ads0 the first dataset that will be appended
+     * @param ads1 the second dataset that will be appended.
      * @return ads1, possibly trimmed.
      */
     private ArrayDataSet trimOverlap(QDataSet ads0, ArrayDataSet ads1) {
@@ -234,7 +234,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
     
     /**
      * ensure that there are no non-monotonic or repeat records, by removing
-     * the first N-1 records of N repeated records.
+     * the first N-1 records of N repeated records.  
+     * TODO: this doesn't look for overlapping yet monotonically increasing segments.
      * @param ds ArrayDataSet
      * @return dataset, possibly with records removed.
      */
