@@ -75,12 +75,46 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         logger.entering( CLASS_NAME, "getEditorFor", f );
         while ( f.startsWith("|") ) f= f.substring(1);
         FilterEditorPanel result;
-        if ( f.matches("slice\\d\\(.*\\)") ) {
-            result= new SliceFilterEditorPanel();
-        } else if ( f.matches("collapse\\d\\(\\)") ) {
+        if ( f.matches("add\\((.*)\\)") ) {
+            result= new AddFilterEditorPanel();
+        } else if ( f.matches("butterworth\\((\\d),(\\d+),(\\w+)\\)") ) {
+            result= new ButterworthFilterEditorPanel();
+        } else if ( f.matches("butterworth\\((\\d),(\\d+),(\\d+),(\\w+)\\)") ) {
+            result= new ButterworthFilterEditorPanel();
+        } else if ( f.matches("collapse(\\d)\\(\\)") ) {
             result= new CollapseFilterEditorPanel();
+        } else if ( f.matches("contour\\((.*)\\)") ) {
+            result= new ContourFilterEditorPanel();
+        } else if ( f.matches("cos\\(\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+            result= new NoArgFilterEditorPanel();
+        } else if ( f.matches("detrend\\((.*)\\)") ) {
+            result= new DetrendFilterEditorPanel();
+        } else if ( f.matches("divide\\((.*)\\)") ) {
+            result= new DivideFilterEditorPanel();
+        } else if ( f.matches("fftPower\\((\\d+),(\\d),'(\\w+)\\'\\)") ) {
+            result= new FftPowerFilterEditorPanel();
+        } else if ( f.matches("hanning\\((.*)\\)") ) {
+            result= new HanningFilterEditorPanel();
+        } else if ( f.matches("median\\((.*)\\)") ) {
+            result= new MedianFilterEditorPanel();
+        } else if ( f.matches("multiply\\((.*)\\)") ) {
+            result= new MultiplyFilterEditorPanel();
+        } else if ( f.matches("reducex\\('(\\d+)\\s(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+            result= new ReducexFilterEditorPanel();
+        } else if ( f.matches("setDepend0Cadence\\('(\\d+)(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+            result= new SetDepend0CadenceFilterEditorPanel();
+        } else if ( f.matches("setDepend0Units\\('(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+            result= new SetDepend0UnitsFilterEditorPanel();
+        } else if ( f.matches("setUnits\\('(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+            result= new SetUnitsFilterEditorPanel();
+        } else if ( f.matches("slice(\\d)\\((\\d+)\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+            result= new SliceFilterEditorPanel();
         } else if ( f.matches("smooth\\(\\d+\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SmoothFilterEditorPanel();
+        } else if ( f.matches("unbundle\\('(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+            result= new UnbundleFilterEditorPanel();
+        } else if ( f.matches("dbAboveBackgroundDim1\\((\\d+)\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+            result= new dbAboveBackgroundDim1FilterEditorPanel();
         } else {
             throw new IllegalArgumentException("filter editor not found.");
         }
@@ -214,7 +248,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         FiltersChainPanel ff= new FiltersChainPanel();
 
         QDataSet ds= getDataSet();
-        ff.setFilter("|slice0(2)|collapse1()|smooth(51)"); //butterworth(2,500,550,True)");
+        ff.setFilter("|slice0(2)|cos()|collapse1()|butterworth(2,500,750,True)"); //butterworth(2,500,550,True)");
         ff.setInput(ds);
         JOptionPane.showMessageDialog( null, ff );
         System.err.println(ff.getFilter());
