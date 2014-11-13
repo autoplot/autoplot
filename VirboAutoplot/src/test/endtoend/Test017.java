@@ -107,6 +107,7 @@ public class Test017 {
 
         //Autoplot gets confused about the escaping. "vap+das2server" turns into "vap das2server" and the das2Server file part is removed. This probably has something to do with its TimeSeriesBrowse capability.
 
+        // Autoranging fails here, look into this sometime:
         "006 vap+das2server:http://www-wbd.physics.uiowa.edu/das/das2Server?dataset=das2_1/cluster/wbd/r_wbd&start_time=2007-04-17T08:40Z&end_time=2007-04-17T08:50Z&spacecraft=c1&mode=DSN&antenna=Any&frequencyOffset=Any&fftSize=1024",
         //Fails to use log for z-axis:
 
