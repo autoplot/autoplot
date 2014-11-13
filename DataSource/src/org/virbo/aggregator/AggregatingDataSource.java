@@ -240,7 +240,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
      */
     private ArrayDataSet ensureMono( ArrayDataSet ds ) {
         
-        QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+        ArrayDataSet dep0= ArrayDataSet.maybeCopy( (QDataSet)ds.property(QDataSet.DEPEND_0) ); // I don't think this will copy.
         if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(dep0) ) ) {
             return ds;
         }
@@ -252,7 +252,10 @@ public final class AggregatingDataSource extends AbstractDataSource {
             int[] idx= new int[r.length()+1];
             for ( int i=0; i<r.length(); i++ ) idx[i]= (int)r.value(i);
             idx[r.length()]= (int)dep0.length()-1;
+            ds.putProperty( QDataSet.DEPEND_0, null );
             ds= ArrayDataSet.copy( c, new SortDataSet( ds, Ops.dataset(idx) ) );
+            Class depclass= dep0.getComponentType();
+            ds.putProperty( QDataSet.DEPEND_0, ArrayDataSet.copy( depclass, new SortDataSet( dep0, Ops.dataset(idx) ) ) );
         }
         return ds;
     }
@@ -507,7 +510,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         } else {
                             assert result!=null;
                             ArrayDataSet ads1= ArrayDataSet.maybeCopy(result.getComponentType(),ds1);
-                            result= ensureMono(ads1);
+                            ads1= ensureMono(ads1);
                             try {
                                 if ( result.canAppend(ads1) ) {
                                     QDataSet saveAds1= ads1; // note these will be backed by the same data.
