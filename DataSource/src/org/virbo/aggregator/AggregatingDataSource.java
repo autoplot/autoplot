@@ -126,6 +126,35 @@ public final class AggregatingDataSource extends AbstractDataSource {
     private TimeSeriesBrowse createTimeSeriesBrowse() {
         return new AggTimeSeriesBrowse();
     }
+    
+    /**
+     * It's easy for programs to mess up and contain timetags that are 24 hours off, so check that the
+     * tags are not more than 50% outside the bounds.
+     * @param bounds the expected bounds for the data
+     * @param ads0 the data which ought to be within these bounds.
+     * @return the dataset, possibly trimmed to exclude miscalculated times.
+     */
+    private ArrayDataSet checkBoundaries( DatumRange bounds, ArrayDataSet ads0 ) {
+        QDataSet dep0_0= (QDataSet) ads0.property(QDataSet.DEPEND_0);
+        if ( dep0_0==null && UnitsUtil.isTimeLocation(SemanticOps.getUnits(ads0) ) ) {
+            dep0_0= ads0;
+        } else if ( dep0_0==null ) {
+            return ads0;
+        }
+        if ( dep0_0.rank()!=1 ) return ads0;
+        int ist= 0;
+        while ( ist<dep0_0.length() && DatumRangeUtil.normalize( bounds, DataSetUtil.asDatum( dep0_0.slice(ist) ) ) < -0.5 ) ist++; // clip off krud at the beginning
+        int ien= ads0.length();
+        while ( ien>0 && DatumRangeUtil.normalize( bounds, DataSetUtil.asDatum( dep0_0.slice(ien-1) ) ) > 1.5 ) ien--;  // clip off krud at the end
+        
+        if ( ist>0 || ien<ads0.length() ) {
+            if ( ist>0 ) logger.log(Level.INFO, "trimming records 0-{0} to remove timetags outside the bounds.", new Object[] { (ist-1) } );
+            if ( ien<ads0.length() ) logger.log(Level.INFO, "trimming records {0}-{1} to remove timetags outside the bounds.", new Object[]{ien-1, ads0.length()-1});
+            return ArrayDataSet.maybeCopy( ads0.trim( ist,ien ) );
+        } else {
+            return ads0;
+        }
+    }
 
     /**
      * check/ensure that no data overlaps from ads0 to ads1.  See 
@@ -137,6 +166,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
     private ArrayDataSet trimOverlap(QDataSet ads0, ArrayDataSet ads1) {
         QDataSet dep0_0= (QDataSet) ads0.property(QDataSet.DEPEND_0);
         QDataSet dep0_1= (QDataSet) ads1.property(QDataSet.DEPEND_0);
+        if ( dep0_0==null && UnitsUtil.isTimeLocation(SemanticOps.getUnits(ads0) ) ) {
+            dep0_0= ads0;
+        }
+        if ( dep0_1==null && UnitsUtil.isTimeLocation(SemanticOps.getUnits(ads1 ) ) ) {
+            dep0_0= ads1;
+        }
         if ( dep0_0==null || dep0_1==null ) return ads1;
         if ( dep0_1.rank()>1 ) throw new IllegalArgumentException("expected rank 1 depend0");
         if ( Ops.gt( dep0_1.slice(0), dep0_0.slice(dep0_0.length()-1) ).value()==1 ) {
@@ -240,8 +275,13 @@ public final class AggregatingDataSource extends AbstractDataSource {
      * @return dataset, possibly with records removed.
      */
     private ArrayDataSet ensureMono( ArrayDataSet ds ) {
-        
-        ArrayDataSet dep0= ArrayDataSet.maybeCopy( (QDataSet)ds.property(QDataSet.DEPEND_0) ); // I don't think this will copy.
+        QDataSet sdep0= (QDataSet)ds.property(QDataSet.DEPEND_0);
+        if ( sdep0==null && UnitsUtil.isTimeLocation( SemanticOps.getUnits(ds) ) ) {
+            sdep0= ds;
+        } else if ( sdep0==null ) {
+            return ds;
+        }
+        ArrayDataSet dep0= ArrayDataSet.maybeCopy( sdep0 ); // I don't think this will copy.
         if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(dep0) ) ) {
             return ds;
         }
@@ -499,6 +539,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                 result = ArrayDataSet.copy(ds1);
                                 result.grow(result.length()*ss.length*11/10);  //110%
                             }
+                            result= checkBoundaries( dr1, result );
                             result= ensureMono(result);
                         }
                         this.metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
@@ -515,6 +556,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                             try {
                                 if ( result.canAppend(ads1) ) {
                                     QDataSet saveAds1= ads1; // note these will be backed by the same data.
+                                    ads1= checkBoundaries( dr1, ads1 );
                                     ads1= trimOverlap( result, ads1 );
                                     if ( ads1.length()!=saveAds1.length() ) {
                                         QDataSet saveDep0= (QDataSet) saveAds1.property(QDataSet.DEPEND_0);
