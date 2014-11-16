@@ -52,6 +52,7 @@ import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
+import org.virbo.filters.FiltersChainPanel;
 
 /**
  * PlotElement for controlling how data is handled.
@@ -920,15 +921,27 @@ public class DataPanel extends javax.swing.JPanel {
 }//GEN-LAST:event_fillValueComboBoxActionPerformed
 
     private void editComponentPanelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editComponentPanelActionPerformed
-        org.das2.util.LoggerManager.logGuiEvent(evt);                
-        FilterChainPanel p= new FilterChainPanel();
-        p.setFilters(componentTextField1.getText());
-        int ret= JOptionPane.showConfirmDialog( this, p, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
-        if ( ret==JOptionPane.OK_OPTION ) {
-            componentTextField1.setText( p.getFilters() );
-            applicationController.getPlotElement().setComponentAutomatically( componentTextField1.getText() );
-            recentComboBox.actionPerformed(evt); // kludge to get it to log the new filter
-            componentChanged();
+        org.das2.util.LoggerManager.logGuiEvent(evt);  
+        if ( true ) {
+            FilterChainPanel p= new FilterChainPanel();
+            p.setFilters(componentTextField1.getText());
+            int ret= JOptionPane.showConfirmDialog( this, p, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
+            if ( ret==JOptionPane.OK_OPTION ) {
+                componentTextField1.setText( p.getFilters() );
+                applicationController.getPlotElement().setComponentAutomatically( componentTextField1.getText() );
+                recentComboBox.actionPerformed(evt); // kludge to get it to log the new filter
+                componentChanged();
+            }
+        } else {        
+            FiltersChainPanel p= new FiltersChainPanel();
+            p.setFilter(componentTextField1.getText());
+            int ret= JOptionPane.showConfirmDialog( this, p, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
+            if ( ret==JOptionPane.OK_OPTION ) {
+                componentTextField1.setText( p.getFilter() );
+                applicationController.getPlotElement().setComponentAutomatically( componentTextField1.getText() );
+                recentComboBox.actionPerformed(evt); // kludge to get it to log the new filter
+                componentChanged();
+            }
         }
     }//GEN-LAST:event_editComponentPanelActionPerformed
 
