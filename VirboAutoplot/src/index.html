@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The PNGWalk Tool with recent cleanup including keybindings.</small></p>
+        <p><small>The legend icon for dashed lines failed to show the break because it was hiding behind the plot symbol.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,11 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-11-13):</p>
+        <p>Bugfixes (2014-11-17):</p>
         <ul> 
+            <li>Correction to the CDAWeb plugin URL used, thanks Tami!</li>
+            <li>aggregation works with ordinal data again.</li>
+            <li>reform just returns the dataset when there are no indeces with just one element, thanks Bill!</li>
             <li>minor corrections to d2s parsing when each plane has a name</li>
             <li>the result of aggregations will now always be monotonically increasing.</li>
             <li>rte_0253344792: catch code fragment unintentionally evaluated with highlite in Jython editor.  Thanks Kristoff!</li>
