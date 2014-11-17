@@ -141,6 +141,9 @@ public final class AggregatingDataSource extends AbstractDataSource {
         } else if ( dep0_0==null ) {
             return ads0;
         }
+        if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(dep0_0) ) ) {
+            return ads0;
+        }
         if ( dep0_0.rank()!=1 ) return ads0;
         int ist= 0;
         while ( ist<dep0_0.length() && DatumRangeUtil.normalize( bounds, DataSetUtil.asDatum( dep0_0.slice(ist) ) ) < -0.5 ) ist++; // clip off krud at the beginning
