@@ -449,7 +449,7 @@ public class ScriptPanelSupport {
                 }
 
                 boolean updateSurl = false;
-                if (file == null || FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) {
+                if ( panel.isDirty() && ( file == null || FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) ) {
                     if (getSaveFile() == JFileChooser.APPROVE_OPTION) {
                         updateSurl = true;
                     } else {
