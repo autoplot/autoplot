@@ -441,18 +441,24 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      */
     private static QDataSet getDataSet() {
         try {
-            MutablePropertyDataSet ds= (MutablePropertyDataSet) Ops.ripples(300,30,20);
-            MutablePropertyDataSet dds;
-            dds= (MutablePropertyDataSet) Ops.timegen("2000-01-01T00:00", "60s", 300 );
-            dds.putProperty( QDataSet.NAME, "Epoch" );
-            ds.putProperty( QDataSet.DEPEND_0, dds );
-            dds= (MutablePropertyDataSet) Ops.findgen(30);
-            dds.putProperty( QDataSet.NAME, "index30" );
-            ds.putProperty( QDataSet.DEPEND_1, dds );
-            dds= (MutablePropertyDataSet) Ops.findgen(20);
-            dds.putProperty( QDataSet.NAME, "index20" );
-            ds.putProperty( QDataSet.DEPEND_2, dds );
-            return ds;
+            String s= "vector";
+            //String s= "qube";
+            if ( s.equals("qube" ) ) {
+                MutablePropertyDataSet ds= (MutablePropertyDataSet) Ops.ripples(300,30,20);
+                MutablePropertyDataSet dds;
+                dds= (MutablePropertyDataSet) Ops.timegen("2000-01-01T00:00", "60s", 300 );
+                dds.putProperty( QDataSet.NAME, "Epoch" );
+                ds.putProperty( QDataSet.DEPEND_0, dds );
+                dds= (MutablePropertyDataSet) Ops.findgen(30);
+                dds.putProperty( QDataSet.NAME, "index30" );
+                ds.putProperty( QDataSet.DEPEND_1, dds );
+                dds= (MutablePropertyDataSet) Ops.findgen(20);
+                dds.putProperty( QDataSet.NAME, "index20" );
+                ds.putProperty( QDataSet.DEPEND_2, dds );
+                return ds;
+            } else {
+                return Ops.ripplesVectorTimeSeries(30);
+            }
         } catch (ParseException ex) {
             throw new RuntimeException(ex);
         }
@@ -468,7 +474,9 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         FiltersChainPanel ff= new FiltersChainPanel();
 
         QDataSet ds= getDataSet();
-        ff.setFilter("|slice0(2)|cos()|collapse1()|butterworth(2,500,750,True)"); //butterworth(2,500,550,True)");
+        //ff.setFilter("|slice0(2)|cos()|collapse1()|butterworth(2,500,750,True)"); //butterworth(2,500,550,True)");
+        //ff.setFilter("|butterworth(2,500,550,True)"
+        ff.setFilter("|unbundle('bx1')");
         ff.setInput(ds);
         JOptionPane.showMessageDialog( null, new JScrollPane(ff) );
         System.err.println(ff.getFilter());
