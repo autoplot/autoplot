@@ -37,7 +37,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
     
     private static PipedInputStream pin;
     
-    private static PyObject printObj;
+    private PyObject printObj;
     
     /**
      * set this to true to evaluate expressions on event thread.  This fails off the event thread, but I'm not sure why.
@@ -333,7 +333,12 @@ public class DebuggerConsole extends javax.swing.JPanel {
         queue.add("up\n");
     }
     
-    synchronized void setEval(String expr) {
+    /**
+     * set the expression to evaluate
+     * @param expr 
+     * @return the evaluation, if possible.
+     */
+    synchronized PyObject setEval( String expr ) {
         expr= expr.trim();
         PyObject lo= out.getLocals();
         if ( lo instanceof PyStringMap ) {
@@ -347,11 +352,16 @@ public class DebuggerConsole extends javax.swing.JPanel {
                 printObj= new PyString("expressions cannot be evaluated");
             }
         }
+        return printObj;
         //if ( printObj==null ) {
         //    printObj= out.eval(expr);
         //}
     }
 
+    /**
+     * get the evaluation
+     * @param expr 
+     */
     PyObject getEval() {
         return printObj;
     }
