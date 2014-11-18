@@ -117,8 +117,8 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             result= new MedianFilterEditorPanel();
         } else if ( f.matches("multiply\\((.*)\\)") ) {
             result= new MultiplyFilterEditorPanel();
-        //} else if ( f.matches("reducex\\('(\\d+)\\s(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
-        //    result= new ReducexFilterEditorPanel();
+        } else if ( f.matches("reducex\\('(\\d+)\\s(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+            result= new ReducexFilterEditorPanel();
         } else if ( f.matches("setDepend0Cadence\\('(\\d+)(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SetDepend0CadenceFilterEditorPanel();
         } else if ( f.matches("setDepend0Units\\('(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
@@ -129,8 +129,8 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             result= new SliceFilterEditorPanel();
         } else if ( f.matches("smooth\\(\\d+\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SmoothFilterEditorPanel();
-        //} else if ( f.matches("unbundle\\('(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
-        //    result= new UnbundleFilterEditorPanel();
+        } else if ( f.matches("unbundle\\('(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+            result= new UnbundleFilterEditorPanel();
         } else if ( f.matches("dbAboveBackgroundDim1\\((\\d+)\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new dbAboveBackgroundDim1FilterEditorPanel();
         } else {
