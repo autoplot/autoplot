@@ -931,8 +931,7 @@ public class ScriptPanelSupport {
 
     protected void newScript() {
         if (panel.isDirty()) {
-       int result = JOptionPane.showConfirmDialog(panel,
-            "save edits first?", "new script", JOptionPane.YES_NO_CANCEL_OPTION );
+            int result = JOptionPane.showConfirmDialog(panel,"save edits first?", "new script", JOptionPane.YES_NO_CANCEL_OPTION );
             if (result == JOptionPane.OK_CANCEL_OPTION) {
                 return;
             }
