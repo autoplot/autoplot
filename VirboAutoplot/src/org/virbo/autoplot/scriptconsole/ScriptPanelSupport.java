@@ -580,8 +580,8 @@ public class ScriptPanelSupport {
                                         EditorAnnotationsSupport.setExpressionLookup( new EditorAnnotationsSupport.ExpressionLookup() {
                                             @Override
                                             public PyObject lookup( final String expr ) {
-                                                dc.setEval(expr);
-                                                return dc.getEval();                                                
+                                                return dc.setEval(expr);
+                                                //return dc.getEval();                                                
                                             }
                                         });
                                     }
