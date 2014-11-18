@@ -269,6 +269,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     protected void updateStatus() {
         if ( filename==null ) {
             fileNameTextField.setText( "" + ( dirty ? " *" : "" ) + ( containsTabs ? " TAB" : "" ) );
+            getEditorPanel().setEditable(true);
         } else {
             File lfile= new File(filename);
             boolean writable= lfile.canWrite() && !FileUtil.isParent( FileSystem.settings().getLocalCacheDir(), lfile );
