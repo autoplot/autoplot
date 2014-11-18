@@ -8,6 +8,10 @@ package org.virbo.filters;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.DefaultComboBoxModel;
+import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.QDataSet;
 
 /**
  *
@@ -31,12 +35,13 @@ public class UnbundleFilterEditorPanel extends AbstractFilterEditorPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        componentTF = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-
-        componentTF.setPreferredSize(new java.awt.Dimension(75, 27));
+        jComboBox1 = new javax.swing.JComboBox();
 
         jLabel1.setText("Component to 'unbundle' :  ");
+
+        jComboBox1.setEditable(true);
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -46,36 +51,47 @@ public class UnbundleFilterEditorPanel extends AbstractFilterEditorPanel {
                 .addContainerGap()
                 .add(jLabel1)
                 .add(2, 2, 2)
-                .add(componentTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(jComboBox1, 0, 136, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                .add(componentTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(jLabel1))
+                .add(jLabel1)
+                .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public javax.swing.JTextField componentTF;
+    public javax.swing.JComboBox jComboBox1;
     public javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
-
+    
+    public void setInput( QDataSet ds ) {
+        if ( ds.rank()>1 ) {
+            try {
+                String[] names= DataSetOps.bundleNames(ds);
+                jComboBox1.setModel( new DefaultComboBoxModel(names) );
+            } catch ( IllegalArgumentException ex ) {
+                jComboBox1.setModel( new DefaultComboBoxModel( new String[] { "ch0", "ch1", "ch2" } ) );
+            }
+        }
+    }
+    
     @Override
     public void setFilter(String filter) {
         Pattern p= Pattern.compile("\\|unbundle\\('(\\w+)'\\)");
         Matcher m= p.matcher(filter);
         if ( m.matches() ) {
-            componentTF.setText(m.group(1));
+            jComboBox1.setSelectedItem(m.group(1));
         } else {
-            componentTF.setText("'Bx'");
+            jComboBox1.setSelectedItem("'Bx'");
         }
     }
 
     @Override
     public String getFilter() {
-         return "|unbundle('" + componentTF.getText() + "')";
+         return "|unbundle('" + jComboBox1.getSelectedItem().toString() + "')";
     }
 }
