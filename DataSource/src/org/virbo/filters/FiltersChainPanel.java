@@ -5,6 +5,7 @@
 package org.virbo.filters;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -33,8 +34,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DataSetOps;
@@ -349,9 +353,13 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             if ( s.length()>0 ) {
                 FilterEditorPanel p = getEditorFor(s);
                 editors.add(p);
-                content.add( onePanel(i) );
+                JPanel ll= onePanel(i);
+                content.add( ll );
                 i++;
-                content.add(p.getPanel());
+                JPanel pp= (JPanel)p.getPanel();
+                Dimension d= pp.getPreferredSize();
+                pp.setMaximumSize( new Dimension( pp.getMaximumSize().width, d.height ) );
+                content.add(pp);
                 //this.add(new JSeparator());
             }
         }
@@ -362,8 +370,6 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         content.add(Box.createVerticalGlue());
            
         this.add( pane );
-        
-        this.revalidate();
         
     }
 
