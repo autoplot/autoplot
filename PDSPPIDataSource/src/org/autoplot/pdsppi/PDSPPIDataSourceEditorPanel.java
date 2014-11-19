@@ -7,6 +7,7 @@
 package org.autoplot.pdsppi;
 
 import java.awt.Window;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
@@ -412,16 +413,22 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     }
     
     private void updateInventorySoon() {
+        new Exception("DUMMY").printStackTrace();
         Runnable run= new Runnable() {
             @Override
             public void run() {
                 logger.fine("updateInventorySoon");
-                final String[] dss= PDSPPIDB.getInstance().getIds("sc="+sc,"PPI/");
-                Runnable run= new Runnable() { public void run() {
-                    datasetComboBox.setModel( new DefaultComboBoxModel(dss) );
-                    doCheckIdSelectedItem();
-                } };
-                SwingUtilities.invokeLater(run);
+                try {
+                    final String[] dss= PDSPPIDB.getInstance().getIds("sc="+sc,"PPI/");
+                    Runnable run= new Runnable() { public void run() {
+                        datasetComboBox.setModel( new DefaultComboBoxModel(dss) );
+                        doCheckIdSelectedItem();
+                    } };
+                    SwingUtilities.invokeLater(run);
+                } catch ( final IOException ex ) {
+                    String msg= "<html><b>PDS/PPI Database is not available</b><br>"+ex.getMessage();
+                    JOptionPane.showMessageDialog( PDSPPIDataSourceEditorPanel.this, msg );
+                }
             }   
         };
         new Thread(run).start();
