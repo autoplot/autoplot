@@ -134,7 +134,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         } else if ( f.matches("dbAboveBackgroundDim1\\((\\d+)\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new dbAboveBackgroundDim1FilterEditorPanel();
         } else {
-            throw new IllegalArgumentException("filter editor not found.");
+            result= new AnyFilterEditorPanel();
         }
         result.setFilter("|"+f);
         return result;
