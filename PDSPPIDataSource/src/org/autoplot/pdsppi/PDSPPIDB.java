@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +33,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.das2.util.LoggerManager;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
@@ -121,7 +123,9 @@ public class PDSPPIDB {
         List<String> result= new ArrayList();
         BufferedReader reader= null;
         try {
-            reader= new BufferedReader( new InputStreamReader( src.openStream() ) );
+            URLConnection connect= src.openConnection();
+            connect.setReadTimeout( FileSystem.settings().getConnectTimeoutMs() );
+            reader= new BufferedReader( new InputStreamReader( connect.getInputStream() ) );
             String line= reader.readLine();
             while ( line!=null ) {
                 if ( !line.startsWith(reqPrefix) ) {
@@ -220,22 +224,19 @@ public class PDSPPIDB {
      * Get the IDs matching the constraint.
      * @param constraint constraints, such as sc=Galileo
      * @param reqPrefix each item of result must start with this.  (PPI/ was omitted.)
-     * @return 
+     * @return the ids
+     * @throws IOException when the database is not available.
      */
-    public String[] getIds( String constraint, String reqPrefix ) {
+    public String[] getIds( String constraint, String reqPrefix ) throws IOException {
         Pattern p= Pattern.compile("sc=[a-zA-Z_ 0-9/\\(\\)]*");
         if ( !p.matcher(constraint).matches() ) {
             throw new IllegalArgumentException("constraint doesn't match (sc=[a-zA-Z_ 0-9/]*): "+constraint);
         }
-        try {
-            //http://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&facet=SPACECRAFT_NAME&title=Cassini&o=txt
-            URL url= new URL( String.format( "http://ppi.pds.nasa.gov/ditdos/inventory?%s&o=txt", constraint.replaceAll(" ","+") ) );
-            logger.log( Level.FINE, "getIds {0}", url);
-            final String[] dss= getStringArray( url, reqPrefix ); //TODO: I still don't know why I need to add this.
-            return dss;
-        } catch ( IOException ex ) {
-            throw new RuntimeException(ex);
-        }
+        //http://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&facet=SPACECRAFT_NAME&title=Cassini&o=txt
+        URL url= new URL( String.format( "http://ppi.pds.nasa.gov/ditdos/inventory?%s&o=txt", constraint.replaceAll(" ","+") ) );
+        logger.log( Level.FINE, "getIds {0}", url);
+        final String[] dss= getStringArray( url, reqPrefix ); //TODO: I still don't know why I need to add this.
+        return dss;
     }
     
     /**
