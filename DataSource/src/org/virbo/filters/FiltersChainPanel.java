@@ -247,6 +247,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
 
     
     private JPanel onePanel( final int fi ) {
+        logger.entering( CLASS_NAME, "onePanel", fi );
         final JPanel sub= new JPanel( new BorderLayout() );
 
         String sfilter= fi==-1 ? "" : editors.get(fi).getFilter();
@@ -371,6 +372,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
            
         this.add( pane );
         
+        this.revalidate();
     }
 
     /**
