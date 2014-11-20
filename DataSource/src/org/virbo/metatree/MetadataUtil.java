@@ -167,10 +167,13 @@ public class MetadataUtil {
                 }
             } else if ( cmd.startsWith("|total") && cmd.length()==7 ) {
                 int dim= cmd.charAt(6)-'0';
-                properties= sliceProperties( properties, dim ); 
+                properties= sliceProperties( properties, dim );                 
             } else if ( cmd.startsWith("|total") && cmd.length()==6 ) {
                 int dim= s.nextInt();
                 properties= sliceProperties( properties, dim );
+            } else if ( cmd.startsWith("|collapse") && cmd.length()==10 ) {
+                int dim= cmd.charAt(9)-'0';
+                properties= sliceProperties( properties, dim );      
             } else if ( cmd.equals("|autoHistogram") ) {
                 Map<String,Object> newproperties= new HashMap<String,Object>();
                 newproperties.put( QDataSet.DEPEND_0, properties );
@@ -178,8 +181,17 @@ public class MetadataUtil {
             } else if ( cmd.equals("|transpose") ) {
                 properties= transposeProperties(properties);
             } else if ( cmd.equals("|smooth") ) {
-                int idx= s.nextInt();
-                //
+                // do nothing
+            } else if ( cmd.equals("|trim") ) {
+                // do nothing
+            } else if ( cmd.equals("|detrend") ) {
+                // do nothing
+            } else if ( cmd.equals("|medianFilter") ) {
+                // do nothing
+            } else if ( cmd.equals("|nop") ) {
+                // do nothing
+            } else if ( cmd.equals("|copy") ) {
+                // do nothing
             } else {
                 return new HashMap();
             }
