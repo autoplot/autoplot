@@ -413,7 +413,6 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
     }
     
     private void updateInventorySoon() {
-        new Exception("DUMMY").printStackTrace();
         Runnable run= new Runnable() {
             @Override
             public void run() {
