@@ -55,24 +55,9 @@ public class PDSPPIDB {
     
     private static final PDSPPIDB instance= new PDSPPIDB();
     
-    private boolean loaded = false;
-    
     List<String> ids= new ArrayList<String>(1100);
     
     public static PDSPPIDB getInstance() {
-        
-        if ( instance.loaded ) {
-            // no need to load
-        } else {
-            synchronized ( PDSPPIDB.class ) {
-                if ( instance.loaded ) {
-                    // another thread loaded it
-                } else {
-                    //instance.load();  this is going to change.
-                    instance.loaded= true;
-                }
-            } 
-        }
         return instance;
     }
     
