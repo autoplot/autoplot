@@ -113,7 +113,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             result= new DetrendFilterEditorPanel();
         } else if ( f.matches("divide\\((.*)\\)") ) {
             result= new DivideFilterEditorPanel();
-        } else if ( f.matches("fftPower\\((\\d+),(\\d),'(\\w+)\\'\\)") ) {
+        } else if ( f.matches("fftPower\\((\\d+),(\\d),'?(\\w+)'?\\)") ) {
             result= new FftPowerFilterEditorPanel();
         } else if ( f.matches("hanning\\((.*)\\)") ) {
             result= new HanningFilterEditorPanel();
@@ -121,9 +121,9 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             result= new MedianFilterEditorPanel();
         } else if ( f.matches("multiply\\((.*)\\)") ) {
             result= new MultiplyFilterEditorPanel();
-        } else if ( f.matches("reducex\\('(\\d+)\\s(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+        } else if ( f.matches("reducex\\('?(\\d+)\\s(\\w+)'?\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new ReducexFilterEditorPanel();
-        } else if ( f.matches("setDepend0Cadence\\('(\\d+)(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+        } else if ( f.matches( SetDepend0CadenceFilterEditorPanel.PROP_REGEX.substring(1) ) ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SetDepend0CadenceFilterEditorPanel();
         } else if ( f.matches("setDepend0Units\\('(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SetDepend0UnitsFilterEditorPanel();
@@ -133,7 +133,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             result= new SliceFilterEditorPanel();
         } else if ( f.matches("smooth\\(\\d+\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SmoothFilterEditorPanel();
-        } else if ( f.matches("unbundle\\('(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+        } else if ( f.matches("unbundle\\('?(\\w+)'?\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new UnbundleFilterEditorPanel();
         } else if ( f.matches("dbAboveBackgroundDim1\\((\\d+)\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new dbAboveBackgroundDim1FilterEditorPanel();
@@ -376,19 +376,15 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     }
 
     /**
-     * 
+     * set the input dataset for each filter.
      */
     private void updateSoon() {
         logger.entering( CLASS_NAME, "updateSoon" );
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                System.err.println( "1: " + getFilter() + "  " + editors.get(0).getPanel().getName() );
-                
                 setFilter( getFilter() );
-                System.err.println("here1");
                 setInput( inputDs );
-                System.err.println("here2");
             }
         };
         SwingUtilities.invokeLater(run);
@@ -449,9 +445,11 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      */
     private static QDataSet getDataSet() {
         try {
-            String s= "vector";
+            String s= "rank1TimeSeries";
             //String s= "qube";
-            if ( s.equals("qube" ) ) {
+            if ( s.equals("rank1TimeSeries" ) ) {
+                return Ops.ripplesTimeSeries(20);
+            } else if ( s.equals("qube" ) ) {
                 MutablePropertyDataSet ds= (MutablePropertyDataSet) Ops.ripples(300,30,20);
                 MutablePropertyDataSet dds;
                 dds= (MutablePropertyDataSet) Ops.timegen("2000-01-01T00:00", "60s", 300 );
@@ -484,7 +482,8 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         QDataSet ds= getDataSet();
         //ff.setFilter("|slice0(2)|cos()|collapse1()|butterworth(2,500,750,True)"); //butterworth(2,500,550,True)");
         //ff.setFilter("|butterworth(2,500,550,True)"
-        ff.setFilter("|unbundle('bx1')");
+        //ff.setFilter("|unbundle('bx1')");
+        ff.setFilter("|setDepend0Cadence(50s)");
         ff.setInput(ds);
         JOptionPane.showMessageDialog( null, new JScrollPane(ff) );
         System.err.println(ff.getFilter());
