@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultComboBoxModel;
 import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 
 /**
@@ -18,6 +17,8 @@ import org.virbo.dataset.QDataSet;
  * @author mmclouth
  */
 public class UnbundleFilterEditorPanel extends AbstractFilterEditorPanel {
+
+    public static final String PROP_REGEX = "\\|unbundle\\('?(\\w+)'?\\)";
 
     /**
      * Creates new form UnbundleFilterEditorPanel
@@ -68,6 +69,7 @@ public class UnbundleFilterEditorPanel extends AbstractFilterEditorPanel {
     public javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
     
+    @Override
     public void setInput( QDataSet ds ) {
         if ( ds.rank()>1 ) {
             try {
@@ -81,7 +83,7 @@ public class UnbundleFilterEditorPanel extends AbstractFilterEditorPanel {
     
     @Override
     public void setFilter(String filter) {
-        Pattern p= Pattern.compile("\\|unbundle\\('(\\w+)'\\)");
+        Pattern p= Pattern.compile(PROP_REGEX);
         Matcher m= p.matcher(filter);
         if ( m.matches() ) {
             jComboBox1.setSelectedItem(m.group(1));
