@@ -24,6 +24,7 @@ import org.virbo.qstream.StreamException;
 
 /**
  * performance and function of QDataSet operations.
+ * validate filters operations.
  * @author jbf
  */
 public class Test011 {
@@ -36,6 +37,28 @@ public class Test011 {
     }
 
     public static void main(String[] args) throws Exception {
+        testFilters();
+        oldmain(args);
+    }
+    
+    private static void testFilters() {
+        boolean okay= true;
+        if ( !DataSetOps.changesDimensions("|slice0(0)","") ) okay= false;
+        if ( !DataSetOps.changesDimensions("|slice0(0)","|slice1(0)") )  okay= false;
+        if ( !DataSetOps.changesDimensions("|slice0(0)","|slice1(0)") )  okay= false;
+        if (  DataSetOps.changesDimensions("|slice0(0)|slice1(0)","|slice0(0)|slice1(0)") )  okay= false;
+        if (  DataSetOps.changesDimensions("","|nop()") )  okay= false;
+        if (  DataSetOps.changesDimensions("|nop()|slice0(0)","|slice0(0)") )  okay= false;
+        if (  DataSetOps.changesDimensions("|slice0(0)","|nop()|slice0(0)") )  okay= false;
+        if (  DataSetOps.changesDimensions("|slice0(0)","|slice0(0)|nop()") )  okay= false;
+        if (  DataSetOps.changesDimensions("|slice0(0)","|smooth(5)|slice0(0)") )  okay= false;
+        if (  DataSetOps.changesDimensions("|slice0(0)","|slice0(0)|smooth(5)") )  okay= false;
+        if (  DataSetOps.changesDimensions("|smooth(5)|slice0(0)","|slice0(0)") )  okay= false;
+        if (  DataSetOps.changesDimensions("|slice0(0)|smooth(5)","|slice0(0)") )  okay= false;
+        if ( !okay ) throw new IllegalArgumentException("not okay");
+    }
+    
+    public static void oldmain(String[] args) throws Exception {
         try {
             timer("reset");
 
