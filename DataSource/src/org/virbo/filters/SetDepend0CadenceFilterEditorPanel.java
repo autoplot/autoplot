@@ -9,8 +9,11 @@ package org.virbo.filters;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.DefaultComboBoxModel;
 import org.das2.datum.Units;
 import static org.das2.datum.Units.getAllUnits;
+import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 
 /**
  *
@@ -18,7 +21,8 @@ import static org.das2.datum.Units.getAllUnits;
  * 
  */
 public class SetDepend0CadenceFilterEditorPanel extends AbstractFilterEditorPanel {
-    private String label;
+
+    public static final String PROP_REGEX = "\\|setDepend0Cadence\\('?(\\d+)\\s*(\\w+)'?\\)";
 
     /**
      * Creates new form SetDepend0CadenceFilterEditorPanel
@@ -39,6 +43,7 @@ public class SetDepend0CadenceFilterEditorPanel extends AbstractFilterEditorPane
         jLabel1 = new javax.swing.JLabel();
         scalarTF = new javax.swing.JTextField();
         unitsCB = new javax.swing.JComboBox();
+        msgLabel = new javax.swing.JLabel();
 
         jLabel1.setText("Depend0 Cadence:  ");
 
@@ -52,23 +57,31 @@ public class SetDepend0CadenceFilterEditorPanel extends AbstractFilterEditorPane
         unitsCB.setMinimumSize(new java.awt.Dimension(200, 27));
         unitsCB.setPreferredSize(new java.awt.Dimension(200, 27));
 
+        msgLabel.setText("<html><em>Explicity set the cadence of the measurements");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel1)
-                .add(6, 6, 6)
-                .add(scalarTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(unitsCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(msgLabel)
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(scalarTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 77, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(unitsCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 155, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(0, 12, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
+                .add(msgLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(scalarTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -80,20 +93,19 @@ public class SetDepend0CadenceFilterEditorPanel extends AbstractFilterEditorPane
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JLabel jLabel1;
+    public javax.swing.JLabel msgLabel;
     public javax.swing.JTextField scalarTF;
     public javax.swing.JComboBox unitsCB;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void setFilter(String filter) {
-        Pattern p= Pattern.compile("\\|setDepend0Cadence\\('(\\d+)(\\w+)'\\)");
+        Pattern p= Pattern.compile(PROP_REGEX);
         Matcher m= p.matcher(filter);
         if ( m.matches() ) {
-            System.out.println( "M matches");
             scalarTF.setText( m.group(1) );
             unitsCB.setSelectedItem( m.group(2) );
-        }
-        else {
+        } else {
             scalarTF.setText("1");
             unitsCB.setSelectedItem( "s" );
         }
@@ -102,7 +114,24 @@ public class SetDepend0CadenceFilterEditorPanel extends AbstractFilterEditorPane
 
     @Override
     public String getFilter() {
-        
         return "|setDepend0Cadence('" + scalarTF.getText() + unitsCB.getSelectedItem() + "')";
     }
+
+    @Override
+    public void setInput(QDataSet ds) {
+        QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+        if ( dep0==null ) {
+            if ( SemanticOps.isJoin(ds) ) {
+                dep0= (QDataSet) ds.slice(0).property(QDataSet.DEPEND_0);
+            }
+        }
+        if ( dep0!=null ) {
+            Units u= SemanticOps.getUnits(dep0);
+            Units[] uu= u.getOffsetUnits().getConvertableUnits();
+            unitsCB.setModel( new DefaultComboBoxModel(uu) );
+        } else {
+            msgLabel.setText("<html><em>Dataset has no DEPEND_0");
+        }
+    }
+    
 }
