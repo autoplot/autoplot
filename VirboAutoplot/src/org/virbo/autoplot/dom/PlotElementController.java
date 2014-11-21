@@ -535,7 +535,7 @@ public class PlotElementController extends DomNodeController {
      * @param properties
      * @return
      */
-    Map<String,Object> processProperties( String c, Map<String,Object> properties ) {
+    private static Map<String,Object> processProperties( String c, Map<String,Object> properties ) {
         c= c.trim();
         if (c.length() > 5 && c.contains("|")) {
             // slice and collapse specification
