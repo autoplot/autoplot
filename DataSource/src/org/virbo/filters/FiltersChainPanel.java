@@ -5,8 +5,6 @@
 package org.virbo.filters;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -29,16 +27,14 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DataSetOps;
@@ -66,7 +62,6 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     public FiltersChainPanel() {
         logger.entering( CLASS_NAME, "<init>" );
         initComponents();
-        this.setPreferredSize( new Dimension( 300, 300 ) );
         setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ));
     }
 
@@ -157,6 +152,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     private void deleteFilter( int fi ) {
         editors.remove(fi);
         setFilter( getFilter() );
+        updateSoon();
     }
     
     private void addFilter( int idx ) {
@@ -378,6 +374,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
 
     /**
      * set the input dataset for each filter.
+     * TODO: This does data processing on the event thread and will surely cause problems.
      */
     private void updateSoon() {
         logger.entering( CLASS_NAME, "updateSoon" );
@@ -444,10 +441,8 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      * @see #main(java.lang.String[]) 
      * @return dataset for testing.
      */
-    private static QDataSet getDataSet() {
+    private static QDataSet getDataSet( String s ) {
         try {
-            String s= "rank1TimeSeries";
-            //String s= "qube";
             if ( s.equals("rank1TimeSeries" ) ) {
                 return Ops.ripplesTimeSeries(20);
             } else if ( s.equals("qube" ) ) {
@@ -480,13 +475,22 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         
         FiltersChainPanel ff= new FiltersChainPanel();
 
-        QDataSet ds= getDataSet();
+        //QDataSet ds= getDataSet( "rank1TimeSeries" );
+        QDataSet ds= getDataSet( "qube" );
+        
         //ff.setFilter("|slice0(2)|cos()|collapse1()|butterworth(2,500,750,True)"); //butterworth(2,500,550,True)");
         //ff.setFilter("|butterworth(2,500,550,True)"
         //ff.setFilter("|unbundle('bx1')");
         ff.setFilter("|setDepend0Cadence(50s)");
         ff.setInput(ds);
-        JOptionPane.showMessageDialog( null, new JScrollPane(ff) );
+        
+        JDialog d= new JDialog();
+        d.setContentPane( ff );
+        d.setResizable(true);
+        d.setModal(true);
+        d.pack();
+        d.setSize(640,480);
+        d.setVisible(true);
         System.err.println(ff.getFilter());
     }
 }
