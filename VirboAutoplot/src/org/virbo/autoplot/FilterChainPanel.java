@@ -139,6 +139,7 @@ public class FilterChainPanel extends JPanel {
         "setUnits('nT') reset the units to the new units",
         "setDepend0Units('nT') reset the units to the new units",
         "setDepend0Cadence('50s') reset the cadence to 50 seconds",
+        "setDepend1Cadence('110 % diff') reset the cadence to 50 seconds",
         "sin() sin of the data in radians. (No units check)",
         "slice0(0) slice the data on the zeroth dimension (often time) at the given index.",
         "slice1(0) slice the data on the first dimension at the given index.",
