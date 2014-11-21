@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -567,7 +568,9 @@ public class DomUtil {
      * @return the DataSourceFilters
      */
     public static List<DataSourceFilter> getParentsFor( Application dom, String uri ) {
-        String[] dep= uri.substring(13).split(",");
+        String parents= uri.substring(13);
+        if ( parents.trim().length()==0 ) return Collections.emptyList();
+        String[] dep= parents.split(",");
         List<DataSourceFilter> result= new ArrayList();
         for ( int j=0; j<dep.length; j++ ) {
             result.add( (DataSourceFilter)getElementById( dom,dep[j]) );
