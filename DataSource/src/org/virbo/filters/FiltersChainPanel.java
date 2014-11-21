@@ -240,6 +240,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
            if ( ss!=null ) {
                editors.add( idx, getEditorFor(ss) );
                setFilter( getFilter() );
+               updateSoon();
            }
        }
 
