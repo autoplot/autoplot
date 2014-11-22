@@ -1095,7 +1095,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         for ( int i=1; i<oo.length; i++ ) {
             for ( int j=0; j<oo[i-1].getChildCount(); j++ ) {
                 DefaultMutableTreeNode kid= (DefaultMutableTreeNode) oo[i-1].getChildAt(j);
-                if ( kid.getUserObject().equals( ss[i-1] ) ) {
+                if ( ((DasServer.DataSrcListItem)kid.getUserObject()).name().equals( ss[i-1] ) ) {
                     oo[i]= kid;
                     break;
                 }
