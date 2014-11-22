@@ -1015,10 +1015,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         return new javax.swing.tree.DefaultTreeModel(treeNode1);
     }
 	 
-    // Class to handle custom rendering of the dataset list.  The DefaultTreeCellRenderer
-    // is just a JLable derived object.  So those are the functions being used to get the
-    // display properly rendered
-    class DataSetItemRenderer extends DefaultTreeCellRenderer {
+    /**
+     * Class to handle custom rendering of the dataset list.  The DefaultTreeCellRenderer
+     * is just a JLable derived object.  So those are the functions being used to get the
+     * display properly rendered
+     */
+    private class DataSetItemRenderer extends DefaultTreeCellRenderer {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value,
