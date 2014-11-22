@@ -54,6 +54,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -110,7 +111,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
      * list of servers we know about
      */
     List<String> d2ss;
-
+	 
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -1010,12 +1011,41 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }
 
     TreeModel waitTreeModel() {
-        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("updating, please wait..." );
+        DefaultMutableTreeNode treeNode1 = new DefaultMutableTreeNode("updating, please wait..." );
         return new javax.swing.tree.DefaultTreeModel(treeNode1);
+    }
+	 
+    // Class to handle custom rendering of the dataset list.  The DefaultTreeCellRenderer
+    // is just a JLable derived object.  So those are the functions being used to get the
+    // display properly rendered
+    class DataSetItemRenderer extends DefaultTreeCellRenderer {
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value,
+                boolean bSelected, boolean bExpanded, boolean bIsLeaf, int iRow, boolean bHasFocus) {
+            super.getTreeCellRendererComponent(tree, value, bSelected, bExpanded, bIsLeaf, iRow,
+                    bHasFocus);
+
+            DefaultMutableTreeNode tn = (DefaultMutableTreeNode) value;
+            Object obj = tn.getUserObject();
+
+            if (obj instanceof DasServer.DataSrcListItem) {
+                DasServer.DataSrcListItem li = (DasServer.DataSrcListItem) obj;
+
+                if (li.description() == null) {
+                    setText(String.format("<html><b>%s</b>", li.name()));
+                } else {
+                    setText(String.format("<html><b>%s</b> &nbsp; %s", li.name(), li.description()));
+                }
+            }
+
+            return this;
+        }
     }
 
     private void updateTree( TreeModel model ) {
         jTree1.setModel(model);
+		jTree1.setCellRenderer(new DataSetItemRenderer());
         if ( dataSetId!=null ) selectDataSetId();
     }
 
@@ -1106,9 +1136,15 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         
         StringBuilder ldataSetId= new StringBuilder("");
-        if ( tp0.length>1 ) {
-            ldataSetId= new StringBuilder( (String) ((DefaultMutableTreeNode) tp0[1]).getUserObject() );
-            for ( int i=2; i<tp0.length; i++ ) ldataSetId.append( "/") .append( (String) ((DefaultMutableTreeNode) tp0[i]).getUserObject() );
+        if (tp0.length > 1) {
+            DefaultMutableTreeNode tn = (DefaultMutableTreeNode) tp0[1];
+            DasServer.DataSrcListItem li = (DasServer.DataSrcListItem) tn.getUserObject();
+            ldataSetId = new StringBuilder(li.name());
+            for (int i = 2; i < tp0.length; i++) {
+                tn = (DefaultMutableTreeNode) tp0[i];
+                li = (DasServer.DataSrcListItem) tn.getUserObject();
+                ldataSetId.append("/").append(li.name());
+            }
         }
 
         StringBuilder params= new StringBuilder();
