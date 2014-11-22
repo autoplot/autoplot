@@ -19,10 +19,13 @@
 #  -Jxxx            pass argument xxx to JRE (e.g. -J-Xmx4G to get 4 Gig of RAM)
 #  -s  --script     launch into script
 #
-#  Set APDEBUG=1 to print debug infomation
+#  Set APDEBUG=1 to print debug infomation. (In bash, "export APDEBUG=1")
 #
 #  For example:
-#    ./autoplot.jar -J-Xmx4G -h --script myscript.jy
+#    wget -O autoplot.jar http://autoplot.org/jnlp/latest/autoplot.jar
+#    chmod 755 autoplot.jar
+#    wget -O sayHello.jy http://autoplot.org/data/script/sayHello.jy
+#    ./autoplot.jar -J-Xmx4G -h --script sayHello.jy
 #  
 
 JAVA_ARGS=""
@@ -30,10 +33,8 @@ AP_ARGS=""
 
 memIsImplicit=1
 
-SSDEBUG=0
-
 for i in "$@"; do
-   if [ "$SSDEBUG"="1" ]; then    
+   if [ "$APDEBUG"="1" ]; then    
        echo "arg: \"$i\""
    fi
    if [[ $i == -J-Xmx* ]]; then
@@ -50,13 +51,13 @@ for i in "$@"; do
    fi
 done
 
-if [ "$SSDEBUG" == "1" ]; then 
-   echo "JAVA_ARGS=${JAVA_ARGS}"
-   echo "AP_ARGS=${AP_ARGS}"
-fi
-
 if [ $memIsImplicit == "1" ]; then 
    JAVA_ARGS="${JAVA_ARGS} -Xmx1000M ";
+fi
+
+if [ "$APDEBUG" == "1" ]; then 
+   echo "JAVA_ARGS=${JAVA_ARGS}"
+   echo "AP_ARGS=${AP_ARGS}"
 fi
 
 # make debugging easier by checking if this is actually the starter script being tested.
@@ -68,7 +69,16 @@ else
    JARFILE=$0;
 fi
 
-if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then
+if [ "$APDEBUG" == "1" ]; then 
+   if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then      
+      echo $EXEC "${JAVA_HOME}"/bin/java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}"
+   else
+      echo $EXEC /usr/bin/env java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}"
+   fi
+fi
+
+
+if [ "${JAVA_HOME}" -a \( -x "${JAVA_HOME}"/bin/java \) ]; then      
       $EXEC "${JAVA_HOME}"/bin/java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}"
 else
       $EXEC /usr/bin/env java ${JAVA_ARGS} -jar ${JARFILE} "${AP_ARGS}"
