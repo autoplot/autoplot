@@ -66,7 +66,7 @@ if [ "$0" == "./starterScript.sh" ]; then
    EXEC="echo";
    JARFILE="autoplot.jar"
 else
-   EXEC="exec";
+   EXEC="";
    JARFILE=$0;
 fi
 
