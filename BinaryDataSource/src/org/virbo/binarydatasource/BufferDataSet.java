@@ -368,7 +368,15 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      */
     @Override
     public QDataSet trim( int ist, int ien ) {
-        BufferDataSet result= makeDataSet( rank, reclen, offset(ist), ien-ist, len1, len2, len3, back, type );
+        int offset;
+        if ( ist<len0 ) {
+            offset= offset(ist);
+        } else if ( ist==len0 && ien==len0 ) {
+            offset= recoffset + reclen * ist;  // code duplicated to avoid index out of bounds error.
+        } else {
+            offset= offset(ist);
+        }
+        BufferDataSet result= makeDataSet( rank, reclen, offset, ien-ist, len1, len2, len3, back, type );
         DataSetUtil.putProperties( DataSetUtil.trimProperties( this, ist, ien ), result );
         return result;
     }
