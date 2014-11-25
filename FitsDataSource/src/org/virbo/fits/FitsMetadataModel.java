@@ -26,14 +26,16 @@ public class FitsMetadataModel extends MetadataModel {
         dep1.put( QDataSet.LABEL, meta.get( "CTYPE2" ) );
         result.put( QDataSet.DEPEND_0, dep0 );
         result.put( QDataSet.DEPEND_1, dep1 );
-        result.put( QDataSet.TITLE, meta.get("INSTRUME") + " "+ meta.get("DATE_OBS") );
+        if ( meta.get("INSTRUME")!=null && meta.get("DATE_OBS")!=null ) {
+            result.put( QDataSet.TITLE, meta.get("INSTRUME") + " "+ meta.get("DATE_OBS") );
+        }
         
 	return result;
     }
 
     @Override
     public String getLabel() {
-	return "FITS";
+        return "FITS";
     }
     
     
