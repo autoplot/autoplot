@@ -96,14 +96,17 @@ public class Test017 {
     }
     
     static String[] uris = new String[]{
-        //[edit] 1 Tsds
+        
+        // this set of URIs was created from the old hand testing wiki page: http://autoplot.org/Test_dataset_urls
+        // Note test140 could be used to test off the wiki page again, automatically.
+        
+        //TEST DATA SOURCE TYPE: 1 Tsds
         "001 vap+tsds:http://timeseries.org/get.cgi?StartDate=19890101&EndDate=19890101&ext=bin&out=tsml&ppd=1440&param1=SourceAcronym_Subset3-1-v0",
         "002 vap+tsds:http://timeseries.org/get.cgi?StartDate=19950101&EndDate=19950104&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-22-v0",
-        //(this loads:
-        "003 vap+tsds:http://timeseries.org/get.cgi?StartDate=19950101&EndDate=19950109&ppd=144&out=tsml&param1=OMNI_OMNIHR-22-v0",
+        //old TSDS URLs that didn't work removed.
         "004 vap+tsds:http://timeseries.org/get.cgi?StartDate=19950101&EndDate=19950104&ext=bin&out=tsml&ppd=144&param1=OMNI_OMNIHR-22-v0",
-        "005 vap+tsds:http://timeseries.org/OMNI_OMNIHR-22-v0-to_19950101-tf_19950104-ppd_144-filter_0-ext_bin.bin",
-        //[edit] 2 Das2Server
+        //old TSDS URLs that didn't work removed.
+        //TEST DATA SOURCE TYPE: 2 Das2Server
 
         //Autoplot gets confused about the escaping. "vap+das2server" turns into "vap das2server" and the das2Server file part is removed. This probably has something to do with its TimeSeriesBrowse capability.
 
@@ -112,13 +115,13 @@ public class Test017 {
         //Fails to use log for z-axis:
 
         "007 vap+das2server:http://www-wbd.physics.uiowa.edu/das/das2Server?dataset=das2_1/cluster/wbd/r_wbd&start_time=2007-04-17T08:40Z&end_time=2007-04-17T08:50Z&spacecraft=c1&mode=DSN&antenna=Ey&frequencyOffset=Any&fftSize=1024",
-        //[edit] 3 CDF
+        //TEST DATA SOURCE TYPE: 3 CDF
 
         "008 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/mari_mag/1994/cn_k0_mari_19940122_v01.cdf?Epoch",
         "009 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/bars/%Y/cn_k0_bars_%Y%m%d_v...cdf?E_vel&timerange=1993-01-02+through+1993-01-14",
         "010 CC ftp://cdaweb.gsfc.nasa.gov/pub/data/imp/imp8/mag_15sec/1973/i8_15sec_mag_19731030_v02.cdf",
         //No data is drawn:
-        "011 ftp://cdaweb.gsfc.nasa.gov/pub/data/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse",
+        //this data no longer exists: "011 ftp://cdaweb.gsfc.nasa.gov/pub/data/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse",
         //IndexOutOfBoundsException:
         "012 http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/cis/2003/c2_pp_cis_20030104_v02.cdf?N_p__C2_PP_CIS",
         //Suspect problem identifying valid data: "" +
@@ -140,29 +143,32 @@ public class Test017 {
         "017 ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/def_or/1995/ge_or_def_19950101_v02.cdf?GSE_POS",
         //Works fine, but nicely demonstrates AutoHistogram's robust statistics and the potential to indentify fill values automatically:
         "018 ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/mgf/1998/ge_k0_mgf_19980102_v01.cdf?IB",
-        //[edit] 4 OpenDAP
+        //TEST DATA SOURCE TYPE: 4 OpenDAP
 
         //Rank 2 spectrogram over OpenDAP:
-        "019 http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/polar/hyd_h0/2002/po_h0_hyd_20020110_v01.cdf.html?ELECTRON_DIFFERENTIAL_ENERGY_FLUX",
-        //[edit] 5 FITS
+        //Open DAP is no longer supported.
+        //"019 http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/polar/hyd_h0/2002/po_h0_hyd_20020110_v01.cdf.html?ELECTRON_DIFFERENTIAL_ENERGY_FLUX",
+
+        //TEST DATA SOURCE TYPE: 5 FITS
 
         //This fails because negative CADENCE and MONOTONIC=true.
 
+        "020 http://www.spacetelescope.org/static/projects/fits_liberator/datasets/m42/m42_40min_red.zip/m42_40min_red.fits",
         //"020 vap:http://www.astro.princeton.edu/~frei/Gcat_htm/Catalog/Fits/n4013_lR.fits",
-        //[edit] 6 ASCII
+
+        //TEST DATA SOURCE TYPE: 6 ASCII
 
         //Autoplot doesn't download this URL:
 
         "021 vap+bin:ftp://ftp.nmh.ac.uk/wdc/obsdata/hourval/single_year/1909/clh1909.wdc",
-        //java.lang.IllegalArgumentException: unable to identify time format for 1990-11-05T16:31:00.000Z
 
-        "022 vap+dat:http://www.igpp.ucla.edu/cache2/GOMA_3001/DATA/SUMMARY/E1_SUMM_GSE_GSM.TAB?timeFormat=ISO8601&column=field1",
+        //"022 vap+dat:http://www.igpp.ucla.edu/cache2/GOMA_3001/DATA/SUMMARY/E1_SUMM_GSE_GSM.TAB?timeFormat=ISO8601&column=field1",
         //This demonstrates fractional day of year:
 
         "023 vap+dat:http://wind.nasa.gov/swe_apbimax/wi_swe_fc_apbimax.1995005.txt?comment=;&column=21&timeFormat=$Y+$j&time=field0",
         //"Fill string is recognized, -1e31 is inserted, but this is not marked as fill:"
 
-        "024 vap+dat:http://goes.ngdc.noaa.gov/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&fill=32700&timerange=Dec+2004",
+        //"024 vap+dat:http://goes.ngdc.noaa.gov/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&fill=32700&timerange=Dec+2004",
         //I'd expect this to read in the column as a rank 1 dataset:
 
 //        "025 http://www-pw.physics.uiowa.edu/~jbf/L1times.2.dat?fixedColumns=29-35",
@@ -171,10 +177,10 @@ public class Test017 {
 //        "026 http://www-pw.physics.uiowa.edu/~jbf/L1times.2.dat?fixedColumns=0-24,29-35&column=field1",
         //Very large with $b and ${skip}:
 
-        "027 http://vho.nasa.gov/mission/soho/celias_pm_30sec/2003.txt",
+        //"027 http://vho.nasa.gov/mission/soho/celias_pm_30sec/2003.txt",
         //High resolution OMNI data:
 
-        "028 vap+dat:ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/high_res_omni/monthly_1min/omni_min200101.asc?time=field0&column=field14&timeFormat=$Y+$j+$H+$M&validMax=9999",
+       // "028 vap+dat:ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/high_res_omni/monthly_1min/omni_min200101.asc?time=field0&column=field14&timeFormat=$Y+$j+$H+$M&validMax=9999",
         //Comment parameter used:
 
         "029 http://wind.nasa.gov/swe_apbimax/wi_swe_fc_apbimax.2001017.txt?column=field2&comment=;&time=field0&timeFormat=$Y+$j",
@@ -184,27 +190,28 @@ public class Test017 {
         //From VHO:
 
         "031 ftp://nis-ftp.lanl.gov/pub/projects/genesis/3dmom/gim-3dl2-2002-01_v02.txt?skip=68&time=field0&timeFormat=$Y+$j+$H+$M+$S&column=field8&fill=-9999.0",
-        //[edit] 7 Excel
+        //TEST DATA SOURCE TYPE: 7 Excel
 
         //German umlaut is not handled when creating column name:
 
 
 //comment because of SVN.  Need to get from wiki to get umlaut.        "032 file:/media/mini/data.backup/examples/xls/2.25_carbopol_summary.xls?firstRow=51&sheet=125 um hifreq 2&depend0=Frequenz&column=Komplexe_Viskosit<umlautA>t",
-        //[edit] 8 Aggregation
+        //TEST DATA SOURCE TYPE: 8 Aggregation
 
         //Here is aggregation with CDF subsampling. This has issues. It doesn't reload when I change the parameter.
 
-        "033 http://cdaweb.gsfc.nasa.gov/istp_public/data/omni/hro_5min/%Y/omni_hro_5min_%Y%m%d_v...cdf?HR[::100]&timerange=1995+to+2000",
+        // note using 01 restores monthly.
+        "033 http://cdaweb.gsfc.nasa.gov/istp_public/data/omni/hro_5min/$Y/omni_hro_5min_$Y$m01_v$v.cdf?HR[::100]&timerange=1995+to+2000",
         //No feedback when using with openDAP:
 
-        "034 http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/polar/vis/%Y/po_k0_vis_%Y%m%d_v...cdf.html?Epoch&timerange=2001",
+        //"034 http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/polar/vis/%Y/po_k0_vis_%Y%m%d_v...cdf.html?Epoch&timerange=2001",
         //"Fails to Identify as aggregation:"
 
-        "035 vap+txt:file:///opt/project/galileo/data/lrsudr/g7/eden/pws$y$j.data?timeRange=1997-049",
+        //"035 vap+txt:file:///opt/project/galileo/data/lrsudr/g7/eden/pws$y$j.data?timeRange=1997-049",
         //Though "Dec 2004" is requested, "Nov 2004 through Jan 2005" is loaded:
 
         "036 vap+dat:http://goes.ngdc.noaa.gov/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&fill=32700&timerange=Dec+2004",
-        //[edit] 9 File System Completions
+        //TEST DATA SOURCE TYPE: 9 File System Completions
 
         //fails:
 
@@ -215,13 +222,13 @@ public class Test017 {
         //perhaps one day this will work:
 
         "040 http://www-pw.physics.uiowa.edu/helios/data1/data/average/a$y$m-...zip/av$y$m$d.dat?rank2=1:&time=field0&timerange=1975-oct",
-        //[edit] 10 Data Source Completions
-        //[edit] 11 URIs with difficult CADENCE
+        //TEST DATA SOURCE TYPE: 10 Data Source Completions
+        //TEST DATA SOURCE TYPE: 11 URIs with difficult CADENCE
 
         //The Time parameter is irregular:
 
         "041 file:///media/mini/data.backup/examples/xls/2008-lion%20and%20tiger%20summary.xls?sheet=Samantha+tiger+lp+lofreq&column=Elastic_Modulus&firstRow=53&depend0=Time",
-        //[edit] 12 Issues with URIs
+        //TEST DATA SOURCE TYPE: 12 Issues with URIs
 
         //It would be nice to support plus notation with excel spreadsheets. Also, this shows an issue with the excel data source which
 
@@ -232,12 +239,12 @@ public class Test017 {
         //<message>java.lang.NullPointerException
         "044 file:///Documents%20and%20Settings/sklemuk/Desktop/UCSF%20Voice%20Conference%202008/Product%20Summary.xls?sheet=nist%20lo&column=H",
         //at org.virbo.excel.ExcelSpreadsheetDataSource.getDataSet(ExcelSpreadsheetDataSource.java:89) at org.virbo.autoplot.ApplicationModel.loadDataSet(ApplicationModel.java:1322) at org.virbo.autoplot.ApplicationModel.updateImmediately(ApplicationModel.java:1260) at org.virbo.autoplot.ApplicationModel.access$600(ApplicationModel.java:112) at org.virbo.autoplot.ApplicationModel$8.run(ApplicationModel.java:1293) at org.das2.system.RequestProcessor$Runner.run(RequestProcessor.java:201) at java.lang.Thread.run(Unknown Source)
-        //[edit] 13 Miscellaneous URIs
+        //TEST DATA SOURCE TYPE: 13 Miscellaneous URIs
 
         //Demonstrates problem with AutoHistogram:
 
         "045 http://goes.ngdc.noaa.gov/data/avg/2004/A1050402.TXT",
-        //[edit] 14 VAPs in the wild
+        //TEST DATA SOURCE TYPE: 14 VAPs in the wild
 
         //VAP files are Autoplot configuration files, an xml version of the DOM tree. I'd expect these to be very fragile right now, but I'll try to support them:
 
