@@ -378,57 +378,30 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 if ( !isBool ) valuePanel.add( getSpacer() );
 
                 if ( parm.type=='R' ) {
-
-                    String val= params.get(vname);
-                    if ( val!=null ) {
+                    final DataSetSelector sel= new DataSetSelector();
+                    sel.setPlotItButtonVisible(false);
+                    sel.setEnableDataSource(false);
+                    sel.setSuggestFiles(true);
+                    sel.setSuggestFsAgg(true);
+                    String val;
+                    if (params.get(vname)!=null ) {
+                        val= params.get(vname);
                         if ( val.startsWith("'") ) val= val.substring(1);
                         if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
                     } else {
                         val= String.valueOf( parm.deft );
+                        params.put( vname, val );
                     }
-
-                    //TODO: figure out, why didn't this work?
-                    //final DataSetSelector sel= new DataSetSelector();
-                    //sel.setHidePlayButton(true);
-                    //sel.setSuggestFiles(true);
-
-                    final JTextField tf= new JTextField();
-                    Dimension x= tf.getPreferredSize();
-                    x.width= Integer.MAX_VALUE;
-                    tf.setMaximumSize(x);
-                    tf.setUI( tf.getUI() ); // kludge to maybe avoid deadlock.
-
-                    Icon fileIcon= new javax.swing.ImageIcon( getClass().getResource("/org/virbo/datasource/jython/file2.png"));
-                    JButton filesButton= new JButton( fileIcon );
-                    filesButton.addActionListener( new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            org.das2.util.LoggerManager.logGuiEvent(e);
-
-                            JFileChooser c= new JFileChooser();
-                            URISplit split2= URISplit.parse(tf.getText());
-                            if ( split2.scheme.equals("file") ) {
-                                try {
-                                    c.setCurrentDirectory( new File( new URI( split2.path ) ) );
-                                    c.setSelectedFile( new File( new URI( split2.file ) ) );
-                                } catch (URISyntaxException ex) {
-                                    Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                                
-                            }
-                            int r= c.showOpenDialog(jLabel1);
-                            if ( r==JFileChooser.APPROVE_OPTION) {
-                                tf.setText("file://"+c.getSelectedFile().toString());
-                            }
-                        }
-                    });
-                    tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-
-                    tf.setText( val );
-                    ctf= tf;
-                    valuePanel.add( ctf );
-                    filesButton.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                    valuePanel.add( filesButton );
+                    sel.setRecent( DataSetSelector.getDefaultRecent() );
+                    sel.setValue( val );
+                    
+                    valuePanel.add( getSpacer(7) );  // kludge.  Set on Jeremy's home Ubuntu
+                    valuePanel.add( sel );
+                    sel.setValue( val );
+                    valuePanel.add( getSpacer(10) ); // put a little space in after the selector as well.
+                            
+                    ctf= sel;
+                    
                 } else if ( parm.type=='U' ) {
                     final DataSetSelector sel= new DataSetSelector();
                     sel.setPlotItButtonVisible(false);
