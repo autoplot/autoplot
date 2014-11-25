@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The legend icon for dashed lines failed to show the break because it was hiding behind the plot symbol.</small></p>
+        <p><small>The FITS plugin got a little cleanup this morning, along with the nightly tests.</small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +23,12 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-11-21):</p>
+        <p>Bugfixes (2014-11-25):</p>
         <ul> 
+            <li>bugfix where &amp;script=foo.jyds would be lost when entering the Jython datasource editor</li>
+            <li>cleanup of hudson tests test017 and test021.</li>
+            <li>rfe405: a number of the hudson tests showed problems in corner cases.</li>
+            <li>bugfix in fits where height and width were exchanged.</li>
             <li>rfe405: Kristoff pointed out where new code ensuring monotonic from aggregations would clip almost all the data.</li>
             <li>improve handling and transparency when PDSPPI is down</li>
             <li>bugfix 1290: jython script editor left in read-only mode </li>
