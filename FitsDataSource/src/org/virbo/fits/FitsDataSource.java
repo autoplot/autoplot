@@ -5,9 +5,13 @@
 package org.virbo.fits;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.das2.util.monitor.ProgressMonitor;
@@ -67,8 +71,14 @@ public class FitsDataSource extends AbstractDataSource {
 
             if (naxis.length == 3) {
                 naxis = new int[]{naxis[2], naxis[0], naxis[1]};
+                crval = new double[] { crval[2], crval[1], crval[0] };
+                crpix = new double[] { crpix[2], crpix[1], crpix[0] };
+                cdelt = new double[] { cdelt[2], cdelt[1], cdelt[0] };                
             } else if ( naxis.length==2 ) {
-                naxis = new int[]{naxis[1], naxis[0]};
+                naxis = new int[]{ naxis[1], naxis[0] };
+                crval = new double[] { crval[1], crval[0] };
+                crpix = new double[] { crpix[1], crpix[0] };
+                cdelt = new double[] { cdelt[1], cdelt[0] };
             } else if ( naxis.length==0 ) {
                 throw new IllegalArgumentException("Unable to use fits file");
             }
