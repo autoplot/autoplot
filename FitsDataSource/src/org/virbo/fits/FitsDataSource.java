@@ -67,6 +67,10 @@ public class FitsDataSource extends AbstractDataSource {
 
             if (naxis.length == 3) {
                 naxis = new int[]{naxis[2], naxis[0], naxis[1]};
+            } else if ( naxis.length==2 ) {
+                naxis = new int[]{naxis[0], naxis[1]};
+            } else if ( naxis.length==0 ) {
+                throw new IllegalArgumentException("Unable to use fits file");
             }
 
             result = FDataSet.wrap(fdata, naxis);
