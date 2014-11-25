@@ -838,8 +838,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 
             }
         } else {
-            params.remove(JythonDataSource.PARAM_SCRIPT);
-            params.remove(JythonDataSource.PARAM_RESOURCE_URI);
+            logger.fine("bugfix code used to go through here and do something that appeared to be incorrect.");
         }
 
         if ( support.isDirty() ) {
