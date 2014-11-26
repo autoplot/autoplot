@@ -1192,10 +1192,19 @@ public class ScriptContext extends PyJavaInstance {
      * A plotElement is added for each plot as well. 
      * @param nrows number of rows
      * @param ncolumns number of columns
-     * @param dir below or above
+     * @param dir below or above, or null (None in Jython) to replace the current plot.
      */
     public static List<Plot> addPlots( int nrows, int ncolumns, String dir ) {
-        return dom.getController().addPlots( nrows, ncolumns, dir );
+        Plot d= null;
+        if ( dir==null ) {
+            d= dom.getController().getPlot();
+        }
+        List<Plot> result= dom.getController().addPlots( nrows, ncolumns, dir );
+        if ( dir==null ) {
+            dom.getController().deletePlot(d);
+            dom.getController().setPlot(result.get(0));
+        }
+        return result;
     }
     
     /**
