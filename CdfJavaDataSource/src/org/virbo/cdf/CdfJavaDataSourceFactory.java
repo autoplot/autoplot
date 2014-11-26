@@ -42,14 +42,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
     }    
     
     public DataSource getDataSource(URI uri) throws Exception {
-        URISplit split= URISplit.parse(uri);
-        Map<String,String> params= URISplit.parseParams(split.params);
-        if ( ( "T".equals(params.get("new")) ) ) { // 
-            return new org.autoplot.cdf.CdfDataSource( uri ); // still issues: http://www.sarahandjeremy.net:8080/hudson/job/autoplot-test100/4987/
-        } else {
-            return new CdfJavaDataSource( uri );
-            //throw new IllegalArgumentException("not supported");
-        }
+        return new org.autoplot.cdf.CdfDataSource( uri ); // still issues: http://www.sarahandjeremy.net:8080/hudson/job/autoplot-test100/4987/
     }
     
     
