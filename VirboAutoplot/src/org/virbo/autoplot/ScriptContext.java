@@ -1202,8 +1202,8 @@ public class ScriptContext extends PyJavaInstance {
         List<Plot> result= dom.getController().addPlots( nrows, ncolumns, dir );
         if ( dir==null ) {
             dom.getController().deletePlot(d);
-            dom.getController().setPlot(result.get(0));
         }
+        dom.getController().setPlot(result.get(0));
         return result;
     }
     
