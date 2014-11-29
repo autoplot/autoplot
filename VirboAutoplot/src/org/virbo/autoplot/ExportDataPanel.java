@@ -295,7 +295,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
             if (format == null) {
                 if (chooser.getFileFilter().getDescription().startsWith("*.")) {
                     ext = chooser.getFileFilter().getDescription().substring(1);
-                    format = DataSourceRegistry.getInstance().getFormatByExt(ext);
+                    format = DataSourceRegistry.getInstance().getFormatByExt(ext);  // OKAY: we're just verifying that we can use this.
                     if (format == null) {
                         JOptionPane.showMessageDialog(this, "No formatter for extension: " + ext);
                         return;
