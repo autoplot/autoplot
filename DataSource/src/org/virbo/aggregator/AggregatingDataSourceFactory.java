@@ -80,7 +80,12 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return ads;
     }
 
-    private static int splitIndex(String surl) { // See also org/autoplot/pngwalk/WalkUtil.java splitIndex...
+    /**
+     * return the index of the agg part of the uri.  
+     * @param surl the URI as a string.
+     * @return the index, which will be the location of a slash.
+     */
+    protected static int splitIndex(String surl) { // See also org/autoplot/pngwalk/WalkUtil.java splitIndex...
         int i0 = surl.indexOf("%Y");  //TODO: /tmp/data_$(m,Y=2011).dat
         if ( i0==-1 ) i0 = surl.indexOf("$Y");
         int i1;
@@ -93,6 +98,13 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return i;
     }
 
+    /**
+     * return the FileStorageModel for the URI.  
+     * @param suri eg. file:/tmp/foo/$Y/$Y$m.dat
+     * @return the FileStorageModel, eg. for $Y/$Y$m.dat.
+     * @throws IOException 
+     * @see #splitIndex(java.lang.String) which splits the static part from the agg part.
+     */
     public static FileStorageModel getFileStorageModel(String suri) throws IOException {
         URISplit split= URISplit.parse(suri);
         String surl= split.surl; // support cases where resource URI is not yet valid.
