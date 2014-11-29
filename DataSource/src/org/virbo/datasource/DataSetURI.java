@@ -53,6 +53,7 @@ import org.das2.util.filesystem.URIException;
 import org.das2.util.filesystem.VFSFileSystemFactory;
 import org.das2.util.filesystem.WebFileSystem;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
+import org.virbo.aggregator.AggregatingDataSourceFormat;
 import org.virbo.dsops.Ops;
 
 /**
@@ -338,6 +339,11 @@ public class DataSetURI {
         int i = uri.getScheme().indexOf(".");
         String ext;
 
+        if ( isAggregating(uri.toString()) ) {
+            DataSourceFormat agg= new AggregatingDataSourceFormat();
+            return agg;
+        }
+        
         if (i != -1) {
             ext = uri.getScheme().substring(0, i);
 
