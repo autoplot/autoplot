@@ -592,8 +592,8 @@ public class DataSourceRegistry {
     
     /**
      * return the formatter based on the extension.
-     * @param extension
-     * @return
+     * @param extension the extension, e.g. .cdf
+     * @return the formatter found for this extension.
      */
     public DataSourceFormat getFormatByExt( String extension ) {
         if ( extension==null ) return null;
