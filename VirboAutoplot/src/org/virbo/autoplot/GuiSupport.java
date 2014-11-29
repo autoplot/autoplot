@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -570,7 +571,7 @@ public class GuiSupport {
                             ext = "";
                         }
 
-                        final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext);
+                        final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
                         if (format == null) {
                             JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
                             return;
@@ -578,6 +579,9 @@ public class GuiSupport {
                         
                         String s= URISplit.format(split);
 
+                        // this can also support aggregations.
+                        final DataSourceFormat formata= DataSetURI.getDataSourceFormat( new URI(s) );
+                        
                         DataSourceFormatEditorPanel opts= edp.getDataSourceFormatEditorPanel();
                         if ( opts!=null ) {
                             URISplit splitopts= URISplit.parse(opts.getURI());
@@ -609,7 +613,7 @@ public class GuiSupport {
                             @Override
                             public void run() {
                                 try {
-                                    doDumpData( fds,dsf,pe,format,uriOut,formatControl );
+                                    doDumpData( fds,dsf,pe,formata,uriOut,formatControl );
                                 } catch ( IOException ex ) {
                                     parent.applicationModel.getExceptionHandler().handle(ex);
                                 }
