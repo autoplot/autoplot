@@ -449,14 +449,14 @@ public class ScriptPanelSupport {
                 }
 
                 boolean updateSurl = false;
-                if ( panel.isDirty() && ( file == null || FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) ) {
+                if ( file == null || ( panel.isDirty() && FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) ) {
                     if (getSaveFile() == JFileChooser.APPROVE_OPTION) {
                         updateSurl = true;
                     } else {
                         return;
                     }
                 }
-
+                
                 if (file != null) {
                     try {
                         if (!uriFilesEqual(selector.getValue(), file.toURI().toString())) {
