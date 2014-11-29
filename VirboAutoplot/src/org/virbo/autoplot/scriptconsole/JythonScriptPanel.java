@@ -35,6 +35,7 @@ import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.util.FileUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
@@ -42,6 +43,7 @@ import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.jythonsupport.ui.EditorTextPane;
 
@@ -68,6 +70,15 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     private transient DocumentListener dirtyListener; // this contains repeated code in ScriptPanelSupport  
 
+    public void loadExampleUri( String uri ) {
+        try {
+            File ff= DataSetURI.getFile( uri, new NullProgressMonitor() );
+            loadFile( ff );
+        } catch (IOException ex) {
+            Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     /** Creates new form JythonScriptPanel */
     public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector) {
         initComponents();
@@ -180,7 +191,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);
-                DataSourceUtil.openBrowser( "https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/VirboAutoplot/src/scripts/" );
+                DataSourceUtil.openBrowser( "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-release/ws/autoplot/VirboAutoplot/src/scripts/" );
             }
         });
 
@@ -204,7 +215,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);
-                DataSourceUtil.openBrowser( "https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/JythonDataSource/src/" );
+                DataSourceUtil.openBrowser( "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-release/ws/autoplot/JythonDataSource/src/" );
             }
         });
 
