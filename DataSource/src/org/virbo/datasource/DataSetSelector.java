@@ -38,6 +38,7 @@ import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -459,7 +460,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                                     try {
                                         tsb.setURI(surl1);
                                         if ( tsb.getTimeRange()!=null && !timeRange.equals(tsb.getTimeRange() ) ) {
-                                            timeRange= pickTimeRange( this, timeRange, tsb.getTimeRange() );
+                                            timeRange= pickTimeRange( this,
+                                                    Arrays.asList( timeRange, tsb.getTimeRange() ),
+                                                    Arrays.asList( "data set selector", "URI" ) );
                                             tsb.setTimeRange(timeRange);
                                         }
                                         String suri= tsb.getURI();
@@ -2162,6 +2165,31 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
             LoggerManager.getLogger("gui").log(Level.FINE, "user picked second timerange {0}", s2);
             return timeRange2 ;
         }
+    }
+    
+    public static DatumRange pickTimeRange( Component parent, List<DatumRange> timeRange, List<String> labels ) {
+        if ( timeRange.size()==1 ) return timeRange.get(0);
+        JPanel p= new JPanel();
+        p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
+        p.add( new JLabel("<html>The URI contains a time different than the application<br>time range.  Which should be used?</html>") );
+        ButtonGroup bg= new ButtonGroup();
+        List<JRadioButton> buttons= new ArrayList<JRadioButton>();
+        for ( int i=0; i<timeRange.size(); i++ ) {
+            String s1= "<html>" + timeRange.get(i).toString() + " <em>("+labels.get(i)+")";
+            JRadioButton b1= new JRadioButton( s1 );
+            p.add(b1);
+            bg.add(b1);
+            if ( i==0 ) bg.setSelected(b1.getModel(),true);
+            buttons.add(b1);
+        }
+        JOptionPane.showMessageDialog( parent, p, "Which Range", JOptionPane.QUESTION_MESSAGE );
+        for ( int i=0; i<timeRange.size(); i++ ) {
+            if ( buttons.get(i).isSelected() ) {
+                LoggerManager.getLogger("gui").log(Level.FINE, "user picked {0} timerange {1}", new Object[] { i, timeRange.get(i) } );
+                return timeRange.get(i);
+            }
+        }
+        return null;
     }
     
 }
