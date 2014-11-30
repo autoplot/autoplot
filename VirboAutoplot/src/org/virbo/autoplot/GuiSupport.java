@@ -342,7 +342,11 @@ public class GuiSupport {
         String uri= furi;
         DatumRange dr;
         if ( !dom.getTimeRange().equals( uriRange ) ) {
-            dr= DataSetSelector.pickTimeRange( parent, dom.getTimeRange(), uriRange );
+            
+            dr= DataSetSelector.pickTimeRange( parent, 
+                    Arrays.asList( dom.getTimeRange(), uriRange ),
+                    Arrays.asList( "current timerange", "URI range" )
+                    );
             if ( dr!=uriRange ) {
                 try {
                     uri= DataSourceUtil.setTimeRange(uri,dom.getTimeRange(),new NullProgressMonitor());
