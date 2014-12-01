@@ -402,7 +402,9 @@ public class TimeSeriesBrowseController {
                     dataSourceController.update(false);
                     dataSourceController.setTsbSuri(surl);
                     dataSourceController.dsf.uri= surl;
-                    domPlot.controller.dom.controller.setFocusUri(surl);
+                    if ( domPlot!=null ) {
+                        domPlot.controller.dom.controller.setFocusUri(surl);
+                    }
                     //String blurUri= DataSetURI.blurTsbUri( surl );
                     //if ( blurUri!=null ) dataSourceController.dsf.uri= blurUri;
                 }
