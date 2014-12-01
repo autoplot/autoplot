@@ -686,6 +686,29 @@ public class ApplicationModel {
         List oldValue = Collections.unmodifiableList(recent);
         ArrayList<Bookmark> newValue = new ArrayList<Bookmark>(recent);
 
+        // check for new timerange in TSB.
+        if ( surl.startsWith("vap+") ) {
+            String lookfor= DataSetURI.blurTsbUri(surl);
+            if ( lookfor!=null ) {
+                List<Bookmark> rm= new ArrayList<Bookmark>();
+                for ( Bookmark b: newValue ) {
+                    if ( b instanceof Bookmark.Item ) {
+                        String suri1= ((Bookmark.Item)b).getUri();
+                        String suri11= DataSetURI.blurTsbUri(suri1);
+                        if ( lookfor.equals(suri11) ) {
+                            rm.add(b);
+                        }
+                    }
+                }
+                if ( rm.size()>0 ) {
+                    logger.log(Level.FINE, "removing {0} other TSB uris", rm.size());
+                    for ( Bookmark o: rm ) {
+                        newValue.remove(o);
+                    }
+                }
+            }
+        }
+
         if ( !surl.equals("") ) {
             Bookmark book = new Bookmark.Item(surl);
             if (newValue.contains(book)) { // move it to the front of the list
@@ -694,7 +717,7 @@ public class ApplicationModel {
 
             newValue.add(book);
         }
-
+        
         while (newValue.size() > MAX_RECENT) {
             newValue.remove(0);
         }
