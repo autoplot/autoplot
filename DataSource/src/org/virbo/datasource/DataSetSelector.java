@@ -411,12 +411,25 @@ public class DataSetSelector extends javax.swing.JPanel {
                         }
 
                     }
+                    
+                    TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
+                    if ( false ) { // TODO: experiment more with this code
+                    if ( tsb!=null ) {
+                        if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) && !timeRange.equals(DataSourceUtil.DEFAULT_TIME_RANGE) ) {
+                            DatumRange newTr= tsb.getTimeRange();
+                            if ( newTr!=null ) {
+                                logger.fine("resetting TSB timeRange to URI range");
+                                timeRange= tsb.getTimeRange();
+                            }
+                        }
+                    }
+                    }
+                    
                     setMessage("busy: checking to see if uri looks acceptable");
                     String surl1 = surl;
                     ProgressMonitor mon= getMonitor();
                     List<String> problems= new ArrayList();
                     if (f.reject(surl1, problems,mon)) { // This is the often-seen code that replaces the timerange in a URI. +#+#+
-                        TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
                         if ( tsb!=null ) {
                             if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) && !timeRange.equals(DataSourceUtil.DEFAULT_TIME_RANGE) ) {
                                 try {
@@ -454,7 +467,6 @@ public class DataSetSelector extends javax.swing.JPanel {
                         }
                         boolean bug1098= true; // hold this change until next release.
                         if ( bug1098 ) {
-                            TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
                             if ( tsb!=null ) {
                                 if ( timeRange!=null && !timeRange.equals(DataSourceUtil.DEFAULT_TIME_RANGE) && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
                                     try {
@@ -1941,6 +1953,11 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     private DatumRange timeRange=null;
     public static final String PROP_TIMERANGE = "timeRange";
     
+    /**
+     * get the timerange associated with this focus dataset.  This is typically
+     * the same as the xaxis range.
+     * @return the timerange associated with this focus dataset.
+     */
     public DatumRange getTimeRange() {
         return timeRange;
     }
@@ -1948,7 +1965,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     /**
      * set default timeRange when aggregation is used, or for dialogs.
      * null is allowed, indicating there is no focus timerange
-     * @param timeRange
+     * @param timerange
      */
     public void setTimeRange(DatumRange timerange) {
         DatumRange oldRange= this.timeRange;
