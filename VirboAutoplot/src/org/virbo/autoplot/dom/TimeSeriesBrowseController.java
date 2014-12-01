@@ -399,8 +399,10 @@ public class TimeSeriesBrowseController {
                     dataSourceController.cancel();
                     dataSourceController.update(false);
                     dataSourceController.setTsbSuri(surl);
-                    String blurUri= DataSetURI.blurTsbUri( surl );
-                    if ( blurUri!=null ) dataSourceController.dsf.uri= blurUri;
+                    dataSourceController.dsf.uri= surl;
+                    domPlot.controller.dom.controller.setFocusUri(surl);
+                    //String blurUri= DataSetURI.blurTsbUri( surl );
+                    //if ( blurUri!=null ) dataSourceController.dsf.uri= blurUri;
                 }
             } else {
                 logger.fine("loaded dataset satifies request");
