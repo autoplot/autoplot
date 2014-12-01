@@ -54,6 +54,7 @@ import org.das2.util.filesystem.VFSFileSystemFactory;
 import org.das2.util.filesystem.WebFileSystem;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.aggregator.AggregatingDataSourceFormat;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 
 /**
@@ -320,6 +321,24 @@ public class DataSetURI {
         if (newURLSplit.params != null && !newURLSplit.params.equals(""))
             scontext.params = newURLSplit.params;
         return URISplit.format(scontext);
+    }
+
+    /**
+     * create the URI without the timerange.
+     * @param value a uri. e.g. /tmp/foo$Y$m$d.dat?timerange=2014-001
+     * @return null or the value without the timerange, e.g. /tmp/foo$Y$m$d.dat
+     */
+    public static String blurTsbUri(String value) {
+        try {
+            DataSource ds= getDataSource(value);
+            TimeSeriesBrowse tsb= ds.getCapability( TimeSeriesBrowse.class );
+            if (tsb==null ) return null;
+            tsb.setURI(value);
+            return tsb.blurURI();
+        } catch (Exception ex) {
+            return null;
+        }
+        
     }
 
     // mark the special case where a resource is actually a folder.
