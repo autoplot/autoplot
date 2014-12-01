@@ -109,7 +109,7 @@ public class TimeSeriesBrowseController {
 
                 final PlotElement fpe= p;
                 final DataSourceFilter fdsf= p!=null ? p.getController().getDataSourceFilter() : null;
-                final TimeSeriesBrowse ftsb= fdsf!=null ?  p.getController().getDataSourceFilter().getController().getTsb() : null;
+                final TimeSeriesBrowse ftsb= fdsf!=null ?  fdsf.getController().getTsb() : null;
 
                 if ( dom.getController().isValueAdjusting() ) {
                     updateTsbTimer.tickle(); 
@@ -172,6 +172,7 @@ public class TimeSeriesBrowseController {
             public String toString() {
                return ""+TimeSeriesBrowseController.this;
             }
+            @Override
             public void propertyChange(PropertyChangeEvent e) {
                 //we should have something to listen for locks.
                 if (e.getPropertyName().equals(property)) {
@@ -261,6 +262,7 @@ public class TimeSeriesBrowseController {
             public String toString() {
                return ""+TimeSeriesBrowseController.this;
             }
+            @Override
             public void propertyChange(PropertyChangeEvent e) {
                 if (plot.getXAxis().valueIsAdjusting()) {
                     return;
@@ -316,9 +318,9 @@ public class TimeSeriesBrowseController {
                 }
             }
 
-            DatumRange visibleRange = null;
+            DatumRange visibleRange;
             Datum newResolution = null;
-            CacheTag testCacheTag = null; // sloppy one
+            CacheTag testCacheTag; // sloppy one
             if ( xAxis!=null ) {
                 visibleRange= xAxis.getDatumRange();
                 if ( xAxis.getDLength()>2 ) {
