@@ -259,7 +259,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
             URISplit split = URISplit.parse(surl);
             Map<String,String> mparams = URISplit.parseParams(split.params);
-
+            mparams.remove("resolution");
             split.params = URISplit.formatParams(mparams);
 
             URISplit split2= URISplit.parse(AggregatingDataSource.this.uri);
