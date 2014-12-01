@@ -346,11 +346,11 @@ class Das2ServerDataSource extends AbstractDataSource {
                  }else if ( cause!=null && ( cause instanceof org.das2.dataset.NoDataInIntervalException )) {
                     throw (org.das2.dataset.NoDataInIntervalException)ex.getCause();
                 } else if ( ex.getMessage().contains("Empty response from reader")  ) {
-                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage()+techContact );
+                    throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage()+" " +techContact );
                 } else if ( ex.getMessage().contains("No data found") ) {
                     throw new org.das2.dataset.NoDataInIntervalException(ex.getMessage());
                 } else {
-                    ex= new StreamException( ex.getMessage()+ "\ndataset request was\n"+url2+techContact );
+                    ex= new StreamException( ex.getMessage()+ "\ndataset request was \n"+url2+" " +techContact );
                     logger.log( Level.INFO, ex.getMessage(), ex );
                     throw ex;
                 }
@@ -461,7 +461,9 @@ class Das2ServerDataSource extends AbstractDataSource {
                         + "&start_time=" + stime
                         + "&end_time=" + etime;
                 if ( resolution!=null ) {
-                        sparams+= "&resolution=" + resolution.doubleValue(Units.seconds);
+                    double resSec= resolution.doubleValue(Units.seconds);
+                    resSec= Math.round( resSec * 1000 ) / 1000.;
+                    sparams+= "&resolution=" + resSec;
                 } else {
                     logger.fine("no resolution specified");
                 }
