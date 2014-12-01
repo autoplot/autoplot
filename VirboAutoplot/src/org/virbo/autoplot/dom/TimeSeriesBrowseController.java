@@ -27,6 +27,7 @@ import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
 import org.das2.datum.format.DateTimeDatumFormatter;
 import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
@@ -230,6 +231,7 @@ public class TimeSeriesBrowseController {
             try {
                 changesSupport.performingChange( TimeSeriesBrowseController.this, PENDING_AXIS_DIRTY );
                 DatumRange tr = dataSourceController.getTsb().getTimeRange();
+                if ( tr==null ) tr= this.domPlot.getXaxis().getRange();
                 this.setTimeRange( tr );
                 if ( this.domPlot.getXaxis().isAutoRange() && !valueWasAdjusting ) {
                     BindingModel[] bms= dsf.getController().getApplication().getBindings();
@@ -397,6 +399,8 @@ public class TimeSeriesBrowseController {
                     dataSourceController.cancel();
                     dataSourceController.update(false);
                     dataSourceController.setTsbSuri(surl);
+                    String blurUri= DataSetURI.blurTsbUri( surl );
+                    if ( blurUri!=null ) dataSourceController.dsf.uri= blurUri;
                 }
             } else {
                 logger.fine("loaded dataset satifies request");
