@@ -1969,7 +1969,7 @@ APSplash.checkTime("init 52.9");
             toolsManager.setTitle("Tools Manager");
             toolsManager.setPrefNode("tools");
 
-            Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, applicationModel, BeanProperty.create( "tools" ), toolsManager.getModel(), BeanProperty.create("list"));
+            Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, applicationModel, BeanProperty.create( "tools" ), toolsManager.getModel(), BeanProperty.create("list")); 
             b.bind();
 
             toolsManager.getModel().addPropertyChangeListener(BookmarksManagerModel.PROP_BOOKMARK, new PropertyChangeListener() {
