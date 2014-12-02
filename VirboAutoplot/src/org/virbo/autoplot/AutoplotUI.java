@@ -545,7 +545,13 @@ public final class AutoplotUI extends javax.swing.JFrame {
             public void actionPerformed( ActionEvent ev ) {
                 if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
                     org.das2.util.LoggerManager.logGuiEvent(ev);                    
-                    runScript( dataSetSelector.getValue() );
+                    String s= dataSetSelector.getValue();
+                    try {
+                        JythonUtil.invokeScriptSoon( DataSetURI.getURL(s), dom, 
+                                new HashMap(), true, true, new NullProgressMonitor() );
+                    } catch ( IOException ex ) { 
+                        throw new RuntimeException(ex);
+                    }
                 } else {
                     org.das2.util.LoggerManager.logGuiEvent(ev);  
                     if ( JOptionPane.YES_OPTION==
