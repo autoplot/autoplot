@@ -931,9 +931,11 @@ public class DataPanel extends javax.swing.JPanel {
             p.setFilter(componentTextField1.getText());
             int ret= JOptionPane.showConfirmDialog( this, p, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
             if ( ret==JOptionPane.OK_OPTION ) {
-                componentTextField1.setText( p.getFilter() );
-                applicationController.getPlotElement().setComponentAutomatically( componentTextField1.getText() );
-                recentComboBox.actionPerformed(evt); // kludge to get it to log the new filter
+                String newFilter= p.getFilter();
+                componentTextField1.setText( newFilter );
+                applicationController.getPlotElement().setComponentAutomatically( newFilter );
+                recentComboBox.setSelectedItem( newFilter );
+                //recentComboBox.actionPerformed(evt); // kludge to get it to log the new filter
                 componentChanged();
             }
         } else {        
@@ -941,8 +943,10 @@ public class DataPanel extends javax.swing.JPanel {
             p.setFilters(componentTextField1.getText());
             int ret= JOptionPane.showConfirmDialog( this, p, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
             if ( ret==JOptionPane.OK_OPTION ) {
-                componentTextField1.setText( p.getFilters() );
-                applicationController.getPlotElement().setComponentAutomatically( componentTextField1.getText() );
+                String newFilter= p.getFilters();
+                componentTextField1.setText( newFilter );
+                applicationController.getPlotElement().setComponentAutomatically( newFilter );
+                recentComboBox.setSelectedItem( newFilter );
                 recentComboBox.actionPerformed(evt); // kludge to get it to log the new filter
                 componentChanged();
             }
