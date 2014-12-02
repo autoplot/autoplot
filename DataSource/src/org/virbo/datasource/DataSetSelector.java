@@ -474,7 +474,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                         if ( tsb.getTimeRange()!=null && !timeRange.equals(tsb.getTimeRange() ) ) {
                                             timeRange= pickTimeRange( this,
                                                     Arrays.asList( timeRange, tsb.getTimeRange() ),
-                                                    Arrays.asList( "data set selector", "URI" ) );
+                                                    Arrays.asList( "Current", "URI" ) );
                                             tsb.setTimeRange(timeRange);
                                         }
                                         String suri= tsb.getURI();
@@ -2184,10 +2184,21 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         }
     }
     
+    /**
+     * allow the user to pick one of a set of times, when it is ambiguous what they want.
+     * @param parent null or the component to focus.
+     * @param timeRange list of time ranges, which may also contain null.
+     * @param labels for each time range.
+     * @return the timerange selected.
+     */
     public static DatumRange pickTimeRange( Component parent, List<DatumRange> timeRange, List<String> labels ) {
+        for ( int i=timeRange.size()-1; i>=0; i-- ) {
+            if ( timeRange.get(i)==null ) {
+                timeRange.remove(i);
+                labels.remove(i);
+            }
+        }
         if ( timeRange.size()==1 ) return timeRange.get(0);
-        if ( timeRange.get(0)==null ) return timeRange.get(1);
-        if ( timeRange.get(1)==null ) return timeRange.get(0);
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
         p.add( new JLabel("<html>The URI contains a time different than the application<br>time range.  Which should be used?</html>") );
