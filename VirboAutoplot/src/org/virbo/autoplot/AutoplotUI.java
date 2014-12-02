@@ -70,6 +70,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TooManyListenersException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -253,6 +255,8 @@ public final class AutoplotUI extends javax.swing.JFrame {
     private List<JComponent> expertMenuItems= new ArrayList(); // list of items to hide
     private JMenu expertMenu;
 
+    private Timer apbusy= new Timer("apbusy", true);
+            
     /**
      * utility for mucking around with the guis to figure out why it can't shrink.  It was because the JComboBox on the
      * timerange panel had long timeranges.
@@ -447,6 +451,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     source.showFileSystemCompletions( true, false, "[^\\s]+[^\\s]+(\\.(?i)(xml)|(xml\\.gz))$" );
                 } else {
                     while ( getBookmarksManager()==null || getBookmarksManager().getModel()==null || getBookmarksManager().getModel().getList()==null ) {
+                        logger.fine("waiting for bookmarks manager to be initialized");
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException ex) {
@@ -1964,10 +1969,10 @@ APSplash.checkTime("init 52.9");
             toolsManager.setTitle("Tools Manager");
             toolsManager.setPrefNode("tools");
 
-            Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, applicationModel, BeanProperty.create( "tools" ), bookmarksManager.getModel(), BeanProperty.create("list"));
+            Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, applicationModel, BeanProperty.create( "tools" ), toolsManager.getModel(), BeanProperty.create("list"));
             b.bind();
 
-            bookmarksManager.getModel().addPropertyChangeListener(BookmarksManagerModel.PROP_BOOKMARK, new PropertyChangeListener() {
+            toolsManager.getModel().addPropertyChangeListener(BookmarksManagerModel.PROP_BOOKMARK, new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     updateToolsBookmarks();
@@ -4185,14 +4190,7 @@ APSplash.checkTime("init 240");
                 }
                 
                 if ( app!=null ) {
-                    Runnable checkStatusRunnable= new Runnable() {
-                        @Override
-                        public void run() {
-                            checkStatusLoop(app);
-                        }
-                    };
-                    new Thread(checkStatusRunnable,"apPendingChangesMonitor").start();
-                            //System.err.println("initAutoplot took (ms): "+(System.currentTimeMillis()-t0) );
+                    checkStatusLoop(app);
                 }
             };
         } );
@@ -4213,60 +4211,72 @@ APSplash.checkTime("init 240");
     
     /**
      * periodically scan the application for nodes that are busy, and indicate
-     * with a busy swirl icon if the app is busy.
-     * @param app 
+     * with a busy swirl icon if the app is busy.  This now uses app.apbusy to
+     * schedule the checks.
+     *
+     * @param app
      */
-    private static void checkStatusLoop( AutoplotUI app ) {
-        while ( true ) {
-            LinkedHashMap<Object,Object> changes= new LinkedHashMap();
-            app.dom.getController().pendingChanges(changes); // TODO: there's a NullPointerException when this is run with --script.
-            //dom.getController().getCanvas().getController().getDasCanvas().pendingChanges(changes);
-            if ( app.statusLabel.getIcon()==WARNING_ICON ) {
-                // wait for setMessage to clear this.
-            } else {
-                if ( changes.size()>0 ) {
-                    app.currentIcon= BUSY_ICON;
-                    String chstr="";
-                    for ( Entry<Object,Object> e: changes.entrySet() ) { 
-                        String client= String.valueOf(e.getValue());
-                        int ist= client.indexOf("(");
-                        int ien= client.lastIndexOf(")");
-                        if ( ist!=-1 ) {
-                            client= client.substring(0,ist)+client.substring(ien+1);
-                        }
-                        if ( chstr.equals("") ) {
-                            chstr= "* " + e.getKey() + " (" + client + ")";
-                        } else {
-                            chstr= chstr + "\n" + "* " + e.getKey() + " (" + client + ")";
-                        }
-                    }
-                    app.currentIconTooltip= chstr;
+    private static void checkStatusLoop(final AutoplotUI app) {
+        //final long t0 = System.currentTimeMillis();
+
+        TimerTask run = new TimerTask() {
+            public String toString() {
+                return "apPendingChangesMonitor";
+            }
+            @Override
+            public void run() {
+                LinkedHashMap<Object, Object> changes = new LinkedHashMap();
+                app.dom.getController().pendingChanges(changes); // TODO: there's a NullPointerException when this is run with --script.
+                //dom.getController().getCanvas().getController().getDasCanvas().pendingChanges(changes);
+                if (app.statusLabel.getIcon() == WARNING_ICON) {
+                    // wait for setMessage to clear this.
                 } else {
-                    app.currentIcon= IDLE_ICON;
-                    app.currentIconTooltip= null;
-                }
-                boolean update= false;
-                if ( app.currentIcon!=app.statusLabel.getIcon() ) update=true;
-                String currentStatusLabel= app.statusLabel.getToolTipText();
-                if ( app.currentIconTooltip!=currentStatusLabel || ( app.currentIconTooltip!=null && !app.currentIconTooltip.equals(currentStatusLabel) ) ) update= true;
-                if ( update ) {
-                    try {
-                        SwingUtilities.invokeAndWait(app.updateIconRunnable);
-                    } catch (InterruptedException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    } catch (InvocationTargetException ex) {
-                        logger.log(Level.SEVERE, null, ex);
+                    if (changes.size() > 0) {
+                        app.currentIcon = BUSY_ICON;
+                        String chstr = "";
+                        for (Entry<Object, Object> e : changes.entrySet()) {
+                            String client = String.valueOf(e.getValue());
+                            int ist = client.indexOf("(");
+                            int ien = client.lastIndexOf(")");
+                            if (ist != -1) {
+                                client = client.substring(0, ist) + client.substring(ien + 1);
+                            }
+                            if (chstr.equals("")) {
+                                chstr = "* " + e.getKey() + " (" + client + ")";
+                            } else {
+                                chstr = chstr + "\n" + "* " + e.getKey() + " (" + client + ")";
+                            }
+                        }
+                        app.currentIconTooltip = chstr;
+                    } else {
+                        app.currentIcon = IDLE_ICON;
+                        app.currentIconTooltip = null;
                     }
+                    boolean update = false;
+                    if (app.currentIcon != app.statusLabel.getIcon()) {
+                        update = true;
+                    }
+                    String currentStatusLabel = app.statusLabel.getToolTipText();
+                    if (app.currentIconTooltip != currentStatusLabel || (app.currentIconTooltip != null && !app.currentIconTooltip.equals(currentStatusLabel))) {
+                        update = true;
+                    }
+                    if (update) {
+                        try {
+                            SwingUtilities.invokeAndWait(app.updateIconRunnable);
+                        } catch (InterruptedException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        } catch (InvocationTargetException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
+                    //System.err.println("apbusy "+(System.currentTimeMillis()-t0)/1000. );
                 }
             }
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            }
-        }
+        };
+        app.apbusy.schedule(run, 500, 200);
         
     }
+    
     /**
      * add a drop listener so that URIs can be dropped on to plots.  This should be added to
      * plots as they are created.
@@ -4491,31 +4501,18 @@ APSplash.checkTime("init 240");
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
-    private void sleep( int millis ) {
-        if ( millis==0 ) return;
-        try {
-            if ( SwingUtilities.isEventDispatchThread() ) {
-                throw new IllegalArgumentException("delay on event thread");
-            }
-            if ( millis==-1 ) millis= 500;
-            Thread.sleep(millis);
-        } catch (InterruptedException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-    }
-
     /**
      * invoke the runnable after at least delayMillis.  If evt is true, then
      * put the runnable on the event thread after.
      * @param delayMillis -1 for default delay, 0 for none, or the positive number of milliseconds
-     * @param evt true means run on the event thread.
-     * @param run
+     * @param evt if true, run on the event thread, otherwise use the timer thread.
+     * @param run the runnable.
      */
-    private void invokeLater( final int delayMillis, final boolean evt, final Runnable run ) {
-        Runnable sleepRun= new Runnable() {
+    private void invokeLater( int delayMillis, final boolean evt, final Runnable run ) {
+        TimerTask sleepRun= new TimerTask() {
             @Override      
             public void run() {
-                sleep(delayMillis);
+                //sleep(delayMillis);
                 if ( evt ) {
                     SwingUtilities.invokeLater(run);
                 } else {
@@ -4523,17 +4520,19 @@ APSplash.checkTime("init 240");
                 }
             }
         };
-        RequestProcessor.invokeLater(sleepRun);
+        if ( delayMillis==-1 ) delayMillis= 500;
+        //RequestProcessor.invokeLater(sleepRun);
+        apbusy.schedule( sleepRun, delayMillis );
     }
 
     private void addTools() {
-        RequestProcessor.invokeLater( new Runnable() {
+        TimerTask addToolsRun= new TimerTask() {
             @Override            
             public void run() {
-                sleep(-1);
                 reloadTools();
             }
-        });
+        };
+        apbusy.schedule( addToolsRun, 500 );
     }
 
     /**
