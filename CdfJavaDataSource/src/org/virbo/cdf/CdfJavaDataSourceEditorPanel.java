@@ -378,8 +378,6 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             cdfException= null;
         } catch ( Exception ex ) {
             cdfException= ex;
-        } catch ( Throwable ex ) {
-            cdfException= ex;
         }
         return true;
     }
@@ -399,7 +397,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             if ( cdf==null && cdfException==null ) {
                 try {
                     cdf = CdfDataSource.getCdfFile(fileName);
-                } catch (Throwable ex) {
+                } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
             }
@@ -614,7 +612,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                             }
                         }
                         root.add( node );
-                    } catch (Throwable ex ) {
+                    } catch (Exception ex ) {
                         logger.log(Level.WARNING,"parameter name found: "+s+" referred to by " +e.getKey(),ex);
                         root.add( node );
                     }
@@ -626,7 +624,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                         selection= new TreePath( new Object[] { root, node } );
                     }
                 }
-            } catch ( Throwable t ) {
+            } catch ( Exception t ) {
+                logger.log(Level.WARNING,t.getMessage(),t);
 
             }
         }

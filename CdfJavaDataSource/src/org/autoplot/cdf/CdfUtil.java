@@ -414,31 +414,21 @@ public class CdfUtil {
         int recLenBytes= BufferDataSet.byteCount(bbType);
         if ( dimSizes.length>0 ) recLenBytes= recLenBytes * DataSetUtil.product( dimSizes );            
         
-        try {
-
-            String stype = getTargetType( cdf.getType(svariable) );
-            ByteBuffer buff2;
-            if ( recInterval>1 ) {
-                buff2= ByteBuffer.allocate((int)(recLenBytes*rc));
-                for ( int i=0; i<rc; i++ ) {
-                    int recNum= (int)recStart+(int)recInterval*i;
-                    ByteBuffer buff1= cdf.getBuffer( svariable, stype, new int[] { recNum,recNum }, true );
-                    buff2.put(buff1);
-                    if ( i==0 ) buff2.order(buff1.order());
-                }
-                buff2.flip();
-            } else {
-                buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, true );
+        String stype = getTargetType( cdf.getType(svariable) );
+        ByteBuffer buff2;
+        if ( recInterval>1 ) {
+            buff2= ByteBuffer.allocate((int)(recLenBytes*rc));
+            for ( int i=0; i<rc; i++ ) {
+                int recNum= (int)recStart+(int)recInterval*i;
+                ByteBuffer buff1= cdf.getBuffer( svariable, stype, new int[] { recNum,recNum }, true );
+                buff2.put(buff1);
+                if ( i==0 ) buff2.order(buff1.order());
             }
-            buf= new ByteBuffer[] { buff2 };
-            
-        } catch ( Throwable ex ) {
-            if ( ex instanceof Exception ) {
-                throw (Exception)ex;
-            } else {
-                throw new Exception(ex);
-            }
+            buff2.flip();
+        } else {
+            buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, true );
         }
+        buf= new ByteBuffer[] { buff2 };
 
         MutablePropertyDataSet result;
         
@@ -508,12 +498,10 @@ public class CdfUtil {
         if ( varType == CDFConstants.CDF_CHAR || varType==CDFConstants.CDF_UCHAR ) {
             EnumerationUnits units = EnumerationUnits.create(svariable);
             Object o;
-            try {
-                if ( recInterval>1 ) throw new IllegalArgumentException("recInterval>1 not supported here");
-                o = cdf.get(svariable);
-            } catch (Throwable ex) {
-                throw new RuntimeException(ex);
-            }
+
+            if ( recInterval>1 ) throw new IllegalArgumentException("recInterval>1 not supported here");
+            o = cdf.get(svariable);
+
             Object o0= Array.get(o,0);
             String[] sdata;
             if ( o0.getClass().isArray() ) {

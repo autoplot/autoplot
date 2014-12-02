@@ -205,7 +205,7 @@ public class CdfDataSource extends AbstractDataSource {
                     }
                 }
             }
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             logger.log( Level.SEVERE, "An exception was caught in CdfJava openFiles caching", ex );
             ex.printStackTrace();
             throw new RuntimeException(ex);
@@ -702,7 +702,7 @@ public class CdfDataSource extends AbstractDataSource {
                     Object v= CdfUtil.wrapCdfHyperDataHacked( cdf,(String)o, 0, -1, 1, -1, new NullProgressMonitor() );
                     props.put( "UNIT_PTR_VALUE", v );
 
-                } catch (Throwable ex) {
+                } catch (Exception ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
@@ -1193,7 +1193,7 @@ public class CdfDataSource extends AbstractDataSource {
                 }
                 
                 return attributes; // transient state
-            } catch ( Throwable ex ) {
+            } catch ( Exception ex ) {
                 if ( ex instanceof IllegalArgumentException ) {
                     throw (IllegalArgumentException)ex;
                 } else {

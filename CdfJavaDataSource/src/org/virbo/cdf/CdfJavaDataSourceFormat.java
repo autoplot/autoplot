@@ -72,7 +72,6 @@ public class CdfJavaDataSourceFormat implements DataSourceFormat {
 
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws Exception {
 
-        try {
         URISplit split= URISplit.parse( uri );
         java.util.Map<String, String> params= URISplit.parseParams( split.params );
 
@@ -135,17 +134,12 @@ public class CdfJavaDataSourceFormat implements DataSourceFormat {
             if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
             if ( dep1!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_1", CDFDataType.CHAR, nameFor(dep1) );
             if ( dep2!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_2", CDFDataType.CHAR, nameFor(dep2) );
-        } catch ( Throwable ex ) {
+        } catch ( Exception ex ) {
             logger.log( Level.WARNING, ex.getMessage() , ex );
         }
             
         cdf.write( file.toString() );
         
-        } catch ( Throwable t ) {
-            throw new Exception(t);
-        } finally {
-            
-        }
     }
 
     private void addVariableRank1NoVary( QDataSet ds, String name, Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon ) throws Exception {
@@ -160,17 +154,11 @@ public class CdfJavaDataSourceFormat implements DataSourceFormat {
         }
 
         if ( ds.rank()==1 ) {
-            try {
-                //cdf.defineNRVVariable( name, type, new int[0], 0 );
-                //cdf.createVariable( name, type, new int[0] );
-                cdf.addNRVVariable( name, type, new int[] { ds.length() }, dataSetToNioArray( ds, uc, type, mon ) );
-                
-            } catch ( Throwable ex ) {
-                throw new RuntimeException(ex);
-            }
+            //cdf.defineNRVVariable( name, type, new int[0], 0 );
+            //cdf.createVariable( name, type, new int[0] );
+            cdf.addNRVVariable( name, type, new int[] { ds.length() }, dataSetToNioArray( ds, uc, type, mon ) );
 
         } else {
-            
             throw new IllegalArgumentException("not supported!");
             
         }
@@ -480,30 +468,24 @@ public class CdfJavaDataSourceFormat implements DataSourceFormat {
             throw new IllegalArgumentException("high rank data not supported");
         }
         
-        try {
             
-            if ( ds.rank()==1 ) {
-                cdf.defineVariable( name, type, new int[0] );
-                //cdf.createVariable( name, type, new int[0] );
-                cdf.addData( name, dataSetToNioArray( ds, uc, type, mon ) );
+        if ( ds.rank()==1 ) {
+            cdf.defineVariable( name, type, new int[0] );
+            //cdf.createVariable( name, type, new int[0] );
+            cdf.addData( name, dataSetToNioArray( ds, uc, type, mon ) );
 
-            } else if ( ds.rank()==2 ) {
-                cdf.defineVariable( name, type, new int[] { ds.length(0) } );
-                cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
+        } else if ( ds.rank()==2 ) {
+            cdf.defineVariable( name, type, new int[] { ds.length(0) } );
+            cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
 
-            } else if ( ds.rank()==3 ) {
-                cdf.defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
-                cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
+        } else if ( ds.rank()==3 ) {
+            cdf.defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
+            cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
 
-            } else if ( ds.rank()==4 ) {
-                cdf.defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
-                cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
+        } else if ( ds.rank()==4 ) {
+            cdf.defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
+            cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
 
-            }
-            
-        } catch ( Throwable th ) {
-            
-            throw new RuntimeException(th);
         }
 
         copyMetadata( units, name, ds );
@@ -519,7 +501,6 @@ public class CdfJavaDataSourceFormat implements DataSourceFormat {
      */
     private void copyMetadata( Units units, String name, QDataSet ds ) throws Exception {
         
-        try {
         if ( units!=null ) {
             if (units != Units.cdfEpoch) {
                 cdf.addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, units.toString() );
@@ -598,9 +579,6 @@ public class CdfJavaDataSourceFormat implements DataSourceFormat {
             displayType= "time_series";
         }
         cdf.addVariableAttributeEntry( name,"DISPLAY_TYPE", CDFDataType.CHAR, displayType );
-        } catch ( Throwable th ) {
-            throw new Exception(th);
-        }
 
     }
 

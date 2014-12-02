@@ -99,13 +99,8 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
                     Map<String,String> result;
 
                     CDFReader cdf;
-                    try {
-                        cdf = CdfDataSource.getCdfFile(f.toString());
-                    } catch (Throwable ex) {
-                        throw new RuntimeException(ex);
-                    }
+                    cdf = CdfDataSource.getCdfFile(f.toString());
                     result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, true, 4);
-                    
 
                     List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                     for ( String key:result.keySet() ) {

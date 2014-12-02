@@ -60,11 +60,8 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
             logger.log(Level.FINEST, "opening cdf file {0}", fileName);
 
             CDFReader cdf;
-            try {
-                cdf = CdfDataSource.getCdfFile(fileName);
-            } catch (Throwable ex) {
-                throw new Exception(ex);
-            }
+
+            cdf = CdfDataSource.getCdfFile(fileName);
 
             logger.finest("inspect cdf for plottable parameters");
             Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 4 );
@@ -96,11 +93,9 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 
                 CDFReader cdf;
-                try {
-                    cdf = CdfDataSource.getCdfFile(fileName);
-                } catch (Throwable ex) {
-                    throw new RuntimeException(ex);
-                }
+
+                cdf = CdfDataSource.getCdfFile(fileName);
+
                 Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 4 );
                 //cdf.close();
                 
@@ -129,11 +124,8 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 String fileName= cdfFile.toString();
                 
                 CDFReader cdf;
-                try {
-                    cdf = org.autoplot.cdf.CdfDataSource.getCdfFile(fileName);
-                } catch (Throwable ex) {
-                    throw new RuntimeException(ex);
-                }
+                cdf = org.autoplot.cdf.CdfDataSource.getCdfFile(fileName);
+
                 Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 2 );
                                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
@@ -182,11 +174,8 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 return true;
             } else {
                 CDFReader cdf;
-                try {
-                    cdf = CdfDataSource.getCdfFile( file.getPath() );
-                } catch ( Throwable ex ) {
-                    throw new RuntimeException(ex);
-                }
+                cdf = CdfDataSource.getCdfFile( file.getPath() );
+
                 Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 4 );
                 //cdf.close();
                 int i= param.indexOf("[");
