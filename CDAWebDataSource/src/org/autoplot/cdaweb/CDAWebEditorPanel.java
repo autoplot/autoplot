@@ -77,7 +77,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     CdfJavaDataSourceEditorPanel paramEditor;
     JComponent messageComponent=null;
     boolean haveAddedRecent= false;
-    private static final String MSG_NO_DATASET = "<html><em>No dataset selected, pick initial dataset...</em></html>";
+    private static final String MSG_NO_DATASET = "<html><i>No dataset selected, pick initial dataset...</i></html>";
     private String currentDs= "";
     private String filter="";
     private String id="";
@@ -300,7 +300,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 }
                 ndot++;
                 if ( ndot==4 ) ndot=1;
-                label.setText( "<html><em><br>&nbsp;Loading file" + "...".substring(0,ndot)+p+"</em></html>" );
+                label.setText( "<html><i><br>&nbsp;Loading file" + "...".substring(0,ndot)+p+"</i></html>" );
             }
         } );
         
@@ -332,7 +332,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 if ( paramEditor!=null ) parameterPanel.remove( paramEditor );
                 if ( messageComponent!=null ) parameterPanel.remove( messageComponent );
 
-                messageComponent= mon.getLabelComponent(); // new JLabel("<html><em><br>&nbsp;Loading file...</em></html>"); // this causes problem when droplist is used.
+                messageComponent= mon.getLabelComponent(); // new JLabel("<html><i><br>&nbsp;Loading file...</i></html>"); // this causes problem when droplist is used.
                 parameterPanel.add( messageComponent, BorderLayout.NORTH );
                 parameterPanel.validate();
             }
@@ -354,7 +354,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             if ( ( ds==null || ds.length()==0 ) ? currentDs != null : true ) {
                 doRefreshDataSet(ds,args,mon);
             } else {
-                messageComponent= new JLabel("<html><em><br>&nbsp;No dataset selected.</em></html>"); // this causes problem when droplist is used.
+                messageComponent= new JLabel("<html><i><br>&nbsp;No dataset selected.</i></html>"); // this causes problem when droplist is used.
                 parameterPanel.add( messageComponent, BorderLayout.NORTH );
                 parameterPanel.validate();    
             }
@@ -365,7 +365,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 public void run() {
                     if ( paramEditor!=null ) parameterPanel.remove( paramEditor );
                     if ( messageComponent!=null ) parameterPanel.remove( messageComponent );
-                    messageComponent= new JLabel("<html><em><br>"+msg+"</em></html>");
+                    messageComponent= new JLabel("<html><i><br>"+msg+"</i></html>");
                     parameterPanel.add( messageComponent, BorderLayout.NORTH );
                     parameterPanel.validate();
                 }
@@ -560,7 +560,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     private void dsidComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dsidComboBoxActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         parameterPanel.removeAll();
-        messageComponent= new JLabel("<html><em>Resetting...</em></html>"); // this causes problem when droplist is used.
+        messageComponent= new JLabel("<html><i>Resetting...</i></html>"); // this causes problem when droplist is used.
         parameterPanel.add( messageComponent, BorderLayout.NORTH );
         parameterPanel.revalidate();
         parameterPanel.repaint();
