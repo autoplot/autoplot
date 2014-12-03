@@ -1,0 +1,47 @@
+# show how iText library can be used to write a report.  This still needs work!
+
+from com.itextpdf.text import Document,Rectangle,Paragraph
+from com.itextpdf.awt import PdfGraphics2D
+from com.itextpdf.text.pdf import PdfWriter
+from com.itextpdf.text.pdf import PdfContentByte
+
+from java.io import FileOutputStream
+from java.awt import Dimension
+
+out= FileOutputStream('/tmp/autoplot.report.pdf')
+
+document = Document( Rectangle(8*73,11*72), 0,0,0,0 )
+
+writer= PdfWriter.getInstance( document, out );
+
+document.open()
+
+p1= Paragraph( 'This is my first PDF in Jython' )
+document.add( p1 )
+
+document.add( Rectangle( 6*72., 4*72. ));
+
+p1= Paragraph( "Isn't this awesome!" )
+document.add( p1 )
+
+cb = writer.getDirectContent()
+pt= cb.createTemplate(6*72,4*72)
+posX=0*72
+posY=(11-5)*72
+
+cb.saveState()
+
+graphics = pt.createGraphics( 6*72., 4*72. )
+
+# this must be free to set the canvas size, so it must not be
+# fitted.
+getApplicationModel().getDocumentModel().getCanvases(0).fitted= False
+getApplicationModel().getCanvas().print(graphics) 
+graphics.dispose()
+
+cb.addTemplate(pt,posX,posY);
+
+cb.restoreState()
+
+document.close()
+out.close()
