@@ -11,7 +11,10 @@ package org.virbo.imagedatasource;
  */
 public class Util {
     /**
-     * returns 45.50833333333333 from 45°30'30"
+     * returns 45.50833333333333 from 45deg30'30", where the text "deg" is
+     *    a placeholder for the unicode degree symbol (its not replicated
+     *    here since non-ASCII characters choke some development tools)
+     * 
      * @param s a GPS coordinate with degrees minutes and seconds 
      * @return decimal version of string
      */
