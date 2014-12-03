@@ -605,10 +605,6 @@ public class CdfUtil {
         }
     }
 
-    public static Map<String, String> getPlottable(CDFReader cdf, boolean dataOnly, int rankLimit) throws Exception {
-        return getPlottable(cdf, dataOnly, rankLimit, false, false);
-    }
-
     /**
      * return the data type for the encoding.  From
      * ftp://cdaweb.gsfc.nasa.gov/pub/cdf/doc/cdf33/cdf33ifd.pdf  page 33.
@@ -617,20 +613,20 @@ public class CdfUtil {
      */
     public static String getStringDataType( int type ) {
         switch ( type ) {
-            case 1: return "CDF_INT1";
-            case 2: return "CDF_INT2";
-            case 4: return "CDF_INT4";
-            case 8: return "CDF_INT8";
+            case  1: return "CDF_INT1";
+            case  2: return "CDF_INT2";
+            case  4: return "CDF_INT4";
+            case  8: return "CDF_INT8";
             case 11: return "CDF_UINT1";
             case 12: return "CDF_UINT2";
             case 14: return "CDF_UINT4";
             case 41: return "CDF_BYTE";
-            case 21:return "CDF_REAL4";
-            case 22:return "CDF_REAL8";
-            case 44:return "CDF_FLOAT";
-            case 45:return "CDF_DOUBLE";
-            case 31:return "CDF_EPOCH";
-            case 32 :return "CDF_EPOCH16";
+            case 21: return "CDF_REAL4";
+            case 22: return "CDF_REAL8";
+            case 44: return "CDF_FLOAT";
+            case 45: return "CDF_DOUBLE";
+            case 31: return "CDF_EPOCH";
+            case 32: return "CDF_EPOCH16";
             case 33: return "CDF_TT2000";
             case 51 :return "CDF_CHAR";
             default: return String.valueOf(type);
@@ -639,9 +635,9 @@ public class CdfUtil {
 
     /**
      * returns null or the attribute.
-     * @param cdf
-     * @param var
-     * @param attrname
+     * @param cdf the cdf file reader
+     * @param var the variable name
+     * @param attrname the attribute name.
      * @return null if there was a problem
      */
     private static Object getAttribute( CDFReader cdf, String var, String attrname ) {
@@ -657,7 +653,13 @@ public class CdfUtil {
         }
     }
 
-
+    /** 
+     * return true if the attribute is set for the variable.
+     * @param cdf the cdf file reader
+     * @param var the variable name
+     * @param attrname the attribute name.
+     * @return true if the attribute is set for the variable.
+     */
     public static boolean hasAttribute( CDFReader cdf, String var, String attrname ) {
         try {
             Object att= cdf.getAttribute( var,attrname );
@@ -772,7 +774,22 @@ public class CdfUtil {
     }    
     
     /**
-     * keys are the names of the variables. values are descriptions.
+     * Return a map where keys are the names of the variables, and values are descriptions.
+     * @param cdf the cdf reader reference.
+     * @param dataOnly show only the DATA and not SUPPORT_DATA.  Note I reclaimed this parameter because I wasn't using it.
+     * @param rankLimit show only variables with no more than this rank.
+     * @return map of parameter name to short description
+     * @throws Exception
+     */
+    public static Map<String, String> getPlottable(CDFReader cdf, boolean dataOnly, int rankLimit) throws Exception {
+        return getPlottable(cdf, dataOnly, rankLimit, false, false);
+    }
+    
+    /**
+     * Return a map where keys are the names of the variables, and values are descriptions.  This 
+     * allows for a deeper query, getting detailed descriptions within the values, and also supports the
+     * mode where the master CDFs (used by the CDAWeb plugin) don't contain data and record counts should
+     * not be supported.
      * @param cdf
      * @param dataOnly show only the DATA and not SUPPORT_DATA.  Note I reclaimed this parameter because I wasn't using it.
      * @param rankLimit show only variables with no more than this rank.
