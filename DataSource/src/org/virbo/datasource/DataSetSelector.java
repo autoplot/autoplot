@@ -2192,6 +2192,8 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      * @return the timerange selected.
      */
     public static DatumRange pickTimeRange( Component parent, List<DatumRange> timeRange, List<String> labels ) {
+        timeRange= new ArrayList<DatumRange>(timeRange); // make mutable.
+        labels= new ArrayList<String>(labels);
         for ( int i=timeRange.size()-1; i>=0; i-- ) {
             if ( timeRange.get(i)==null ) {
                 timeRange.remove(i);
