@@ -661,7 +661,7 @@ public class CdfUtil {
     public static boolean hasAttribute( CDFReader cdf, String var, String attrname ) {
         try {
             Object att= cdf.getAttribute( var,attrname );
-            return !( att==null );
+            return !( att==null || ((Vector)att).isEmpty() );
         } catch ( CDFException ex ) {
             return false;
         }
@@ -779,7 +779,7 @@ public class CdfUtil {
      * @param deep return more detailed descriptions in HTML
      * @param master cdf is a master cdf, so don't indicate record counts.
      * @return map of parameter name to short description
-     * @throws gsfc.nssdc.cdf.CDFException
+     * @throws Exception
      */
     public static Map<String, String> getPlottable(CDFReader cdf, boolean dataOnly, int rankLimit, boolean deep, boolean master) throws Exception {
 
@@ -824,7 +824,7 @@ public class CdfUtil {
             int rank=-1;
             int[] dims=new int[0];
                     
-            try {
+            try {              
                 svar = v[i];
                 int varType;
                 try {
@@ -834,12 +834,12 @@ public class CdfUtil {
                 }
                 
                 // reject variables that are ordinal data that do not have DEPEND_0.
-                Object dep0= cdf.getAttribute("DEPEND_0");
-                boolean hasDep0= false;
-                if ( dep0!=null ) {
-                    hasDep0= true;
-                }
-
+                boolean hasDep0= hasAttribute( cdf, svar, "DEPEND_0" );
+                if ( ( varType==CDFConstants.CDF_CHAR || varType==CDFConstants.CDF_UCHAR ) && ( !hasDep0 ) ) {
+                    logger.log(Level.FINER, "skipping because ordinal and no depend_0: {0}", svar );
+                    continue;
+                } 
+                    
                 maxRec = cdf.getNumberOfValues(svar); 
                 recCount= maxRec;
 
