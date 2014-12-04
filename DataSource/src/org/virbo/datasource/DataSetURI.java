@@ -330,8 +330,8 @@ public class DataSetURI {
      */
     public static String blurTsbUri(String value) {
         try {
-            DataSource ds= getDataSource(value);
-            TimeSeriesBrowse tsb= ds.getCapability( TimeSeriesBrowse.class );
+            DataSourceFactory dsf= getDataSourceFactory( new URI(value), new NullProgressMonitor() );
+            TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
             if (tsb==null ) return null;
             tsb.setURI(value);
             return tsb.blurURI();
@@ -340,6 +340,25 @@ public class DataSetURI {
         }
         
     }
+    
+    /**
+     * create the URI without the timerange.
+     * @param value a uri. e.g. /tmp/foo$Y$m$d.dat?timerange=2014-001
+     * @return null or the value without the timerange, e.g. /tmp/foo$Y$m$d.dat
+     */
+    public static String blurTsbResolutionUri(String value) {
+        try {
+            DataSourceFactory dsf= getDataSourceFactory( new URI(value), new NullProgressMonitor() );
+            TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
+            if (tsb==null ) return null;
+            tsb.setURI(value);
+            tsb.setTimeResolution(null);
+            return tsb.getURI();
+        } catch (Exception ex) {
+            return null;
+        }
+        
+    }    
 
     // mark the special case where a resource is actually a folder.
     public static class NonResourceException extends IllegalArgumentException {
