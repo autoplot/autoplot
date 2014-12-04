@@ -401,9 +401,23 @@ public class TimeSeriesBrowseController {
                     dataSourceController.cancel();
                     dataSourceController.update(false);
                     dataSourceController.setTsbSuri(surl);
-                    dataSourceController.dsf.uri= surl;
                     if ( domPlot!=null ) {
-                        domPlot.controller.dom.controller.setFocusUri(surl);
+                        String uriMode= "reset"; // "blur" "none"
+                        if ( uriMode.equals("blur") ) { // this branch has issues, in particular inserting the timerange for histories.
+                            String newUri= DataSetURI.blurTsbUri( surl );
+                            if ( newUri!=null ) {
+                                dataSourceController.dsf.uri= newUri;
+                                domPlot.controller.dom.controller.setFocusUri(newUri);
+                            }
+                        } else if ( uriMode.equals("reset") ) {
+                            String newUri= DataSetURI.blurTsbResolutionUri( surl );
+                            if ( newUri!=null ) {
+                                dataSourceController.dsf.uri= newUri;
+                                domPlot.controller.dom.controller.setFocusUri(newUri);                        
+                            }
+                        } else {
+                            //none
+                        }
                     }
                     //String blurUri= DataSetURI.blurTsbUri( surl );
                     //if ( blurUri!=null ) dataSourceController.dsf.uri= blurUri;
