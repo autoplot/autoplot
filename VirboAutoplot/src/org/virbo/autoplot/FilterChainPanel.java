@@ -270,7 +270,7 @@ public class FilterChainPanel extends JPanel {
 
         } else {
             final JLabel tf= new JLabel();
-            tf.setText("<html><em>(click to add)</em></html>");
+            tf.setText("<html><i>(click to add)</i></html>");
             sub.add( tf, BorderLayout.CENTER );
 
         }

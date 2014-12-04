@@ -296,7 +296,7 @@ public class ParametersFormPanel {
                     if ( !parm.label.equals(parm.name) ) {
                         doc= doc + " ("+parm.label+" inside the script)";
                     }
-                    label= "<html>" + parm.name + ", <em>" + doc + "</em>"+colon+"</html>";
+                    label= "<html>" + parm.name + ", <i>" + doc + "</i>"+colon+"</html>";
                 }      
                 
                 if ( !isBool ) {
@@ -526,7 +526,7 @@ public class ParametersFormPanel {
             hasVars= parms.size()>0;
 
             if ( !hasVars ) {
-                JLabel l= new JLabel("<html><em>(no input parameters)</em></html>");
+                JLabel l= new JLabel("<html><i>(no input parameters)</i></html>");
                 l.setToolTipText("This looks through the code for getParam calls, and no conforming calls were found");
                 paramsPanel.add( l );
             } 

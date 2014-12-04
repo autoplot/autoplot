@@ -295,7 +295,7 @@ public class JythonCompletionTask implements CompletionTask {
                             signature = methodSignature(propReadMethod);
                             args = "";
                             String type= propReadMethod.getReturnType().getCanonicalName();
-                            label = ss + " <em>("+type+")</em>";
+                            label = ss + " <i>("+type+")</i>";
                         } else {
                             Field f = null;
                             try {

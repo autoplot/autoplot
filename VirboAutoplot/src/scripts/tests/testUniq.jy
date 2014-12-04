@@ -1,18 +1,20 @@
-# The documentation doesn't look consistent with result of the uniqValues command.
-# It should not be used for now.
+# this demonstrates the uniqValues command.
 
-ra= floor( randomn(4335,100)* 10 ) + 0.5
+ra= floor( randomu(4335,100)* 10 ) + 0.5
 
 print 'Here is what we will sort:'
 print ra[0]
 print ra
+plot(0,ra)
 
 uv= uniqValues(ra,None)
 print uv[0]
 print uv
+plot(1,uv)
 
 s= sort( ra )
  
 uv= uniqValues(ra,s)
 print uv[0]
 print uv
+plot(2,uv)

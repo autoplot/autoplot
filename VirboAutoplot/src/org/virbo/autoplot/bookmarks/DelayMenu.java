@@ -131,7 +131,7 @@ public class DelayMenu extends JMenu {
 
                     if ( treeDepth==0 && folder.getRemoteUrl()!=null ) {
                         if ( book.getDescription()!=null && book.getDescription().length()>0 ) {
-                            String ttext=  "<html><em>"+ title + "<br>" + book.getDescription()+"</em>";
+                            String ttext=  "<html><i>"+ title + "<br>" + book.getDescription()+"</i>";
                             subMenu.setToolTipText( ttext + "<br>" + tooltip );
                         } else {
                             if ( tooltip.length()>0 ) subMenu.setToolTipText( "<html>"+tooltip );

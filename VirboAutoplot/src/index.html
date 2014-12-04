@@ -7,7 +7,9 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The FITS plugin got a little cleanup this morning, along with the nightly tests.</small></p>
+        <p><small>Two PNGWalk Tools are bound together to build a tool for inspecting the results of nightly tests.  
+                (See <a href="http://jfaden.net/~jbf/autoplot/script/demos/hudsonReview.jy">hudsonReview.jy</a>)
+            </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -23,8 +25,12 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-12-02):</p>
+        <p>Bugfixes (2014-12-04):</p>
         <ul> 
+            <li>bug 1098: improve feedback as to where the two timeranges options are coming from in the query.</li>
+            <li>bug 1295: get rid of Thread.sleep use by using new java.util.Timer aptimer. </li>
+            <li>contoursRenderer accepts pre-contoured data, like the output of the contours filter</li>
+            <li>CDFJ getPlottable was returning the LABL_PTR_1 variables, when it shouldn't be</li>
             <li>214: correct for bold and italic when printing</li>
             <li>bugfix: filters recentComboBox didn't show the new value.  I think it has always like this, but I just noticed this with the new editor.</li>
             <li>restore inspect (browse) behavior for .jy files.</li>
@@ -79,7 +85,8 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>relucantLegendIcons=true (autoplot_data/config/system.properties) hides icon when there is only one renderer</li>
+            <li>add branch for total(dsr2,1) where dsr2 is a rank 2 dataset, to get BMag from components of huge magnetometer dataset.</li>
+            <li>experimental reluctantLegendIcons=true (autoplot_data/config/system.properties) hides icon when there is only one renderer</li>
             <li>URIs update with TSB, removing mistakes the old URI would cause.</li>
             <li>Export now supports aggregation</li>
             <li>New Pure-Java CDF library is in production, improving speed and memory use.  Old library is removed.</li>

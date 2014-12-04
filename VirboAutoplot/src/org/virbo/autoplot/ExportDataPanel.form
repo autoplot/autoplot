@@ -184,13 +184,13 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel4">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;em&gt;Data from the selected plot element can be exported to a format by data sources that provide a method to export data."/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;i&gt;Data from the selected plot element can be exported to a format by data sources that provide a method to export data."/>
             <Property name="verticalAlignment" type="int" value="1"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="warningMessageLabel">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;em&gt;(warning message)"/>
+            <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;i&gt;(warning message)"/>
           </Properties>
         </Component>
       </SubComponents>

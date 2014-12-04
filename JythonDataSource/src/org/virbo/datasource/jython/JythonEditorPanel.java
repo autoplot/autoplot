@@ -358,7 +358,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     if ( !parm.label.equals(parm.name) ) {
                         doc= doc + " ("+parm.label+" inside the script)";
                     }
-                    label= "<html>" + parm.name + ", <em>" + doc + "</em>"+colon+"</html>";
+                    label= "<html>" + parm.name + ", <i>" + doc + "</i>"+colon+"</html>";
                 }      
                 
                 if ( !isBool ) {
@@ -566,7 +566,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             hasVars= parms.size()>0;
 
             if ( !hasVars ) {
-                paramsPanel.add( new JLabel("<html><em>no input parameters</em></html>") );
+                paramsPanel.add( new JLabel("<html><i>no input parameters</i></html>") );
             }
 
             paramsPanel.add( Box.createVerticalStrut(paramsPanel.getFont().getSize()*2 ) );
@@ -692,7 +692,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
             dropList[0]= "";
             for ( Entry<String,String> ent: results.entrySet()  ) {
-                dropList[i+1]= "<html>"+ent.getKey()+"<span color=#808080>: <em>"+ent.getValue()+"</em></span>";
+                dropList[i+1]= "<html>"+ent.getKey()+"<span color=#808080>: <i>"+ent.getValue()+"</i></span>";
                 if ( param!=null && param.equals(ent.getKey()) ) {
                     idx= i+1;
                 }

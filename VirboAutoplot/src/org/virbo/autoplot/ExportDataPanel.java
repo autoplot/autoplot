@@ -169,10 +169,10 @@ public class ExportDataPanel extends javax.swing.JPanel {
         processedWithinXRangeB.setText("Processed Data within X Axis Range");
         processedWithinXRangeB.setToolTipText("Processed data, but also trim to the data to the X axis bounds.\n");
 
-        jLabel4.setText("<html><em>Data from the selected plot element can be exported to a format by data sources that provide a method to export data.");
+        jLabel4.setText("<html><i>Data from the selected plot element can be exported to a format by data sources that provide a method to export data.");
         jLabel4.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
-        warningMessageLabel.setText("<html><em>(warning message)");
+        warningMessageLabel.setText("<html><i>(warning message)");
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -441,8 +441,8 @@ public class ExportDataPanel extends javax.swing.JPanel {
      */
     void setTsb(boolean b) {
         if ( b ) {
-            warningMessageLabel.setText("<html><em>Exporting data at native resolution.</em></html>");
-            warningMessageLabel.setToolTipText("<html><em>This data comes from a reader that can return data at multiple resolutions.  Data will be reread at native resolution before writing output.</em></html>");
+            warningMessageLabel.setText("<html><i>Exporting data at native resolution.</i></html>");
+            warningMessageLabel.setToolTipText("<html><i>This data comes from a reader that can return data at multiple resolutions.  Data will be reread at native resolution before writing output.</i></html>");
         } 
     }
 

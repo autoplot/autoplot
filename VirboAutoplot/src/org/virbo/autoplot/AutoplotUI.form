@@ -845,7 +845,7 @@
                 <EmptyBorder/>
               </Border>
             </Property>
-            <Property name="promptText" type="java.lang.String" value="&lt;html&gt;&lt;em&gt;Just a moment...&lt;/em&gt;&lt;/html&gt;"/>
+            <Property name="promptText" type="java.lang.String" value="&lt;html&gt;&lt;i&gt;Just a moment...&lt;/i&gt;&lt;/html&gt;"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dataSetSelectorActionPerformed"/>

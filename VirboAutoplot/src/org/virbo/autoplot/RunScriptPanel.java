@@ -132,7 +132,7 @@ public class RunScriptPanel extends javax.swing.JPanel {
         scriptPanel.setLayout(new java.awt.BorderLayout());
         jScrollPane1.setViewportView(scriptPanel);
 
-        scriptFilename.setText("<html><em>script filename\n");
+        scriptFilename.setText("<html><i>script filename ");
 
         jLabel2.setText("Make sure the script does not contain malicious code.");
 

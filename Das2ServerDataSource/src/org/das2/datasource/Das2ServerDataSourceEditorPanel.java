@@ -97,7 +97,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private static final String EXAMPLE_TIMERANGE_LABEL_DELIM = "|";
 
     //DANGER: NB gui code doesn't use this...
-    private static final String EXAMPLE_TIME_RANGES = "<html><em>Example Time Ranges</em>";
+    private static final String EXAMPLE_TIME_RANGES = "<html><i>Example Time Ranges</i>";
 
 
     private String DEFAULT_TIMERANGE="2001-01-01";
@@ -195,7 +195,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         });
 
         validRangeLabel.setFont(new java.awt.Font("DejaVu LGC Sans", 0, 10)); // NOI18N
-        validRangeLabel.setText("<html><em>no valid range for dataset provided</em></html>");
+        validRangeLabel.setText("<html><i>no valid range for dataset provided</i></html>");
 
         discoveryCb.setText("require example time");
         discoveryCb.setToolTipText("Show only datasets that have identified example times.  These should be a higher quality, and can be tested by a machine.");
@@ -205,7 +205,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
-        examplesComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "<html><em>Example Time Ranges</em>", " " }));
+        examplesComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "<html><i>Example Time Ranges</i>", " " }));
         examplesComboBox.setToolTipText("Example times specified in the data set descriptor file");
         examplesComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -398,11 +398,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                             String s= examples.get(i);
                             int j= s.indexOf( EXAMPLE_TIMERANGE_LABEL_DELIM );
                             if ( j>-1 ) {
-                                s= "<html>" + s.substring(0,j) + " <em><nbsp>"+s.substring(j+1).trim() + "</em>";
+                                s= "<html>" + s.substring(0,j) + " <i><nbsp>"+s.substring(j+1).trim() + "</i>";
                             }
                             examples.set(i,s);
                         }
-                        examples.add( 0, String.format( "<html><em>Example Time Ranges (%d)</em>", examples.size() ) );
+                        examples.add( 0, String.format( "<html><i>Example Time Ranges (%d)</i>", examples.size() ) );
                         DefaultComboBoxModel model= new DefaultComboBoxModel( examples.toArray( new String[examples.size()] ) );
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setModel( model );
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setEnabled(true);
@@ -430,7 +430,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     if ( validRange!=null ) {
                         Das2ServerDataSourceEditorPanel.this.validRangeLabel.setText( "valid range: " + validRange.getNodeValue() );
                     } else {
-                        Das2ServerDataSourceEditorPanel.this.validRangeLabel.setText("<html><em>no valid range for dataset provided</em></html>");
+                        Das2ServerDataSourceEditorPanel.this.validRangeLabel.setText("<html><i>no valid range for dataset provided</i></html>");
                     }
                     if ( isTca ) {
                         tcaTextField.setText("60");
@@ -470,11 +470,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         TreeModel m= ((JTree)evt.getSource()).getModel();
         if ( ! m.isLeaf( p.getLastPathComponent() ) ) {
             descriptionLabel.setText( "" );
-            this.validRangeLabel.setText("<html><em>no dataset selected</em></html>");
+            this.validRangeLabel.setText("<html><i>no dataset selected</i></html>");
             this.viewDsdfButton.setEnabled(false);
         } else {
             this.viewDsdfButton.setEnabled(true);
-            this.validRangeLabel.setText("<html><em>retrieving dataset info...</em></html>");
+            this.validRangeLabel.setText("<html><i>retrieving dataset info...</i></html>");
             Object[] oo= p.getPath();
             StringBuilder ds= new StringBuilder( String.valueOf( oo[1] ) );
             for ( int i=2; i<oo.length; i++ ) {
@@ -820,7 +820,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         org.das2.util.LoggerManager.logGuiEvent(evt);
         String item= (String) examplesComboBox.getSelectedItem();
         if ( !item.equals(EXAMPLE_TIME_RANGES) ) {
-            int i= item.indexOf("<em>");
+            int i= item.indexOf("<i>");
             if ( i>-1 && item.startsWith("<html>") ) {
                 timeRangeTextField.setText(item.substring(6,i).trim());
             } else {
@@ -1035,9 +1035,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 DasServer.DataSrcListItem li = (DasServer.DataSrcListItem) obj;
 
                 if (li.description() == null) {
-                    setText(String.format("<html><b>%s</b>", li.name()));
+                    setText(String.format("<html>%s", li.name()));
                 } else {
-                    setText(String.format("<html><b>%s</b> &nbsp; %s", li.name(), li.description()));
+                    setText(String.format("<html>%s &nbsp;<i>%s</i>", li.name(), li.description()));
                 }
             }
 

@@ -345,7 +345,7 @@ public class GuiSupport {
             
             dr= DataSetSelector.pickTimeRange( parent, 
                     Arrays.asList( dom.getTimeRange(), uriRange ),
-                    Arrays.asList( "current timerange", "URI range" )
+                    Arrays.asList( "Current", "URI" )
                     );
             if ( dr!=uriRange ) {
                 try {

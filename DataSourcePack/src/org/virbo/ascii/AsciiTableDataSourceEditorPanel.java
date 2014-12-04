@@ -433,7 +433,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
-        jLabel9.setText("<html><em>Specify time format (e.g. $Y$m+$d) when times are not iso8601 or span multiple fields.</em></html>");
+        jLabel9.setText("<html><i>Specify time format (e.g. $Y$m+$d) when times are not iso8601 or span multiple fields.</i></html>");
 
         guessTimeFormatToggleButton.setAction(createToolAction( "guessTimeFormat", Tool.GUESSTIMEFORMAT ));
         guessTimeFormatToggleButton.setText("Guess");
@@ -451,9 +451,13 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel3Layout.createSequentialGroup()
+                .add(24, 24, 24)
+                .add(timesStatusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+            .add(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel9, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel9, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 678, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jPanel3Layout.createSequentialGroup()
                         .add(jLabel2)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -464,11 +468,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(timeFormatToggleButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(guessTimeFormatToggleButton)))
-                .addContainerGap(167, Short.MAX_VALUE))
-            .add(jPanel3Layout.createSequentialGroup()
-                .add(24, 24, 24)
-                .add(timesStatusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addContainerGap(126, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -482,7 +482,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(timeFormatToggleButton)
                     .add(jLabel2)
                     .add(guessTimeFormatToggleButton))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 8, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(timesStatusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 15, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
