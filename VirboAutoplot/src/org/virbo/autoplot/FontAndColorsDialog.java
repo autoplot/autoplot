@@ -272,9 +272,11 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     private void canEmbedFont(Font f) {
         String s= org.das2.util.awt.PdfGraphicsOutput.ttfFromName(f);
         if ( s!=null ) {
-            canEmbedFontTF.setText("font can be embedded in PDF");
+            canEmbedFontTF.setText("PDF okay");
+            canEmbedFontTF.setToolTipText("font should work in PDF files");
         } else {
             canEmbedFontTF.setText("font can not be embedded in PDF");
+            canEmbedFontTF.setToolTipText("TTF file not found or licensing restricts use");
         }
     }
 }
