@@ -17,7 +17,9 @@ import org.das2.util.LoggerManager;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
- * Default implementation commonly found, doesn't use resolution
+ * Default implementation commonly found, doesn't use resolution.  This
+ * uses URISplit.PARAM_TIME_RANGE='timerange' and URISplit.PARAM_TIME_RANGE='resolution'
+ * for representing the TSB state.
  * @author jbf
  */
 public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
@@ -99,6 +101,7 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
         params.remove( URISplit.PARAM_TIME_RANGE );
+        params.remove( URISplit.PARAM_TIME_RESOLUTION );
         split.params= URISplit.formatParams(params);
         return URISplit.format(split);
     }
