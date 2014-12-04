@@ -310,7 +310,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
 
         } else {
             final JLabel tf= new JLabel();
-            tf.setText("<html><em>(click to add)</em></html>");
+            tf.setText("<html><i>(click to add)</i></html>");
             sub.add( tf, BorderLayout.CENTER );
 
         }

@@ -343,7 +343,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
         if ( empty ) {
             String id= split.vapScheme==null ? ( "for " + split.ext ) : split.vapScheme;
-            optionsPanel.add( new JLabel("<html><em>Data source "+ id + " provides no completions, so presumably there are no options available.</em></html>"));
+            optionsPanel.add( new JLabel("<html><i>Data source "+ id + " provides no completions, so presumably there are no options available.</i></html>"));
         }
 
         optionsPanel.add( Box.createGlue() );

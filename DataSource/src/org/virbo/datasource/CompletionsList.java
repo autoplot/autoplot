@@ -16,7 +16,7 @@ import javax.swing.JPopupMenu;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 
 /**
- *
+ * Old class, which I believe is no longer used.
  * @author jbf
  */
 public class CompletionsList {
@@ -81,8 +81,8 @@ public class CompletionsList {
                 subMenu = nextSubMenu;
             }
         }
-        if (completions.size() == 0) {
-            popupMenu.add("<html><em>(empty)</em></html>");
+        if (completions.isEmpty()) {
+            popupMenu.add("<html><i>(empty)</i></html>");
         }
         return popupMenu;
     }

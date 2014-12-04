@@ -84,11 +84,13 @@ public class MetaDataScraper {
     /**
      * retrieve the URL, which should be a dods server form.  The
      * content is scraped, looking for textareas with the name
-     * <em>varname</em>_attr.  The textarea content is assumed to
+     * <i>varname</i>_attr.  The textarea content is assumed to
      * be a newline delimited set of name value pairs, name: value.
      * Value is of type Double or String.
      *
      * After parseURL is performed, getAttr is used to get Attributes.
+     * @param url
+     * @throws IllegalArgumentException when the url does not end in .html
      */
     public void parseURL( URL url ) throws IOException {
         if ( !url.toString().endsWith(".html" ) ) throw new IllegalArgumentException("must end in .html");

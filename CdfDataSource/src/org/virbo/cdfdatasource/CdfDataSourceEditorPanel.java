@@ -47,7 +47,7 @@ import org.virbo.datasource.URISplit;
  * @author jbf
  */
 public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
-    public static final String NO_PLOTTABLE_PARAMETERS_MSG = "<html><em>No plottable parameters</em></html>";
+    public static final String NO_PLOTTABLE_PARAMETERS_MSG = "<html><i>No plottable parameters</i></html>";
 
     /** the maximum number of DEPEND_1 channels where we should show option for depend_1. */
     private static final int MAX_SLICE1_OFFER = 32;

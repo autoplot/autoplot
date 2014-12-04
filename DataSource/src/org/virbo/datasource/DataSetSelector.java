@@ -2185,11 +2185,11 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     }
     
     /**
-     * allow the user to pick one of a set of times, when it is ambiguous what they want.
+     * Allow the user to pick one of a set of times, when it is ambiguous what they want.
      * @param parent null or the component to focus.
      * @param timeRange list of time ranges, which may also contain null.
      * @param labels for each time range.
-     * @return the timerange selected.
+     * @return the time range selected.
      */
     public static DatumRange pickTimeRange( Component parent, List<DatumRange> timeRange, List<String> labels ) {
         timeRange= new ArrayList<DatumRange>(timeRange); // make mutable.
@@ -2203,11 +2203,11 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         if ( timeRange.size()==1 ) return timeRange.get(0);
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
-        p.add( new JLabel("<html>The URI contains a time different than the application<br>time range.  Which should be used?</html>") );
+        p.add( new JLabel("<html>The URI contains a time different than the current<br>application time range.  Which should be used?</html>") );
         ButtonGroup bg= new ButtonGroup();
         List<JRadioButton> buttons= new ArrayList<JRadioButton>();
         for ( int i=0; i<timeRange.size(); i++ ) {
-            String s1= "<html>" + timeRange.get(i).toString() + " <em>("+labels.get(i)+")";
+            String s1= "<html>" + timeRange.get(i).toString() + " <i>("+labels.get(i)+")";
             JRadioButton b1= new JRadioButton( s1 );
             p.add(b1);
             bg.add(b1);

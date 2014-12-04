@@ -57,7 +57,7 @@ public class SetDepend0CadenceFilterEditorPanel extends AbstractFilterEditorPane
         unitsCB.setMinimumSize(new java.awt.Dimension(200, 27));
         unitsCB.setPreferredSize(new java.awt.Dimension(200, 27));
 
-        msgLabel.setText("<html><em>Explicity set the cadence of the measurements");
+        msgLabel.setText("<html><i>Explicity set the cadence of the measurements");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -130,7 +130,7 @@ public class SetDepend0CadenceFilterEditorPanel extends AbstractFilterEditorPane
             Units[] uu= u.getOffsetUnits().getConvertableUnits();
             unitsCB.setModel( new DefaultComboBoxModel(uu) );
         } else {
-            msgLabel.setText("<html><em>Dataset has no DEPEND_0");
+            msgLabel.setText("<html><i>Dataset has no DEPEND_0");
         }
     }
     
