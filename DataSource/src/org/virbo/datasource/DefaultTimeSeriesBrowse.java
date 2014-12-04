@@ -66,8 +66,13 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
 
     @Override
     public void setTimeResolution(Datum d) {
-        logger.log(Level.FINE, "setTimeResolution {0} ignores resolution", d );
-        // do nothing
+        if ( d==null ) {
+            URISplit split= URISplit.parse(uri);
+            Map<String,String> params= URISplit.parseParams(split.params);
+            params.remove(URISplit.PARAM_TIME_RESOLUTION);
+            split.params= URISplit.formatParams(params);
+            this.uri= URISplit.format(split);
+        }
     }
 
     @Override
