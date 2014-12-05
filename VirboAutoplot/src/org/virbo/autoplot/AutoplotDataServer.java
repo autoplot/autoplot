@@ -221,7 +221,7 @@ public class AutoplotDataServer {
             FileInputStream fin= new FileInputStream(file);
             DataSourceUtil.transfer( fin, out );
         } else {
-            throw new IllegalAccessException("bad format");
+            throw new IllegalAccessException("bad format: "+format );
         }
     }
 
