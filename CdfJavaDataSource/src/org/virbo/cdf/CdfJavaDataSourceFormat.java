@@ -156,7 +156,9 @@ public class CdfJavaDataSourceFormat implements DataSourceFormat {
         if ( ds.rank()==1 ) {
             //cdf.defineNRVVariable( name, type, new int[0], 0 );
             //cdf.createVariable( name, type, new int[0] );
-            cdf.addNRVVariable( name, type, new int[] { ds.length() }, dataSetToNioArray( ds, uc, type, mon ) );
+            
+            Object array= dataSetToArray( ds, uc, type, mon );
+            cdf.addNRVVariable( name, type, new int[] { ds.length() }, array );
 
         } else {
             throw new IllegalArgumentException("not supported!");
@@ -167,13 +169,13 @@ public class CdfJavaDataSourceFormat implements DataSourceFormat {
     }
 
     /**
-     * convert the rank 1 dataset to a native array.
+     * convert the rank 1 dataset to a buffer.
      * @param ds rank 1 dataset
      * @param uc units converter to convert the type.
      * @param type type code, such as CDF_DOUBLE indicating how the data should be converted.
-     * @return array of this type.
+     * @return buffer of this type.
      */
-    private Object doIt1Nio( QDataSet ds, UnitsConverter uc, CDFDataType type ) {
+    private ByteBuffer doIt1Nio( QDataSet ds, UnitsConverter uc, CDFDataType type ) {
         ByteBuffer export;
         QubeDataSetIterator iter = new QubeDataSetIterator(ds);
         if ( type==CDFDataType.DOUBLE || type==CDFDataType.EPOCH ) {
@@ -243,9 +245,9 @@ public class CdfJavaDataSourceFormat implements DataSourceFormat {
      * @param ds the dataset.
      * @param uc UnitsConverter in case we need to handle times.
      * @param type the data type.
-     * @return a 1,2,3,4-d array of double,long,float,int,short,byte.
+     * @return a ByteBuffer containing the data.
      */
-    private Object dataSetToNioArray( QDataSet ds, UnitsConverter uc, CDFDataType type, ProgressMonitor mon ){
+    private ByteBuffer dataSetToNioArray( QDataSet ds, UnitsConverter uc, CDFDataType type, ProgressMonitor mon ){
         if ( ds.rank()==1 ) {
             return doIt1Nio( ds, uc, type );
             
