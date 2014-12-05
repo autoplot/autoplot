@@ -520,7 +520,7 @@ public class DataSourceRegistry {
     public synchronized DataSourceFactory getSource(String extension) {
         if ( extension==null ) return null;
         extension= getExtension(extension);
-         Object o = dataSourcesByExt.get(extension);
+        Object o = dataSourcesByExt.get(extension);
         if (o == null) {
             return null;
         }
@@ -541,8 +541,8 @@ public class DataSourceRegistry {
             } catch (IllegalAccessException ex) {
                 throw new RuntimeException(ex);
             } catch ( UnsatisfiedLinkError ex ) { // kludge in support to fall back to Java reader if the C-based one is not found.
-                if ( extension.equals(".cdf") ) {
-                    logger.fine("attempting to use java based reader to handle cdf.");
+                if ( extension.equals(".cdfn") ) {
+                    logger.fine("attempting to use java based reader to handle cdfn.");
                     DataSourceFactory dsf=  getSource(".cdfj");
                     if ( dsf!=null ) {
                         dataSourcesByExt.put( extension, dsf ); //TODO: kludge for CDF
