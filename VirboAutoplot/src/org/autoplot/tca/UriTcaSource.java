@@ -164,7 +164,7 @@ public class UriTcaSource extends AbstractQFunction {
             }
         }
         Datum d;
-        DatumRange dr= null;
+        DatumRange dr= null; // calculate the bounding DatumRange for all params.
         for ( int i=0; i<parms.length(); i++ ) {
             d= DataSetUtil.asDatum( parms.slice(i).slice(0) );
             dr= DatumRangeUtil.union( dr, d );
@@ -176,7 +176,7 @@ public class UriTcaSource extends AbstractQFunction {
                 needToRead= true;
             }
         }
-        return super.values(parms); // just loop over them as we did before.
+        return super.values(parms); // just loop over them, calling value for each, as we did before.
     }
     
     @Override
@@ -235,13 +235,19 @@ public class UriTcaSource extends AbstractQFunction {
                 logger.fine("dataset dependence is not monotonic");
                 return new BundleDataSet( nonMonoDs );
             }
-            QDataSet findex= Ops.findex( dep0, d0 ); // TODO: param.slice(0) does findex support rank 0?
-
+            QDataSet findex= Ops.findex( dep0, d0 ); 
+            
             QDataSet result;
             if ( findex.value()>=-0.5 && findex.value()<dep0.length()-0.5 ) {
                 int ii= (int)( findex.value() + 0.5 ); // nearest neighbor
                 result= ds.slice(ii); 
                 if ( !isValid(result) ) { // pick a relavant near neighbor
+                    if ( deltaPlus==null ) {
+                        deltaPlus= DataSetUtil.asDataSet( SemanticOps.getUnits(dep0).getOffsetUnits().createDatum(0) );
+                    }
+                    if ( deltaMinus==null ) {
+                        deltaMinus= deltaPlus;
+                    }
                     findex= Ops.findex( dep0, Ops.subtract( d0, deltaMinus ) );
                     int imin= (int)( findex.value() + 0.5 );
                     if ( imin<0 ) imin=0;
@@ -265,7 +271,7 @@ public class UriTcaSource extends AbstractQFunction {
                     }
                 } else {
                     
-                    logger.log( Level.FINER, "findex={0} for {1} {2}", new Object[]{findex, d0, result.value(result.length()-1)});
+                    logger.log( Level.FINER, "findex={0} for {1} {2}", new Object[]{findex, d0, result.value()});
                     if ( deltaPlus!=null ) {
                         QDataSet delta= Ops.magnitude( Ops.subtract( d0, dep0.slice(ii) ) );
                         if ( Ops.gt( delta, tlim ).value()==1 ) {
@@ -331,6 +337,7 @@ public class UriTcaSource extends AbstractQFunction {
 
         } catch ( Exception lex ) {
             logger.log( Level.WARNING, lex.getMessage(), lex );
+            lex.printStackTrace();
             return new BundleDataSet( error );
         }
 
