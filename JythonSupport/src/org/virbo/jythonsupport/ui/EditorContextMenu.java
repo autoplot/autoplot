@@ -30,6 +30,7 @@ import org.das2.jythoncompletion.CompletionContext;
 import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.CompletionSupport;
 import org.das2.jythoncompletion.JythonCompletionProvider;
+import static org.das2.jythoncompletion.Utilities.getLineNumberForOffset;
 import org.das2.util.LoggerManager;
 import org.python.parser.SimpleNode;
 import org.python.parser.ast.Module;
@@ -232,7 +233,41 @@ public class EditorContextMenu {
         String result= f.getFamily();
         if ( style.length()>1 ) result+= style;
         return result + "-" + f.getSize();
-    }    
+    }  
+    
+    /**
+     * return "a" when line is a=...
+     * @param editor
+     * @return 
+     */
+    private String getVariableNameContext( EditorTextPane editor ) {
+        String s= editor.getSelectedText();
+        if ( s!=null ) {
+            int i= s.indexOf("=");
+            if ( i>0 ) {
+                s= s.substring(0,i);
+            }
+        }
+        if ( s==null ) {
+            int i1= editor.getCaretPosition();
+            int i0 = org.das2.jythoncompletion.Utilities.getRowStart( editor, i1 );
+            if ( i1>i0 ) {
+                try {
+                    s= editor.getText( i0, i1-i0 ).trim();
+                    int i= s.indexOf("=");
+                    if ( i>0 ){
+                        s= s.substring(0,i);
+                    }
+                } catch (BadLocationException ex) {
+                    s= null;
+                }
+            }
+        }
+        if ( s!=null ) {
+            s= s.trim();
+        }           
+        return s;
+    }
     
     private synchronized void maybeCreateMenu() {
         if ( menu==null ) {
@@ -247,12 +282,12 @@ public class EditorContextMenu {
             a= new AbstractAction("getParam()") {
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
-                    String var= editor.getSelectedText();
+                    String var= getVariableNameContext( editor );
                     logger.log( Level.FINE, "editor.getdoc: {0}", editor.getDocument());
                     if ( var==null || var.length()==0 ) {
-                        insertCode( "p1= getParam( 'p1', 0.0, 'parameter p1 (default=0.0)' )\n");
+                        insertLine( "p1= getParam( 'p1', 0.0, 'parameter p1 (default=0.0)' )\n");
                     } else {
-                        insertCode( var + "= getParam( '"+var+"', 0.0, 'parameter "+var+" (default=0.0)' )\n" );
+                        insertLine( var + "= getParam( '"+var+"', 0.0, 'parameter "+var+" (default=0.0)' )\n" );
                     }
                 }
             };
@@ -263,12 +298,12 @@ public class EditorContextMenu {
             a= new AbstractAction("getParam() with enumeration") {
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);    
-                    String var= editor.getSelectedText();
+                    String var= getVariableNameContext( editor );
                     logger.log( Level.FINE, "editor.getdoc: {0}", editor.getDocument());
                     if ( var==null || var.length()==0 ) {
-                        insertCode( "sc= getParam( 'sc', 'c1', 'the spacecraft name', ['c1','c2','c3','c4'] )\n");
+                        insertLine( "sc= getParam( 'sc', 'A', 'the spacecraft name', ['A','B'] )\n");
                     } else {
-                        insertCode( var + "= getParam( '"+var+"', 'c1', 'the spacecraft name', ['c1','c2','c3','c4'] )\n");
+                        insertLine( var + "= getParam( '"+var+"', 'A', 'the spacecraft name', ['A','B'] )\n");
                     }
                 }
             };
@@ -279,12 +314,12 @@ public class EditorContextMenu {
             a= new AbstractAction("getParam() for boolean checkbox") {
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
-                    String var= editor.getSelectedText();
+                    String var= getVariableNameContext( editor );
                     logger.log( Level.FINE, "editor.getdoc: {0}", editor.getDocument());
                     if ( var==null || var.length()==0 ) {
-                        insertCode( "filt= getParam( 'filter', 'F', 'filter data', ['T','F'] )\n");
+                        insertLine( "filt= getParam( 'filter', 'F', 'filter data', ['T','F'] )\n");
                     } else {
-                        insertCode( var + "= getParam( '"+var+"', 'F', 'filter data', ['T','F'] )\n");
+                        insertLine( var + "= getParam( '"+var+"', 'F', 'filter data', ['T','F'] )\n");
                     }
                 }
             };
@@ -296,11 +331,11 @@ public class EditorContextMenu {
             a= new AbstractAction("getParam() for timerange to support time series browse") {
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
-                    String var= editor.getSelectedText();
+                    String var= getVariableNameContext( editor );
                     if ( var==null || var.length()==0 ) {
-                        insertCode( "tr= getParam( 'timerange', '2014-01-09', 'timerange to load' )\n");
+                        insertLine( "tr= getParam( 'timerange', '2014-01-09', 'timerange to load' )\n");
                     } else {
-                        insertCode( var + "= getParam( 'timerange', '2014-01-09', 'timerange to load' )\n");
+                        insertLine( var + "= getParam( 'timerange', '2014-01-09', 'timerange to load' )\n");
                     }   
                 }
             };
@@ -311,7 +346,7 @@ public class EditorContextMenu {
             a= new AbstractAction("getParam() to get the resource URI") {
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
-                    insertCode( "resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/rainfall_KIOW_20120522_0252.html', 'example file to load' )\n" );
+                    insertLine( "resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/rainfall_KIOW_20120522_0252.html', 'example file to load' )\n" );
                 }
             };
             item= new JMenuItem( a );
@@ -514,6 +549,24 @@ public class EditorContextMenu {
         }
     }
 
+    /**
+     * delete the current line and insert the code.
+     * @param code 
+     */
+    private void insertLine( String code ) {
+        try {
+            int i= editor.getCaretPosition();
+            int i1 = org.das2.jythoncompletion.Utilities.getRowEnd( editor, i );
+            int i0 = org.das2.jythoncompletion.Utilities.getRowStart( editor, i );
+            if ( i1>i0 ) {
+                editor.getDocument().remove(i0,i1-i0-1);
+            }
+            editor.getDocument().insertString(editor.getCaretPosition(), code, null);
+        } catch (BadLocationException ex) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+    }
+    
     private void insertCode( String code ) {
         try {
             editor.getDocument().insertString(editor.getCaretPosition(), code, null);
