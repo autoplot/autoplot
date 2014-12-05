@@ -551,20 +551,16 @@ public class EditorContextMenu {
 
     /**
      * delete the current line and insert the code.
+     * Note this shows how to do a replacement as an atomic operation that properly supports undo.
      * @param code 
      */
     private void insertLine( String code ) {
-        try {
-            int i= editor.getCaretPosition();
-            int i1 = org.das2.jythoncompletion.Utilities.getRowEnd( editor, i );
-            int i0 = org.das2.jythoncompletion.Utilities.getRowStart( editor, i );
-            if ( i1>i0 ) {
-                editor.getDocument().remove(i0,i1-i0-1);
-            }
-            editor.getDocument().insertString(editor.getCaretPosition(), code, null);
-        } catch (BadLocationException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        }
+        int i= editor.getCaretPosition();
+        int i1 = org.das2.jythoncompletion.Utilities.getRowEnd( editor, i );
+        int i0 = org.das2.jythoncompletion.Utilities.getRowStart( editor, i );
+        editor.setSelectionStart(i0);
+        editor.setSelectionEnd(i1);
+        editor.replaceSelection(code);
     }
     
     private void insertCode( String code ) {
