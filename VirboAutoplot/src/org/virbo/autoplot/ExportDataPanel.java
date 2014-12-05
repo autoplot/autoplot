@@ -56,6 +56,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
             String name = (String) originalDataSet.property(QDataSet.NAME);
             if ( name==null ) name= "data";
             String f= new File(".").getAbsoluteFile().getParent();
+            f= f.replaceAll("\\\\", "/");
             f= f+"/"+name.toLowerCase();
             filenameTF.setText(f);
             originalDataB.setToolTipText( String.format( "<html>%s<br>%s</html>", originalDataB.getToolTipText(), originalDataSet ) );
