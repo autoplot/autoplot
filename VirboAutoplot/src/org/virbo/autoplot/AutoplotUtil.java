@@ -702,6 +702,9 @@ public class AutoplotUtil {
                 w.println("");
                 w.println("# provide option in save dialog to embed data within a zip file.");
                 w.println("#allowEmbedData=true");
+                w.println("");
+                w.println("# don't show icon in legend when there is only one renderer.");
+                w.println("#reluctantLegendIcons=true");
                 w.close();
             } catch ( IOException ex ) {
                 logger.log(Level.WARNING, "write initial {0} failed", propFile );
