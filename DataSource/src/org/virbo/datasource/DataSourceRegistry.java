@@ -56,6 +56,10 @@ public class DataSourceRegistry {
         extToDescription= new HashMap<String,String>();
     }
 
+    /**
+     * get the single instance of this class.
+     * @return the single instance of this class.
+     */
     public static DataSourceRegistry getInstance() {
         if (instance == null) {
             instance = new DataSourceRegistry();
@@ -63,6 +67,11 @@ public class DataSourceRegistry {
         return instance;
     }
 
+    /**
+     * get an instance of a class given the class name.
+     * @param o the class name, e.g. org.virbo.netCDF.HDF5DataSourceFormatEditorPanel
+     * @return an instance of the class.
+     */
     public static Object getInstanceFromClassName( String o ) {
         try {
             Class clas = Class.forName((String) o);
@@ -76,7 +85,7 @@ public class DataSourceRegistry {
     }
     /**
      * return a list of registered extensions the can format.  These will contain the dot prefix.
-     * @return
+     * @return a list of registered extensions.
      */
     public List<String> getFormatterExtensions() {
         List<String> result= new ArrayList<String>();
@@ -89,7 +98,7 @@ public class DataSourceRegistry {
 
     /**
      * return a list of registered extensions.  These will contain the dot prefix.
-     * @return
+     * @return a list of registered extensions. 
      */
     public List<String> getSourceExtensions() {
         List<String> result= new ArrayList<String>();
@@ -101,7 +110,7 @@ public class DataSourceRegistry {
 
     /**
      * return a list of registered extensions.  These will contain the dot prefix.
-     * @return
+     * @returna list of registered extensions.
      */
     public List<String> getSourceEditorExtensions() {
         List<String> result= new ArrayList<String>();
@@ -319,7 +328,7 @@ public class DataSourceRegistry {
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
                                 logger.warning("META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions contains extension that contains period: ");
-                                logger.warning( ss[0] + " " + ss[i] + " in " + url);
+                                logger.log(Level.WARNING, "{0} {1} in {2}", new Object[]{ss[0], ss[i], url});
                                 logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
                                 logger.warning("");
                                 throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
@@ -348,7 +357,7 @@ public class DataSourceRegistry {
                         for (int i = 1; i < ss.length; i++) {
                             if ( ss[i].contains(".") ) {
                                 logger.warning("META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions contains extension that contains period: ");
-                                logger.warning( ss[0] + " " + ss[i] + " in " + url);
+                                logger.log(Level.WARNING, "{0} {1} in {2}", new Object[]{ss[0], ss[i], url});
                                 logger.warning("This sometimes happens when extension files are concatenated, so check that all are terminated by end-of-line");
                                 logger.warning("");
                                 throw new IllegalArgumentException("DataSourceFactory.extensions contains extension that contains period: "+url );
@@ -423,8 +432,8 @@ public class DataSourceRegistry {
 
     /**
      * return true if the source is registered.
-     * @param ext, for example ".cdf"
-     * @return 
+     * @param ext, for example ".cdf" or "cdf"
+     * @return if the source is registered.
      */
     public boolean hasSourceByExt(String ext) {
         if ( ext==null ) return false;
@@ -432,10 +441,10 @@ public class DataSourceRegistry {
     }
 
     /**
-     * return true if the source is registered by mime type.  This
-     * is not used much.
+     * return true if the source is registered by mime type.  
+     * This is not used much.
      * @param mime, for example "application/x-das2stream"
-     * @return 
+     * @return true if the source is registered by mime type.
      */
     public boolean hasSourceByMime(String mime) {
         if ( mime==null ) return false;
@@ -444,6 +453,8 @@ public class DataSourceRegistry {
 
     /**
      * register the data source factory by extension
+     * @param factory the factory (org.autoplot.foo.FooReaderFactory)
+     * @param extension the extension (e.g. ".foo")
      */
     public void register(DataSourceFactory factory, String extension) {
         extension= getExtension(extension);
@@ -452,6 +463,9 @@ public class DataSourceRegistry {
 
     /**
      * register the data source factory by extension and mime
+     * @param factory the factory (org.autoplot.foo.FooReaderFactory)
+     * @param extension the extension (e.g. ".foo")
+     * @param mime the mime type. (e.g. "x-application/foo")
      */
     public void register(DataSourceFactory factory, String extension, String mime) {
         extension= getExtension(extension);
@@ -463,6 +477,9 @@ public class DataSourceRegistry {
      * register the data source factory by extension.  The name of the
      * factory class is given, so that the class is not accessed until first
      * use.
+     * @param className the class name of the factory. (e.g. "org.virbo.cdf.CdfJavaDataSourceFactory")
+     * @param extension the  extension (e.g. "cdf")
+     * @param description a description of the format (e.g. "CDF files using java based reader")
      */
     public void registerExtension(String className, String extension, String description ) {
         extension= getExtension(extension);
@@ -470,7 +487,7 @@ public class DataSourceRegistry {
         if ( old!=null ) {
             String oldClassName= ( old instanceof String ) ? (String) old : old.getClass().getName() ;
             if ( !(oldClassName.equals(className)) ) {
-                logger.fine("extension "+extension+ " is already handled by "+oldClassName + ", replacing with "+className );
+                logger.log(Level.FINE, "extension {0} is already handled by {1}, replacing with {2}", new Object[]{extension, oldClassName, className});
             }
         }
         dataSourcesByExt.put(extension, className);
@@ -481,17 +498,30 @@ public class DataSourceRegistry {
      * register the data source factory by extension.  The name of the
      * factory class is given, so that the class is not accessed until first
      * use.
+     * @param className the class name of the formatter
+     * @param extension  the  extension (e.g. "cdf")
      */
     public void registerFormatter(String className, String extension) {
         if (extension.indexOf('.') != 0) extension= "."+extension;
         dataSourceFormatByExt.put(extension, className);
     }
 
+    /**
+     * register the data source editor by extension.  
+     * @param className the class name of the editor (e.g. "org.autoplot.cdf.CdfDataSourceEditorPanel")
+     * @param extension the  extension (e.g. "cdf")
+     */    
     public void registerEditor( String className, String extension ) {
         extension= getExtension(extension);
         dataSourceEditorByExt.put(extension, className);
     }
 
+    /**
+     * register the data source format editor by extension.  This implements an
+     * editor for formatting.
+     * @param className the class name of the editor (e.g. "org.autoplot.cdf.CdfDataSourceFormatEditorPanel")
+     * @param extension the  extension (e.g. "cdf")
+     */    
     public void registerFormatEditor( String className, String extension ) {
         extension= getExtension(extension);
         dataSourceFormatEditorByExt.put(extension, className);
@@ -512,10 +542,10 @@ public class DataSourceRegistry {
 
     /**
      * look up the source by its id.  If a filename is provided, then the
-     * filename's extension is used, otherwise ".<ext>" or "<ext>" are accepted.
+     * filename's extension is used, otherwise ".ext" or "ext" are accepted.
      * 
-     * @param extension
-     * @return
+     * @param extension the extension, (e.g. ".cdf" or "/tmp/myfile.cdf")
+     * @return the DataSourceFactory which will create the reader.
      */
     public synchronized DataSourceFactory getSource(String extension) {
         if ( extension==null ) return null;
@@ -566,9 +596,11 @@ public class DataSourceRegistry {
 
     /**
      * returns canonical extension for name by:
-     *   add a dot when it's not there.
-     *   clip off the filename part if it's there.
-     *   force to lower case.
+     * <ul> 
+     * <li>add a dot when it's not there.
+     * <li>clip off the filename part if it's there.
+     * <li>force to lower case.
+     * </ul>
      * @param name, such as "http://autoplot.org/data/autoplot.gif"
      * @return extension, such as ".gif"
      */
