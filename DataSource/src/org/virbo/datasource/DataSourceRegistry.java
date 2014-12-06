@@ -571,7 +571,7 @@ public class DataSourceRegistry {
             } catch (IllegalAccessException ex) {
                 throw new RuntimeException(ex);
             } catch ( UnsatisfiedLinkError ex ) { // kludge in support to fall back to Java reader if the C-based one is not found.
-                if ( extension.equals(".cdfn") ) {
+                if ( extension.equals(".cdfn") || extension.equals(".cdf") ) {
                     logger.fine("attempting to use java based reader to handle cdfn.");
                     DataSourceFactory dsf=  getSource(".cdfj");
                     if ( dsf!=null ) {
