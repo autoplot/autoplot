@@ -110,7 +110,7 @@ public class DataSourceRegistry {
 
     /**
      * return a list of registered extensions.  These will contain the dot prefix.
-     * @returna list of registered extensions.
+     * @return a list of registered extensions.
      */
     public List<String> getSourceEditorExtensions() {
         List<String> result= new ArrayList<String>();
