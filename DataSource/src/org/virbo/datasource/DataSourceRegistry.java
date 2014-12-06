@@ -533,6 +533,9 @@ public class DataSourceRegistry {
 
     /**
      * register the data source factory by extension and mime
+     * @param className the class name of the factory. (e.g. "org.virbo.cdf.CdfJavaDataSourceFactory")
+     * @param extension the  extension (e.g. "cdf")
+     * @param mime for example "application/x-das2stream"
      */
     public void register(String className, String extension, String mime) {
         extension= getExtension(extension);
