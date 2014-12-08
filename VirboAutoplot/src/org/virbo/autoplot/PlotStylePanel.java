@@ -142,6 +142,26 @@ public class PlotStylePanel extends javax.swing.JPanel {
                 return new Color( rgb );// shouldn't enter here.  But it does! https://sourceforge.net/p/autoplot/bugs/1055/
             }
         };
+//        Converter unitsConverter= new Converter() {
+//            @Override
+//            public Object convertForward(Object s) {
+//                int i= unitsCB.getSelectedIndex();
+//                if ( i==0 ) {
+//                    return s;
+//                } else {
+//                    throw new IllegalArgumentException("not supported");
+//                }
+//            }
+//            @Override
+//            public Object convertReverse(Object t) {
+//                int i= unitsCB.getSelectedIndex();
+//                if ( i==0 ) {
+//                    return t;
+//                } else {
+//                    throw new IllegalArgumentException("not supported");
+//                }
+//            }            
+//        };
         b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create( Options.PROP_FOREGROUND ), foregroundColorButton, BeanProperty.create("icon") );
         b.setConverter( colorIconConverter );
         bc.addBinding(b);
@@ -153,10 +173,19 @@ public class PlotStylePanel extends javax.swing.JPanel {
         b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_FITTED ), fittedCB, BeanProperty.create("selected") );
         bc.addBinding(b);
         b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_HEIGHT ), heightTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST") );
+        //b.setConverter(unitsConverter);
         bc.addBinding(b);
         b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_WIDTH ), widthTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST") );
+        //b.setConverter(unitsConverter);
         bc.addBinding(b);
         bc.bind();
+        dom.getCanvases(0).getController().getDasCanvas().addPropertyChangeListener( "preferredSize", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateSize();
+            }
+        } );
+        updateSize();
     }
 
     private transient PropertyChangeListener renderTypeListener= new PropertyChangeListener() {
@@ -309,6 +338,8 @@ public class PlotStylePanel extends javax.swing.JPanel {
         heightLabel = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         fittedCB = new javax.swing.JCheckBox();
+        unitsCB = new javax.swing.JComboBox();
+        sizeLabel = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(688, 300));
 
@@ -370,7 +401,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
             }
         });
 
-        widthLabel.setText("Width:");
+        widthLabel.setText("Width (px):");
         widthLabel.setToolTipText("Canvas width in pixels");
         widthLabel.setEnabled(false);
 
@@ -378,13 +409,23 @@ public class PlotStylePanel extends javax.swing.JPanel {
         widthTextField.setToolTipText("width of fixed size canvas in pixels");
         widthTextField.setEnabled(false);
         widthTextField.setFocusLostBehavior(javax.swing.JFormattedTextField.COMMIT);
+        widthTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                widthTextFieldActionPerformed(evt);
+            }
+        });
 
         heightTextField.setText("100");
         heightTextField.setToolTipText("height of fixed size canvas in pixels");
         heightTextField.setEnabled(false);
         heightTextField.setFocusLostBehavior(javax.swing.JFormattedTextField.COMMIT);
+        heightTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                heightTextFieldActionPerformed(evt);
+            }
+        });
 
-        heightLabel.setText("Height:");
+        heightLabel.setText("Height (px):");
         heightLabel.setToolTipText("Canvas height in pixels");
         heightLabel.setEnabled(false);
 
@@ -399,6 +440,15 @@ public class PlotStylePanel extends javax.swing.JPanel {
             }
         });
 
+        unitsCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "points/pixels", "inches", "cm" }));
+        unitsCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                unitsCBActionPerformed(evt);
+            }
+        });
+
+        sizeLabel.setText("jLabel5");
+
         org.jdesktop.layout.GroupLayout plotPanelLayout = new org.jdesktop.layout.GroupLayout(plotPanel);
         plotPanel.setLayout(plotPanelLayout);
         plotPanelLayout.setHorizontalGroup(
@@ -407,32 +457,39 @@ public class PlotStylePanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(plotPanelLayout.createSequentialGroup()
-                        .add(jLabel12)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(majorTicksCheckBox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(minorGridCheckBox))
-                    .add(plotPanelLayout.createSequentialGroup()
-                        .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(plotPanelLayout.createSequentialGroup()
-                                .add(10, 10, 10)
-                                .add(jLabel2)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(foregroundColorButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(jLabel1))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(plotPanelLayout.createSequentialGroup()
-                                .add(jLabel3)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(backgroundColorButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(foreBackColorsList, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 173, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                    .add(plotPanelLayout.createSequentialGroup()
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(fontLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 191, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 29, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 31, Short.MAX_VALUE)
                         .add(pickFontButton))
+                    .add(plotPanelLayout.createSequentialGroup()
+                        .add(jLabel7)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(fittedCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE))
+                    .add(plotPanelLayout.createSequentialGroup()
+                        .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(plotPanelLayout.createSequentialGroup()
+                                .add(jLabel12)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(majorTicksCheckBox)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(minorGridCheckBox))
+                            .add(plotPanelLayout.createSequentialGroup()
+                                .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(plotPanelLayout.createSequentialGroup()
+                                        .add(10, 10, 10)
+                                        .add(jLabel2)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(foregroundColorButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                    .add(jLabel1))
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(plotPanelLayout.createSequentialGroup()
+                                        .add(jLabel3)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(backgroundColorButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                    .add(foreBackColorsList, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 173, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                        .add(0, 0, Short.MAX_VALUE))
                     .add(plotPanelLayout.createSequentialGroup()
                         .add(12, 12, 12)
                         .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -444,11 +501,13 @@ public class PlotStylePanel extends javax.swing.JPanel {
                                 .add(heightTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE))
                             .add(plotPanelLayout.createSequentialGroup()
                                 .add(12, 12, 12)
-                                .add(widthTextField))))
-                    .add(plotPanelLayout.createSequentialGroup()
-                        .add(jLabel7)
+                                .add(widthTextField)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(fittedCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE)))
+                        .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(plotPanelLayout.createSequentialGroup()
+                                .add(unitsCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .add(0, 0, Short.MAX_VALUE))
+                            .add(sizeLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .add(12, 12, 12))
         );
 
@@ -483,12 +542,14 @@ public class PlotStylePanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(widthLabel)
-                    .add(widthTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(widthTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(sizeLabel))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(heightLabel)
-                    .add(heightTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(30, Short.MAX_VALUE))
+                    .add(heightTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(unitsCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
 
         jSplitPane2.setRightComponent(plotPanel);
@@ -501,7 +562,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .add(jSplitPane2)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -575,6 +636,30 @@ public class PlotStylePanel extends javax.swing.JPanel {
         heightLabel.setEnabled(s);
     }//GEN-LAST:event_fittedCBActionPerformed
 
+    private void updateSize() {
+        int wpixels= dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().width;
+        int hpixels= dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().height;
+        if ( unitsCB.getSelectedIndex()==0 ) {
+            sizeLabel.setText( String.format( "w=%d by h=%d points",wpixels,hpixels ) );
+        } else if ( unitsCB.getSelectedIndex()==1 ) {
+            sizeLabel.setText( String.format( "w=%.2f by h=%.2f inches",wpixels/72.,hpixels/72. ) );
+        } else {
+            sizeLabel.setText( String.format( "w=%.1f by h=%.1f cm",wpixels/72*2.54,hpixels/72*2.54 ) );
+        }
+    }
+    
+    private void widthTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_widthTextFieldActionPerformed
+        dom.getCanvases(0).getController().getDasCanvas().setPreferredWidth( Integer.parseInt(widthTextField.getText()) );
+    }//GEN-LAST:event_widthTextFieldActionPerformed
+
+    private void heightTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heightTextFieldActionPerformed
+        dom.getCanvases(0).getController().getDasCanvas().setPreferredHeight( Integer.parseInt(heightTextField.getText()) );
+    }//GEN-LAST:event_heightTextFieldActionPerformed
+
+    private void unitsCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unitsCBActionPerformed
+        updateSize();
+    }//GEN-LAST:event_unitsCBActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backgroundColorButton;
     private javax.swing.JCheckBox fittedCB;
@@ -594,7 +679,9 @@ public class PlotStylePanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox minorGridCheckBox;
     private javax.swing.JButton pickFontButton;
     private javax.swing.JPanel plotPanel;
+    private javax.swing.JLabel sizeLabel;
     private javax.swing.JPanel stylePanel;
+    private javax.swing.JComboBox unitsCB;
     private javax.swing.JLabel widthLabel;
     private javax.swing.JFormattedTextField widthTextField;
     // End of variables declaration//GEN-END:variables

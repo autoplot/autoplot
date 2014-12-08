@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <Properties>
@@ -26,7 +26,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jSplitPane2" alignment="0" pref="300" max="32767" attributes="0"/>
+          <Component id="jSplitPane2" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -72,39 +72,49 @@
                   <Group type="102" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Component id="jLabel12" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="majorTicksCheckBox" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="minorGridCheckBox" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="1">
-                                      <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                                      <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="foregroundColorButton" linkSize="3" min="-2" pref="30" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="backgroundColorButton" linkSize="3" min="-2" pref="28" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="foreBackColorsList" alignment="0" min="-2" pref="173" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Component id="fontLabel" min="-2" pref="191" max="-2" attributes="0"/>
-                              <EmptySpace pref="29" max="32767" attributes="1"/>
+                              <EmptySpace pref="31" max="32767" attributes="1"/>
                               <Component id="pickFontButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="fittedCB" pref="252" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="jLabel12" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="majorTicksCheckBox" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="minorGridCheckBox" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" alignment="0" attributes="1">
+                                              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                                              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="foregroundColorButton" linkSize="3" min="-2" pref="30" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="backgroundColorButton" linkSize="3" min="-2" pref="28" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Component id="foreBackColorsList" alignment="0" min="-2" pref="173" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                              </Group>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="12" pref="12" max="12" attributes="0"/>
@@ -122,11 +132,14 @@
                                       <Component id="widthTextField" max="32767" attributes="1"/>
                                   </Group>
                               </Group>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="fittedCB" pref="252" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="unitsCB" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Component id="sizeLabel" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
                       </Group>
                       <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
@@ -168,13 +181,15 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="widthLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="widthTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="sizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="heightLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="heightTextField" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="unitsCB" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="30" max="32767" attributes="0"/>
+                      <EmptySpace pref="46" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -263,7 +278,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="widthLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Width:"/>
+                <Property name="text" type="java.lang.String" value="Width (px):"/>
                 <Property name="toolTipText" type="java.lang.String" value="Canvas width in pixels"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
@@ -275,6 +290,9 @@
                 <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusLostBehavior" type="int" value="0"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="widthTextFieldActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JFormattedTextField" name="heightTextField">
               <Properties>
@@ -283,10 +301,13 @@
                 <Property name="enabled" type="boolean" value="false"/>
                 <Property name="focusLostBehavior" type="int" value="0"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="heightTextFieldActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="heightLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Height:"/>
+                <Property name="text" type="java.lang.String" value="Height (px):"/>
                 <Property name="toolTipText" type="java.lang.String" value="Canvas height in pixels"/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
@@ -305,6 +326,25 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fittedCBActionPerformed"/>
               </Events>
+            </Component>
+            <Component class="javax.swing.JComboBox" name="unitsCB">
+              <Properties>
+                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                  <StringArray count="3">
+                    <StringItem index="0" value="points/pixels"/>
+                    <StringItem index="1" value="inches"/>
+                    <StringItem index="2" value="cm"/>
+                  </StringArray>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="unitsCBActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JLabel" name="sizeLabel">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="jLabel5"/>
+              </Properties>
             </Component>
           </SubComponents>
         </Container>
