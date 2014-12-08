@@ -217,8 +217,10 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     private void pickFontButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickFontButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         Font f= GuiSupport.pickFont( (JFrame) SwingUtilities.getWindowAncestor(this), app );
-        if ( f!=null ) fontLabel.setText( DomUtil.encodeFont(f));
-        canEmbedFont(f);
+        if ( f!=null ) {
+            fontLabel.setText( DomUtil.encodeFont(f));
+            canEmbedFont(f);
+        }
     }//GEN-LAST:event_pickFontButtonActionPerformed
 
     private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
