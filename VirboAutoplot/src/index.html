@@ -25,8 +25,13 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-12-04):</p>
+        <p>Bugfixes (2014-12-08):</p>
         <ul> 
+            <li>bugfix: pickFont can return null.</li>
+            <li>revert the message about varying slice locations.</li>
+            <li>fix hang when thumbnailer code would get stuck in infinite loop (with small canvas).</li>
+            <li>fix failure to update when canvas size is set explicitly.</li>
+            <li>bugfix: rank 1, one-element DELTA_PLUS in vap+cdaweb:ds=C3_PP_CIS&amp;id=T_p_par__C3_PP_CIS</li>
             <li>bug with rank 1 data and data gap for ephemeris ticks resolved.  Thanks Joe!</li>
             <li>bug 1098: improve feedback as to where the two timeranges options are coming from in the query.</li>
             <li>bug 1295: get rid of Thread.sleep use by using new java.util.Timer aptimer. </li>
@@ -86,6 +91,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>put in label to show the canvas size in inches or centimeters.</li>
+            <li>minor improvements to getParam insert in Jython editor.</li>
             <li>add branch for total(dsr2,1) where dsr2 is a rank 2 dataset, to get BMag from components of huge magnetometer dataset.</li>
             <li>experimental reluctantLegendIcons=true (autoplot_data/config/system.properties) hides icon when there is only one renderer</li>
             <li>URIs update with TSB, removing mistakes the old URI would cause.</li>
