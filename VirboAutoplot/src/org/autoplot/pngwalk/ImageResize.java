@@ -8,6 +8,9 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 
 /**
  * first from http://today.java.net/pub/a/today/2007/04/03/perils-of-image-getscaledinstance.html
@@ -16,6 +19,8 @@ import java.awt.image.BufferedImage;
  */
 public class ImageResize {
 
+    public static Logger logger= LoggerManager.getLogger("autoplot.pngwalk");
+    
     /**
      * convenient typical use.
      * @param img image to resize.
@@ -79,6 +84,7 @@ public class ImageResize {
             h = targetHeight;
         }
 
+        int count= 0;
         do {
             if (higherQuality && w > targetWidth) {
                 w /= 2;
@@ -101,7 +107,13 @@ public class ImageResize {
             g2.dispose();
 
             ret = tmp;
-        } while (w != targetWidth || h != targetHeight);
+            count++; // I noticed a case where it hung in this loop.
+            
+        } while ( count<50 && ( w != targetWidth || h != targetHeight) );
+
+        if ( count==50 ) {
+            logger.log( Level.WARNING, "ran out of iterations in imageResize" );
+        }
 
         return ret;
     }
