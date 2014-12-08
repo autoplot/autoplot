@@ -326,6 +326,12 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         if ( dia1!=null ) {
             errorMessage= errorMessage + "\n\nError hit "+(1+dia1.hits)+ " times" ;
             dia1.hits++;
+            if ( ( dia1.hits % 100 ) == 0 ) {
+                // this is a catastrophic problem, often where an event is thrown on the 
+                // GUI thread itself.  Dump to stdout and reset.
+                System.err.println("== Error hit "+dia1.hits +" times");
+                t.printStackTrace( System.err );
+            }
         }
 
         if ( dia1==null ) {
