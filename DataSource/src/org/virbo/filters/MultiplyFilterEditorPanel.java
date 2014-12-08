@@ -59,7 +59,7 @@ public class MultiplyFilterEditorPanel extends AbstractFilterEditorPanel {
                             .addComponent(jSeparator1)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel2)
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addGap(0, 9, Short.MAX_VALUE)))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
