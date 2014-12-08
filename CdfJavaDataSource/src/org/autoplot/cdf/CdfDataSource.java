@@ -895,12 +895,18 @@ public class CdfDataSource extends AbstractDataSource {
                 if ( hasVariable( cdf, (String)deltaPlus ) ) {
                     QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !!cdf.recordVariance((String)deltaPlus), false, null ); //TODO: slice1
                     Units deltaUnits= SemanticOps.getUnits(delta);
+                    if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
+                        delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
+                    }
                     if ( UnitsUtil.isRatioMeasurement(deltaUnits)
                             && deltaUnits.isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() )
                             && ( delta.rank()==0 || result.length()==delta.length() ) ) {
                         result.putProperty( QDataSet.BIN_PLUS, delta );
                         if ( !deltaMinus.equals(deltaPlus) ) {
                             delta= wrapDataSet( cdf, (String)deltaMinus, constraints, !cdf.recordVariance((String)deltaMinus), false, null );
+                            if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
+                               delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
+                            }
                         }
                         if ( SemanticOps.getUnits(delta).isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
                             result.putProperty( QDataSet.BIN_MINUS, delta );
@@ -912,7 +918,7 @@ public class CdfDataSource extends AbstractDataSource {
                         if ( !UnitsUtil.isRatioMeasurement(deltaUnits) ) {
                             logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not ratio measurements having a meaningful zero: {0}", new Object[] { deltaUnits } );
                         } else if ( result.length()!=delta.length() ) {
-                            logger.log(Level.WARNING, "DELTA_PLUS_VAR length ({0})!= data length ({0})", new Object[] { delta.length(), result.length() } );
+                            logger.log(Level.WARNING, "DELTA_PLUS_VAR length ({0})!= data length ({1})", new Object[] { delta.length(), result.length() } );
                         } else {
                             logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
                         }
