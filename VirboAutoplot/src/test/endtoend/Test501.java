@@ -128,7 +128,7 @@ public class Test501 {
 
         int iid= 0;
 
-        DasServer[] dsss= new DasServer[] { DasServer.plasmaWaveGroup,
+        DasServer[] dsss= new DasServer[] { DasServer.create(new URL("http://www-pw.physics.uiowa.edu/das/das2Server") ),
             DasServer.create(new URL("http://emfisis.physics.uiowa.edu/das/das2Server")) };
         
         Map<Integer,String> failures= new LinkedHashMap();
@@ -150,7 +150,7 @@ public class Test501 {
             flatten( tm, "", tm.getRoot(), ids );
 
             List<Integer> skip;
-            if ( dss==DasServer.plasmaWaveGroup ) {
+            if ( dss==dsss[0] ) {
                 skip= new ArrayList( Arrays.asList( 3, 4, 5, 6, 7, 18 ) );
             } else {
                 skip= new ArrayList(  );
