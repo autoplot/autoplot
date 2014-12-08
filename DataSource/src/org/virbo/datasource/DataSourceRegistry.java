@@ -543,6 +543,19 @@ public class DataSourceRegistry {
         dataSourcesByMime.put(mime.toLowerCase(), className);
     }
 
+    private DataSourceFactory useJavaCdfForNative( String extension, Error ex ) {
+        logger.fine("attempting to use java based reader to handle cdfn.");
+        DataSourceFactory dsf=  getSource(".cdfj");
+        if ( dsf!=null ) {
+            dataSourcesByExt.put( extension, dsf ); //TODO: kludge for CDF
+            dataSourceEditorByExt.put( extension, getDataSourceEditorByExt(".cdfj") );
+            dataSourceFormatByExt.put( extension, getDataSourceFormatEditorByExt(".cdfj") );
+            return dsf;
+        } else {
+            throw new RuntimeException(ex);
+        }
+    }
+    
     /**
      * look up the source by its id.  If a filename is provided, then the
      * filename's extension is used, otherwise ".ext" or "ext" are accepted.
@@ -573,18 +586,15 @@ public class DataSourceRegistry {
                 throw new RuntimeException(ex);
             } catch (IllegalAccessException ex) {
                 throw new RuntimeException(ex);
+            } catch ( NoClassDefFoundError ex ) {
+                if ( extension.equals(".cdfn") || extension.equals(".cdf") ) {
+                    result= useJavaCdfForNative(extension,ex);
+                } else {
+                    throw new RuntimeException(ex);
+                }
             } catch ( UnsatisfiedLinkError ex ) { // kludge in support to fall back to Java reader if the C-based one is not found.
                 if ( extension.equals(".cdfn") || extension.equals(".cdf") ) {
-                    logger.fine("attempting to use java based reader to handle cdfn.");
-                    DataSourceFactory dsf=  getSource(".cdfj");
-                    if ( dsf!=null ) {
-                        dataSourcesByExt.put( extension, dsf ); //TODO: kludge for CDF
-                        dataSourceEditorByExt.put( extension, getDataSourceEditorByExt(".cdfj") );
-                        dataSourceFormatByExt.remove( extension );
-                        return dsf;
-                    } else {
-                        throw new RuntimeException(ex);
-                    }
+                    result= useJavaCdfForNative(extension,ex);
                 } else {
                     throw new RuntimeException(ex);
                 }
