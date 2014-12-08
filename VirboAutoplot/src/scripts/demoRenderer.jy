@@ -2,6 +2,8 @@
 # with each record: [x,y,rad,color]
 
 from org.virbo.dataset import SemanticOps
+from org.das2.graph import Renderer
+
 from java.lang import IllegalArgumentException
 
 cb= dom.plots[0].zaxis.controller.getDasAxis()
@@ -13,7 +15,7 @@ class MyPCL( java.beans.PropertyChangeListener ):
 
 cb.addPropertyChangeListener( MyPCL() )  #TODO: there's a jython way to do this
 
-class MyRend( org.das2.graph.Renderer ):
+class MyRend( Renderer ):
   def render( self, g, xAxis, yAxis, mon ):
      ds= self.getDataSet()
      if ( ds.rank()!=2 or ds.length(0)!=4 ):
