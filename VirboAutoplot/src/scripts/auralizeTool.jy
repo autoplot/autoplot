@@ -35,10 +35,10 @@ plot= dom.plots[0].controller.dasPlot
 from org.das2.event import BoxSelectorMouseModule
 mm= BoxSelectorMouseModule.create( plot, 'Auralize' )
 mm.BoxSelected=boxSelected
-plot.mouseAdapter.primaryModule=mm
+plot.dasMouseInputAdapter.primaryModule=mm
 
 plot= dom.plots[1].controller.dasPlot
 from org.das2.event import BoxSelectorMouseModule
 mm= BoxSelectorMouseModule.create( plot, 'Auralize' )
 mm.BoxSelected=boxSelected
-plot.mouseAdapter.primaryModule=mm
+plot.dasMouseInputAdapter.primaryModule=mm
