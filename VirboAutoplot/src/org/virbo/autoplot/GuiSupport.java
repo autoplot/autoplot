@@ -1808,7 +1808,7 @@ public class GuiSupport {
                 } else if ( font!=null ) {
                     return "PDF okay";
                 } else {                    
-                    return "Cannot be embedded in PDF";
+                    return "Can not be embedded in PDF";
                 }
             }
         });
