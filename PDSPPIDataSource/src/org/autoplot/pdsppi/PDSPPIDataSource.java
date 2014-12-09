@@ -9,11 +9,14 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.dataset.NoDataInIntervalException;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.URISplit;
@@ -30,6 +33,11 @@ import org.virbo.spase.VOTableReader;
 public class PDSPPIDataSource extends AbstractDataSource {
 
     private static final Logger logger= LoggerManager.getLogger("apdss.pdsppi");
+    
+    /**
+     * no dataset can have more than MAX_BUNDLE_COUNT datasets.  
+     */
+    public static int MAX_BUNDLE_COUNT= 12;
     
     PDSPPIDataSource( URI uri ) {
         super(uri);
@@ -78,6 +86,20 @@ public class PDSPPIDataSource extends AbstractDataSource {
             String n= (String) bds.property(QDataSet.DEPENDNAME_0,i);
             if ( n!=null ) {
                 result= Ops.link( DataSetOps.unbundle(ds,n), result );
+            } else {
+                if ( i>0 ) {
+                    QDataSet dep0check= DataSetOps.unbundle( ds,i-1 );
+                    Units tu= SemanticOps.getUnits(dep0check);
+                    if ( UnitsUtil.isTimeLocation(tu) ) {
+                        result= Ops.putProperty( result, QDataSet.DEPEND_0, dep0check );
+                    }
+                }
+            }
+        }
+        
+        if ( result.rank()>1 ) {
+            if ( result.length(0)>MAX_BUNDLE_COUNT ) {
+                result= Ops.putProperty( result, QDataSet.BUNDLE_1, null );
             }
         }
         
