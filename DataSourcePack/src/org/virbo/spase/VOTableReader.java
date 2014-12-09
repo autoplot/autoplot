@@ -381,7 +381,7 @@ public class VOTableReader {
         DDataSet result= dataSetBuilder.getDataSet();
         
         for ( int jj=0; jj<ids.size(); jj++ ) {
-            if ( stopEnumerations.get(jj)==Boolean.TRUE ) {
+            if ( Boolean.TRUE.equals( stopEnumerations.get(jj) ) ) {
                 logger.log(Level.INFO, "clear out enumeration at {0}, too many different values.", jj);
                 for ( int ii=0; ii<result.length(); ii++ ) {
                     result.putValue( ii, jj, FILL_VALUE );
@@ -398,21 +398,31 @@ public class VOTableReader {
      */
     private QDataSet formBundleDescriptor() {
         SparseDataSetBuilder head= new SparseDataSetBuilder(2);
-        head.setQube( new int[] { nelements, 0 } ); // all datasets must be or are made to be rank 1.
+        head.setLength( nelements ); // all datasets must be or are made to be rank 1.
         
-        int ielement=0;
+        int ielement1=0;
         for ( int ii=0; ii<ids.size(); ii++ ) {
             if ( arraysizes.get(ii)>0 ) {
+                int first= ielement1;
                 for ( int jj=0; jj<arraysizes.get(ii); jj++ ) {
-                    head.putProperty( QDataSet.NAME, ielement, ids.get(ii)+"_"+ielement );
-                    head.putProperty( QDataSet.LABEL, ielement, names.get(ii) ); 
-                    head.putProperty( QDataSet.UNITS, ielement, units.get(ii) ); 
+                    head.putProperty( QDataSet.NAME, ielement1, ids.get(ii)+"_"+ielement1 );
+                    head.putProperty( QDataSet.LABEL, ielement1, names.get(ii) ); 
+                    head.putProperty( QDataSet.UNITS, ielement1, units.get(ii) ); 
+                    head.putProperty( QDataSet.TITLE, ielement1, descriptions.get(ii) );
+                    if ( jj==0 ) {
+                        head.putValue( ielement1, 0, arraysizes.get(ii) );
+                        head.putProperty( QDataSet.ELEMENT_LABEL, ielement1, names.get(ii) );
+                        head.putProperty( QDataSet.ELEMENT_NAME, ielement1, ids.get(ii) );
+                        head.putProperty( QDataSet.DEPEND_1, ielement1, Ops.findgen(arraysizes.get(ii)) );
+                    }
+                    head.putProperty( QDataSet.START_INDEX, ielement1, first );
+                    
                     if ( fillValues.get(ii)!=null ) {
-                        head.putProperty( QDataSet.FILL_VALUE, ielement, FILL_VALUE ); 
+                        head.putProperty( QDataSet.FILL_VALUE, ielement1, FILL_VALUE ); 
                     }
                     if ( minValues.get(ii)!=null ) {
                         try {
-                            head.putProperty( QDataSet.VALID_MIN, ielement, units.get(ii).parse(minValues.get(ii)).doubleValue(units.get(ii)) );
+                            head.putProperty( QDataSet.VALID_MIN, ielement1, units.get(ii).parse(minValues.get(ii)).doubleValue(units.get(ii)) );
                         } catch ( ParseException ex ) {
                             logger.log( Level.INFO, "unable to parse MIN for {0}", ids.get(ii));
                         }
@@ -420,40 +430,40 @@ public class VOTableReader {
                     if ( maxValues.get(ii)!=null ) {
                         //TODO: I think there's an inclusive/exclusive property to look for.  VALID_MAX is inclusive.
                         try {
-                            head.putProperty( QDataSet.VALID_MAX, ielement, units.get(ii).parse(maxValues.get(ii)).doubleValue(units.get(ii)) );
+                            head.putProperty( QDataSet.VALID_MAX, ielement1, units.get(ii).parse(maxValues.get(ii)).doubleValue(units.get(ii)) );
                         } catch ( ParseException ex ) {
                             logger.log( Level.INFO, "unable to parse MAX for {0}", ids.get(ii));
                         }
                     }
-                    ielement++;
+                    ielement1++;
                 }
                 
             } else {
-                head.putProperty( QDataSet.NAME, ielement, ids.get(ii) );
+                head.putProperty( QDataSet.NAME, ielement1, ids.get(ii) );
                 if ( dep0s.get(ii)>-1 && dep0s.get(ii)<ii ) {
-                    head.putProperty( QDataSet.DEPENDNAME_0, ielement, ids.get(dep0s.get(ii)) ); 
+                    head.putProperty( QDataSet.DEPENDNAME_0, ielement1, ids.get(dep0s.get(ii)) ); 
                 }
-                head.putProperty( QDataSet.LABEL, ielement, names.get(ii) ); 
-                head.putProperty( QDataSet.UNITS, ielement, units.get(ii) ); 
-                head.putProperty( QDataSet.TITLE, ielement, descriptions.get(ii) ); 
+                head.putProperty( QDataSet.LABEL, ielement1, names.get(ii) ); 
+                head.putProperty( QDataSet.UNITS, ielement1, units.get(ii) ); 
+                head.putProperty( QDataSet.TITLE, ielement1, descriptions.get(ii) ); 
                 if ( fillValues.get(ii)!=null ) {
-                   head.putProperty( QDataSet.FILL_VALUE, ielement, FILL_VALUE ); 
+                   head.putProperty( QDataSet.FILL_VALUE, ielement1, FILL_VALUE ); 
                 }
                 if ( minValues.get(ii)!=null ) {
                     try {
-                        head.putProperty( QDataSet.VALID_MIN, ielement, units.get(ii).parse(minValues.get(ii)).doubleValue(units.get(ii)) );
+                        head.putProperty( QDataSet.VALID_MIN, ielement1, units.get(ii).parse(minValues.get(ii)).doubleValue(units.get(ii)) );
                     } catch ( ParseException ex ) {
                         logger.log( Level.INFO, "unable to parse MIN for {0}", ids.get(ii));
                     }
                 }
                 if ( maxValues.get(ii)!=null ) {
                     try {
-                        head.putProperty( QDataSet.VALID_MAX, ielement, units.get(ii).parse(maxValues.get(ii)).doubleValue(units.get(ii)) );
+                        head.putProperty( QDataSet.VALID_MAX, ielement1, units.get(ii).parse(maxValues.get(ii)).doubleValue(units.get(ii)) );
                     } catch ( ParseException ex ) {
                         logger.log( Level.INFO, "unable to parse MAX for {0}", ids.get(ii));
                     }
                 }                
-                ielement++;
+                ielement1++;
             }
             //if ( ii>0 ) head.putProperty( QDataSet.DEPENDNAME_0, ielement, ids.get(0) );
         }
