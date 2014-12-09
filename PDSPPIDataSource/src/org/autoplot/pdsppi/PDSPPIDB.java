@@ -287,14 +287,14 @@ public class PDSPPIDB {
             read= new VOTableReader();
             mon.setProgressMessage("downloading data");
             logger.log(Level.FINE, "getParams {0}", url);
-            File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon );
+            File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon.getSubtaskMonitor("downloading file") );
             String s= checkXML(f);
             if ( s!=null ) {
                 throw new IllegalArgumentException("file does not appear to be xml: "+s );
             }
             
             mon.setProgressMessage("reading data");
-            QDataSet ds= read.readHeader( f.toString(), mon );
+            QDataSet ds= read.readHeader( f.toString(), mon.getSubtaskMonitor("reading data") );
             
             Map<String,String> result= new LinkedHashMap();
             
