@@ -327,6 +327,42 @@ public class CdfUtil {
         return rank;
     }
     
+    /**
+     * implements slice1 by packing all the remaining elements towards the front and trimming.
+     * @param buf
+     * @param varType
+     * @param qube
+     * @param slice1
+     * @param rowMajority
+     * @return 
+     */
+    private static ByteBuffer doSlice1( ByteBuffer buf, long varType, int[] qube, int slice1, boolean rowMajority ) {
+        //TODO: implement me
+        return buf;
+//        int nelem= DataSetUtil.product(qube) / qube[0];
+//        int nelemslice1= nelem / qube[1];
+//        int p1= slice1 * nelem / qube[1];
+//        int p2= slice1 * nelem / qube[1] + nelem / qube[1];
+//        int nelem= DataSetUtil.product(qube) / qube[0];
+//        if ( rowMajority ) { // one of these two is wrong.
+//            for ( int irec=0; irec<qube[0]; irec++ ) {
+//                buf.position(irec*nelem + p1);
+//                buf.limit(irec*nelem + p2 );
+//                ByteBuffer b= buf.slice();
+//                buf.position(irec*nelem);
+//                buf.put(b);
+//            }
+//        } else {
+//            for ( int irec=0; irec<qube[0]; irec++ ) {
+//                buf.position(irec*nelem + p1);
+//                buf.limit(irec*nelem + p2 );
+//                ByteBuffer b= buf.slice();
+//                buf.position(irec*nelem);
+//                buf.put(b);
+//            }            
+//        }
+//        return buf;
+    }
     
     /**
      * Return the named variable as a QDataSet.
@@ -443,7 +479,12 @@ public class CdfUtil {
             qube[0]= (int)recCount;
         }
 
-        if ( slice1>-1 ) { 
+        if ( buf.length>1 ) {
+            throw new IllegalArgumentException("multiple buffers not yet implemented");
+        }
+        
+        if ( slice1>-1 ) {
+            buf[0]= doSlice1( buf[0], varType, qube, slice1, cdf.rowMajority() );
             if ( recCount==-1 ) throw new IllegalArgumentException("recCount==-1 and slice1>-1");
             int[] nqube= new int[qube.length-1];
             nqube[0]= qube[0];
@@ -464,7 +505,7 @@ public class CdfUtil {
                 qube= Arrays.copyOf(qube,1);
             }
         }
-                          
+        
         if ( cdf.rowMajority()  ) {
 
             if ( recCount==-1 ) {
