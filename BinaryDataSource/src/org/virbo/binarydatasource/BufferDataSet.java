@@ -365,6 +365,8 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     /**
      * provide a subset of the dataset.  Note that writes to the result dataset
      * will affect the original dataset.  TODO: correct this since it's a WriteableDataSet.
+     * @param ist the first index 
+     * @param ien the last index, exclusive.
      */
     @Override
     public QDataSet trim( int ist, int ien ) {
