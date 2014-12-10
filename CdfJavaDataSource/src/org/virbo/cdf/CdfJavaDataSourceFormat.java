@@ -383,9 +383,9 @@ public class CdfJavaDataSourceFormat implements DataSourceFormat {
             } else if ( type==CDFDataType.FLOAT ) {
                 oexport= new float[ds.length()][][];
             } else if ( type==CDFDataType.INT4 ) {
-                oexport= new int[ds.length()][];
+                oexport= new int[ds.length()][][];
             } else if ( type==CDFDataType.INT2 ) {
-                oexport= new short[ds.length()][];
+                oexport= new short[ds.length()][][];
             } else if ( type==CDFDataType.INT1 ) {
                 oexport= new byte[ds.length()][][];
             } else {
@@ -404,9 +404,9 @@ public class CdfJavaDataSourceFormat implements DataSourceFormat {
             } else if ( type==CDFDataType.FLOAT ) {
                 oexport= new float[ds.length()][][][];
             } else if ( type==CDFDataType.INT4 ) {
-                oexport= new int[ds.length()][];
+                oexport= new int[ds.length()][][][];
             } else if ( type==CDFDataType.INT2 ) {
-                oexport= new short[ds.length()][];
+                oexport= new short[ds.length()][][][];
             } else if ( type==CDFDataType.INT1 ) {
                 oexport= new byte[ds.length()][][][];
             } else {
