@@ -284,17 +284,13 @@ public class CdfUtil {
     }
 
     /**
-     * returns the size of the variable in bytes.
-     * TODO: this needs to be verified.  Unsigned numbers may come back as next larger size.
-     * @param dims number of dimensions in each record
-     * @param dimSizes dimensions of each record
+     * returns the size of the data type in bytes.
      * @param itype type of data, such as CDFConstants.CDF_FLOAT
-     * @param rc number of records (rec count)
-     * @return the size the variable in bytes 
+     * @return the size the data atom in bytes 
+     * TODO: this needs to be verified.  Unsigned numbers may come back as next larger size.
      */
-    private static long sizeOf( int dims, int[] dimSizes, long itype, long rc ) {
-        long size= dims==0 ? rc : rc * DataSetUtil.product( dimSizes );
-        long sizeBytes;
+    private static int sizeOf( long itype ) {
+        int sizeBytes;
         if ( itype==CDFConstants.CDF_EPOCH16 ) {
             sizeBytes= 16;
         } else if(itype == CDFConstants.CDF_DOUBLE || itype == CDFConstants.CDF_REAL8 || itype == CDFConstants.CDF_EPOCH || itype==CDFConstants.CDF_TT2000 || itype==CDFConstants.CDF_INT8 ) {
@@ -308,7 +304,20 @@ public class CdfUtil {
         } else {
             throw new IllegalArgumentException("didn't code for type");
         }
-        size= size*sizeBytes;
+        return sizeBytes;
+    }
+    
+    /**
+     * returns the size of the variable in bytes.
+     * @param dims number of dimensions in each record
+     * @param dimSizes dimensions of each record
+     * @param itype type of data, such as CDFConstants.CDF_FLOAT
+     * @param rc number of records (rec count)
+     * @return the size the variable in bytes 
+     */
+    private static long sizeOf( int dims, int[] dimSizes, long itype, long rc ) {
+        long size= dims==0 ? rc : rc * DataSetUtil.product( dimSizes );
+        size= size*sizeOf(itype);
         return size;
     }
 
@@ -329,39 +338,42 @@ public class CdfUtil {
     
     /**
      * implements slice1 by packing all the remaining elements towards the front and trimming.
-     * @param buf
-     * @param varType
-     * @param qube
-     * @param slice1
-     * @param rowMajority
-     * @return 
+     * @param buf the byte buffer, which can be read-only.
+     * @param varType the variable type, see sizeOf(varType)
+     * @param qube the dimensions of the unsliced dataset
+     * @param slice1 the index to slice 
+     * @param rowMajority true if the buffer is row majority.
+     * @return a copy containing just the slice1 of the input buffer.
      */
     private static ByteBuffer doSlice1( ByteBuffer buf, long varType, int[] qube, int slice1, boolean rowMajority ) {
-        //TODO: implement me
-        return buf;
-//        int nelem= DataSetUtil.product(qube) / qube[0];
-//        int nelemslice1= nelem / qube[1];
-//        int p1= slice1 * nelem / qube[1];
-//        int p2= slice1 * nelem / qube[1] + nelem / qube[1];
-//        int nelem= DataSetUtil.product(qube) / qube[0];
-//        if ( rowMajority ) { // one of these two is wrong.
-//            for ( int irec=0; irec<qube[0]; irec++ ) {
-//                buf.position(irec*nelem + p1);
-//                buf.limit(irec*nelem + p2 );
-//                ByteBuffer b= buf.slice();
-//                buf.position(irec*nelem);
-//                buf.put(b);
-//            }
-//        } else {
-//            for ( int irec=0; irec<qube[0]; irec++ ) {
-//                buf.position(irec*nelem + p1);
-//                buf.limit(irec*nelem + p2 );
-//                ByteBuffer b= buf.slice();
-//                buf.position(irec*nelem);
-//                buf.put(b);
-//            }            
-//        }
-//        return buf;
+        int recSizeBytes= DataSetUtil.product(qube) / qube[0] * sizeOf(varType);
+        ByteBuffer result= ByteBuffer.allocate( recSizeBytes / qube[1] * qube[0] );
+        result.order(buf.order());
+        if ( rowMajority ) { // one of these two is wrong.
+            int p1= slice1 * recSizeBytes / qube[1];
+            int p2= ( slice1 * recSizeBytes / qube[1] + recSizeBytes / qube[1] );
+            for ( int irec=0; irec<qube[0]; irec++ ) {
+                buf.limit(irec*recSizeBytes + p2 );
+                buf.position(irec*recSizeBytes + p1);
+                ByteBuffer b= buf.slice();
+                result.put(b);
+            }
+        } else {
+            int varSize= sizeOf(varType);
+            for ( int irec=0; irec<qube[0]; irec++ ) {
+                for ( int j=0; j<recSizeBytes; j++ ) {
+                    if ( (j/varSize) % qube[1] == slice1 ) {
+                        result.put( buf.get( irec*recSizeBytes + j ) );                        
+                    } else {
+                        // skip to slice
+                    }
+                }
+            }            
+        }
+        result.flip();
+        buf.position(0);
+        buf.limit(recSizeBytes*qube[0]);
+        return result;
     }
     
     /**
@@ -483,7 +495,7 @@ public class CdfUtil {
             throw new IllegalArgumentException("multiple buffers not yet implemented");
         }
         
-        if ( slice1>-1 ) {
+        if ( slice1>-1 && qube.length>1 ) {
             buf[0]= doSlice1( buf[0], varType, qube, slice1, cdf.rowMajority() );
             if ( recCount==-1 ) throw new IllegalArgumentException("recCount==-1 and slice1>-1");
             int[] nqube= new int[qube.length-1];
@@ -491,6 +503,7 @@ public class CdfUtil {
             for ( int i=2;i<qube.length;i++ ) {
                 nqube[i-1]= qube[i];
             }
+            recLenBytes= recLenBytes/qube[1];
             qube= nqube;
         }
         
