@@ -8,6 +8,7 @@ package org.virbo.filters;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -86,5 +87,16 @@ public class AddFilterEditorPanel extends AbstractFilterEditorPanel implements F
             scalar.setText("0");
         }
         
+    }
+    
+    /**
+     * demonstrate filter.
+     * @param args 
+     */
+    public static void main(String[] args) {
+        FilterEditorPanel filter= new AddFilterEditorPanel();
+        filter.setFilter("|add(0)");
+        JOptionPane.showMessageDialog( null, filter);
+        System.err.println( filter.getFilter() );
     }
 }
