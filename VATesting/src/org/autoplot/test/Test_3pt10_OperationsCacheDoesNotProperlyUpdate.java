@@ -3,18 +3,13 @@
  * and open the template in the editor.
  */
 
-package test;
+package org.autoplot.test;
 
 import java.io.IOException;
-import util.RegexComponentChooser;
-import org.netbeans.jemmy.ComponentChooser;
-import javax.swing.JMenuItem;
-import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.virbo.autoplot.dom.Application;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.LoggerManager;
-import org.netbeans.jemmy.operators.JFrameOperator;
 import org.virbo.autoplot.AutoplotUI;
 import org.netbeans.jemmy.Scenario;
 import static org.virbo.autoplot.ScriptContext.*;
@@ -23,7 +18,7 @@ import static org.virbo.autoplot.ScriptContext.*;
  *
  * @author jbf
  */
-public class Test_3pt8_CopyPlotElementsDown implements Scenario  {
+public class Test_3pt10_OperationsCacheDoesNotProperlyUpdate implements Scenario  {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
@@ -31,27 +26,23 @@ public class Test_3pt8_CopyPlotElementsDown implements Scenario  {
         try {
             createGui();
             AutoplotUI app = (AutoplotUI) getViewWindow();
-            
+
             Application dom = getDocumentModel();
             dom.getOptions().setAutolayout(false);
             
-            JFrameOperator mainFrame = new JFrameOperator(app);
             waitUntilIdle();
 
-            plot( "vap+inline:ripplesVectorTimeSeries(200)&RENDER_TYPE=hugeScatter" );
+            plot( "vap+das2server:http://www-pw.physics.uiowa.edu/das/das2Server?dataset=juno/waves/flight/survey.dsdf&start_time=2012-07-21T12:00:00.000Z&end_time=2012-07-21T24:00:00.000Z" );
             waitUntilIdle();
 
-            org.das2.graph.DasPlot c= dom.getPlots(0).getController().getDasPlot();
-            javax.swing.JPopupMenu menu= c.getDasMouseInputAdapter().getPrimaryPopupMenu();
-            menu.show(app, 300, 300 );
-            JPopupMenuOperator op= new JPopupMenuOperator( menu );
-            JMenuItem item= op.pushMenu( new ComponentChooser[] { new RegexComponentChooser("Add Plot"),
-            new RegexComponentChooser("Copy Plot Elements Down") } );
+            dom.getPlotElements(0).setComponent("|dbAboveBackgroundDim1(10)");
+            waitUntilIdle();
 
-            Thread.sleep(1000);
+            dom.getPlots(0).getXaxis().getController().getDasAxis().scanPrevious();
+            waitUntilIdle();
 
-            writeToPng("Test_3pt8_CopyPlotElementsDown.png");
-            save("Test_3pt8_CopyPlotElementsDown.vap");
+            writeToPng("Test_3pt10_OperationsCacheDoesNotProperlyUpdate.png");
+            save("Test_3pt10_OperationsCacheDoesNotProperlyUpdate.vap");
 
             return 0;
         } catch (IOException ex) {
@@ -65,7 +56,7 @@ public class Test_3pt8_CopyPlotElementsDown implements Scenario  {
 
 
     public static void main(String[] argv) {
-	String[] params = {"test.Test_3pt8_CopyPlotElementsDown"};
+	String[] params = {"test.Test_3pt10_OperationsCacheDoesNotProperlyUpdate"};
 	org.netbeans.jemmy.Test.main(params);
     }
 

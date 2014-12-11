@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package test;
+package org.autoplot.test;
 
 import org.virbo.autoplot.dom.Application;
 import java.text.ParseException;

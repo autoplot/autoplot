@@ -3,9 +3,8 @@
  * and open the template in the editor.
  */
 
-package test;
+package org.autoplot.test;
 
-import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
@@ -14,15 +13,16 @@ import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
 
 /**
- *
+ * first testing of Jemmy API.
  * @author jbf
  */
-public class Second implements Scenario {
-    public int runIt(Object param) {
+public class First {
+    public static void main( String[] args ) throws Exception {
+
         ScriptContext.createGui();
-
+        
         AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
-
+        
         JFrameOperator mainFrame = new JFrameOperator(app);
 
          //wait "Reloaded" footer
@@ -30,16 +30,18 @@ public class Second implements Scenario {
 
         new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("vap+inline:ripples(200)");
         new JButtonOperator( app.getDataSetSelector().getGoButton() ).press();
-
+        
         new JLabelOperator(mainFrame, AutoplotUI.READY_MESSAGE );
+
+        mainFrame.close();
 
         System.err.println("Done!");
 
-        return(0);
-    }
+//        JTextFieldOperator testField = new JTextFieldOperator(mainFrame);
 
-    public static void main(String[] argv) {
-	String[] params = {"test.Second"};
-	org.netbeans.jemmy.Test.main(params);
+	//type new value in the text field
+//	testField.clearText();
+//	testField.typeText("3");
+
     }
 }

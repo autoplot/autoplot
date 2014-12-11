@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package test;
+package org.autoplot.test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;

@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package test;
+package org.autoplot.test;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

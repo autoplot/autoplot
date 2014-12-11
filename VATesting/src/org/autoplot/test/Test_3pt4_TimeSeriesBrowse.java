@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package test;
+package org.autoplot.test;
 
 import java.awt.Toolkit;
 import java.io.File;
