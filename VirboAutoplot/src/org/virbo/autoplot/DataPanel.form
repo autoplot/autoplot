@@ -47,48 +47,36 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace min="12" pref="12" max="12" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <EmptySpace min="12" pref="12" max="12" attributes="0"/>
-                                          <Component id="sliceIndexLabel" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="sliceIndexSpinner" min="-2" pref="104" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="sliceAutorangesCB" pref="269" max="32767" attributes="0"/>
-                                      </Group>
-                                      <Group type="102" alignment="1" attributes="0">
-                                          <Component id="doSliceCheckBox" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" max="-2" attributes="0"/>
-                                          <Component id="sliceTypeComboBox" pref="342" max="32767" attributes="0"/>
-                                      </Group>
-                                      <Component id="transposeCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel1" pref="248" max="32767" attributes="0"/>
+                                      <Component id="dataSetLabel" alignment="0" max="32767" attributes="0"/>
                                   </Group>
+                                  <EmptySpace min="-2" pref="258" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jLabel1" pref="452" max="32767" attributes="0"/>
-                                      <Component id="dataSetLabel" alignment="0" pref="452" max="32767" attributes="0"/>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Component id="operationsLabel" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
-                                          <Component id="recentComboBox" pref="366" max="32767" attributes="0"/>
-                                      </Group>
-                                  </Group>
+                                  <Component id="operationsLabel" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                                  <Component id="editComponentPanel" min="-2" max="-2" attributes="0"/>
+                                  <Component id="recentComboBox" max="32767" attributes="0"/>
+                                  <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="editComponentPanel" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="processDataSetLabel" pref="452" max="32767" attributes="0"/>
-                          <EmptySpace min="-2" pref="52" max="-2" attributes="0"/>
+                          <Component id="sliceAutorangesCB" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="235" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="processDataSetLabel" alignment="0" max="32767" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
+                          <Component id="filtersChainPanel1" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -98,7 +86,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="dataSetLabel" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -108,82 +96,23 @@
                           <Component id="recentComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="doSliceCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="sliceTypeComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="sliceIndexLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="sliceIndexSpinner" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="sliceAutorangesCB" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="transposeCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <Component id="filtersChainPanel1" pref="100" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <Component id="sliceAutorangesCB" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="processDataSetLabel" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="48" max="-2" attributes="0"/>
+                  <EmptySpace min="16" pref="16" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JComboBox" name="sliceTypeComboBox">
-          <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="3">
-                <StringItem index="0" value="first"/>
-                <StringItem index="1" value="second"/>
-                <StringItem index="2" value="last"/>
-              </StringArray>
-            </Property>
-            <Property name="selectedIndex" type="int" value="2"/>
-          </Properties>
-          <Events>
-            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="sliceTypeComboBoxItemStateChanged"/>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sliceTypeComboBoxActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JSpinner" name="sliceIndexSpinner">
-          <Properties>
-            <Property name="editor" type="javax.swing.JComponent" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new javax.swing.JSpinner.NumberEditor(sliceIndexSpinner, &quot;#&quot;)" type="code"/>
-            </Property>
-          </Properties>
-          <Events>
-            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="sliceIndexSpinnerStateChanged"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JLabel" name="sliceIndexLabel">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Slice Index:"/>
-            <Property name="toolTipText" type="java.lang.String" value="Slice Index of the slice function"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="transposeCheckBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Transpose"/>
-            <Property name="toolTipText" type="java.lang.String" value="Transpose the rank 2 dataset after slicing.&#xa;" noResource="true"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="transposeCheckBoxActionPerformed"/>
-          </Events>
-        </Component>
         <Component class="javax.swing.JLabel" name="operationsLabel">
           <Properties>
             <Property name="text" type="java.lang.String" value="Operations:"/>
             <Property name="toolTipText" type="java.lang.String" value="Process string that specifies component to plot, or how a data set&apos;s dimensionality should be reduced before display."/>
           </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="doSliceCheckBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Slice Dimension"/>
-            <Property name="toolTipText" type="java.lang.String" value="Slice dimension of the slice function"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="doSliceCheckBoxActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JCheckBox" name="sliceAutorangesCB">
           <Properties>
@@ -223,6 +152,12 @@
           </Events>
         </Component>
         <Component class="org.virbo.datasource.RecentComboBox" name="recentComboBox">
+          <BindingProperties>
+            <BindingProperty name="selectedItem" source="filtersChainPanel1" sourcePath="${filter}" target="recentComboBox" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
+          </BindingProperties>
+          <Events>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="recentComboBoxItemStateChanged"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="processDataSetLabel">
           <Properties>
@@ -234,6 +169,10 @@
             <Property name="text" type="java.lang.String" value="(dataset will go here)"/>
           </Properties>
         </Component>
+        <Container class="org.virbo.filters.FiltersChainPanel" name="filtersChainPanel1">
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
+        </Container>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="jPanel1">
@@ -251,7 +190,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel2" alignment="0" pref="492" max="32767" attributes="0"/>
+                      <Component id="jLabel2" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="validRangeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -359,7 +298,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="uriTextField" pref="492" max="32767" attributes="0"/>
+                  <Component id="uriTextField" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
