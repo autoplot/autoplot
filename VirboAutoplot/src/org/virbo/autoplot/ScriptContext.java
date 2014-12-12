@@ -47,6 +47,7 @@ import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.datum.InconvertibleUnitsException;
+import org.das2.util.awt.SvgGraphicsOutput;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.Plot;
@@ -660,7 +661,7 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * write out the current canvas to stdout.  This is introduced to support servers.
      * TODO: this has issues with the size.  See writeToPng(filename).
-     * @param OutputStream out
+     * @param out the OutputStream accepting the data, which is not closed.
      * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
@@ -681,7 +682,50 @@ public class ScriptContext extends PyJavaInstance {
         encoder.write( image, out);
 
     }
+    
+    /**
+     * write out the current canvas to a svg file.
+     * @param filename the local file to write the file.
+     * @throws java.lang.InterruptedException
+     * @throws java.io.IOException
+     */    
+    public static void writeToSvg( String filename ) throws InterruptedException, IOException {
+        if ( !( filename.endsWith(".svg") || filename.endsWith(".SVG") ) ) {
+            filename= filename + ".svg";
+        }
+        filename= getLocalFilename(filename);
+        
+        waitUntilIdle();
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        model.getCanvas().setSize( width, height );
+        model.getCanvas().validate();
+        waitUntilIdle();
 
+        maybeMakeParent(filename);
+
+        model.getCanvas().writeToSVG(filename);
+        setStatus("wrote to "+filename);        
+    }
+
+    /**
+     * write out the current canvas to stdout.  This is introduced to support servers.
+     * @param out the OutputStream accepting the data, which is not closed.
+     * @throws java.lang.InterruptedException
+     * @throws java.io.IOException
+     */
+    public static void writeToSvg(OutputStream out) throws InterruptedException, IOException {
+        waitUntilIdle();
+
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        model.getCanvas().setSize( width, height );
+        model.getCanvas().validate();
+        waitUntilIdle();
+        model.getCanvas().writeToGraphicsOutput( out, new SvgGraphicsOutput() );
+
+    }
+    
     /**
      * write out the current canvas to a pdf file.
      * TODO: this has issues with the size.  See writeToPng(filename).  It looks
