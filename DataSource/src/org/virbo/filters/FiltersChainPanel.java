@@ -397,16 +397,20 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         
         String[] ss= filter.split("\\|");
         int i=0;
+        int iss= 0;
         for (String s : ss) {
             s= s.trim();
+            iss++;
             if ( s.length()>0 ) {
                 FilterEditorPanel p = editors.get(i);
                 if ( ds!=null ) {
                     p.setInput(ds);
-                    try {
-                        ds= DataSetOps.sprocess( "|"+s, ds, new NullProgressMonitor() );
-                    } catch ( Exception ex ) {
-                        ds= null;
+                    if ( iss<ss.length ) {
+                        try {
+                            ds= DataSetOps.sprocess( "|"+s, ds, new NullProgressMonitor() );
+                        } catch ( Exception ex ) {
+                            ds= null;
+                        }
                     }
                     PropertyChangeListener[] pcls= p.getPanel().getPropertyChangeListeners();
                     for ( PropertyChangeListener pcl: pcls ) {
