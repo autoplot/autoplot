@@ -27,12 +27,14 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.das2.util.LoggerManager;
@@ -242,15 +244,24 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
 
     }
 
-    
+    /**
+     * return the panel with the add and remove icons.
+     * @param fi
+     * @return 
+     */
     private JPanel onePanel( final int fi ) {
         logger.entering( CLASS_NAME, "onePanel", fi );
         final JPanel sub= new JPanel( new BorderLayout() );
 
         String sfilter= fi==-1 ? "" : editors.get(fi).getFilter();
+        JPanel pp= fi==-1 ? null : editors.get(fi).getPanel();
+        
+        Dimension limit= new Dimension(20,20);
         
         JButton subAdd= new JButton("");
         subAdd.setIcon( new ImageIcon( FiltersChainPanel.class.getResource("/org/virbo/datasource/add.png") ) );
+        subAdd.setMaximumSize( limit );
+        subAdd.setPreferredSize( limit );
 
         if ( fi>=0 ) {
             subAdd.setToolTipText( "insert new filter before "+ sfilter );
@@ -277,6 +288,8 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         if ( fi>=0 ) {
             JButton subDelete= new JButton("");
             subDelete.setIcon( new ImageIcon( FiltersChainPanel.class.getResource("/org/virbo/datasource/subtract.png") ) );
+            subDelete.setMaximumSize( limit );
+            subDelete.setPreferredSize( limit );
             subDelete.setToolTipText( "remove filter " + sfilter );
             subDelete.addActionListener( new ActionListener() {
                 @Override
@@ -292,25 +305,11 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         }
 
         if ( fi>=0 ) {
-            final JTextField tf= new JTextField();
-            tf.setText(editors.get(fi).getFilter());
-            tf.addActionListener( new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    editors.get(fi).setFilter( tf.getText() );
-                }
-            });
-            tf.addFocusListener( new FocusAdapter() {
-                @Override
-                public void focusLost(FocusEvent e) {
-                    editors.get(fi).setFilter( tf.getText() );
-                }
-            });
-            sub.add( tf, BorderLayout.CENTER );
+            sub.add( pp, BorderLayout.CENTER );
 
         } else {
             final JLabel tf= new JLabel();
-            tf.setText("<html><i>(click to add)</i></html>");
+            tf.setText("<html><i>&nbsp;(click to add)</i></html>");
             sub.add( tf, BorderLayout.CENTER );
 
         }
@@ -354,11 +353,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                 JPanel ll= onePanel(i);
                 content.add( ll );
                 i++;
-                JPanel pp= (JPanel)p.getPanel();
-                Dimension d= pp.getPreferredSize();
-                pp.setMaximumSize( new Dimension( pp.getMaximumSize().width, d.height ) );
-                content.add(pp);
-                //this.add(new JSeparator());
+                content.add( new JLabel( "--------" ) );
             }
         }
 
