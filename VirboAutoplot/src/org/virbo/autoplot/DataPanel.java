@@ -332,7 +332,9 @@ public class DataPanel extends javax.swing.JPanel {
         String newf= componentTextField1.getText();
         if ( !fcpf.equals(newf) ) {
             filtersChainPanel1.setFilter(newf);
-            filtersChainPanel1.setInput(dsf.getController().getFillDataSet());
+            if ( dsf!=null ) {
+                filtersChainPanel1.setInput(dsf.getController().getFillDataSet());
+            }
         }
         
     }
