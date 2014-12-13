@@ -102,7 +102,7 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
 
     private void sliceDimensionCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceDimensionCBActionPerformed
         final String ff= getFilter();
-        logger.log(Level.FINER, "0: {0}{1}", new Object[]{ff, this.getName()});
+        logger.log(Level.FINEST, "0: {0}{1}", new Object[]{ff, this.getName()});
         firePropertyChange( PROP_FILTER, null, ff );
         int idx= sliceDimensionCB.getSelectedIndex();
         if ( qube!=null ) {
@@ -116,7 +116,7 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
 
     private void sliceIndexSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sliceIndexSpinnerStateChanged
         final String ff= getFilter();
-        logger.log(Level.FINER, "1: {0}{1}", new Object[]{ff, this.getName()});
+        logger.log(Level.FINEST, "1: {0}{1}", new Object[]{ff, this.getName()});
         firePropertyChange( PROP_FILTER, null, ff );
     }//GEN-LAST:event_sliceIndexSpinnerStateChanged
 
