@@ -264,6 +264,12 @@ public class DataPanel extends javax.swing.JPanel {
                 return;
             }
             try {
+                if ( !olds.equals(s) ) {
+                    filtersChainPanel1.setFilter(s);
+                    if ( dsf!=null ) {
+                        filtersChainPanel1.setInput(dsf.getController().getFillDataSet());
+                    }
+                }
                 componentTextField1.setText(s);
                 applicationController.getPlotElement().setComponent( componentTextField1.getText() );
                 componentTextField1.setCaretPosition(cp);
