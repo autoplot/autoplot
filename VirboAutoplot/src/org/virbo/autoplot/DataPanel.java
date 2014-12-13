@@ -786,7 +786,7 @@ public class DataPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_editComponentPanelActionPerformed
 
     private void recentComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_recentComboBoxItemStateChanged
-        System.err.println("Hello");
+        
     }//GEN-LAST:event_recentComboBoxItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
