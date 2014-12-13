@@ -27,15 +27,12 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -325,6 +322,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      * set the filter, and rebuild the GUI.  Note this should be called from the 
      * event thread.  TODO: This means that filters are happening on the event thread,
      * which is going to lead to problems.
+     * @param filter the filter for the block, such as "|slice1(2)"
      */
     @Override
     public void setFilter(String filter) {
@@ -376,8 +374,10 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                setFilter( getFilter() );
+                String f= getFilter();
+                setFilter( f );
                 setInput( inputDs );
+                firePropertyChange( PROP_FILTER, null, f );
             }
         };
         SwingUtilities.invokeLater(run);
