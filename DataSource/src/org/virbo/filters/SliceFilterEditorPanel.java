@@ -4,36 +4,29 @@
  */
 package org.virbo.filters;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.SwingUtilities;
+import javax.swing.SpinnerNumberModel;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import static org.virbo.filters.FilterEditorPanel.PROP_FILTER;
 
 /**
- *
+ * Editor panel to replace the original GUI that was a part of the data panel.
  * @author jbf
  */
 public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements FilterEditorPanel {
 
     static final long t0= System.currentTimeMillis();
+    int[] qube= null;
     
     /**
      * Creates new form SlicesFilterEditorPanel
      */
     public SliceFilterEditorPanel() {
         initComponents();
-        sliceDimensionCB.addItemListener( new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                System.err.println( " " + SliceFilterEditorPanel.this.getName() + " " + ( e.getStateChange()==ItemEvent.SELECTED ) + " " +e.getItem());
-            }
-        });
         setName("cb"+String.format( "%04d", (System.currentTimeMillis()-t0)/100 ));
         setToolTipText( getName() );
     }
@@ -60,6 +53,18 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
         });
 
         jLabel1.setText("Slice Index:");
+
+        sliceIndexSpinner.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
+        sliceIndexSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                sliceIndexSpinnerStateChanged(evt);
+            }
+        });
+        sliceIndexSpinner.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                sliceIndexSpinnerMouseWheelMoved(evt);
+            }
+        });
 
         jLabel2.setText("Slice Dimension:");
 
@@ -97,9 +102,35 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
 
     private void sliceDimensionCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceDimensionCBActionPerformed
         final String ff= getFilter();
-        System.err.println("0: "+ff + this.getName());
+        logger.log(Level.FINER, "0: {0}{1}", new Object[]{ff, this.getName()});
         firePropertyChange( PROP_FILTER, null, ff );
+        int idx= sliceDimensionCB.getSelectedIndex();
+        if ( qube!=null ) {
+            SpinnerNumberModel snm= ((SpinnerNumberModel)sliceIndexSpinner.getModel());
+            snm.setMaximum(qube[idx]-1);
+            if ( snm.getNumber().intValue()>=qube[idx] ) {
+                snm.setValue(qube[idx]-1);
+            }
+        }
     }//GEN-LAST:event_sliceDimensionCBActionPerformed
+
+    private void sliceIndexSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sliceIndexSpinnerStateChanged
+        final String ff= getFilter();
+        logger.log(Level.FINER, "1: {0}{1}", new Object[]{ff, this.getName()});
+        firePropertyChange( PROP_FILTER, null, ff );
+    }//GEN-LAST:event_sliceIndexSpinnerStateChanged
+
+    private void sliceIndexSpinnerMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_sliceIndexSpinnerMouseWheelMoved
+        SpinnerNumberModel snm= ((SpinnerNumberModel)sliceIndexSpinner.getModel());
+        int newIndex= snm.getNumber().intValue() - evt.getWheelRotation();
+        if ( newIndex<0 ) newIndex= 0;
+        Number nmax= (Number)snm.getMaximum();
+        if ( nmax!=null ) {
+            int maxIndex= nmax.intValue();
+            if ( newIndex>maxIndex ) newIndex= maxIndex;
+        }
+        snm.setValue( newIndex );
+    }//GEN-LAST:event_sliceIndexSpinnerMouseWheelMoved
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -128,6 +159,10 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
         String[] depNames1= FilterEditorPanelUtil.getDimensionNames(ds);
         int idx= sliceDimensionCB.getSelectedIndex();
         sliceDimensionCB.setModel(new DefaultComboBoxModel(depNames1));
+        qube= DataSetUtil.qubeDims(ds);
+        if ( qube!=null ) {
+            ((SpinnerNumberModel)sliceIndexSpinner.getModel()).setMaximum(qube[idx]-1);
+        }
         try {
             sliceDimensionCB.setSelectedIndex(idx);
         } catch ( IllegalArgumentException ex ) {
