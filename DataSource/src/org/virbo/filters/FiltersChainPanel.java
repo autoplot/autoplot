@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
@@ -154,6 +155,21 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         updateSoon();
     }
     
+    private final FocusListener lostFocusListener= new FocusListener() {
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            logger.fine("focusGained");
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            logger.fine("focusLost");
+            updateSoon();
+        }
+        
+    };
+    
     private void addFilter( int idx ) {
         JPanel optionsPanel= new JPanel();
 
@@ -233,7 +249,9 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                }
            }
            if ( ss!=null ) {
-               editors.add( idx, getEditorFor(ss) );
+               FilterEditorPanel filter1= getEditorFor(ss);
+               filter1.getPanel().addFocusListener( lostFocusListener );
+               editors.add( idx, filter1 );
                setFilter( getFilter() );
                updateSoon();
            }
