@@ -25,7 +25,7 @@ public class Test_4pt1_Lanl20140214b implements Scenario {
     
     public int runIt(Object param) {
         try {
-            System.err.println( "## v20141212 ##" );
+            System.err.println( "## v20141212" );
             
             createGui();
             Application dom= getDocumentModel();
@@ -64,7 +64,7 @@ public class Test_4pt1_Lanl20140214b implements Scenario {
             
             waitUntilIdle();
             
-            Thread.sleep(10000);
+            Thread.sleep(1000);
              
             return 0;
             
@@ -75,7 +75,7 @@ public class Test_4pt1_Lanl20140214b implements Scenario {
     }
 
     public static void main(String[] argv) {
-	String[] params = {"test.Test_4pt1_Lanl20140214b"};
+	String[] params = {"org.autoplot.test.Test_4pt1_Lanl20140214b"};
         Util.setLAF();
 	org.netbeans.jemmy.Test.main(params);
     }
