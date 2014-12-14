@@ -87,7 +87,7 @@ public class Test_3pt7_ZoomPan implements Scenario {
     }
 
     public static void main(String[] argv) {
-	String[] params = {"test.Test_3pt7_ZoomPan"};
+	String[] params = {"org.autoplot.test.Test_3pt7_ZoomPan"};
 	org.netbeans.jemmy.Test.main(params);
     }
 }

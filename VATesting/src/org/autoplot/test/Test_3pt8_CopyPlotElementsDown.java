@@ -65,7 +65,7 @@ public class Test_3pt8_CopyPlotElementsDown implements Scenario  {
 
 
     public static void main(String[] argv) {
-	String[] params = {"test.Test_3pt8_CopyPlotElementsDown"};
+	String[] params = {"org.autoplot.test.Test_3pt8_CopyPlotElementsDown"};
 	org.netbeans.jemmy.Test.main(params);
     }
 

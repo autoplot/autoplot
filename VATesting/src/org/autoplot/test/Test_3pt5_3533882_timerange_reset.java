@@ -91,7 +91,7 @@ public class Test_3pt5_3533882_timerange_reset implements Scenario {
     }
 
     public static void main(String[] argv) {
-	String[] params = {"test.Test_3pt5_3533882_timerange_reset"};
+	String[] params = {"org.autoplot.test.Test_3pt5_3533882_timerange_reset"};
 	org.netbeans.jemmy.Test.main(params);
     }
 

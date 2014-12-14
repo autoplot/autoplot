@@ -60,7 +60,7 @@ public class ActionsSample implements Scenario {
 	return(0);
     }
     public static void main(String[] argv) {
-	String[] params = {"test.ActionsSample"};
+	String[] params = {"org.autoplot.test.ActionsSample"};
 	org.netbeans.jemmy.Test.main(params);
     }
 }

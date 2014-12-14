@@ -56,7 +56,7 @@ public class Test_3pt10_OperationsCacheDoesNotProperlyUpdate implements Scenario
 
 
     public static void main(String[] argv) {
-	String[] params = {"test.Test_3pt10_OperationsCacheDoesNotProperlyUpdate"};
+	String[] params = {"org.autoplot.test.Test_3pt10_OperationsCacheDoesNotProperlyUpdate"};
 	org.netbeans.jemmy.Test.main(params);
     }
 

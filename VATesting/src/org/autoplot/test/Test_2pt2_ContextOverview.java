@@ -109,7 +109,7 @@ public class Test_2pt2_ContextOverview implements Scenario {
     }
 
     public static void main(String[] argv) {
-	String[] params = {"test.Test_2pt2_ContextOverview"};
+	String[] params = {"org.autoplot.test.Test_2pt2_ContextOverview"};
 	org.netbeans.jemmy.Test.main(params);
     }
 

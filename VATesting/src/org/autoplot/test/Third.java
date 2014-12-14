@@ -43,7 +43,7 @@ public class Third implements Scenario  {
     }
 
     public static void main(String[] argv) {
-	String[] params = {"test.Third"};
+	String[] params = {"org.autoplot.test.Third"};
 	org.netbeans.jemmy.Test.main(params);
     }
 }
