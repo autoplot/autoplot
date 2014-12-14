@@ -347,6 +347,8 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         logger.entering( CLASS_NAME, "setFilter", filter );
         editors.clear();
         
+        if ( filter==null ) filter= ""; // autoplot-test100 Automatic GUI testing hits this, presumably intermediate state.
+        
         JPanel content= new JPanel();
         this.setPreferredSize( new Dimension( 300, 300 ) );
 
