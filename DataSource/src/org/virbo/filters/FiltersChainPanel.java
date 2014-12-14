@@ -128,6 +128,10 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             result= new SliceFilterEditorPanel();
         } else if ( f.matches("smooth\\(\\d+\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SmoothFilterEditorPanel();
+        } else if ( f.matches("histogram\\(\\)") ) { 
+            result= new HistogramFilterEditorPanel();
+        } else if ( f.matches("histogram\\((\\d),(\\d+),(\\d+)\\)") ) { 
+            result= new HistogramFilterEditorPanel();            
         } else if ( f.matches( UnbundleFilterEditorPanel.PROP_REGEX.substring(1) ) ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new UnbundleFilterEditorPanel();
         } else if ( f.matches("dbAboveBackgroundDim1\\((\\d+)\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
