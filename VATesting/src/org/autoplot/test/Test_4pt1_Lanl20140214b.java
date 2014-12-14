@@ -25,6 +25,8 @@ public class Test_4pt1_Lanl20140214b implements Scenario {
     
     public int runIt(Object param) {
         try {
+            System.err.println( "## v20141212 ##" );
+            
             createGui();
             Application dom= getDocumentModel();
             
@@ -62,6 +64,7 @@ public class Test_4pt1_Lanl20140214b implements Scenario {
             
             waitUntilIdle();
             
+            Thread.sleep(10000);
              
             return 0;
             
