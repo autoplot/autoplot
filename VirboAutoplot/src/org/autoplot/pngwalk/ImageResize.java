@@ -19,7 +19,7 @@ import org.das2.util.LoggerManager;
  */
 public class ImageResize {
 
-    public static Logger logger= LoggerManager.getLogger("autoplot.pngwalk");
+    public static final Logger logger= LoggerManager.getLogger("autoplot.pngwalk");
     
     /**
      * convenient typical use.
@@ -30,12 +30,12 @@ public class ImageResize {
     public static BufferedImage getScaledInstance( BufferedImage img, int thumbSize ) {
         int w0= img.getWidth();
         int h0= img.getHeight();
-        int thumbH = 0, thumbW = 0;
-        if ( true ) {
-            double aspect = 1. * w0 / h0;
-            thumbH = (int) (Math.sqrt(Math.pow(thumbSize, 2) / (aspect * aspect + 1.)));
-            thumbW = (int) (thumbH * aspect);
-        }
+        int thumbH, thumbW;
+
+        double aspect = 1. * w0 / h0;
+        thumbH = (int) (Math.sqrt(Math.pow(thumbSize, 2) / (aspect * aspect + 1.)));
+        thumbW = (int) (thumbH * aspect);
+
         return getScaledInstance( img, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true );
     }
 
