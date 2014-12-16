@@ -39,10 +39,13 @@ public class UnbundleFilterEditorPanel extends AbstractFilterEditorPanel {
         jLabel1 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
 
+        FormListener formListener = new FormListener();
+
         jLabel1.setText("Component to 'unbundle' :  ");
 
         jComboBox1.setEditable(true);
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBox1.addItemListener(formListener);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -61,7 +64,22 @@ public class UnbundleFilterEditorPanel extends AbstractFilterEditorPanel {
                 .add(jLabel1)
                 .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
+    }
+
+    // Code for dispatching events from components to event handlers.
+
+    private class FormListener implements java.awt.event.ItemListener {
+        FormListener() {}
+        public void itemStateChanged(java.awt.event.ItemEvent evt) {
+            if (evt.getSource() == jComboBox1) {
+                UnbundleFilterEditorPanel.this.jComboBox1ItemStateChanged(evt);
+            }
+        }
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jComboBox1ItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBox1ItemStateChanged
+        firePropertyChange( PROP_FILTER, null, getFilter() );
+    }//GEN-LAST:event_jComboBox1ItemStateChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
