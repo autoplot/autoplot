@@ -28,7 +28,7 @@ public interface FilterEditorPanel {
     /**
      * configure the GUI based on this filter.  The filter string will
      * start with the pipe character.
-     * @param the filter string
+     * @param filter the filter string
      */
     void setFilter( String filter );
     
