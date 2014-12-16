@@ -5,7 +5,6 @@
 package org.virbo.filters;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -16,6 +15,7 @@ import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +29,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -54,6 +53,7 @@ import org.virbo.dsops.Ops;
 public class FiltersChainPanel extends javax.swing.JPanel implements FilterEditorPanel {
     
     private QDataSet inputDs;
+    private boolean implicitUnbundle= false;
 
     private static final Logger logger= LoggerManager.getLogger("apdss.filters");
     private static final String CLASS_NAME = FiltersChainPanel.class.getName();
@@ -149,16 +149,20 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     public String getFilter() {
         logger.entering( CLASS_NAME, "getFilter" );
         StringBuilder b= new StringBuilder();
+        int ifilter= 0;
         for ( FilterEditorPanel p: editors ) {
-            b.append(p.getFilter());
+            if ( ifilter==0 && p instanceof UnbundleFilterEditorPanel && implicitUnbundle ) {
+                b.append( ((UnbundleFilterEditorPanel)p).getComponent() );
+            } else {
+                b.append(p.getFilter());
+            }
         }
         return b.toString();
     }
 
     private void deleteFilter( int fi ) {
-        FilterEditorPanel panel = editors.remove(fi);
-        removeFocusListenerKids( panel.getPanel() );
-        rebuildGui( getFilter() );
+        editors.remove(fi);
+        setFilter( getFilter() );
         updateSoon();
     }
     
@@ -257,28 +261,15 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
            }
            if ( ss!=null ) {
                FilterEditorPanel filter1= getEditorFor(ss);
-               addFocusListenerKids(filter1.getPanel());
+               filter1.getPanel().addFocusListener( lostFocusListener );
                editors.add( idx, filter1 );
-               rebuildGui( getFilter() );
-               //setFilter( getFilter() );
+               setFilter( getFilter() );
                updateSoon();
            }
        }
 
     }
-    
-    private void addFocusListenerKids( JComponent c ) {
-        for ( Component cc: c.getComponents() ) {
-            cc.addFocusListener(lostFocusListener);
-        }
-    }
 
-    private void removeFocusListenerKids( JComponent c ) {
-        for ( Component cc: c.getComponents() ) {
-            cc.removeFocusListener(lostFocusListener);
-        }
-    }
-    
     /**
      * return the panel with the add and remove icons.
      * @param fi
@@ -365,21 +356,9 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     @Override
     public void setFilter(String filter) {
         logger.entering( CLASS_NAME, "setFilter", filter );
+        editors.clear();
         
         if ( filter==null ) filter= ""; // autoplot-test100 Automatic GUI testing hits this, presumably intermediate state.
-        
-        String filter0= getFilter();
-        if ( filter0.equals(filter) ) {
-            return;
-        }
-        
-        rebuildGui(filter);
-        
-    }
-
-    private void rebuildGui(String filter) {
-        
-        editors.clear();
         
         JPanel content= new JPanel();
         this.setPreferredSize( new Dimension( 300, 300 ) );
@@ -387,10 +366,28 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         BoxLayout lo= new BoxLayout( content, BoxLayout.Y_AXIS );
         content.setLayout( lo );
 
+        JScrollPane pane= new JScrollPane( content );
+        pane.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS );
+        pane.getVerticalScrollBar().setUnitIncrement( pane.getFont().getSize() );
+        
         this.removeAll();
         String[] ss= filter.split("\\|");
         
         int i=0;
+
+        if ( ss[0].trim().length()>0 ) {
+            FilterEditorPanel p = getEditorFor("|unbundle("+ss[0]+")");
+            editors.add(p);
+            JPanel ll= onePanel(i);
+            content.add( ll );
+            i++;
+            content.add( new JLabel( "--------" ) );
+            implicitUnbundle= true;
+        } else {
+            implicitUnbundle= false;
+        }
+        ss= Arrays.copyOfRange( ss, 1, ss.length );
+        
         for (String s : ss) {
             s= s.trim();
             if ( s.length()>0 ) {
@@ -408,10 +405,6 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
 
         content.add(Box.createVerticalGlue());
            
-        JScrollPane pane= new JScrollPane( content );
-        pane.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS );
-        pane.getVerticalScrollBar().setUnitIncrement( pane.getFont().getSize() );
-
         this.add( pane );
         
         this.revalidate();
