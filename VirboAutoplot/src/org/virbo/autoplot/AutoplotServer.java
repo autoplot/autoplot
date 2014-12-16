@@ -31,7 +31,7 @@ public class AutoplotServer {
             l.log(Level.FINE, "Logging at {0}", l.getLevel());
         }
           
-        System.err.println("org.virbo.autoplot.AutoplotServer 20120922");
+        System.err.println("org.virbo.autoplot.AutoplotServer 20140806");
 
         ArgumentList alm= new ArgumentList("AutoplotServer");
         alm.addBooleanSwitchArgument("foo", "x", "foo", "test test");
