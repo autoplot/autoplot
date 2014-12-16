@@ -273,6 +273,7 @@ public class DataPanel extends javax.swing.JPanel {
                 componentTextField1.setText(s);
                 applicationController.getPlotElement().setComponent( componentTextField1.getText() );
                 componentTextField1.setCaretPosition(cp);
+                componentChanged();
             } catch ( ArrayIndexOutOfBoundsException ex ) {
                 logger.log( Level.WARNING, ex.getMessage(), ex );
                 componentTextField1.setText(olds);
@@ -340,6 +341,8 @@ public class DataPanel extends javax.swing.JPanel {
             filtersChainPanel1.setFilter(newf);
             if ( dsf!=null ) {
                 filtersChainPanel1.setInput(dsf.getController().getFillDataSet());
+            } else {
+                filtersChainPanel1.setInput(null);
             }
         }
         
@@ -580,14 +583,10 @@ public class DataPanel extends javax.swing.JPanel {
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, filtersChainPanel1, org.jdesktop.beansbinding.ELProperty.create("${filter}"), recentComboBox, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         bindingGroup.addBinding(binding);
 
-        recentComboBox.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                recentComboBoxItemStateChanged(evt);
-            }
-        });
-
         processDataSetLabel.setFont(processDataSetLabel.getFont().deriveFont(processDataSetLabel.getFont().getSize()-4f));
         processDataSetLabel.setText("(dataset will go here)");
+
+        filtersChainPanel1.setLayout(new javax.swing.BoxLayout(filtersChainPanel1, javax.swing.BoxLayout.LINE_AXIS));
 
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -790,10 +789,6 @@ public class DataPanel extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_editComponentPanelActionPerformed
-
-    private void recentComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_recentComboBoxItemStateChanged
-        
-    }//GEN-LAST:event_recentComboBoxItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dataSetLabel;
