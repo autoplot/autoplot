@@ -165,7 +165,9 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         FilterEditorPanel p= editors.remove(fi);
         removeFocusListeners(p.getPanel());
         setFilter( getFilter() );
-        updateSoon( inputDs );
+        QDataSet inputDs1= inputDs;
+        this.inputDs= null;
+        updateSoon( inputDs1 );
     }
     
     private final FocusListener lostFocusListener= new FocusListener() {
@@ -267,7 +269,9 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                addFocusListeners( filter1.getPanel() );
                editors.add( idx, filter1 );
                setFilter( getFilter() );
-               updateSoon( inputDs );
+               QDataSet inputDs1= this.inputDs;
+               this.inputDs= null;
+               updateSoon( inputDs1 );
            }
        }
 
@@ -376,10 +380,10 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     public void setFilter(String filter) {
         logger.entering( CLASS_NAME, "setFilter", filter );
         
-        if ( filter.equals( this.getFilter() ) ) { // the problem is that bindings will call this without setInput.
-            logger.finer("no need to update...");
-            return;
-        }
+        //if ( filter.equals( this.getFilter() ) ) { // the problem is that bindings will call this without setInput.
+        //    logger.finer("no need to update...");
+        //    return;
+        //}
         
         for ( FilterEditorPanel p: editors ) {
             removeFocusListeners( p.getPanel() );
@@ -443,7 +447,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      * TODO: This does data processing on the event thread and will surely cause problems.
      */
     private void updateSoon( final QDataSet inputDs ) {
-        this.inputDs= null;
+        //this.inputDs= null;
         logger.entering( CLASS_NAME, "updateSoon" );
         Runnable run= new Runnable() {
             @Override
@@ -468,7 +472,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         if ( this.inputDs==ds ) {
             logger.fine("already set input...");
             return;
-        }
+        } 
         
         this.inputDs= ds;
         
