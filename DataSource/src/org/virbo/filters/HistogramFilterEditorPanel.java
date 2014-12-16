@@ -5,6 +5,7 @@
  */
 package org.virbo.filters;
 
+import java.awt.Component;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,13 +53,28 @@ public class HistogramFilterEditorPanel extends AbstractFilterEditorPanel {
         jLabel3.setText("Bin Size:");
 
         binsizeTF.setText("1");
+        binsizeTF.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                binsizeTFFocusLost(evt);
+            }
+        });
 
         maximumTF.setText("10");
+        maximumTF.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                maximumTFFocusLost(evt);
+            }
+        });
 
         minimumTF.setText("0");
         minimumTF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 minimumTFActionPerformed(evt);
+            }
+        });
+        minimumTF.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                myFocusLost(evt);
             }
         });
 
@@ -131,6 +147,21 @@ public class HistogramFilterEditorPanel extends AbstractFilterEditorPanel {
     private void minimumTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minimumTFActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_minimumTFActionPerformed
+
+    private void myFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_myFocusLost
+        //Component opposite= evt.getOppositeComponent();
+        //if ( opposite==null || opposite.getParent()!=this.getParent() ) {
+            firePropertyChange( PROP_FILTER, null, getFilter() );
+        //}
+    }//GEN-LAST:event_myFocusLost
+
+    private void maximumTFFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_maximumTFFocusLost
+        myFocusLost(evt);
+    }//GEN-LAST:event_maximumTFFocusLost
+
+    private void binsizeTFFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_binsizeTFFocusLost
+        myFocusLost(evt);
+    }//GEN-LAST:event_binsizeTFFocusLost
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
