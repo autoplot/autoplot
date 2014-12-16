@@ -364,6 +364,7 @@ public class DataPanel extends javax.swing.JPanel {
         if ( !fcpf.equals(newf) ) {
             filtersChainPanel1.setFilter(newf);
             if ( dsf!=null ) {
+                filtersChainPanel1.setInput(null);
                 filtersChainPanel1.setInput(dsf.getController().getFillDataSet());
             } else {
                 filtersChainPanel1.setInput(null);
