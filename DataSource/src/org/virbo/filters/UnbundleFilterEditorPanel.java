@@ -73,8 +73,10 @@ public class UnbundleFilterEditorPanel extends AbstractFilterEditorPanel {
     public void setInput( QDataSet ds ) {
         if ( ds.rank()>1 ) {
             try {
+                String name= (String)jComboBox1.getSelectedItem();
                 String[] names= DataSetOps.bundleNames(ds);
                 jComboBox1.setModel( new DefaultComboBoxModel(names) );
+                jComboBox1.setSelectedItem(name);
             } catch ( IllegalArgumentException ex ) {
                 jComboBox1.setModel( new DefaultComboBoxModel( new String[] { "ch0", "ch1", "ch2" } ) );
             }
@@ -95,5 +97,13 @@ public class UnbundleFilterEditorPanel extends AbstractFilterEditorPanel {
     @Override
     public String getFilter() {
          return "|unbundle('" + jComboBox1.getSelectedItem().toString() + "')";
+    }
+    
+    /**
+     * return just the component
+     * @return the component, such "Bx"
+     */
+    public String getComponent() {
+        return jComboBox1.getSelectedItem().toString();
     }
 }
