@@ -37,7 +37,7 @@ public class PDSPPIDataSource extends AbstractDataSource {
     /**
      * no dataset can have more than MAX_BUNDLE_COUNT datasets.  
      */
-    public static int MAX_BUNDLE_COUNT= 12;
+    public static final int MAX_BUNDLE_COUNT= 12;
     
     PDSPPIDataSource( URI uri ) {
         super(uri);
