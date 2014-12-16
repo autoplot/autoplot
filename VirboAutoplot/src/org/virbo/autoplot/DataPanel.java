@@ -27,16 +27,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.autoplot.help.AutoplotHelpSystem;
+import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -45,7 +45,6 @@ import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.BindingSupport;
-import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementController;
@@ -75,19 +74,41 @@ public class DataPanel extends javax.swing.JPanel {
 
     public DataPanel( Application dom ) {
         initComponents();
+        
+        ((JTextField)recentComboBox.getEditor().getEditorComponent()).getDocument().addDocumentListener( new DocumentListener() {
 
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                if ( !adjusting ) {
+                    componentChanged();
+                } else {
+                    logger.info("I would update if I were not adjusting.");
+                }
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+            }
+        });
+        
         recentComboBox.setPreferenceNode("operations");
         recentComboBox.setToolTipText("Recently entered operations");
         ((JComponent)recentComboBox.getEditor().getEditorComponent()).setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
         
-        recentComboBox.addFocusListener( new FocusAdapter() {
+        recentComboBox.getEditor().getEditorComponent().addFocusListener( new FocusAdapter() {
             @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
+                LoggerManager.logGuiEvent(evt);
                 setAdjusting(false);
                 componentChanged();
             }
             @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
+                LoggerManager.logGuiEvent(evt);
                 setAdjusting(true);
             }
         });
@@ -99,7 +120,7 @@ public class DataPanel extends javax.swing.JPanel {
                 applicationController.getPlotElement().setComponentAutomatically( (String)recentComboBox.getSelectedItem() );
                 setAdjusting(false);
                 componentChanged();
-                setAdjusting(true);
+                setAdjusting(recentComboBox.getEditor().getEditorComponent().hasFocus());
             }
         });
 
@@ -211,14 +232,16 @@ public class DataPanel extends javax.swing.JPanel {
         applicationController.getPlotElement().setComponentAutomatically( componentTextField1.getText() );
         setAdjusting(false);
         componentChanged();
-        setAdjusting(true);
+        setAdjusting(recentComboBox.getEditor().getEditorComponent().hasFocus());
     }
     
     private void componentTextFieldFocusGained(java.awt.event.FocusEvent evt) {
+        LoggerManager.logGuiEvent(evt);
         setAdjusting(true);
     }
 
     private void componentTextFieldFocusLost(java.awt.event.FocusEvent evt) {
+        LoggerManager.logGuiEvent(evt);
         setAdjusting(false);
         componentChanged();
     }
@@ -267,6 +290,7 @@ public class DataPanel extends javax.swing.JPanel {
                 if ( !olds.equals(s) ) {
                     filtersChainPanel1.setFilter(s);
                     if ( dsf!=null ) {
+                        filtersChainPanel1.setInput(null);
                         filtersChainPanel1.setInput(dsf.getController().getFillDataSet());
                     }
                 }
@@ -303,11 +327,11 @@ public class DataPanel extends javax.swing.JPanel {
     private synchronized PlotElement getElement() {
         return element;
     }
-    
+        
     private synchronized DataSourceFilter getDsf() {
         return dsf;
     }
-        
+
 
     public void doBindings() {
         logger.fine("doBindings");
@@ -583,6 +607,12 @@ public class DataPanel extends javax.swing.JPanel {
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, filtersChainPanel1, org.jdesktop.beansbinding.ELProperty.create("${filter}"), recentComboBox, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         bindingGroup.addBinding(binding);
 
+        recentComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                recentComboBoxItemStateChanged(evt);
+            }
+        });
+
         processDataSetLabel.setFont(processDataSetLabel.getFont().deriveFont(processDataSetLabel.getFont().getSize()-4f));
         processDataSetLabel.setText("(dataset will go here)");
 
@@ -789,6 +819,10 @@ public class DataPanel extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_editComponentPanelActionPerformed
+
+    private void recentComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_recentComboBoxItemStateChanged
+        System.err.println("item state "+evt.getItem());
+    }//GEN-LAST:event_recentComboBoxItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dataSetLabel;
