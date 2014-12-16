@@ -5,6 +5,7 @@
 package org.virbo.filters;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -161,22 +162,23 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     }
 
     private void deleteFilter( int fi ) {
-        editors.remove(fi);
+        FilterEditorPanel p= editors.remove(fi);
+        removeFocusListeners(p.getPanel());
         setFilter( getFilter() );
-        updateSoon();
+        updateSoon( inputDs );
     }
     
     private final FocusListener lostFocusListener= new FocusListener() {
 
         @Override
         public void focusGained(FocusEvent e) {
-            logger.fine("focusGained");
+            logger.log(Level.FINE, "focusGained {0}", e.getComponent());
         }
 
         @Override
         public void focusLost(FocusEvent e) {
-            logger.fine("focusLost");
-            updateSoon();
+            logger.log(Level.FINE, "focusLost {0}", e.getComponent());
+            updateSoon( inputDs );
         }
         
     };
@@ -262,14 +264,27 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
            if ( ss!=null ) {
                FilterEditorPanel filter1= getEditorFor(ss);
                filter1.getPanel().addFocusListener( lostFocusListener );
+               addFocusListeners( filter1.getPanel() );
                editors.add( idx, filter1 );
                setFilter( getFilter() );
-               updateSoon();
+               updateSoon( inputDs );
            }
        }
 
     }
-
+ 
+    private void addFocusListeners( JPanel p ) {
+        for ( Component c: p.getComponents() ) {
+            c.addFocusListener(lostFocusListener);
+        }
+    }
+    
+    private void removeFocusListeners( JPanel p ) { 
+        for ( Component c: p.getComponents() ) {
+            c.removeFocusListener(lostFocusListener);
+        }
+    }
+    
     /**
      * return the panel with the add and remove icons.
      * @param fi
@@ -281,6 +296,10 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
 
         String sfilter= fi==-1 ? "" : editors.get(fi).getFilter();
         JPanel pp= fi==-1 ? null : editors.get(fi).getPanel();
+        
+        if ( pp!=null ) {
+            addFocusListeners( pp );
+        }
         
         Dimension limit= new Dimension(20,20);
         
@@ -356,6 +375,15 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     @Override
     public void setFilter(String filter) {
         logger.entering( CLASS_NAME, "setFilter", filter );
+        
+        if ( filter.equals( this.getFilter() ) ) { // the problem is that bindings will call this without setInput.
+            logger.finer("no need to update...");
+            return;
+        }
+        
+        for ( FilterEditorPanel p: editors ) {
+            removeFocusListeners( p.getPanel() );
+        }
         editors.clear();
         
         if ( filter==null ) filter= ""; // autoplot-test100 Automatic GUI testing hits this, presumably intermediate state.
@@ -414,7 +442,8 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      * set the input dataset for each filter.
      * TODO: This does data processing on the event thread and will surely cause problems.
      */
-    private void updateSoon() {
+    private void updateSoon( final QDataSet inputDs ) {
+        this.inputDs= null;
         logger.entering( CLASS_NAME, "updateSoon" );
         Runnable run= new Runnable() {
             @Override
@@ -435,6 +464,12 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     @Override
     public void setInput( QDataSet ds) {
         logger.entering( CLASS_NAME, "setInput", ds );
+        
+        if ( this.inputDs==ds ) {
+            logger.fine("already set input...");
+            return;
+        }
+        
         this.inputDs= ds;
         
         String filter= getFilter();
@@ -464,7 +499,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                     p.getPanel().addPropertyChangeListener("filter",new PropertyChangeListener() {
                         @Override
                         public void propertyChange(PropertyChangeEvent evt) {
-                            updateSoon();
+                            updateSoon( inputDs );
                         }
                     });
                 }
