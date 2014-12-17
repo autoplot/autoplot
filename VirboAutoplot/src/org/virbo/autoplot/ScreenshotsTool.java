@@ -53,7 +53,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.autoplot.pngwalk.PngWalkTool;
-import org.autoplot.pngwalk.PngWalkTool1;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.LoggerManager;
 import org.das2.datum.TimeParser;
@@ -299,20 +298,24 @@ public class ScreenshotsTool extends EventQueue {
         Frame[] frames = Frame.getFrames();
         for (Frame frame : frames) {
             if ( frame.isVisible() ) {
-                Rectangle rect= frame.getBounds();
-                rect.translate( -b.x, -b.y );
-                s.subtract( new Area( rect ) );
+                if( frame.getExtendedState() != Frame.ICONIFIED ) {
+                    Rectangle rect= frame.getBounds();
+                    rect.translate( -b.x, -b.y );
+                    s.subtract( new Area( rect ) );
+                }
             }
         }
 
-        Window[] windows= Window.getWindows();
-        for ( Window window: windows ) {
-            if ( window.isVisible() ) {
-                Rectangle rect= window.getBounds();
-                rect.translate( -b.x, -b.y );
-                s.subtract( new Area( rect ) );
-            }
-        }
+//        Window[] windows= Window.getWindows();
+//        for ( Window window: windows ) {
+//            if ( window.isVisible() ) {
+//                if ( window.isShowing() ) {
+//                    Rectangle rect= window.getBounds();
+//                    rect.translate( -b.x, -b.y );
+//                    s.subtract( new Area( rect ) );
+//                }
+//            }
+//        }
 
         g.fill(s);
         
