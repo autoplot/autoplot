@@ -53,7 +53,7 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jLabel1" pref="248" max="32767" attributes="0"/>
+                                      <Component id="jLabel1" max="32767" attributes="0"/>
                                       <Component id="dataSetLabel" alignment="0" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="-2" pref="258" max="-2" attributes="0"/>
@@ -62,7 +62,7 @@
                                   <Component id="operationsLabel" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
                                   <Component id="recentComboBox" max="32767" attributes="0"/>
-                                  <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <Component id="editComponentPanel" min="-2" max="-2" attributes="0"/>
@@ -73,11 +73,7 @@
                           <EmptySpace min="-2" pref="235" max="-2" attributes="0"/>
                       </Group>
                       <Component id="processDataSetLabel" alignment="0" max="32767" attributes="0"/>
-                      <Group type="102" alignment="1" attributes="0">
-                          <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
-                          <Component id="filtersChainPanel1" max="32767" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="filtersChainPanel1" alignment="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -97,7 +93,7 @@
                       </Group>
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="filtersChainPanel1" pref="100" max="32767" attributes="0"/>
+                  <Component id="filtersChainPanel1" pref="134" max="32767" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="sliceAutorangesCB" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -192,15 +188,14 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jLabel2" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="validRangeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="fillValueLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="validRangeLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="fillValueComboBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="validRangeComboBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="validRangeComboBox" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="fillValueLabel" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="fillValueComboBox" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -215,9 +210,6 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="validRangeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="validRangeComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="fillValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="fillValueComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -297,9 +289,9 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="uriTextField" max="32767" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
