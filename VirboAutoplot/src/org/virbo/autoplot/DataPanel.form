@@ -151,9 +151,6 @@
           <BindingProperties>
             <BindingProperty name="selectedItem" source="filtersChainPanel1" sourcePath="${filter}" target="recentComboBox" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
           </BindingProperties>
-          <Events>
-            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="recentComboBoxItemStateChanged"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="processDataSetLabel">
           <Properties>

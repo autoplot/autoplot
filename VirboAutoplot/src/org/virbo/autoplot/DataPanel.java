@@ -15,6 +15,7 @@ import java.awt.Event;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -608,12 +609,6 @@ public class DataPanel extends javax.swing.JPanel {
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, filtersChainPanel1, org.jdesktop.beansbinding.ELProperty.create("${filter}"), recentComboBox, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         bindingGroup.addBinding(binding);
 
-        recentComboBox.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                recentComboBoxItemStateChanged(evt);
-            }
-        });
-
         processDataSetLabel.setFont(processDataSetLabel.getFont().deriveFont(processDataSetLabel.getFont().getSize()-4f));
         processDataSetLabel.setText("(dataset will go here)");
 
@@ -816,10 +811,6 @@ public class DataPanel extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_editComponentPanelActionPerformed
-
-    private void recentComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_recentComboBoxItemStateChanged
-        System.err.println("item state "+evt.getItem());
-    }//GEN-LAST:event_recentComboBoxItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dataSetLabel;
