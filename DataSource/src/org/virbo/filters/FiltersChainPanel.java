@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -15,12 +16,14 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Timer;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -43,11 +46,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.das2.util.LoggerManager;
+import org.das2.util.TickleTimer;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
+import static org.virbo.filters.FilterEditorPanel.PROP_FILTER;
 
 /**
  * Chain together a number of FilterEditorPanels to one long filter chain.  For example,
@@ -59,7 +64,9 @@ import org.virbo.dsops.Ops;
 public class FiltersChainPanel extends javax.swing.JPanel implements FilterEditorPanel {
     
     private QDataSet inputDs;
+    private String currentFilter= null;
     private boolean implicitUnbundle= false;
+    TickleTimer timer;
 
     private static final Logger logger= LoggerManager.getLogger("apdss.filters");
     private static final String CLASS_NAME = FiltersChainPanel.class.getName();
@@ -71,6 +78,12 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         logger.entering( CLASS_NAME, "<init>" );
         initComponents();
         setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ));
+        timer= new TickleTimer( 50, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateImmediately();
+            }
+        });
     }
 
     List<FilterEditorPanel> editors= new LinkedList();
@@ -105,7 +118,9 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         if ( srecyclable!=null && srecyclable.startsWith(f.substring(0,i)) ) {
             assert recyclable!=null;
             logger.log(Level.FINE, "recycling to provide {0}", f);
-            recyclable.setFilter(f);
+            if ( !srecyclable.equals(f) ) {
+                recyclable.setFilter(f);
+            }
             return recyclable;
         }
         
@@ -184,7 +199,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         setFilter( getFilter() );
         QDataSet inputDs1= inputDs;
         this.inputDs= null;
-        updateSoon( inputDs1 );
+        updateSoon(inputDs1, getFilter() );
     }
     
     private final FocusListener lostFocusListener= new FocusListener() {
@@ -197,7 +212,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         @Override
         public void focusLost(FocusEvent e) {
             logger.log(Level.FINE, "focusLost {0}", e.getComponent());
-            updateSoon( inputDs );
+            updateSoon(inputDs, null );
         }
         
     };
@@ -206,7 +221,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     private final ActionListener requestUpdateListener= new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-            updateSoon( inputDs );
+            updateSoon(inputDs, null );
         }
     };
     
@@ -214,7 +229,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     private final ChangeListener requestChangeListener= new ChangeListener() {
         @Override
         public void stateChanged(ChangeEvent e) {
-            updateSoon( inputDs );
+            updateSoon(inputDs, null );
         }
     };
         
@@ -301,10 +316,11 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                filter1.getPanel().addFocusListener( lostFocusListener );
                addFocusListeners( filter1.getPanel() );
                editors.add( idx, filter1 );
-               setFilter( getFilter() );
+               String filter= getFilter();
+               setFilter( filter );
                QDataSet inputDs1= this.inputDs;
                this.inputDs= null;
-               updateSoon( inputDs1 );
+               updateSoon(inputDs1, filter );
            }
        }
 
@@ -423,6 +439,8 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     public synchronized void setFilter(String filter) {
         logger.entering( CLASS_NAME, "setFilter", filter );
         
+        if ( filter==null ) filter= ""; // autoplot-test100 Automatic GUI testing hits this, presumably intermediate state.
+                
         //if ( filter.equals( this.getFilter() ) ) { // the problem is that bindings will call this without setInput.
         //    logger.finer("no need to update...");
         //    return;
@@ -440,8 +458,6 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             removeFocusListeners( p.getPanel() );
         }
         editors.clear();
-        
-        if ( filter==null ) filter= ""; // autoplot-test100 Automatic GUI testing hits this, presumably intermediate state.
         
         JPanel content= new JPanel();
         this.setPreferredSize( new Dimension( 300, 300 ) );
@@ -495,13 +511,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         this.revalidate();
     }
 
-    /**
-     * set the input dataset for each filter.
-     * TODO: This does data processing on the event thread and will surely cause problems.
-     */
-    private void updateSoon( final QDataSet inputDs ) {
-        //this.inputDs= null;
-        logger.entering( CLASS_NAME, "updateSoon" );
+    private void updateImmediately() {
         Runnable run= new Runnable() {
             @Override
             public void run() {
@@ -509,9 +519,27 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                 setFilter( f );
                 if ( inputDs!=null ) setInput( inputDs );
                 firePropertyChange( PROP_FILTER, null, f );
+                currentFilter= f;        
             }
         };
-        SwingUtilities.invokeLater(run);
+        try {
+            SwingUtilities.invokeAndWait(run);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FiltersChainPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(FiltersChainPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    /**
+     * set the input dataset for each filter.
+     * TODO: This does data processing on the event thread and will surely cause problems.
+     */
+    private void updateSoon( final QDataSet inputDs, final String filter) {
+        //this.inputDs= null;
+        if ( ( filter!=null && filter.equals(currentFilter) ) && this.inputDs!=null && this.inputDs.equals(inputDs) ) {
+            return;
+        }
+        timer.tickle(filter);
     }
     
     /**
@@ -556,10 +584,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                     p.getPanel().addPropertyChangeListener("filter",new PropertyChangeListener() {
                         @Override
                         public void propertyChange(PropertyChangeEvent evt) {
-                            if ( evt.getNewValue().equals(evt.getOldValue()) ) {
-                                
-                            }
-                            updateSoon( inputDs );
+                            updateSoon(inputDs, (String)evt.getNewValue() );
                         }
                     });
                 }
