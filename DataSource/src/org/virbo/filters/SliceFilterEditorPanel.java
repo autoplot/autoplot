@@ -146,6 +146,9 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
 
     @Override
     public void setFilter(String filter) {
+        if ( getFilter().equals(filter) ) {
+            logger.warning("redundant set filter");
+        }
         Pattern p= Pattern.compile("\\|slice(\\d)\\((\\d+)\\)");
         Matcher m= p.matcher(filter);
         if ( m.matches() ) {
