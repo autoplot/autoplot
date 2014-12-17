@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 import java.util.List;
 import org.das2.datum.Units;
 import static org.das2.datum.Units.getAllUnits;
+import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 
 
 /**
@@ -98,4 +100,13 @@ public class ReducexFilterEditorPanel extends AbstractFilterEditorPanel {
     public String getFilter() {
         return "|reducex('" + scalarTF.getText() + " " + unitsCB.getSelectedItem() + "')";
     }
+
+    @Override
+    public void setInput(QDataSet ds) {
+        QDataSet dep0= SemanticOps.xtagsDataSet(ds);
+        Units tu= SemanticOps.getUnits(dep0);
+        Units[] array= tu.getOffsetUnits().getConvertableUnits();
+        unitsCB.setModel(new javax.swing.DefaultComboBoxModel(array));  
+    }
+
 }
