@@ -147,7 +147,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     }
     
     @Override
-    public String getFilter() {
+    public synchronized String getFilter() {
         logger.entering( CLASS_NAME, "getFilter" );
         StringBuilder b= new StringBuilder();
         int ifilter= 0;
@@ -305,7 +305,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             addFocusListeners( pp );
         }
         
-        Dimension limit= new Dimension(20,20);
+        Dimension limit= new Dimension(24,24);
         
         JButton subAdd= new JButton("");
         subAdd.setIcon( new ImageIcon( FiltersChainPanel.class.getResource("/org/virbo/datasource/add.png") ) );
@@ -377,7 +377,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      * @param filter the filter for the block, such as "|slice1(2)"
      */
     @Override
-    public void setFilter(String filter) {
+    public synchronized void setFilter(String filter) {
         logger.entering( CLASS_NAME, "setFilter", filter );
         
         //if ( filter.equals( this.getFilter() ) ) { // the problem is that bindings will call this without setInput.
@@ -466,7 +466,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      * @param ds 
      */
     @Override
-    public void setInput( QDataSet ds) {
+    public synchronized void setInput( QDataSet ds) {
         logger.entering( CLASS_NAME, "setInput", ds );
         
         if ( this.inputDs==ds ) {
