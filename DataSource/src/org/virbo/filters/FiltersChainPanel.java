@@ -37,7 +37,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DataSetOps;
@@ -92,58 +96,70 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      * @param f the filter, which may or may not start with a pipe.
      * @return the filter.
      */
-    private FilterEditorPanel getEditorFor(String f) {
+    private FilterEditorPanel getEditorFor(String f, FilterEditorPanel recyclable) {
         logger.entering( CLASS_NAME, "getEditorFor", f );
-        while ( f.startsWith("|") ) f= f.substring(1);
+        if ( !f.startsWith("|") ) f= "|"+f;
+        
+        String srecyclable= recyclable==null ? null : recyclable.getFilter();
+        int i= f.indexOf("(");
+        if ( srecyclable!=null && srecyclable.startsWith(f.substring(0,i)) ) {
+            assert recyclable!=null;
+            logger.log(Level.FINE, "recycling to provide {0}", f);
+            recyclable.setFilter(f);
+            return recyclable;
+        }
+        
+        logger.log( Level.FINE, "creating new editor panel for {0}", f );
+        
         FilterEditorPanel result;
-        if ( f.matches("add\\((.*)\\)") ) {
+        if ( f.matches("\\|add\\((.*)\\)") ) {
             result= new AddFilterEditorPanel();
-        } else if ( f.matches("butterworth\\((\\d),(\\d+),(\\w+)\\)") ) {
+        } else if ( f.matches("\\|butterworth\\((\\d),(\\d+),(\\w+)\\)") ) {
             result= new ButterworthFilterEditorPanel();
-        } else if ( f.matches("butterworth\\((\\d),(\\d+),(\\d+),(\\w+)\\)") ) {
+        } else if ( f.matches("\\|butterworth\\((\\d),(\\d+),(\\d+),(\\w+)\\)") ) {
             result= new ButterworthFilterEditorPanel();
-        } else if ( f.matches("collapse(\\d)\\(\\)") ) {
+        } else if ( f.matches("\\|collapse(\\d)\\(\\)") ) {
             result= new CollapseFilterEditorPanel();
-        } else if ( f.matches("contour\\((.*)\\)") ) {
+        } else if ( f.matches("\\|contour\\((.*)\\)") ) {
             result= new ContourFilterEditorPanel();
-        } else if ( f.matches("cos\\(\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+        } else if ( f.matches("\\|cos\\(\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new NoArgFilterEditorPanel();
-        } else if ( f.matches("detrend\\((.*)\\)") ) {
+        } else if ( f.matches("\\|detrend\\((.*)\\)") ) {
             result= new DetrendFilterEditorPanel();
-        } else if ( f.matches("divide\\((.*)\\)") ) {
+        } else if ( f.matches("\\|divide\\((.*)\\)") ) {
             result= new DivideFilterEditorPanel();
-        } else if ( f.matches("fftPower\\((\\d+),(\\d),'?(\\w+)'?\\)") ) {
+        } else if ( f.matches("\\|fftPower\\((\\d+),(\\d),'?(\\w+)'?\\)") ) {
             result= new FftPowerFilterEditorPanel();
-        } else if ( f.matches("hanning\\((.*)\\)") ) {
+        } else if ( f.matches("\\|hanning\\((.*)\\)") ) {
             result= new HanningFilterEditorPanel();
-        } else if ( f.matches("median\\((.*)\\)") ) {
+        } else if ( f.matches("\\|median\\((.*)\\)") ) {
             result= new MedianFilterEditorPanel();
-        } else if ( f.matches("multiply\\((.*)\\)") ) {
+        } else if ( f.matches("\\|multiply\\((.*)\\)") ) {
             result= new MultiplyFilterEditorPanel();
-        } else if ( f.matches("reducex\\('?(\\d+)\\s(\\w+)'?\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+        } else if ( f.matches("\\|reducex\\('?(\\d+)\\s(\\w+)'?\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new ReducexFilterEditorPanel();
-        } else if ( f.matches( SetDepend0CadenceFilterEditorPanel.PROP_REGEX.substring(1) ) ) { // TODO: FilterEditorPanel might choose to accept a filter.
+        } else if ( f.matches( SetDepend0CadenceFilterEditorPanel.PROP_REGEX ) ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SetDepend0CadenceFilterEditorPanel();
-        } else if ( f.matches("setDepend0Units\\('(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+        } else if ( f.matches("\\|setDepend0Units\\('(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SetDepend0UnitsFilterEditorPanel();
-        } else if ( f.matches("setUnits\\('(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+        } else if ( f.matches("\\|setUnits\\('(\\w+)'\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SetUnitsFilterEditorPanel();
-        } else if ( f.matches("slice(\\d)\\((\\d+)\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+        } else if ( f.matches("\\|slice(\\d)\\((\\d+)\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SliceFilterEditorPanel();
-        } else if ( f.matches("smooth\\(\\d+\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+        } else if ( f.matches("\\|smooth\\(\\d+\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SmoothFilterEditorPanel();
-        } else if ( f.matches("histogram\\(\\)") ) { 
+        } else if ( f.matches("\\|histogram\\(\\)") ) { 
             result= new HistogramFilterEditorPanel();
-        } else if ( f.matches("histogram\\((\\d),(\\d+),(\\d+)\\)") ) { 
+        } else if ( f.matches("\\|histogram\\((\\d),(\\d+),(\\d+)\\)") ) { 
             result= new HistogramFilterEditorPanel();            
-        } else if ( f.matches( UnbundleFilterEditorPanel.PROP_REGEX.substring(1) ) ) { // TODO: FilterEditorPanel might choose to accept a filter.
+        } else if ( f.matches( UnbundleFilterEditorPanel.PROP_REGEX ) ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new UnbundleFilterEditorPanel();
-        } else if ( f.matches("dbAboveBackgroundDim1\\((\\d+)\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+        } else if ( f.matches("\\|dbAboveBackgroundDim1\\((\\d+)\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new dbAboveBackgroundDim1FilterEditorPanel();
         } else {
             result= new AnyFilterEditorPanel();
         }
-        result.setFilter("|"+f);
+        result.setFilter(f);
         return result;
     }
     
@@ -186,6 +202,22 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         
     };
     
+    
+    private final ActionListener requestUpdateListener= new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            updateSoon( inputDs );
+        }
+    };
+    
+    
+    private final ChangeListener requestChangeListener= new ChangeListener() {
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            updateSoon( inputDs );
+        }
+    };
+        
     private void addFilter( int idx ) {
         JPanel optionsPanel= new JPanel();
 
@@ -265,7 +297,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                }
            }
            if ( ss!=null ) {
-               FilterEditorPanel filter1= getEditorFor(ss);
+               FilterEditorPanel filter1= getEditorFor(ss, null);
                filter1.getPanel().addFocusListener( lostFocusListener );
                addFocusListeners( filter1.getPanel() );
                editors.add( idx, filter1 );
@@ -281,12 +313,22 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
     private void addFocusListeners( JPanel p ) {
         for ( Component c: p.getComponents() ) {
             c.addFocusListener(lostFocusListener);
+            if ( c instanceof JTextField ) {
+                ((JTextField)c).addActionListener(requestUpdateListener);
+            } else if ( c instanceof JSpinner ) {
+                ((JSpinner)c).addChangeListener(requestChangeListener);
+            }
         }
     }
     
     private void removeFocusListeners( JPanel p ) { 
         for ( Component c: p.getComponents() ) {
             c.removeFocusListener(lostFocusListener);
+            if ( c instanceof JTextField ) {
+                ((JTextField)c).removeActionListener(requestUpdateListener);
+            } else if ( c instanceof JSpinner ) {
+                ((JSpinner)c).removeChangeListener(requestChangeListener);
+            }
         }
     }
     
@@ -385,8 +427,14 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         //    logger.finer("no need to update...");
         //    return;
         //}
+
+        // will contain an empty string when there is no initial unbundle, 
+        String[] ss= filter.split("\\|");
         
         List<FilterEditorPanel> recycle= new ArrayList(editors);
+        for ( int i= editors.size(); i<ss.length; i++ ) {
+            recycle.add(null);
+        }
         
         for ( FilterEditorPanel p: editors ) {
             removeFocusListeners( p.getPanel() );
@@ -406,7 +454,6 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         pane.getVerticalScrollBar().setUnitIncrement( pane.getFont().getSize() );
         
         this.removeAll();
-        String[] ss= filter.split("\\|");
         
         for ( int i=0; i<ss.length; i++ ) {
             ss[i]= ss[i].trim();
@@ -415,11 +462,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         int i=0;
 
         if ( ss[0].length()>0 ) {
-            FilterEditorPanel p = getEditorFor("|unbundle("+ss[0]+")");
-            if ( recycle.size()>editors.size() && recycle.get(editors.size()).getClass().isInstance(p) ) {
-                p= recycle.get(editors.size());
-                p.setFilter("|unbundle("+ss[0]+")");
-            }
+            FilterEditorPanel p = getEditorFor("|unbundle("+ss[0]+")", recycle.get(0) );
             editors.add(p);
             JPanel ll= onePanel(i);
             content.add( ll );
@@ -433,11 +476,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         
         for (String s : ss) {
             if ( s.length()>0 ) {
-                FilterEditorPanel p = getEditorFor(s);
-                if ( recycle.size()>editors.size() && recycle.get(editors.size()).getClass().isInstance(p) ) {
-                    p= recycle.get(editors.size());
-                    p.setFilter("|"+s);
-                }
+                FilterEditorPanel p = getEditorFor(s, recycle.get(editors.size()) );
                 editors.add(p);
                 JPanel ll= onePanel(i);
                 content.add( ll );
@@ -468,7 +507,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             public void run() {
                 String f= getFilter();
                 setFilter( f );
-                setInput( inputDs );
+                if ( inputDs!=null ) setInput( inputDs );
                 firePropertyChange( PROP_FILTER, null, f );
             }
         };
@@ -517,6 +556,9 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                     p.getPanel().addPropertyChangeListener("filter",new PropertyChangeListener() {
                         @Override
                         public void propertyChange(PropertyChangeEvent evt) {
+                            if ( evt.getNewValue().equals(evt.getOldValue()) ) {
+                                
+                            }
                             updateSoon( inputDs );
                         }
                     });
