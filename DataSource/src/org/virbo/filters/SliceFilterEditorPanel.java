@@ -141,11 +141,13 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
 
     @Override
     public String getFilter() {
+        logger.fine( "getFilter" );
         return String.format( "|slice%d(%d)", sliceDimensionCB.getSelectedIndex(), (Integer)sliceIndexSpinner.getValue() );
     }
 
     @Override
     public void setFilter(String filter) {
+        logger.log(Level.FINE, "setFilter {0}", filter);
         if ( getFilter().equals(filter) ) {
             logger.warning("redundant set filter");
         }
