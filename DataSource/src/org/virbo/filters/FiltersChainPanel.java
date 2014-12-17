@@ -16,6 +16,7 @@ import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -385,6 +386,8 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         //    return;
         //}
         
+        List<FilterEditorPanel> recycle= new ArrayList(editors);
+        
         for ( FilterEditorPanel p: editors ) {
             removeFocusListeners( p.getPanel() );
         }
@@ -405,10 +408,18 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         this.removeAll();
         String[] ss= filter.split("\\|");
         
+        for ( int i=0; i<ss.length; i++ ) {
+            ss[i]= ss[i].trim();
+        }
+        
         int i=0;
 
-        if ( ss[0].trim().length()>0 ) {
+        if ( ss[0].length()>0 ) {
             FilterEditorPanel p = getEditorFor("|unbundle("+ss[0]+")");
+            if ( recycle.size()>editors.size() && recycle.get(editors.size()).getClass().isInstance(p) ) {
+                p= recycle.get(editors.size());
+                p.setFilter("|unbundle("+ss[0]+")");
+            }
             editors.add(p);
             JPanel ll= onePanel(i);
             content.add( ll );
@@ -421,9 +432,12 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         ss= Arrays.copyOfRange( ss, 1, ss.length );
         
         for (String s : ss) {
-            s= s.trim();
             if ( s.length()>0 ) {
                 FilterEditorPanel p = getEditorFor(s);
+                if ( recycle.size()>editors.size() && recycle.get(editors.size()).getClass().isInstance(p) ) {
+                    p= recycle.get(editors.size());
+                    p.setFilter("|"+s);
+                }
                 editors.add(p);
                 JPanel ll= onePanel(i);
                 content.add( ll );
