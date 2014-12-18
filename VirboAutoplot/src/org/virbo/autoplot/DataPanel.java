@@ -46,6 +46,7 @@ import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.BindingSupport;
+import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementController;
@@ -413,6 +414,14 @@ public class DataPanel extends javax.swing.JPanel {
         }
     };
 
+    private transient PropertyChangeListener fillDataSetListener= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            QDataSet ds= (QDataSet)evt.getNewValue();
+            filtersChainPanel1.setInput(ds);
+        }
+    };
+    
     private void updateProcessDataSetLabel() {
         PlotElement lelement= getElement();
         DataSourceFilter dsf1= dom.getController().getDataSourceFilterFor(lelement);
@@ -461,6 +470,7 @@ public class DataPanel extends javax.swing.JPanel {
 
         if ( dsf!=null ) {
             dsf.getController().removePropertyChangeListener(dsfListener);
+            dsf.getController().removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener );
         }
         
         final DataSourceFilter newDsf = applicationController.getDataSourceFilter();
@@ -473,6 +483,9 @@ public class DataPanel extends javax.swing.JPanel {
 
         QDataSet ds= newDsf.getController().getFillDataSet();
         dataSetLabel.setText( ds==null ? "(no dataset)" : ds.toString() );
+        
+        newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_FILLDATASET, fillDataSetListener );
+        filtersChainPanel1.setInput(ds);
 
         BindingGroup bc = new BindingGroup();
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("fill"), this.fillValueComboBox, BeanProperty.create("selectedItem")));

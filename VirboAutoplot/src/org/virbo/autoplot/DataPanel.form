@@ -93,7 +93,7 @@
                       </Group>
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="filtersChainPanel1" pref="134" max="32767" attributes="0"/>
+                  <Component id="filtersChainPanel1" pref="137" max="32767" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="sliceAutorangesCB" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
