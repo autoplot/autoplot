@@ -1356,13 +1356,15 @@ public class PlotElementController extends DomNodeController {
                     //check for non-unique labels, or labels that are simply numbers.
                     boolean uniqLabels= true;
                     assert lnames!=null;
+                    Pattern p= Pattern.compile("ch_\\d+");
                     for ( int i=0;i<lnames.length; i++ ) {
                         if ( AutoplotUtil.isParsableDouble( lnames[i] ) ) uniqLabels= false;
+                        if ( p.matcher(lnames[i]).matches() ) uniqLabels= false;
                         for ( int j=i+1; j<lnames.length; j++ ) {
                             if ( lnames[i].equals(lnames[j]) ) uniqLabels= false;
                         }
                     }
-
+                    
                     for (int i = 0; i < count; i++) {
                         //long t0= System.currentTimeMillis();
                         PlotElement ele = dom.controller.makeChildPlotElement(plotElement, domPlot, dsf);
@@ -1383,13 +1385,35 @@ public class PlotElementController extends DomNodeController {
                                 label1= l1;
                             }
                         } else {
-                            if ( uniqLabels ) {
-                                s= s+"|unbundle('"+lnames[i]+"')";
+                            if ( s.equals("") ) {
+                                QDataSet ds1= DataSetOps.unbundle(fillDs,i);
+                                QDataSet context= (QDataSet) ds1.property(QDataSet.CONTEXT_0);
+                                if ( context!=null ) {
+                                    if ( context.rank()==1 ) {
+                                        context= Ops.extent(context);
+                                        if ( Ops.valid( context.slice(0) ).value()>0 ) {
+                                            if ( context.value(0)==context.value(1) ) {
+                                                label1= context.slice(0).toString();
+                                            } else {
+                                                label1= context.toString();
+                                            }
+                                        } else {
+                                            label1= "fill";
+                                        }
+                                    } else {
+                                        label1= context.toString(); // rank 0.
+                                    }
+                                }
+                                s= lnames[i];
                             } else {
-                                s= s+"|unbundle('ch_"+i+"')";
+                                if ( uniqLabels ) {
+                                    s= s+"|unbundle('"+lnames[i]+"')";
+                                } else {
+                                    s= s+"|unbundle('ch_"+i+"')";
+                                }
+                                addParentComponentListener(plotElement,ele);
+                                label1= llabels[i];
                             }
-                            label1= llabels[i];
-                            addParentComponentListener(plotElement,ele);
                         }
                         ele.setComponentAutomatically(s);
                         ele.setActive(false); // setComponentAutomatically resets this
