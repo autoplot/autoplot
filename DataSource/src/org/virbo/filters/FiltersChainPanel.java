@@ -319,7 +319,8 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                String filter= getFilter();
                setFilter( filter );
                QDataSet inputDs1= this.inputDs;
-               this.inputDs= null;
+               setInput(null);
+               setInput(inputDs1);
                updateSoon(inputDs1, filter );
            }
        }
@@ -536,9 +537,6 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
      */
     private void updateSoon( final QDataSet inputDs, final String filter) {
         //this.inputDs= null;
-        if ( ( filter!=null && filter.equals(currentFilter) ) && this.inputDs!=null && this.inputDs.equals(inputDs) ) {
-            return;
-        }
         timer.tickle(filter);
     }
     
