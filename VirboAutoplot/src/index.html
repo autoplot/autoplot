@@ -7,8 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Two PNGWalk Tools are bound together to build a tool for inspecting the results of nightly tests.  
-                (See <a href="http://jfaden.net/~jbf/autoplot/script/demos/hudsonReview.jy">hudsonReview.jy</a>)
+        <p><small>New Filters GUI makes filtering data more intuitive.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -25,8 +24,10 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-12-08):</p>
+        <p>Bugfixes (2014-12-18):</p>
         <ul> 
+            <li>fix the labels for Seth's data with Rank 2 DEPEND_1, where stack of lineplots</li>
+            <li>bugfix 1251: reuse of monitors</li>
             <li>bugfix: pickFont can return null.</li>
             <li>revert the message about varying slice locations.</li>
             <li>fix hang when thumbnailer code would get stuck in infinite loop (with small canvas).</li>
@@ -91,6 +92,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Filters editor panel provides small GUIs to control each filter.</li>
+            <li>don't include iconified window area in CreateScreenShot code</li>
+            <li>Introduce Jython writeToSvg to support future servers.</li>
+            <li>Update to the new version of CDFJ library</li>
             <li>put in label to show the canvas size in inches or centimeters.</li>
             <li>minor improvements to getParam insert in Jython editor.</li>
             <li>add branch for total(dsr2,1) where dsr2 is a rank 2 dataset, to get BMag from components of huge magnetometer dataset.</li>
