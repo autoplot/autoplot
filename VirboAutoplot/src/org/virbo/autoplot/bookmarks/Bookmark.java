@@ -104,7 +104,7 @@ public abstract class Bookmark {
 
 
     /**
-     * read in the bookmarks file, which should be an xml file with the top node <bookmark-list>.
+     * read in the bookmarks file, which should be an xml file with the top node &lt;bookmark-list&gt;.
      * @param url local or remote file.
      * @return
      * @throws SAXException
@@ -555,7 +555,7 @@ public abstract class Bookmark {
     /**
      * parse the bookmarks, checking to see what version scheme should be used.
      * @param root the root node, from which the version scheme should be read
-     * @param remoteLevel if >0, then allow remote to be retrieved (this many levels). &lt;0 means assume resolve have been resolved.
+     * @param remoteLevel if &gt;0, then allow remote to be retrieved (this many levels). &lt;0 means assume resolve have been resolved.
      * @throws BookmarksException if the bookmark cannot be parsed.
      * @return the bookmarks, possibly with unresolved remote nodes.
      */
