@@ -161,6 +161,7 @@ public class SliceFilterEditorPanel extends AbstractFilterEditorPanel implements
 
     @Override
     public void setInput(QDataSet ds) {
+        logger.log(Level.FINE, "setInput {0}", ds.toString() );
         String[] depNames1= FilterEditorPanelUtil.getDimensionNames(ds);
         int idx= sliceDimensionCB.getSelectedIndex();
         sliceDimensionCB.setModel(new DefaultComboBoxModel(depNames1));
