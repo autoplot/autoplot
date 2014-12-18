@@ -1401,7 +1401,9 @@ public class PlotElementController extends DomNodeController {
                                             label1= "fill";
                                         }
                                     } else {
-                                        label1= context.toString(); // rank 0.
+                                        if ( !"slice1".equals( context.property(QDataSet.NAME) ) ) { // check for default name.
+                                            label1= context.toString(); // rank 0.
+                                        }
                                     }
                                 }
                                 s= lnames[i];
