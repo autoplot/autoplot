@@ -84,6 +84,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                 updateImmediately();
             }
         });
+        setFilter("");
     }
 
     List<FilterEditorPanel> editors= new LinkedList();
@@ -509,6 +510,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
            
         this.add( pane );
         
+        //content.revalidate();
         this.revalidate();
     }
 
@@ -567,7 +569,9 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             if ( s.length()>0 ) {
                 FilterEditorPanel p = editors.get(i);
                 if ( ds!=null ) {
+                    
                     p.setInput(ds);
+                    
                     if ( iss<ss.length ) {
                         try {
                             ds= DataSetOps.sprocess( "|"+s, ds, new NullProgressMonitor() );
@@ -589,7 +593,8 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                 i=i+1;
             }
         }
-        this.revalidate();        
+        this.repaint();
+        //this.revalidate();        
     }
 
     @Override
