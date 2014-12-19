@@ -56,7 +56,7 @@
 	<classpathentry kind="lib" path="APLibs/lib/javaws.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/opendap-2.1.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/cdfjava.3.3.2.tt2000.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/cdfj_20141101.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/cdfj_20141113.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jsamp-1.1.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jsyntaxpane-0.9.6.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/metadata-extractor-2.6.4.jar"/>
