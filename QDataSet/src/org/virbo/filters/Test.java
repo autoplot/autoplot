@@ -7,9 +7,7 @@
 package org.virbo.filters;
 
 import javax.swing.JOptionPane;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
 
 /**
