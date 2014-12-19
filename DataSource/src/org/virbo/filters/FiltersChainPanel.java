@@ -347,7 +347,7 @@ public final class FiltersChainPanel extends javax.swing.JPanel implements Filte
             } else if ( c instanceof AbstractButton ) {
                 ((AbstractButton)c).addActionListener(requestUpdateListener);
             } else if ( c instanceof JPanel ) {
-                addFocusListeners((JPanel)c);
+                addFocusListeners((JPanel)c); //TODO: consider not until the JPanel focus is blurred.
             }
         }
     }
