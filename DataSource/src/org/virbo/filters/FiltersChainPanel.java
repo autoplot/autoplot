@@ -34,6 +34,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -52,7 +53,6 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
-import static org.virbo.filters.FilterEditorPanel.PROP_FILTER;
 
 /**
  * Chain together a number of FilterEditorPanels to one long filter chain.  For example,
@@ -61,15 +61,20 @@ import static org.virbo.filters.FilterEditorPanel.PROP_FILTER;
  * 
  * @author jbf
  */
-public class FiltersChainPanel extends javax.swing.JPanel implements FilterEditorPanel {
+public final class FiltersChainPanel extends javax.swing.JPanel implements FilterEditorPanel {
     
     private QDataSet inputDs;
-    private String currentFilter= null;
+    //private String currentFilter= null;
     private boolean implicitUnbundle= false;
     TickleTimer timer;
 
     private static final Logger logger= LoggerManager.getLogger("apdss.filters");
     private static final String CLASS_NAME = FiltersChainPanel.class.getName();
+    
+    /**
+     * the current 
+     */
+    public static final String PROP_FILTER= "filter";
     
     /**
      * Creates new form FiltersChainPanel
@@ -163,6 +168,8 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         } else if ( f.matches("\\|slice(\\d)\\((\\d+)\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SliceFilterEditorPanel();
         } else if ( f.matches("\\|smooth\\(\\d+\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
+            result= new SmoothFilterEditorPanel();
+        } else if ( f.matches("\\|smoothfit\\(\\d+\\)") ) { // TODO: FilterEditorPanel might choose to accept a filter.
             result= new SmoothFilterEditorPanel();
         } else if ( f.matches("\\|histogram\\(\\)") ) { 
             result= new HistogramFilterEditorPanel();
@@ -333,8 +340,12 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             c.addFocusListener(lostFocusListener);
             if ( c instanceof JTextField ) {
                 ((JTextField)c).addActionListener(requestUpdateListener);
+            } else if ( c instanceof JComboBox ) {
+                ((JComboBox)c).addActionListener(requestUpdateListener);
             } else if ( c instanceof JSpinner ) {
                 ((JSpinner)c).addChangeListener(requestChangeListener);
+            } else if ( c instanceof AbstractButton ) {
+                ((AbstractButton)c).addActionListener(requestUpdateListener);
             }
         }
     }
@@ -344,8 +355,12 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
             c.removeFocusListener(lostFocusListener);
             if ( c instanceof JTextField ) {
                 ((JTextField)c).removeActionListener(requestUpdateListener);
+            } else if ( c instanceof JComboBox ) {
+                ((JComboBox)c).removeActionListener(requestUpdateListener);
             } else if ( c instanceof JSpinner ) {
                 ((JSpinner)c).removeChangeListener(requestChangeListener);
+            } else if ( c instanceof AbstractButton ) {
+                ((AbstractButton)c).removeChangeListener(requestChangeListener);
             }
         }
     }
@@ -522,7 +537,7 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
                 setFilter( f );
                 if ( inputDs!=null ) setInput( inputDs );
                 firePropertyChange( PROP_FILTER, null, f );
-                currentFilter= f;        
+                //currentFilter= f;        
             }
         };
         try {
@@ -640,10 +655,10 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         
         logger.addHandler( h );
         
-        FiltersChainPanel ff= new FiltersChainPanel();
+        final FiltersChainPanel ff= new FiltersChainPanel();
 
         //QDataSet ds= getDataSet( "rank1TimeSeries" );
-        QDataSet ds= getDataSet( "qube" );
+        final QDataSet ds= getDataSet( "qube" );
         
         //ff.setFilter("|slice0(2)|cos()|collapse1()|butterworth(2,500,750,True)"); //butterworth(2,500,550,True)");
         //ff.setFilter("|butterworth(2,500,550,True)"
@@ -651,8 +666,30 @@ public class FiltersChainPanel extends javax.swing.JPanel implements FilterEdito
         ff.setFilter("|setDepend0Cadence(50s)");
         ff.setInput(ds);
         
+        final JTextField tf= new JTextField();
+        tf.setText(ff.getFilter());
+        
+        tf.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ff.setFilter(tf.getText());
+                ff.setInput(ds);
+            }
+        });
+        
+        ff.addPropertyChangeListener( "filter", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                tf.setText(ff.getFilter());
+            }
+        });
+        
+        JPanel p= new JPanel( new BorderLayout() );
+        p.add( ff );
+        p.add( tf, BorderLayout.NORTH );
+        
         JDialog d= new JDialog();
-        d.setContentPane( ff );
+        d.setContentPane( p );
         d.setResizable(true);
         d.setModal(true);
         d.pack();
