@@ -346,6 +346,8 @@ public final class FiltersChainPanel extends javax.swing.JPanel implements Filte
                 ((JSpinner)c).addChangeListener(requestChangeListener);
             } else if ( c instanceof AbstractButton ) {
                 ((AbstractButton)c).addActionListener(requestUpdateListener);
+            } else if ( c instanceof JPanel ) {
+                addFocusListeners((JPanel)c);
             }
         }
     }
@@ -361,6 +363,8 @@ public final class FiltersChainPanel extends javax.swing.JPanel implements Filte
                 ((JSpinner)c).removeChangeListener(requestChangeListener);
             } else if ( c instanceof AbstractButton ) {
                 ((AbstractButton)c).removeChangeListener(requestChangeListener);
+            } else if ( c instanceof JPanel ) {
+                addFocusListeners((JPanel)c);
             }
         }
     }
