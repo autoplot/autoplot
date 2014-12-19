@@ -31,13 +31,20 @@ public class SmoothFilterEditorPanel extends AbstractFilterEditorPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jCheckBox1 = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
         sizeTF = new javax.swing.JTextField();
+        fitCB = new javax.swing.JCheckBox();
+
+        jCheckBox1.setText("jCheckBox1");
 
         jLabel1.setText("'Smooth' Boxcar Size:  ");
 
         sizeTF.setText("3");
         sizeTF.setPreferredSize(new java.awt.Dimension(50, 27));
+
+        fitCB.setText("Fit Ends");
+        fitCB.setToolTipText("Use a linear fit for the end points.");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -48,6 +55,8 @@ public class SmoothFilterEditorPanel extends AbstractFilterEditorPanel {
                 .add(jLabel1)
                 .add(2, 2, 2)
                 .add(sizeTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(fitCB)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -56,13 +65,16 @@ public class SmoothFilterEditorPanel extends AbstractFilterEditorPanel {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
-                    .add(sizeTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(sizeTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(fitCB))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JCheckBox fitCB;
+    public javax.swing.JCheckBox jCheckBox1;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JTextField sizeTF;
     // End of variables declaration//GEN-END:variables
@@ -73,13 +85,27 @@ public class SmoothFilterEditorPanel extends AbstractFilterEditorPanel {
         Matcher m= p.matcher(filter);
         if ( m.matches() ) {
             sizeTF.setText( m.group(1) );
+            fitCB.setSelected(false);
         } else {
-            sizeTF.setText( "3" );
+            p= Pattern.compile("\\|smoothfit\\((\\d+)\\)");
+            m= p.matcher(filter);
+            if ( m.matches() ) {
+                sizeTF.setText( m.group(1) );
+                fitCB.setSelected(true);
+            } else {
+                sizeTF.setText( "3" );
+                fitCB.setSelected(false);
+            }
         }
+        
     }
 
     @Override
     public String getFilter() {
-        return "|smooth(" + sizeTF.getText() + ")";
+        if ( fitCB.isSelected() ) {
+            return "|smoothfit(" + sizeTF.getText() + ")";            
+        } else {
+            return "|smooth(" + sizeTF.getText() + ")";
+        }
     }
 }
