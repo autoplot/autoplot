@@ -1,1 +1,1 @@
-org.autoplot.cdf.CdfJavaDataSourceFormat cdfj cdf
+org.autoplot.cdf.CdfDataSourceFormat cdfj cdf

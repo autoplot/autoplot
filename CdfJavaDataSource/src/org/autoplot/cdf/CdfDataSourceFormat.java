@@ -33,7 +33,7 @@ import org.virbo.dataset.SemanticOps;
  *
  * @author jbf
  */
-public class CdfJavaDataSourceFormat implements DataSourceFormat {
+public class CdfDataSourceFormat implements DataSourceFormat {
 
     CDFWriter cdf;
     //Object depend_0, depend_1, depend_2;
@@ -45,7 +45,7 @@ public class CdfJavaDataSourceFormat implements DataSourceFormat {
 
     private static final Logger logger= LoggerManager.getLogger("apdss.cdfj");
     
-    public CdfJavaDataSourceFormat() {
+    public CdfDataSourceFormat() {
         names= new HashMap<QDataSet,String>();
         seman= new HashMap<String,QDataSet>();
     }
