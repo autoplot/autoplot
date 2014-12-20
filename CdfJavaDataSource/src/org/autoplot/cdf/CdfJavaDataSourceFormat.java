@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.virbo.cdf;
+package org.autoplot.cdf;
 
 import gov.nasa.gsfc.spdf.cdfj.CDFDataType;
 import gov.nasa.gsfc.spdf.cdfj.CDFWriter;
