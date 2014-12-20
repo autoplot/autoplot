@@ -79,6 +79,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
         mon.setTaskSize(len);
         mon.started();
+        mon.setProgressMessage("recording from system audio");
         dataBuffer.limit( 2048 );
         fillBuffer(mon);
 
