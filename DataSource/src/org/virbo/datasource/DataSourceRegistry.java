@@ -653,8 +653,15 @@ public class DataSourceRegistry {
             try {
                 Class clas = Class.forName((String) o);
                 Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
-                System.err.println("constructor for getFormat: "+clas);
-                result = (DataSourceFormat) constructor.newInstance(new Object[]{});
+                
+                Object oresult= constructor.newInstance(new Object[]{});
+                if ( oresult instanceof DataSourceFormat ) {
+                    result = (DataSourceFormat) constructor.newInstance(new Object[]{});
+                    logger.log(Level.FINE, "constructor for getFormat: {0}", clas);
+                } else {
+                    logger.log(Level.WARNING, "constructor of incorrect type for {0}, extension {1}", new Object[]{o, extension});
+                    return null;
+                }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
