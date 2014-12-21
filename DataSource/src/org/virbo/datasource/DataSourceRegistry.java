@@ -653,6 +653,7 @@ public class DataSourceRegistry {
             try {
                 Class clas = Class.forName((String) o);
                 Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
+                System.err.println("constructor for getFormat: "+clas);
                 result = (DataSourceFormat) constructor.newInstance(new Object[]{});
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
