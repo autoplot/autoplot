@@ -1067,11 +1067,22 @@ public class DataSetURI {
             mon.setProgressMessage("waiting for resource");
             mon.started();
             try {
+                long l0= tempfile.length();
+                long tlength= System.currentTimeMillis();
                 while ( tempfile.exists() ) {
                     try {
                         Thread.sleep(300);
                         if ( System.currentTimeMillis()-t0 > 60000 ) {
                             logger.log(Level.FINE, "waiting for other process to finish loading %s...{0}", tempfile);
+                        }
+                        if ( tempfile.length()!=l0 ) {
+                            l0= tempfile.length();
+                            tlength= System.currentTimeMillis();
+                        } else {
+                            if ( System.currentTimeMillis()-tlength >  3 * FileSystem.settings().getConnectTimeoutMs() ) { 
+                                logger.warning("timeout waiting for lengthening of file "+tempfile+" which another thread is loading");
+                                throw new IOException("timeout waiting for lengthening of file "+tempfile+" which another thread is loading");
+                            }
                         }
                         if ( mon.isCancelled() ) {
                             throw new InterruptedIOException("cancel pressed");
