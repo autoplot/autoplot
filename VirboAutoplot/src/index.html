@@ -7,14 +7,14 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New Filters GUI makes filtering data more intuitive.
+        <p><small>FFTPower routine is used to create a spectrogram from a .wav file.  Happy Holidays!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
         </p>
 
-        <p>This is the Autoplot2014a branch.  This is an update to the production version containing bugfixes and minor new features.
+        <p>This is the Autoplot2014b branch.  This is an update to the production version containing bugfixes and minor new features.
             Java 6 is now required.
         </p>
 
@@ -24,18 +24,21 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-12-18):</p>
+        <p>Bugfixes (2014-12-22):</p>
         <ul> 
-            <li>fix the labels for Seth's data with Rank 2 DEPEND_1, where stack of lineplots</li>
-            <li>bugfix 1251: reuse of monitors</li>
+            <li>1018: put in sanity check when waiting for another process to load file, check for movement within 15sec</li>
+            <li>1300: strange export data behavior on Mac, where somehow discovery mechanism was getting the wrong type</li>
+            <li>1299: where trimProperties would drop the original properties</li>
+            <li>fix the labels for Seth's data with Rank 2 DEPEND_1, where stack of lineplots were not given unique labels</li>
+            <li>1251: reuse of monitors</li>
             <li>bugfix: pickFont can return null.</li>
             <li>revert the message about varying slice locations.</li>
             <li>fix hang when thumbnailer code would get stuck in infinite loop (with small canvas).</li>
             <li>fix failure to update when canvas size is set explicitly.</li>
             <li>bugfix: rank 1, one-element DELTA_PLUS in vap+cdaweb:ds=C3_PP_CIS&amp;id=T_p_par__C3_PP_CIS</li>
             <li>bug with rank 1 data and data gap for ephemeris ticks resolved.  Thanks Joe!</li>
-            <li>bug 1098: improve feedback as to where the two timeranges options are coming from in the query.</li>
-            <li>bug 1295: get rid of Thread.sleep use by using new java.util.Timer aptimer. </li>
+            <li>1098: improve feedback as to where the two timeranges options are coming from in the query.</li>
+            <li>1295: get rid of Thread.sleep use by using new java.util.Timer aptimer. </li>
             <li>contoursRenderer accepts pre-contoured data, like the output of the contours filter</li>
             <li>CDFJ getPlottable was returning the LABL_PTR_1 variables, when it shouldn't be</li>
             <li>214: correct for bold and italic when printing</li>
@@ -48,7 +51,7 @@
             <li>bugfix in fits where height and width were exchanged.</li>
             <li>rfe405: Kristoff pointed out where new code ensuring monotonic from aggregations would clip almost all the data.</li>
             <li>improve handling and transparency when PDSPPI is down</li>
-            <li>bugfix 1290: jython script editor left in read-only mode </li>
+            <li>1290: jython script editor left in read-only mode </li>
             <li>Correction to the CDAWeb plugin URL used, thanks Tami!</li>
             <li>aggregation works with ordinal data again.</li>
             <li>reform just returns the dataset when there are no indeces with just one element, thanks Bill!</li>
@@ -93,6 +96,7 @@
         <p>Features:</p>
         <ul>
             <li>Filters editor panel provides small GUIs to control each filter.</li>
+            <li>Add smoothfit function to filters.</li>
             <li>don't include iconified window area in CreateScreenShot code</li>
             <li>Introduce Jython writeToSvg to support future servers.</li>
             <li>Update to the new version of CDFJ library</li>
