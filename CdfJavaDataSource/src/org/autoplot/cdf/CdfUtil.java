@@ -388,7 +388,7 @@ public class CdfUtil {
      * @return the dataset
      * @throws Exception
      */
-    public static MutablePropertyDataSet wrapCdfHyperDataHacked(
+    public static MutablePropertyDataSet wrapCdfData(
             CDFReader cdf, String svariable, long recStart, long recCount, long recInterval, int slice1, ProgressMonitor mon) throws Exception {
         logger.log( Level.FINE, "wrapCdfHyperDataSetHacked {0}[{1}:{2}:{3}]", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
                  ""+(recCount+recStart), recInterval } );
