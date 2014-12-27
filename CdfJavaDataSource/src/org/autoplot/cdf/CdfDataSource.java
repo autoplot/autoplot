@@ -733,427 +733,423 @@ public class CdfDataSource extends AbstractDataSource {
     
     private MutablePropertyDataSet wrapDataSet(final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> thisAttributes, int slice1, ProgressMonitor mon) throws Exception, ParseException {
 
-        try {
-            if ( !hasVariable(cdf, svariable) ) {
-                throw new IllegalArgumentException( "No such variable: "+svariable );
-            }
-            if ( thisAttributes==null ) {
-                thisAttributes = readAttributes(cdf, svariable, 0); //legacy, use with caution.
-            }
+        if ( !hasVariable(cdf, svariable) ) {
+            throw new IllegalArgumentException( "No such variable: "+svariable );
+        }
+        if ( thisAttributes==null ) {
+            thisAttributes = readAttributes(cdf, svariable, 0); //legacy, use with caution.
+        }
 
-            long numRec = cdf.getNumberOfValues(svariable);
+        long numRec = cdf.getNumberOfValues(svariable);
 
-            if ( mon==null ) mon= new NullProgressMonitor();
+        if ( mon==null ) mon= new NullProgressMonitor();
 
-            String displayType= (String)thisAttributes.get("DISPLAY_TYPE");
+        String displayType= (String)thisAttributes.get("DISPLAY_TYPE");
 
-            if (numRec == 0) {
-                String funct= (String)thisAttributes.get("FUNCTION");
-                if ( funct==null ) funct= (String)thisAttributes.get("FUNCT");
-                if (thisAttributes.containsKey("COMPONENT_0") && funct!=null && funct.startsWith("comp_themis_epoch" )) {
-                    // themis kludge that CDAWeb supports, so we support it too.  The variable has no records, but has
-                    // two attributes, COMPONENT_0 and COMPONENT_1.  These are two datasets that should be added to
-                    // get the result.  Note cdf_epoch16 fixes the shortcoming that themis was working around.
-                    QDataSet c0 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_0"), constraints, true, false, null );
-                    if ( thisAttributes.containsKey("COMPONENT_1")) {
-                        QDataSet c1 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_1"), constraints, false, false, null );
-                        if (c0.rank() == 1 && CdfDataSetUtil.validCount(c0, 2) == 1 && c1.length() > 1) { // it should have been rank 0.
-                            c0 = DataSetOps.slice0(c0, 0);
-                            // Convert the units to the more precise Units.us2000.  We may still truncate here, and the only way
-                            // to avoid this would be to introduce a new Basis that is equal to c0.
-                            if (Units.cdfEpoch == c0.property(QDataSet.UNITS)) {
-                                double value = ((RankZeroDataSet) c0).value();
-                                double valueUs2000 = Units.cdfEpoch.convertDoubleTo(Units.us2000, value);
-                                c0 = DataSetUtil.asDataSet(Units.us2000.createDatum(valueUs2000));
-                            }
-                        }
-                        if ( c0.property( QDataSet.UNITS )!=null && c1.property( QDataSet.UNITS )!=null ) {
-                            c0 = Ops.add(c0, c1);  //tha_l2_esa_20071101_v01.cdf?tha_peif_velocity_gseQ
+        if (numRec == 0) {
+            String funct= (String)thisAttributes.get("FUNCTION");
+            if ( funct==null ) funct= (String)thisAttributes.get("FUNCT");
+            if (thisAttributes.containsKey("COMPONENT_0") && funct!=null && funct.startsWith("comp_themis_epoch" )) {
+                // themis kludge that CDAWeb supports, so we support it too.  The variable has no records, but has
+                // two attributes, COMPONENT_0 and COMPONENT_1.  These are two datasets that should be added to
+                // get the result.  Note cdf_epoch16 fixes the shortcoming that themis was working around.
+                QDataSet c0 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_0"), constraints, true, false, null );
+                if ( thisAttributes.containsKey("COMPONENT_1")) {
+                    QDataSet c1 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_1"), constraints, false, false, null );
+                    if (c0.rank() == 1 && CdfDataSetUtil.validCount(c0, 2) == 1 && c1.length() > 1) { // it should have been rank 0.
+                        c0 = DataSetOps.slice0(c0, 0);
+                        // Convert the units to the more precise Units.us2000.  We may still truncate here, and the only way
+                        // to avoid this would be to introduce a new Basis that is equal to c0.
+                        if (Units.cdfEpoch == c0.property(QDataSet.UNITS)) {
+                            double value = ((RankZeroDataSet) c0).value();
+                            double valueUs2000 = Units.cdfEpoch.convertDoubleTo(Units.us2000, value);
+                            c0 = DataSetUtil.asDataSet(Units.us2000.createDatum(valueUs2000));
                         }
                     }
-                    return DDataSet.maybeCopy(c0);
-                } else {
-                    // bug 1211: cdf virtual variable cannot be accessed by single record 
-                    throw new NoDataInIntervalException("variable " + svariable + " contains no records!");
+                    if ( c0.property( QDataSet.UNITS )!=null && c1.property( QDataSet.UNITS )!=null ) {
+                        c0 = Ops.add(c0, c1);  //tha_l2_esa_20071101_v01.cdf?tha_peif_velocity_gseQ
+                    }
                 }
-            }
-
-            long[] recs = DataSourceUtil.parseConstraint(constraints, numRec);
-            boolean slice= recs[1]==-1;
-            MutablePropertyDataSet result;
-
-            if ( cdf.getDimensions(svariable).length>0 && slice1>-1 ) {
-                int n1= cdf.getDimensions(svariable)[0];
-                if ( slice1>=n1 ) {
-                    throw new IllegalArgumentException("slice1="+slice1+" is too big for the dimension size ("+n1+")");
-                }
-            }
-
-            if (reform) {
-                //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.
-                result = CdfUtil.wrapCdfData(cdf,svariable, 0, -1, 1, slice1, new NullProgressMonitor() );
+                return DDataSet.maybeCopy(c0);
             } else {
-                long recCount = (recs[1] - recs[0]) / recs[2];
-                if ( slice ) {
-                    recCount= -1;
-                    recs[2]= 1;
-                }
-                result = CdfUtil.wrapCdfData(cdf,svariable, recs[0], recCount, recs[2], slice1, mon);
-                //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
+                // bug 1211: cdf virtual variable cannot be accessed by single record 
+                throw new NoDataInIntervalException("variable " + svariable + " contains no records!");
             }
-            result.putProperty(QDataSet.NAME, svariable);
+        }
 
-            final boolean doUnits = true;
-            Units units=null;
-            if (doUnits) {
-                if (thisAttributes.containsKey("UNITS")) {
-                    String sunits= (String) thisAttributes.get("UNITS");
-                    Units mu;
-                    if ( sunits.equalsIgnoreCase("row number") || sunits.equalsIgnoreCase("column number" ) ) { // kludge for POLAR/VIS
-                        mu= Units.dimensionless;
-                    } else {
-                        mu = SemanticOps.lookupUnits(sunits);
-                    }
-                    Units u = (Units) result.property(QDataSet.UNITS);
-                    if (u == null) {
-                        result.putProperty(QDataSet.UNITS, mu);
-                        units= mu;
-                    } else {
-                        units= u;
-                    }
-                } else if ( thisAttributes.containsKey("UNIT_PTR") ) {
-                    String svar= (String) thisAttributes.get("UNIT_PTR");
-                    if ( svar!=null ) {
-                        logger.log(Level.FINER, "found UNIT_PTR for {0}", svariable);
-                        boolean okay= true;
-                        QDataSet s=null;
-                        try {
-                            if ( hasVariable(cdf, svar) ) {
-                                s= CdfUtil.wrapCdfData( cdf, svar, 0, 1, 1, -1, new NullProgressMonitor() );
-                                s= s.slice(0);
-                                double s1= s.value(0);
-                                for ( int i=1; i<s.length(); i++ ) {
-                                    if ( s.value(i)!=s1 ) {
-                                        logger.log( Level.INFO, "units are not all the same, unable to use: {0}", svar );
-                                        okay= false;
-                                    }
+        long[] recs = DataSourceUtil.parseConstraint(constraints, numRec);
+        boolean slice= recs[1]==-1;
+        MutablePropertyDataSet result;
+
+        if ( cdf.getDimensions(svariable).length>0 && slice1>-1 ) {
+            int n1= cdf.getDimensions(svariable)[0];
+            if ( slice1>=n1 ) {
+                throw new IllegalArgumentException("slice1="+slice1+" is too big for the dimension size ("+n1+")");
+            }
+        }
+
+        if (reform) {
+            //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.
+            result = CdfUtil.wrapCdfData(cdf,svariable, 0, -1, 1, slice1, new NullProgressMonitor() );
+        } else {
+            long recCount = (recs[1] - recs[0]) / recs[2];
+            if ( slice ) {
+                recCount= -1;
+                recs[2]= 1;
+            }
+            result = CdfUtil.wrapCdfData(cdf,svariable, recs[0], recCount, recs[2], slice1, mon);
+            //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
+        }
+        result.putProperty(QDataSet.NAME, svariable);
+
+        final boolean doUnits = true;
+        Units units=null;
+        if (doUnits) {
+            if (thisAttributes.containsKey("UNITS")) {
+                String sunits= (String) thisAttributes.get("UNITS");
+                Units mu;
+                if ( sunits.equalsIgnoreCase("row number") || sunits.equalsIgnoreCase("column number" ) ) { // kludge for POLAR/VIS
+                    mu= Units.dimensionless;
+                } else {
+                    mu = SemanticOps.lookupUnits(sunits);
+                }
+                Units u = (Units) result.property(QDataSet.UNITS);
+                if (u == null) {
+                    result.putProperty(QDataSet.UNITS, mu);
+                    units= mu;
+                } else {
+                    units= u;
+                }
+            } else if ( thisAttributes.containsKey("UNIT_PTR") ) {
+                String svar= (String) thisAttributes.get("UNIT_PTR");
+                if ( svar!=null ) {
+                    logger.log(Level.FINER, "found UNIT_PTR for {0}", svariable);
+                    boolean okay= true;
+                    QDataSet s=null;
+                    try {
+                        if ( hasVariable(cdf, svar) ) {
+                            s= CdfUtil.wrapCdfData( cdf, svar, 0, 1, 1, -1, new NullProgressMonitor() );
+                            s= s.slice(0);
+                            double s1= s.value(0);
+                            for ( int i=1; i<s.length(); i++ ) {
+                                if ( s.value(i)!=s1 ) {
+                                    logger.log( Level.INFO, "units are not all the same, unable to use: {0}", svar );
+                                    okay= false;
                                 }
-                            } else {
-                                logger.log( Level.INFO, "units variable does not exist: {0}", svar);
-                                okay= false;
                             }
-                        } catch ( Exception ex ) {
-                            logger.log(Level.SEVERE, ex.getMessage(), ex);
+                        } else {
+                            logger.log( Level.INFO, "units variable does not exist: {0}", svar);
                             okay= false;
                         }
-                        if ( okay ) {
-                            units= SemanticOps.lookupUnits( DataSetUtil.getStringValue( s, s.value(0) ) );
-                            result.putProperty(QDataSet.UNITS, units);
-                        } else {
-                            units= SemanticOps.getUnits(result); // do what we did before...
-                        }
+                    } catch ( Exception ex ) {
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
+                        okay= false;
+                    }
+                    if ( okay ) {
+                        units= SemanticOps.lookupUnits( DataSetUtil.getStringValue( s, s.value(0) ) );
+                        result.putProperty(QDataSet.UNITS, units);
                     } else {
                         units= SemanticOps.getUnits(result); // do what we did before...
                     }
                 } else {
-                    units= SemanticOps.getUnits(result); // someone has already figured out TimeLocationUnits...
+                    units= SemanticOps.getUnits(result); // do what we did before...
                 }
             } else {
-                // doFill must not be true for this branch.
+                units= SemanticOps.getUnits(result); // someone has already figured out TimeLocationUnits...
             }
+        } else {
+            // doFill must not be true for this branch.
+        }
 
-            final boolean doFill= ! ( UnitsUtil.isTimeLocation(units) || UnitsUtil.isNominalMeasurement(units) );
-            if ( doFill ) {
-                Object f= thisAttributes.get("FILLVAL");
-                double dv= IstpMetadataModel.doubleValue( f, units, Double.NaN, IstpMetadataModel.VALUE_MIN );
-                if ( !Double.isNaN(dv) ) {
-                    result.putProperty(QDataSet.FILL_VALUE, dv );
-                }
-                DatumRange vrange= IstpMetadataModel.getValidRange( thisAttributes, units );
-                if ( vrange!=null ) {
-                    result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
-                    result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
-                }
+        final boolean doFill= ! ( UnitsUtil.isTimeLocation(units) || UnitsUtil.isNominalMeasurement(units) );
+        if ( doFill ) {
+            Object f= thisAttributes.get("FILLVAL");
+            double dv= IstpMetadataModel.doubleValue( f, units, Double.NaN, IstpMetadataModel.VALUE_MIN );
+            if ( !Double.isNaN(dv) ) {
+                result.putProperty(QDataSet.FILL_VALUE, dv );
             }
-
-            if ( slice && depend ) {
-                Map dep0map= (Map) thisAttributes.get( "DEPEND_0" );
-                if ( dep0map!=null ) {
-                    QDataSet dep0= wrapDataSet( cdf, (String) dep0map.get("NAME"), constraints, false, false, null );
-                    result.putProperty( QDataSet.CONTEXT_0, dep0 );
-                }
+            DatumRange vrange= IstpMetadataModel.getValidRange( thisAttributes, units );
+            if ( vrange!=null ) {
+                result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+                result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
             }
+        }
 
-            // CDF uses DELTA_PLUS and DELTA_MINUS on a dependency to represent the BIN boundaries.
-            // vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H has units error.
-            boolean doPlusMinus= depend==false;
-            Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
-            Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
-            if ( doPlusMinus 
-                    && ( deltaPlus!=null && deltaPlus instanceof String && !deltaPlus.equals(svariable) ) 
-                    && (  deltaMinus!=null && deltaMinus instanceof String ) && !deltaPlus.equals(svariable) ) {
-                if ( hasVariable( cdf, (String)deltaPlus ) ) {
-                    QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !!cdf.recordVariance((String)deltaPlus), false, null ); //TODO: slice1
-                    Units deltaUnits= SemanticOps.getUnits(delta);
-                    if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
-                        delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
+        if ( slice && depend ) {
+            Map dep0map= (Map) thisAttributes.get( "DEPEND_0" );
+            if ( dep0map!=null ) {
+                QDataSet dep0= wrapDataSet( cdf, (String) dep0map.get("NAME"), constraints, false, false, null );
+                result.putProperty( QDataSet.CONTEXT_0, dep0 );
+            }
+        }
+
+        // CDF uses DELTA_PLUS and DELTA_MINUS on a dependency to represent the BIN boundaries.
+        // vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H has units error.
+        boolean doPlusMinus= depend==false;
+        Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
+        Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
+        if ( doPlusMinus 
+                && ( deltaPlus!=null && deltaPlus instanceof String && !deltaPlus.equals(svariable) ) 
+                && (  deltaMinus!=null && deltaMinus instanceof String ) && !deltaPlus.equals(svariable) ) {
+            if ( hasVariable( cdf, (String)deltaPlus ) ) {
+                QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !!cdf.recordVariance((String)deltaPlus), false, null ); //TODO: slice1
+                Units deltaUnits= SemanticOps.getUnits(delta);
+                if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
+                    delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
+                }
+                if ( UnitsUtil.isRatioMeasurement(deltaUnits)
+                        && deltaUnits.isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() )
+                        && ( delta.rank()==0 || result.length()==delta.length() ) ) {
+                    result.putProperty( QDataSet.BIN_PLUS, delta );
+                    if ( !deltaMinus.equals(deltaPlus) ) {
+                        delta= wrapDataSet( cdf, (String)deltaMinus, constraints, !cdf.recordVariance((String)deltaMinus), false, null );
+                        if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
+                           delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
+                        }
                     }
-                    if ( UnitsUtil.isRatioMeasurement(deltaUnits)
-                            && deltaUnits.isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() )
-                            && ( delta.rank()==0 || result.length()==delta.length() ) ) {
-                        result.putProperty( QDataSet.BIN_PLUS, delta );
-                        if ( !deltaMinus.equals(deltaPlus) ) {
-                            delta= wrapDataSet( cdf, (String)deltaMinus, constraints, !cdf.recordVariance((String)deltaMinus), false, null );
-                            if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
-                               delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
-                            }
-                        }
-                        if ( SemanticOps.getUnits(delta).isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
-                            result.putProperty( QDataSet.BIN_MINUS, delta );
-                        } else {
-                            result.putProperty( QDataSet.BIN_PLUS, null );
-                            logger.log(Level.WARNING, "DELTA_MINUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
-                        }
+                    if ( SemanticOps.getUnits(delta).isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
+                        result.putProperty( QDataSet.BIN_MINUS, delta );
                     } else {
-                        if ( !UnitsUtil.isRatioMeasurement(deltaUnits) ) {
-                            logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not ratio measurements having a meaningful zero: {0}", new Object[] { deltaUnits } );
-                        } else if ( result.length()!=delta.length() ) {
-                            logger.log(Level.WARNING, "DELTA_PLUS_VAR length ({0})!= data length ({1})", new Object[] { delta.length(), result.length() } );
-                        } else {
-                            logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
-                        }
+                        result.putProperty( QDataSet.BIN_PLUS, null );
+                        logger.log(Level.WARNING, "DELTA_MINUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
                     }
                 } else {
-                    if ( UnitsUtil.isTimeLocation(units) ) {
-                        logger.log(Level.FINE, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );                    
+                    if ( !UnitsUtil.isRatioMeasurement(deltaUnits) ) {
+                        logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not ratio measurements having a meaningful zero: {0}", new Object[] { deltaUnits } );
+                    } else if ( result.length()!=delta.length() ) {
+                        logger.log(Level.WARNING, "DELTA_PLUS_VAR length ({0})!= data length ({1})", new Object[] { delta.length(), result.length() } );
                     } else {
-                        logger.log(Level.WARNING, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );
+                        logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
                     }
                 }
-            }
-
-
-            int[] qubeDims= DataSetUtil.qubeDims(result);
-            if ( depend ) {
-                for (int idep = 0; idep < result.rank(); idep++) {
-                    //int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
-                    int sidep= idep;
-                    Map dep = (Map) thisAttributes.get( "DEPEND_" + sidep );
-                    // sometime LABL_PTR_1 is a QDataSet, sometimes it's a string.  Thanks VATesting for catching this.
-                    Object oo= thisAttributes.get("LABL_PTR_" + sidep);
-                    MutablePropertyDataSet lablDs=null;
-                    String labl=null;
-                    if ( oo instanceof MutablePropertyDataSet ) {
-                        labl= (String) ( (MutablePropertyDataSet) oo).property( QDataSet.NAME) ;
-                    } else if ( oo instanceof String ) {
-                        if ( hasVariable(cdf,(String)oo) ) {
-                            labl= (String)oo;
-                        } else {
-                            logger.log( Level.FINE, "LABL_PTR_{0} pointed to non-existant variable {1}", new Object[]{sidep, oo});
-                        }
-                    }
-                    if ( labl==null ) labl= (String) thisAttributes.get("LABEL_" + sidep); // kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
-
-                    if ( labl!=null ) {
-                        try {
-                            lablDs= wrapDataSet(cdf, labl, constraints, idep > 0, false, null);
-                            if ( idep==1 && attributes!=null ) attributes.put( "LABL_PTR_1", lablDs );
-                        } catch ( Exception ex ) {
-                            logger.log( Level.WARNING, "unable to load LABL_PTR_"+sidep+" for "+svariable, ex );
-                            thisAttributes.remove("LABL_PTR_" + sidep);
-                        }
-                        if ( lablDs!=null && lablDs.length()<4 && displayType==null ) {
-                            logger.log(Level.FINER, "setting null displayType to time_series", displayType);
-                            displayType= "time_series";
-                        }
-                    }
-
-                    if ( dep != null && qubeDims.length<=idep ) {
-                        if ( slice1==-1 ) {
-                            logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
-                        }
-                        continue;
-                    }
-
-                    MutablePropertyDataSet  depDs=null;
-
-                    logger.log(Level.FINER, "displayType={0}", displayType);
-                    if ( dep != null ) {
-
-                            String depName= (String)dep.get("NAME");
-
-                            if ( !hasVariable(cdf,depName) ) {
-                                logger.log(Level.FINE, "unable to find variable \"{0}\" for DEPEND_{1} of {2}", new Object[]{depName, sidep, svariable});
-                                continue;
-                            }
-
-                            boolean reformDep= idep > 0;  // make a rank 2 [1,ny] into rank 1 [ny]
-
-                            if ( reformDep && cdf.recordVariance( depName ) ) {
-                                reformDep= false;
-                            }
-
-                            depDs = wrapDataSet(cdf, depName, constraints, reformDep, false, dep, -1, null);
-
-                            if ( idep>0 && reformDep==false && depDs.length()==1 && ( qubeDims[0]==1 || qubeDims[0]>depDs.length() ) ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
-                                depDs= (MutablePropertyDataSet)depDs.slice(0);
-                                //depDs= Ops.reform(depDs);  // This would be more explicit, but reform doesn't handle metadata properly.
-                            }
-
-                            if ( idep==0 ) { //TODO: check for spareness property.  
-                                if ( cdf.getNumberOfValues(svariable)==1 && depDs.length()>1 ) {
-                                    MutablePropertyDataSet nresult;
-                                    nresult= new ReplicateDataSet( result.slice(0), depDs.length() );
-                                    result= nresult;
-                                }
-                            }
-
-                            if (DataSetUtil.isMonotonic(depDs)) {
-                                depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
-                            } else {
-    //                            if (sidep == 0) {
-    //                                logger.info("sorting dep0 to make depend0 monotonic");
-    //                                QDataSet sort = org.virbo.dataset.DataSetOps.sort(depDs);
-    //                                result = DataSetOps.applyIndex(result, idep, sort, false);
-    //                                depDs = DataSetOps.applyIndex(depDs, 0, sort, false);
-    //                                depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
-    //                            }
-                            }
-
-                            if ( slice1<0 ) {
-                                result.putProperty("DEPEND_" + idep, depDs);
-                            } else {
-                                if ( idep==1 ) {
-                                    // continue
-                                } else {
-                                    if ( idep>1 ) {
-                                        result.putProperty( "DEPEND_"+(idep-1), depDs );                    
-                                    } else {
-                                        result.putProperty( "DEPEND_"+idep, depDs );                                                        
-                                    }
-                                }                            
-                            }
-
-                    }
-
-                    if ( lablDs!=null && ( depDs==null || depDs.rank()==2 || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
-                        if ( depDs!=null && lablDs.rank()==1 && depDs.rank()==2 && DataSetUtil.asDatum(lablDs.slice(0)).toString().equals("channel00") ) {
-                            MutablePropertyDataSet b= org.virbo.metatree.IstpMetadataModel.maybeReduceRank2( depDs );
-                            if ( b!=null ) {
-                                lablDs= b;
-                            }
-                        }
-
-                        // kludge for Seth's file file:///home/jbf/ct/lanl/data.backup/seth/rbspa_pre_ect-mageis-L2_20121031_v1.0.0.cdf?FEDO
-                            if ( depDs!=null && lablDs.rank()==1 && depDs.rank()==2 && DataSetUtil.asDatum(lablDs.slice(0)).toString().equals("channel00") ) {
-                                QDataSet wds= SemanticOps.weightsDataSet(depDs);
-                                int i0;
-                                int l0= (wds.length(0)-1)*1/8;
-                                int l1= (wds.length(0)-1)*7/8;
-                                for ( i0=0; i0<depDs.length(); i0++ ) {
-                                    if ( wds.value(i0,l0)>0 && wds.value(i0,l1)>0 ) break;
-                                }
-                                if ( i0<depDs.length() ) {
-                                    QDataSet ex= Ops.extent( DataSetOps.slice1(depDs,0) );
-                                    if ( ex.value(0)==ex.value(1) ) {
-                                        lablDs= (MutablePropertyDataSet)depDs.slice(i0);
-                                    }
-                                }
-                            }
-
-                            if ( slice1<0 ) {                            
-                                QDataSet bundleDs= lablDs;
-                                result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
-                            } else {
-                                if ( idep==1 ) {
-                                    // continue
-                                } else {
-                                    if ( idep>1 ) {
-                                        QDataSet bundleDs= lablDs;
-                                        result.putProperty( "BUNDLE_"+(idep-1), DataSetUtil.toBundleDs(bundleDs) );                    
-                                    } else {
-                                        QDataSet bundleDs= lablDs;
-                                        result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );                                                        
-                                    }
-                                }
-
-                            }
-                    }
+            } else {
+                if ( UnitsUtil.isTimeLocation(units) ) {
+                    logger.log(Level.FINE, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );                    
+                } else {
+                    logger.log(Level.WARNING, "DELTA_PLUS_VAR variable is not found for {0}: {1}", new Object[] { svariable, deltaPlus } );
                 }
             }
-
-            boolean swapHack = false; // TODO: figure out where this was needed.
-
-            if ( result.rank() == 3) {
-                int n1 = result.length(0);
-                int n2 = result.length(0, 0);
-                QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
-                QDataSet dep2 = (QDataSet) result.property(QDataSet.DEPEND_2);
-                if (n1 != n2 && dep1 != null && dep1.length() == n2) {
-                    if (dep2 != null && dep2.length() == n1) {
-                        swapHack = true;
-                        logger.fine("swaphack avoids runtime error");
-                    }
-                }
-            }
-
-            if ( slice && result.rank()==2 ) {
-                int n0 = result.length();
-                int n1 = result.length(0);
-                QDataSet dep0 = (QDataSet) result.property(QDataSet.DEPEND_0);
-                QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
-                if (n0 != n1 && dep0 != null && dep0.length() == n1) {
-                    if (dep1 != null && dep1.length() == n0) {
-                        swapHack = true;
-                        logger.fine("swaphack avoids runtime error");
-                    }
-                }
-            }
-
-            if (swapHack && result.rank() == 3) { // need to swap for rank 3.
-                QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
-                QDataSet dep2 = (QDataSet) result.property(QDataSet.DEPEND_2);
-                result.putProperty(QDataSet.DEPEND_2, dep1);
-                result.putProperty(QDataSet.DEPEND_1, dep2);
-
-                Object att1 = thisAttributes.get(QDataSet.DEPEND_1);
-                Object att2 = thisAttributes.get(QDataSet.DEPEND_2);
-                thisAttributes.put(QDataSet.DEPEND_1, att2);
-                thisAttributes.put(QDataSet.DEPEND_2, att1);
-            }
-
-            if (swapHack && slice && result.rank() == 2) { // need to swap for rank 3.
-                QDataSet dep0 = (QDataSet) result.property(QDataSet.DEPEND_0);
-                QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
-                result.putProperty(QDataSet.DEPEND_1, dep0);
-                result.putProperty(QDataSet.DEPEND_0, dep1);
-
-                Object att0 = thisAttributes.get(QDataSet.DEPEND_0);
-                Object att1 = thisAttributes.get(QDataSet.DEPEND_1);
-                thisAttributes.put(QDataSet.DEPEND_0, att1);
-                thisAttributes.put(QDataSet.DEPEND_1, att0);
-            }
-
-            // last check for LANL min,max file
-            //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO  Autoplot Test016 has one of these vap:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU.
-            for ( int idep=1; idep<result.rank(); idep++ ) {
-                QDataSet depDs= (QDataSet) result.property("DEPEND_"+idep);
-                if ( depDs!=null && depDs.rank() == 2 && depDs.length(0) == 2 && depDs.length()==qubeDims[idep] ) {
-                    logger.warning("applying min,max kludge for old LANL cdf files");
-                    MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
-                    QDataSet binmax = DataSetOps.slice1(depDs, 1);
-                    QDataSet binmin = DataSetOps.slice1(depDs, 0);
-                    depDs1.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(depDs1, binmin));
-                    depDs1.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(binmax, depDs1));
-                    depDs = depDs1;
-                    result.putProperty("DEPEND_"+idep,depDs);
-                }
-            }      
-
-            return result;
-        } catch ( CDFException ex ) {
-            throw new Exception( ex.getMessage() );
         }
+
+
+        int[] qubeDims= DataSetUtil.qubeDims(result);
+        if ( depend ) {
+            for (int idep = 0; idep < result.rank(); idep++) {
+                //int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
+                int sidep= idep;
+                Map dep = (Map) thisAttributes.get( "DEPEND_" + sidep );
+                // sometime LABL_PTR_1 is a QDataSet, sometimes it's a string.  Thanks VATesting for catching this.
+                Object oo= thisAttributes.get("LABL_PTR_" + sidep);
+                MutablePropertyDataSet lablDs=null;
+                String labl=null;
+                if ( oo instanceof MutablePropertyDataSet ) {
+                    labl= (String) ( (MutablePropertyDataSet) oo).property( QDataSet.NAME) ;
+                } else if ( oo instanceof String ) {
+                    if ( hasVariable(cdf,(String)oo) ) {
+                        labl= (String)oo;
+                    } else {
+                        logger.log( Level.FINE, "LABL_PTR_{0} pointed to non-existant variable {1}", new Object[]{sidep, oo});
+                    }
+                }
+                if ( labl==null ) labl= (String) thisAttributes.get("LABEL_" + sidep); // kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
+
+                if ( labl!=null ) {
+                    try {
+                        lablDs= wrapDataSet(cdf, labl, constraints, idep > 0, false, null);
+                        if ( idep==1 && attributes!=null ) attributes.put( "LABL_PTR_1", lablDs );
+                    } catch ( Exception ex ) {
+                        logger.log( Level.WARNING, "unable to load LABL_PTR_"+sidep+" for "+svariable, ex );
+                        thisAttributes.remove("LABL_PTR_" + sidep);
+                    }
+                    if ( lablDs!=null && lablDs.length()<4 && displayType==null ) {
+                        logger.log(Level.FINER, "setting null displayType to time_series", displayType);
+                        displayType= "time_series";
+                    }
+                }
+
+                if ( dep != null && qubeDims.length<=idep ) {
+                    if ( slice1==-1 ) {
+                        logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
+                    }
+                    continue;
+                }
+
+                MutablePropertyDataSet  depDs=null;
+
+                logger.log(Level.FINER, "displayType={0}", displayType);
+                if ( dep != null ) {
+
+                        String depName= (String)dep.get("NAME");
+
+                        if ( !hasVariable(cdf,depName) ) {
+                            logger.log(Level.FINE, "unable to find variable \"{0}\" for DEPEND_{1} of {2}", new Object[]{depName, sidep, svariable});
+                            continue;
+                        }
+
+                        boolean reformDep= idep > 0;  // make a rank 2 [1,ny] into rank 1 [ny]
+
+                        if ( reformDep && cdf.recordVariance( depName ) ) {
+                            reformDep= false;
+                        }
+
+                        depDs = wrapDataSet(cdf, depName, constraints, reformDep, false, dep, -1, null);
+
+                        if ( idep>0 && reformDep==false && depDs.length()==1 && ( qubeDims[0]==1 || qubeDims[0]>depDs.length() ) ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
+                            depDs= (MutablePropertyDataSet)depDs.slice(0);
+                            //depDs= Ops.reform(depDs);  // This would be more explicit, but reform doesn't handle metadata properly.
+                        }
+
+                        if ( idep==0 ) { //TODO: check for spareness property.  
+                            if ( cdf.getNumberOfValues(svariable)==1 && depDs.length()>1 ) {
+                                MutablePropertyDataSet nresult;
+                                nresult= new ReplicateDataSet( result.slice(0), depDs.length() );
+                                result= nresult;
+                            }
+                        }
+
+                        if (DataSetUtil.isMonotonic(depDs)) {
+                            depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
+                        } else {
+//                            if (sidep == 0) {
+//                                logger.info("sorting dep0 to make depend0 monotonic");
+//                                QDataSet sort = org.virbo.dataset.DataSetOps.sort(depDs);
+//                                result = DataSetOps.applyIndex(result, idep, sort, false);
+//                                depDs = DataSetOps.applyIndex(depDs, 0, sort, false);
+//                                depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
+//                            }
+                        }
+
+                        if ( slice1<0 ) {
+                            result.putProperty("DEPEND_" + idep, depDs);
+                        } else {
+                            if ( idep==1 ) {
+                                // continue
+                            } else {
+                                if ( idep>1 ) {
+                                    result.putProperty( "DEPEND_"+(idep-1), depDs );                    
+                                } else {
+                                    result.putProperty( "DEPEND_"+idep, depDs );                                                        
+                                }
+                            }                            
+                        }
+
+                }
+
+                if ( lablDs!=null && ( depDs==null || depDs.rank()==2 || depDs.rank()==1 && depDs.length()<100 ) ) { // Reiner has a file where DEPEND_1 is defined, but is just 0,1,2,3,...
+                    if ( depDs!=null && lablDs.rank()==1 && depDs.rank()==2 && DataSetUtil.asDatum(lablDs.slice(0)).toString().equals("channel00") ) {
+                        MutablePropertyDataSet b= org.virbo.metatree.IstpMetadataModel.maybeReduceRank2( depDs );
+                        if ( b!=null ) {
+                            lablDs= b;
+                        }
+                    }
+
+                    // kludge for Seth's file file:///home/jbf/ct/lanl/data.backup/seth/rbspa_pre_ect-mageis-L2_20121031_v1.0.0.cdf?FEDO
+                        if ( depDs!=null && lablDs.rank()==1 && depDs.rank()==2 && DataSetUtil.asDatum(lablDs.slice(0)).toString().equals("channel00") ) {
+                            QDataSet wds= SemanticOps.weightsDataSet(depDs);
+                            int i0;
+                            int l0= (wds.length(0)-1)*1/8;
+                            int l1= (wds.length(0)-1)*7/8;
+                            for ( i0=0; i0<depDs.length(); i0++ ) {
+                                if ( wds.value(i0,l0)>0 && wds.value(i0,l1)>0 ) break;
+                            }
+                            if ( i0<depDs.length() ) {
+                                QDataSet ex= Ops.extent( DataSetOps.slice1(depDs,0) );
+                                if ( ex.value(0)==ex.value(1) ) {
+                                    lablDs= (MutablePropertyDataSet)depDs.slice(i0);
+                                }
+                            }
+                        }
+
+                        if ( slice1<0 ) {                            
+                            QDataSet bundleDs= lablDs;
+                            result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );
+                        } else {
+                            if ( idep==1 ) {
+                                // continue
+                            } else {
+                                if ( idep>1 ) {
+                                    QDataSet bundleDs= lablDs;
+                                    result.putProperty( "BUNDLE_"+(idep-1), DataSetUtil.toBundleDs(bundleDs) );                    
+                                } else {
+                                    QDataSet bundleDs= lablDs;
+                                    result.putProperty( "BUNDLE_"+idep, DataSetUtil.toBundleDs(bundleDs) );                                                        
+                                }
+                            }
+
+                        }
+                }
+            }
+        }
+
+        boolean swapHack = false; // TODO: figure out where this was needed.
+
+        if ( result.rank() == 3) {
+            int n1 = result.length(0);
+            int n2 = result.length(0, 0);
+            QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
+            QDataSet dep2 = (QDataSet) result.property(QDataSet.DEPEND_2);
+            if (n1 != n2 && dep1 != null && dep1.length() == n2) {
+                if (dep2 != null && dep2.length() == n1) {
+                    swapHack = true;
+                    logger.fine("swaphack avoids runtime error");
+                }
+            }
+        }
+
+        if ( slice && result.rank()==2 ) {
+            int n0 = result.length();
+            int n1 = result.length(0);
+            QDataSet dep0 = (QDataSet) result.property(QDataSet.DEPEND_0);
+            QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
+            if (n0 != n1 && dep0 != null && dep0.length() == n1) {
+                if (dep1 != null && dep1.length() == n0) {
+                    swapHack = true;
+                    logger.fine("swaphack avoids runtime error");
+                }
+            }
+        }
+
+        if (swapHack && result.rank() == 3) { // need to swap for rank 3.
+            QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
+            QDataSet dep2 = (QDataSet) result.property(QDataSet.DEPEND_2);
+            result.putProperty(QDataSet.DEPEND_2, dep1);
+            result.putProperty(QDataSet.DEPEND_1, dep2);
+
+            Object att1 = thisAttributes.get(QDataSet.DEPEND_1);
+            Object att2 = thisAttributes.get(QDataSet.DEPEND_2);
+            thisAttributes.put(QDataSet.DEPEND_1, att2);
+            thisAttributes.put(QDataSet.DEPEND_2, att1);
+        }
+
+        if (swapHack && slice && result.rank() == 2) { // need to swap for rank 3.
+            QDataSet dep0 = (QDataSet) result.property(QDataSet.DEPEND_0);
+            QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
+            result.putProperty(QDataSet.DEPEND_1, dep0);
+            result.putProperty(QDataSet.DEPEND_0, dep1);
+
+            Object att0 = thisAttributes.get(QDataSet.DEPEND_0);
+            Object att1 = thisAttributes.get(QDataSet.DEPEND_1);
+            thisAttributes.put(QDataSet.DEPEND_0, att1);
+            thisAttributes.put(QDataSet.DEPEND_1, att0);
+        }
+
+        // last check for LANL min,max file
+        //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO  Autoplot Test016 has one of these vap:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU.
+        for ( int idep=1; idep<result.rank(); idep++ ) {
+            QDataSet depDs= (QDataSet) result.property("DEPEND_"+idep);
+            if ( depDs!=null && depDs.rank() == 2 && depDs.length(0) == 2 && depDs.length()==qubeDims[idep] ) {
+                logger.warning("applying min,max kludge for old LANL cdf files");
+                MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
+                QDataSet binmax = DataSetOps.slice1(depDs, 1);
+                QDataSet binmin = DataSetOps.slice1(depDs, 0);
+                depDs1.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(depDs1, binmin));
+                depDs1.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(binmax, depDs1));
+                depDs = depDs1;
+                result.putProperty("DEPEND_"+idep,depDs);
+            }
+        }      
+
+        return result;
     }
 
     @Override
