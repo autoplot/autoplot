@@ -389,13 +389,13 @@ public class CdfUtil {
      * @throws Exception
      */
     public static MutablePropertyDataSet wrapCdfData(
-            CDFReader cdf, String svariable, long recStart, long recCount, long recInterval, int slice1, ProgressMonitor mon) throws Exception {
+            CDFReader cdf, String svariable, long recStart, long recCount, long recInterval, 
+            int slice1, ProgressMonitor mon) throws Exception {
+        
         logger.log( Level.FINE, "wrapCdfHyperDataSetHacked {0}[{1}:{2}:{3}]", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
                  ""+(recCount+recStart), recInterval } );
         
-        try {
-            
-        {
+//        {
 //            String cdfFile;
 //            synchronized ( CdfDataSource.lock ) {
 //                cdfFile= CdfDataSource.openFilesRev.get(cdf);
@@ -411,7 +411,7 @@ public class CdfUtil {
 //                    if ( result!=null ) return result;
 //                }
 //            }
-        }
+//        }
         
         long varType = cdf.getType(svariable);
 
@@ -451,7 +451,7 @@ public class CdfUtil {
             recStart= 0;
         }
 
-        ByteBuffer[] buf=null;
+        ByteBuffer[] buf;
 
         long rc= recCount;
         if ( rc==-1 ) rc= 1;  // -1 is used as a flag for a slice, we still really read one record.
@@ -632,9 +632,7 @@ public class CdfUtil {
         //}
                 
         return result;
-        } catch ( CDFException ex ) {
-            throw new Exception( ex.getMessage(), ex );
-        }
+        
     }
     
 
