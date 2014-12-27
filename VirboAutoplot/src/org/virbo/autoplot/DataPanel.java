@@ -349,10 +349,14 @@ public class DataPanel extends javax.swing.JPanel {
         i0++;
         int i1= cp;
         while ( i1<s.length() && Character.isDigit(s.charAt(i1) ) ) i1++;
-        int ch= Integer.parseInt( s.substring(i0,i1) );
-        ch= ch+add;
-        if ( ch<0 ) ch=0;
-        return s.substring(0,i0) + ch + s.substring(i1);
+        try {
+            int ch= Integer.parseInt( s.substring(i0,i1) );
+            ch= ch+add;
+            if ( ch<0 ) ch=0;
+            return s.substring(0,i0) + ch + s.substring(i1);
+        } catch ( NumberFormatException e ) { //e.g. slices(':')
+            return s; 
+        }
     }
 
     private void componentChanged() {
