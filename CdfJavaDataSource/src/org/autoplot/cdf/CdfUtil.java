@@ -626,10 +626,6 @@ public class CdfUtil {
                 CdfDataSource.dsCachePut( uri, result );
             }
         }
-        
-        //if ( slice1>-1 ) {
-        //    result= DataSetOps.slice1(result,slice1);
-        //}
                 
         return result;
         
