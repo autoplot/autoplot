@@ -377,7 +377,9 @@ public class CdfUtil {
     }
     
     /**
-     * Return the named variable as a QDataSet.
+     * Return the named variable as a QDataSet.  This does not look at the
+     * metadata for DEPEND_0, etc, and only adds metadata to represent time units
+     * (e.g. the data is in TT2000) and ordinal data.
      * @param cdf the value of cdf
      * @param svariable name of the variable
      * @param recStart the first record to retrieve (0 is the first record in the file).
