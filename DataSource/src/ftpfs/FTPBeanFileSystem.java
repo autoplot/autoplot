@@ -50,6 +50,7 @@ import java.util.concurrent.locks.Lock;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
+import org.das2.util.OsUtil;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -684,6 +685,16 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 }
             }
 
+            if ( targetFile.length()==partFile.length() ) {
+                if ( OsUtil.contentEquals(targetFile, partFile ) ) {
+                    logger.fine("another thread must have downloaded file.");
+                    if ( !partFile.delete() ) {
+                        throw new IllegalArgumentException("unable to delete "+partFile );
+                    }
+                    return;
+                }
+            }
+            
             if ( copyFile(partFile, targetFile) ) {
                 logger.fine( String.format( "%s: deleting %s", Thread.currentThread(), partFile ) );
                 synchronized ( FTPBeanFileSystem.class ) {
