@@ -287,7 +287,7 @@ public class JythonUtil {
         File ff4= new File( ff3, "autoplot.py" );
         String vers= "";
         
-        double currentVersion= 1.11;  //rfe320 improved getParam support.
+        double currentVersion= 1.22;  //rfe320 improved getParam support.
                 
         if ( ff4.exists() ) {
             BufferedReader r= new BufferedReader( new FileReader( ff4 ) );
@@ -303,6 +303,13 @@ public class JythonUtil {
             } finally {
                 r.close();
             }
+        }
+        
+        if ( true ) {
+            System.err.println("== JythonUtil getLocalJythonAutoplotLib ==");
+            System.err.println("ff4.exists()="+ff4.exists());
+            System.err.println("vers="+vers);
+            System.err.println("currentVersion="+currentVersion );
         }
         
         if ( ! ff4.exists() || vers.equals("") || Double.parseDouble(vers)<currentVersion ) {
