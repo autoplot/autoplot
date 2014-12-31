@@ -305,11 +305,11 @@ public class JythonUtil {
             }
         }
         
-        if ( true ) {
-            System.err.println("== JythonUtil getLocalJythonAutoplotLib ==");
-            System.err.println("ff4.exists()="+ff4.exists());
-            System.err.println("vers="+vers);
-            System.err.println("currentVersion="+currentVersion );
+        if ( logger.isLoggable(Level.FINE) ) {
+            logger.fine("== JythonUtil getLocalJythonAutoplotLib ==");
+            logger.log(Level.FINE, "ff4.exists()={0}", ff4.exists());
+            logger.log(Level.FINE, "vers={0}", vers);
+            logger.log(Level.FINE, "currentVersion={0}", currentVersion);
         }
         
         if ( ! ff4.exists() || vers.equals("") || Double.parseDouble(vers)<currentVersion ) {
