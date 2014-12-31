@@ -189,8 +189,7 @@ public class FtpFileObject extends WebFileObject {
         }
         File localFile= getLocalFile();
         if ( !getLocalFile().exists() || ( lastModified().getTime()-getLocalFile().lastModified() > 10 ) ) {
-            File partFile = new File( localFile.toString() + ".part");
-            ftpfs.downloadFile( getNameExt(), localFile, partFile, monitor );
+            ftpfs.downloadFile( getNameExt(), localFile, ftpfs.getPartFile(localFile), monitor );
         }
         ftpfs.getLogger().log( Level.FINE, "read local file {0}", localFile);
         return new FileInputStream(localFile);
