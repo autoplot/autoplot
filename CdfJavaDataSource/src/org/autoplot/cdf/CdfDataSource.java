@@ -21,7 +21,6 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,7 +47,6 @@ import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.ReplicateDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
@@ -713,6 +711,35 @@ public class CdfDataSource extends AbstractDataSource {
         }
     }
 
+    /**
+     * read the delta plus or delta minus variable, reconciling the geometry with
+     * the data it modifies.  For example, rbspb_$x_ect-hope-sci-L2SA_$Y$m$d_v$(v,sep).cdf
+     * has rank 2 energies [3000,72], but the delta plus is [72], so this is repeated.
+     * 
+     * Test with:<ul>
+     * <li>vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H
+     * <li>vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
+     * <li>http://www.rbsp-ect.lanl.gov/data_pub/rbspb/hope/level2/rbspb_$x_ect-hope-sci-L2SA_$Y$m$d_v$(v,sep).cdf?FESA&timerange=2012-11-20
+     * </ul>
+     * 
+     * @param cdf the cdf file.
+     * @param ds the result which the delta plus describes.
+     * @param deltaPlus the variable name.
+     * @param constraints any constraints.
+     * @return rank 0 dataset or dataset with rank equal to ds.
+     * @throws Exception 
+     */
+    private QDataSet getDeltaPlusMinus( final CDFReader cdf, QDataSet ds, final String deltaPlus, final String constraints ) throws Exception {
+        QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !!cdf.recordVariance((String)deltaPlus), false, null ); //TODO: slice1
+        if ( delta.rank()>0 && delta.length()==1 && delta.length()!=ds.length() ) {
+            delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
+        }
+        if ( ds.rank()==2 && delta.length()==ds.length(0) ) {
+            delta= Ops.replicate( delta, ds.length() );
+        }               
+        return delta;
+    }
+    
     private MutablePropertyDataSet wrapDataSet(final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> attr ) throws Exception, ParseException {
         return wrapDataSet( cdf, svariable, constraints, reform, depend, attr, -1, new NullProgressMonitor() );
     }
@@ -892,17 +919,14 @@ public class CdfDataSource extends AbstractDataSource {
                 && ( deltaPlus!=null && deltaPlus instanceof String && !deltaPlus.equals(svariable) ) 
                 && (  deltaMinus!=null && deltaMinus instanceof String ) && !deltaPlus.equals(svariable) ) {
             if ( hasVariable( cdf, (String)deltaPlus ) ) {
-                QDataSet delta= wrapDataSet( cdf, (String)deltaPlus, constraints, !!cdf.recordVariance((String)deltaPlus), false, null ); //TODO: slice1
+                QDataSet delta= getDeltaPlusMinus( cdf, result, (String)deltaPlus, constraints ); //TODO: slice1
                 Units deltaUnits= SemanticOps.getUnits(delta);
-                if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
-                    delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
-                }
                 if ( UnitsUtil.isRatioMeasurement(deltaUnits)
                         && deltaUnits.isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() )
                         && ( delta.rank()==0 || result.length()==delta.length() ) ) {
                     result.putProperty( QDataSet.BIN_PLUS, delta );
                     if ( !deltaMinus.equals(deltaPlus) ) {
-                        delta= wrapDataSet( cdf, (String)deltaMinus, constraints, !cdf.recordVariance((String)deltaMinus), false, null );
+                        delta= getDeltaPlusMinus( cdf, result, (String)deltaMinus, constraints );
                         if ( delta.length()==1 && delta.rank()==1 && delta.length()!=result.length() ) {
                            delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
                         }
@@ -917,7 +941,7 @@ public class CdfDataSource extends AbstractDataSource {
                     if ( !UnitsUtil.isRatioMeasurement(deltaUnits) ) {
                         logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not ratio measurements having a meaningful zero: {0}", new Object[] { deltaUnits } );
                     } else if ( result.length()!=delta.length() ) {
-                        logger.log(Level.WARNING, "DELTA_PLUS_VAR length ({0})!= data length ({1})", new Object[] { delta.length(), result.length() } );
+                        logger.log(Level.WARNING, "DELTA_PLUS_VAR length ({0,number,#})!= data length ({1,number,#})", new Object[] { delta.length(), result.length() } );
                     } else {
                         logger.log(Level.WARNING, "DELTA_PLUS_VAR units are not convertable: {0}", SemanticOps.getUnits(delta));
                     }
