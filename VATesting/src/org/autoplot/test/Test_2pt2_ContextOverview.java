@@ -12,6 +12,7 @@ import javax.swing.JMenuItem;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.LoggerManager;
+import org.das2.datum.Units;
 import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.*;
@@ -41,18 +42,22 @@ public class Test_2pt2_ContextOverview implements Scenario {
             AutoplotUI app = (AutoplotUI) getViewWindow();
             JFrameOperator mainFrame = new JFrameOperator(app);
             waitUntilIdle();
-
-            Thread.sleep(3000); //give the menus a moment to initialize
-
+            
             JMenuBarOperator menuop= new JMenuBarOperator(mainFrame);
 
-            menuop.pushMenu( new ComponentChooser[] { new RegexComponentChooser("Bookmarks"),
-            new RegexComponentChooser("Demos"), new RegexComponentChooser("Demo 5: .*") } );
+            JMenuItem check= menuop.pushMenu( 
+                    new ComponentChooser[] { new RegexComponentChooser("Bookmarks"),
+                    new RegexComponentChooser("Demos"), new RegexComponentChooser("Demo 5: .*") } );
 
             waitUntilIdle();
 
             DatumRange range0= dom.getPlots(0).getXaxis().getRange();
-            System.err.println("after wait, data loaded. "+range0);
+            
+            if ( range0.getUnits().isConvertableTo(Units.dimensionless) ) {
+                System.err.println("** xaxis is not a time axis");
+            } else {
+                System.err.println("after wait, data loaded. "+range0);
+            }
 
             save( "Test_2pt2_ContextOverview.000.vap" );
 
@@ -64,12 +69,12 @@ public class Test_2pt2_ContextOverview implements Scenario {
             System.err.println("rescale to "+dr);
 
             dom.getPlots(0).getXaxis().setRange( dr );
-            Thread.sleep(5000); // get to work on hudson--not sure why
+            Thread.sleep(1000); // get to work on hudson--not sure why
             
             dr= DatumRangeUtil.rescale(dom.getPlots(0).getYaxis().getRange(), 0.1, 0.9 );
             dom.getPlots(0).getYaxis().setRange( dr );
 
-            Thread.sleep(5000); // get to work on hudson--not sure why
+            Thread.sleep(1000); // get to work on hudson--not sure why
 
             writeToPng( "Test_2pt2_ContextOverview.001.png");
 
@@ -92,9 +97,9 @@ public class Test_2pt2_ContextOverview implements Scenario {
             if ( tbindings && trange ) {
                 return 0;
             } else {
-                System.err.println("fail because one of the following is not true:");
-                System.err.println("tbindings="+tbindings+"\tdom.getBindings().length should be 13, it is "+dom.getBindings().length );
-                System.err.println("trange="+trange+ "\t"+range0+" should equal "+ dom.getPlots(1).getXaxis().getRange() );
+                System.err.println("** fail because one of the following is not true:");
+                if ( !tbindings ) System.err.println("** tbindings="+tbindings+"\tdom.getBindings().length should be 13, it is "+dom.getBindings().length );
+                if ( !trange ) System.err.println("** trange="+trange+ "\t"+range0+" should equal "+ dom.getPlots(1).getXaxis().getRange() );
                 return 1;
             }
 
