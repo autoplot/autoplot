@@ -341,256 +341,252 @@ public class CdfDataSource extends AbstractDataSource {
             svariable = svariable.substring(0, i);
         }
 
-        try {
-            String interpMeta = (String) map.get(PARAM_INTERPMETA);
+        String interpMeta = (String) map.get(PARAM_INTERPMETA);
 
-            boolean doDep= !"no".equals( map.get(PARAM_DODEP) );
+        boolean doDep= !"no".equals( map.get(PARAM_DODEP) );
 
-            MutablePropertyDataSet result;
-            if ( attr1!=null && attr1.containsKey("VIRTUAL") && ( attr1.containsKey("FUNCTION") || attr1.containsKey("FUNCT") ) ) {
-                List<QDataSet> attr= new ArrayList();
-                String function= (String)attr1.get("FUNCTION");
-                if ( function==null ) function= (String)attr1.get("FUNCT");
-                if ( attr1.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, -1, mon ) );
-                if ( attr1.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, -1, mon ) );
-                if ( attr1.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, -1, mon ) );
-                if ( attr1.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, -1, mon ) );
-                if ( attr1.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, -1, mon ) );
-                try {
-                    Map<String,Object> qmetadata= new IstpMetadataModel().properties(attr1);
-                    result= (MutablePropertyDataSet) CdfVirtualVars.execute( qmetadata, function, attr, mon );
-                } catch ( IllegalArgumentException ex ) {
-                    throw new IllegalArgumentException("virtual function "+function+" not supported",ex);
-                }
-
-            } else { // typical route
-                String os1= (String)map.get(PARAM_SLICE1);
-                if ( os1!=null && !os1.equals("") && cdf.getDimensions(svariable).length>0 ) {
-                    int is= Integer.parseInt(os1);
-                    result= wrapDataSet( cdf, svariable, constraint, false, doDep, attr1, is, new NullProgressMonitor() );
-                } else {
-                    result= wrapDataSet(cdf, svariable, constraint, false, doDep, attr1, -1, new NullProgressMonitor() );
-                }
-                logger.log(Level.FINE, "got {0}", result);
+        MutablePropertyDataSet result;
+        if ( attr1!=null && attr1.containsKey("VIRTUAL") && ( attr1.containsKey("FUNCTION") || attr1.containsKey("FUNCT") ) ) {
+            List<QDataSet> attr= new ArrayList();
+            String function= (String)attr1.get("FUNCTION");
+            if ( function==null ) function= (String)attr1.get("FUNCT");
+            if ( attr1.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, -1, mon ) );
+            if ( attr1.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, -1, mon ) );
+            if ( attr1.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, -1, mon ) );
+            if ( attr1.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, -1, mon ) );
+            if ( attr1.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, -1, mon ) );
+            try {
+                Map<String,Object> qmetadata= new IstpMetadataModel().properties(attr1);
+                result= (MutablePropertyDataSet) CdfVirtualVars.execute( qmetadata, function, attr, mon );
+            } catch ( IllegalArgumentException ex ) {
+                throw new IllegalArgumentException("virtual function "+function+" not supported",ex);
             }
 
-            String w= (String)map.get( PARAM_WHERE );
-            if ( w!=null && w.length()>0 ) {
-                Pattern p= Pattern.compile("\\.([elgn][qte])\\(");
-                Matcher m= p.matcher(w);
-                int ieq;
-                if ( !m.find() ) {
-                    throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
-                } else {
-                    ieq= m.start();
-                    String op= m.group(1);
-                    String sval= w.substring(ieq+4);
-                    if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
-                    String sparm= w.substring(0,ieq);
-                    QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, null );
-                    parm= Ops.reform(parm); // TODO: Nasty kludge why did we see it in the first place vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN&where=range__C4_CP_FGM_SPIN.eq(3)
-                    QDataSet r;
-                    Datum d;
-                    if ( parm.rank()==2 ) {
-                        if ( sval.equals("mode") && ( op.equals("eq") || op.equals("ne") ) ) {
-                            QDataSet hash= Ops.hashcodes(parm);
-                            QDataSet mode= Ops.mode(hash);
-                            d= DataSetUtil.asDatum( mode );
-                            parm= hash;
-                        } else { 
-                            Units du= SemanticOps.getUnits(parm);
-                            d= du.parse(sval);
-                        }
-                    } else if ( parm.rank()==1 ) {
-                        if ( sval.equals("mode") ) {
-                            QDataSet mode= Ops.mode(parm);
-                            d= DataSetUtil.asDatum(mode);
-                        } else if ( sval.equals("median") ) {
-                            QDataSet median= Ops.median(parm);
-                            d= DataSetUtil.asDatum(median);
-                        } else if ( sval.equals("mean") ) {
-                            QDataSet mean= Ops.mean(parm);
-                            d= DataSetUtil.asDatum(mean);  
-                        } else {
-                            Units du= SemanticOps.getUnits(parm);
-                            d= du.parse(sval);
-                        }
-                    } else {
-                        throw new IllegalArgumentException("param is rank>2");
-                    }
-                    if ( parm.rank()<result.rank() ) {
-                        QDataSet[] operands= new QDataSet[2];
-                        CoerceUtil.coerce( result, parm, false, operands );
-                        parm= operands[1];
-                    }
-                    if ( parm.rank()>1 ) {
-                        if ( op.equals("gt" ) ){
-                            r= Ops.where( Ops.le( parm,d ) );
-                        } else if ( op.equals("lt") ) {
-                            r= Ops.where( Ops.ge( parm,d ) );
-                        } else if ( op.equals("eq") ) {
-                            r= Ops.where( Ops.ne( parm,d ) );
-                        } else if ( op.equals("ne") ) {
-                            r= Ops.where( Ops.eq( parm,d ) );
-                        } else {
-                            throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");                        
-                        }
-                        double fill= Double.NaN;
-                        result= ArrayDataSet.maybeCopy(result);
-                        if ( parm.rank()==2 && result.rank()==2 ) {
-                            for ( int jj=0; jj<r.length(); jj++ ) {
-                                ((ArrayDataSet)result).putValue((int)r.value(jj,0),(int)r.value(jj,1),fill);
-                            }
-                        } else if ( parm.rank()==3 && result.rank()==3 ) {
-                            for ( int jj=0; jj<r.length(); jj++ ) {
-                                ((ArrayDataSet)result).putValue((int)r.value(jj,0),(int)r.value(jj,1),(int)r.value(jj,2),fill);
-                            }
-                        } else {
-                            throw new IllegalArgumentException("where can only apply filter and dataset have same dimensions");  
-                        }
-                    } else if ( parm.rank()<2 ) {
-                        if ( op.equals("gt" ) ){
-                            r= Ops.where( Ops.gt( parm,d ) );
-                        } else if ( op.equals("lt") ) {
-                            r= Ops.where( Ops.lt( parm,d ) );
-                        } else if ( op.equals("eq") ) {
-                            r= Ops.where( Ops.eq( parm,d ) );
-                        } else if ( op.equals("ne") ) {
-                            r= Ops.where( Ops.ne( parm,d ) );
-                        } else {
-                                throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
-                        }
-                        if ( r.length()==0 ) {
-                            throw new NoDataInIntervalException("'where' argument removes all data");
-                        } else {
-                            result= DataSetOps.applyIndex( result, 0, r, true );
-                            // check to see if rank 2 depend can now be rank 1.  This might be the reason we used where...
-                            for ( int ii=1; ii<result.rank(); ii++ ) {
-                                String sdep= "DEPEND_"+ii;
-                                QDataSet dep= (QDataSet) result.property(sdep);
-                                if ( dep!=null && dep.rank()==2 && DataSetUtil.isConstant(dep) ) {
-                                    result.putProperty(sdep,dep.slice(0) );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-                        
-            if ( !doDep ) {
-                result.putProperty( QDataSet.DEPEND_0, null );
-                result.putProperty( QDataSet.DEPEND_1, null );
-                result.putProperty( QDataSet.DEPEND_2, null );
-                result.putProperty( QDataSet.DEPEND_3, null );
-                if ( attr1!=null ) {
-                    attr1.remove( "DEPEND_0" );
-                    attr1.remove( "DEPEND_1" );
-                    attr1.remove( "DEPEND_2" );
-                    attr1.remove( "DEPEND_3" );
-                }
-            }
-
-            if (!"no".equals(interpMeta)) {
-                MetadataModel model = new IstpMetadataModel();
-
-                Map<String, Object> istpProps = model.properties(attr1);
-                CdfUtil.maybeAddValidRange(istpProps, result);
-                result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
-                result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL)  );
-                result.putProperty(QDataSet.TITLE, istpProps.get(QDataSet.TITLE)  );
-                String renderType= (String)istpProps.get(QDataSet.RENDER_TYPE);
-                if ( renderType!=null && renderType.equals( "time_series" ) ) {
-                    // kludge for rbsp-a_WFR-waveform_emfisis-L2_20120831_v1.2.1.cdf.  This is actually a waveform.
-                    // Note Seth (RBSP/ECT Team) has a file with 64 channels.  Dan's file rbsp-a_HFR-spectra_emfisis-L2_20120831_v1.2.3.cdf has 82 channels.
-                    if ( result.rank()>1 && result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT ) {
-                        logger.log(Level.FINE, "result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT={0}, this cannot be treated as a time_series", QDataSet.MAX_UNIT_BUNDLE_COUNT);
-                        renderType=null;
-                    }
-                }
-                if ( renderType !=null && renderType.equals("image") ) {
-                    logger.fine("renderType=image not supported in CDF files");
-                    renderType= null;
-                }
-                if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
-                    renderType= "eventsbar";
-                }                
-                String os1= (String)map.get(PARAM_SLICE1);
-                if ( os1!=null && os1.length()>0 ) {
-                    logger.finer("dropping render type because of slice1");
-                } else {
-                    result.putProperty(QDataSet.RENDER_TYPE, renderType );
-                }
-                
-                if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
-                    if ( result.property(QDataSet.DEPEND_0)==null ) {
-                        result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_DIGITAL );
-                    } else {
-                        result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_EVENTS_BAR );
-                    }
-                } else {                
-                    if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
-                        if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
-                            String rt= (String)istpProps.get("RENDER_TYPE" );
-                            if ( rt!=null ) result.putProperty(QDataSet.RENDER_TYPE, rt );
-                            if ( istpProps.get("RENDER_TYPE")==null ) { //goes11_k0s_mag
-                                if ( result.property("DEPEND_1")==null ) {
-                                    result.putProperty(QDataSet.RENDER_TYPE, "time_series" );
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                for ( int j=0; j<result.rank(); j++ ) {
-                    MutablePropertyDataSet depds= (MutablePropertyDataSet) result.property("DEPEND_"+j);
-                    Map<String,Object> depProps= (Map<String, Object>) istpProps.get("DEPEND_"+j);
-                    if ( depds!=null && depProps!=null ) {
-                        CdfUtil.maybeAddValidRange( depProps, depds );
-                        Map<String, Object> istpProps2 = model.properties(depProps);
-                        depds.putProperty(QDataSet.FILL_VALUE, istpProps2.get(QDataSet.FILL_VALUE));
-                        if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(depds) ) ) {
-                            depds.putProperty(QDataSet.LABEL, istpProps2.get(QDataSet.LABEL) );
-                            depds.putProperty(QDataSet.TITLE, istpProps2.get(QDataSet.TITLE) );
-                        }
-                    }
-                }
-            // apply properties.
+        } else { // typical route
+            String os1= (String)map.get(PARAM_SLICE1);
+            if ( os1!=null && !os1.equals("") && cdf.getDimensions(svariable).length>0 ) {
+                int is= Integer.parseInt(os1);
+                result= wrapDataSet( cdf, svariable, constraint, false, doDep, attr1, is, new NullProgressMonitor() );
             } else {
-                QDataSet dep;
-                dep= (QDataSet)result.property(QDataSet.DEPEND_0); // twins misuses DEPEND properties.
-                if ( dep!=null && dep.length()!=result.length() ) result.putProperty( QDataSet.DEPEND_0, null );
-                result.putProperty( QDataSet.DEPEND_1, null );
-                result.putProperty( QDataSet.DEPEND_2, null );
-                result.putProperty( QDataSet.DEPEND_3, null );
+                result= wrapDataSet(cdf, svariable, constraint, false, doDep, attr1, -1, new NullProgressMonitor() );
+            }
+            logger.log(Level.FINE, "got {0}", result);
+        }
+
+        String w= (String)map.get( PARAM_WHERE );
+        if ( w!=null && w.length()>0 ) {
+            Pattern p= Pattern.compile("\\.([elgn][qte])\\(");
+            Matcher m= p.matcher(w);
+            int ieq;
+            if ( !m.find() ) {
+                throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
+            } else {
+                ieq= m.start();
+                String op= m.group(1);
+                String sval= w.substring(ieq+4);
+                if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
+                String sparm= w.substring(0,ieq);
+                QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, null );
+                parm= Ops.reform(parm); // TODO: Nasty kludge why did we see it in the first place vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN&where=range__C4_CP_FGM_SPIN.eq(3)
+                QDataSet r;
+                Datum d;
+                if ( parm.rank()==2 ) {
+                    if ( sval.equals("mode") && ( op.equals("eq") || op.equals("ne") ) ) {
+                        QDataSet hash= Ops.hashcodes(parm);
+                        QDataSet mode= Ops.mode(hash);
+                        d= DataSetUtil.asDatum( mode );
+                        parm= hash;
+                    } else { 
+                        Units du= SemanticOps.getUnits(parm);
+                        d= du.parse(sval);
+                    }
+                } else if ( parm.rank()==1 ) {
+                    if ( sval.equals("mode") ) {
+                        QDataSet mode= Ops.mode(parm);
+                        d= DataSetUtil.asDatum(mode);
+                    } else if ( sval.equals("median") ) {
+                        QDataSet median= Ops.median(parm);
+                        d= DataSetUtil.asDatum(median);
+                    } else if ( sval.equals("mean") ) {
+                        QDataSet mean= Ops.mean(parm);
+                        d= DataSetUtil.asDatum(mean);  
+                    } else {
+                        Units du= SemanticOps.getUnits(parm);
+                        d= du.parse(sval);
+                    }
+                } else {
+                    throw new IllegalArgumentException("param is rank>2");
+                }
+                if ( parm.rank()<result.rank() ) {
+                    QDataSet[] operands= new QDataSet[2];
+                    CoerceUtil.coerce( result, parm, false, operands );
+                    parm= operands[1];
+                }
+                if ( parm.rank()>1 ) {
+                    if ( op.equals("gt" ) ){
+                        r= Ops.where( Ops.le( parm,d ) );
+                    } else if ( op.equals("lt") ) {
+                        r= Ops.where( Ops.ge( parm,d ) );
+                    } else if ( op.equals("eq") ) {
+                        r= Ops.where( Ops.ne( parm,d ) );
+                    } else if ( op.equals("ne") ) {
+                        r= Ops.where( Ops.eq( parm,d ) );
+                    } else {
+                        throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");                        
+                    }
+                    double fill= Double.NaN;
+                    result= ArrayDataSet.maybeCopy(result);
+                    if ( parm.rank()==2 && result.rank()==2 ) {
+                        for ( int jj=0; jj<r.length(); jj++ ) {
+                            ((ArrayDataSet)result).putValue((int)r.value(jj,0),(int)r.value(jj,1),fill);
+                        }
+                    } else if ( parm.rank()==3 && result.rank()==3 ) {
+                        for ( int jj=0; jj<r.length(); jj++ ) {
+                            ((ArrayDataSet)result).putValue((int)r.value(jj,0),(int)r.value(jj,1),(int)r.value(jj,2),fill);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("where can only apply filter and dataset have same dimensions");  
+                    }
+                } else if ( parm.rank()<2 ) {
+                    if ( op.equals("gt" ) ){
+                        r= Ops.where( Ops.gt( parm,d ) );
+                    } else if ( op.equals("lt") ) {
+                        r= Ops.where( Ops.lt( parm,d ) );
+                    } else if ( op.equals("eq") ) {
+                        r= Ops.where( Ops.eq( parm,d ) );
+                    } else if ( op.equals("ne") ) {
+                        r= Ops.where( Ops.ne( parm,d ) );
+                    } else {
+                            throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
+                    }
+                    if ( r.length()==0 ) {
+                        throw new NoDataInIntervalException("'where' argument removes all data");
+                    } else {
+                        result= DataSetOps.applyIndex( result, 0, r, true );
+                        // check to see if rank 2 depend can now be rank 1.  This might be the reason we used where...
+                        for ( int ii=1; ii<result.rank(); ii++ ) {
+                            String sdep= "DEPEND_"+ii;
+                            QDataSet dep= (QDataSet) result.property(sdep);
+                            if ( dep!=null && dep.rank()==2 && DataSetUtil.isConstant(dep) ) {
+                                result.putProperty(sdep,dep.slice(0) );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if ( !doDep ) {
+            result.putProperty( QDataSet.DEPEND_0, null );
+            result.putProperty( QDataSet.DEPEND_1, null );
+            result.putProperty( QDataSet.DEPEND_2, null );
+            result.putProperty( QDataSet.DEPEND_3, null );
+            if ( attr1!=null ) {
+                attr1.remove( "DEPEND_0" );
+                attr1.remove( "DEPEND_1" );
+                attr1.remove( "DEPEND_2" );
+                attr1.remove( "DEPEND_3" );
+            }
+        }
+
+        if (!"no".equals(interpMeta)) {
+            MetadataModel model = new IstpMetadataModel();
+
+            Map<String, Object> istpProps = model.properties(attr1);
+            CdfUtil.maybeAddValidRange(istpProps, result);
+            result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
+            result.putProperty(QDataSet.LABEL, istpProps.get(QDataSet.LABEL)  );
+            result.putProperty(QDataSet.TITLE, istpProps.get(QDataSet.TITLE)  );
+            String renderType= (String)istpProps.get(QDataSet.RENDER_TYPE);
+            if ( renderType!=null && renderType.equals( "time_series" ) ) {
+                // kludge for rbsp-a_WFR-waveform_emfisis-L2_20120831_v1.2.1.cdf.  This is actually a waveform.
+                // Note Seth (RBSP/ECT Team) has a file with 64 channels.  Dan's file rbsp-a_HFR-spectra_emfisis-L2_20120831_v1.2.3.cdf has 82 channels.
+                if ( result.rank()>1 && result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT ) {
+                    logger.log(Level.FINE, "result.length(0)>QDataSet.MAX_UNIT_BUNDLE_COUNT={0}, this cannot be treated as a time_series", QDataSet.MAX_UNIT_BUNDLE_COUNT);
+                    renderType=null;
+                }
+            }
+            if ( renderType !=null && renderType.equals("image") ) {
+                logger.fine("renderType=image not supported in CDF files");
+                renderType= null;
+            }
+            if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
+                renderType= "eventsbar";
+            }                
+            String os1= (String)map.get(PARAM_SLICE1);
+            if ( os1!=null && os1.length()>0 ) {
+                logger.finer("dropping render type because of slice1");
+            } else {
+                result.putProperty(QDataSet.RENDER_TYPE, renderType );
             }
 
-            result.putProperty( QDataSet.METADATA, attr1 );
-            result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
-
-            if ( attributes!=null && "waveform".equals( attributes.get("DISPLAY_TYPE") ) ) {
-                QDataSet dep1=   (QDataSet) result.property( QDataSet.DEPEND_1 );
-                if ( dep1!=null ) {
-                    Units dep1units= SemanticOps.getUnits(dep1);
-                    if ( Units.ns!=dep1units ) {
-                        ArrayDataSet dep1_= ArrayDataSet.copy(dep1);
-                        dep1_.putProperty( QDataSet.VALID_MIN, null );
-                        dep1_.putProperty( QDataSet.VALID_MAX, null );
-                        dep1_.putProperty( QDataSet.FILL_VALUE, null );
-                        while ( dep1_.rank()>0 ) dep1_= (ArrayDataSet) Ops.reduceMax( dep1_, 0 );
-                        if ( dep1_.value()>1e6 ) {
-                            logger.log(Level.WARNING, "offset units do not appear to be in {0}, using ns", dep1units);
-                            ((MutablePropertyDataSet)dep1).putProperty(QDataSet.UNITS,Units.ns);
+            if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
+                if ( result.property(QDataSet.DEPEND_0)==null ) {
+                    result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_DIGITAL );
+                } else {
+                    result.putProperty(QDataSet.RENDER_TYPE, QDataSet.VALUE_RENDER_TYPE_EVENTS_BAR );
+                }
+            } else {                
+                if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
+                    if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
+                        String rt= (String)istpProps.get("RENDER_TYPE" );
+                        if ( rt!=null ) result.putProperty(QDataSet.RENDER_TYPE, rt );
+                        if ( istpProps.get("RENDER_TYPE")==null ) { //goes11_k0s_mag
+                            if ( result.property("DEPEND_1")==null ) {
+                                result.putProperty(QDataSet.RENDER_TYPE, "time_series" );
+                            }
                         }
                     }
                 }
             }
 
-            result.makeImmutable(); // this may cause problems with scripts that assume data is mutable.        
-
-            return result;
-        } catch ( CDFException e ) {
-            throw new Exception( e.getMessage() );
+            for ( int j=0; j<result.rank(); j++ ) {
+                MutablePropertyDataSet depds= (MutablePropertyDataSet) result.property("DEPEND_"+j);
+                Map<String,Object> depProps= (Map<String, Object>) istpProps.get("DEPEND_"+j);
+                if ( depds!=null && depProps!=null ) {
+                    CdfUtil.maybeAddValidRange( depProps, depds );
+                    Map<String, Object> istpProps2 = model.properties(depProps);
+                    depds.putProperty(QDataSet.FILL_VALUE, istpProps2.get(QDataSet.FILL_VALUE));
+                    if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(depds) ) ) {
+                        depds.putProperty(QDataSet.LABEL, istpProps2.get(QDataSet.LABEL) );
+                        depds.putProperty(QDataSet.TITLE, istpProps2.get(QDataSet.TITLE) );
+                    }
+                }
+            }
+        // apply properties.
+        } else {
+            QDataSet dep;
+            dep= (QDataSet)result.property(QDataSet.DEPEND_0); // twins misuses DEPEND properties.
+            if ( dep!=null && dep.length()!=result.length() ) result.putProperty( QDataSet.DEPEND_0, null );
+            result.putProperty( QDataSet.DEPEND_1, null );
+            result.putProperty( QDataSet.DEPEND_2, null );
+            result.putProperty( QDataSet.DEPEND_3, null );
         }
+
+        result.putProperty( QDataSet.METADATA, attr1 );
+        result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
+
+        if ( attributes!=null && "waveform".equals( attributes.get("DISPLAY_TYPE") ) ) {
+            QDataSet dep1=   (QDataSet) result.property( QDataSet.DEPEND_1 );
+            if ( dep1!=null ) {
+                Units dep1units= SemanticOps.getUnits(dep1);
+                if ( Units.ns!=dep1units ) {
+                    ArrayDataSet dep1_= ArrayDataSet.copy(dep1);
+                    dep1_.putProperty( QDataSet.VALID_MIN, null );
+                    dep1_.putProperty( QDataSet.VALID_MAX, null );
+                    dep1_.putProperty( QDataSet.FILL_VALUE, null );
+                    while ( dep1_.rank()>0 ) dep1_= (ArrayDataSet) Ops.reduceMax( dep1_, 0 );
+                    if ( dep1_.value()>1e6 ) {
+                        logger.log(Level.WARNING, "offset units do not appear to be in {0}, using ns", dep1units);
+                        ((MutablePropertyDataSet)dep1).putProperty(QDataSet.UNITS,Units.ns);
+                    }
+                }
+            }
+        }
+
+        result.makeImmutable(); // this may cause problems with scripts that assume data is mutable.        
+
+        return result;
 
     }
     
