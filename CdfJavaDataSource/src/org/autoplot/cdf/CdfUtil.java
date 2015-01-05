@@ -16,7 +16,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import java.lang.reflect.Array;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -197,7 +196,9 @@ public class CdfUtil {
 
     /**
      * returns the range of the data by looking for the SCALEMIN/SCALEMAX params,
-     * or the required VALIDMIN/VALIDMAX parameters
+     * or the required VALIDMIN/VALIDMAX parameters.  This is not used.
+     * @param attrs the properties for the variable
+     * @return the range
      */
     public static DatumRange getRange(HashMap attrs) {
         DatumRange range;
@@ -221,6 +222,8 @@ public class CdfUtil {
 
     /**
      * add the valid range only if it looks like it is correct.  It must contain some of the data.
+     * @param props the properties for the variable
+     * @param ds the dataset to which the valid range would be added.
      */
     public static void maybeAddValidRange( Map<String,Object> props, MutablePropertyDataSet ds ) {
 
@@ -269,7 +272,7 @@ public class CdfUtil {
         if ( u instanceof EnumerationUnits  )  {
             EnumerationUnits eu= (EnumerationUnits)u;
             if ( nmax!=null && nmax.intValue()<=eu.getHighestOrdinal() ) {
-                nmax= Integer.valueOf(eu.getHighestOrdinal()+1); // rbsp-e_L1_mageisLOW-sp_20110922_V.06.0.0.cdf?channel_num
+                nmax= eu.getHighestOrdinal()+1; // rbsp-e_L1_mageisLOW-sp_20110922_V.06.0.0.cdf?channel_num
             }
         }
         
@@ -380,7 +383,7 @@ public class CdfUtil {
      * Return the named variable as a QDataSet.  This does not look at the
      * metadata for DEPEND_0, etc, and only adds metadata to represent time units
      * (e.g. the data is in TT2000) and ordinal data.
-     * @param cdf the value of cdf
+     * @param cdf the value of CDF
      * @param svariable name of the variable
      * @param recStart the first record to retrieve (0 is the first record in the file).
      * @param recCount the number of records to retrieve
@@ -862,13 +865,12 @@ public class CdfUtil {
         logger.fine("getting CDF attributes");
 
         int skipCount=0;
-        for (int i=0; i<v.length; i++ ) {
-            String svar = v[i];
+        for (String svar : v) {
             if ( dataOnly ) {
-               Object attr= getAttribute( cdf, svar, "VAR_TYPE" );
-               if ( attr==null || !attr.equals("data") ) {
-                   skipCount++;
-               }
+                Object attr= getAttribute( cdf, svar, "VAR_TYPE" );
+                if ( attr==null || !attr.equals("data") ) {
+                    skipCount++;
+                }
             }
         }
         if ( skipCount==v.length ) {
@@ -876,8 +878,7 @@ public class CdfUtil {
             dataOnly= false;
         }
 
-        for (int i = 0; i < v.length; i++) {
-
+        for (String v1 : v) {
             String svar=null;
             List<String> warn= new ArrayList();
             String xDependVariable=null;
@@ -890,57 +891,46 @@ public class CdfUtil {
             StringBuilder vdescr=null;
             int rank=-1;
             int[] dims=new int[0];
-                    
-            try {              
-                svar = v[i];
+            try {
+                svar = v1;
                 int varType;
                 try {
                     varType= cdf.getType(svar);
                 } catch ( CDFException ex ) {
                     throw new RuntimeException(ex);
                 }
-                
                 // reject variables that are ordinal data that do not have DEPEND_0.
                 boolean hasDep0= hasAttribute( cdf, svar, "DEPEND_0" );
                 if ( ( varType==CDFConstants.CDF_CHAR || varType==CDFConstants.CDF_UCHAR ) && ( !hasDep0 ) ) {
                     logger.log(Level.FINER, "skipping because ordinal and no depend_0: {0}", svar );
                     continue;
-                } 
-                    
+                }
                 maxRec = cdf.getNumberOfValues(svar); 
                 recCount= maxRec;
-
                 dims = cdf.getDimensions(svar);
-
                 boolean[] dimVary= cdf.getVarys(svar);
-
                 // cdf java Nand
                 if ( dimVary.length>0 && dimVary[0]==false ) {
                     dims= new int[0];
                 }
-
                 if (dims == null) {
                     rank = 1;
                 } else {
                     rank = dims.length + 1;
                 }
-
                 if (rank > rankLimit) {
                     continue;
                 }
-
                 if ( svar.equals("Time_PB5") ) {
                     logger.log(Level.FINE, "skipping {0} because we always skip Time_PB5", svar );
                     continue;
                 }
-
                 if ( dataOnly ) {
                     Object attr= getAttribute( cdf, svar, "VAR_TYPE" );
                     if ( attr==null || !attr.equals("data") ) {
                         continue;
                     }
                 }
-
                 Object att= getAttribute( cdf, svar, "VIRTUAL" );
                 if ( att!=null ) {
                     logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", svar );
@@ -974,12 +964,11 @@ public class CdfUtil {
                         isVirtual= true;
                     }
                 }
-            } catch (CDFException e) {
+            }catch (CDFException e) {
                 logger.fine(e.getMessage());
-            } catch (Exception e) {
+            }catch (Exception e) {
                 logger.fine(e.getMessage());
             }
-            
             try {
                 if ( hasAttribute( cdf, svar, "DEPEND_0" )) {  // check for metadata for DEPEND_0
                     Object att= getAttribute( cdf, svar, "DEPEND_0" );
@@ -1008,13 +997,9 @@ public class CdfUtil {
             } catch (Exception e) {
                 warn.add( "problem with DEPEND_0: " + e.getMessage() );
             }
-
             DepDesc dep1desc= getDepDesc( cdf, svar, rank, dims, 1, warn );
-
             DepDesc dep2desc= getDepDesc( cdf, svar, rank, dims, 2, warn );
-
             DepDesc dep3desc= getDepDesc( cdf, svar, rank, dims, 3, warn );
-
             if (deep) {
                 Object o= (Object) getAttribute( cdf, svar, "CATDESC" );
                 if ( o != null && o instanceof String ) {
@@ -1027,12 +1012,11 @@ public class CdfUtil {
                     svarNotes = (String)o ;
                 }
             }
-
             String desc = svar;
             if (xDependVariable != null) {
                 desc += "(" + xDependVariable;
                 if ( xMaxRec>0 || !isMaster ) { // small kludge for CDAWeb, where we expect masters to be empty.
-                     desc+= "=" + (xMaxRec);
+                    desc+= "=" + (xMaxRec);
                 }
                 if ( dep1desc.dep != null) {
                     desc += "," + dep1desc.dep + "=" + dep1desc.nrec + ( dep1desc.rank2 ? "*": "" );
@@ -1047,7 +1031,6 @@ public class CdfUtil {
                 }
                 desc += ")";
             }
-
             if (deep) {
                 StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
 
@@ -1094,7 +1077,6 @@ public class CdfUtil {
                     result.put(svar, desc);
                 }
             }
-
         } // for
 
         logger.fine("done, get plottable ");
