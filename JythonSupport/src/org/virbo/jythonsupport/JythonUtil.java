@@ -596,7 +596,7 @@ public class JythonUtil {
       * @param sval
       * @return 
       */
-     private static String maybeQuoteString(String sval) {
+     public static String maybeQuoteString(String sval) {
         boolean isNumber= false;
         try {
             Double.parseDouble(sval); 
