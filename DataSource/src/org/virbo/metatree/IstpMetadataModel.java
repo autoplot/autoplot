@@ -178,7 +178,7 @@ public class IstpMetadataModel extends MetadataModel {
                 }
             } else {
                 // bug 1063 Don't use CDF valid range for typical range 
-                logger.fine("SCALEMIN and SCALEMAX are missing");
+                logger.finer("SCALEMIN and SCALEMAX are missing");
                 return null;
             }
         }
