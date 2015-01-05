@@ -344,8 +344,10 @@ public class JythonUtil {
         
     /**
      * check the script that it doesn't redefine symbol names like "str"
-     * @param code
+     * @param uri, such as sftp://user@host/script.jy
+     * @param errs an empty list where the errors can be logged.
      * @return true if an err is suspected.
+     * @throws java.io.IOException
      */
     public static boolean pythonLint( URI uri, List<String> errs ) throws IOException {
         LineNumberReader reader;
@@ -594,7 +596,7 @@ public class JythonUtil {
       * @param sval
       * @return 
       */
-     public static String maybeQuoteString(String sval) {
+     private static String maybeQuoteString(String sval) {
         boolean isNumber= false;
         try {
             Double.parseDouble(sval); 
@@ -1112,50 +1114,57 @@ public class JythonUtil {
     }
 
     /**
-     * scrape script for local variables, looking for assignments.
+     * scrape script for local variables, looking for assignments.  The reader is closed
+     * after reading.
      * @param reader the source for the script.  It is closed when the code executes properly.
      * @return a map of the local variable name to the line containing it.
+     * @throws java.io.IOException
      */
     public static Map getLocals( BufferedReader reader ) throws IOException {
         
-        String s = reader.readLine();
+        try {
+            String s = reader.readLine();
 
-        Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=.*(#(.*))?");
-        Pattern defPattern= Pattern.compile("def .*");
+            Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=.*(#(.*))?");
+            Pattern defPattern= Pattern.compile("def .*");
 
-        boolean inDef= false;
+            boolean inDef= false;
 
-        Map<String,String> result= new LinkedHashMap<String, String>(); // from ID to description
+            Map<String,String> result= new LinkedHashMap<String, String>(); // from ID to description
 
-        while (s != null) {
+            while (s != null) {
 
-            if ( inDef==false ) {
-                Matcher defm= defPattern.matcher(s);
-                if ( defm.matches() ) {
-                    inDef= true;
-                }
-            } else {
-                if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
+                if ( inDef==false ) {
                     Matcher defm= defPattern.matcher(s);
-                    inDef=  defm.matches();
-                }
-            }
-
-            if ( !inDef ) {
-                Matcher m= assignPattern.matcher(s);
-                if ( m.matches() ) {
-                    if ( m.group(3)!=null ) {
-                        result.put(m.group(1), m.group(3) );
-                    } else {
-                        result.put(m.group(1), s );
+                    if ( defm.matches() ) {
+                        inDef= true;
+                    }
+                } else {
+                    if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
+                        Matcher defm= defPattern.matcher(s);
+                        inDef=  defm.matches();
                     }
                 }
+
+                if ( !inDef ) {
+                    Matcher m= assignPattern.matcher(s);
+                    if ( m.matches() ) {
+                        if ( m.group(3)!=null ) {
+                            result.put(m.group(1), m.group(3) );
+                        } else {
+                            result.put(m.group(1), s );
+                        }
+                    }
+                }
+
+                s = reader.readLine();
             }
 
-            s = reader.readLine();
+            return result;
+            
+        } finally {
+            reader.close();
         }
-        reader.close();
-        return result;
 
     }
 
