@@ -22,6 +22,8 @@ import dods.dap.DSequence;
 import dods.dap.DStructure;
 import dods.dap.Float32PrimitiveVector;
 import dods.dap.Float64PrimitiveVector;
+import dods.dap.Int16PrimitiveVector;
+import dods.dap.Int32PrimitiveVector;
 import dods.dap.NoSuchVariableException;
 import dods.dap.PrimitiveVector;
 import dods.dap.StatusUI;
@@ -44,7 +46,6 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
@@ -101,6 +102,10 @@ public class DodsAdapter {
             return 4 * ( streaming ? v.getFirstDimension().getSize() : 1 );
         } else if (pv instanceof Float64PrimitiveVector) {
             return 8 * ( streaming ? v.getFirstDimension().getSize() : 1 );
+        } else if (pv instanceof Int32PrimitiveVector ) {
+            return 4 * ( streaming ? v.getFirstDimension().getSize() : 1 );
+        } else if (pv instanceof Int16PrimitiveVector ) {
+            return 2 * ( streaming ? v.getFirstDimension().getSize() : 1 );
         } else {
             return 1;
         }
