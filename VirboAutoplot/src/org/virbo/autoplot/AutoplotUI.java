@@ -250,6 +250,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
      * ready message.
      */
     public static final String READY_MESSAGE= "ready";
+    
+    /**
+     * the app has been asked to plot a URI
+     */
+    private static final String PENDING_CHANGE_PLOTURI= "plotUri";
 
     private TimeRangeEditor timeRangeEditor;
     private List<JComponent> expertMenuItems= new ArrayList(); // list of items to hide
@@ -1670,7 +1675,7 @@ APSplash.checkTime("init 52.9");
         updateFrameTitle();
     }
 
-
+    
     private ProgressMonitor getStatusBarProgressMonitor( final String finishMessage ) {
         return new NullProgressMonitor() {
             @Override
@@ -1782,10 +1787,13 @@ APSplash.checkTime("init 52.9");
     }
     
     private void plotUrl( final String surl ) {
+        dom.getController().registerPendingChange( this, PENDING_CHANGE_PLOTURI );
         Runnable run= new Runnable() {
             @Override
             public void run() {
+                dom.getController().performingChange( AutoplotUI.this, PENDING_CHANGE_PLOTURI );
                 plotUrlImmediately(surl);
+                dom.getController().changePerformed( AutoplotUI.this, PENDING_CHANGE_PLOTURI );
             }
         };
         if ( false && SwingUtilities.isEventDispatchThread() ) {
@@ -4235,7 +4243,7 @@ APSplash.checkTime("init 240");
                 app.dom.getController().pendingChanges(changes); // TODO: there's a NullPointerException when this is run with --script.
                 //dom.getController().getCanvas().getController().getDasCanvas().pendingChanges(changes);
                 if (app.statusLabel.getIcon() == WARNING_ICON) {
-                    // wait for setMessage to clear this.
+                // wait for setMessage to clear this.
                 } else {
                     if (changes.size() > 0) {
                         app.currentIcon = BUSY_ICON;
@@ -4258,25 +4266,26 @@ APSplash.checkTime("init 240");
                         app.currentIcon = IDLE_ICON;
                         app.currentIconTooltip = null;
                     }
-                    boolean update = false;
-                    if (app.currentIcon != app.statusLabel.getIcon()) {
-                        update = true;
-                    }
-                    String currentStatusLabel = app.statusLabel.getToolTipText();
-                    if (app.currentIconTooltip != currentStatusLabel || (app.currentIconTooltip != null && !app.currentIconTooltip.equals(currentStatusLabel))) {
-                        update = true;
-                    }
-                    if (update) {
-                        try {
-                            SwingUtilities.invokeAndWait(app.updateIconRunnable);
-                        } catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        } catch (InvocationTargetException ex) {
-                            logger.log(Level.SEVERE, null, ex);
-                        }
-                    }
-                    //System.err.println("apbusy "+(System.currentTimeMillis()-t0)/1000. );
                 }
+                boolean update = false;
+                if (app.currentIcon != app.statusLabel.getIcon()) {
+                    update = true;
+                }
+                String currentStatusLabel = app.statusLabel.getToolTipText();
+                if (app.currentIconTooltip != currentStatusLabel || (app.currentIconTooltip != null && !app.currentIconTooltip.equals(currentStatusLabel))) {
+                    update = true;
+                }
+                if (update) {
+                    try {
+                        SwingUtilities.invokeAndWait(app.updateIconRunnable);
+                    } catch (InterruptedException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    } catch (InvocationTargetException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+                //System.err.println("apbusy "+(System.currentTimeMillis()-t0)/1000. );
+
             }
         };
         app.apbusy.schedule(run, 500, 200);
