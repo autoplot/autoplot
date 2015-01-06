@@ -96,9 +96,9 @@ public class SimpleServlet extends HttpServlet {
         try {
             Application app= (Application) StatePersistence.restoreState(vap);
             DataSourceFilter[] dsfs= app.getDataSourceFilters();
-            for ( int i=0; i<dsfs.length; i++ ) {
-                URI uri= DataSetURI.toUri(dsfs[i].getUri());
-                if ( FileSystemUtil.isLocalResource( dsfs[i].getUri() ) ) {
+            for (DataSourceFilter dsf : dsfs) {
+                URI uri = DataSetURI.toUri(dsf.getUri());
+                if (FileSystemUtil.isLocalResource(dsf.getUri())) {
                     logger.log( Level.FINE, "vap contains local reference: {0}", uri );
                     return true;
                 } else {
@@ -134,6 +134,8 @@ public class SimpleServlet extends HttpServlet {
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
      * @param response servlet response
+     * @throws ServletException
+     * @throws IOException
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -554,6 +556,8 @@ public class SimpleServlet extends HttpServlet {
      * Handles the HTTP <code>GET</code> method.
      * @param request servlet request
      * @param response servlet response
+     * @throws javax.servlet.ServletException
+     * @throws java.io.IOException
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
