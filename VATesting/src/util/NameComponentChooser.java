@@ -6,10 +6,6 @@
 package util;
 
 import java.awt.Component;
-import java.awt.Dialog;
-import java.awt.Frame;
-import javax.swing.JLabel;
-import javax.swing.text.JTextComponent;
 import org.netbeans.jemmy.ComponentChooser;
 
 /**
@@ -24,11 +20,13 @@ public class NameComponentChooser implements ComponentChooser {
         this.name= regex;
     }
 
+    @Override
     public boolean checkComponent(Component comp) {
         String n= comp.getName();
         return ( n!=null && n.equals(name) );
     }
 
+    @Override
     public String getDescription() {
         return "Regex Name";
     }

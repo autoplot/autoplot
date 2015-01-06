@@ -27,6 +27,7 @@ public class RegexComponentChooser implements ComponentChooser {
         this.regex= regex;
     }
 
+    @Override
     public boolean checkComponent(Component comp) {
         String n= null;
         if ( n==null && comp instanceof Dialog ) {
@@ -47,6 +48,7 @@ public class RegexComponentChooser implements ComponentChooser {
         return ( n!=null && n.matches(regex) );
     }
 
+    @Override
     public String getDescription() {
         return "Regex in Text Or Title";
     }
