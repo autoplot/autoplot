@@ -227,7 +227,7 @@ public class DodsAdapter {
                 throw ex;
             }
         } finally {
-            mon.finished();
+            if ( !mon.isFinished() ) mon.finished();
         }
        
 

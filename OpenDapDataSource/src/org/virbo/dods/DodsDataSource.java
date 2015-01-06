@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -44,7 +45,7 @@ import org.virbo.datasource.URISplit;
 import org.virbo.dsutil.TransposeRankNDataSet;
 
 /**
- *
+ * Read data via OpenDAP.
  * @author jbf
  */
 public class DodsDataSource extends AbstractDataSource {
@@ -105,6 +106,8 @@ public class DodsDataSource extends AbstractDataSource {
      * http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5.dds?TerrainReflectivity
      * CDAWEB no longer supports: http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/polar/hyd_h0/1997/po_h0_hyd_19970102_v01.cdf.dds?ELECTRON_DIFFERENTIAL_ENERGY_FLUX
      *
+     * @param uri
+     * @throws java.io.IOException
      */
     public DodsDataSource(URI uri) throws IOException {
 
@@ -118,7 +121,7 @@ public class DodsDataSource extends AbstractDataSource {
 
         // get the variable
         i = surl.indexOf('?');
-        String variableConstraint= null;
+        String variableConstraint;
         if ( i!=-1 ) {
             String s= surl.substring(i + 1);
             s= DataSetURI.maybePlusToSpace(s);
@@ -251,6 +254,7 @@ public class DodsDataSource extends AbstractDataSource {
         return constraint1.toString();
     }
     
+    @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException, CancelledOperationException {
 
         mon.setTaskSize(-1);
@@ -267,7 +271,7 @@ public class DodsDataSource extends AbstractDataSource {
                 throw new FileNotFoundException( "OpenDAP Server unavailable, file not found: \n"+ex.getMessage());
             }
 
-            getMetadata(mon);
+            getMetadata( mon.getSubtaskMonitor("metadata") );
 
             Map<String,Object> interpretedMetadata = null;
 
@@ -304,7 +308,7 @@ public class DodsDataSource extends AbstractDataSource {
                 }
             }
 
-            adapter.loadDataset( mon, metadata );
+            adapter.loadDataset( mon.getSubtaskMonitor("loadDataset"), metadata );
             MutablePropertyDataSet ds = (MutablePropertyDataSet) adapter.getDataSet(metadata);
                 
             ds= checkLatLon( ds );
@@ -323,7 +327,8 @@ public class DodsDataSource extends AbstractDataSource {
                 ds.putProperty( QDataSet.TITLE, String.valueOf(val) );
             }
             
-            if (isIstp) {
+            if (isIstp ) {
+                assert interpretedMetadata!=null;
                 interpretedMetadata.remove("DEPEND_0");
                 interpretedMetadata.remove("DEPEND_1");
                 interpretedMetadata.remove("DEPEND_2");
@@ -380,7 +385,7 @@ public class DodsDataSource extends AbstractDataSource {
             while (n.hasMoreElements()) {
                 Object key = n.nextElement();
                 Attribute att = at.getAttribute((String) key);
-                Matcher m = null;
+                Matcher m;
                 try {
                     int type = att.getType();
                     if (type == Attribute.CONTAINER) {
@@ -404,12 +409,12 @@ public class DodsDataSource extends AbstractDataSource {
                             if ( val.length()>0 ) {
                                 result.put(att.getName(), val);
                             } else {
-                                logger.fine("skipping "+att.getName()+"  because length=0");
+                                logger.log(Level.FINE, "skipping {0}  because length=0", att.getName());
                             }
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.log( Level.WARNING, null, e );
                 }
             }
 
