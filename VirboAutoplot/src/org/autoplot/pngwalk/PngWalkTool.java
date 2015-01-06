@@ -1105,7 +1105,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         timeFilterTextField.setText("");
 
         if ( seq.size()==0 ) {
-            Container p= this.getParent();
+            Container p= SwingUtilities.getWindowAncestor(this);
             if ( this.getX()!=0 ) p= this; // for Linux, where the component isn't initialized yet.
             JOptionPane.showMessageDialog( p, "<html>Unable to find any images in sequence:<br>"+ seq.getTemplate() );
             return;
