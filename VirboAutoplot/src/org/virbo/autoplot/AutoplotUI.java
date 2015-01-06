@@ -256,6 +256,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
      */
     private static final String PENDING_CHANGE_PLOTURI= "plotUri";
 
+    /**
+     * the app has been launched with a URI
+     */
+    private static final String PENDING_CHANGE_INITIAL_URI= "initialUri";
+    
     private TimeRangeEditor timeRangeEditor;
     private List<JComponent> expertMenuItems= new ArrayList(); // list of items to hide
     private JMenu expertMenu;
@@ -1787,6 +1792,8 @@ APSplash.checkTime("init 52.9");
     }
     
     private void plotUrl( final String surl ) {
+        Map<Object,Object> changes= new HashMap();
+        dom.getController().pendingChanges(changes);
         dom.getController().registerPendingChange( this, PENDING_CHANGE_PLOTURI );
         Runnable run= new Runnable() {
             @Override
@@ -3949,6 +3956,8 @@ private void updateFrameTitle() {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
+        final boolean headless=  "true".equals( System.getProperty("java.awt.headless") ) ;
+        
         System.err.println(welcome);
         logger.info(welcome);
         final ApplicationModel model = new ApplicationModel();
@@ -4003,8 +4012,6 @@ private void updateFrameTitle() {
             logger.fine("enable scriptPanel");
             model.getDocumentModel().getOptions().setLogConsoleVisible(true);
         }
-
-        final boolean headless=  "true".equals( System.getProperty("java.awt.headless") ) ;
 
         if ( !headless && alm.getBooleanValue("nativeLAF")) {
             logger.fine("nativeLAF");
@@ -4085,7 +4092,11 @@ APSplash.checkTime("init 200");
                 }
 
 APSplash.checkTime("init 210");
-                
+
+                if ( !headless && finitialURL!=null && app!=null ) {
+                    app.dom.getController().registerPendingChange( app, PENDING_CHANGE_INITIAL_URI );
+                }
+
                 final boolean port= !alm.getValue("port").equals("-1");
                 if ( port ) {
                     System.err.println("port keyword is deprecated, use --server="+port+" instead");
@@ -4163,8 +4174,10 @@ APSplash.checkTime("init 220");
                 }
 APSplash.checkTime("init 230");
                 if ( !headless && finitialURL!=null) {
-                    if ( app!=null ) app.dataSetSelector.setValue(finitialURL);
-                    if ( app!=null ) app.dataSetSelector.maybePlot(false);
+                    if ( app!=null ) {
+                        app.dataSetSelector.setValue(finitialURL);
+                        app.dataSetSelector.maybePlot(false);
+                    }
                 }
                 
                 if ( bookmarks!=null ) {
@@ -4206,6 +4219,19 @@ APSplash.checkTime("init 240");
                 if ( app!=null ) {
                     checkStatusLoop(app);
                 }
+                
+                if ( !headless && finitialURL!=null) {
+                    if ( app!=null ) {
+                        Runnable run = new Runnable() {
+                            public void run() {
+                                app.dom.getController().performingChange( app, PENDING_CHANGE_INITIAL_URI);
+                                app.dom.getController().changePerformed( app, PENDING_CHANGE_INITIAL_URI);                
+                            }
+                        };
+                        SwingUtilities.invokeLater(run);
+                    }
+                }
+                
             };
         } );
     }
