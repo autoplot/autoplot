@@ -66,7 +66,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20141107.0744";
+    public static final String version= "v20150106.1631";
 
     static FileHandler handler;
 
@@ -89,6 +89,8 @@ public class SimpleServlet extends HttpServlet {
     
     /**
      * return true if the .vap file contains any references to local resources.
+     * This checks .jyds references to see that they also do not contain local 
+     * references.
      * @param vap vap file
      * @return true if the file has local references.
      */
@@ -312,7 +314,7 @@ public class SimpleServlet extends HttpServlet {
                 File openable = DataSetURI.getFile(vap,new NullProgressMonitor());
                 if ( !isLocalVap ) {
                     if ( vapHasLocalReferences( openable ) ) {
-                        throw new IllegalArgumentException("remote vap file has local references");
+                        throw new IllegalArgumentException("remote .vap file has local references");
                     }
                 }
                 URISplit split= URISplit.parse(vap);
@@ -349,21 +351,26 @@ public class SimpleServlet extends HttpServlet {
             }
 
             if (surl != null && !"".equals(surl)) {
-                
+
+                URISplit split = URISplit.parse(surl);                
+
                 if ( FileSystemUtil.isLocalResource(surl) ) {
-                    // See http://autoplot.org/developer.servletSecurity for more info.
-                    throw new IllegalArgumentException("local resources cannot be served, except via local vap file.  ");
+                    if ( split.file!=null && split.file.matches(".*\\/jyds\\/.*\\.jyds") ) {
+                        logger.fine("local .jyds files in the directory jyds are allowed.");
+                    } else {
+                        // See http://autoplot.org/developer.servletSecurity for more info.
+                        throw new IllegalArgumentException("local resources cannot be served, except via local vap file.  ");
+                    }
+                } else {
+                    if ( split.file!=null && split.file.contains("jyds") || ( split.vapScheme!=null && split.vapScheme.equals("jyds") ) ) {
+                        throw new IllegalArgumentException("non-local .jyds scripts are not allowed.");
+                    }
                 }
                 
-                URISplit split = URISplit.parse(surl);
                 if ( split.vapScheme!=null && split.vapScheme.equals("vap+inline") && split.surl.contains("getDataSet") ) { // this list could go on forever...
                     throw new IllegalArgumentException("vap+inline URI cannot contain getDataSet.");
                 }
-                
-                if ( split.file!=null && split.file.contains("jyds") || ( split.vapScheme!=null && split.vapScheme.equals("jyds") ) ) {
-                    throw new IllegalArgumentException("jyds scripts are temporarily disabled.");
-                }
-                
+                                
                 DataSource dsource;
                 try {
                     dsource = DataSetURI.getDataSource(surl);
