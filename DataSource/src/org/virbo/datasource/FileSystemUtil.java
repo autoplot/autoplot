@@ -132,8 +132,8 @@ public class FileSystemUtil {
      * that is not local could attempt to use local resources.  For this reason
      * there is JythonDataSourceFactory.hasLocalReferences.
      * 
-     * "upload" is another magic element.  Paths containing upload are considered 
-     * remote.
+     * "upload" is another magic element.  Paths containing "upload" are considered 
+     * remote.  This is to allow areas where content is uploaded.
      * 
      * @param file an Autoplot URI.
      * @return true if the uri is a reference to a local resource.
