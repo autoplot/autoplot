@@ -13,12 +13,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,6 +42,7 @@ import org.das2.graph.DasCanvas;
 import org.das2.graph.Painter;
 import org.das2.system.DasLogger;
 import org.das2.util.AboutUtil;
+import org.das2.util.FileUtil;
 import org.das2.util.TimerConsoleFormatter;
 import org.das2.util.awt.GraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -62,7 +65,7 @@ import org.virbo.dsops.Ops;
 
 /**
  * SimpleServlet produces PNG,PDF, and SVG products for
- * .vap files and Autoplot URIs.  A simple set on controls is provided
+ * .vap files and Autoplot URIs.  A simple set of controls is provided
  * to tweak layout when automatic settings are not satisfactory.
  * 
  * @author jbf
@@ -70,7 +73,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20150107.0905";
+    public static final String version= "v20150107.1100";
 
     static FileHandler handler;
 
@@ -258,6 +261,28 @@ public class SimpleServlet extends HttpServlet {
                     throw new IllegalArgumentException("unable to resolve id="+id);
                 }
             }
+            
+            boolean whiteListed= false;
+            if ( surl!=null ) {
+                List<String> whiteList= ServletUtil.getWhiteList();
+                for ( String s: whiteList ) {
+                    if ( Pattern.matches( s, surl ) ) {
+                        whiteListed= true;
+                        logger.fine("uri is whitelisted");
+                    }
+                }
+            }
+            if ( vap!=null ) {
+                List<String> whiteList= ServletUtil.getWhiteList();
+                for ( String s: whiteList ) {
+                    if ( Pattern.matches( s, vap ) ) {
+                        whiteListed= true;
+                        logger.fine("vap is whitelisted");
+                    }
+                }
+                //TODO: there may be a request that the URIs within the vap are 
+                //verified to be whitelisted.  This is not done.
+            }
                 
             // Allow a little caching.  See https://devcenter.heroku.com/articles/increasing-application-performance-with-http-cache-headers
             // public means multiple browsers can use the same cache, maybe useful for workshops and seems harmless.
@@ -389,24 +414,38 @@ public class SimpleServlet extends HttpServlet {
 
             if (surl != null && !"".equals(surl)) {
 
+                File data= new File( ServletUtil.getServletHome(), "data" );
+                if ( !data.exists() ) {
+                    if ( !data.mkdirs() ) {
+                        throw new IllegalArgumentException("Unable to make servlet data directory");
+                    }
+                }
+                surl= URISplit.makeAbsolute( data.getAbsolutePath(), surl );
+                
                 URISplit split = URISplit.parse(surl);                
 
                 if ( id==null ) { // id!=null indicates that the surl was generated within the server.
-                    if ( FileSystemUtil.isLocalResource(surl) ) {
-                        if ( split.file!=null && split.file.matches(".*\\/jyds\\/.*\\.jyds") ) {
-                            logger.fine("local .jyds files in the directory jyds are allowed.");
-                        } else {
-                            // See http://autoplot.org/developer.servletSecurity for more info.
-                            throw new IllegalArgumentException("local resources cannot be served, except via local vap file.  ");
-                        }
+                    if ( whiteListed ) {
+                        
                     } else {
-                        if ( split.file!=null && split.file.contains("jyds") || ( split.vapScheme!=null && split.vapScheme.equals("jyds") ) ) {
-                            throw new IllegalArgumentException("non-local .jyds scripts are not allowed.");
+                        if ( FileSystemUtil.isLocalResource(surl) ) {
+                            File p= new File(data.getAbsolutePath());
+                            File f= new File(split.file.substring(7));
+                            if ( FileUtil.isParent( p, f ) ) {
+                                logger.fine("file within autoplot_data/server/data folder is allowed");
+                            } else {
+                                // See http://autoplot.org/developer.servletSecurity for more info.
+                                throw new IllegalArgumentException("local resources cannot be served, except via local vap file.  ");
+                            }
+                        } else {
+                            if ( split.file!=null && split.file.contains("jyds") || ( split.vapScheme!=null && split.vapScheme.equals("jyds") ) ) {
+                                throw new IllegalArgumentException("non-local .jyds scripts are not allowed.");
+                            }
                         }
-                    }
 
-                    if ( split.vapScheme!=null && split.vapScheme.equals("vap+inline") && split.surl.contains("getDataSet") ) { // this list could go on forever...
-                        throw new IllegalArgumentException("vap+inline URI cannot contain getDataSet.");
+                        if ( split.vapScheme!=null && split.vapScheme.equals("vap+inline") && split.surl.contains("getDataSet") ) { // this list could go on forever...
+                            throw new IllegalArgumentException("vap+inline URI cannot contain getDataSet.");
+                        }
                     }
                 }
                                 
