@@ -766,6 +766,10 @@ public class AutoplotUtil {
         JOptionPane.showMessageDialog( parent, p );
     }
 
+    /**
+     * legacy class for describing the results of the autorange routine.
+     * Note that QDataSet bounding cubes provide the same functionality.
+     */
     public static class AutoRangeDescriptor {
 
         public DatumRange range;
@@ -991,6 +995,14 @@ public class AutoplotUtil {
         return result;
     }
 
+    /**
+     * convert the legacy AutoRangeDescriptor to a QDataSet bounding cube.
+     * The bounding cube is a rank 1, 2-element dataset with min and max as the
+     * elements, and SCALE_TYPE="log" if the AutoRangeDescriptor log property was
+     * true.
+     * @param ard AutoRangeDescriptor.
+     * @return a rank 1 bounding cube.
+     */
     public static QDataSet toDataSet( AutoRangeDescriptor ard ) {
         DDataSet result= DDataSet.createRank1(2);
         Units u= ard.range.getUnits();
