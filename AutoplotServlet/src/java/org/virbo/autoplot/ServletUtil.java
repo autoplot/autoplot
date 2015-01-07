@@ -123,8 +123,9 @@ public class ServletUtil {
         if ( !ff.exists() ) {
             try {
                 BufferedWriter w= new BufferedWriter( new FileWriter( ff ) );
-                w.write("# list of whitelisted URIs regular expressions.  See http://autoplot.org/servlet_guide.");
-                w.newLine();
+                w.write("# list of whitelisted URIs regular expressions.  See http://autoplot.org/servlet_guide.\n");
+                w.write("# http://autoplot.org/data.*  # uncomment to allow scripts from autoplot.org\n");                
+                w.write("http://localhost(:\\d+)?/.*\n");
                 w.close();
             } catch ( IOException ex ) {
                 throw ex;
