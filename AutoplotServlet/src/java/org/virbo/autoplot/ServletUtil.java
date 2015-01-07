@@ -108,11 +108,11 @@ public class ServletUtil {
     private static long whiteListFresh= 0;
     
     /**
-     * return the id map, checking no more than once per 5 seconds, and
-     * creating an empty file if one is not found.  
+     * return the whitelist, checking no more than once per 5 seconds, and
+     * creating the default file if one is not found.  
      * See HOME/autoplot_data/server/whitelist.txt
      * 
-     * @return map whose keys are the whitelist
+     * @return list of regular expressions to allow.
      * @throws java.io.IOException
      */
     public static List<String> getWhiteList() throws IOException {
