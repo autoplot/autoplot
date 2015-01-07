@@ -132,7 +132,7 @@ public class URISplit {
 
     /**
      * ensure that the reference, which may be relative, absolute.
-     * NOTE this is only implemented for unix filenames. 
+     * NOTE this is only implemented for unix filenames. TODO: Windows.
      * For example:<ul>
      * <li>/tmp/,foo.dat -> /home/t/foo.dat
      * <li>/tmp/,/home/jbf/foo.dat -> /home/jbf/foo.dat
@@ -147,7 +147,8 @@ public class URISplit {
             boolean isAbsolute= suri.startsWith("/");
             if ( !isAbsolute ) {
                 String pwd= path;
-                if ( pwd.length()>2 && !pwd.endsWith("/")) {
+                if ( pwd.endsWith("/.") ) pwd= pwd.substring(0,pwd.length()-2);
+                if ( !pwd.endsWith("/")) {
                     pwd= pwd + "/"; //TODO: Windows...
                 }
                 suri= pwd + suri;
