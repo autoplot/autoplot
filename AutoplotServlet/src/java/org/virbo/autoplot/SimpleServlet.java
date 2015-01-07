@@ -243,7 +243,14 @@ public class SimpleServlet extends HttpServlet {
                     if ( m.matches() ) {
                         surl= e.getValue();
                         for ( int i=1; i<m.groupCount()+1; i++ ) {
-                            surl= surl.replaceAll( "\\$"+i, m.group(i) ); // I know there's a better way to do this.
+                            String r= m.group(i);
+                            if ( r.contains("..") ) {
+                                throw new IllegalArgumentException(".. (up directory) is not allowed in id.");
+                            }
+                            surl= surl.replaceAll( "\\$"+i, r ); // I know there's a better way to do this.
+                        }
+                        if ( surl.contains("..") ) {
+                            throw new IllegalArgumentException(".. (up directory) is not allowed in the result of id: "+surl);
                         }
                     }
                 }
