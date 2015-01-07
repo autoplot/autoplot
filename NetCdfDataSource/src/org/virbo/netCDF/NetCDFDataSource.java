@@ -103,6 +103,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         }
     }
     
+    @Override
     public QDataSet getDataSet( ProgressMonitor mon) throws IOException {
         logger.finer("getDataSet");
         mon.started();
@@ -160,7 +161,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         String location;
         boolean makeLocal= true;
         if ( makeLocal ) {
-            File file= getFile(mon);
+            File file= getFile(mon.getSubtaskMonitor("getFile"));
             location= "file://"+file.toString();
         } else {
             location= DataSetURI.fromUri(resourceURI);
@@ -183,16 +184,14 @@ public class NetCDFDataSource extends AbstractDataSource {
             List<Variable> variables= (List<Variable>)dataset.getVariables();
 
             if ( svariable==null ) {
-                for ( int i=0; i<variables.size(); i++ ) {
-                    Variable v= variables.get(i);
+                for (Variable v : variables) {
                     if ( !v.getDimension(0).getName().equals(v.getName()) ) {
                         variable= v;
                         break;
                     }
                 }
             } else {
-                for ( int i=0; i<variables.size(); i++ ) {
-                    Variable v= variables.get(i);
+                for (Variable v : variables) {
                     if ( v.getName().replaceAll(" ", "+").equals( svariable ) ) { //TODO: verify this, it's probably going to cause problems now.
                         variable= v;
                     }
