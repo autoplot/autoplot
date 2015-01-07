@@ -20,9 +20,13 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -66,7 +70,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20150106.1631";
+    public static final String version= "v20150107.0905";
 
     static FileHandler handler;
 
@@ -172,6 +176,7 @@ public class SimpleServlet extends HttpServlet {
             String surl = request.getParameter("url");
             String suri = request.getParameter("uri");
             if ( suri!=null ) surl= suri;
+            String id= request.getParameter("id"); // lookup local URIs in table id.txt
             String process = ServletUtil.getStringParameter(request, "process", "");
             String vap = request.getParameter("vap");
             int width = ServletUtil.getIntParameter(request, "width", -1);
@@ -183,6 +188,7 @@ public class SimpleServlet extends HttpServlet {
             String row = ServletUtil.getStringParameter(request, "row", "");
             String srenderType = ServletUtil.getStringParameter(request, "renderType", "");
             String stimeRange = ServletUtil.getStringParameter(request, "timeRange", "");
+            if ( stimeRange.length()==0 ) stimeRange= ServletUtil.getStringParameter(request, "timerange", "");
             String scolor = ServletUtil.getStringParameter(request, "color", "");
             String sfillColor = ServletUtil.getStringParameter(request, "fillColor", "");
             String sforegroundColor = ServletUtil.getStringParameter(request, "foregroundColor", "");
@@ -221,7 +227,31 @@ public class SimpleServlet extends HttpServlet {
             if ( surl!=null ) {
                 response.setHeader( "X-Autoplot-URI", surl );
             }
+            if ( id!=null ) {
+                response.setHeader( "X-Autoplot-ID", id );
+            }
             
+            // id lookups.  The file id.txt is a flat file with hash comments,
+            // with each record containing a regular expression with groups, 
+            // then a map with group ids.
+            if ( id!=null ) {
+                surl= null;
+                Map<String,String> ids= ServletUtil.getIdMap();
+                for ( Entry<String,String> e : ids.entrySet() ) {
+                    Pattern p= Pattern.compile(e.getKey());
+                    Matcher m= p.matcher(id);
+                    if ( m.matches() ) {
+                        surl= e.getValue();
+                        for ( int i=1; i<m.groupCount()+1; i++ ) {
+                            surl= surl.replaceAll( "\\$"+i, m.group(i) ); // I know there's a better way to do this.
+                        }
+                    }
+                }
+                if ( surl==null ) {
+                    throw new IllegalArgumentException("unable to resolve id="+id);
+                }
+            }
+                
             // Allow a little caching.  See https://devcenter.heroku.com/articles/increasing-application-performance-with-http-cache-headers
             // public means multiple browsers can use the same cache, maybe useful for workshops and seems harmless.
             // max-age means the result is valid for the next 10 seconds.  
@@ -354,21 +384,23 @@ public class SimpleServlet extends HttpServlet {
 
                 URISplit split = URISplit.parse(surl);                
 
-                if ( FileSystemUtil.isLocalResource(surl) ) {
-                    if ( split.file!=null && split.file.matches(".*\\/jyds\\/.*\\.jyds") ) {
-                        logger.fine("local .jyds files in the directory jyds are allowed.");
+                if ( id==null ) { // id!=null indicates that the surl was generated within the server.
+                    if ( FileSystemUtil.isLocalResource(surl) ) {
+                        if ( split.file!=null && split.file.matches(".*\\/jyds\\/.*\\.jyds") ) {
+                            logger.fine("local .jyds files in the directory jyds are allowed.");
+                        } else {
+                            // See http://autoplot.org/developer.servletSecurity for more info.
+                            throw new IllegalArgumentException("local resources cannot be served, except via local vap file.  ");
+                        }
                     } else {
-                        // See http://autoplot.org/developer.servletSecurity for more info.
-                        throw new IllegalArgumentException("local resources cannot be served, except via local vap file.  ");
+                        if ( split.file!=null && split.file.contains("jyds") || ( split.vapScheme!=null && split.vapScheme.equals("jyds") ) ) {
+                            throw new IllegalArgumentException("non-local .jyds scripts are not allowed.");
+                        }
                     }
-                } else {
-                    if ( split.file!=null && split.file.contains("jyds") || ( split.vapScheme!=null && split.vapScheme.equals("jyds") ) ) {
-                        throw new IllegalArgumentException("non-local .jyds scripts are not allowed.");
+
+                    if ( split.vapScheme!=null && split.vapScheme.equals("vap+inline") && split.surl.contains("getDataSet") ) { // this list could go on forever...
+                        throw new IllegalArgumentException("vap+inline URI cannot contain getDataSet.");
                     }
-                }
-                
-                if ( split.vapScheme!=null && split.vapScheme.equals("vap+inline") && split.surl.contains("getDataSet") ) { // this list could go on forever...
-                    throw new IllegalArgumentException("vap+inline URI cannot contain getDataSet.");
                 }
                                 
                 DataSource dsource;
