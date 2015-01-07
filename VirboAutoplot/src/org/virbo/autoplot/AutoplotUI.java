@@ -3739,20 +3739,10 @@ private void updateFrameTitle() {
         }        
  
         if ( suri!=null && suri.length()>1 ) { // check for relative filenames 
-            int i= suri.indexOf(":");
-            if ( i==-1 ) { // it's a file.
-                boolean isAbsolute= suri.startsWith("/");
-                if ( !isAbsolute ) {
-                    try {
-                        String pwd= new File(".").getCanonicalPath();
-                        if ( pwd.length()>2 ) {
-                            pwd= pwd + "/"; //TODO: Windows...
-                        }
-                        suri= pwd + suri;
-                    } catch ( IOException ex ) {
-                        ex.printStackTrace();
-                    }
-                }
+            try {
+                suri= URISplit.makeAbsolute( new File(".").getCanonicalPath(), suri );
+            } catch ( IOException ex ) {
+                throw new RuntimeException(ex);
             }
         }
 
