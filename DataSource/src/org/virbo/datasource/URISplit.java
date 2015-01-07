@@ -1,6 +1,7 @@
 package org.virbo.datasource;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -127,6 +128,32 @@ public class URISplit {
         }
         logger.log(Level.FINEST, "makeColloquial results in {0}", result);
         return result;
+    }
+
+    /**
+     * ensure that the reference, which may be relative, absolute.
+     * NOTE this is only implemented for unix filenames. 
+     * For example:<ul>
+     * <li>/tmp/,foo.dat -> /home/t/foo.dat
+     * <li>/tmp/,/home/jbf/foo.dat -> /home/jbf/foo.dat
+     * </ul>
+     * @param path the absolute directory.
+     * @param suri the URI, which may be relative to path.
+     * @return the absolute path
+     */
+    public static String makeAbsolute( String path, String suri ) {
+        int i= suri.indexOf(":");
+        if ( i==-1 ) { // it's a file.
+            boolean isAbsolute= suri.startsWith("/");
+            if ( !isAbsolute ) {
+                String pwd= path;
+                if ( pwd.length()>2 && !pwd.endsWith("/")) {
+                    pwd= pwd + "/"; //TODO: Windows...
+                }
+                suri= pwd + suri;
+            }
+        }
+        return suri;
     }
 
     /**
