@@ -127,6 +127,9 @@ public abstract class AbstractDataSource implements DataSource {
 
     /**
      * make the remote file available.
+     * @param mon
+     * @return 
+     * @throws java.io.IOException
      */
     protected File getFile(ProgressMonitor mon) throws IOException {
         if ( resourceURI==null || resourceURI.toString().equals("")  ) {
@@ -138,7 +141,7 @@ public abstract class AbstractDataSource implements DataSource {
     // Practically identical to the URL version below...
     protected File getFile(URI uri, ProgressMonitor mon) throws IOException {
         File f = DataSetURI.getFile(uri, mon);
-         if (params.containsKey("filePollUpdates")) {
+        if (params.containsKey("filePollUpdates")) {
             int poll= (int)(Double.parseDouble(params.get("filePollUpdates")) );
             pollingUpdater= new FilePollUpdating(uri,poll);
             pollingUpdater.startPolling();
@@ -150,6 +153,10 @@ public abstract class AbstractDataSource implements DataSource {
      * make the remote file available.  If the parameter "filePollUpdates" is set to
      * a float, a thread will be started to monitor the local file for updates.
      * This is done by monitoring for file length and modification time changes.
+     * @param url
+     * @param mon
+     * @return 
+     * @throws java.io.IOException
      */
     protected File getFile( URL url, ProgressMonitor mon ) throws IOException {
         File f = DataSetURI.getFile( url, mon );
@@ -189,6 +196,7 @@ public abstract class AbstractDataSource implements DataSource {
     }
     /**
      * return the parameters from the URL.
+     * @return the parameters from the URL.
      */
     protected Map getParams() {
         return new LinkedHashMap(params);
@@ -198,6 +206,9 @@ public abstract class AbstractDataSource implements DataSource {
      * return the named parameter, or the default.  
      * Note arg_0, arg_1, etc are for unnamed positional parameters.  It's recommended
      * that there be only one positional parameter.
+     * @param name the parameter name
+     * @param dflt the default, which is returned when the parameter is not found.
+     * @return the parameter value, or dflt when the parameter is not found.
      */
     protected String getParam( String name, String dflt ) {
         String result= params.get(name);
@@ -211,12 +222,22 @@ public abstract class AbstractDataSource implements DataSource {
     /**
      * abstract class version returns an empty tree.  Override this method
      * to provide metadata.
+     * @param mon progress monitor
+     * @return 
+     * @throws java.lang.Exception
      */
     @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         return new HashMap<String, Object>();
     }
 
+    /**
+     * return a MetadataModel object that can make the metadata canonical.
+     * For example, ISTPMetadataModel interprets the metadata returned from CDF files,
+     * but this same model can be used with HDF files.  This returns a null model
+     * that does no interpretation, and some data sources will override this.
+     * @return 
+     */
     @Override
     public MetadataModel getMetadataModel() {
         return MetadataModel.createNullModel();
@@ -253,6 +274,8 @@ public abstract class AbstractDataSource implements DataSource {
     /**
      * attempt to get a capability.  null will be returned if the 
      * capability doesn't exist.
+     * @param clazz the capability class.
+     * @return null or an implementation of a capability.
      */
     @Override
     public <T> T getCapability(Class<T> clazz) {
@@ -261,6 +284,8 @@ public abstract class AbstractDataSource implements DataSource {
 
     /**
      * attach a capability
+     * @param clazz the capability class.
+     * @param o an implementation.
      */
     public <T> void addCability(Class<T> clazz, T o) {
         capabilities.put(clazz, o);
