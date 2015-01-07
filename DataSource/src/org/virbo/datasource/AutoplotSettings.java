@@ -13,7 +13,7 @@ import java.util.prefs.Preferences;
 import org.das2.util.filesystem.FileSystem;
 
 /**
- *
+ * Autoplot's settings are stored in Java preferences.
  * @author jbf
  */
 public final class AutoplotSettings {
@@ -66,6 +66,12 @@ public final class AutoplotSettings {
     protected String autoplotData = ""; // see loadPreferences
     public static final String PROP_AUTOPLOTDATA = "autoplotData";
 
+    /**
+     * return the location where Autoplot is storing its data.  This
+     * includes bookmarks, history, and the file cache, and 
+     * is typically "${HOME}/autoplot_data"
+     * @return the user's Autoplot data folder.
+     */
     public String getAutoplotData() {
         return autoplotData;
     }
@@ -95,6 +101,12 @@ public final class AutoplotSettings {
         propertyChangeSupport.firePropertyChange(PROP_FSCACHE, old, val );
     }
 
+    /**
+     * resolve the property, resolving references.  For example, ${HOME} 
+     * is replaced with System.getProperty("user.home").
+     * @param name the name to resolve, such as PROP_AUTOPLOTDATA or PROP_FSCACHE
+     * @return the value with references resolved.
+     */
     public String resolveProperty( String name ) {
         if ( name.equals("autoplotData") ) {
             return getAutoplotData().replace("${HOME}", System.getProperty("user.home") );
