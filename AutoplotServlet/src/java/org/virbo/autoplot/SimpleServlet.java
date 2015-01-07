@@ -439,7 +439,7 @@ public class SimpleServlet extends HttpServlet {
                             }
                         } else {
                             if ( split.file!=null && split.file.contains("jyds") || ( split.vapScheme!=null && split.vapScheme.equals("jyds") ) ) {
-                                throw new IllegalArgumentException("non-local .jyds scripts are not allowed.");
+                                throw new IllegalArgumentException("non-local .jyds scripts are not allowed.  Administrators may wish to whitelist this data, see HOME/autoplot_data/server/whitelist.txt.");
                             }
                         }
 
