@@ -556,11 +556,13 @@ public class DataPanel extends javax.swing.JPanel {
         processMenu.add( createMenuItem( "|magnitude()", "calculate the magnitude of the vectors " ) );
         processMenu.add( createMenuItem( "|multiply(2)", "multiply by a scalar " ) );
         processMenu.add( createMenuItem( "|negate()", "flip the sign on the data." ) );
+        processMenu.add( createMenuItem( "|pow(2.)", "square the data" ) );
         processMenu.add( createMenuItem( "|setUnits('nT')", "reset the units to the new units" ) );
         processMenu.add( createMenuItem( "|sin()", "sin of the data in radians. (No units check)" ) );
         processMenu.add( createMenuItem( "|slice0(0)", "slice the data on the zeroth dimension (often time) at the given index." ) );
         processMenu.add( createMenuItem( "|slice1(0)", "slice the data on the first dimension at the given index." ) );
         processMenu.add( createMenuItem( "|slices(':',2,3))", "slice the data on the first and second dimensions, leaving the zeroth alone." ) );
+        processMenu.add( createMenuItem( "|sqrt()", "square root of the data" ) );
         processMenu.add( createMenuItem( "|smooth(5)", "boxcar average over the rank 1 data" ) );
         processMenu.add( createMenuItem( "|toDegrees()", "convert the data to degrees. (No units check)" ) );
         processMenu.add( createMenuItem( "|toRadians()", "convert the data to radians. (No units check) " ) );
