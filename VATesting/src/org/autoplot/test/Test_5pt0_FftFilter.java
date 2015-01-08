@@ -72,21 +72,21 @@ public class Test_5pt0_FftFilter implements Scenario {
             
             System.err.println("Done!");
             
-            writeToPng("Test_5_FftFilter.png"); // Leave artifacts for testing.
-            save("Test_5_FftFilter.vap");
+            writeToPng("Test_5pt0_FftFilter.png"); // Leave artifacts for testing.
+            save("Test_5pt0_FftFilter.vap");
             
             return(0);
         } catch (InterruptedException ex) {
-            Logger.getLogger(Test_5_FftFilter.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test_5pt0_FftFilter.class.getName()).log(Level.SEVERE, null, ex);
             return(1);
         } catch (IOException ex) {
-            Logger.getLogger(Test_5_FftFilter.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test_5pt0_FftFilter.class.getName()).log(Level.SEVERE, null, ex);
             return(2);
         }
     }
     
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_5_FftFilter"};
+	String[] params = {"org.autoplot.test.Test_5pt0_FftFilter"};
 	org.netbeans.jemmy.Test.main(params);
     }
 }
