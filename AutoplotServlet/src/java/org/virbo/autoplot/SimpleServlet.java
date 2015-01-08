@@ -461,7 +461,7 @@ public class SimpleServlet extends HttpServlet {
                 DataSource dsource;
                 try {
                     dsource = DataSetURI.getDataSource(suri);
-                    DataSourceFactory dsf= DataSetURI.getDataSourceFactory(new URI(suri),new NullProgressMonitor());
+                    DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.getURI(suri),new NullProgressMonitor());
                     List<String> problems= new ArrayList<String>(1);
                     if ( dsf.reject(suri, problems, new NullProgressMonitor() )) {
                         if ( problems.isEmpty() ) {
