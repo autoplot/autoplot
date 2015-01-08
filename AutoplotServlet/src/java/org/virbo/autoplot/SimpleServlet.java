@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.logging.FileHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,7 +74,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20150107.1652";
+    public static final String version= "v20150108.1052";
 
     static FileHandler handler;
 
@@ -171,13 +173,15 @@ public class SimpleServlet extends HttpServlet {
 
         String debug = request.getParameter("debug");
         if ( debug==null ) debug= "false";
+        //debug= "TRUE";
 
         logit("-- new request " + uniq + " --", t0, uniq, debug);
         try {
 
-            String surl = request.getParameter("url");
-            String suri = request.getParameter("uri");
-            if ( suri!=null ) surl= suri;
+            String suri = request.getParameter("url");
+            if ( suri.length()==0 ) {
+               suri = request.getParameter("uri");
+            }
             String id= request.getParameter("id"); // lookup local URIs in table id.txt
             String process = ServletUtil.getStringParameter(request, "process", "");
             String vap = request.getParameter("vap");
@@ -220,14 +224,18 @@ public class SimpleServlet extends HttpServlet {
                 srenderType = "fillToZero";
             }
 
+            if ( suri!=null && suri.length()>0 ) logger.log(Level.FINE, "suri={0}", suri);
+            if ( vap!=null && vap.length()>0 ) logger.log(Level.FINE, "vap={0}", vap);
+            if ( id!=null && id.length()>0 ) logger.log(Level.FINE, "id={0}", id);
+            
             OutputStream out = response.getOutputStream();
 
             // To support load balancing, insert the actual host that resolved the request
             String host= java.net.InetAddress.getLocalHost().getCanonicalHostName();
             response.setHeader( "X-Served-By", host );
             response.setHeader( "X-Server-Version", version );
-            if ( surl!=null ) {
-                response.setHeader( "X-Autoplot-URI", surl );
+            if ( suri!=null ) {
+                response.setHeader( "X-Autoplot-URI", suri );
             }
             if ( id!=null ) {
                 response.setHeader( "X-Autoplot-ID", id );
@@ -237,35 +245,35 @@ public class SimpleServlet extends HttpServlet {
             // with each record containing a regular expression with groups, 
             // then a map with group ids.
             if ( id!=null ) {
-                surl= null;
+                suri= null;
                 Map<String,String> ids= ServletUtil.getIdMap();
                 for ( Entry<String,String> e : ids.entrySet() ) {
                     Pattern p= Pattern.compile(e.getKey());
                     Matcher m= p.matcher(id);
                     if ( m.matches() ) {
-                        surl= e.getValue();
+                        suri= e.getValue();
                         for ( int i=1; i<m.groupCount()+1; i++ ) {
                             String r= m.group(i);
                             if ( r.contains("..") ) {
                                 throw new IllegalArgumentException(".. (up directory) is not allowed in id.");
                             }
-                            surl= surl.replaceAll( "\\$"+i, r ); // I know there's a better way to do this.
+                            suri= suri.replaceAll( "\\$"+i, r ); // I know there's a better way to do this.
                         }
-                        if ( surl.contains("..") ) {
-                            throw new IllegalArgumentException(".. (up directory) is not allowed in the result of id: "+surl);
+                        if ( suri.contains("..") ) {
+                            throw new IllegalArgumentException(".. (up directory) is not allowed in the result of id: "+suri);
                         }
                     }
                 }
-                if ( surl==null ) {
+                if ( suri==null ) {
                     throw new IllegalArgumentException("unable to resolve id="+id);
                 }
             }
             
             boolean whiteListed= false;
-            if ( surl!=null ) {
+            if ( suri!=null ) {
                 List<String> whiteList= ServletUtil.getWhiteList();
                 for ( String s: whiteList ) {
-                    if ( Pattern.matches( s, surl ) ) {
+                    if ( Pattern.matches( s, suri ) ) {
                         whiteListed= true;
                         logger.fine("uri is whitelisted");
                     }
@@ -293,18 +301,18 @@ public class SimpleServlet extends HttpServlet {
 
             if (vap != null) {
                 response.setContentType(format);
-            } else if ( surl==null ) {
+            } else if ( suri==null ) {
                 response.setContentType("text/html");
                 response.setStatus(400);
                 out.write(("Either vap= or url= needs to be specified:<br>"+request.getRequestURI()+"?"+request.getQueryString()).getBytes());
                 out.close();
                 return;
-            } else if (surl.equals("about:plugins")) {
+            } else if (suri.equals("about:plugins")) {
                 response.setContentType("text/html");
                 out.write(DataSetSelectorSupport.getPluginsText().getBytes());
                 out.close();
                 return;
-            } else if (surl.equals("about:autoplot")) {
+            } else if (suri.equals("about:autoplot")) {
                 response.setContentType("text/html");
                 String s = AboutUtil.getAboutHtml();
                 s = s.substring(0, s.length() - 7);
@@ -316,6 +324,8 @@ public class SimpleServlet extends HttpServlet {
                 response.setContentType(format);
             }
 
+            logit("surl: "+suri,t0, uniq, debug );
+            
             logit("get parameters", t0, uniq, debug);
 
             System.setProperty("java.awt.headless", "true");
@@ -411,7 +421,7 @@ public class SimpleServlet extends HttpServlet {
                 c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
             }
 
-            if (surl != null && !"".equals(surl)) {
+            if (suri != null && !"".equals(suri)) {
 
                 File data= new File( ServletUtil.getServletHome(), "data" );
                 if ( !data.exists() ) {
@@ -419,15 +429,15 @@ public class SimpleServlet extends HttpServlet {
                         throw new IllegalArgumentException("Unable to make servlet data directory");
                     }
                 }
-                surl= URISplit.makeAbsolute( data.getAbsolutePath(), surl );
+                suri= URISplit.makeAbsolute( data.getAbsolutePath(), suri );
                 
-                URISplit split = URISplit.parse(surl);                
+                URISplit split = URISplit.parse(suri);                
 
                 if ( id==null ) { // id!=null indicates that the surl was generated within the server.
                     if ( whiteListed ) {
                         
                     } else {
-                        if ( FileSystemUtil.isLocalResource(surl) ) {
+                        if ( FileSystemUtil.isLocalResource(suri) ) {
                             File p= new File(data.getAbsolutePath());
                             File f= new File(split.file.substring(7));
                             if ( FileUtil.isParent( p, f ) ) {
@@ -450,7 +460,18 @@ public class SimpleServlet extends HttpServlet {
                                 
                 DataSource dsource;
                 try {
-                    dsource = DataSetURI.getDataSource(surl);
+                    dsource = DataSetURI.getDataSource(suri);
+                    DataSourceFactory dsf= DataSetURI.getDataSourceFactory(new URI(suri),new NullProgressMonitor());
+                    List<String> problems= new ArrayList<String>(1);
+                    if ( dsf.reject(suri, problems, new NullProgressMonitor() )) {
+                        if ( problems.isEmpty() ) {
+                            throw new IllegalArgumentException("URI was rejected: "+suri);
+                        } else if ( problems.size()==1 ) {
+                            throw new IllegalArgumentException("URI was rejected: "+problems.get(0) );
+                        } else {
+                            throw new IllegalArgumentException("URI was rejected: "+problems.get(0) + " and "+(problems.size()-1) + "more" );
+                        }
+                    }
                 } catch (NullPointerException ex) {
                     throw new RuntimeException("No such data source: ", ex);
                 } catch (Exception ex) {
@@ -582,7 +603,9 @@ public class SimpleServlet extends HttpServlet {
             logger.log( Level.FINER, "bounds: {0}", dom.getPlots(0).getXaxis().getController().getDasAxis().getBounds());
 
             if (format.equals("image/png")) {
-                                
+                
+                logger.log(Level.FINE, "time to create image: {0} ms", ( System.currentTimeMillis()-t0 ));
+                
                 try {
                     appmodel.canvas.writeToPng( out, width, height );
                     
@@ -653,6 +676,8 @@ public class SimpleServlet extends HttpServlet {
      * Handles the HTTP <code>POST</code> method.
      * @param request servlet request
      * @param response servlet response
+     * @throws javax.servlet.ServletException
+     * @throws java.io.IOException
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -662,13 +687,34 @@ public class SimpleServlet extends HttpServlet {
 
     /** 
      * Returns a short description of the servlet.
+     * @return a short description of the servlet.
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Autoplot Simple Servlet";
     }// </editor-fold>
 
     private void logit(String string, long t0, long id, String debug) {
-        logger.log( ( ( debug!=null && !debug.equals("false") ) ? Level.FINE : Level.FINER ), String.format( "##%d# %s: %d\n", id, string, (System.currentTimeMillis() - t0) ) );
+        boolean flushHandlers= true;
+        if ( debug!=null && !debug.equals("false") ) {
+            if ( logger.isLoggable(Level.FINE) ) {
+                logger.log( Level.FINE, String.format( "##%d# %s: %d\n", id, string, (System.currentTimeMillis() - t0) ) );
+                if ( flushHandlers ) {
+                    for ( Handler h: logger.getHandlers() ) {
+                        h.flush();
+                    }   
+                }
+            }
+            //System.err.println( String.format( "##%d# %s: %d\n", id, string, (System.currentTimeMillis() - t0) ) );
+        } else {
+            if ( logger.isLoggable(Level.FINER) ) {
+                logger.log( Level.FINER, String.format( "##%d# %s: %d\n", id, string, (System.currentTimeMillis() - t0) ) );
+                if ( flushHandlers ) {
+                    for ( Handler h: logger.getHandlers() ) {
+                        h.flush();
+                    }
+                }
+            }
+        }
     }
 }
