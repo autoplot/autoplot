@@ -47,6 +47,7 @@ import org.das2.util.FileUtil;
 import org.das2.util.TimerConsoleFormatter;
 import org.das2.util.awt.GraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
+import static org.virbo.autoplot.ServletUtil.getServletHome;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.DataSourceFilter;
@@ -448,7 +449,9 @@ public class SimpleServlet extends HttpServlet {
                             }
                         } else {
                             if ( split.file!=null && split.file.contains("jyds") || ( split.vapScheme!=null && split.vapScheme.equals("jyds") ) ) {
-                                throw new IllegalArgumentException("non-local .jyds scripts are not allowed.  Administrators may wish to whitelist this data, see HOME/autoplot_data/server/whitelist.txt.");
+                                File sd= ServletUtil.getServletHome();
+                                File ff= new File( sd, "whitelist.txt" );
+                                throw new IllegalArgumentException("non-local .jyds scripts are not allowed.  Administrators may wish to whitelist this data, see "+ff+"."); //TODO: this server file reference should be removed.
                             }
                         }
 
