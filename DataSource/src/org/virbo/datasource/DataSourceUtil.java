@@ -914,8 +914,8 @@ public class DataSourceUtil {
      * return a one-line string representation of the exception.  This was introduced
      * when a NullPointerException was represented as "null", and it was somewhat
      * unclear about what was going on.
-     * @param ex
-     * @return 
+     * @param ex an exception
+     * @return a 1-line string representation of the error, for the end user.
      */
     public static String getMessage( Exception ex ) {
         if ( ex==null ) {
