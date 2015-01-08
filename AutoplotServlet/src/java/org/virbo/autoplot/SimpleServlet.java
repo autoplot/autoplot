@@ -178,9 +178,9 @@ public class SimpleServlet extends HttpServlet {
         logit("-- new request " + uniq + " --", t0, uniq, debug);
         try {
 
-            String suri = request.getParameter("url");
-            if ( suri.length()==0 ) {
-               suri = request.getParameter("uri");
+            String suri = request.getParameter("uri");
+            if ( suri==null ) {
+               suri = request.getParameter("url");
             }
             String id= request.getParameter("id"); // lookup local URIs in table id.txt
             String process = ServletUtil.getStringParameter(request, "process", "");
@@ -224,9 +224,9 @@ public class SimpleServlet extends HttpServlet {
                 srenderType = "fillToZero";
             }
 
-            if ( suri!=null && suri.length()>0 ) logger.log(Level.FINE, "suri={0}", suri);
-            if ( vap!=null && vap.length()>0 ) logger.log(Level.FINE, "vap={0}", vap);
-            if ( id!=null && id.length()>0 ) logger.log(Level.FINE, "id={0}", id);
+            if ( suri!=null ) logger.log(Level.FINE, "suri={0}", suri);
+            if ( vap!=null ) logger.log(Level.FINE, "vap={0}", vap);
+            if ( id!=null ) logger.log(Level.FINE, "id={0}", id);
             
             OutputStream out = response.getOutputStream();
 
