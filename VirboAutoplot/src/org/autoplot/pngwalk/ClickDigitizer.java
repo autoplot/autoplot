@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.dsops.Ops;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -195,7 +196,8 @@ public class ClickDigitizer {
                             try {
                                 viewer.digitizer.addDataPoint( DataSetUtil.asDatum(xx), DataSetUtil.asDatum(yy) );
                             } catch ( RuntimeException ex ) { // units conversion
-                                JOptionPane.showMessageDialog( viewer,ex.getMessage());
+                                String msg= DataSourceUtil.getMessage(ex);
+                                JOptionPane.showMessageDialog( viewer, msg );
                             }
                         }
                     } else {
