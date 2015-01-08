@@ -196,6 +196,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
     void gotoSubrange(DatumRange ds) {
         int idx= -1;
         for ( int i=datumRanges.size()-1; i>=0; i-- ) {
+            if ( datumRanges.get(i)==null ) {
+                logger.info("ranges are not available");
+                return;
+            }
             if ( ds.contains( datumRanges.get(i).min() ) ) {
                 idx= i;
                 break;
