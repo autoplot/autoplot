@@ -27,18 +27,20 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
- *
+ * DataSourceFactory for communicating with Das2servers.
  * @author jbf
  */
 public class Das2ServerDataSourceFactory implements DataSourceFactory {
 
     private static final Logger logger= LoggerManager.getLogger("apdss.das2server");
 
+    @Override
     public DataSource getDataSource(URI uri) throws Exception {
         return new Das2ServerDataSource(uri);
     }
     Map<String, List<String>> datasetsList = null;
 
+    @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         //http://www-pw.physics.uiowa.edu/das/das2Server
         //?dataset=das2_1/voyager1/pws/sa-4s-pf.new
@@ -70,7 +72,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
 
     }
 
-    synchronized List<String> getDatasetsList(String surl) {
+    private synchronized List<String> getDatasetsList(String surl) {
         if (datasetsList == null) {
             datasetsList = new HashMap<String, List<String>>();
         }
@@ -93,7 +95,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
                 throw new RuntimeException(ex);
             } finally {
                 try {
-                    reader.close();
+                    if ( reader!=null ) reader.close();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
@@ -104,6 +106,9 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
         
     }
 
+    public static final String PROB_DS= "dataset";
+    public static final String PROB_TIMERANGE= "timerange";
+    
     /**
      * Indicate if a URI is acceptable.
      * vap+das2server:http://www-pw.physics.uiowa.edu/das/das2Server?galileo/pws/EDPosition.dsdf&timerange=2001-10-17
@@ -112,12 +117,21 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
      * @param mon
      * @return true if it is not acceptable.
      */
+    @Override
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         URISplit split= URISplit.parse( surl );
         Map<String,String> params= URISplit.parseParams(split.params);
         String ds= params.get("dataset");
         if ( params.get("arg_0")!=null ) {
             ds=  params.get("arg_0");
+        }
+        if ( ds==null || ds.length()==0 ) {
+            problems.add( PROB_DS );
+            return true;
+        }
+        if ( ds.endsWith("/") ) {
+            problems.add( PROB_DS );
+            return true;
         }
         String str= params.get("timerange");
         if ( str!=null ) {
@@ -129,17 +143,21 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
             } catch (ParseException ex) {
                 logger.log(Level.WARNING, "unable to parse timerange {0}", str);
             }
-        } else {
-            
         }
-        return !( params.containsKey("start_time") && params.containsKey("end_time") && ds!=null && ds.length()>0 );
+        if ( !( params.containsKey("start_time") && params.containsKey("end_time") ) ) {
+            problems.add( PROB_TIMERANGE );
+            return true;
+        }
+        return false;
     }
 
+    @Override
     public boolean supportsDiscovery() {
         return true; //TODO: completions should support this.
     }
 
     
+    @Override
     public <T> T getCapability(Class<T> clazz) {
         if ( clazz== TimeSeriesBrowse.class ) {
            return (T) new Das2ServerTimeSeriesBrowse();

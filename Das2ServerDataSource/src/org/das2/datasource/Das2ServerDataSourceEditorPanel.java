@@ -1117,6 +1117,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         
     }
 
+    @Override
     public String getURI() {
 
         TreePath tp=  jTree1.getSelectionPath();
@@ -1124,6 +1125,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             return "vap+das2server:"+serverURL + "?" ;
         }
 
+        boolean folder= !jTree1.getModel().isLeaf(tp.getLastPathComponent());
         Object[] tp0= tp.getPath();
 
         DatumRange timeRange;
@@ -1148,6 +1150,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 ldataSetId.append("/").append(li.name());
             }
         }
+        if ( folder ) ldataSetId.append("/");
 
         StringBuilder params= new StringBuilder();
         String readerParams= readerParamsTextArea.getText();
