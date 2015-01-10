@@ -145,8 +145,8 @@ public class PlotElementController extends DomNodeController {
      * set the child plotElements.
      * @param plotElements
      */
-    protected void setChildPlotElements(List<PlotElement> peles) {
-        for ( PlotElement p: peles ) {
+    protected void setChildPlotElements(List<PlotElement> plotElements) {
+        for ( PlotElement p: plotElements ) {
             p.setParent(plotElement.getId());
         }
     }
@@ -368,7 +368,15 @@ public class PlotElementController extends DomNodeController {
                         plotElement.renderType= RenderType.spectrogram;
                     }
                 }
-            } 
+            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_SYMBOL_CONNECTOR ) ) {
+                plotElement.setAutoRenderType( false );
+            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_SYMBOL_SIZE ) ) {
+                plotElement.setAutoRenderType( false );
+            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_LINE_WIDTH ) ) {
+                plotElement.setAutoRenderType( false );
+            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_PLOT_SYMBOL ) ) {
+                plotElement.setAutoRenderType( false );
+            }
         }
     };
 
@@ -2525,6 +2533,8 @@ public class PlotElementController extends DomNodeController {
 
         setupStyle( plotElement );
 
+        plotElement.setAutoRenderType( true );
+        
         final Renderer newRenderer =
                 AutoplotUtil.maybeCreateRenderer( plotElement.getRenderType(),
                 oldRenderer, cb, false );
