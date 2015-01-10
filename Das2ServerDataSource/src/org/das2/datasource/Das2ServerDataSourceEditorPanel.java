@@ -1005,6 +1005,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         updateDas2ServersImmediately(); // this will set serverUrl to the last used server if nothing is specified.
 
         Runnable run = new Runnable() {
+            @Override
             public void run() {
                 das2ServerComboBox.setSelectedItem(serverURL);
                 jTree1.setModel( waitTreeModel() );
@@ -1076,6 +1077,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     }
                     updateDas2ServersImmediately();
                     SwingUtilities.invokeLater( new Runnable() {
+                        @Override
                         public void run() {
                             updateTree(model);
                         }
