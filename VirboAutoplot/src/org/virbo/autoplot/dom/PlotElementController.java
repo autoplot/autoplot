@@ -837,9 +837,7 @@ public class PlotElementController extends DomNodeController {
                 logger.log(Level.FINE, "  resetRanges: {0}", resetRanges);
                 logger.log(Level.FINE, "  resetRenderType: {0}", resetRenderType );
                 
-                if ( plotElement.isAutoRenderType() ) {
-                    resetPlotElement= true;
-                }
+                resetPlotElement= true;
                 
                 if (resetPlotElement) {
                     if (comp.equals("")) {
