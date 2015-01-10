@@ -55,6 +55,8 @@ public class Test007 {
             setCanvasSize(750, 300);
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            getDocumentModel().getCanvases(0).getMarginRow().setTop("2em");
+            getDocumentModel().getCanvases(0).getMarginRow().setBottom("100%-2em");
 
             doTest( 0, "vap+tsds:http://timeseries.org/get.cgi?StartDate=19980101&EndDate=20090101&ppd=1&ext=bin&out=tsml&param1=NGDC_NOAA15_SEM2-33-v0" );
             doTest( 1, "vap+tsds:http://tsds.net/cgi-bin/get.cgi?StartDate=20000101&EndDate=20010101&ext=bin&out=tsml&ppd=24&filter=mean&param1=OMNI_OMNI2-41-v1");
