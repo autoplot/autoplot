@@ -24,9 +24,18 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2014-12-22):</p>
+        <p>Bugfixes (2015-01-10):</p>
         <ul> 
-            <li>1018: put in sanity check when waiting for another process to load file, check for movement within 15sec</li>
+            <li>rte_2124254968: Das2Server editor panel allowed folders to be selected, causing RTE.  Thanks Dan!</li>
+            <li>dashed property was reset when browsing to the next day.</li>
+            <li>Add pow and sqrt to list of filters.  Thanks Allison!</li>
+            <li>Fix CDAWeb demo in thin client</li>
+            <li>In PNGWalk, NullPointerException when image with time axis was digitized, but the granule didn't have a corresponding timerange, (e.g. *.png)</li>
+            <li>1303: jyds scripts with SimpleServlet.  Allow relative reference to scripts/data/, introduce whitelist.txt.</li>
+            <li>correct progress feedback in demo 1</li>
+            <li>1302: indicate busy when Autoplot is launched with URI.  There was a ~5 second period where no feedback was provided.</li>
+            <li>In PNGWalk, set window ancestor properly for "Unable to find any images" message.</li>
+            <li>1301: redo mechanism that resolves the same file downloaded from two Autoplot instances, by allowing simultaneous loads and resolving the results.</li>
             <li>1300: strange export data behavior on Mac, where somehow discovery mechanism was getting the wrong type</li>
             <li>1299: where trimProperties would drop the original properties</li>
             <li>fix the labels for Seth's data with Rank 2 DEPEND_1, where stack of lineplots were not given unique labels</li>
@@ -95,6 +104,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>More Jemmy testing.  Thanks Kenzie!</li>
+            <li>logging cleanup</li>
+            <li>Code cleanup in Java CDF library</li>
             <li>Filters editor panel provides small GUIs to control each filter.</li>
             <li>Add smoothfit function to filters.</li>
             <li>don't include iconified window area in CreateScreenShot code</li>
