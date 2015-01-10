@@ -368,14 +368,14 @@ public class PlotElementController extends DomNodeController {
                         plotElement.renderType= RenderType.spectrogram;
                     }
                 }
-            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_SYMBOL_CONNECTOR ) ) {
-                plotElement.setAutoRenderType( false );
-            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_SYMBOL_SIZE ) ) {
-                plotElement.setAutoRenderType( false );
-            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_LINE_WIDTH ) ) {
-                plotElement.setAutoRenderType( false );
-            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_PLOT_SYMBOL ) ) {
-                plotElement.setAutoRenderType( false );
+//            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_SYMBOL_CONNECTOR ) ) {
+//                plotElement.setAutoRenderType( false );
+//            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_SYMBOL_SIZE ) ) {
+//                plotElement.setAutoRenderType( false );
+//            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_LINE_WIDTH ) ) {
+//                plotElement.setAutoRenderType( false );
+//            } else if ( evt.getPropertyName().equals( PlotElementStyle.PROP_PLOT_SYMBOL ) ) {
+//                plotElement.setAutoRenderType( false );
             }
         }
     };
