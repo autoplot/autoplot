@@ -65,7 +65,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.das2.DasApplication;
 import org.das2.DasException;
 import org.das2.client.DasServer;
 import org.das2.datum.Datum;
@@ -100,7 +99,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private static final String EXAMPLE_TIME_RANGES = "<html><i>Example Time Ranges</i>";
 
 
-    private String DEFAULT_TIMERANGE="2001-01-01";
+    private final String DEFAULT_TIMERANGE="2001-01-01";
 
     /** Creates new form Das2ServerDataSourceEditorPanel */
     public Das2ServerDataSourceEditorPanel() {
@@ -352,6 +351,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             final Document document = builder.parse(source);
 
             Runnable run = new Runnable() {
+                @Override
                 public void run() {
                     try {
                     validTimeRange= null;
@@ -484,6 +484,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             try {
                 final URL url = new URL(surl);
                 RequestProcessor.invokeLater( new Runnable() {
+                    @Override
                     public void run() {
                         updateDataSetSelected( url );
                     }
@@ -499,6 +500,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     private void updateDas2ServersImmediately() {
         d2ss= listDas2Servers();
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 das2ServerComboBox.setModel( new DefaultComboBoxModel(d2ss.toArray()) );
             
@@ -514,7 +516,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }
 
     
-    private static Map<String,ImageIcon> icons= Collections.synchronizedMap( new HashMap() );
+    private static final Map<String,ImageIcon> icons= Collections.synchronizedMap( new HashMap() );
     
     private static Icon iconFor( Object o, boolean wait ) {
         //return new javax.swing.ImageIcon(Das2ServerDataSourceEditorPanel.class.getResource("/org/virbo/datasource/fileMag.png"));
@@ -544,6 +546,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     
     private static class IconCellRenderer implements ListCellRenderer {
         DefaultListCellRenderer r= new DefaultListCellRenderer();
+        @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             Component c= r.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             Icon icon= iconFor( value, false );
@@ -552,7 +555,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }
     
-    private ListCellRenderer myListCellRenderer= new IconCellRenderer();
+    private final ListCellRenderer myListCellRenderer= new IconCellRenderer();
     
     private List<String> listPeers( String suri ) {
 
@@ -649,9 +652,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 JOptionPane.showConfirmDialog(examplesComboBox,"IOException when reading in "+hist );
             } finally {
                 try {
-                    if ( r!=null ) {
-                        r.close();
-                    }
+                    if ( r!=null ) r.close();
                 } catch (IOException ex) {
                     logger.log( Level.SEVERE, ex.getMessage(), ex );
                 }
@@ -662,6 +663,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         
         final List<String> fd2ss1= d2ss1;
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 for ( String s: fd2ss1 ) {
                     Icon i= iconFor( s, true ); // force load of icon off the event thread.
@@ -712,6 +714,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             final String fresult= result.toString();
 
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     JTextArea area= new JTextArea();
                     area.setText(fresult);
@@ -780,6 +783,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     final URL url = new URL(surl);
 
                     RequestProcessor.invokeLater( new Runnable() {
+                        @Override
                         public void run() {
                             showDsdf(url);
                         }
@@ -898,10 +902,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         firePropertyChange(PROP_DATASETID, oldDataSetId, dataSetId);
     }
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
 
+    @Override
     public boolean reject(String uri) throws Exception {
         URISplit split = URISplit.parse(uri);
         if ( split.file==null || split.file.equals("file:///") ) { // use UIOWA's main one by default.
@@ -928,10 +934,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }
 
 
+    @Override
     public boolean prepare( String uri, java.awt.Window parent, ProgressMonitor mon) {
         return true;
     }
 
+    @Override
     public void setURI(String uri) {
 
         URISplit split= URISplit.parse(uri);
@@ -1053,6 +1061,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     Runnable getDataSetsRunnable() {
         Runnable run= new Runnable() {
+            @Override
             public void run() {
 
                 String ss1= serverURL;
@@ -1108,6 +1117,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         final TreePath tp= new TreePath( oo );
         Runnable run= new Runnable() {
+            @Override
             public void run() {
             jTree1.setSelectionPath(tp);
             jTree1.scrollPathToVisible(tp);
@@ -1191,6 +1201,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         return result.toString();
     }
 
+    @Override
     public void markProblems(List<String> problems) {
 
     }
