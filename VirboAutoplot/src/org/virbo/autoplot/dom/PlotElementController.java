@@ -837,7 +837,9 @@ public class PlotElementController extends DomNodeController {
                 logger.log(Level.FINE, "  resetRanges: {0}", resetRanges);
                 logger.log(Level.FINE, "  resetRenderType: {0}", resetRenderType );
                 
-                resetPlotElement= true;
+                if ( plotElement.isAutoRenderType() ) {
+                    resetPlotElement= true;
+                }
                 
                 if (resetPlotElement) {
                     if (comp.equals("")) {
@@ -2530,8 +2532,6 @@ public class PlotElementController extends DomNodeController {
         if ( RenderTypeUtil.needsColorbar(plotElement.getRenderType()) ) cb= getColorbar();
 
         setupStyle( plotElement );
-
-        plotElement.setAutoRenderType( true );
         
         final Renderer newRenderer =
                 AutoplotUtil.maybeCreateRenderer( plotElement.getRenderType(),
