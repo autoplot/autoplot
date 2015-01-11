@@ -838,9 +838,9 @@ public class PlotElementController extends DomNodeController {
                 logger.log(Level.FINE, "  resetRenderType: {0}", resetRenderType );
                 
                 //This was to support the CdawebVapServlet, where partial vaps are handled.  See https://sourceforge.net/p/autoplot/bugs/1304/
-                //if ( plotElement.isAutoRenderType() ) {
-                //    resetPlotElement= true;
-                //}
+                if ( plotElement.isAutoRenderType() ) {
+                    resetPlotElement= true;
+                }
                 
                 if (resetPlotElement) {
                     if (comp.equals("")) {
