@@ -839,7 +839,7 @@ public class PlotElementController extends DomNodeController {
                 
                 //This was to support the CdawebVapServlet, where partial vaps are handled.  See https://sourceforge.net/p/autoplot/bugs/1304/
                 if ( plotElement.isAutoRenderType() ) {
-                    resetPlotElement= true;
+                    //resetPlotElement= true;
                 }
                 
                 if (resetPlotElement) {
