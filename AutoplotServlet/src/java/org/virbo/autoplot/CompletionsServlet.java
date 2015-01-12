@@ -32,7 +32,7 @@ public class CompletionsServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         String uri= request.getParameter("uri");
         if ( uri==null ) throw new IllegalArgumentException("uri parameter not specified");
-        if ( !uri.endsWith("&") ) uri= uri+"&";  //kludge for Dan's server
+        if ( !uri.endsWith("&") ) uri= uri+"&";  //kludge for Dan's server, which doesn't include the final ampersand.  This should probably be removed.
         try {
             String[] result= ScriptContext.getCompletions(uri);
             for ( String r: result ) {
