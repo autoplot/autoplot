@@ -59,6 +59,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if (paramName.equals("dataset")) {
                 URI uri= cc.resourceURI;
+                if ( uri==null ) throw new IllegalArgumentException("expected das2server location");
                 List<String> dss= getDatasetsList( uri.toString() ); // bug 3055130 okay
                 for ( String ds: dss ) {
                     if ( ds.startsWith(cc.completable) ) {
