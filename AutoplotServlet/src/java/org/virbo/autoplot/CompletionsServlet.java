@@ -7,17 +7,26 @@ package org.virbo.autoplot;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.virbo.datasource.URISplit;
 
 /**
- *
+ * Servlet to provide completions and will be used to bridge the thin client launcher with
+ * the thin client fully-qualified URI.
  * @author jbf
  */
 public class CompletionsServlet extends HttpServlet {
 
+    private static final Logger logger= Logger.getLogger("autoplot.servlet" );
+        
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      *
@@ -32,6 +41,21 @@ public class CompletionsServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         String uri= request.getParameter("uri");
         if ( uri==null ) throw new IllegalArgumentException("uri parameter not specified");
+        URISplit split= URISplit.parse(uri); // make it canonical
+                    
+        boolean whiteListed= false;
+        List<String> whiteList= ServletUtil.getWhiteList();
+        for ( String s: whiteList ) {
+            if ( Pattern.matches( s, uri ) ) {
+                whiteListed= true;
+                logger.fine("uri is whitelisted");
+            }
+        }
+
+        if ( split.scheme.startsWith("file:/") && !whiteListed ) {
+            throw new IllegalArgumentException("URI cannot be a local file: "+uri);
+        }
+        
         if ( !uri.endsWith("&") ) uri= uri+"&";  //kludge for Dan's server, which doesn't include the final ampersand.  This should probably be removed.
         try {
             String[] result= ScriptContext.getCompletions(uri);
