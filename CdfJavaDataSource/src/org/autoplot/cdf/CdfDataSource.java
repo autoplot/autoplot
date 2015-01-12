@@ -754,7 +754,7 @@ public class CdfDataSource extends AbstractDataSource {
      * @throws ParseException
      */
     
-    private MutablePropertyDataSet wrapDataSet(final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> thisAttributes, int slice1, ProgressMonitor mon) throws Exception, ParseException {
+    private synchronized MutablePropertyDataSet wrapDataSet(final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> thisAttributes, int slice1, ProgressMonitor mon) throws Exception, ParseException {
 
         if ( !hasVariable(cdf, svariable) ) {
             throw new IllegalArgumentException( "No such variable: "+svariable );

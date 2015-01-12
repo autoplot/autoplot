@@ -393,7 +393,7 @@ public class CdfUtil {
      * @return the dataset
      * @throws Exception
      */
-    public static MutablePropertyDataSet wrapCdfData(
+    public static synchronized MutablePropertyDataSet wrapCdfData(
             CDFReader cdf, String svariable, long recStart, long recCount, long recInterval, 
             int slice1, ProgressMonitor mon) throws Exception {
         
