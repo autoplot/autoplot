@@ -146,6 +146,7 @@ public class JythonUtil {
     /**
      * invoke the python script on another thread.
      * @param url the address of the script.
+     * @throws java.io.IOException
      */
     public static void invokeScriptSoon( final URL url ) throws IOException {
         invokeScriptSoon( url, null, new NullProgressMonitor() );
@@ -157,6 +158,7 @@ public class JythonUtil {
      * @param url the address of the script.
      * @param dom if null, then null is passed into the script and the script must not use dom.
      * @param mon monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
+     * @throws java.io.IOException
      */
     public static void invokeScriptSoon( final URL url, final Application dom, ProgressMonitor mon ) throws IOException {
         invokeScriptSoon( url, dom, new HashMap(), false, false, mon );
@@ -248,8 +250,9 @@ public class JythonUtil {
      * @param vars values for parameters, or null.
      * @param askParams if true, query the user for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
-     * @param mon monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
+     * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
      * @return JOptionPane.OK_OPTION of the script is invoked.
+     * @throws java.io.IOException
      */
     public static int invokeScriptSoon( final URL url, final Application dom, Map<String,String> vars, boolean askParams, boolean makeTool, ProgressMonitor mon1) throws IOException {
         final ProgressMonitor mon;
@@ -299,6 +302,7 @@ public class JythonUtil {
         }
         
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 try {
                     PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, mon );
@@ -307,7 +311,6 @@ public class JythonUtil {
                         try {
                             fd.implement( interp, v.getKey(), v.getValue() );
                         } catch ( ParseException ex ) {
-                            ex.printStackTrace();
                             logger.log( Level.WARNING, null, ex );
                         }
                     }
