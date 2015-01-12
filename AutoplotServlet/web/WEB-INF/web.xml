@@ -30,6 +30,10 @@
         <servlet-name>JnlpServlet</servlet-name>
         <servlet-class>org.virbo.autoplot.JnlpServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>CompletionsServlet</servlet-name>
+        <servlet-class>org.virbo.autoplot.CompletionsServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SimpleServlet</servlet-name>
         <url-pattern>/SimpleServlet</url-pattern>
@@ -53,6 +57,10 @@
     <servlet-mapping>
         <servlet-name>JnlpServlet</servlet-name>
         <url-pattern>/autoplot.jnlp</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CompletionsServlet</servlet-name>
+        <url-pattern>/CompletionsServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
