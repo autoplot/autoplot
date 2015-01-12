@@ -52,7 +52,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "dataset=", "dataset identifier"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "start_time=", "ISO8601 start time"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "end_time=", "ISO8601 end time"));
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "resolution=", "resolution in seconds"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "intrinsic=true", "do not reduce on server"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "interval=", "cadence in seconds for TCAs"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "item=", "item number for TCAs"));
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
