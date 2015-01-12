@@ -134,6 +134,9 @@ class Das2ServerDataSource extends AbstractDataSource {
         otherParams.remove("dataset");
         otherParams.remove("tsb");
         otherParams.remove("timerange");
+        otherParams.remove("_res");      // =0.0 means use native resolution
+        otherParams.remove("intrinsic"); // =true means use native resolution
+                
 
         String item= (String) otherParams.remove("item");
         String interval= (String)otherParams.remove("interval");
@@ -151,6 +154,13 @@ class Das2ServerDataSource extends AbstractDataSource {
 
         // optional explicit resolution
         String sresolution= params.get("_res");
+        if ( sresolution!=null ) {
+            params2.remove("_res");
+        }
+        if ( "true".equals(params.get("intrinsic")) ) {
+            sresolution= "0";
+            params2.remove("intrinsic");
+        }
 
         if ( sresolution!=null ) {
             if ( sresolution.trim().length()==0 || sresolution.equals("0") ) {
