@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Autoplot completions Servlet</title>
+    </head>
+    <body>
+        <h2>Autoplot Completions Servlet</h2>
+        <p>This demonstrates the completions which is used .</p>
+    <form action="CompletionsServlet" method="GET">
+        Enter Aggregation URI (<a href="http://autoplot.org/help#Wildcard_codes">help</a>)
+        Examples:
+        <a href="#" onclick="document.getElementById('uri').value='http://autoplot.org/data/autoplot.cdf?';">A</a>
+        <a href="#" onclick="document.getElementById('uri').value='vap+cdf:http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L2/$Y/$m/$d/rbsp-a_HFR-spectra_emfisis-L2_$Y$m$d_v$(v,sep).cdf?timerange=2013-03-05';">B</a>
+        <a href="#" onclick="document.getElementById('uri').value='vap+das2server:http://emfisis.physics.uiowa.edu/das/das2Server?dataset=';">C</a>
+        <a href="#" onclick="document.getElementById('uri').value='vap+cdaweb:';">D</a>
+        <br>
+        <textarea rows="1" cols="120" id="uri" name="uri" >http://autoplot.org/data/autoplot.cdf?</textarea><br>
+        <br>
+        <input type="submit" value="Execute" />
+    </form>
+</html>
