@@ -19,6 +19,7 @@ import org.netbeans.jemmy.operators.*;
 import org.virbo.autoplot.AutoplotUI;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.BindingModel;
 import util.RegexComponentChooser;
 
 /**
@@ -98,7 +99,12 @@ public class Test_2pt2_ContextOverview implements Scenario {
                 return 0;
             } else {
                 System.err.println("** fail because one of the following is not true:");
-                if ( !tbindings ) System.err.println("** tbindings="+tbindings+"\tdom.getBindings().length should be 13, it is "+dom.getBindings().length );
+                if ( !tbindings ) {
+                    System.err.println("** tbindings="+tbindings+"\tdom.getBindings().length should be 13, it is "+dom.getBindings().length );
+                    for ( BindingModel binding : dom.getBindings()) {
+                        System.err.println("  " + binding);
+                    }
+                }
                 if ( !trange ) System.err.println("** trange="+trange+ "\t"+range0+" should equal "+ dom.getPlots(1).getXaxis().getRange() );
                 return 1;
             }
