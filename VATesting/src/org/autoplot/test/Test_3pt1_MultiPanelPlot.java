@@ -5,11 +5,13 @@
  */
 package org.autoplot.test;
 
+import java.awt.Point;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JInternalFrame;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
@@ -17,6 +19,7 @@ import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JInternalFrameOperator;
+import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JMenuOperator;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JPopupMenuOperator.JPopupMenuFinder;
@@ -46,7 +49,10 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             
             JFrameOperator mainFrame = new JFrameOperator(app);
             
-            //new JLabelOperator(mainFrame, AutoplotUI.READY_MESSAGE );
+            // wait for the application to be in the "ready" state.
+            new JLabelOperator(mainFrame).waitText( AutoplotUI.READY_MESSAGE );
+            
+            Thread.sleep(500);
             
             JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
             menuBar.pushMenu("Options|Enable Feature|Layout Panel", "|");
@@ -58,21 +64,19 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             ScriptContext.waitUntilIdle();
             
             JButtonOperator tallerB = new JButtonOperator( mainFrame, "Taller" );
-            tallerB.clickMouse(4);
+            tallerB.clickMouse(4); // This is the number of clicks, for example 2 is double-click.
             
-            int pointX = mainFrame.getCenterX();
-            int pointY = mainFrame.getCenterY();
-            mainFrame.clickForPopup(pointX, pointY);
-            mainFrame.clickForPopup(pointX-200, pointY-200);
+            Point clickPoint= tallerB.getLocation();
+            clickPoint= SwingUtilities.convertPoint( tallerB.getSource().getParent(), clickPoint, mainFrame.getSource() );
+            //int pointX = tallerB.getX()+100;
+            //int pointY = tallerB.getY()-100;
+            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-100 );
+            //mainFrame.clickForPopup(pointX-200, pointY-200);
             
-            //JPopupMenu jpm = new JPopupMenu(new RegexComponentChooser("plot.*"));
-            //JPopupMenuOperator popup = new JPopupMenuOperator(mainFrame);
-            //popup.pushMenu("Plots|Add Plots", "|");
-            //System.err.println(jpm.getLocation());
+            JPopupMenuOperator popup = new JPopupMenuOperator();
+            popup.pushMenuNoBlock("Plot|Add Plots", "|"); // I think because this is a "modal" dialog.
             
-            
-            
-            
+            Thread.sleep(200);
             //System.err.println((mainFrame.getComponentAt(pointX-200, pointY-200)).toString());
             //System.err.println((mainFrame.getRootPane()).toString());
             //JInternalFrame plots = new JInternalFrame((mainFrame.getComponentAt(pointX-200, pointY-200)).toString());
@@ -96,8 +100,21 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             
             //new JLabelOperator(mainFrame, AutoplotUI.READY_MESSAGE );
 
-            Thread.sleep(1000); // This is because of a bug in the locking, otherwise it will grab the current image.
+            DialogOperator frame = new DialogOperator( new RegexComponentChooser( "Add Plots") );
             
+            
+            JTextComponentOperator size = new JTextComponentOperator( frame, new RegexComponentChooser("1") ); // this will pick the first
+            size.enterText("2"); // enterText, not setText, or the values don't commit. (Huh.)
+            size = new JTextComponentOperator( frame, new RegexComponentChooser("1") ); // this will pick the second because the first is "2"
+            size.enterText("3");
+            new JButtonOperator(frame,"OK").press();
+            
+            ScriptContext.waitUntilIdle();
+
+            while ( frame.isVisible() ) {
+                Thread.sleep(100);  // Why does the press take so long???
+            }
+
             System.err.println("Done!");
             
             writeToPng("Test_3pt1_MultiPanelPlot.png"); // Leave artifacts for testing.
