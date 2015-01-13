@@ -95,7 +95,7 @@ public class Test_2pt2_ContextOverview implements Scenario {
             boolean tbindings= dom.getBindings().length==13; // colorbar //TODO: WHY????
             boolean trange= range0.equals( dom.getPlots(1).getXaxis().getRange() );
 
-            System.err.println("= Bindings =");
+            System.err.println("= Bindings ("+dom.getBindings().length+")=");
             for ( BindingModel binding : dom.getBindings()) {
                 System.err.println("  " + binding);
             }
