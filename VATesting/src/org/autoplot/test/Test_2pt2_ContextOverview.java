@@ -92,19 +92,25 @@ public class Test_2pt2_ContextOverview implements Scenario {
 
             writeToPng( "Test_2pt2_ContextOverview.002.png");
 
-            boolean tbindings= dom.getBindings().length==13 || dom.getBindings().length==16; // colorbar //TODO: WHY????
+            boolean tbindings= dom.getBindings().length==13; // colorbar //TODO: WHY????
             boolean trange= range0.equals( dom.getPlots(1).getXaxis().getRange() );
 
+            System.err.println("= Bindings =");
+            for ( BindingModel binding : dom.getBindings()) {
+                System.err.println("  " + binding);
+            }
+            
+            Thread.sleep(1000); 
+            
             if ( tbindings && trange ) {
                 return 0;
             } else {
                 System.err.println("** fail because one of the following is not true:");
                 if ( !tbindings ) {
                     System.err.println("** tbindings="+tbindings+"\tdom.getBindings().length should be 13, it is "+dom.getBindings().length );
-                    for ( BindingModel binding : dom.getBindings()) {
-                        System.err.println("  " + binding);
-                    }
-                }
+                } else if ( dom.getBindings().length==16 ) {
+                    System.err.println("  WHY???");
+                } 
                 if ( !trange ) System.err.println("** trange="+trange+ "\t"+range0+" should equal "+ dom.getPlots(1).getXaxis().getRange() );
                 return 1;
             }
