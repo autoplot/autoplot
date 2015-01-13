@@ -14,7 +14,7 @@
            displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
         </p>
 
-        <p>This is the Autoplot2014b branch.  This is an update to the production version containing bugfixes and minor new features.
+        <p>This is the Autoplot2015a branch.  This is an update to the production version containing bugfixes and minor new features.
             Java 6 is now required.
         </p>
 
@@ -26,6 +26,9 @@
         to resolve old numbers.
         <p>Bugfixes (2015-01-10):</p>
         <ul> 
+            <li>1304: Partial vap support introduced bug where linestyle setting would be reset for time series browsing.</li>
+            <li>synchronize cdf reads because of occasional RTE shown in test500.</li>
+            <li>das2server reader _res switch is not sent to the server.</li>
             <li>rte_2124254968: Das2Server editor panel allowed folders to be selected, causing RTE.  Thanks Dan!</li>
             <li>dashed property was reset when browsing to the next day.</li>
             <li>Add pow and sqrt to list of filters.  Thanks Allison!</li>
@@ -104,6 +107,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>completions servlet will support the thin client.</li>
+            <li>das2server data source code supports 401 and conventional authentication</li>
+            <li>add intrinsic=true to das2server data source.</li>            
             <li>add leap second for July 1, 2015</li>
             <li>update RBSP orbits to 2015-01-13</li>
             <li>Start more Jemmy GUI testing.  Thanks Kenzie!</li>

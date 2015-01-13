@@ -15,7 +15,7 @@
     href="autoplot.jnlp">
    
     <information> 
-        <title>Autoplot (v2014a)</title>
+        <title>Autoplot (v2015a)</title>
         <vendor>http://virbo.org/</vendor>
 	<homepage href="http://autoplot.org/" />
         <description>plots data from various sources, such as opendap, cdf, and netcdf using das2</description> 
