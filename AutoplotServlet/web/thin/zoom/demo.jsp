@@ -17,13 +17,20 @@
 <body>
     <%
          String vap= request.getParameter("vap");
-         if ( vap==null ) {
-             throw new IllegalArgumentException("vap file not specified.");
+         String uri= request.getParameter("uri");
+         String ssArg;
+         if ( vap==null && uri==null ) {
+             throw new IllegalArgumentException("vap file or uri not specified.");
+         } else if ( vap!=null ) {
+             ssArg= "vap="+URLEncoder.encode(vap,"US-ASCII");
+         } else {
+             ssArg= "uri="+URLEncoder.encode(uri,"US-ASCII");
          }
+         
      %>
 	<div id="iddivimg">
 		<img id="idplot" 
-                     src="../../SimpleServlet?vap=<%= URLEncoder.encode(vap,"US-ASCII") %>"
+                     src="../../SimpleServlet?<%= ssArg %>"
                      onload="logloaded();" 
                 >
 	</div>

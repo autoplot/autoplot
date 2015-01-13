@@ -37,9 +37,22 @@ public class CompletionsServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/plain;charset=UTF-8");
-        PrintWriter out = response.getWriter();
+        
         String uri= request.getParameter("uri");
+        String alt= request.getParameter("alt");
+        
+        if ( "1".equals(alt) ) {
+            response.setContentType("text/html;charset=UTF-8");
+        } else {
+            response.setContentType("text/plain;charset=UTF-8");
+        }
+        
+        PrintWriter out = response.getWriter();
+
+        if ( "1".equals(alt) ) {
+            out.println("<html><head></head>");
+        }
+        
         if ( uri==null ) throw new IllegalArgumentException("uri parameter not specified");
         URISplit split= URISplit.parse(uri); // make it canonical
                     
@@ -60,8 +73,16 @@ public class CompletionsServlet extends HttpServlet {
         try {
             String[] result= ScriptContext.getCompletions(uri);
             for ( String r: result ) {
-                out.println(r);
+                if ( "1".equals(alt) ) {
+                    out.println("<a href='thin/zoom/demo.jsp?uri="+r+"'>"+r+"</a><br>\n");
+                } else {
+                    out.println(r);
+                }
             }
+            if ( "1".equals(alt) ) {
+                out.println("</html>");
+            }
+                    
         } catch ( Exception ex ) {
             out.println("(Error: "+ex.getMessage()+")");
         } finally {
