@@ -103,11 +103,11 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             DialogOperator frame = new DialogOperator( new RegexComponentChooser( "Add Plots") );
             
             
-            JTextComponentOperator size = new JTextComponentOperator( frame, new RegexComponentChooser("1") ); // this will pick the first
+            JTextComponentOperator size = new JTextComponentOperator( frame, 1 ); // this will pick the first
             size.enterText("2"); // enterText, not setText, or the values don't commit. (Huh.)
-            size = new JTextComponentOperator( frame, new RegexComponentChooser("1") ); // this will pick the second because the first is "2"
-            size.enterText("3");
-            new JButtonOperator(frame,"OK").press();
+            JTextComponentOperator size1 = new JTextComponentOperator( frame, 0 ); // this will pick the second because the first is "2"
+            size1.enterText("3");
+            new JButtonOperator(frame,"OK").clickMouse();
             
             ScriptContext.waitUntilIdle();
 
@@ -115,6 +115,13 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
                 Thread.sleep(100);  // Why does the press take so long???
             }
 
+            
+            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110 );
+            JPopupMenuOperator popup2 = new JPopupMenuOperator();
+            popup2.pushMenuNoBlock("Plot|Delete", "|");
+            Thread.sleep(200);
+            
+            
             System.err.println("Done!");
             
             writeToPng("Test_3pt1_MultiPanelPlot.png"); // Leave artifacts for testing.
