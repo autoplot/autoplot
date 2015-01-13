@@ -41,6 +41,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.stream.MIME;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.KeyChain;
 import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -270,6 +271,33 @@ class Das2ServerDataSource extends AbstractDataSource {
 		  if(conn instanceof HttpURLConnection){
 		     HttpURLConnection httpConn = (HttpURLConnection) conn;
 			  int nStatus = httpConn.getResponseCode();
+                          while ( nStatus==401 ) {
+                                org.das2.util.CredentialsManager cm= org.das2.util.CredentialsManager.getMannager();
+                                String sLocId= this.resourceURI.toURL().toString() + "|" + dataset;
+                                //String sLocId = "planet.physics.uiowa.edu/das/das2Server|voyager1/pwi/SpecAnalyzer-4s-Efield";
+                                if(!cm.hasCredentials(sLocId)){
+                                    DasServer svr = DasServer.create(this.resourceURI.toURL());
+                                    String sDesc = String.format("<html><h3>%s</h3><hr>Server: <b>%s</b><br>"+ "Data Set: <b>%s</b>",
+                                         svr.getName(), svr.getHost(),
+                                         dataset );
+                                    cm.setDescription(sLocId, sDesc, svr.getLogo() );
+                                }
+                                String sHash = cm.getHttpBasicHash(sLocId);
+                                if ( sHash==null ) {
+                                    throw new java.io.IOException("User credentials are not available "+
+					  " for URL: " + url2);
+                                }
+                                conn = url2.openConnection(); //TODO: stderr should be consumed.
+                                conn.setRequestProperty("Authorization", "Basic " + sHash );
+                                conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+                                httpConn = (HttpURLConnection) conn;
+                                nStatus = httpConn.getResponseCode();
+                                if ( nStatus==401 ){
+                                    cm.invalidate(sLocId);
+                                }
+                          }
+                                
+                              
 			  if(nStatus >= 400){
 			     String sMime = httpConn.getContentType();
 				  
