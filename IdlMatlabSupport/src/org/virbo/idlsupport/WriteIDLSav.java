@@ -70,9 +70,9 @@ public final class WriteIDLSav {
         for ( int i=0; i<257*4; i++ ) {
             result.put((byte)0);
         }
-        result.put(date); System.err.println(4+result.position());
-        result.put(user); System.err.println(4+result.position());
-        result.put(host); System.err.println(4+result.position());
+        result.put(date); //System.err.println(4+result.position());
+        result.put(user); //System.err.println(4+result.position());
+        result.put(host); //System.err.println(4+result.position());
         result.flip();
         return result;
     }
@@ -303,11 +303,11 @@ public final class WriteIDLSav {
 
         rec.flip();
 
-        String stype= nameFor( recType ) ;
+        //String stype= nameFor( recType ) ;
 
 
         //System.err.println( "writing "+stype + " to buffer bytes "+ pos + " to " + ( pos + rec.limit() ) + " " + padBytes );
-        System.err.printf( "%d %d %s\n", pos, pos +rec.limit(), stype );
+        //System.err.printf( "%d %d %s\n", pos, pos +rec.limit(), stype );
         ch.write(rec);
 
         pos+= rec.limit();
