@@ -328,8 +328,8 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * bring up the autoplot with the dataset
-     * @param chNum the data source number to reset the URI.
-     * @param label for the plot.
+     * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param label the label for the plot dependent parameter
      * @param ds the dataset to use.
      * @throws java.lang.InterruptedException
      */
@@ -341,7 +341,8 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * plot the dataset in the specified  dataSource node.
-     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param label the label for the plot dependent parameter
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      * @throws java.lang.InterruptedException
@@ -356,7 +357,8 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * plot the dataset in the specified  dataSource node.
-     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param label the label for the plot dependent parameter
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      * @param renderType string explicitly controlling the renderType and hints.
@@ -373,8 +375,8 @@ public class ScriptContext extends PyJavaInstance {
     
     /**
      * plot the dataset in the specified  dataSource node.
-     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
-     * @param label the label for the dependent parameter
+     * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param label the label for the plot dependent parameter
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
@@ -401,13 +403,13 @@ public class ScriptContext extends PyJavaInstance {
      * specified.  The renderType parameter is a string identifier, and currently the following are
      * used: digital spectrogram nnSpectrogram hugeScatter series scatter colorScatter stairSteps
      * fillToZero digital image  pitchAngleDistribution eventsBar vectorPlot orbitPlot contour
-     **<blockquote><pre><small>{@code
+     *<blockquote><pre><small>{@code
      *plot( 0, 'label', findgen(20), ripples(20), ripples(20), 'digital' )
      *from org.virbo.autoplot import RenderType
      *plot( 0, 'label', findgen(20), ripples(20), ripples(20), RenderType.digital.toString() )
      *}</small></pre></blockquote>
      *
-     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param label the label for the dependent parameter
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
