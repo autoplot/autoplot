@@ -125,13 +125,23 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
 
         Variable var= ncfile.addVariable( varName, typeFor(data,typeSuggest), dims );
 
+        double fill;
+        Number nfill= (Number)data.property(QDataSet.FILL_VALUE);
+        if ( nfill==null ) {
+            fill= -1e38;
+        } else {
+            fill= nfill.doubleValue();
+        }
+        
         String meta= getParam( "metadata", "" );
         if ( meta.equals("istp") ) {
             var.addAttribute( new Attribute("UNITS", SemanticOps.getUnits(data).toString() ) );
             var.addAttribute( new Attribute("VAR_TYPE", "data" ) );
             var.addAttribute( new Attribute("VALIDMIN", (Double) getProperty( data, QDataSet.VALID_MIN, -1e38 ) ) );
             var.addAttribute( new Attribute("VALIDMAX", (Double) getProperty( data, QDataSet.VALID_MAX, 1e38 ) ) );
-            var.addAttribute( new Attribute("FILLVAL",  (Double) getProperty( data, QDataSet.FILL_VALUE, -1e31 ) ) );
+            var.addAttribute( new Attribute("FILLVAL",  fill ) );
+        } else {
+            var.addAttribute( new Attribute("_FillValue", fill ) );
         }
 
         if ( append ) {
