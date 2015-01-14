@@ -295,7 +295,7 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * plot the dataset in the specified dataSource node.
-     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param ds dataset to plot.
      * @throws java.lang.InterruptedException
      */
@@ -305,7 +305,7 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * plot the dataset in the specified  dataSource node.
-     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      * @throws java.lang.InterruptedException
@@ -316,7 +316,7 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * plot the dataset in the specified  dataSource node.
-     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
