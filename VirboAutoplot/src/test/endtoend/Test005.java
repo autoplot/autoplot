@@ -4,17 +4,13 @@
  */
 package test.endtoend;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.Column;
-import org.virbo.cdfdatasource.CdfFileDataSourceFactory;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 
@@ -33,7 +29,6 @@ public class Test005 {
 
     public static void main(String[] args)  {
         try {
-            CdfFileDataSourceFactory.loadCdfLibraries();
 
             Column mc= getDocumentModel().getCanvases(0).getMarginColumn();
             System.err.println("margin column: "+ mc.getId() + " " + mc.getLeft() + " " + mc.getRight() );
