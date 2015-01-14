@@ -5,12 +5,16 @@
 
 package org.virbo.netCDF;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetIterator;
@@ -34,7 +38,8 @@ import ucar.nc2.Variable;
 public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
 
     Map<QDataSet,String> names= new HashMap();
-
+    private static final Logger logger= LoggerManager.getLogger("apdss.cdfj");
+    
     private synchronized String nameFor(QDataSet dep0) {
         String name= names.get(dep0);
 
@@ -80,8 +85,24 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         setUri(uri);
 
         String typeSuggest= getParam( "type", "double" );
+        
+        File file= new File( getResourceURI().toURL().getFile() );
+        NetcdfFileWriteable ncfile;
+        
+        boolean append= "T".equals( getParam("append","F") ) ;
+        
+        if ( ! append ) {
+            if ( file.exists() && !file.delete() ) {
+                throw new IllegalArgumentException("Unable to delete file"+file);
+            }
+            logger.log(Level.FINE, "create HDF5 file {0}", file);
+            ncfile= NetcdfFileWriteable.createNew( file.toString(), true );
 
-        NetcdfFileWriteable ncfile= NetcdfFileWriteable.createNew( getResourceURI().toURL().getFile(), true );
+        } else {
+            throw new IllegalArgumentException("append is not supported"); // this is more complex than I was hoping.
+            //ncfile= NetcdfFileWriteable.openExisting( file.toString(), true );
+            
+        }
 
         String varName= nameFor(data);
 
@@ -113,7 +134,11 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             var.addAttribute( new Attribute("FILLVAL",  (Double) getProperty( data, QDataSet.FILL_VALUE, -1e31 ) ) );
         }
 
-        ncfile.create();
+        if ( append ) {
+            // I wonder how this would be done
+        } else {
+            ncfile.create();
+        }
 
         ArrayDataSet ads= ArrayDataSet.copy(data);
 
