@@ -136,14 +136,8 @@ public class ScriptPanelSupport {
                 return false;
             }
             if (panel.isDirty()) {
-                int result = JOptionPane.showConfirmDialog(panel,
-                        "save edits before loading\n" + sfile + ",\nor cancel script loading?", "loading new script", JOptionPane.OK_CANCEL_OPTION);
-                if (result == JOptionPane.OK_CANCEL_OPTION) {
-                    return false;
-                }
-                if ( saveAs()==JOptionPane.CANCEL_OPTION ) {
-                    return false;
-                }
+                logger.fine("editor is dirty, not showing script.");
+                return false;
             }
             if ( split.params!=null ) {
                 Map<String,String> params= URISplit.parseParams(split.params);
