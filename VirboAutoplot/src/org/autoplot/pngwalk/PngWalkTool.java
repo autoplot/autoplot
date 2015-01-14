@@ -238,6 +238,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
     public static PngWalkTool start( String template, final Window parent ) {
 
         final PngWalkTool tool = new PngWalkTool();
+        tool.parentWindow= parent;
 
         if ( template!=null ) {
             if ( template.endsWith(".pngwalk") ) {
@@ -473,6 +474,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
         }
     }
+    private Window parentWindow;
 
     /**
      * return the interval size (up/down)
@@ -1013,7 +1015,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         }
         
         dataSetSelector1.setValue(template);
-
+        
         WalkImageSequence oldseq= this.seq;
 
         URI uri= DataSetURI.getResourceURI(template);
@@ -1106,6 +1108,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         if ( seq.size()==0 ) {
             Container p= SwingUtilities.getWindowAncestor(this);
+            if ( p==null ) p= parentWindow;
             if ( this.getX()!=0 ) p= this; // for Linux, where the component isn't initialized yet.
             JOptionPane.showMessageDialog( p, "<html>Unable to find any images in sequence:<br>"+ seq.getTemplate() );
             return;
