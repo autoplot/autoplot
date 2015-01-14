@@ -91,6 +91,21 @@ class Das2ServerDataSource extends AbstractDataSource {
             
         }
 
+        Map<String,String> otherParams= new LinkedHashMap( params );
+        otherParams.remove("start_time");
+        otherParams.remove("end_time");
+        otherParams.remove("resolution");
+        otherParams.remove("dataset");
+        otherParams.remove("tsb");
+        otherParams.remove("timerange");
+        otherParams.remove("_res");      // =0.0 means use native resolution
+        otherParams.remove("intrinsic"); // =true means use native resolution
+        otherParams.remove("item");
+        otherParams.remove("interval");
+        otherParams.remove("key");
+
+        dsParams= (String)  URISplit.formatParams(otherParams);
+        
         if ( params2.get("start_time")!=null && params2.get("end_time")!=null ) {
             timeRange= new DatumRange( Units.us2000.parse( params2.get("start_time") ), Units.us2000.parse( params2.get("end_time") ) );
         }
