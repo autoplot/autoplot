@@ -224,6 +224,11 @@ public class DodsAdapter {
 
         mon.started();
         try {
+            logger.fine("There is suddenly a NullPointerException when using webstart");
+            logger.log(Level.FINE, "constraint: {0}", constraint);
+            logger.log(Level.FINE, "sui: {0}", sui);
+            logger.log(Level.FINE, "source: {0}", source);
+            logger.log(Level.FINE, "url: {0}", url);
             dds = url.getData(constraint, sui);
         } catch (DODSException ex) {
             if (mon.isCancelled()) {
