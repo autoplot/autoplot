@@ -197,7 +197,7 @@ public class PlotCommand extends PyObject {
 
         if ( nargs==1 && po0 instanceof PyString ) {
             try {
-                ScriptContext.plot(((PyString) po0).toString());
+                ScriptContext.plot( iplot, ((PyString) po0).toString());
             } catch (InterruptedException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
