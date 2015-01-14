@@ -5,7 +5,6 @@
 
 package test.endtoend;
 
-import gsfc.nssdc.cdf.CDF;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSourceRegistry;
 import static org.virbo.autoplot.ScriptContext.*;
@@ -206,7 +205,7 @@ public class Test032 {
     public static void main( String[] args ) throws Exception {
 
         System.err.println( System.getProperty("java.version") + " " + System.getProperty("os.arch") );
-        System.err.println( "C-based library version: " + CDF.getLibraryVersion() );
+        System.err.println( "C-based library version: (No Longer Installed)" );
 
         test1();
         test1_b();
