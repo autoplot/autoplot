@@ -589,7 +589,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     }
 
     public String getDescription() {
-        return "NASA Common Data Format (CDFJ)";
+        return "NASA Common Data Format";
     }
     
 }
