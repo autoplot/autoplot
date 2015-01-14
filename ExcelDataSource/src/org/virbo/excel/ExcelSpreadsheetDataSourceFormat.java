@@ -296,14 +296,22 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             }
             
             dateCellStyle= wb.createCellStyle();
-            dateCellStyle.setDataFormat( HSSFDataFormat.getBuiltinFormat("m/d/yy h:mm") );
+            dateCellStyle.setDataFormat( HSSFDataFormat.getBuiltinFormat("m/d/yy h:mm") ); // Note this list is limited to https://poi.apache.org/apidocs/org/apache/poi/ss/usermodel/BuiltinFormats.html
 
             if (data.rank() == 2) {
                 formatRank2(sheet, cellName, data, mon);
             } else if (data.rank() == 1) {
                 formatRank1(sheet, cellName, data, mon);
             }
-
+            
+            HSSFRow lastRow=  sheet.getRow(sheet.getLastRowNum());
+            short ncol= lastRow.getLastCellNum();
+            for ( short i=0; i<ncol; i++ ) {
+                if ( dateCellStyle.equals( lastRow.getCell(i).getCellStyle() ) ) {
+                    sheet.autoSizeColumn(i);
+                }
+            }
+            
             wb.write(out);
         } finally {
             out.close();
