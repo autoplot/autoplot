@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>FFTPower routine is used to create a spectrogram from a .wav file.  Happy Holidays!
+        <p><small>Binary file reader is used to read image from Juno camera data.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -24,8 +24,13 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2015-01-10):</p>
+        <p>Bugfixes (2015-01-14):</p>
         <ul> 
+            <li>In PNGWalk, set window ancestor properly for "Unable to find any images" message.</li>
+            <li>plotx(2,'vap+inline:ripples(20)') would always plot in the 0th position.</li>
+            <li>support fill in non-ISTP HDF files, using _FillVal metadata.</li>
+            <li>1306: automatically set the width of any time columns in export to Excel.</li>
+            <li>remove stderr noise from WriteIDLSav.</li>
             <li>1305: das2server URIs would loose their parameters, because TSB.getURI was called before getDataSet</li>
             <li>1304: Partial vap support introduced bug where linestyle setting would be reset for time series browsing.</li>
             <li>synchronize cdf reads because of occasional RTE shown in test500.</li>
@@ -38,7 +43,6 @@
             <li>1303: jyds scripts with SimpleServlet.  Allow relative reference to scripts/data/, introduce whitelist.txt.</li>
             <li>correct progress feedback in demo 1</li>
             <li>1302: indicate busy when Autoplot is launched with URI.  There was a ~5 second period where no feedback was provided.</li>
-            <li>In PNGWalk, set window ancestor properly for "Unable to find any images" message.</li>
             <li>1301: redo mechanism that resolves the same file downloaded from two Autoplot instances, by allowing simultaneous loads and resolving the results.  Thanks, Bill!</li>
             <li>1300: strange export data behavior on Mac, where somehow discovery mechanism was getting the wrong type</li>
             <li>1299: where trimProperties would drop the original properties</li>
