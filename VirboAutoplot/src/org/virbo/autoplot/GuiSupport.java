@@ -420,7 +420,7 @@ public class GuiSupport {
                         parent.setStatus( "export data cancelled" );
                         return;
                     }
-                    mon.finished(); //why?
+                    if ( !mon.isFinished() ) mon.finished(); // in cause the getDataSet method fails to call finished.
                 }
             }
 
