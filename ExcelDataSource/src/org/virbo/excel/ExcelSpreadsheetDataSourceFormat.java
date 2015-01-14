@@ -307,7 +307,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             HSSFRow lastRow=  sheet.getRow(sheet.getLastRowNum());
             short ncol= lastRow.getLastCellNum();
             for ( short i=0; i<ncol; i++ ) {
-                if ( dateCellStyle.equals( lastRow.getCell(i).getCellStyle() ) ) {
+                if ( lastRow.getCell(i)!=null && dateCellStyle.equals( lastRow.getCell(i).getCellStyle() ) ) {
                     sheet.autoSizeColumn(i);
                 }
             }
