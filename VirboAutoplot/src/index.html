@@ -26,6 +26,7 @@
         to resolve old numbers.
         <p>Bugfixes (2015-01-10):</p>
         <ul> 
+            <li>1305: das2server URIs would loose their parameters, because TSB.getURI was called before getDataSet</li>
             <li>1304: Partial vap support introduced bug where linestyle setting would be reset for time series browsing.</li>
             <li>synchronize cdf reads because of occasional RTE shown in test500.</li>
             <li>das2server reader _res switch is not sent to the server.</li>
