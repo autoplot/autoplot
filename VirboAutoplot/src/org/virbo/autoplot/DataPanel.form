@@ -109,7 +109,7 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="operationsLabel">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Operations:"/>
+            <Property name="text" type="java.lang.String" value="Filter/Component:"/>
             <Property name="toolTipText" type="java.lang.String" value="Process string that specifies component to plot, or how a data set&apos;s dimensionality should be reduced before display."/>
           </Properties>
         </Component>
@@ -144,7 +144,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/org/virbo/autoplot/resources/pipeMag2.png"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" value="Open operations editor"/>
+            <Property name="toolTipText" type="java.lang.String" value="Open filters editor"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editComponentPanelActionPerformed"/>
@@ -162,7 +162,7 @@
                 <Font component="processDataSetLabel" property="font" relativeSize="true" size="-4"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" value="(dataset will go here)"/>
+            <Property name="text" type="java.lang.String" value="(filtered dataset will go here)"/>
           </Properties>
         </Component>
         <Container class="org.virbo.filters.FiltersChainPanel" name="filtersChainPanel1">

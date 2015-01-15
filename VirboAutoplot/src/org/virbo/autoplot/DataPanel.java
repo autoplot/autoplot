@@ -612,7 +612,7 @@ public class DataPanel extends javax.swing.JPanel {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Data Post Processing [?]\n"));
 
-        operationsLabel.setText("Operations:");
+        operationsLabel.setText("Filter/Component:");
         operationsLabel.setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
 
         sliceAutorangesCB.setText("Slice Index Change Autoranges");
@@ -625,7 +625,7 @@ public class DataPanel extends javax.swing.JPanel {
         dataSetLabel.setText("(dataset will go here)");
 
         editComponentPanel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/resources/pipeMag2.png"))); // NOI18N
-        editComponentPanel.setToolTipText("Open operations editor");
+        editComponentPanel.setToolTipText("Open filters editor");
         editComponentPanel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editComponentPanelActionPerformed(evt);
@@ -636,7 +636,7 @@ public class DataPanel extends javax.swing.JPanel {
         bindingGroup.addBinding(binding);
 
         processDataSetLabel.setFont(processDataSetLabel.getFont().deriveFont(processDataSetLabel.getFont().getSize()-4f));
-        processDataSetLabel.setText("(dataset will go here)");
+        processDataSetLabel.setText("(filtered dataset will go here)");
 
         filtersChainPanel1.setLayout(new javax.swing.BoxLayout(filtersChainPanel1, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -654,7 +654,7 @@ public class DataPanel extends javax.swing.JPanel {
                         .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jPanel2Layout.createSequentialGroup()
                                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
+                                    .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 173, Short.MAX_VALUE)
                                     .add(dataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .add(258, 258, 258))
                             .add(jPanel2Layout.createSequentialGroup()
@@ -823,7 +823,8 @@ public class DataPanel extends javax.swing.JPanel {
         
         panel.add( p, BorderLayout.CENTER );
         p.setFilter(componentTextField1.getText());
-        p.setInput(element.getController().getDataSet()); 
+        QDataSet inputDs= this.dsf.getController().getFillDataSet();
+        p.setInput(inputDs); 
      
         int ret= AutoplotUtil.showConfirmDialog( this, panel, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
         if ( ret==JOptionPane.OK_OPTION ) {
