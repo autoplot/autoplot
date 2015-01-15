@@ -15,6 +15,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Event;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -41,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.autoplot.help.AutoplotHelpSystem;
@@ -373,14 +375,24 @@ public class DataPanel extends javax.swing.JPanel {
             return;
         }
         String fcpf= filtersChainPanel1.getFilter();
-        String newf= componentTextField1.getText();
+        final String newf= componentTextField1.getText();
         if ( !fcpf.equals(newf) ) {
-            filtersChainPanel1.setFilter(newf);
-            if ( dsf!=null ) {
-                filtersChainPanel1.setInput(null);
-                filtersChainPanel1.setInput(dsf.getController().getFillDataSet());
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    filtersChainPanel1.setFilter(newf);
+                    if ( dsf!=null ) {
+                        filtersChainPanel1.setInput(null);
+                        filtersChainPanel1.setInput(dsf.getController().getFillDataSet());
+                    } else {
+                        filtersChainPanel1.setInput(null);
+                    }
+                }
+            };
+            if ( EventQueue.isDispatchThread() ) {
+                run.run();
             } else {
-                filtersChainPanel1.setInput(null);
+                SwingUtilities.invokeLater(run);
             }
         }
         
