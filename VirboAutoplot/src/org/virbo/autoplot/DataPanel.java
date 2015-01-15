@@ -11,6 +11,9 @@
 
 package org.virbo.autoplot;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,9 +31,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -800,13 +807,25 @@ public class DataPanel extends javax.swing.JPanel {
         if (s.equals("(none)")) s = "";
         applicationController.getDataSourceFilter().setFill(s);
 }//GEN-LAST:event_fillValueComboBoxActionPerformed
-
+    
     private void editComponentPanelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editComponentPanelActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);  
 
+        JPanel panel= new JPanel(new BorderLayout());
+        
+        panel.add( new JLabel("<html><em>Add filters to apply to the data before plotting.<br> "), BorderLayout.NORTH );
+        
         FiltersChainPanel p= new FiltersChainPanel();
+        
+        Dimension d= new Dimension(480,320);
+        panel.setPreferredSize( d );
+        panel.setMinimumSize( d );
+        
+        panel.add( p, BorderLayout.CENTER );
         p.setFilter(componentTextField1.getText());
-        int ret= JOptionPane.showConfirmDialog( this, p, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
+        p.setInput(element.getController().getDataSet());
+     
+        int ret= AutoplotUtil.showConfirmDialog( this, panel, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
         if ( ret==JOptionPane.OK_OPTION ) {
             String newFilter= p.getFilter();
             componentTextField1.setText( newFilter );
