@@ -7,7 +7,6 @@
 	<classpathentry kind="src" path="dasCoreDatum/src"/>
 	<classpathentry kind="src" path="AutoplotHelp/src"/>
 	<classpathentry kind="src" path="BinaryDataSource/src"/>
-	<classpathentry kind="src" path="CdfDataSource/src"/>
 	<classpathentry kind="src" path="CefDataSource/src"/>
 	<classpathentry kind="src" path="Das2ServerDataSource/src"/>
 	<classpathentry kind="src" path="DataSource/src"/>
@@ -55,7 +54,6 @@
 	<classpathentry kind="lib" path="APLibs/lib/javacsv.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/javaws.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/opendap-2.1.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/cdfjava.3.3.2.tt2000.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/cdfj_20141113.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jsamp-1.1.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jsyntaxpane-0.9.6.jar"/>
