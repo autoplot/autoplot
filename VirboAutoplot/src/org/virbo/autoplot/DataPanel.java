@@ -823,7 +823,7 @@ public class DataPanel extends javax.swing.JPanel {
         
         panel.add( p, BorderLayout.CENTER );
         p.setFilter(componentTextField1.getText());
-        p.setInput(element.getController().getDataSet());
+        p.setInput(element.getController().getDataSet()); 
      
         int ret= AutoplotUtil.showConfirmDialog( this, panel, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
         if ( ret==JOptionPane.OK_OPTION ) {
