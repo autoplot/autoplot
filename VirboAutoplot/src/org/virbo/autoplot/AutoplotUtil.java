@@ -1493,8 +1493,8 @@ public class AutoplotUtil {
         // round out to frame the data with empty space, so that the data extent is known.
         if (UnitsUtil.isIntervalOrRatioMeasurement(u) ) {
             if (result.log) {
-                if (result.robustMax <= 0.0 || !Double.isFinite(result.robustMax) ) result.robustMax = 1000;
-                if (result.robustMin <= 0.0 || !Double.isFinite(result.robustMin) ) result.robustMin = result.robustMax / 1e3;
+                if (result.robustMax <= 0.0 || Double.isNaN(result.robustMax) ) result.robustMax = 1000;
+                if (result.robustMin <= 0.0 || Double.isNaN(result.robustMin) ) result.robustMin = result.robustMax / 1e3;
                 Datum min= u.createDatum(result.robustMin);
                 Datum max= u.createDatum(result.robustMax );
                 DomainDivider div= DomainDividerUtil.getDomainDivider(
