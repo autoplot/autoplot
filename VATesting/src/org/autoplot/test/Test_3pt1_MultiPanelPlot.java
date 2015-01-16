@@ -5,28 +5,24 @@
  */
 package org.autoplot.test;
 
+
 import java.awt.Point;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JInternalFrame;
-import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
-import org.netbeans.jemmy.operators.JComboBoxOperator;
+import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
-import org.netbeans.jemmy.operators.JInternalFrameOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
-import org.netbeans.jemmy.operators.JMenuOperator;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
-import org.netbeans.jemmy.operators.JPopupMenuOperator.JPopupMenuFinder;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
+import org.netbeans.jemmy.operators.JTableOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import static org.netbeans.jemmy.operators.Operator.getPopupMouseButton;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
 import static org.virbo.autoplot.ScriptContext.save;
@@ -68,44 +64,18 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             
             Point clickPoint= tallerB.getLocation();
             clickPoint= SwingUtilities.convertPoint( tallerB.getSource().getParent(), clickPoint, mainFrame.getSource() );
-            //int pointX = tallerB.getX()+100;
-            //int pointY = tallerB.getY()-100;
             mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-100 );
-            //mainFrame.clickForPopup(pointX-200, pointY-200);
             
             JPopupMenuOperator popup = new JPopupMenuOperator();
             popup.pushMenuNoBlock("Plot|Add Plots", "|"); // I think because this is a "modal" dialog.
             
             Thread.sleep(200);
-            //System.err.println((mainFrame.getComponentAt(pointX-200, pointY-200)).toString());
-            //System.err.println((mainFrame.getRootPane()).toString());
-            //JInternalFrame plots = new JInternalFrame((mainFrame.getComponentAt(pointX-200, pointY-200)).toString());
-            //JInternalFrameOperator plotsFrame = new JInternalFrameOperator(plots);
-            //plotsFrame.makeComponentVisible();
-            //System.err.println(plotsFrame.contains(pointX-200, pointY-200));
-            //System.err.println(plotsFrame.getCenterX());
-            //System.err.println(plotsFrame.getCenterY());
-            
-            
-            //mainFrame.moveMouse(pointX-198, pointY-195);
-            //mainFrame.moveMouse(pointX, pointY-150);
-            //mainFrame.moveMouse(pointX, pointY-160);  //moves mouse down to "Add Plots" option
-            //mainFrame.clickMouse();
-
-            
-           
-            
-            //new JPopupMenuOperator(popup).pushMenu("Plot|Add Plots", "|");
-            
-            
-            //new JLabelOperator(mainFrame, AutoplotUI.READY_MESSAGE );
 
             DialogOperator frame = new DialogOperator( new RegexComponentChooser( "Add Plots") );
-            
-            
-            JTextComponentOperator size = new JTextComponentOperator( frame, 1 ); // this will pick the first
+                       
+            JTextComponentOperator size = new JTextComponentOperator( frame, 1 ); 
             size.enterText("2"); // enterText, not setText, or the values don't commit. (Huh.)
-            JTextComponentOperator size1 = new JTextComponentOperator( frame, 0 ); // this will pick the second because the first is "2"
+            JTextComponentOperator size1 = new JTextComponentOperator( frame, 0 ); 
             size1.enterText("3");
             new JButtonOperator(frame,"OK").clickMouse();
             
@@ -115,11 +85,104 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
                 Thread.sleep(100);  // Why does the press take so long???
             }
 
+
+            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //this initially calls the popup, but because the Plot is unselected by this click, the popup is useless
+            mainFrame.clickMouse(mainFrame.getCenterX(), mainFrame.getCenterY()); //click away to get out of the popup
+            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //now the plot is selected, allowing the popup to function properly (I know this isn't the easiest way to do this)
+            popup = new JPopupMenuOperator();
+            popup.pushMenu("Plot|Delete", "|");
             
-            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110 );
-            JPopupMenuOperator popup2 = new JPopupMenuOperator();
-            popup2.pushMenuNoBlock("Plot|Delete", "|");
+            //Open DOM Properties
+            menuBar.pushMenu("Edit|Edit DOM", "|");
+            DialogOperator domProps = new DialogOperator( new RegexComponentChooser( "DOM Properties") );
+            
+            JTableOperator domTable = new JTableOperator( domProps);
+            
+            //Open Plot Elements Tree
+            domTable.selectCell(8, 0);
+            
+            //Plot Element 1
+            domTable.selectCell(9, 0);
+            domTable.selectCell(15,1);
+            JTextFieldOperator component = new JTextFieldOperator(domTable);
+            component.setText("slice0(i)");
+            domTable.selectCell(9,0);
+            
+            
+            //Plot Element 2
+            domTable.selectCell(10, 0);
+            domTable.selectCell(16,1);
+            component = new JTextFieldOperator(domTable);
+            component.setText("slice0(i)");
+            domTable.selectCell(18, 1);
+            JTextFieldOperator dataSourceFilt = new JTextFieldOperator(domTable, "data_2");
+            dataSourceFilt.setText("data_1");
+            domTable.selectCell(10, 0);
+            
+            //Plot Element 3
+            domTable.selectCell(11,0);
+            domTable.selectCell(17,1);
+            component = new JTextFieldOperator(domTable);
+            component.setText("slice0(i)");
+            domTable.selectCell(19,1);
+            dataSourceFilt = new JTextFieldOperator(domTable, "data_3");
+            dataSourceFilt.setText("data_1");
+            domTable.selectCell(11, 0);
+            
+            //Plot Element 4
+            domTable.selectCell(12, 0);
+            domTable.selectCell(18,1);
+            component = new JTextFieldOperator(domTable);
+            component.setText("slice0(i)");
+            domTable.selectCell(20, 1);
+            dataSourceFilt = new JTextFieldOperator(domTable, "data_4");
+            dataSourceFilt.setText("data_1");
+            domTable.selectCell(12, 0);
+            
+            //Plot Element 5
+            domTable.selectCell(13, 0);
+            domTable.selectCell(19,1);
+            component = new JTextFieldOperator(domTable);
+            component.setText("slice0(i)");
+            domTable.selectCell(21, 1);
+            dataSourceFilt = new JTextFieldOperator(domTable, "data_5");
+            dataSourceFilt.setText("data_1");
+            domTable.selectCell(13, 0);
+            
+            //Plot Element 6
+            domTable.selectCell(14, 0);
+            domTable.selectCell(20,1);
+            component = new JTextFieldOperator(domTable);
+            component.setText("slice0(i)");
+            domTable.selectCell(22, 1);
+            dataSourceFilt = new JTextFieldOperator(domTable, "data_6");
+            dataSourceFilt.setText("data_1");
+            domTable.selectCell(14, 0);
+            
+            new JButtonOperator(domProps, "Apply").clickMouse();
+            new JButtonOperator(domProps, "OK").clickMouse();
+            
+            ScriptContext.waitUntilIdle();
+            while ( domProps.isVisible() ) {
+                Thread.sleep(100);  // Why does the press take so long???
+            }
+            
+            //Add Hidden Plot to bind all the plot X and Y axes together
+            mainFrame.clickForPopup(clickPoint.x+200, clickPoint.y-100 );
+            popup = new JPopupMenuOperator();
+            popup.pushMenu("Canvas|Add Hidden Plot...", "|");
             Thread.sleep(200);
+            
+            
+            DialogOperator addhiddenplot = new DialogOperator( new RegexComponentChooser( "Add hidden .*") );
+            JCheckBoxOperator zaxis = new JCheckBoxOperator(addhiddenplot, 2);
+            zaxis.setSelected(false);
+            new JButtonOperator(addhiddenplot, "OK").clickMouse();
+            
+            ScriptContext.waitUntilIdle();
+            while ( addhiddenplot.isVisible() ) {
+                Thread.sleep(100);  // Why does the press take so long???
+            }
             
             
             System.err.println("Done!");
