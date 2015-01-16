@@ -84,15 +84,19 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             while ( frame.isVisible() ) {
                 Thread.sleep(100);  // Why does the press take so long???
             }
-
-
+            
             ScriptContext.plot(1,"vap+fits:http://autoplot.org/data/hsi_qlimg_5050601_001.fits"); // small cheat
             
-            mainFrame.clickMouse(clickPoint.x+50, clickPoint.y-110); //click away to get out of the popup
+            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //this initially calls the popup, but because the Plot is unselected by this click, the popup is useless
+            mainFrame.clickMouse(clickPoint.x+150, clickPoint.y-110); //click away to get out of the popup
             //mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //this initially calls the popup, but because the Plot is unselected by this click, the popup is useless
             mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //now the plot is selected, allowing the popup to function properly (I know this isn't the easiest way to do this)
-            popup = new JPopupMenuOperator();
-            popup.pushMenu("Plot|Delete", "|");
+            JPopupMenuOperator popup1 = new JPopupMenuOperator();
+            popup1.pushMenuNoBlock("Plot|Delete", "|");
+            
+            Thread.sleep(500);
+            
+            ScriptContext.waitUntilIdle();
             
             //Open DOM Properties
             menuBar.pushMenu("Edit|Edit DOM", "|");
@@ -107,7 +111,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(9, 0);
             domTable.selectCell(15,1);
             JTextFieldOperator component = new JTextFieldOperator(domTable);
-            component.enterText("slice0(0)");
+            component.setText("slice0(0)");
             //domTable.selectCell(18, 1);
             //dataSourceFilt = new JTextFieldOperator(domTable, "data_1");
             //dataSourceFilt.setText("data_1");
@@ -118,7 +122,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(10, 0);
             domTable.selectCell(16,1);
             component = new JTextFieldOperator(domTable);
-            component.enterText("slice0(1)");
+            component.setText("slice0(1)");
             domTable.selectCell(18, 1);
             dataSourceFilt = new JTextFieldOperator(domTable, "data_2");
             dataSourceFilt.setText("data_1");
@@ -128,7 +132,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(11,0);
             domTable.selectCell(17,1);
             component = new JTextFieldOperator(domTable);
-            component.enterText("slice0(2)");
+            component.setText("slice0(2)");
             domTable.selectCell(19,1);
             dataSourceFilt = new JTextFieldOperator(domTable, "data_3");
             dataSourceFilt.setText("data_1");
@@ -138,7 +142,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(12, 0);
             domTable.selectCell(18,1);
             component = new JTextFieldOperator(domTable);
-            component.enterText("slice0(3)");
+            component.setText("slice0(3)");
             domTable.selectCell(20, 1);
             dataSourceFilt = new JTextFieldOperator(domTable, "data_4");
             dataSourceFilt.setText("data_1");
@@ -148,7 +152,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(13, 0);
             domTable.selectCell(19,1);
             component = new JTextFieldOperator(domTable);
-            component.enterText("slice0(4)");
+            component.setText("slice0(4)");
             domTable.selectCell(21, 1);
             dataSourceFilt = new JTextFieldOperator(domTable, "data_5");
             dataSourceFilt.setText("data_1");
@@ -161,7 +165,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             component.setText("slice0(5)");
             domTable.selectCell(22, 1);
             dataSourceFilt = new JTextFieldOperator(domTable, "data_6");
-            dataSourceFilt.enterText("data_1");
+            dataSourceFilt.setText("data_1");
             domTable.selectCell(14, 0);
             
             new JButtonOperator(domProps, "Apply").clickMouse();
@@ -189,6 +193,8 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
                 Thread.sleep(100);  // Why does the press take so long???
             }
             
+            new JTabbedPaneOperator( app.getTabs() ).selectPage("canvas");
+            Thread.sleep(5000);
             
             System.err.println("Done!");
             
