@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <Properties>
+    <Property name="name" type="java.lang.String" value="dataPanel" noResource="true"/>
+  </Properties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -41,6 +44,7 @@
             <TitledBorder title="Data Post Processing [?]&#xa;"/>
           </Border>
         </Property>
+        <Property name="name" type="java.lang.String" value="dataPostProcessingPanel" noResource="true"/>
       </Properties>
 
       <Layout>
@@ -54,29 +58,27 @@
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jLabel1" pref="173" max="32767" attributes="0"/>
-                                      <Component id="dataSetLabel" alignment="0" max="32767" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace min="-2" pref="258" max="-2" attributes="0"/>
-                              </Group>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Component id="dataSetLabel" max="32767" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="operationsLabel" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
                                   <Component id="recentComboBox" max="32767" attributes="0"/>
-                                  <EmptySpace min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Component id="editComponentPanel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="sliceAutorangesCB" max="32767" attributes="0"/>
+                          <Component id="sliceAutorangesCB" pref="289" max="32767" attributes="0"/>
                           <EmptySpace min="-2" pref="235" max="-2" attributes="0"/>
                       </Group>
                       <Component id="processDataSetLabel" alignment="0" max="32767" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Component id="jLabel1" min="-2" pref="488" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
                   </Group>
               </Group>
           </Group>
@@ -109,7 +111,7 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="operationsLabel">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Filter/Component:"/>
+            <Property name="text" type="java.lang.String" value="Operations:"/>
             <Property name="toolTipText" type="java.lang.String" value="Process string that specifies component to plot, or how a data set&apos;s dimensionality should be reduced before display."/>
           </Properties>
         </Component>
@@ -117,6 +119,7 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Slice Index Change Autoranges"/>
             <Property name="toolTipText" type="java.lang.String" value="Changing the slice index will re-autorange the data"/>
+            <Property name="name" type="java.lang.String" value="sliceAutorangesCB" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
@@ -127,6 +130,7 @@
               </FontInfo>
             </Property>
             <Property name="text" type="java.lang.String" value="Apply additional operations to the dataset"/>
+            <Property name="name" type="java.lang.String" value="DataPostProcessingInstructionsLabel" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="dataSetLabel">
@@ -137,6 +141,7 @@
               </FontInfo>
             </Property>
             <Property name="text" type="java.lang.String" value="(dataset will go here)"/>
+            <Property name="name" type="java.lang.String" value="inputDataSetLabel" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="editComponentPanel">
@@ -151,6 +156,9 @@
           </Events>
         </Component>
         <Component class="org.virbo.datasource.RecentComboBox" name="recentComboBox">
+          <Properties>
+            <Property name="name" type="java.lang.String" value="recentComboBox" noResource="true"/>
+          </Properties>
           <BindingProperties>
             <BindingProperty name="selectedItem" source="filtersChainPanel1" sourcePath="${filter}" target="recentComboBox" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
           </BindingProperties>
@@ -166,6 +174,9 @@
           </Properties>
         </Component>
         <Container class="org.virbo.filters.FiltersChainPanel" name="filtersChainPanel1">
+          <Properties>
+            <Property name="name" type="java.lang.String" value="filtersChainPanel" noResource="true"/>
+          </Properties>
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
         </Container>
@@ -178,6 +189,7 @@
             <TitledBorder title="Data Source [?]"/>
           </Border>
         </Property>
+        <Property name="name" type="java.lang.String" value="dataSourcePanel" noResource="true"/>
       </Properties>
 
       <Layout>
@@ -283,6 +295,7 @@
           </Border>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="The Data Address, or URI, identifies the data that is loaded.  Plug-in data sources, resolved from this address, are used to load in the data for the given URI.  (This is not editable, but will be soon.)"/>
+        <Property name="name" type="java.lang.String" value="uriPanel" noResource="true"/>
       </Properties>
 
       <Layout>
