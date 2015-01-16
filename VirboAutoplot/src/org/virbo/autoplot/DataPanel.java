@@ -62,6 +62,7 @@ import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.InputVerifier;
 import org.virbo.filters.FiltersChainPanel;
 
 /**
@@ -134,6 +135,13 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
 
+        recentComboBox.setVerifier( new InputVerifier() {
+            @Override
+            public boolean verify(String value) {
+                return ( value.trim().length()>0 );
+            }
+        });
+        
         componentTextField1= ((JTextField)recentComboBox.getEditor().getEditorComponent());
         
         //dataSetSelector= new DataSetSelector();
@@ -209,16 +217,7 @@ public class DataPanel extends javax.swing.JPanel {
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel2, "dataPanel_2");
 
         componentTextField1.setText(" ");
-        componentTextField1.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                componentTextFieldMousePressed(evt);
-            }
-            @Override
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                componentTextFieldMouseReleased(evt);
-            }
-        });
+
         componentTextField1.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -255,18 +254,6 @@ public class DataPanel extends javax.swing.JPanel {
         setAdjusting(false);
         componentChanged();
     }
-
-    private void componentTextFieldMousePressed(java.awt.event.MouseEvent evt) {
-        if ( evt.isPopupTrigger() ) {
-            showProcessMenu(evt);
-        }
-    }
-
-    private void componentTextFieldMouseReleased(java.awt.event.MouseEvent evt) {
-        if ( evt.isPopupTrigger() ) {
-            showProcessMenu(evt);
-        }
-    }         
 
     protected void setExpertMode( boolean expert ) {
         componentTextField1.setVisible(expert);
@@ -855,6 +842,7 @@ public class DataPanel extends javax.swing.JPanel {
             recentComboBox.setSelectedItem( newFilter );
             //recentComboBox.actionPerformed(evt); // kludge to get it to log the new filter
             componentChanged();
+            recentComboBox.addToRecent( newFilter );
         }
     }//GEN-LAST:event_editComponentPanelActionPerformed
 
