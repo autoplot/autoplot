@@ -58,8 +58,10 @@ import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.RunLaterListener;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.DataSetWrapper;
 import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -1399,7 +1401,12 @@ public class PlotElementController extends DomNodeController {
                                 QDataSet context= (QDataSet) ds1.property(QDataSet.CONTEXT_0);
                                 if ( context!=null ) {
                                     if ( context.rank()==1 ) {
-                                        context= Ops.extent(context);
+                                        context= ArrayDataSet.copy(( QDataSet) ds1.property(QDataSet.CONTEXT_0) );
+                                        context= Ops.putProperty( context, QDataSet.DELTA_MINUS, null );
+                                        context= Ops.putProperty( context, QDataSet.DELTA_PLUS, null );
+                                        context= Ops.putProperty( context, QDataSet.BIN_MINUS, null );
+                                        context= Ops.putProperty( context, QDataSet.BIN_PLUS, null );
+                                        context= Ops.extent( context);
                                         if ( Ops.valid( context.slice(0) ).value()>0 ) {
                                             if ( context.value(0)==context.value(1) ) {
                                                 label1= context.slice(0).toString();
