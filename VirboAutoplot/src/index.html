@@ -24,8 +24,14 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2015-01-14):</p>
+        <p>Bugfixes (2015-01-16):</p>
         <ul> 
+            <li>energy channels were reported as ranges in MAGEIS plots, because of BIN_PLUS and BIN_MINUS.</li>
+            <li>the new addFilter dialog to match Tools->Filters menu</li>
+            <li>rfe407: deleting a filter would also loose track of the input dataset.</li>
+            <li>slices GUI was not tested thoroughly</li>
+            <li>1308:  Demo 12 never completes when Data tab is torn off.</li>
+            <li>remove confusing prompt to save and show new script or cancel, when a new script is referenced</li>
             <li>In PNGWalk, set window ancestor properly for "Unable to find any images" message.</li>
             <li>plotx(2,'vap+inline:ripples(20)') would always plot in the 0th position.</li>
             <li>support fill in non-ISTP HDF files, using _FillVal metadata.</li>
