@@ -86,8 +86,10 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             }
 
 
-            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //this initially calls the popup, but because the Plot is unselected by this click, the popup is useless
-            mainFrame.clickMouse(mainFrame.getCenterX(), mainFrame.getCenterY()); //click away to get out of the popup
+            ScriptContext.plot(1,"vap+fits:http://autoplot.org/data/hsi_qlimg_5050601_001.fits"); // small cheat
+            
+            mainFrame.clickMouse(clickPoint.x+50, clickPoint.y-110); //click away to get out of the popup
+            //mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //this initially calls the popup, but because the Plot is unselected by this click, the popup is useless
             mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //now the plot is selected, allowing the popup to function properly (I know this isn't the easiest way to do this)
             popup = new JPopupMenuOperator();
             popup.pushMenu("Plot|Delete", "|");
@@ -97,7 +99,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             DialogOperator domProps = new DialogOperator( new RegexComponentChooser( "DOM Properties") );
             
             JTableOperator domTable = new JTableOperator( domProps);
-            
+            JTextFieldOperator dataSourceFilt;
             //Open Plot Elements Tree
             domTable.selectCell(8, 0);
             
@@ -105,7 +107,10 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(9, 0);
             domTable.selectCell(15,1);
             JTextFieldOperator component = new JTextFieldOperator(domTable);
-            component.setText("slice0(i)");
+            component.enterText("slice0(0)");
+            //domTable.selectCell(18, 1);
+            //dataSourceFilt = new JTextFieldOperator(domTable, "data_1");
+            //dataSourceFilt.setText("data_1");
             domTable.selectCell(9,0);
             
             
@@ -113,9 +118,9 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(10, 0);
             domTable.selectCell(16,1);
             component = new JTextFieldOperator(domTable);
-            component.setText("slice0(i)");
+            component.enterText("slice0(1)");
             domTable.selectCell(18, 1);
-            JTextFieldOperator dataSourceFilt = new JTextFieldOperator(domTable, "data_2");
+            dataSourceFilt = new JTextFieldOperator(domTable, "data_2");
             dataSourceFilt.setText("data_1");
             domTable.selectCell(10, 0);
             
@@ -123,7 +128,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(11,0);
             domTable.selectCell(17,1);
             component = new JTextFieldOperator(domTable);
-            component.setText("slice0(i)");
+            component.enterText("slice0(2)");
             domTable.selectCell(19,1);
             dataSourceFilt = new JTextFieldOperator(domTable, "data_3");
             dataSourceFilt.setText("data_1");
@@ -133,7 +138,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(12, 0);
             domTable.selectCell(18,1);
             component = new JTextFieldOperator(domTable);
-            component.setText("slice0(i)");
+            component.enterText("slice0(3)");
             domTable.selectCell(20, 1);
             dataSourceFilt = new JTextFieldOperator(domTable, "data_4");
             dataSourceFilt.setText("data_1");
@@ -143,7 +148,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(13, 0);
             domTable.selectCell(19,1);
             component = new JTextFieldOperator(domTable);
-            component.setText("slice0(i)");
+            component.enterText("slice0(4)");
             domTable.selectCell(21, 1);
             dataSourceFilt = new JTextFieldOperator(domTable, "data_5");
             dataSourceFilt.setText("data_1");
@@ -153,10 +158,10 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(14, 0);
             domTable.selectCell(20,1);
             component = new JTextFieldOperator(domTable);
-            component.setText("slice0(i)");
+            component.setText("slice0(5)");
             domTable.selectCell(22, 1);
             dataSourceFilt = new JTextFieldOperator(domTable, "data_6");
-            dataSourceFilt.setText("data_1");
+            dataSourceFilt.enterText("data_1");
             domTable.selectCell(14, 0);
             
             new JButtonOperator(domProps, "Apply").clickMouse();
@@ -170,11 +175,11 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             //Add Hidden Plot to bind all the plot X and Y axes together
             mainFrame.clickForPopup(clickPoint.x+200, clickPoint.y-100 );
             popup = new JPopupMenuOperator();
-            popup.pushMenu("Canvas|Add Hidden Plot...", "|");
+            popup.pushMenuNoBlock("Canvas|Add Hidden Plot...", "|");
             Thread.sleep(200);
             
             
-            DialogOperator addhiddenplot = new DialogOperator( new RegexComponentChooser( "Add hidden .*") );
+            DialogOperator addhiddenplot = new DialogOperator( new RegexComponentChooser( "Add hidden plot for binding.*") );
             JCheckBoxOperator zaxis = new JCheckBoxOperator(addhiddenplot, 2);
             zaxis.setSelected(false);
             new JButtonOperator(addhiddenplot, "OK").clickMouse();
