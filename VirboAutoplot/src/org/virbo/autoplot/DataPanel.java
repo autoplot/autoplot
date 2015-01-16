@@ -107,8 +107,6 @@ public class DataPanel extends javax.swing.JPanel {
         });
         
         recentComboBox.setPreferenceNode("operations");
-        recentComboBox.setToolTipText("Recently entered operations");
-        ((JComponent)recentComboBox.getEditor().getEditorComponent()).setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
         
         recentComboBox.getEditor().getEditorComponent().addFocusListener( new FocusAdapter() {
             @Override
