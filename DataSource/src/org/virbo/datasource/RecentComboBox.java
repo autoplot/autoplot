@@ -5,6 +5,7 @@
 
 package org.virbo.datasource;
 
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -22,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.SwingUtilities;
 import org.das2.datum.LoggerManager;
 
 /**
@@ -154,6 +156,48 @@ public class RecentComboBox extends JComboBox {
         }
     }
 
+    public void addToRecent( final String s ) {
+        if ( verifier!=null ) {
+            if ( !verifier.verify(s) ) {
+                return;
+            }
+        }
+
+        Runnable run= new Runnable() {
+            public void run() {
+                
+                BufferedWriter w = null;
+                try {
+                    synchronized (this) {
+                        if ( recentFile.exists() ) {
+                            w = new BufferedWriter(new FileWriter(recentFile,true));
+                        } else {
+                            w = new BufferedWriter(new FileWriter(recentFile));
+                        }
+                        w.append(s, 0, s.length());
+                        w.append("\n");
+                        w.close();
+                    }
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } finally {
+                    try {
+                        if ( w!=null ) w.close();
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
+                    }
+                }
+                loadRecent();        
+            }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            logger.fine("this shouldn't happen on event thread.");
+            run.run();
+        } else {
+            run.run();
+        }
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e) {
         org.das2.util.LoggerManager.logGuiEvent(e);        
@@ -161,34 +205,8 @@ public class RecentComboBox extends JComboBox {
 
         String s = getSelectedItem().toString();
 
-        if ( verifier!=null ) {
-            if ( !verifier.verify(s) ) {
-                return;
-            }
-        }
+        addToRecent(s);
         
-        BufferedWriter w = null;
-        try {
-            synchronized (this) {
-                if ( recentFile.exists() ) {
-                    w = new BufferedWriter(new FileWriter(recentFile,true));
-                } else {
-                    w = new BufferedWriter(new FileWriter(recentFile));
-                }
-                w.append(s, 0, s.length());
-                w.append("\n");
-                w.close();
-            }
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        } finally {
-            try {
-                if ( w!=null ) w.close();
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            }
-        }
-        loadRecent();
     }
 
 
