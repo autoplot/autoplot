@@ -12,14 +12,11 @@
 package org.virbo.autoplot;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Event;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
-import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -32,9 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -79,7 +73,7 @@ public class DataPanel extends javax.swing.JPanel {
     DataSetSelector dataSetSelector;
     JTextField componentTextField1;
 
-    private transient PropertyChangeListener compListener; // listen to component property changes
+    private final transient PropertyChangeListener compListener; // listen to component property changes
     
     private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui");
 
@@ -428,14 +422,14 @@ public class DataPanel extends javax.swing.JPanel {
      * show the context after the slicing and operations for the user's reference.
      * TODO: make sure this is released so stray datasets can be garbage collected.
      */
-    private transient PropertyChangeListener contextListener= new PropertyChangeListener() {
+    private final transient PropertyChangeListener contextListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updateProcessDataSetLabel();
         }
     };
 
-    private transient PropertyChangeListener fillDataSetListener= new PropertyChangeListener() {
+    private final transient PropertyChangeListener fillDataSetListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             QDataSet ds= (QDataSet)evt.getNewValue();
