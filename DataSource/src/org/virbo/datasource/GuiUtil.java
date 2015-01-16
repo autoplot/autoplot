@@ -8,8 +8,12 @@ package org.virbo.datasource;
 import java.awt.Component;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import javax.swing.CellRendererPane;
 import javax.swing.JComponent;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 /**
  * Utility class for working with GUIs, first introduced to listen for
@@ -66,5 +70,6 @@ public class GuiUtil {
         }
     }
     
-
+    // see SlicesFilterEditorPanel for addMouseWheelListenerToSpinner
+    
 }
