@@ -885,7 +885,8 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * sleep for so many milliseconds.  This is introduced to avoid the import.
+     * sleep for so many milliseconds.  This is introduced to avoid the import,
+     * which makes running scripts securely non-trivial.
      * @param millis number of milliseconds to pause execution
      */
     public static void sleep( int millis ) {
