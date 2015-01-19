@@ -885,6 +885,18 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
+     * sleep for so many milliseconds.  This is introduced to avoid the import.
+     * @param millis number of milliseconds to pause execution
+     */
+    public static void sleep( int millis ) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    /**
      * create a model with a GUI presentation layer.  If the GUI is already 
      * created, then this does nothing.
      */
