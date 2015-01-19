@@ -1071,26 +1071,34 @@ public class DataSourceController extends DomNodeController {
         }
         if ( cadence!=null ) xds.putProperty(QDataSet.CADENCE, cadence);
     }
+    
     /**
-     * the fill parameters have changed, so update the auto range stats.
-     * This should not be run on the AWT event thread!
-     * @param autorange if false, then no autoranging is done.
+     * <p>the fill parameters have changed, so fire an update to notify the
+     * listeners.  This creates the "fillDataSet" whose name comes from an
+     * early version of Autoplot where fill data would be handled here.</p>
      * 
-     * preconditions: The dataset has been loaded
-     * postconditions: 
-     *   the "fill" dataset is created, maybe by making the dataset mutable.  
-     *   The dataset's rank has been reduced to two, if necessary.  
-     *   the fillDataSet is set.  the fillProperties are set.
-     *   reduceRankString is set to document the reduction
-     *   all parties interested in the fill dataset will be notified of the new version.
+     * <p>This should not be run on the AWT event thread!</p>
+     * 
+     * preconditions: <ul>
+     *   <li>The dataset has been loaded
+     * </ul>
+     * postconditions: <ul>
+     *   <li>the "fill" dataset is created, maybe by making the dataset mutable.  
+     *   <li>internal operations like slice may be applied here if the .vap file has instructed, but rarely are.
+     *   <li>reduceRankString is set to document any operation.
+     *   <li>the fillDataSet is set.  the fillProperties are set.
+     *   <li>all parties interested in the fill dataset will be notified of the new version.
      *     (which triggers plotting via PlotElement)
+     * </ul>
      */
     @SuppressWarnings("unchecked")
     private void updateFill() {
 
         logger.fine("enter updateFill");
 
-        if (getDataSet() == null) {
+        QDataSet ds= getDataSet();
+        
+        if ( ds == null) {
             return;
         }
 
@@ -1107,14 +1115,14 @@ public class DataSourceController extends DomNodeController {
 
             if ( doSlice ) { // plot element now does slicing, but we can do it here as well.
 
-                QDataSet ds;
                 if ( DataSetOps.isProcessAsync(filters) ) {
                     logger.warning("asynchronous processes not supported here");
-                    setReduceDataSetString(null);
-                    ds= getDataSet();
+                    setReduceDataSetString("");
                 } else {
                     try {
-                        ds= DataSetOps.sprocess( filters, getDataSet(), new AlertNullProgressMonitor("sprocess "+filters) );
+                        ds= DataSetOps.sprocess( filters, ds, new AlertNullProgressMonitor("sprocess "+filters) );
+                        //TODO: must we process the props as well?
+                        
                         setReduceDataSetString(filters);
                     } catch ( Exception ex ) {
                         setException(ex);
@@ -1122,12 +1130,12 @@ public class DataSourceController extends DomNodeController {
                     }
                 }
 
-                //TODO: must we process the props as well?
-                fillDs = DataSetOps.makePropertiesMutable(ds);
+                fillDs = DataSetOps.makePropertiesMutable( ds );
 
             } else {
-                fillDs = DataSetOps.makePropertiesMutable(getDataSet());
+                fillDs = DataSetOps.makePropertiesMutable( ds );
                 setReduceDataSetString(null);
+                
             }
 
             // add the cadence property to each dimension of the dataset, so that
@@ -1169,7 +1177,7 @@ public class DataSourceController extends DomNodeController {
             applyFillValidRange(fillDs, vmin, vmax, fill);
 
             setFillProperties(props);
-            if (fillDs == getDataSet()) { //kludge to force reset renderer, because QDataSet is mutable.
+            if ( fillDs == ds ) { //kludge to force reset renderer, because QDataSet is mutable.
                 this.fillDataSet = null;
             }
             setFillDataSet(fillDs);
@@ -1514,14 +1522,27 @@ public class DataSourceController extends DomNodeController {
         this.fillProperties = fillProperties;
         propertyChangeSupport.firePropertyChange(PROP_FILLPROPERTIES, oldFillProperties, fillProperties);
     }
-    protected String reduceDataSetString = null;
+    protected String reduceDataSetString = "";
     public static final String PROP_REDUCEDATASETSTRING = "reduceDataSetString";
 
+    /**
+     * return documentation of any processes applied to the data within the DataSourceFilter.
+     * This will be an empty string when no processes were applied.
+     * See getFilters which specified which should be applied.
+     * @return reduceDataSetString the string, which may be empty but will not be null.
+     */
     public String getReduceDataSetString() {
         return reduceDataSetString;
     }
 
+    /**
+     * set the documentation of any processes applied to the data within the DataSourceFilter.
+     * This will be an empty string when no processes were applied.
+     * See getFilters which specified which should be applied.
+     * @param reduceDataSetString 
+     */
     public void setReduceDataSetString(String reduceDataSetString) {
+        assert reduceDataSetString!=null;
         String oldReduceDataSetString = this.reduceDataSetString;
         this.reduceDataSetString = reduceDataSetString;
         propertyChangeSupport.firePropertyChange(PROP_REDUCEDATASETSTRING, oldReduceDataSetString, reduceDataSetString);

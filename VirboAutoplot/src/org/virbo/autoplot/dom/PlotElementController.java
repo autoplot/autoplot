@@ -1671,13 +1671,15 @@ public class PlotElementController extends DomNodeController {
     }
 
     /**
-     * Do initialization to get the plotElement and attached plot to have reasonable
-     * settings.
-     * preconditions:
-     *   renderType has been identified for the plotElement.
-     * postconditions:
-     *   plotElement's plotDefaults are set based on metadata and autoranging.
-     *   listening plot may invoke its resetZoom method.
+     * <p>Do initialization to get the plotElement and attached plot to have reasonable
+     * settings.</p>
+     * preconditions:<ul>
+     *   <li>renderType has been identified for the plotElement.
+     * </ul>
+     * postconditions:<ul>
+     *   <li>plotElement's plotDefaults are set based on metadata and autoranging.
+     *   <li>listening plot may invoke its resetZoom method.
+     * </ul>
      */
     private synchronized void doResetRanges() {
 
@@ -1685,6 +1687,14 @@ public class PlotElementController extends DomNodeController {
 
         changesSupport.performingChange(this, PENDING_RESET_RANGE);
 
+        DataSourceFilter ldsf= getDataSourceFilter(); // make local copy to avoid any synchronization problems and to clean up code.
+        DataSourceController dsc= ldsf!=null ? ldsf.getController() : null;
+        
+        if ( dsc==null ) { // don't think this happens.
+            logger.warning("expected dsc to be non-null.");
+            return; 
+        }
+        
         try {
             Plot plot = dom.controller.getPlotFor(plotElement);
 
@@ -1693,7 +1703,6 @@ public class PlotElementController extends DomNodeController {
             peleCopy.setParent("");
             peleCopy.getPlotDefaults().syncTo( plot, Arrays.asList(DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID) );
 
-            DataSourceController dsc= getDataSourceFilter().getController();
             logger.log(Level.FINE, "doResetRanges for {0}", dsc);
 
             QDataSet fillDs = dsc.getFillDataSet();
@@ -1720,8 +1729,8 @@ public class PlotElementController extends DomNodeController {
 
                 doMetadata(peleCopy, props, fillDs );
 
-                String reduceRankString = getDataSourceFilter().controller.getReduceDataSetString();
-                if (dsf.controller.getReduceDataSetString() != null) { //TODO remove dsf slicing
+                String reduceRankString = dsc.getReduceDataSetString();
+                if ( reduceRankString != null && reduceRankString.length()>0 ) { //TODO remove dsf slicing
                     String title = peleCopy.getPlotDefaults().getTitle();
                     title += "!c" + reduceRankString;
                     peleCopy.getPlotDefaults().setTitle(title);
@@ -1761,7 +1770,7 @@ public class PlotElementController extends DomNodeController {
                 
                 //logger.fine("  "+( System.currentTimeMillis()-t0 )+" ms spent autoranging "+fillDs );
 
-                TimeSeriesBrowse tsb= getDataSourceFilter().getController().getTsb();
+                TimeSeriesBrowse tsb= dsc.getTsb();
                 if ( tsb!=null ) {
                     if ( fillDs!=null ) {
                         if ( fillDs.rank()==0 ) {
