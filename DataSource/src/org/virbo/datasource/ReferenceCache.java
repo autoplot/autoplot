@@ -319,7 +319,7 @@ public class ReferenceCache {
         for ( Entry<String,ReferenceCacheEntry> ent : instance.uris.entrySet() ) {
             System.err.printf( "%3d %s\n", ++i, String.valueOf(ent.getValue()) );
             ReferenceCacheEntry ent1= ent.getValue();
-            QDataSet ds= ent1.qds.get();
+            QDataSet ds= ent1.qds==null ? null : ent1.qds.get();
             if ( ds!=null ) {
                 Class dsclass= ds.getClass();
                 Method m=null;
