@@ -346,6 +346,19 @@ public class DodsDataSource extends AbstractDataSource {
                 ds.putProperty( QDataSet.TITLE, String.valueOf(val) );
             }
             
+            String sunits = (String) metadata.get("units");
+            if (sunits != null) {
+                if (sunits.contains("since")) {
+                    Units u;
+                    try {
+                        u = Units.lookupTimeUnits(sunits);
+                        ds.putProperty(QDataSet.UNITS, u);
+                    } catch (java.text.ParseException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            }            
+            
             if (isIstp ) {
                 assert interpretedMetadata!=null;
                 interpretedMetadata.remove("DEPEND_0");
