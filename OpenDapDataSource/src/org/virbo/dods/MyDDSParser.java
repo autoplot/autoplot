@@ -109,6 +109,8 @@ public class MyDDSParser {
             } else {
                 return result.toArray( new String[result.size()] );
             }
+        } else if ( bt instanceof DGrid ) {
+            return null;
         } else {
             return null;
         }
