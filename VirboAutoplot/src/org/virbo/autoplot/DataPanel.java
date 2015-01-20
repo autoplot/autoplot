@@ -235,6 +235,9 @@ public class DataPanel extends javax.swing.JPanel {
                 componentTextFieldFocusLost(evt);
             }
         });
+        
+        doBindings();
+
     }
 
     private void componentTextFieldActionPerformed(java.awt.event.ActionEvent evt) {
@@ -329,8 +332,10 @@ public class DataPanel extends javax.swing.JPanel {
         return dsf;
     }
 
-
-    public void doBindings() {
+    /**
+     * bind to the data source and plot element.
+     */
+    protected final void doBindings() {
         logger.fine("doBindings");
         doPlotElementBindings();
         doDataSourceFilterBindings();
@@ -831,9 +836,10 @@ public class DataPanel extends javax.swing.JPanel {
         
         panel.add( p, BorderLayout.CENTER );
         p.setFilter(componentTextField1.getText());
-        QDataSet inputDs= this.dsf.getController().getFillDataSet();
-        p.setInput(inputDs); 
-     
+        if ( this.dsf!=null ) {
+            QDataSet inputDs= this.dsf.getController().getFillDataSet();
+            p.setInput(inputDs); 
+        }
         int ret= AutoplotUtil.showConfirmDialog( this, panel, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
         if ( ret==JOptionPane.OK_OPTION ) {
             String newFilter= p.getFilter();
