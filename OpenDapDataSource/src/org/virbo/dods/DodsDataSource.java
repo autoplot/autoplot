@@ -329,7 +329,14 @@ public class DodsDataSource extends AbstractDataSource {
             val= metadata.get("missing_value");
             if ( val!=null ) {
                 try {
-                    ds.putProperty(QDataSet.FILL_VALUE, Double.parseDouble( (String)val ) );
+                    double dfill= Double.parseDouble( (String)val );
+                    ds.putProperty(QDataSet.FILL_VALUE, dfill );
+                    if ( dfill!=0 ) {  // kludge for rounding errors.  I don't know why the normal fuzz isn't working.
+                        double check= Math.abs( ( ds.value(0,0) - dfill )/ dfill );
+                        if ( check < 0.00001 ) {
+                            ds.putProperty( QDataSet.FILL_VALUE, ds.value(0,0) );
+                        }
+                    }
                 } catch ( NumberFormatException ex ) {
                     logger.log( Level.INFO, "When parsing missing_value", ex );
                 }
