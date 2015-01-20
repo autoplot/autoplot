@@ -163,6 +163,8 @@ public class DodsAdapter {
                     } else {
                         size = -1; // we don't know number of records.
                     }
+                } else if ( o instanceof DGrid ) {
+                    return -1;
                 } else {
                     DArray v = (DArray) o;
                     Enumeration dimensions = v.getDimensions();
