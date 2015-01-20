@@ -23,6 +23,7 @@ import opendap.dap.parser.ParseException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import opendap.dap.DGrid;
 
 /**
  *
@@ -56,6 +57,10 @@ public class MyDDSParser {
         BaseType t = myDDS.getVariable(variable);
         int[] result;
         if (t instanceof DSequence) {
+            return null;
+            
+        } else if ( t instanceof DGrid ) {
+            DGrid dgrid = (DGrid) t;
             return null;
             
         } else {
