@@ -308,7 +308,13 @@ public class DodsDataSource extends AbstractDataSource {
                 }
             }
 
-            adapter.loadDataset( mon.getSubtaskMonitor("loadDataset"), metadata );
+            try {
+                adapter.loadDataset( mon.getSubtaskMonitor("loadDataset"), metadata );
+            } catch ( NullPointerException ex ) {
+                RuntimeException n= new RuntimeException("Strange NullPointerException occurs with Java 8 Webstart.  This will be resolved, but use the single-jar version of Autoplot instead.",ex);
+                throw n;
+            }
+            
             MutablePropertyDataSet ds = (MutablePropertyDataSet) adapter.getDataSet(metadata);
                 
             ds= checkLatLon( ds );

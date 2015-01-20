@@ -236,6 +236,9 @@ public class DodsAdapter {
             } else {
                 throw ex;
             }
+        } catch (NullPointerException ex ) {
+            logger.warning("strange OpenDap bug with Java 8 webstart");
+            throw ex;
         } finally {
             if ( !mon.isFinished() ) mon.finished();
         }
