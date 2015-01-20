@@ -958,11 +958,27 @@ public final class AutoplotUI extends javax.swing.JFrame {
         return result;
     }
 
+    /**
+     * return a place holder so that each tab's minimum size is set in case
+     * one is torn off early.
+     * 
+     * @param label which panel is not initialized.
+     * @return JPanel with minimum size
+     */
+    private JPanel getFeaturePanelPlaceHolder( String label ) {
+        JPanel p= new JPanel( new BorderLayout() );
+        p.add( new JLabel( String.format( "<html><i>%s not initialized</i></html>", label ) ), BorderLayout.NORTH );
+        p.setMinimumSize( new Dimension(640,480) );
+        p.setPreferredSize( p.getMinimumSize() );
+        return p;
+    }
+    
     private void addFeatures( ApplicationModel model ) {
 
         final JScrollPane flayoutPane;
         if (model.getDocumentModel().getOptions().isLayoutVisible() ) {
             flayoutPane= new JScrollPane();
+            flayoutPane.setViewportView( getFeaturePanelPlaceHolder("layout") );
             tabs.insertTab("layout",null, flayoutPane,
                     String.format( TAB_TOOLTIP_LAYOUT, TABS_TOOLTIP), tabs.getTabCount() );
         } else {
@@ -973,6 +989,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         final JScrollPane fdataPane;
         if (model.getDocumentModel().getOptions().isDataVisible()) {
             fdataPane= new JScrollPane();
+            fdataPane.setViewportView( getFeaturePanelPlaceHolder("data") );
             tabs.insertTab("data", null, fdataPane,
                     String.format(  TAB_TOOLTIP_DATA, TABS_TOOLTIP), tabs.getTabCount() );
         } else {
@@ -980,6 +997,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         }
 
         final JScrollPane fmetadataPane= new JScrollPane();
+        fmetadataPane.setViewportView( getFeaturePanelPlaceHolder("metadata") );
         tabs.insertTab("metadata", null, fmetadataPane,
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
@@ -1035,6 +1053,8 @@ APSplash.checkTime("init 270");
         if (model.getDocumentModel().getOptions().isScriptVisible()) {
             final DataSetSelector fdataSetSelector= this.dataSetSelector; // org.pushngpixels.tracing.TracingEventQueueJMX showed this was a problem.
             jythonScriptPanel= new JPanel( new BorderLayout() );
+            jythonScriptPanel.setMinimumSize(new Dimension(640,480));
+            jythonScriptPanel.setPreferredSize(new Dimension(640,480));
             tabs.addTab( TAB_SCRIPT, null, jythonScriptPanel,
                   String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
             invokeLater( 4000, true, new Runnable() {
@@ -1050,6 +1070,8 @@ APSplash.checkTime("init 270");
         }
         if (model.getDocumentModel().getOptions().isLogConsoleVisible()) {
             logConsolePanel= new JScrollPane();
+            logConsolePanel.setViewportView( getFeaturePanelPlaceHolder(TAB_CONSOLE) );
+
             tabs.addTab( TAB_CONSOLE, null, logConsolePanel,
                 String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
             invokeLater( 4020, true, new Runnable() {
