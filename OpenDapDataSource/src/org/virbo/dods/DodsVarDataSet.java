@@ -8,10 +8,10 @@
  */
 package org.virbo.dods;
 
-import dods.dap.BaseType;
-import dods.dap.DArray;
-import dods.dap.DArrayDimension;
-import dods.dap.DString;
+import opendap.dap.BaseType;
+import opendap.dap.DArray;
+import opendap.dap.DArrayDimension;
+import opendap.dap.DString;
 import org.das2.datum.Units;
 import java.text.ParseException;
 import java.util.Enumeration;

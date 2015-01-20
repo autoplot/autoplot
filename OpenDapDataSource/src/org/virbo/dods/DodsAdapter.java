@@ -8,26 +8,26 @@
  */
 package org.virbo.dods;
 
-import dods.dap.BaseType;
-import dods.dap.DArray;
-import dods.dap.DArrayDimension;
-import dods.dap.DConnect;
-import dods.dap.DDS;
-import dods.dap.DDSException;
-import dods.dap.DFloat32;
-import dods.dap.DFloat64;
-import dods.dap.DGrid;
-import dods.dap.DODSException;
-import dods.dap.DSequence;
-import dods.dap.DStructure;
-import dods.dap.Float32PrimitiveVector;
-import dods.dap.Float64PrimitiveVector;
-import dods.dap.Int16PrimitiveVector;
-import dods.dap.Int32PrimitiveVector;
-import dods.dap.NoSuchVariableException;
-import dods.dap.PrimitiveVector;
-import dods.dap.StatusUI;
-import dods.dap.parser.ParseException;
+import opendap.dap.BaseType;
+import opendap.dap.DArray;
+import opendap.dap.DArrayDimension;
+import opendap.dap.DConnect;
+import opendap.dap.DDS;
+import opendap.dap.DDSException;
+import opendap.dap.DFloat32;
+import opendap.dap.DFloat64;
+import opendap.dap.DGrid;
+import opendap.dap.DDSException;
+import opendap.dap.DSequence;
+import opendap.dap.DStructure;
+import opendap.dap.Float32PrimitiveVector;
+import opendap.dap.Float64PrimitiveVector;
+import opendap.dap.Int16PrimitiveVector;
+import opendap.dap.Int32PrimitiveVector;
+import opendap.dap.NoSuchVariableException;
+import opendap.dap.PrimitiveVector;
+import opendap.dap.StatusUI;
+import opendap.dap.parser.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Units;
@@ -40,6 +40,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import opendap.dap.DAP2Exception;
 import org.das2.util.monitor.CancelledOperationException;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
@@ -187,14 +188,14 @@ public class DodsAdapter {
      * @throws java.io.FileNotFoundException
      * @throws java.net.MalformedURLException
      * @throws java.io.IOException
-     * @throws dods.dap.parser.ParseException
-     * @throws dods.dap.DDSException
-     * @throws dods.dap.DODSException
+     * @throws opendap.dap.parser.ParseException
+     * @throws opendap.dap.DDSException
+     * @throws opendap.dap.DODSException
      * @throws org.das2.CancelledOperationException
      */
     public void loadDataset(final ProgressMonitor mon, Map<String,Object> attr ) throws FileNotFoundException, MalformedURLException,
-            IOException, ParseException, DDSException, DODSException,
-            CancelledOperationException {
+            IOException, ParseException, DDSException, DDSException,
+            CancelledOperationException, DAP2Exception {
 
         if ( constraint==null ) {
             constraint="";
@@ -230,15 +231,12 @@ public class DodsAdapter {
             logger.log(Level.FINE, "source: {0}", source);
             logger.log(Level.FINE, "url: {0}", url);
             dds = url.getData(constraint, sui);
-        } catch (DODSException ex) {
+        } catch (DDSException ex) {
             if (mon.isCancelled()) {
                 throw new CancelledOperationException("Dods load cancelled");
             } else {
                 throw ex;
             }
-        } catch (NullPointerException ex ) {
-            logger.warning("strange OpenDap bug with Java 8 webstart");
-            throw ex;
         } finally {
             if ( !mon.isFinished() ) mon.finished();
         }

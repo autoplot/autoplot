@@ -9,11 +9,11 @@
 
 package org.virbo.dods;
 
-import dods.dap.DDSException;
-import dods.dap.NoSuchVariableException;
-import dods.dap.Server.InvalidParameterException;
-import dods.dap.parser.ParseException;
-import dods.dap.parser.TokenMgrError;
+import opendap.dap.DDSException;
+import opendap.dap.NoSuchVariableException;
+import opendap.dap.Server.InvalidParameterException;
+import opendap.dap.parser.ParseException;
+import opendap.dap.parser.TokenMgrError;
 import java.net.MalformedURLException;
 import java.io.IOException;
 import java.net.URI;

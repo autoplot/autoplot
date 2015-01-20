@@ -8,18 +8,18 @@
  */
 package org.virbo.dods;
 
-import dods.dap.BaseType;
-import dods.dap.BaseTypeFactory;
-import dods.dap.DArray;
-import dods.dap.DDS;
-import dods.dap.DDSException;
-import dods.dap.DFloat64;
-import dods.dap.DSequence;
-import dods.dap.DefaultFactory;
-import dods.dap.NoSuchVariableException;
-import dods.dap.Server.InvalidParameterException;
-import dods.dap.parser.DDSParser;
-import dods.dap.parser.ParseException;
+import opendap.dap.BaseType;
+import opendap.dap.BaseTypeFactory;
+import opendap.dap.DArray;
+import opendap.dap.DDS;
+import opendap.dap.DDSException;
+import opendap.dap.DFloat64;
+import opendap.dap.DSequence;
+import opendap.dap.DefaultFactory;
+import opendap.dap.NoSuchVariableException;
+import opendap.dap.Server.InvalidParameterException;
+import opendap.dap.parser.DDSParser;
+import opendap.dap.parser.ParseException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -50,7 +50,7 @@ public class MyDDSParser {
      * return the dimensions, or null for Sequences
      * @param variable
      * @return
-     * @throws dods.dap.NoSuchVariableException
+     * @throws opendap.dap.NoSuchVariableException
      */
     public int[] getRecDims(String variable) throws NoSuchVariableException {
         BaseType t = myDDS.getVariable(variable);

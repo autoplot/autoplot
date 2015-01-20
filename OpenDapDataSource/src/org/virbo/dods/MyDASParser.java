@@ -9,13 +9,13 @@
 
 package org.virbo.dods;
 
-import dods.dap.BaseType;
-import dods.dap.BaseTypeFactory;
-import dods.dap.DAS;
-import dods.dap.DASException;
-import dods.dap.DefaultFactory;
-import dods.dap.parser.DASParser;
-import dods.dap.parser.ParseException;
+import opendap.dap.BaseType;
+import opendap.dap.BaseTypeFactory;
+import opendap.dap.DAS;
+import opendap.dap.DASException;
+import opendap.dap.DefaultFactory;
+import opendap.dap.parser.DASParser;
+import opendap.dap.parser.ParseException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;

@@ -10,12 +10,11 @@ package org.virbo.dods;
 
 import org.virbo.datasource.MetadataModel;
 import org.virbo.metatree.IstpMetadataModel;
-import dods.dap.AttributeTable;
-import dods.dap.DAS;
-import dods.dap.DASException;
-import dods.dap.DDSException;
-import dods.dap.DODSException;
-import dods.dap.parser.ParseException;
+import opendap.dap.AttributeTable;
+import opendap.dap.DAS;
+import opendap.dap.DASException;
+import opendap.dap.DDSException;
+import opendap.dap.parser.ParseException;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,8 +23,9 @@ import java.net.URL;
 import java.util.Enumeration;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import dods.dap.Attribute;
+import opendap.dap.Attribute;
 import java.net.URI;
+import java.util.Collections;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.datum.Units;
 import java.util.HashMap;
@@ -35,6 +35,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import opendap.dap.DAP2Exception;
+import opendap.dap.NoSuchAttributeException;
+import opendap.dap.Server.InvalidParameterException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetUtil;
@@ -255,7 +258,8 @@ public class DodsDataSource extends AbstractDataSource {
     }
     
     @Override
-    public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException, CancelledOperationException {
+    public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, 
+        IOException, ParseException, DDSException, CancelledOperationException, DASException, InvalidParameterException, DAP2Exception {
 
         mon.setTaskSize(-1);
         mon.started();
@@ -341,8 +345,12 @@ public class DodsDataSource extends AbstractDataSource {
                 DataSetUtil.putProperties(interpretedMetadata, ds);
             }
 
-            AttributeTable at = das.getAttributeTable(variable);
-            ds.putProperty(QDataSet.METADATA,at);
+            try {
+                AttributeTable at = das.getAttributeTable(variable);
+                ds.putProperty(QDataSet.METADATA,at);
+            } catch ( NoSuchAttributeException ex ) {
+                logger.log(Level.WARNING,ex.getMessage(),ex);
+            }
 
             if ( DataSetURI.fromUri(uri).contains(".cdf.dds") ) {
                 ds.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
@@ -373,8 +381,12 @@ public class DodsDataSource extends AbstractDataSource {
      * @return
      */
     private Map<String, Object> getMetaData(String variable) {
-        AttributeTable at = das.getAttributeTable(variable);
-        return getMetaData(at);
+        try {
+            AttributeTable at = das.getAttributeTable(variable);
+            return getMetaData(at);
+        } catch ( NoSuchAttributeException ex ) {
+            return Collections.emptyMap();
+        }
     }
      
     private Map<String,Object> getMetaData( AttributeTable at ) {
