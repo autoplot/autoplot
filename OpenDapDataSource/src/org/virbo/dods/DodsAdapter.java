@@ -237,6 +237,9 @@ public class DodsAdapter {
             } else {
                 throw ex;
             }
+        } catch ( NullPointerException ex ) {
+            System.err.println("null is thrown at 233");
+            throw ex;
         } finally {
             if ( !mon.isFinished() ) mon.finished();
         }

@@ -314,6 +314,8 @@ public class DodsDataSource extends AbstractDataSource {
 
             try {
                 adapter.loadDataset( mon.getSubtaskMonitor("loadDataset"), metadata );
+                System.err.println("here got dataset dods");
+                
             } catch ( NullPointerException ex ) {
                 RuntimeException n= new RuntimeException("Strange NullPointerException occurs with Java 8 Webstart.  This will be resolved, but use the single-jar version of Autoplot instead.",ex);
                 throw n;
