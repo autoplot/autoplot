@@ -2077,10 +2077,11 @@ APSplash.checkTime("init 52.9");
                 }
                 bookmarksManager.resetPrefNode("bookmarks");
             } else { // new user state
-                setStatus("loading initial demo bookmarks");
+                setStatus("busy: loading initial demo bookmarks");
                 List<Bookmark> bookmarks = applicationModel.getLegacyBookmarks();
                 bookmarksManager.getModel().setList(bookmarks);
                 bookmarksManager.resetPrefNode("bookmarks");
+                setStatus("done loading initial demo bookmarks");
             }
         }
 
