@@ -1011,7 +1011,6 @@ APSplash.checkTime("init 259");
                 if ( fdataPane!=null ) {
                     final DataPanel dp= new DataPanel(dom);
                     dataPanel= dp;
-                    dp.doBindings();
                     SwingUtilities.invokeLater( new Runnable() { public void run() {
                         fdataPane.setViewportView(dp);
                     } } );
