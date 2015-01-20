@@ -376,7 +376,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         //but makes it so URIs cannot be entered. https://sourceforge.net/tracker/index.php?func=detail&aid=3532217&group_id=199733&atid=970682
         //this.setFocusableWindowState(false);
                 
-        referenceCacheCheckBoxMenuItem.setSelected( System.getProperty( "enableReferenceCache", "false" ).equals("true") ); 
+        referenceCacheCheckBoxMenuItem.setSelected( System.getProperty( "enableReferenceCache", "true" ).equals("true") ); 
         
         expertMenuItems.add( editDomMenuItem );
         expertMenuItems.add( editDomSeparator );
