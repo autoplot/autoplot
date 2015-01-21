@@ -24,8 +24,13 @@
         SourceForge has changed the numbering of all the bugs.  If you go to the page
         https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
         to resolve old numbers.
-        <p>Bugfixes (2015-01-16):</p>
-        <ul> 
+        <p>Bugfixes (2015-01-21):</p>
+        <ul>            
+            <li>remove the dtd from internal filters.xml, which was preventing use on Seth's computer.</li>
+            <li>1312: tearing off tabs before initialization results in tiny tab</li>
+            <li>1311: new user data tab enabled after the initial data load resulted in RTE</li>
+            <li>Copy data to local variables after seeing nullPointerException in test002</li>
+            <li>update to new CDFJ library which fixes synchronization problems</li>
             <li>energy channels were reported as ranges in MAGEIS plots, because of BIN_PLUS and BIN_MINUS.</li>
             <li>the new addFilter dialog to match Tools->Filters menu</li>
             <li>rfe407: deleting a filter would also loose track of the input dataset.</li>
@@ -118,6 +123,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>reference cache is enabled for new users.</li>
+            <li>1313: switch to new version of OpenDAP library.  Support grids.</li>
+            <li>1310: add jython sleep command which is often imported</li>            
             <li>support Time and TimeRange qualifiers in Das2Streams</li>
             <li>completions servlet will support the thin client.</li>
             <li>das2server data source code supports 401 and conventional authentication</li>
