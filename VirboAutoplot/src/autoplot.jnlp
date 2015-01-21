@@ -9,6 +9,11 @@
     codebase="http://autoplot.org/jnlp/#{tag}/"
     href="autoplot.jnlp"> 
 -->
+<!-- <jnlp 
+    spec="1.0+"
+    codebase="http://autoplot.org/jnlp/devel/"
+    href="autoplot.jnlp"> 
+-->
 <jnlp 
     spec="1.0+"
     codebase="#{codebase}"
@@ -44,10 +49,7 @@
         </j2se>
 
         <jar href="AutoplotVolatile.jar" />
-        <jar href="AutoplotStable.jar" />
-        <!--
-        <jar href="../lib/AutoplotStable.20141113.jar" />
-        -->
+        <jar href="../lib/AutoplotStable.20150120.jar" />
 
         <property name="jnlp.packEnabled" value="true"/>
         <!-- this no longer has any effect: <property name="deployment.security.authenticator" value="false"/>-->
