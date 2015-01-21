@@ -368,6 +368,8 @@ ${JAVA6_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/
 
 # if these are needed.
 # These are needed for the single-jar build.  The single-jar build is done later in a different script.
+cp AutoplotStable.jar.pack.gz lib/AutoplotStable.${STABLE_TAG}.jar.pack.gz
+cp AutoplotStable.jar lib/AutoplotStable.${STABLE_TAG}.jar
 mv AutoplotStable.jar.pack.gz dist/
 mv AutoplotStable.jar dist/
 
