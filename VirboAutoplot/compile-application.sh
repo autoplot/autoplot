@@ -32,13 +32,15 @@ if [ "" = "$TAG" ]; then
 fi
 echo "TAG=${TAG}"
 
-if [ "" = "$STABLE_TAG" ]; then
-    STABLE_TAG="need_stable_tag"
-fi
-echo "STABLE_TAG=${STABLE_TAG}"
-
 JAVAC=$JAVA6_HOME/bin/javac
 JAR=$JAVA6_HOME/bin/jar
+
+# we rsync over stable jars to compile against.  Setting AP_KEEP_STABLE=T means keep the Jar files.
+if [ "" = "$AP_KEEP_STABLE" ]; then
+    AP_KEEP_STABLE=F
+fi
+
+echo "$AP_KEEP_STABLE=${AP_KEEP_STABLE}  # if T then keep the stable jars for release"
 
 if [ "" = "$ALIAS" ]; then
     ALIAS=virbo
@@ -367,18 +369,14 @@ ${JAVA6_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/
 ${JAVA6_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
 
 # if these are needed.
-# These are needed for the single-jar build.  The single-jar build is done later in a different script.
-cp AutoplotStable.jar.pack.gz lib/AutoplotStable.${STABLE_TAG}.jar.pack.gz
-cp AutoplotStable.jar lib/AutoplotStable.${STABLE_TAG}.jar
+# These are needed for the single-jar build.
+#if [ $AP_KEEP_STABLE = 'T' ]; then
 mv AutoplotStable.jar.pack.gz dist/
 mv AutoplotStable.jar dist/
-
-# make links so the nightly build can be launched.
-cd lib
-ln -s ../dist/AutoplotStable.jar AutoplotStable.${STABLE_TAG}.jar
-ln -s ../dist/AutoplotStable.jar.pack.gz AutoplotStable.${STABLE_TAG}.jar.pack.gz
-touch ../afile.txt
-cd ..
+#else
+#  rm AutoplotStable.jar.pack.gz
+#  rm AutoplotStable.jar
+#fi
 
 echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pack.gz."
 cp src/htaccess.txt dist/
