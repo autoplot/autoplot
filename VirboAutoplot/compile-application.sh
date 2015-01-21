@@ -369,7 +369,7 @@ ${JAVA6_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/
 ${JAVA6_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
 
 # if these are needed.
-# These are needed for the single-jar build.
+# These are needed for the single-jar build.  The single-jar build is done later in a different script.
 #if [ $AP_KEEP_STABLE = 'T' ]; then
 mv AutoplotStable.jar.pack.gz dist/
 mv AutoplotStable.jar dist/
