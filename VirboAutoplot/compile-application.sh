@@ -377,6 +377,7 @@ mv AutoplotStable.jar dist/
 cd lib
 ln -s ../dist/AutoplotStable.jar AutoplotStable.${STABLE_TAG}.jar
 ln -s ../dist/AutoplotStable.jar.pack.gz AutoplotStable.${STABLE_TAG}.jar.pack.gz
+touch ../afile.txt
 cd ..
 
 echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pack.gz."
