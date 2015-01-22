@@ -31,26 +31,26 @@ ImageInfo.range = 10240;
                             if (errorCallback) errorCallback();
                         },
 			ImageInfo.useRange ? [0, ImageInfo.range] : null
-		)
+		);
 	}
 
 	function readInfoFromData(data) {
 
 		var offset = 0;
 
-		if (data.getByteAt(0) == 0xFF && data.getByteAt(1) == 0xD8) {
+		if (data.getByteAt(0) === 0xFF && data.getByteAt(1) === 0xD8) {
 			return readJPEGInfo(data);
 		}
-		if (data.getByteAt(0) == 0x89 && data.getStringAt(1, 3) == "PNG") {
+		if (data.getByteAt(0) === 0x89 && data.getStringAt(1, 3) === "PNG") {
 			return readPNGInfo(data);
 		}
-		if (data.getStringAt(0,3) == "GIF") {
+		if (data.getStringAt(0,3) === "GIF") {
 			return readGIFInfo(data);
 		}
-		if (data.getByteAt(0) == 0x42 && data.getByteAt(1) == 0x4D) {
+		if (data.getByteAt(0) === 0x42 && data.getByteAt(1) === 0x4D) {
 			return readBMPInfo(data);
 		}
-		if (data.getByteAt(0) == 0x00 && data.getByteAt(1) == 0x00) {
+		if (data.getByteAt(0) === 0x00 && data.getByteAt(1) === 0x00) {
 			return readICOInfo(data);
 		}
 
@@ -65,7 +65,7 @@ ImageInfo.range = 10240;
             while ( offset<data.getLength() ) {
                 var len= data.getLongAt( offset,true );
                 var chunkType= data.getStringAt( offset+4,4 );
-                if ( chunkType=='tEXt' ) {
+                if ( chunkType==='tEXt' ) {
                     str= data.getStringAt( offset+8, len );
                     
                     i= str.indexOf('\x00');
@@ -84,9 +84,9 @@ ImageInfo.range = 10240;
 		var ct = data.getByteAt(25);
 
 		var bpp = bpc;
-		if (ct == 4) bpp *= 2;
-		if (ct == 2) bpp *= 3;
-		if (ct == 6) bpp *= 4;
+		if (ct === 4) bpp *= 2;
+		if (ct === 2) bpp *= 3;
+		if (ct === 6) bpp *= 4;
 
 		var alpha = data.getByteAt(25) >= 4;
 
@@ -101,7 +101,7 @@ ImageInfo.range = 10240;
 			alpha : alpha,
                         data: data1,
 			exif : {}
-		}
+		};
 	}
 
 	function readGIFInfo(data) {
@@ -119,7 +119,7 @@ ImageInfo.range = 10240;
 			bpp : bpp,
 			alpha : false,
 			exif : {}
-		}
+		};
 	}
 
 	function readJPEGInfo(data) {
@@ -132,19 +132,19 @@ ImageInfo.range = 10240;
 		while (offset < len) {
 			var marker = data.getShortAt(offset, true);
 			offset += 2;
-			if (marker == 0xFFC0) {
+			if (marker === 0xFFC0) {
 				h = data.getShortAt(offset + 3, true);
 				w = data.getShortAt(offset + 5, true);
-				comps = data.getByteAt(offset + 7, true)
+				comps = data.getByteAt(offset + 7, true);
 				break;
 			} else {
-				offset += data.getShortAt(offset, true)
+				offset += data.getShortAt(offset, true);
 			}
 		}
 
 		var exif = {};
 
-		if (typeof EXIF != "undefined" && EXIF.readFromBinaryFile) {
+		if (typeof EXIF !== "undefined" && EXIF.readFromBinaryFile) {
 			exif = EXIF.readFromBinaryFile(data);
 		}
 
@@ -156,7 +156,7 @@ ImageInfo.range = 10240;
 			bpp : comps * 8,
 			alpha : false,
 			exif : exif
-		}
+		};
 	}
 
 	function readBMPInfo(data) {
@@ -171,7 +171,7 @@ ImageInfo.range = 10240;
 			bpp : bpp,
 			alpha : false,
 			exif : {}
-		}
+		};
 	}
 
 	ImageInfo.loadInfo = function(url, cb, errorCallback ) {
@@ -180,7 +180,7 @@ ImageInfo.range = 10240;
 		} else {
 			if (cb) cb();
 		}
-	}
+	};
 
 	ImageInfo.getAllFields = function(url) {
 		if (!files[url]) return null;
@@ -191,12 +191,12 @@ ImageInfo.range = 10240;
 				tags[a] = files[url][a];
 		}
 		return tags;
-	}
+	};
 
 	ImageInfo.getField = function(url, field) {
 		if (!files[url]) return null;
 		return files[url][field];
-	}
+	};
 
 
 })();
