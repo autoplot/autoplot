@@ -75,7 +75,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20150108.1052";
+    public static final String version= "v20150122.0853";
 
     static FileHandler handler;
 
@@ -231,6 +231,14 @@ public class SimpleServlet extends HttpServlet {
             
             OutputStream out = response.getOutputStream();
 
+            // allow URI=vapfile
+            if ( vap==null && suri!=null ) {
+                if ( suri.contains(".vap") || suri.contains(".vap?") ) {
+                    vap= suri;
+                    suri= null;
+                }
+            }
+            
             // To support load balancing, insert the actual host that resolved the request
             String host= java.net.InetAddress.getLocalHost().getCanonicalHostName();
             response.setHeader( "X-Served-By", host );
