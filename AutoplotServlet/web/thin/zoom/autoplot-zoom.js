@@ -91,6 +91,7 @@ function refresh() {
 /**
  * the current URL to set.  The timerange is reset by appending to this "timeRange=" + iso8601s + "/" + iso8601e;
  * If blank, then read the URL from vapta input area.
+ * @param {String} url the new URL.
  */
 function resetUrl(url) {
     if ( url.length===0 ) {
@@ -130,8 +131,8 @@ function centerFocus() {
 
 /**
  * 
- * @param number startMilliseconds
- * @param number endMilliseconds
+ * @param {number} startMilliseconds the time in ms since 1970.
+ * @param {number} endMilliseconds the time in ms since 1970.
  * @returns the formatted string, limited to resolution
  */
 function iso8601RangeStr( startMilliseconds, endMilliseconds ) {
@@ -142,9 +143,9 @@ function iso8601RangeStr( startMilliseconds, endMilliseconds ) {
 
 /**
  * return the iso string, limited in resolution by startMilliseconds and endMilliseconds
- * @param number startMilliseconds time in ms since 1970
- * @param number endMilliseconds time in ms since 1970
- * @param number t the time to be formatted
+ * @param {number} startMilliseconds time in ms since 1970
+ * @param {number} endMilliseconds time in ms since 1970
+ * @param {number} t the time to be formatted
  * @returns the formatted string, limited to the resolution
  */
 function iso8601Str( startMilliseconds, endMilliseconds, t ) {
@@ -233,7 +234,7 @@ function clickshift(subEvent) {
 
     console.log(plotInfo);
 
-    if (plotInfo == -1) {
+    if (plotInfo === -1) {
         $("#info").html('No metadata found.');
         return;
     }
