@@ -745,7 +745,7 @@ public class JythonCompletionTask implements CompletionTask {
         String method = cc.contextString;
         int [] pos= new int[2];
         String s= DataSetUrlCompletionTask.popString(editor,pos);
-        if (method.equals("getDataSet")) {
+        if (method.equals("getDataSet") || method.equals("plot") || method.equals("plotx")) {
             DataSetUrlCompletionTask task = new DataSetUrlCompletionTask(editor);
             task.query(arg0);
         } else if ( method.equals("File") && s.startsWith("/") ) {
