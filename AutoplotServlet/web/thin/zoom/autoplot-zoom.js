@@ -99,7 +99,7 @@ function resetUrl(url) {
     $('#idstatus').text("reset url "+url);
     $('#progress').attr('src', 'spinner.gif');
     imgurl = url;
-    ImageInfo.loadInfo(imgurl, mycallback);
+    ImageInfo.loadInfo(imgurl, mycallback, myErrorCallback );
     document.getElementById('idplot').src = imgurl;
 }
 
@@ -310,9 +310,18 @@ function setTime(startMilliseconds, endMilliseconds) {
     
     //echoImgUrl();
 
-    ImageInfo.loadInfo(imgurl, mycallback);
+    ImageInfo.loadInfo(imgurl, mycallback, myErrorCallback );
     console.log('--> startdateinmilliseconds=' + startdateinmilliseconds);
 
+}
+
+// clear spinner busy wheel
+function myErrorCallback() {
+    $('#idstatus').text("** ERROR **");
+    imgloaded= imgloaded & ( ~2 );
+    if ( imgloaded===0 ) {
+       $('#progress').attr('src', 'idle-icon.png');
+    }
 }
 
 // Callback function for when metadata extracted
@@ -350,7 +359,7 @@ function mycallback() {
 
 
 var ias;
-$('#idstatus').text("v20140111_0754");
+$('#idstatus').text("v20150122_0705");
 
 var PLOTINFO;
 
@@ -364,7 +373,7 @@ $(document).ready(function() {
 
     echoImgUrl();
 
-    ImageInfo.loadInfo(imgurl, mycallback);
+    ImageInfo.loadInfo(imgurl, mycallback, myErrorCallback );
 
     // **************************************************************************
     // imgAreaSelect()

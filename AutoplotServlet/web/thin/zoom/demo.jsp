@@ -103,6 +103,6 @@
         <div id="idstatus">status</div>
         <!-- src="../../SimpleServlet?url=tsds.http%3A%2F%2Ftimeseries.org%2Fget.cgi%3FStartDate%3D20050101%26EndDate%3D20060101%26ext%3Dbin%26out%3Dtsml%26ppd%3D1440%26param1%3DOMNI_OMNIHR-26-v0&font=sans-8&format=image%2Fpng&width=700&height=400&column=5em%2C100%25-10em&row=3em%2C100%25-3em" />-->
         
-        <small>v20140114_0941</small>
+        <small>v20150122_0705</small>
 </body>
 </html>

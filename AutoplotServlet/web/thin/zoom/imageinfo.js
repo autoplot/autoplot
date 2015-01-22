@@ -14,7 +14,7 @@ ImageInfo.range = 10240;
 
 	var files = [];
 
-	function readFileData(url, callback) {
+	function readFileData(url, callback, errorCallback ) {
 		BinaryAjax(
 			url,
 			function(http) {
@@ -27,7 +27,9 @@ ImageInfo.range = 10240;
 				files[url] = tags;
 				if (callback) callback();
 			},
-			null,
+			function(http) {
+                            if (errorCallback) errorCallback();
+                        },
 			ImageInfo.useRange ? [0, ImageInfo.range] : null
 		)
 	}
@@ -172,9 +174,9 @@ ImageInfo.range = 10240;
 		}
 	}
 
-	ImageInfo.loadInfo = function(url, cb) {
+	ImageInfo.loadInfo = function(url, cb, errorCallback ) {
 		if (!files[url]) {
-			readFileData(url, cb);
+			readFileData(url, cb, errorCallback );
 		} else {
 			if (cb) cb();
 		}
