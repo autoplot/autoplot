@@ -12,13 +12,10 @@
 package org.virbo.autoplot;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -32,8 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.CellRendererPane;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -66,7 +61,9 @@ import org.virbo.datasource.InputVerifier;
 import org.virbo.filters.FiltersChainPanel;
 
 /**
- * PlotElement for controlling how data is handled.
+ * GUI tab for controlling how data is handled, provides feedback for what is
+ * being plotted, allows fill value to be specified, and provides the filters
+ * chain of operations to apply to the data before plotting.
  * @author jbf
  */
 public class DataPanel extends javax.swing.JPanel {
@@ -95,7 +92,7 @@ public class DataPanel extends javax.swing.JPanel {
                 if ( !adjusting ) {
                     componentChanged();
                 } else {
-                    logger.info("I would update if I were not adjusting.");
+                    logger.info("Unexpected update that cannot be performed because we are adjusting.");
                 }
             }
 
