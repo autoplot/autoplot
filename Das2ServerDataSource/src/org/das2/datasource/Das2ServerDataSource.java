@@ -41,7 +41,6 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.stream.MIME;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.KeyChain;
 import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -59,7 +58,7 @@ import org.virbo.qstream.QDataSetStreamHandler;
  */
 class Das2ServerDataSource extends AbstractDataSource {
 
-    private static Map<String,String> keys= new HashMap();
+    private static final Map<String,String> keys= new HashMap();
     
     public Das2ServerDataSource(URI uri) throws ParseException {
         super(uri);
@@ -509,16 +508,19 @@ class Das2ServerDataSource extends AbstractDataSource {
 
     }
 
-    public TimeSeriesBrowse getTimeSeriesBrowse() {
+    public final TimeSeriesBrowse getTimeSeriesBrowse() {
         return new TimeSeriesBrowse() {
+            @Override
             public void setTimeRange(DatumRange dr) {
                 timeRange= dr;
             }
 
+            @Override
             public void setTimeResolution(Datum d) {
                 resolution= d;
             }
 
+            @Override
             public String getURI() {
                 String stime= timeRange.min().toString().replace(" ", "+");
                 String etime= timeRange.max().toString().replace(" ", "+");
@@ -536,20 +538,24 @@ class Das2ServerDataSource extends AbstractDataSource {
                 return "vap+das2Server:" + resourceURI + "?" + sparams;
             }
 
+            @Override
             public String blurURI() {
                 String sparams= "dataset="+params.get( "dataset" );
                 if ( dsParams!=null )  sparams+= "&" + dsParams;
                 return "vap+das2Server:" + resourceURI + "?" + sparams;
             }
             
+            @Override
             public DatumRange getTimeRange() {
                 return timeRange;
             }
 
+            @Override
             public Datum getTimeResolution() {
                 return resolution;
             }
 
+            @Override
             public void setURI(String suri) throws ParseException {
                 URISplit split= URISplit.parse(uri);
                 Map<String,String> params= URISplit.parseParams(split.params);
