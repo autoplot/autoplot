@@ -1,0 +1,81 @@
+# title: Add Point Digitizer
+# label: Point Digitizer
+# Click events are registered on the tab "digitizer." If the data is a spectrogram,
+# report the Z value as well.  Note this will not work with the pitch angle distribution.
+# This also provides feedback showing the digitized data and the data points selected in the 
+# digitizer tab.
+
+from org.das2.components import DataPointRecorder
+from org.virbo.dataset import SemanticOps
+from org.das2.dataset import DataSetUpdateListener
+
+setLayoutOverplot(3)
+
+dpr= DataPointRecorder()
+
+addTab( 'digitizer', dpr )
+
+class MyUpdateListener( DataSetUpdateListener ):
+    def dataSetUpdated( self, e ):
+        ds= dpr.getDataSet()
+        if ( ds!=None ):
+            xx= ds.property( QDataSet.DEPEND_0 )
+            yy= ds[:,0]
+            plot( 2,xx,yy  )
+        else:
+            plot( 2, "" )
+dpr.addDataSetUpdateListener( MyUpdateListener() )
+
+class MySelectionListener(DataSetUpdateListener):
+   def dataSetUpdated(self,event):
+        ds= dpr.getSelectedDataSet()
+        if ( ds!=None ):
+            xx= ds.property( QDataSet.DEPEND_0 )
+            yy= ds[:,0]
+            plotx(1,xx,yy, color=Color.PINK, symsize=11  )
+        else:
+            plot( 1, "" )
+dpr.addSelectedDataSetUpdateListener( MySelectionListener() )
+            
+pp= dom.plots[0].controller.dasPlot
+
+from org.das2.event import BoxSelectorMouseModule
+
+mm= BoxSelectorMouseModule.create( pp, 'digitizer' )
+
+def boxSelected(event):
+    x= event.getXRange().min()
+    y= event.getYRange().max()
+    pes= dom.controller.getPlotElementsFor(dom.plots[0])
+    if ( len(pes)==0 ): 
+        setStatus('no data found for plot')
+        return
+    ds= pes[0].controller.getDataSet()
+    if ( ds==None ):
+        setStatus('nothing plotted')
+        return 
+    if ( SemanticOps.isSimpleTableDataSet( ds  ) ):
+       try:
+          z= slice0( ds, dataset(x) )
+          z= slice0( z, dataset(y) )
+          map= java.util.HashMap()
+          map.put( 'z', z )
+       except:
+          setStatus('out of bounds')
+          return
+    else:
+       map= None
+    dpr.addDataPoint( x, y, map )
+    
+mm.BoxSelected=boxSelected
+
+pp.dasMouseInputAdapter.primaryModule= mm
+
+# make sure the focus is on the 0th plot element.  The 2nd will be the selected points and above that is the digitized.
+dom.controller.plotElement= dom.plotElements[0]
+
+import javax
+javax.swing.JOptionPane.showMessageDialog( getViewWindow(),'Draw a box, and it will be recorded on the digitizer tab')
+
+plot(0, 'vap+cdaweb:ds=PO_H0_CAM&id=H_PLUS&timerange=2000-03-16' )
+dom.plots[0].yaxis.autoRange= False
