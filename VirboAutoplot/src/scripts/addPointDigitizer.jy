@@ -5,13 +5,14 @@
 # This also provides feedback showing the digitized data and the data points selected in the 
 # digitizer tab.
 
-from org.das2.components import DataPointRecorder
+from org.das2.components import DataPointRecorderNew
 from org.virbo.dataset import SemanticOps
 from org.das2.dataset import DataSetUpdateListener
+from org.das2.graph import SpectrogramRenderer
 
 setLayoutOverplot(3)
 
-dpr= DataPointRecorder()
+dpr= DataPointRecorderNew()
 
 addTab( 'digitizer', dpr )
 
@@ -19,9 +20,7 @@ class MyUpdateListener( DataSetUpdateListener ):
     def dataSetUpdated( self, e ):
         ds= dpr.getDataSet()
         if ( ds!=None ):
-            xx= ds.property( QDataSet.DEPEND_0 )
-            yy= ds[:,0]
-            plot( 2,xx,yy  )
+            plot( 2, ds[:,0], ds[:,1]  )
         else:
             plot( 2, "" )
 dpr.addDataSetUpdateListener( MyUpdateListener() )
@@ -30,9 +29,7 @@ class MySelectionListener(DataSetUpdateListener):
    def dataSetUpdated(self,event):
         ds= dpr.getSelectedDataSet()
         if ( ds!=None ):
-            xx= ds.property( QDataSet.DEPEND_0 )
-            yy= ds[:,0]
-            plotx(1,xx,yy, color=Color.PINK, symsize=11  )
+            plotx( 1, ds[:,0], ds[:,1] , color=Color.PINK, symsize=11 )
         else:
             plot( 1, "" )
 dpr.addSelectedDataSetUpdateListener( MySelectionListener() )
@@ -74,8 +71,10 @@ pp.dasMouseInputAdapter.primaryModule= mm
 # make sure the focus is on the 0th plot element.  The 2nd will be the selected points and above that is the digitized.
 dom.controller.plotElement= dom.plotElements[0]
 
+plot(0, 'vap+cdaweb:ds=PO_H0_CAM&id=H_PLUS&timerange=2000-03-16' )
+#plot(0, 'http://www.rbsp-ect.lanl.gov/data_pub/rbspa/hope/level3/PA/rbspa_rel02_ect-hope-PA-L3_20121023_v5.0.0.cdf?FEDO' )
+
 import javax
 javax.swing.JOptionPane.showMessageDialog( getViewWindow(),'Draw a box, and it will be recorded on the digitizer tab')
 
-plot(0, 'vap+cdaweb:ds=PO_H0_CAM&id=H_PLUS&timerange=2000-03-16' )
 dom.plots[0].yaxis.autoRange= False
