@@ -59,6 +59,8 @@ import org.virbo.qstream.QDataSetStreamHandler;
  */
 class Das2ServerDataSource extends AbstractDataSource {
 
+    private static Map<String,String> keys= new HashMap();
+    
     public Das2ServerDataSource(URI uri) throws ParseException {
         super(uri);
         if ( !"no".equals( params.get("tsb") ) ) {
@@ -258,11 +260,21 @@ class Das2ServerDataSource extends AbstractDataSource {
             String groupAccess= (String)dsdfParams.get("groupAccess" );
             if ( groupAccess!=null && groupAccess.trim().length()>0 ) {
                 if ( key1==null ) {
-                    Authenticator authenticator;
-                    authenticator= new Authenticator( DasServer.create(this.resourceURI.toURL()),groupAccess);
-                    Key key2= authenticator.authenticate();
-                    if ( key2!=null ) {
-                        params2.put("key", key2.toString() );
+                    //keys.clear();
+                    String k= this.resourceURI.toString()+"?"+ params.get("dataset");
+                    String t= keys.get( k );
+                    //String t= null; // TODO: See if we can keep track of keys for jython scripts.  See sftp://jbf@klunk/home/jbf/project/cassini/production/devel/autoplot/jyds/cassini.jyds?timerange=2014-12-10+21:18+to+23:29&bg=F
+                    if ( t==null ) {
+                        Authenticator authenticator;
+                        authenticator= new Authenticator( DasServer.create(this.resourceURI.toURL()),groupAccess);
+                        Key key2= authenticator.authenticate();
+                        if ( key2!=null ) {
+                            params2.put("key", key2.toString() );
+                            url2= new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
+                            keys.put( k, key2.toString() );
+                        }
+                    } else {
+                        params2.put("key", t );
                         url2= new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
                     }
                 } else {
