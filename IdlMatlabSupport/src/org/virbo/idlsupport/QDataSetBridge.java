@@ -149,9 +149,10 @@ public abstract class QDataSetBridge {
     }
 
     /**
-     * This initiates the read on a separate thread, so this does not block and should
-     * be used with caution.  See getProgressMonitor for use.  Note this is 
-     * more advanced and is intended to support use in other software (e.g. PaPCO).
+     * This initiates the read on a separate thread, so this does not 
+     * block and should be used with caution.  See getProgressMonitor for 
+     * use.  Note this is more advanced and is intended to support use in 
+     * other software (e.g. PaPCo).
      *
      * Note because there is one exception that is stored, a QDataSetBridge object
      * is only able to load one dataset at a time.  Simultaneous loads should
@@ -574,7 +575,6 @@ public abstract class QDataSetBridge {
     /**
      * return an 1,2,or 3-D array of doubles or floats containing the values
      * in the default dataset.
-     * @param name
      * @return
      */
     public Object values() {
