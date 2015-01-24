@@ -112,7 +112,7 @@ public class Test024 {
      */
     public static void example5() throws InterruptedException, IOException {
         org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
-        apds.setDataSetURI("http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density");
+        apds.setDataSetURI("http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5.dds?lat");
         apds.doGetDataSet();
         if ( apds.getStatus()!=0 ) {
             System.err.println( apds.getStatusMessage() );
@@ -168,7 +168,7 @@ public class Test024 {
      */
     public static void test6() throws Exception {
         {
-            DataSource dss= org.virbo.datasource.DataSetURI.getDataSource( "http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density" );
+            DataSource dss= org.virbo.datasource.DataSetURI.getDataSource( "http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5.dds?lat" );
             TimeSeriesBrowse tsb= org.virbo.datasource.DataSourceUtil.getTimeSeriesBrowse(dss);
             System.err.println(tsb);
         }
@@ -234,7 +234,7 @@ public class Test024 {
             //test6();
             test7();
             checkAPDS( "vap+cdaweb:ds=PO_K0_MFE&id=MBTIGRF&filter=polar&timerange=2003-05-01", "2003-05-02" );
-            checkAPDS( "vap+cdfj:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2001-01-17", "2000-01-09" );
+            checkAPDS( "vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2001-01-17", "2000-01-09" );
 
             testGuessNameFor();
 
