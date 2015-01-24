@@ -86,7 +86,7 @@ public class Test024 {
 
     public static void example4() throws Exception {
         org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
-        apds.setDataSetURI("vap+inline:ripplesx(20)");
+        apds.setDataSetURI("vap+inline:ripples(20)");
         apds.doGetDataSet();
 
         if ( apds.getStatus()!=0 ) {
@@ -210,7 +210,7 @@ public class Test024 {
         Object vv= apds.values();
         System.err.println( "t20: "+ (System.currentTimeMillis()-t0)/1000. + " seconds" );
 
-        System.err.println( String.valueOf( Array.get(Array.get(vv,0),0)) );
+        System.err.println( String.valueOf( Array.get(Array.get(vv,0),0)) + " " + vv.getClass().getSimpleName() );
     }
 
     /**
