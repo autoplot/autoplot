@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.jythonsupport;
 
 import java.io.BufferedReader;
@@ -26,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -64,6 +60,7 @@ import org.virbo.datasource.DataSetURI;
 
 /**
  * Utilities to support Jython scripting.
+ * @see org.virbo.autoplot.JythonUtil
  * @author jbf
  */
 public class JythonUtil {
@@ -72,8 +69,10 @@ public class JythonUtil {
 
     /**
      * create an interpreter object configured for Autoplot contexts:
-     *   * QDataSets are wrapped so that operators are overloaded.
-     *   * a standard set of names are imported.
+     * <ul>
+     *   <li> QDataSets are wrapped so that operators are overloaded.
+     *   <li> a standard set of names are imported.
+     * </ul>
      * This also adds things to the python search path 
      * (see getLocalJythonAutoplotLib) so imports will find them.
      * 
