@@ -34,12 +34,16 @@
         <icon href="logo128x128.gif" width="128" height="128" />
         <icon href="splash.gif" kind="splash" />
         <offline-allowed/>
+        <!--X
         <shortcut online="true">
             <desktop />
             <menu submenu="autoplot" />
         </shortcut>
+        X-->
+        <!--X
         <association mime-type="application/autoplot+xml" extensions="vap"/>
         <association mime-type="application/x-cdf" extensions="cdf"/>        
+        X-->
     </information>
     
     <security>
@@ -52,13 +56,11 @@
         </j2se>
 
         <jar href="AutoplotVolatile.jar" />
-        <jar href="AutoplotStable.jar" />
-        <!--
+        <jar href="AutoplotStable.jar" /><!--X
         <jar href="../lib/AutoplotStable.20150120.jar" />
-        -->
+        X-->
 
         <property name="jnlp.packEnabled" value="true"/>
-        <!-- this no longer has any effect: <property name="deployment.security.authenticator" value="false"/>-->
 
         <property name="jnlp.autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         <property name="sun.java2d.d3d" value="false" />  <!-- bug 953 -->
