@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Energy labels for slices corrected, before BIN_PLUS and BIN_MINUS were inadvertently used to show a range
+        <p><small>A new digitizing script is introduced, which shows feedback.  See code <a href="https://svn.code.sf.net/p/autoplot/code/autoplot/trunk/VirboAutoplot/src/scripts/addPointDigitizer.jy">here</a>.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -26,6 +26,11 @@
         to resolve old numbers.
         <p>Bugfixes (2015-01-21):</p>
         <ul>            
+            <li>result of fftPower hints that log scale type should be used.</li>
+            <li>1315: keep track of das2server key so the user is prompted just once per session.</li>
+            <li>turn on word wrap in runtime error submit form.</li>
+            <li>Thin client support finally catches errors instead of leaving the progress wheel spinning.</li>
+            <li>corrections to FiltersEditorPanel, such as allowing for float arguments and medianFilter.</li>
             <li>remove the dtd from internal filters.xml, which was preventing use on Seth's computer.</li>
             <li>1312: tearing off tabs before initialization results in tiny tab</li>
             <li>1311: new user data tab enabled after the initial data load resulted in RTE</li>
