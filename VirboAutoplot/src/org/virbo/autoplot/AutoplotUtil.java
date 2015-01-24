@@ -1115,6 +1115,8 @@ public class AutoplotUtil {
      * which does an efficient, self-configuring, one-pass histogram of the data
      * that more effectively identifies the data range and outliers.
      *
+     * TODO: This needs to be reworked. https://sourceforge.net/p/autoplot/bugs/1318/
+     * 
      * @param ds The dataset, a non-bundle, to be autoranged.
      * @param properties Additional constraints for properties, such as SCALE_TYPE
      * @param ignoreDsProps Don't check ds for TYPICAL_MIN and SCALE_TYPE.  MONOTONIC is never ignored.
