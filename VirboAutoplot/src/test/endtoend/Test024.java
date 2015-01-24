@@ -6,6 +6,7 @@
 package test.endtoend;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.virbo.autoplot.ScriptContext;
@@ -178,6 +179,39 @@ public class Test024 {
             System.err.println(tsb);
         }
     }
+    
+    /**
+     * test of large read, which in IDL was slow but did work.  The
+     * problem is that floats are converted to doubles.
+     * @throws Exception 
+     */
+    public static void test8() throws Exception {
+
+        String date="2012-11-02";
+
+        String timeformat="seconds since "+date+"T00:00:00";
+
+        String range= "2012-11-01 23:00 to 2012-11-03 01:00";
+        
+        long t0= System.currentTimeMillis();
+
+        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        apds.setDataSetURI( TestSupport.TEST_HOME+"data.backup/cdf/rbsp-a_magnetometer_hires-sm_emfisis-L3_$Y$m$d_v$(v,sep).cdf?coordinates&timerange="+range );
+
+        System.err.println( "t05: "+ (System.currentTimeMillis()-t0)/1000. + " seconds" );
+
+        apds.doGetDataSet();
+        apds.setPreferredUnits( timeformat );
+        
+        System.err.println( "t10: "+ (System.currentTimeMillis()-t0)/1000. + " seconds" );
+        
+        //x,y,z, positions in SM coordinates in km.  These should already be joined onto the 
+        //same time base as the magnetic field data.
+        Object vv= apds.values();
+        System.err.println( "t20: "+ (System.currentTimeMillis()-t0)/1000. + " seconds" );
+
+        System.err.println( String.valueOf( Array.get(Array.get(vv,0),0)) );
+    }
 
     /**
      * model PaPCo's use of the interface, which also uses TSB.
@@ -224,6 +258,8 @@ public class Test024 {
     public static void main( String[] args )  {
         try {
 
+            test8();
+            
             example1();
             example2();
             example3();  // Jared's slice
