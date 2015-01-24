@@ -43,6 +43,8 @@ import org.virbo.jythonsupport.ui.ScriptPanelSupport;
  * Utilities for Jython functions, such as a standard way to initialize
  * an interpreter and invoke a script asynchronously.  See also 1310.
  * TODO: this needs review, since the autoplot.py was added to the imports.
+ * 
+ * @see org.virbo.jythonsupport.JythonUtil
  * @author jbf
  */
 public class JythonUtil {
