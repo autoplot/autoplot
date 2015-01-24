@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.autoplot;
 
@@ -44,7 +40,9 @@ import org.virbo.jythonsupport.ui.ParametersFormPanel;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 
 /**
- *
+ * Utilities for Jython functions, such as a standard way to initialize
+ * an interpreter and invoke a script asynchronously.  See also 1310.
+ * TODO: this needs review, since the autoplot.py was added to the imports.
  * @author jbf
  */
 public class JythonUtil {
@@ -53,8 +51,10 @@ public class JythonUtil {
 
     /**
      * create an interpreter object configured for Autoplot contexts:
-     *   * QDataSets are wrapped so that operators are overloaded.
-     *   * a standard set of names are imported.
+     * <ul>
+     *   <li> QDataSets are wrapped so that operators are overloaded.
+     *   <li> a standard set of names are imported.
+     * </ul>
      *   
      * @param appContext load in additional symbols that make sense in application context.
      * @param sandbox limit symbols to safe symbols for server.
@@ -78,6 +78,16 @@ public class JythonUtil {
         return interp;
     }
 
+    /**
+     * create a Jython interpreter, with the dom and monitor available to the
+     * code.
+     * @param appContext run this in the application context, with access to the dom.  (TODO: this is probably always equivalent to dom!=null)
+     * @param sandbox limit symbols to safe symbols for server.
+     * @param dom the application state, if available.
+     * @param mon a monitor, if available.  If it is not a monitor is created.
+     * @return the interpreter.
+     * @throws IOException 
+     */
     public static InteractiveInterpreter createInterpreter( boolean appContext, boolean sandbox, Application dom, ProgressMonitor mon ) throws IOException {
         InteractiveInterpreter interp= createInterpreter(appContext, sandbox);
         if ( dom!=null ) interp.set("dom", dom );
@@ -324,7 +334,7 @@ public class JythonUtil {
                         in.close();
                     }
                     //TODO: error annotations on the editor.
-                    mon.finished();
+                    if ( !mon.isFinished() ) mon.finished();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
