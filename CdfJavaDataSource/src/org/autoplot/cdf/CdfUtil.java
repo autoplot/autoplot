@@ -420,6 +420,7 @@ public class CdfUtil {
         
         long varType = cdf.getType(svariable);
 
+        
         int[] dimSizes = cdf.getDimensions(svariable);
         boolean[] dimVaries= cdf.getVarys(svariable);
 
@@ -479,7 +480,9 @@ public class CdfUtil {
             }
             buff2.flip();
         } else {
+            logger.entering("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
             buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, true );
+            logger.exiting("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
         }
         buf= new ByteBuffer[] { buff2 };
 
