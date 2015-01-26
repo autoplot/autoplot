@@ -87,10 +87,9 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             
             ScriptContext.plot(1,"vap+fits:http://autoplot.org/data/hsi_qlimg_5050601_001.fits"); // small cheat
             
-            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //this initially calls the popup, but because the Plot is unselected by this click, the popup is useless
+            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //right click on plot0 causes it to become unselected
             mainFrame.clickMouse(clickPoint.x+150, clickPoint.y-110); //click away to get out of the popup
-            //mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //this initially calls the popup, but because the Plot is unselected by this click, the popup is useless
-            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //now the plot is selected, allowing the popup to function properly (I know this isn't the easiest way to do this)
+            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //right click to select plot0 and also call the popup (not easiest way to do this)
             JPopupMenuOperator popup1 = new JPopupMenuOperator();
             popup1.pushMenuNoBlock("Plot|Delete", "|");
             
@@ -104,6 +103,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             
             JTableOperator domTable = new JTableOperator( domProps);
             JTextFieldOperator dataSourceFilt;
+            
             //Open Plot Elements Tree
             domTable.selectCell(8, 0);
             
@@ -112,9 +112,6 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(15,1);
             JTextFieldOperator component = new JTextFieldOperator(domTable);
             component.setText("slice0(0)");
-            //domTable.selectCell(18, 1);
-            //dataSourceFilt = new JTextFieldOperator(domTable, "data_1");
-            //dataSourceFilt.setText("data_1");
             domTable.selectCell(9,0);
             
             
@@ -182,10 +179,8 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             popup.pushMenuNoBlock("Canvas|Add Hidden Plot...", "|");
             Thread.sleep(200);
             
-            
             DialogOperator addhiddenplot = new DialogOperator( new RegexComponentChooser( "Add hidden plot for binding.*") );
-            JCheckBoxOperator zaxis = new JCheckBoxOperator(addhiddenplot, 2);
-            zaxis.setSelected(false);
+            new JCheckBoxOperator(addhiddenplot, 2).setSelected(false);
             new JButtonOperator(addhiddenplot, "OK").clickMouse();
             
             ScriptContext.waitUntilIdle();
@@ -194,7 +189,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             }
             
             new JTabbedPaneOperator( app.getTabs() ).selectPage("canvas");
-            Thread.sleep(5000);
+            Thread.sleep(5000);  
             
             System.err.println("Done!");
             
