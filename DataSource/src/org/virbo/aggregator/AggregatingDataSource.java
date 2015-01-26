@@ -135,7 +135,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
      * @param ads0 the data which ought to be within these bounds.
      * @return the dataset, possibly trimmed to exclude miscalculated times.
      */
-    private ArrayDataSet checkBoundaries( DatumRange bounds, ArrayDataSet ads0 ) {
+    private MutablePropertyDataSet checkBoundaries( DatumRange bounds, MutablePropertyDataSet ads0 ) {
         QDataSet dep0_0= (QDataSet) ads0.property(QDataSet.DEPEND_0);
         if ( dep0_0==null && UnitsUtil.isTimeLocation(SemanticOps.getUnits(ads0) ) ) {
             dep0_0= ads0;
@@ -154,7 +154,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
         if ( ist>0 || ien<ads0.length() ) {
             if ( ist>0 ) logger.log(Level.INFO, "trimming records 0-{0} to remove timetags outside the bounds.", new Object[] { (ist-1) } );
             if ( ien<ads0.length() ) logger.log(Level.INFO, "trimming records {0}-{1} to remove timetags outside the bounds.", new Object[]{ien-1, ads0.length()-1});
-            return ArrayDataSet.maybeCopy( ads0.trim( ist,ien ) );
+            return Ops.maybeCopy( (MutablePropertyDataSet)ads0.trim( ist,ien ) );
+            
         } else {
             return ads0;
         }
@@ -167,7 +168,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
      * @param ads1 the second dataset that will be appended.
      * @return ads1, possibly trimmed.
      */
-    private ArrayDataSet trimOverlap(QDataSet ads0, ArrayDataSet ads1) {
+    private QDataSet trimOverlap(QDataSet ads0, QDataSet ads1) {
         QDataSet dep0_0= (QDataSet) ads0.property(QDataSet.DEPEND_0);
         QDataSet dep0_1= (QDataSet) ads1.property(QDataSet.DEPEND_0);
         if ( dep0_0==null && UnitsUtil.isTimeLocation(SemanticOps.getUnits(ads0) ) ) {
@@ -185,7 +186,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             while ( i<dep0_1.length() && Ops.le( dep0_1.slice(i), dep0_0.slice(dep0_0.length()-1) ).value()==1 ) {
                 i=i+1;
             }
-            return (ArrayDataSet)ads1.trim(i,ads1.length());
+            return ads1.trim(i,ads1.length());
         }
     }
 
@@ -363,7 +364,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
             
 
-            ArrayDataSet result = null;
+            MutablePropertyDataSet result = null;
             JoinDataSet altResult= null; // used when JoinDataSets are found
 
             if ( ss.length==0 ) {
@@ -506,23 +507,24 @@ public final class AggregatingDataSource extends AbstractDataSource {
                             DDataSet mpds= DDataSet.create(new int[0]);
                             altResult.putProperty(QDataSet.JOIN_0,mpds );
                         } else {
-//                            if ( ds1 instanceof BufferDataSet ) {
-//                                if ( ss.length>1 ) {
-//                                    result = BufferDataSet.copy(ds1);
-//                                    result.grow(result.length()*ss.length*11/10);  //110%
-//                                }
-//                                result= checkBoundaries( dr1, result );
-//                                result= ArrayDataSet.monotonicSubset(result);
-//                            } else {
+                            if ( false && ds1 instanceof BufferDataSet ) {
+                                if ( ss.length>1 ) {
+                                    result = BufferDataSet.copy(ds1);
+                                    //TODO: why the next line???
+                                    //((BufferDataSet)result).grow(result.length()*ss.length*11/10);  //110%
+                                }
+                                result= checkBoundaries( dr1, result );
+                                result= Ops.monotonicSubset(result);
+                            } else {
                                 if ( ss.length==1 ) {
                                     result= ArrayDataSet.maybeCopy(ds1);
                                 } else {
                                     result = ArrayDataSet.copy(ds1);
-                                    result.grow(result.length()*ss.length*11/10);  //110%
+                                    ((ArrayDataSet)result).grow(result.length()*ss.length*11/10);  //110%
                                 }
                                 result= checkBoundaries( dr1, result );
-                                result= ArrayDataSet.monotonicSubset(result);
-                            //}
+                                result= Ops.monotonicSubset(result);
+                            }
                         }
                         this.metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
                         cacheRange1 = dr1;
@@ -531,30 +533,56 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         if ( ds1 instanceof JoinDataSet ) {
                             assert altResult!=null;
                             altResult.joinAll( (JoinDataSet)ds1 );
+//                        } else if ( ds1 instanceof BufferDataSet ) {
+//                            assert result!=null;
+//                            BufferDataSet bresult= (BufferDataSet)ds1;
+//                            BufferDataSet ads1= (BufferDataSet)Ops.maybeCopy( bresult );
+//                            ads1= (BufferDataSet)Ops.monotonicSubset(ads1);
+//                            try {
+//                                if ( bresult.canAppend(ads1) ) {
+//                                    QDataSet saveAds1= ads1; // note these will be backed by the same data.
+//                                    ads1= (BufferDataSet)checkBoundaries( dr1, ads1 );
+//                                    ads1= (BufferDataSet)trimOverlap( result, ads1 );
+//                                    if ( ads1.length()!=saveAds1.length() ) {
+//                                        QDataSet saveDep0= (QDataSet) saveAds1.property(QDataSet.DEPEND_0);
+//                                        logger.log(Level.WARNING, "data trimmed from dataset to avoid overlap at {0}", saveDep0.slice(0));
+//                                    }
+//                                    bresult.append( ads1 );
+//                                } else {
+//                                    bresult.grow( result.length() + ads1.length() * (ss.length-i) );
+//                                    bresult.append( ads1 );
+//                                }
+//                            } catch ( IllegalArgumentException ex ) {
+//                                throw new IllegalArgumentException( "can't append data from "+delegateUri, ex );
+//                            } catch ( Exception ex ) {
+//                                doThrow= true;
+//                                throw ex; // the exception occurring in the append step was hidden because the code assumed it was a problem with the read.
+//                            }
                         } else {
-                            assert result!=null;
-                            ArrayDataSet ads1= ArrayDataSet.maybeCopy(result.getComponentType(),ds1);
+                            assert result instanceof ArrayDataSet;
+                            ArrayDataSet aresult= ((ArrayDataSet)result);
+                            ArrayDataSet ads1= ArrayDataSet.maybeCopy( aresult.getComponentType(),ds1);
                             ads1= ArrayDataSet.monotonicSubset(ads1);
                             try {
-                                if ( result.canAppend(ads1) ) {
+                                if ( aresult.canAppend(ads1) ) {
                                     QDataSet saveAds1= ads1; // note these will be backed by the same data.
-                                    ads1= checkBoundaries( dr1, ads1 );
-                                    ads1= trimOverlap( result, ads1 );
+                                    ads1= (ArrayDataSet)checkBoundaries( dr1, ads1 );
+                                    ads1= (ArrayDataSet)trimOverlap( result, ads1 );
                                     if ( ads1.length()!=saveAds1.length() ) {
                                         QDataSet saveDep0= (QDataSet) saveAds1.property(QDataSet.DEPEND_0);
                                         logger.log(Level.WARNING, "data trimmed from dataset to avoid overlap at {0}", saveDep0.slice(0));
                                     }
-                                    result.append( ads1 );
+                                    aresult.append( ads1 );
                                 } else {
-                                    result.grow( result.length() + ads1.length() * (ss.length-i) );
-                                    result.append( ads1 );
+                                    aresult.grow( result.length() + ads1.length() * (ss.length-i) );
+                                    aresult.append( ads1 );
                                 }
                             } catch ( IllegalArgumentException ex ) {
                                 throw new IllegalArgumentException( "can't append data from "+delegateUri, ex );
                             } catch ( Exception ex ) {
                                 doThrow= true;
                                 throw ex; // the exception occurring in the append step was hidden because the code assumed it was a problem with the read.
-                            }
+                            }                            
                         }
 
                         //TODO: combine metadata.  We don't have a way of doing this.
