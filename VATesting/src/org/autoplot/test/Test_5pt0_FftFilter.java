@@ -38,8 +38,7 @@ public class Test_5pt0_FftFilter implements Scenario {
             AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
             
             JFrameOperator mainFrame = new JFrameOperator(app);
-            
-            //new JLabelOperator(mainFrame, AutoplotUI.READY_MESSAGE );
+
             
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/2012/12/01/rbsp-a_magnetometer_1sec-gei_emfisis-L3_20121201_v1.3.2.cdf?Magnitude");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
@@ -58,14 +57,9 @@ public class Test_5pt0_FftFilter implements Scenario {
             window.selectItem(0);
             JComboBoxOperator slide = new JComboBoxOperator(fftFrame, 1);
             slide.selectItem(2);
-            
-            
-            
+                    
             new JButtonOperator( fftFrame, "Ok" ).clickMouse();
             
-  
-            //new JLabelOperator(mainFrame, AutoplotUI.READY_MESSAGE );
-
             Thread.sleep(1000); // This is because of a bug in the locking, otherwise it will grab the current image.
             new JTabbedPaneOperator( app.getTabs() ).selectPage("data");
             System.err.println("Done!");
