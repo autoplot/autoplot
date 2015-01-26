@@ -138,14 +138,14 @@ public class CdfDataSource extends AbstractDataSource {
     }
 
     /**
-     * To resolve bug 3605590 we unload the cache after 10 seconds.  Joe at Aerospace had a problem where
+     * To resolve bug 1002 we unload the cache after 10 seconds.  Joe at Aerospace had a problem where
      * he couldn't kill a lingering autoplot process and then couldn't get at the file because it held a reference to the
      * file.  Now we automatically unload all the cached files.  I did look at just disabling the cache, but the file is
-     * open and closed three times during the load.
+     * open and closed three times during the load.  See http://sourceforge.net/p/autoplot/bugs/1002.
      */
     public static final TickleTimer timer= new TickleTimer( 10000, new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            logger.log(Level.FINER, "unloading cache to resolve bug 3605590" );
+            logger.log(Level.FINER, "unloading CDF cache to resolve bug 1002" );
             synchronized (lock ) {
                 openFiles.clear();
                 openFilesRev.clear();
@@ -234,7 +234,7 @@ public class CdfDataSource extends AbstractDataSource {
             File cdfFile;
             cdfFile = getFile(mon);
 
-            logger.log(Level.FINE, "getDataSet ({0})", String.valueOf(cdfFile));
+            logger.log(Level.FINE, "getDataSet ({0})", getURI() );
 
             String fileName = cdfFile.toString();
 
