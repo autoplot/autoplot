@@ -41,6 +41,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
 	
     }    
     
+    @Override
     public DataSource getDataSource(URI uri) throws Exception {
         return new org.autoplot.cdf.CdfDataSource( uri ); // still issues: http://www.sarahandjeremy.net:8080/hudson/job/autoplot-test100/4987/
     }
@@ -50,6 +51,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
         return surl;
     }
     
+    @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
             
@@ -146,6 +148,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
         }
     }
     
+    @Override
     public boolean reject( String surl, List<String> problems, ProgressMonitor mon ) {
         try {
             if (!surl.contains("?") || surl.indexOf("?") == surl.length() - 1) {
@@ -190,10 +193,12 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
         }
     }
 
+    @Override
     public <T> T getCapability(Class<T> clazz) {
         return null;
     }
 
+    @Override
     public boolean supportsDiscovery() {
         return false;
     }
