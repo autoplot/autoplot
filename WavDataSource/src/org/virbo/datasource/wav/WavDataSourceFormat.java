@@ -22,7 +22,7 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.binarydatasource.BufferDataSet;
+import org.autoplot.bufferdataset.BufferDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
