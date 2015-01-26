@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.autoplot.bufferdataset.BufferDataSet;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.CacheTag;
 import org.das2.datum.Datum;
@@ -505,14 +506,23 @@ public final class AggregatingDataSource extends AbstractDataSource {
                             DDataSet mpds= DDataSet.create(new int[0]);
                             altResult.putProperty(QDataSet.JOIN_0,mpds );
                         } else {
-                            if ( ss.length==1 ) {
-                                result= ArrayDataSet.maybeCopy(ds1);
-                            } else {
-                                result = ArrayDataSet.copy(ds1);
-                                result.grow(result.length()*ss.length*11/10);  //110%
-                            }
-                            result= checkBoundaries( dr1, result );
-                            result= ArrayDataSet.monotonicSubset(result);
+//                            if ( ds1 instanceof BufferDataSet ) {
+//                                if ( ss.length>1 ) {
+//                                    result = BufferDataSet.copy(ds1);
+//                                    result.grow(result.length()*ss.length*11/10);  //110%
+//                                }
+//                                result= checkBoundaries( dr1, result );
+//                                result= ArrayDataSet.monotonicSubset(result);
+//                            } else {
+                                if ( ss.length==1 ) {
+                                    result= ArrayDataSet.maybeCopy(ds1);
+                                } else {
+                                    result = ArrayDataSet.copy(ds1);
+                                    result.grow(result.length()*ss.length*11/10);  //110%
+                                }
+                                result= checkBoundaries( dr1, result );
+                                result= ArrayDataSet.monotonicSubset(result);
+                            //}
                         }
                         this.metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
                         cacheRange1 = dr1;
