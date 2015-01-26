@@ -30,7 +30,7 @@ import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.binarydatasource.BufferDataSet;
+import org.autoplot.bufferdataset.BufferDataSet;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
@@ -643,7 +643,7 @@ public class CdfUtil {
     /**
      * returns the amount of JVM memory in bytes occupied by the dataset. This is an approximation,
      * calculated by taking the element type size (e.g. float=4 bytes) times the number of elements for
-     * the dataset.
+     * the dataset.  This does not include the memory consumed by DEPEND_0, etc.
      * @param ds the ArrayDataSet, or TrArrayDataSet, or BufferDataSet.
      * @return the approximate memory consumption in bytes
      */
