@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import org.autoplot.bufferdataset.BufferDataSet;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetUtil;
@@ -21,7 +22,10 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 
 /**
- *
+ * BinaryDataSource returns data backed by binary data files.  Data
+ * is downloaded using the usual mechanisms, then mapped into memory
+ * using Java NIO, and presented as a QDataSet using BufferDataSet.
+ * 
  * @author jbf
  */
 public class BinaryDataSource extends AbstractDataSource {
@@ -86,7 +90,7 @@ public class BinaryDataSource extends AbstractDataSource {
         int ifield=0;
         for ( int i=0; i<ss.length; i++ ) {
 
-            int repeat=1;
+            int repeat;
             int n= ss[i].length();
             Object type;
             String code;
@@ -125,6 +129,7 @@ public class BinaryDataSource extends AbstractDataSource {
         return result;
     }
 
+    @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         File f = getFile(mon);

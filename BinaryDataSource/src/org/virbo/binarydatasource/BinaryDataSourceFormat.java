@@ -13,6 +13,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import java.util.Map;
+import org.autoplot.bufferdataset.BufferDataSet;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
@@ -131,6 +132,7 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         return result;
     }
 
+    @Override
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
         
         URISplit split= URISplit.parse(uri);
@@ -152,10 +154,12 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         
     }
 
+    @Override
     public boolean canFormat(QDataSet ds) {
         return ! ( ds.rank()==0  || SemanticOps.isJoin(ds) );
     }
 
+    @Override
     public String getDescription() {
         return "Binary Table";
     }
