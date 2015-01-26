@@ -35,7 +35,7 @@ import util.RegexComponentChooser;
  */
 public class Test_3pt1_MultiPanelPlot implements Scenario {
     
-    @Override
+        @Override
     public int runIt(Object o) {
 
         try {
