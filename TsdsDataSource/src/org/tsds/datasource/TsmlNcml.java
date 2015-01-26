@@ -34,10 +34,9 @@ import org.das2.datum.LoggerManager;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.binarydatasource.BufferDataSet;
+import org.autoplot.bufferdataset.BufferDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.TagGenDataSet;
 import org.virbo.dsops.Ops;
 import org.w3c.dom.Attr;
@@ -387,10 +386,10 @@ public class TsmlNcml {
 
         if (len1 == -1) {
             int points = bbuf.limit() / BufferDataSet.byteCount(type);
-            return org.virbo.binarydatasource.BufferDataSet.makeDataSet(1, BufferDataSet.byteCount(type), 0, points, 1, 1, 1, bbuf, type);
+            return BufferDataSet.makeDataSet(1, BufferDataSet.byteCount(type), 0, points, 1, 1, 1, bbuf, type);
         } else {
             int points = bbuf.limit() / len1 / BufferDataSet.byteCount(type);
-            return org.virbo.binarydatasource.BufferDataSet.makeDataSet(RANK_LIMIT, len1 * BufferDataSet.byteCount(type), 0, points, len1, 1, 1, bbuf, type);
+            return BufferDataSet.makeDataSet(RANK_LIMIT, len1 * BufferDataSet.byteCount(type), 0, points, len1, 1, 1, bbuf, type);
         }
     }
 }

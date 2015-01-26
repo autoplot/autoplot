@@ -40,11 +40,11 @@ import org.das2.datum.LoggerManager;
 import org.das2.datum.TimeParser;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.binarydatasource.BufferDataSet;
+import org.autoplot.bufferdataset.BufferDataSet;
+import org.autoplot.bufferdataset.DoubleDataSet;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.URISplit;
@@ -433,9 +433,9 @@ class TsdsDataSource extends AbstractDataSource {
         }
 
         if ( len1==-1 ) {
-            return new org.virbo.binarydatasource.Double( 1, SIZE_DOUBLE, 0, points, 1, 1, 1, bbuf );
+            return new DoubleDataSet( 1, SIZE_DOUBLE, 0, points, 1, 1, 1, bbuf );
         } else {
-            return new org.virbo.binarydatasource.Double( 2, len1*SIZE_DOUBLE, 0, points, len1, 1, 1, bbuf );
+            return new DoubleDataSet( 2, len1*SIZE_DOUBLE, 0, points, len1, 1, 1, bbuf );
         }
     }
 
@@ -604,7 +604,7 @@ class TsdsDataSource extends AbstractDataSource {
                 HttpURLConnection connect = (HttpURLConnection) dataUrl.openConnection();
                 connect.setRequestProperty("Accept-Encoding", "gzip, deflate");
                 logger.log(Level.FINE, "loading {0}", surl4);
-                org.virbo.binarydatasource.Double data3 = (org.virbo.binarydatasource.Double)dataUrl(connect, 3*size, 3*points, -1, mon.getSubtaskMonitor("dataUrl" ));
+                DoubleDataSet data3 = (DoubleDataSet)dataUrl(connect, 3*size, 3*points, -1, mon.getSubtaskMonitor("dataUrl" ));
                 logit("done loading mean", t0);
 
                 data= (BufferDataSet)data3.trim( 0, points );
