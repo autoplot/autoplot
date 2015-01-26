@@ -57,19 +57,17 @@ public class Test_5pt0_FftFilter implements Scenario {
             JComboBoxOperator window = new JComboBoxOperator(fftFrame, 0);
             window.selectItem(0);
             JComboBoxOperator slide = new JComboBoxOperator(fftFrame, 1);
-            slide.selectItem(1);
+            slide.selectItem(2);
             
             
             
             new JButtonOperator( fftFrame, "Ok" ).clickMouse();
             
-            
-            new JTabbedPaneOperator( app.getTabs() ).selectPage("data");
-            
+  
             //new JLabelOperator(mainFrame, AutoplotUI.READY_MESSAGE );
 
             Thread.sleep(1000); // This is because of a bug in the locking, otherwise it will grab the current image.
-            
+            new JTabbedPaneOperator( app.getTabs() ).selectPage("data");
             System.err.println("Done!");
             
             writeToPng("Test_5pt0_FftFilter.png"); // Leave artifacts for testing.
