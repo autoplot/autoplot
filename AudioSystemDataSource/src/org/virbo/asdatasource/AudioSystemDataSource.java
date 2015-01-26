@@ -19,7 +19,7 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.binarydatasource.BufferDataSet;
+import org.autoplot.bufferdataset.BufferDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.TagGenDataSet;
