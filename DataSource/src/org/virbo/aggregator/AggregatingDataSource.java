@@ -508,7 +508,9 @@ public final class AggregatingDataSource extends AbstractDataSource {
                             altResult.putProperty(QDataSet.JOIN_0,mpds );
                         } else {
                             if ( ds1 instanceof BufferDataSet ) {
-                                if ( ss.length>1 ) {
+                                if ( ss.length==1 ) {
+                                    result= BufferDataSet.maybeCopy(ds1);
+                                } else {
                                     result = BufferDataSet.copy(ds1);
                                     ((BufferDataSet)result).grow(result.length()*ss.length*11/10);  //110%
                                 }
