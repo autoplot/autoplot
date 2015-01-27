@@ -536,14 +536,14 @@ public final class AggregatingDataSource extends AbstractDataSource {
                             altResult.joinAll( (JoinDataSet)ds1 );
                         } else if ( ds1 instanceof BufferDataSet ) {
                             assert result!=null;
-                            BufferDataSet bresult= (BufferDataSet)ds1;
-                            BufferDataSet ads1= (BufferDataSet)Ops.maybeCopy( bresult );
-                            ads1= (BufferDataSet)Ops.monotonicSubset(ads1);
+                            BufferDataSet bresult= (BufferDataSet)result;
+                            BufferDataSet ads1= (BufferDataSet)Ops.maybeCopy( ds1 );
+                            //TODO:ads1= (BufferDataSet)Ops.monotonicSubset(ads1);
                             try {
                                 if ( bresult.canAppend(ads1) ) {
                                     QDataSet saveAds1= ads1; // note these will be backed by the same data.
-                                    ads1= (BufferDataSet)checkBoundaries( dr1, ads1 );
-                                    ads1= (BufferDataSet)trimOverlap( result, ads1 );
+                                    //ads1= (BufferDataSet)checkBoundaries( dr1, ads1 );
+                                    //ads1= (BufferDataSet)trimOverlap( result, ads1 );
                                     if ( ads1.length()!=saveAds1.length() ) {
                                         QDataSet saveDep0= (QDataSet) saveAds1.property(QDataSet.DEPEND_0);
                                         logger.log(Level.WARNING, "data trimmed from dataset to avoid overlap at {0}", saveDep0.slice(0));
