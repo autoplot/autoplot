@@ -136,6 +136,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
      * @return the dataset, possibly trimmed to exclude miscalculated times.
      */
     private MutablePropertyDataSet checkBoundaries( DatumRange bounds, MutablePropertyDataSet ads0 ) {
+        logger.entering( "org.virbo.aggregator.AggregatingDataSource","checkBoundaries");
         QDataSet dep0_0= (QDataSet) ads0.property(QDataSet.DEPEND_0);
         if ( dep0_0==null && UnitsUtil.isTimeLocation(SemanticOps.getUnits(ads0) ) ) {
             dep0_0= ads0;
@@ -154,9 +155,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
         if ( ist>0 || ien<ads0.length() ) {
             if ( ist>0 ) logger.log(Level.INFO, "trimming records 0-{0} to remove timetags outside the bounds.", new Object[] { (ist-1) } );
             if ( ien<ads0.length() ) logger.log(Level.INFO, "trimming records {0}-{1} to remove timetags outside the bounds.", new Object[]{ien-1, ads0.length()-1});
-            return Ops.maybeCopy( (MutablePropertyDataSet)ads0.trim( ist,ien ) );
+            MutablePropertyDataSet result= Ops.maybeCopy( (MutablePropertyDataSet)ads0.trim( ist,ien ) );
+            logger.exiting( "org.virbo.aggregator.AggregatingDataSource","checkBoundaries");
+            return result;
             
         } else {
+            logger.exiting( "org.virbo.aggregator.AggregatingDataSource","checkBoundaries");
             return ads0;
         }
     }
@@ -169,6 +173,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
      * @return ads1, possibly trimmed.
      */
     private QDataSet trimOverlap(QDataSet ads0, QDataSet ads1) {
+        logger.entering( "org.virbo.aggregator.AggregatingDataSource","trimOverlap");
         QDataSet dep0_0= (QDataSet) ads0.property(QDataSet.DEPEND_0);
         QDataSet dep0_1= (QDataSet) ads1.property(QDataSet.DEPEND_0);
         if ( dep0_0==null && UnitsUtil.isTimeLocation(SemanticOps.getUnits(ads0) ) ) {
@@ -180,12 +185,14 @@ public final class AggregatingDataSource extends AbstractDataSource {
         if ( dep0_0==null || dep0_1==null ) return ads1;
         if ( dep0_1.rank()>1 ) throw new IllegalArgumentException("expected rank 1 depend0");
         if ( Ops.gt( dep0_1.slice(0), dep0_0.slice(dep0_0.length()-1) ).value()==1 ) {
+            logger.exiting( "org.virbo.aggregator.AggregatingDataSource","trimOverlap");
             return ads1;
         } else {
             int i=0;
             while ( i<dep0_1.length() && Ops.le( dep0_1.slice(i), dep0_0.slice(dep0_0.length()-1) ).value()==1 ) {
                 i=i+1;
             }
+            logger.exiting( "org.virbo.aggregator.AggregatingDataSource","trimOverlap");
             return ads1.trim(i,ads1.length());
         }
     }
