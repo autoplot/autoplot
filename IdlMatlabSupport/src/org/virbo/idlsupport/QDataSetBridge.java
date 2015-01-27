@@ -13,6 +13,7 @@ import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.FDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.SemanticOps;
@@ -36,6 +37,8 @@ public abstract class QDataSetBridge {
     Map<QDataSet, String> names;
     List<Units> prefUnits; // convert to these if possible
     double fill; // use this fill value
+    float ffill;
+    
     boolean useFill=false; // true means convert fill values
 
     boolean debug= false;
@@ -100,6 +103,13 @@ public abstract class QDataSetBridge {
      */
     public void setFillValue( double d ) {
         this.fill= d;
+        this.ffill= (float)d; // danger
+        this.useFill= true;
+    }
+    
+    public void setFillValue( float f ) {
+        this.ffill= f;
+        this.fill= (double)f; // danger
         this.useFill= true;
     }
 
@@ -348,6 +358,68 @@ public abstract class QDataSetBridge {
         return uc;
     }
 
+    /* -- convert qubes to float arrays -- */
+    private void copyValues( QDataSet ds1, float[] result ) {
+        UnitsConverter uc= maybeGetConverter(ds1);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds1);
+        if ( debug ) {
+            System.err.println("copyValues rank1 into double using "+uc);
+        }
+        for (int i0 = 0; i0 < ds1.length(); i0++) {
+            if ( useFill && wds.value(i0)==0 ) {
+                result[i0] = ffill;
+            } else {
+                result[i0] = (float)uc.convert( ds1.value(i0) );
+            }
+        }
+    }
+    
+    private void copyValues( QDataSet ds1, float[][] result ) {
+        UnitsConverter uc= maybeGetConverter(ds1);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds1);
+        for (int i0 = 0; i0 < ds1.length(); i0++) {
+            for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                if ( useFill && wds.value(i0, i1 )==0 ) {
+                    result[i0][i1] = ffill;
+                } else {
+                    result[i0][i1] = (float)uc.convert( ds1.value(i0, i1) );
+                }
+            }
+        }
+    }
+    private void copyValues( QDataSet ds1, float[][][] result ) {
+        UnitsConverter uc= maybeGetConverter(ds1);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds1);
+        for (int i0 = 0; i0 < ds1.length(); i0++) {
+            for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
+                    if ( useFill && wds.value(i0, i1, i2 )==0 ) {
+                        result[i0][i1][i2] = ffill;
+                    } else {
+                        result[i0][i1][i2] = (float)uc.convert( ds1.value(i0, i1, i2) );
+                    }
+                }
+            }
+        }
+    }
+    private void copyValues( QDataSet ds1, float[][][][] result ) {
+        UnitsConverter uc= maybeGetConverter(ds1);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds1);
+        for (int i0 = 0; i0 < ds1.length(); i0++) {
+            for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
+                    for (int i3 = 0; i3 < ds1.length(i0,i1,i2); i2++) {
+                        if ( useFill && wds.value(i0, i1, i2, i3 )==0 ) {
+                            result[i0][i1][i2][i3] = ffill;
+                        } else {
+                            result[i0][i1][i2][i3] = (float)uc.convert( ds1.value(i0, i1, i2, i3 ) );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     /* -- convert qubes to double arrays -- */
     private void copyValues( QDataSet ds1, double[] result ) {
         UnitsConverter uc= maybeGetConverter(ds1);
@@ -477,7 +549,7 @@ public abstract class QDataSetBridge {
     public void slice(int i, double[][][] result) {
         slice(this.name(), i, result);
     }
-
+        
     /**
      * return an 1,2,or 3-D array of doubles or floats containing the values
      * in the specified dataset.
@@ -489,24 +561,48 @@ public abstract class QDataSetBridge {
             System.err.println("reading values for dataset " + name );
         }
         QDataSet ds1 = datasets.get(name);
-        if (ds1.rank() == 1) {
-            double[] result = new double[ds1.length()];
-            values(name, result);
-            return result;
-        } else if (ds1.rank() == 2) {
-            double[][] result = new double[ds1.length()][ds1.length(0)];
-            values(name, result);
-            return result;
-        } else if (ds1.rank() == 3) {
-            double[][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
-            values(name, result);
-            return result;
-        } else if (ds1.rank() == 4) {
-            double[][][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
-            values(name, result);
-            return result;
+        
+        if ( false && ds1 instanceof FDataSet ) {
+            //TODO: don't forget about BufferDataSet FloatDataSet
+            if (ds1.rank() == 1) {
+                float[] result = new float[ds1.length()];
+                copyValues(ds1, result);
+                return result;
+            } else if (ds1.rank() == 2) {
+                float[][] result = new float[ds1.length()][ds1.length(0)];
+                copyValues(ds1, result);
+                return result;
+            } else if (ds1.rank() == 3) {
+                float[][][] result = new float[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
+                copyValues(ds1, result);
+                return result;
+            } else if (ds1.rank() == 4) {
+                float[][][][] result = new float[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
+                copyValues(ds1, result);
+                return result;
+            } else {
+                throw new IllegalArgumentException("rank limit");
+            }  
         } else {
-            throw new IllegalArgumentException("rank limit");
+            if (ds1.rank() == 1) {
+                double[] result = new double[ds1.length()];
+                values(name, result);
+                return result;
+            } else if (ds1.rank() == 2) {
+                double[][] result = new double[ds1.length()][ds1.length(0)];
+                values(name, result);
+                return result;
+            } else if (ds1.rank() == 3) {
+                double[][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
+                values(name, result);
+                return result;
+            } else if (ds1.rank() == 4) {
+                double[][][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
+                values(name, result);
+                return result;
+            } else {
+                throw new IllegalArgumentException("rank limit");
+            }
         }
     }
 
@@ -555,20 +651,39 @@ public abstract class QDataSetBridge {
      */
     private Object sliceDep( String name, int i ) {
         QDataSet ds1= (QDataSet) datasets.get(this.name).slice(i).property(sliceDep.get(name));
-        if (ds1.rank() == 1 ) {
-            double[] result = new double[ds1.length()];
-            copyValues( ds1, result );
-            return result;
-        } else if (ds1.rank() == 2) {
-            double[][] result = new double[ds1.length()][ds1.length(0)];
-            copyValues( ds1, result );
-            return result;
-        } else if (ds1.rank() == 3) {
-            double[][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0,0)];
-            copyValues( ds1, result );
-            return result;
+        if ( false && ds1 instanceof FDataSet ) { 
+            //TODO: don't forget about BufferDataSet FloatDataSet
+            if (ds1.rank() == 1 ) {
+                float[] result = new float[ds1.length()];
+                copyValues( ds1, result );
+                return result;
+            } else if (ds1.rank() == 2) {
+                float[][] result = new float[ds1.length()][ds1.length(0)];
+                copyValues( ds1, result );
+                return result;
+            } else if (ds1.rank() == 3) {
+                float[][][] result = new float[ds1.length()][ds1.length(0)][ds1.length(0,0)];
+                copyValues( ds1, result );
+                return result;
+            } else {
+                throw new IllegalArgumentException("rank limit");
+            }
         } else {
-            throw new IllegalArgumentException("rank limit");
+            if (ds1.rank() == 1 ) {
+                double[] result = new double[ds1.length()];
+                copyValues( ds1, result );
+                return result;
+            } else if (ds1.rank() == 2) {
+                double[][] result = new double[ds1.length()][ds1.length(0)];
+                copyValues( ds1, result );
+                return result;
+            } else if (ds1.rank() == 3) {
+                double[][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0,0)];
+                copyValues( ds1, result );
+                return result;
+            } else {
+                throw new IllegalArgumentException("rank limit");
+            }            
         }
     }
 
@@ -583,14 +698,28 @@ public abstract class QDataSetBridge {
 
     /**
      * return an 1,2,or 3-D array of doubles or floats containing the values
-     * in a slice of the default dataset.
-     * @param name
-     * @return
+     * in a slice on the zeroth dimension of the default dataset.
+     * @param i0 the index to slice on.
+     * @return 1,2,or 3-D  array of doubles or floats.
      */
     public Object slice(int i0 ) {
         return slice(name,i0);
     }
 
+    /**
+     * slice on the first dimension, which is useful for extracting 
+     * data component by component.
+     * @param index
+     * @return array of floats or doubles.
+     */
+    public Object slice1( int index ) {
+        return slice1( index, name );
+    }
+
+    public Object slice1( int index, String name ) {
+        throw new IllegalArgumentException("not implemented");
+    }
+    
     public String depend(int dim) {
         QDataSet result = (QDataSet) this.ds.property("DEPEND_" + dim);
         if (result == null) return "";
