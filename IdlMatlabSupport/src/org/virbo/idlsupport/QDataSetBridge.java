@@ -339,7 +339,8 @@ public abstract class QDataSetBridge {
     }
 
     /**
-     * returns the converter if there is one
+     * returns the converter if there is one.  If no converter is
+     * registered, then UnitsConverter.IDENTITY is returned.
      * @param ds1
      * @return
      */
@@ -736,7 +737,8 @@ public abstract class QDataSetBridge {
      */
     private Object sliceDep( String name, int i ) {
         QDataSet ds1= (QDataSet) datasets.get(this.name).slice(i).property(sliceDep.get(name));
-        if ( false && ds1 instanceof FDataSet ) { 
+        UnitsConverter uc= maybeGetConverter(ds1);
+        if ( ds1 instanceof FDataSet || ds1 instanceof FloatDataSet) { 
             //TODO: don't forget about BufferDataSet FloatDataSet
             if (ds1.rank() == 1 ) {
                 float[] result = new float[ds1.length()];
@@ -753,6 +755,26 @@ public abstract class QDataSetBridge {
             } else {
                 throw new IllegalArgumentException("rank limit");
             }
+        } else if ( ds1 instanceof LongDataSet && uc==UnitsConverter.IDENTITY ) { // Special support for CDF TT2000
+             if (ds1.rank() == 1) {
+                long[] result = new long[ds1.length()];
+                copyValues(ds1, result);
+                return result;
+            } else if (ds1.rank() == 2) {
+                long[][] result = new long[ds1.length()][ds1.length(0)];
+                copyValues(ds1, result);
+                return result;
+            } else if (ds1.rank() == 3) {
+                long[][][] result = new long[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
+                copyValues(ds1, result);
+                return result;
+            } else if (ds1.rank() == 4) {
+                long[][][][] result = new long[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
+                copyValues(ds1, result);
+                return result;
+            } else {
+                throw new IllegalArgumentException("rank limit");
+            }                         
         } else {
             if (ds1.rank() == 1 ) {
                 double[] result = new double[ds1.length()];
