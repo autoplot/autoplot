@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.autoplot.bufferdataset.FloatDataSet;
+import org.autoplot.bufferdataset.LongDataSet;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -38,6 +40,7 @@ public abstract class QDataSetBridge {
     List<Units> prefUnits; // convert to these if possible
     double fill; // use this fill value
     float ffill;
+    long lfill= -999999999999999999L; // hope this isn't used.
     
     boolean useFill=false; // true means convert fill values
 
@@ -70,7 +73,7 @@ public abstract class QDataSetBridge {
     public void setPreferredUnits( String sunit ) {
         Units unit;
         if ( sunit.contains(" since ") ) {
-            unit= SemanticOps.lookupUnits(sunit);
+            unit= Units.lookupUnits(sunit);
         } else {
             unit= Units.getByName(sunit);
         }
@@ -359,11 +362,73 @@ public abstract class QDataSetBridge {
     }
 
     /* -- convert qubes to float arrays -- */
+    private void copyValues( QDataSet ds1, long[] result ) {
+        UnitsConverter uc= maybeGetConverter(ds1);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds1);
+        if ( debug ) {
+            System.err.println("copyValues rank1 into float using "+uc);
+        }
+        for (int i0 = 0; i0 < ds1.length(); i0++) {
+            if ( useFill && wds.value(i0)==0 ) {
+                result[i0] = lfill;
+            } else {
+                result[i0] = (long)uc.convert( ds1.value(i0) );
+            }
+        }
+    }
+    
+    private void copyValues( QDataSet ds1, long[][] result ) {
+        UnitsConverter uc= maybeGetConverter(ds1);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds1);
+        for (int i0 = 0; i0 < ds1.length(); i0++) {
+            for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                if ( useFill && wds.value(i0, i1 )==0 ) {
+                    result[i0][i1] = lfill;
+                } else {
+                    result[i0][i1] = (long)uc.convert( ds1.value(i0, i1) );
+                }
+            }
+        }
+    }
+    private void copyValues( QDataSet ds1, long[][][] result ) {
+        UnitsConverter uc= maybeGetConverter(ds1);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds1);
+        for (int i0 = 0; i0 < ds1.length(); i0++) {
+            for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
+                    if ( useFill && wds.value(i0, i1, i2 )==0 ) {
+                        result[i0][i1][i2] = lfill;
+                    } else {
+                        result[i0][i1][i2] = (long)uc.convert( ds1.value(i0, i1, i2) );
+                    }
+                }
+            }
+        }
+    }
+    private void copyValues( QDataSet ds1, long[][][][] result ) {
+        UnitsConverter uc= maybeGetConverter(ds1);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds1);
+        for (int i0 = 0; i0 < ds1.length(); i0++) {
+            for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
+                    for (int i3 = 0; i3 < ds1.length(i0,i1,i2); i2++) {
+                        if ( useFill && wds.value(i0, i1, i2, i3 )==0 ) {
+                            result[i0][i1][i2][i3] = lfill;
+                        } else {
+                            result[i0][i1][i2][i3] = (long)uc.convert( ds1.value(i0, i1, i2, i3 ) );
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /* -- convert qubes to float arrays -- */
     private void copyValues( QDataSet ds1, float[] result ) {
         UnitsConverter uc= maybeGetConverter(ds1);
         QDataSet wds= DataSetUtil.weightsDataSet(ds1);
         if ( debug ) {
-            System.err.println("copyValues rank1 into double using "+uc);
+            System.err.println("copyValues rank1 into float using "+uc);
         }
         for (int i0 = 0; i0 < ds1.length(); i0++) {
             if ( useFill && wds.value(i0)==0 ) {
@@ -561,9 +626,9 @@ public abstract class QDataSetBridge {
             System.err.println("reading values for dataset " + name );
         }
         QDataSet ds1 = datasets.get(name);
+        UnitsConverter uc= maybeGetConverter(ds1);
         
-        if ( false && ds1 instanceof FDataSet ) {
-            //TODO: don't forget about BufferDataSet FloatDataSet
+        if ( ds1 instanceof FDataSet || ds1 instanceof FloatDataSet ) {
             if (ds1.rank() == 1) {
                 float[] result = new float[ds1.length()];
                 copyValues(ds1, result);
@@ -583,6 +648,26 @@ public abstract class QDataSetBridge {
             } else {
                 throw new IllegalArgumentException("rank limit");
             }  
+        } else if ( ds1 instanceof LongDataSet && uc==UnitsConverter.IDENTITY ) { // Special support for CDF TT2000
+             if (ds1.rank() == 1) {
+                long[] result = new long[ds1.length()];
+                copyValues(ds1, result);
+                return result;
+            } else if (ds1.rank() == 2) {
+                long[][] result = new long[ds1.length()][ds1.length(0)];
+                copyValues(ds1, result);
+                return result;
+            } else if (ds1.rank() == 3) {
+                long[][][] result = new long[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
+                copyValues(ds1, result);
+                return result;
+            } else if (ds1.rank() == 4) {
+                long[][][][] result = new long[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
+                copyValues(ds1, result);
+                return result;
+            } else {
+                throw new IllegalArgumentException("rank limit");
+            }             
         } else {
             if (ds1.rank() == 1) {
                 double[] result = new double[ds1.length()];
