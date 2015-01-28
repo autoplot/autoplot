@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.util.LoggerManager;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.datasource.DataSource;
@@ -191,7 +192,7 @@ public class Test024 {
 
         String timeformat="seconds since "+date+"T00:00:00";
 
-        String range= "2012-11-01 23:00 to 2012-11-03 01:00";
+        String range= "2012-11-01 23:00 to 2012-11-02 01:00";
         
         long t0= System.currentTimeMillis();
 
@@ -213,6 +214,37 @@ public class Test024 {
         System.err.println( String.valueOf( Array.get(Array.get(vv,0),0)) + " " + vv.getClass().getSimpleName() );
     }
 
+    /**
+     * test of CDF_TT2000 timetags, which need to be read in as longs.
+     * This shows that by default cdfTT2000 longs will be used, and if 
+     * "seconds since 2014-01-17" is used then doubles are returned.
+     * @throws Exception 
+     */
+    public static void test9() throws Exception {
+
+        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        apds.setDataSetURI( TestSupport.TEST_HOME+"data.backup/cdf/rbsp-a_WFR-waveform-continuous-burst-magnitude_emfisis-L4_20140117T00_v1.3.2.cdf?Epoch" );
+        //apds.setDataSetURI( "/home/jbf/tmp/rbsp-a_WFR-waveform-continuous-burst-magnitude_emfisis-L4_20140117T00_v1.3.2.cdf?Epoch" );
+        
+        apds.doGetDataSet();
+
+        Object vv= apds.values();
+        System.err.println( String.valueOf( Array.get(vv,0) ) + " " + vv.getClass().getSimpleName() );
+      
+        String timeformat="seconds since 2014-01-17T00:00:00";
+        apds.setPreferredUnits( timeformat );
+        
+        vv= apds.values();
+        System.err.println( String.valueOf( Array.get(vv,0) ) + " " + vv.getClass().getSimpleName() );
+        
+        timeformat="cdfTT2000";
+        apds.setPreferredUnits( timeformat );
+        
+        vv= apds.values();
+        System.err.println( String.valueOf( Array.get(vv,0) ) + " " + vv.getClass().getSimpleName() );
+        
+    }
+    
     /**
      * model PaPCo's use of the interface, which also uses TSB.
      * @param uri
@@ -257,7 +289,11 @@ public class Test024 {
     }
     public static void main( String[] args )  {
         try {
+            
+            LoggerManager.readConfiguration();
 
+            test9();
+            
             test8();
             
             example1();
