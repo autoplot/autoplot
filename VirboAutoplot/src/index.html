@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A new digitizing script is introduced, which shows feedback.  See code <a href="https://svn.code.sf.net/p/autoplot/code/autoplot/trunk/VirboAutoplot/src/scripts/addPointDigitizer.jy">here</a>.
+        <p><small>Aggregation undid all the benefits of the new CDF library.  Here's a blooper from adding special support for aggregation.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -18,19 +18,22 @@
             Java 6 is now required.
         </p>
 
-        <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.  Note CDFs are only supported
-            via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
+        <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        SourceForge has changed the numbering of all the bugs.  If you go to the page
-        https://sourceforge.net/p/autoplot/bugs/, "Search Bugs" in the upper left corner can be used
-        to resolve old numbers.
-        <p>Bugfixes (2015-01-21):</p>
-        <ul>            
-            <li>result of fftPower hints that log scale type should be used.</li>
+        <p>Bugfixes (2015-01-28 rev 16139):</p>
+        <ul>          
+            <li>1321: improvements to the IDL bridge, after trying to read 5M points of magnetometer data.  Thanks, Kris!</li>
+            <li>1321: IDL bridge preserves TT2000 longs. </li>
+            <li>1322: aggregation supports NIO BufferDataSets that come out of the CDF reader. (Whoops!)</li>
+            <li>1323: "no valid y tags" message caused by fill in DELTA_PLUS when DELTA_PLUS wasn't really needed.  Thanks, Seth!</li>
+            <li>1317: result of fftPower hints that log scale type should be used.</li>
             <li>1315: keep track of das2server key so the user is prompted just once per session.</li>
             <li>turn on word wrap in runtime error submit form.</li>
             <li>Thin client support finally catches errors instead of leaving the progress wheel spinning.</li>
             <li>corrections to FiltersEditorPanel, such as allowing for float arguments and medianFilter.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>remove the dtd from internal filters.xml, which was preventing use on Seth's computer.</li>
             <li>1312: tearing off tabs before initialization results in tiny tab</li>
             <li>1311: new user data tab enabled after the initial data load resulted in RTE</li>
@@ -102,32 +105,14 @@
             <li>bugfix: restore ctrl+mouse wheel pan behavior.</li>
             <li>bugfix in aggregation completion, where the path is not part of the completion.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>rte_1930845582: xds.length()!=yds.length() in odd branch of SeriesRenderer guess cadence. Thanks Jeremy!</li>
-            <li>rte_1635938883: NullPointerException for new users when entering pngwalk.  Thanks Chris!</li>
-            <li>1281: linestyle settings not set properly for pngwalk, clone to new window </li>
-            <li>1282: CDF LABL_PTR_2 when the data is rank 2</li>
-            <li>NoDataInInterval exception on das2stream is treated the same as with QStreams.</li>
-            <li>autoranging in ImageDataSource didn't account for explicit scaling, which would prevent Pngwalks from being run.</li>
-            <li>1277: initial delay caused by bindings</li>
-            <li>getDataSets method for Jython loads multiple datasets in parallel</li>
-            <li>SIUnits class finally included in release to help with maturing that code.</li>
-            <li>FileNotFound with HTTP shows file not found from automatic .gz attempt, not the original</li>
-            <li>bugfix in concatenate, where join of FDataSets would cause cast exception</li>
-            <li>vap+audiosystem now returns elapsed seconds instead of trying to calculate UT time</li>
-            <li>catch missing rank and name tags in QStreams</li>
-            <li>1272: (rte 1771804608) new users would see failure to check for null pointers when creating folders.  Thanks CORYB and lesidaner!</li>
-            <li>1265: Don't reload remote scripts into the editor when the local copy is already showing.  Show fscache scripts as read-only.</li>
-            <li>Hanning window had off-by-one error making it asymmetric</li>
-            <li>1270: improve labels for Tools bookmarks.  Improve handling of .jy for tools</li>
-            <li>1270: Beware: any tool in the Tools bookmarks is trusted, including remote bookmarks!</li>
-            <li>formatBookmarks formats to temp file then moves result</li>
-            <li>asterisk in new folder of bookmarks tool fixed.</li>
-            <li>1229: Apache HTTP automatic unzip/gzip.  Improvements to get this working.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>BufferDataSet, which uses native-memory-backed-buffers, moved from BinaryDataSource to QDataSet</li>
+            <li>allow aggregation reduce to be used when resolution is null, because trim will still have an effect.</li>
+            <li>SimpleServlet will figure out if URI is a vap file, to support the thin client and to match the Autoplot interface.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>           
             <li>reference cache is enabled for new users.</li>
             <li>1313: switch to new version of OpenDAP library.  Support grids.</li>
             <li>1310: add jython sleep command which is often imported</li>            
@@ -164,29 +149,6 @@
             <li>add shift+mousewheel nudge behavior</li>
             <li>das2servers can return non-200 error codes.</li>
             <li>PNGWalkTool digitizer looks up plot coordinates when axis metadata is found.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>           
-            <li>initial coding to use NIO for CDF reads, which will be faster and take less JVM memory.</li>
-            <li>add setDepend0Cadence to filters</li> 
-            <li>introduce trim( ds, dataset('2013-03-03'), dataset('2013-03-04') ) in filters</li>
-            <li>display URL in SPASE record Space/Granule/Source/URL/text node.</li>
-            <li>new code for python debugging and new filters dialogs added, but these are still under development</li>
-            <li>add fog parameter to ImageDataSource, so that an image can provide context competing with overplots</li>
-            <li>marsx orbits added to time range editor.</li>
-            <li>vap+inline: data editor table has editable cells</li>
-            <li>393: das2server list responses can contain human-readable descriptions.</li>
-            <li>--server keyword replaces --port keyword, indicate server status on title bar.</li>
-            <li>add randu functions, since Matlab "rand" is ambiguous.</li>
-            <li>introduce merge command for safely combining datasets</li>
-            <li>improvements to the orbit plot, including properly binding color and thick.</li>
-            <li>Tools bookmarks editor rebranded "Tools", avoid problem where address bar is reset to the script name.</li>
-            <li>introduce save_cdf and restore_cdf intended to replace save and restore commands in IDL with non-proprietary format.</li>
-            <li>jython editor shows python doc blocks in popup completions.</li>
-            <li>secret button for switching dataSetSelector/timeRangeSelector</li>
-            <li>improve gap detection in orbitPlot</li>
-            <li>orbitPlot supports renderControls like color and lineThick.</li>
-            <li>391: aggregation trims datasets so that result is monotonic</li>
         </ul>
 
         <p>Known issues:</p>
