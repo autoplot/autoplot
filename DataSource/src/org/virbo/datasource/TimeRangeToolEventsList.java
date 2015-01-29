@@ -561,13 +561,17 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                DatumRange current= tsb.getTimeRange();
-                if ( dir==-1 ) {
-                    current= current.previous();
-                } else {
-                    current= current.next();
+                try {
+                    DatumRange current= tsb.getTimeRange();
+                    if ( dir==-1 ) {
+                        current= current.previous();
+                    } else {
+                        current= current.next();
+                    }
+                    loadViaTsb( current, dir );
+                } finally {
+                    intervalsList.setEnabled(true);
                 }
-                loadViaTsb( current, dir );
             }
         };
         new Thread(run).start();
@@ -606,11 +610,11 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         Runnable run= new Runnable() {
             @Override
             public void run() {
+                ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
                 try {
                     TimeRangeToolEventsList.this.tsb= null;
                     DataSource dsource = DataSetURI.getDataSource(uri);
                     dss= dsource;
-                    ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
                     QDataSet currentDataSet1= dss.getDataSet(mon);
                     tsb= dsource.getCapability( TimeSeriesBrowse.class );
                     if ( tsb!=null ) {
@@ -636,10 +640,12 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                             }
                         }
                     }
-                    currentDataSetSelector.setEnabled(true);
                     fillList( );
-                } catch (Exception ex) {
-                    Logger.getLogger(TimeRangeToolEventsList.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {                    
+                    throw new RuntimeException(ex);
+                } finally {
+                    currentDataSetSelector.setEnabled(true);
+                    if ( !mon.isFinished() ) mon.finished();
                 }
             }
         };
