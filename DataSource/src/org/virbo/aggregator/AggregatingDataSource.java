@@ -35,12 +35,13 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.dataset.SortDataSet;
+import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
@@ -163,6 +164,33 @@ public final class AggregatingDataSource extends AbstractDataSource {
             logger.exiting( "org.virbo.aggregator.AggregatingDataSource","checkBoundaries");
             return ads0;
         }
+    }
+    
+    /**
+     * replacing ensureMonotonic, instead we just sort the data.
+     * @param ads0
+     * @return dataset sorted by its times.
+     */
+    private MutablePropertyDataSet checkSort( MutablePropertyDataSet ads0 ) {
+        logger.entering( "org.virbo.aggregator.AggregatingDataSource","checkSort");
+        QDataSet dep0_0= (QDataSet) ads0.property(QDataSet.DEPEND_0); 
+        if ( dep0_0==null && UnitsUtil.isTimeLocation(SemanticOps.getUnits(ads0) ) ) {
+            dep0_0= ads0;
+        } else if ( dep0_0==null ) {
+            return ads0;
+        }
+        QDataSet sort= Ops.sort(dep0_0);
+        if ( ads0 instanceof WritableDataSet ) {
+            if ( ads0.isImmutable() ) {
+                ads0= Ops.copy(ads0);
+            }
+            DataSetOps.applyIndexInSitu( ((WritableDataSet)ads0), sort );
+        } else {
+            ads0= Ops.copy(ads0);
+            DataSetOps.applyIndexInSitu( ((WritableDataSet)ads0), sort );
+        }
+        logger.exiting( "org.virbo.aggregator.AggregatingDataSource","checkSort");
+        return ads0;
     }
 
     /**
@@ -522,7 +550,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                     ((BufferDataSet)result).grow(result.length()*ss.length*11/10);  //110%
                                 }
                                 result= checkBoundaries( dr1, result );
-                                result= Ops.monotonicSubset(result);
+                                result= checkSort(result);
                             } else {
                                 if ( ss.length==1 ) {
                                     result= ArrayDataSet.maybeCopy(ds1);
@@ -531,7 +559,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                     ((ArrayDataSet)result).grow(result.length()*ss.length*11/10);  //110%
                                 }
                                 result= checkBoundaries( dr1, result );
-                                result= Ops.monotonicSubset(result);
+                                result= checkSort(result);
                             }
                         }
                         this.metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
