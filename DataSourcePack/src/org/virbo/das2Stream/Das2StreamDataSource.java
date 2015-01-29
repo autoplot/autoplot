@@ -40,6 +40,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
         super(uri);
     }
 
+    @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, StreamException, IOException, org.virbo.qstream.StreamException, NoDataInIntervalException {
 
         InputStream in = DataSetURI.getInputStream(uri, mon);
@@ -48,7 +49,9 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
         URISplit split = URISplit.parse( uri );
 
-        if (split.ext.equals(".qds")) {
+        String ext= split.vapScheme;
+        
+        if ( ext.equals("vap+qds") || ext.equals("vap+qdst") ) {
             try {
                 QDataSetStreamHandler h= new QDataSetStreamHandler();
                 org.virbo.qstream.StreamTool.readStream(channel, h);
