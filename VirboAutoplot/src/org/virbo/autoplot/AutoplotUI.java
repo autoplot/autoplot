@@ -1285,7 +1285,7 @@ APSplash.checkTime("init 270");
                         if ( uri.trim().length()>0 ){
                             Runnable run= new Runnable() {
                                 public void run() {
-                                    EventsListToolUtil.show( AutoplotUI.this, uri );
+                                    EventsListToolUtil.setEventsListURI( AutoplotUI.this, uri );
                                 }
                             };
                             if ( EventQueue.isDispatchThread() ) {
@@ -1789,7 +1789,7 @@ APSplash.checkTime("init 52.9");
     }
     
     /**
-     * show the unexpected html response dialog, with a button to look at the HTML response.
+     * setEventsListURI the unexpected html response dialog, with a button to look at the HTML response.
      * @param surl the URL 
      * @param ex the exception
      * @return 
@@ -5031,7 +5031,7 @@ APSplash.checkTime("init 240");
             Runnable run= new Runnable() { 
                 @Override
                 public void run() {
-                    // see if the uri would be rejected, and show the editor.
+                    // see if the uri would be rejected, and setEventsListURI the editor.
                     sel.setValue(furi);
                     DataSourceFactory factory=null;
                     try {
