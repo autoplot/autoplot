@@ -20,8 +20,11 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-01-28 rev 16139):</p>
-        <ul>          
+        <p>Bugfixes (2015-01-29 rev 16152):</p>
+        <ul>    
+            <li>1326: new aggregation monotonic rule causes too many problems.  Initial code to just sort the data.</li>
+            <li>das2stream reader detects when a qstream is input.</li>
+            <li>Events List tool handles exceptions properly.</li>
             <li>1321: improvements to the IDL bridge, after trying to read 5M points of magnetometer data.  Thanks, Kris!</li>
             <li>1321: IDL bridge preserves TT2000 longs. </li>
             <li>1322: aggregation supports NIO BufferDataSets that come out of the CDF reader. (Whoops!)</li>
