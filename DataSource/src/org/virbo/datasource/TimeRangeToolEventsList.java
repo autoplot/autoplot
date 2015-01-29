@@ -368,6 +368,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         });
 
         timeRangeTF.setText(" ");
+        timeRangeTF.setToolTipText("Load events from the given timerange");
         timeRangeTF.setEnabled(false);
         timeRangeTF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
