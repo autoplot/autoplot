@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import org.das2.datum.LoggerManager;
 import org.das2.event.DataRangeSelectionEvent;
 import org.das2.event.DataRangeSelectionListener;
@@ -80,22 +81,31 @@ public class EventsListToolUtil {
             getEventsList( t );
             dialog= instances.get(t);
         }
+        String uri= t.getDocumentModel().getEventsListUri();
+        if ( uri!=null && uri.length()>0 ) {
+            instances2.get(t).getDataSetSelector().setValue(uri);
+            instances2.get(t).getDataSetSelector().maybePlot(0);
+        }
+        
         dialog.setVisible(true);
     }
     
-    public static void show( final AutoplotUI t, String uri ) {
+    public static void setEventsListURI( final AutoplotUI t, String uri ) {
         
         if ( !EventQueue.isDispatchThread() ) {
             throw new IllegalArgumentException("must be called from the event thread");
         }
         JDialog dialog= instances.get(t);
-              
+
         if ( dialog==null ) {
             getEventsList( t );
             dialog= instances.get(t);
         }
-        dialog.setVisible(true);
+        //dialog.setVisible(true);
+        
         instances2.get(t).getDataSetSelector().setValue(uri);
+        instances2.get(t).getDataSetSelector().maybePlot(0);
+        
     }
     
     public static TimeRangeToolEventsList getEventsList( final AutoplotUI t ) {
