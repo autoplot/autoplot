@@ -254,9 +254,11 @@ public class LogConsole extends javax.swing.JPanel {
      * to the Loggers that should be displayed here.  Also, the log levels of
      * the Loggers should be set to ALL, since the filtering is done here.
      * For example:
-     *         Handler h = lc.getHandler();
-     *         Logger.getLogger("virbo").setLevel(Level.ALL);
-     *         Logger.getLogger("virbo").addHandler(h);
+     * <blockquote><pre><small>{@code
+     *    Handler h = lc.getHandler();
+     *    Logger.getLogger("virbo").setLevel(Level.ALL);
+     *    Logger.getLogger("virbo").addHandler(h);
+     *}</small></pre></blockquote>
      * @return handler for receiving messages.
      */
     public synchronized Handler getHandler() {
