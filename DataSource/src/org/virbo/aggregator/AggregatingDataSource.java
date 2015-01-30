@@ -167,7 +167,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
     }
     
     /**
-     * replacing ensureMonotonic, instead we just sort the data.
+     * replacing ensureMonotonic, instead we just sort the data.  Note this
+     * sorts the data in place.
      * @param ads0
      * @return dataset sorted by its times.
      */
@@ -573,16 +574,16 @@ public final class AggregatingDataSource extends AbstractDataSource {
                             assert result!=null;
                             BufferDataSet bresult= (BufferDataSet)result;
                             BufferDataSet ads1= (BufferDataSet)Ops.maybeCopy( ds1 );
-                            //TODO:ads1= (BufferDataSet)Ops.monotonicSubset(ads1);
+                            ads1= (BufferDataSet) checkSort(ads1);
                             try {
                                 if ( bresult.canAppend(ads1) ) {
                                     QDataSet saveAds1= ads1; // note these will be backed by the same data.
-                                    //ads1= (BufferDataSet)checkBoundaries( dr1, ads1 );
-                                    //ads1= (BufferDataSet)trimOverlap( result, ads1 );
-                                    if ( ads1.length()!=saveAds1.length() ) {
-                                        QDataSet saveDep0= (QDataSet) saveAds1.property(QDataSet.DEPEND_0);
-                                        logger.log(Level.WARNING, "data trimmed from dataset to avoid overlap at {0}", saveDep0.slice(0));
-                                    }
+                                    ads1= (BufferDataSet)checkBoundaries( dr1, ads1 );
+                                    ads1= (BufferDataSet)checkSort(ads1);
+                                    
+                                    QDataSet saveDep0= (QDataSet) saveAds1.property(QDataSet.DEPEND_0);
+                                    logger.log(Level.WARNING, "data trimmed from dataset to avoid overlap at {0}", saveDep0.slice(0));
+                                    
                                     bresult.append( ads1 );
                                 } else {
                                     bresult.grow( result.length() + ads1.length() * (ss.length-i) );
