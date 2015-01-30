@@ -270,9 +270,13 @@ public class LogConsole extends javax.swing.JPanel {
                     String rm1= rec.getMessage();
                     if ( rm1!=null ) {
                         if ( rec.getMessage().equals("ENTRY {0}") ) {
-                            recMsg= rec.getSourceClassName() + "." +rec.getSourceMethodName() + " {0}";
+                            recMsg= "ENTRY " + rec.getSourceClassName() + "." +rec.getSourceMethodName() + " {0}";
                         } else if ( rec.getMessage().equals("ENTRY") ) {
-                            recMsg= rec.getSourceClassName() + "." +rec.getSourceMethodName();
+                            recMsg= "ENTRY " + rec.getSourceClassName() + "." +rec.getSourceMethodName();
+                        } else if ( rec.getMessage().equals("RETURN {0}") ) {
+                            recMsg= "RETURN " + rec.getSourceClassName() + "." +rec.getSourceMethodName() + " {0}";
+                        } else if ( rec.getMessage().equals("RETURN") ) {
+                            recMsg= "RETURN " + rec.getSourceClassName() + "." +rec.getSourceMethodName();
                         } else {
                             recMsg = rec.getMessage();
                         }
