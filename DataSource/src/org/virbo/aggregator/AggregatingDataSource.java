@@ -190,6 +190,17 @@ public final class AggregatingDataSource extends AbstractDataSource {
             ads0= Ops.copy(ads0);
             DataSetOps.applyIndexInSitu( ((WritableDataSet)ads0), sort );
         }
+        ((WritableDataSet)ads0).putProperty( QDataSet.MONOTONIC, Boolean.TRUE );
+        //if ( DataSetUtil.isMonotonic((QDataSet)ads0.property(QDataSet.DEPEND_0) ) ) {
+        //    logger.fine("indeed data DEPEND_0 is now monotonic.");
+        //} else {
+        //    logger.fine("why is data DEPEND_0 not monotonic, after I just sorted it");
+        //    System.err.println("===");
+        //    System.err.println(((QDataSet)ads0.property(QDataSet.DEPEND_0)).hashCode());
+        //    for ( int i=0; i<4; i++ ) {
+        //        System.err.println(((QDataSet)ads0.property(QDataSet.DEPEND_0)).value(i));
+        //    }
+        //}
         logger.exiting( "org.virbo.aggregator.AggregatingDataSource","checkSort");
         return ads0;
     }
