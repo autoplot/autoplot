@@ -202,6 +202,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
             p.load( in );
             String vers= p.getProperty("version");
             if ( vers==null || vers.trim().length()==0 ) vers=""; else vers="_"+vers;
+            String codebase= p.getProperty("codebase","."); // codebase is needed so that pngwalks can be used out-of-context, for example when a browse downloads the file and hands it off to Autoplot.
+            if ( !codebase.equals(".") ) {
+                split.path=codebase;
+            }
             String t= split.path + p.getProperty("product") + "_" + p.getProperty("timeFormat") +vers + ".png";
             template= t;
         } catch (FileSystemOfflineException ex) {
