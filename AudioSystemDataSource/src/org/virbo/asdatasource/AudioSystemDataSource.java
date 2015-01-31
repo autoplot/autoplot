@@ -39,7 +39,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
         super(uri);
         String sspec= (String) getParams().get("spec");
         if ( sspec!=null ) spec= Integer.parseInt(sspec);
-        addCability( Updating.class, this );
+        addCapability( Updating.class, this );
     }
     
     ByteBuffer dataBuffer;

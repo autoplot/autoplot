@@ -63,7 +63,7 @@ class Das2ServerDataSource extends AbstractDataSource {
     public Das2ServerDataSource(URI uri) throws ParseException {
         super(uri);
         if ( !"no".equals( params.get("tsb") ) ) {
-            addCability( TimeSeriesBrowse.class, getTimeSeriesBrowse() );
+            addCapability( TimeSeriesBrowse.class, getTimeSeriesBrowse() );
         }
         HashMap<String,String> params2 = new HashMap(params);
         params2.put("server", "dataset");

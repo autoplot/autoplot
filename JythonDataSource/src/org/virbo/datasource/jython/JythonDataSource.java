@@ -69,7 +69,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
     public JythonDataSource(URI uri, JythonDataSourceFactory factory) {
         super(uri);
-        addCability(Caching.class, this); //TODO: check for parameter inputs!
+        addCapability(Caching.class, this); //TODO: check for parameter inputs!
         this.listener = factory.listener;
 
         if ( true ) {
@@ -78,7 +78,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 JythonDataSourceTimeSeriesBrowse tsb1= JythonDataSourceTimeSeriesBrowse.checkForTimeSeriesBrowse( uri.toString(), jythonScript );
                 if ( tsb1!=null ) {
                     tsb1.setJythonDataSource(this);
-                    addCability( TimeSeriesBrowse.class, tsb1 );
+                    addCapability( TimeSeriesBrowse.class, tsb1 );
                     tsb= tsb1;
                     notCheckedTsb= false;
                 }
@@ -390,7 +390,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     if ( !(tr.toString().equals("x")) ) {
                         tsb1.setTimeRange( DatumRangeUtil.parseTimeRange(tr.toString()) );
                     }
-                    addCability( TimeSeriesBrowse.class, tsb1 );
+                    addCapability( TimeSeriesBrowse.class, tsb1 );
                     tsb= tsb1;
                 }
                 notCheckedTsb= false;
