@@ -816,7 +816,50 @@ public class URISplit {
         }
         return result;
     }
-
+    
+    /**
+     * convenience method for creating URIs.  
+     * @param vapScheme null or the data source scheme, such as "vap+das2server" or "vap+cdaweb"
+     * @param resourceUri null or the resource uri, such as "http://www-pw.physics.uiowa.edu/das/das2Server"
+     * @param args null or a map of arguments, including "arg_0" for a positional argument.  
+     * @return the URI.  If vapScheme is null, then the URI will be implicit.
+     * @see org.virbo.jythonsupport#uri
+     */
+    public static String format( String vapScheme, String resourceUri, Map<String,Object> args ) {
+        Map<String,String> largs;
+        if ( args!=null ) {
+            largs= new LinkedHashMap(); //
+            for ( Entry<String,Object> e: args.entrySet() ) {
+                if ( e.getValue()==null ) {
+                    largs.put( e.getKey(), "" );
+                } else {
+                    largs.put( e.getKey(), String.valueOf(e.getValue()) );
+                }
+            }
+        } else {
+            largs= null;
+        }
+        if ( resourceUri==null ) {
+            if ( vapScheme==null ) {
+                throw new IllegalArgumentException("vapScheme must be specified when resourceUri is null");
+            } 
+            if ( largs!=null ) {
+                return vapScheme + formatParams(largs);
+            } else {
+                return vapScheme;
+            }
+        } else {
+            URISplit split= URISplit.parse(resourceUri);
+            if ( vapScheme!=null ) {
+                split.vapScheme= vapScheme;
+            }
+            if ( largs!=null ) {
+                split.params= formatParams(largs);
+            }
+            return URISplit.format(split);
+        }
+    }
+    
     /**
      * We need a standard way to detect if a string has already been URL encoded.
      * The problem is we want valid URIs that are also readable, so just using
