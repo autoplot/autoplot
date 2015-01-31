@@ -1284,6 +1284,7 @@ APSplash.checkTime("init 270");
                         final String uri = (String)evt.getNewValue();
                         if ( uri.trim().length()>0 ){
                             Runnable run= new Runnable() {
+                                @Override
                                 public void run() {
                                     EventsListToolUtil.setEventsListURI( AutoplotUI.this, uri );
                                 }
@@ -3710,9 +3711,11 @@ private void updateFrameTitle() {
 
             @Override
             public void newActivation(String[] argv) {
-                System.err.println( "single instance listener argv:" );
-                for ( int i=0; i<argv.length; i++ ) {
-                    System.err.printf( " argv[%d]: %s\n", i, argv[i] );
+                if ( logger.isLoggable(Level.FINE) ) {
+                    logger.fine("single instance listener argv:" );
+                    for ( int i=0; i<argv.length; i++ ) {
+                        logger.log(Level.FINE, " argv[{0}]: {1}\n", new Object[]{i, argv[i]});
+                    }
                 }
 
                 for ( int i=0; i<argv.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
