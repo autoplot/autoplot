@@ -105,7 +105,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
         super(uri);
         this.delegateDataSourceFactory = delegateFactory;
         tsb= createTimeSeriesBrowse();
-        addCability(TimeSeriesBrowse.class, tsb );
+        addCapability(TimeSeriesBrowse.class, tsb );
         String stimeRange= super.params.get( URISplit.PARAM_TIME_RANGE );
         if ( stimeRange!=null ) {
             if ( super.params.get("timeRange")!=null ) {
@@ -124,7 +124,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             FileStorageModel fsm1 = AggregatingDataSourceFactory.getFileStorageModel(surl);
             double ffilePollUpdates= Math.ceil( Double.parseDouble( filePollUpdates ) );
             upd= new AggregationPollUpdating(fsm1, viewRange, (long)(ffilePollUpdates) );
-            addCability( Updating.class, upd );
+            addCapability( Updating.class, upd );
         }
     }
 
