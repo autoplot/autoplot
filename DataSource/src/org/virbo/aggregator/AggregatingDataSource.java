@@ -63,7 +63,11 @@ import org.virbo.dsutil.Reduction;
  * data for intervals.  For example, 
  * http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v$v.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109
  * is the aggregation of daily files from the CDAWeb.  This provides an 
- * easy method for storing a long time series without having a fancy data server.
+ * easy method for storing a long time series without having a complex 
+ * data server.
+ * 
+ * The result of this is not guaranteed to be monotonically increasing in 
+ * time.  See 
  * @author jbf
  */
 public final class AggregatingDataSource extends AbstractDataSource {
@@ -562,8 +566,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                     result = BufferDataSet.copy(ds1);
                                     ((BufferDataSet)result).grow(result.length()*ss.length*11/10);  //110%
                                 }
-                                result= checkBoundaries( dr1, result );
-                                result= checkSort(result);
+                                //result= checkBoundaries( dr1, result );
+                                //result= checkSort(result);
                             } else {
                                 if ( ss.length==1 ) {
                                     result= ArrayDataSet.maybeCopy(ds1);
@@ -571,8 +575,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                     result = ArrayDataSet.copy(ds1);
                                     ((ArrayDataSet)result).grow(result.length()*ss.length*11/10);  //110%
                                 }
-                                result= checkBoundaries( dr1, result );
-                                result= checkSort(result);
+                                //result= checkBoundaries( dr1, result );
+                                //result= checkSort(result);
                             }
                         }
                         this.metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
@@ -586,12 +590,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
                             assert result!=null;
                             BufferDataSet bresult= (BufferDataSet)result;
                             BufferDataSet ads1= (BufferDataSet)Ops.maybeCopy( ds1 );
-                            ads1= (BufferDataSet) checkSort(ads1);
+                            //ads1= (BufferDataSet) checkSort(ads1);
                             try {
                                 if ( bresult.canAppend(ads1) ) {
                                     QDataSet saveAds1= ads1; // note these will be backed by the same data.
-                                    ads1= (BufferDataSet)checkBoundaries( dr1, ads1 );
-                                    ads1= (BufferDataSet)checkSort(ads1);
+                                    //ads1= (BufferDataSet)checkBoundaries( dr1, ads1 );
+                                    //ads1= (BufferDataSet)checkSort(ads1);
                                     
                                     QDataSet saveDep0= (QDataSet) saveAds1.property(QDataSet.DEPEND_0);
                                     logger.log(Level.WARNING, "data trimmed from dataset to avoid overlap at {0}", saveDep0.slice(0));
@@ -611,12 +615,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
                             assert result instanceof ArrayDataSet;
                             ArrayDataSet aresult= ((ArrayDataSet)result);
                             ArrayDataSet ads1= ArrayDataSet.maybeCopy( aresult.getComponentType(),ds1);
-                            ads1= ArrayDataSet.monotonicSubset(ads1);
+                            //ads1= ArrayDataSet.monotonicSubset(ads1);
                             try {
                                 if ( aresult.canAppend(ads1) ) {
                                     QDataSet saveAds1= ads1; // note these will be backed by the same data.
-                                    ads1= (ArrayDataSet)checkBoundaries( dr1, ads1 );
-                                    ads1= (ArrayDataSet)trimOverlap( result, ads1 );
+                                    //ads1= (ArrayDataSet)checkBoundaries( dr1, ads1 );
+                                    //ads1= (ArrayDataSet)trimOverlap( result, ads1 );
                                     if ( ads1.length()!=saveAds1.length() ) {
                                         QDataSet saveDep0= (QDataSet) saveAds1.property(QDataSet.DEPEND_0);
                                         logger.log(Level.WARNING, "data trimmed from dataset to avoid overlap at {0}", saveDep0.slice(0));
