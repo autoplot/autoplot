@@ -26,15 +26,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Element;
-import org.das2.jythoncompletion.CompletionContext;
 import org.das2.jythoncompletion.CompletionSettings;
-import org.das2.jythoncompletion.CompletionSupport;
 import org.das2.jythoncompletion.JythonCompletionProvider;
-import static org.das2.jythoncompletion.Utilities.getLineNumberForOffset;
 import org.das2.util.LoggerManager;
 import org.python.parser.SimpleNode;
-import org.python.parser.ast.Module;
-import org.python.parser.ast.stmtType;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.jythonsupport.JythonUtil;
@@ -60,7 +55,7 @@ public class EditorContextMenu {
         maybeCreateMenu();
 
         JythonCompletionProvider.getInstance().settings().addPropertyChangeListener( new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getPropertyName().equals( CompletionSettings.PROP_EDITORFONT ) ) {
                     editor.setFont( Font.decode((String)evt.getNewValue() ) );
@@ -72,6 +67,7 @@ public class EditorContextMenu {
         editor.setComponentPopupMenu(menu); // override the default popup for the editor.
         
         menu.addPropertyChangeListener( "visible", new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 doRebuildJumpToMenu();
             }
@@ -86,6 +82,7 @@ public class EditorContextMenu {
         for ( int i=0; i<ss.length; i++ ) {
             final String fs= ss[i];
             tree.add( new JMenuItem( new AbstractAction( ss[i] ) {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     if ( fs.equals("top") ) {
                         editor.setCaretPosition(0);
@@ -104,6 +101,7 @@ public class EditorContextMenu {
             } ) );
         }
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 actionsMenu.remove(jumpToMenuPosition);
                 actionsMenu.add( tree, jumpToMenuPosition );
@@ -124,6 +122,7 @@ public class EditorContextMenu {
      */
     private JMenuItem createInsertMenuItem( String label, final String text ) {
         JMenuItem result= new JMenuItem( new AbstractAction( label ) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);                                
                 insertCode( text );
@@ -280,6 +279,7 @@ public class EditorContextMenu {
             getParamMenu.setToolTipText("<html>Parameters provide a consistent and clean method for passing parameters into scripts.");
 
             a= new AbstractAction("getParam()") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     String var= getVariableNameContext( editor );
@@ -296,6 +296,7 @@ public class EditorContextMenu {
             getParamMenu.add( item );
 
             a= new AbstractAction("getParam() with enumeration") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);    
                     String var= getVariableNameContext( editor );
@@ -312,6 +313,7 @@ public class EditorContextMenu {
             getParamMenu.add( item );
 
             a= new AbstractAction("getParam() for boolean checkbox") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     String var= getVariableNameContext( editor );
@@ -329,6 +331,7 @@ public class EditorContextMenu {
 
 
             a= new AbstractAction("getParam() for timerange to support time series browse") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     String var= getVariableNameContext( editor );
@@ -344,6 +347,7 @@ public class EditorContextMenu {
             getParamMenu.add( item );
 
             a= new AbstractAction("getParam() to get the resource URI") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     insertLine( "resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/rainfall_KIOW_20120522_0252.html', 'example file to load' )\n" );
@@ -375,6 +379,7 @@ public class EditorContextMenu {
             insertCodeMenu.add(fragmentsMenu);
             
             a= new AbstractAction("getDataSet()") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     String var= getVariableNameContext( editor );
@@ -404,6 +409,7 @@ public class EditorContextMenu {
             actionsMenu.add(jumpToMenu);
             
             JMenuItem mi= new JMenuItem( new AbstractAction("plot") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     String doThis= editor.getSelectedText();
@@ -414,6 +420,7 @@ public class EditorContextMenu {
             mi.setToolTipText("Plot dataset reference in a second Autoplot with its server port open");
             actionsMenu.add( mi );
             mi= new JMenuItem( new AbstractAction("indent block") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     int[] il= roundLines();
@@ -432,6 +439,7 @@ public class EditorContextMenu {
             mi.setToolTipText("indent the selected block of lines");
             actionsMenu.add( mi );
             mi= new JMenuItem( new AbstractAction("dedent block") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     int[] il= roundLines();
@@ -450,6 +458,7 @@ public class EditorContextMenu {
             mi.setToolTipText("indent the selected block of lines");
             actionsMenu.add( mi );
             mi= new JMenuItem( new AbstractAction("comment block") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     int[] il= roundLines();
@@ -469,6 +478,7 @@ public class EditorContextMenu {
             actionsMenu.add( mi );
             
             mi= new JMenuItem( new AbstractAction("uncomment block") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     int[] il= roundLines();
@@ -490,6 +500,7 @@ public class EditorContextMenu {
             menu.add( actionsMenu );
 
             mi= new JMenuItem( new AbstractAction("show usages") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);  
                     String script= editor.getText();
@@ -509,6 +520,7 @@ public class EditorContextMenu {
 
             JMenu settingsMenu= new JMenu("Settings");
             mi= new JMenuItem( new AbstractAction("Edit Settings") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     CompletionSettings settings= JythonCompletionProvider.getInstance().settings();
@@ -520,6 +532,7 @@ public class EditorContextMenu {
             settingsMenu.add( mi );
 
             mi= new JMenuItem( new AbstractAction("Pick Font...") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     JFrame parent= (JFrame)SwingUtilities.getWindowAncestor( editor );
