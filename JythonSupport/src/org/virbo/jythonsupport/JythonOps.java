@@ -37,6 +37,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
 
 /**
@@ -173,6 +174,36 @@ public class JythonOps {
         }
     }
     
+    /**
+     * convenience method for creating URIs.  
+     * @param vapScheme null or the data source scheme, such as "vap+das2server" or "vap+cdaweb"
+     * @param resourceUri null or the resource uri, such as "http://www-pw.physics.uiowa.edu/das/das2Server"
+     * @param args null or a map/dictionary of arguments, including "arg_0" for a positional argument.  
+     * @return the URI.  If vapScheme is null, then the URI will be implicit.
+     */
+    public static String formUri( String vapScheme, String resourceUri, Object args ) {
+        
+        Map<String,Object> jargs= new LinkedHashMap();
+        if ( args!=null ) {
+            if ( args instanceof PyDictionary ) {
+                LinkedHashMap m= new LinkedHashMap();
+                PyDictionary pd= (PyDictionary)args;
+                for ( Object k: pd.keys() ) {
+                    jargs.put( String.valueOf(k), String.valueOf( pd.get(  new PyString( String.valueOf(k) ) ) ) ); // TODO: surely there's an easier way
+                }
+                
+            } else if ( args instanceof Map ) {
+                Map m= (Map)args;
+                for ( Object k: ((Map)args).keySet() ) {
+                    jargs.put( String.valueOf(k), m.get( k ) );
+                }
+            } else {
+                throw new IllegalArgumentException("args cannot be converted to Map");
+            }
+        }
+        return URISplit.format( vapScheme, resourceUri, jargs );
+    }
+            
     /**
      * converts types often seen in Jython codes to the correct type.  For
      * example, ds= putProperty( ds, 'UNITS', 'seconds since 2012-01-01').
