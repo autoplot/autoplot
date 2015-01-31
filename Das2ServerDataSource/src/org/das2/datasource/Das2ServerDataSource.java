@@ -539,6 +539,9 @@ class Das2ServerDataSource extends AbstractDataSource {
                 } else {
                     logger.fine("no resolution specified");
                 }
+                if ( params.containsKey("interval") ) {
+                    sparams+= "&interval="+params.get("interval");
+                }
                 if ( dsParams!=null && dsParams.trim().length()>0 )  sparams+= "&" + dsParams; //TODO: Double-load was caused by extra & at the end.  It's silly to have it so sensitive.
                 return "vap+das2Server:" + resourceURI + "?" + sparams;
             }
@@ -546,7 +549,11 @@ class Das2ServerDataSource extends AbstractDataSource {
             @Override
             public String blurURI() {
                 String sparams= "dataset="+params.get( "dataset" );
-                if ( dsParams!=null )  sparams+= "&" + dsParams;
+                if ( params.containsKey("interval") ) { // this is important, because TSB will not update this.
+                    sparams+= "&interval="+params.get("interval"); 
+                }
+                if ( dsParams!=null && dsParams.trim().length()>0 )  sparams+= "&" + dsParams;
+                
                 return "vap+das2Server:" + resourceURI + "?" + sparams;
             }
             
