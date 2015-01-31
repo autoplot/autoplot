@@ -377,13 +377,13 @@ public class EditorContextMenu {
             a= new AbstractAction("getDataSet()") {
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
-                    String var= editor.getSelectedText();
+                    String var= getVariableNameContext( editor );
                     String surl= dataSetSelector.getValue();
                     if ( var==null || var.length()==0 ) {
                         String name= DataSourceUtil.guessNameFor(surl);
-                        insertCode( name + "= getDataSet('"+surl+"')\n");
+                        insertLine( name + "= getDataSet('"+surl+"')\n");
                     } else {
-                        insertCode( var + "= getDataSet('"+surl+"')\n");
+                        insertLine( var + "= getDataSet('"+surl+"')\n");
                     }
                 }
             };
