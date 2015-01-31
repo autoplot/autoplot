@@ -286,8 +286,18 @@ public abstract class AbstractDataSource implements DataSource {
      * attach a capability
      * @param clazz the capability class.
      * @param o an implementation.
+     * @deprecated use addCapability
      */
     public <T> void addCability(Class<T> clazz, T o) {
         capabilities.put(clazz, o);
+    }
+    
+    /**
+     * attach a capability
+     * @param clazz the capability class.
+     * @param o an implementation.
+     */
+    public <T> void addCapability( Class<T> clazz, T o) {
+        capabilities.put(clazz, o);   
     }
 }
