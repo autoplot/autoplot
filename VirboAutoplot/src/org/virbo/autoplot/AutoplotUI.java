@@ -3905,19 +3905,6 @@ private void updateFrameTitle() {
         //https://sourceforge.net/p/autoplot/bugs/1159/
         System.setProperty("java.util.Arrays.useLegacyMergeSort", "true"); // see also jnlp which sets the property.
         
-        // A Mar 11, 2014 email in Jeremy's inbox describes why this is needed for secure jnlp files.
-        if ( System.getProperty( "autoplot.default.bookmarks" )==null ) {
-            String s= System.getProperty( "jnlp.autoplot.default.bookmarks" );
-            if ( s!=null ) {
-                System.setProperty( "autoplot.default.bookmarks", s );
-            }
-        }
-        if ( System.getProperty( "java.util.logging.config.file" )==null ) {
-            String s= System.getProperty( "jnlp.java.util.logging.config.file" );
-            if ( s!=null ) {
-                System.setProperty( "java.util.logging.config.file", s );
-            }
-        }        
         { // read in the file $HOME/autoplot_data/config/logging.properties, if it exists.
             File f1= new File( AutoplotSettings.settings().getAutoplotData(), "config" );
             File f2= new File( f1, "logging.properties" );
@@ -3940,6 +3927,20 @@ private void updateFrameTitle() {
             }
         }
         
+        // A Mar 11, 2014 email in Jeremy's inbox describes why this is needed for secure jnlp files.
+        if ( System.getProperty( "autoplot.default.bookmarks" )==null ) {
+            String s= System.getProperty( "jnlp.autoplot.default.bookmarks" );
+            if ( s!=null ) {
+                System.setProperty( "autoplot.default.bookmarks", s );
+            }
+        }
+        if ( System.getProperty( "java.util.logging.config.file" )==null ) {
+            String s= System.getProperty( "jnlp.java.util.logging.config.file" );
+            if ( s!=null ) {
+                System.setProperty( "java.util.logging.config.file", s );
+            }
+        }        
+
         final ArgumentList alm = new ArgumentList("AutoplotUI");
         alm.addOptionalPositionArgument(0, "URI", null, "initial URI to load");
         alm.addOptionalSwitchArgument("position", null, "position", null, "plot position for the URI, an integer indicating which data position to update.");
