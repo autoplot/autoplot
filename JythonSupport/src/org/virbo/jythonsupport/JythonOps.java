@@ -186,7 +186,6 @@ public class JythonOps {
         Map<String,Object> jargs= new LinkedHashMap();
         if ( args!=null ) {
             if ( args instanceof PyDictionary ) {
-                LinkedHashMap m= new LinkedHashMap();
                 PyDictionary pd= (PyDictionary)args;
                 for ( Object k: pd.keys() ) {
                     jargs.put( String.valueOf(k), String.valueOf( pd.get(  new PyString( String.valueOf(k) ) ) ) ); // TODO: surely there's an easier way
