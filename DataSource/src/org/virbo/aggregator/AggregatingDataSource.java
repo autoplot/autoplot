@@ -190,7 +190,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
             ads0= Ops.copy(ads0);
             DataSetOps.applyIndexInSitu( ((WritableDataSet)ads0), sort );
         }
-        ((WritableDataSet)ads0).putProperty( QDataSet.MONOTONIC, Boolean.TRUE );
+        
+        ((WritableDataSet)dep0_0).putProperty( QDataSet.MONOTONIC, Boolean.TRUE );
         //if ( DataSetUtil.isMonotonic((QDataSet)ads0.property(QDataSet.DEPEND_0) ) ) {
         //    logger.fine("indeed data DEPEND_0 is now monotonic.");
         //} else {
