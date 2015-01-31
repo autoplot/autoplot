@@ -3906,7 +3906,7 @@ private void updateFrameTitle() {
         System.setProperty("java.util.Arrays.useLegacyMergeSort", "true"); // see also jnlp which sets the property.
         
         { // read in the file $HOME/autoplot_data/config/logging.properties, if it exists.
-            File f1= new File( AutoplotSettings.settings().getAutoplotData(), "config" );
+            File f1= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "config" );
             File f2= new File( f1, "logging.properties" );
             if ( f2.exists() ) {
                 if ( !f2.canRead() ) logger.log(Level.WARNING, "Unable to read {0}", f2);
