@@ -3912,7 +3912,12 @@ private void updateFrameTitle() {
                 System.setProperty( "autoplot.default.bookmarks", s );
             }
         }
-        
+        if ( System.getProperty( "java.util.logging.config.file" )==null ) {
+            String s= System.getProperty( "jnlp.java.util.logging.config.file" );
+            if ( s!=null ) {
+                System.setProperty( "java.util.logging.config.file", s );
+            }
+        }        
         { // read in the file $HOME/autoplot_data/config/logging.properties, if it exists.
             File f1= new File( AutoplotSettings.settings().getAutoplotData(), "config" );
             File f2= new File( f1, "logging.properties" );
