@@ -20,8 +20,14 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-01-29 rev 16152):</p>
+        <p>Bugfixes (2015-01-31 rev 16192):</p>
         <ul>    
+            <li>bug 1327:  blur URI causes das2server to loose resolution </li>
+            <li>correct misspelling/typo of addCapability after years without noticing.  Yeah code completion!</li>
+            <li>getDataSet menu option completion now correctly checks for var= to see if the user has already corrected the name.</li>
+            <li>1326: aggregations are no longer guarenteed monotonic.  See ensureMonotonic to correct.</li>
+            <li>allow vap+qds:/tmp/foo.dqt to work.  Before it was using the extension.</li>
+            <li>bugfix: support eventsListUri in vap file.</li>
             <li>1326: new aggregation monotonic rule causes too many problems.  Initial code to just sort the data.</li>
             <li>das2stream reader detects when a qstream is input.</li>
             <li>Events List tool handles exceptions properly.</li>
@@ -110,6 +116,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add Jython formUri to provide a nicer way to construct URIs.</li>
+            <li>411: add hook to check for logging.properties to make it easier to debug webstart. </li>
+            <li>.pngwalk files now have a codebase parameter so that they can be used out-of-context.</li>
+            <li>add |getProperty('DEPEND_1') filter so I can easily have a look at timetags.</li>
             <li>BufferDataSet, which uses native-memory-backed-buffers, moved from BinaryDataSource to QDataSet</li>
             <li>allow aggregation reduce to be used when resolution is null, because trim will still have an effect.</li>
             <li>SimpleServlet will figure out if URI is a vap file, to support the thin client and to match the Autoplot interface.</li>
