@@ -63,8 +63,8 @@ public class EventsListToolUtil {
         
     }
     
-    private static WeakHashMap<AutoplotUI,JDialog> instances= new WeakHashMap();
-    private static WeakHashMap<AutoplotUI,TimeRangeToolEventsList> instances2= new WeakHashMap();
+    private static final WeakHashMap<AutoplotUI,JDialog> instances= new WeakHashMap();
+    private static final WeakHashMap<AutoplotUI,TimeRangeToolEventsList> instances2= new WeakHashMap();
     
     /**
      * this must be called on the event thread.
