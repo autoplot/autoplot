@@ -194,6 +194,11 @@ class Das2ServerDataSource extends AbstractDataSource {
         if ( dataset==null ) {
             dataset= params.get("arg_0");
         }
+        
+        if ( dataset==null ) {
+            throw new IllegalArgumentException("dataset is not specified");
+        }
+        
         mon.setProgressMessage("request "+dataset );
 
         if ( interval!=null ) { // TCAs use interval parameter
