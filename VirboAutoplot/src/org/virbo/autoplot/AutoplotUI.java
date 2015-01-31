@@ -47,6 +47,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -75,6 +76,7 @@ import java.util.TimerTask;
 import java.util.TooManyListenersException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.help.CSH;
@@ -3908,6 +3910,28 @@ private void updateFrameTitle() {
             String s= System.getProperty( "jnlp.autoplot.default.bookmarks" );
             if ( s!=null ) {
                 System.setProperty( "autoplot.default.bookmarks", s );
+            }
+        }
+        
+        { // read in the file $HOME/autoplot_data/config/logging.properties, if it exists.
+            File f1= new File( AutoplotSettings.settings().getAutoplotData(), "config" );
+            File f2= new File( f1, "logging.properties" );
+            if ( f2.exists() ) {
+                if ( !f2.canRead() ) logger.log(Level.WARNING, "Unable to read {0}", f2);
+                InputStream in=null;
+                try {
+                    logger.log(Level.INFO, "Reading {0}", f2);
+                    in= new FileInputStream(f2);
+                    LogManager.getLogManager().readConfiguration(in);
+                } catch ( IOException ex ) {
+                    logger.log(Level.WARNING, "IOException during read of {0}", f2);
+                } finally {
+                    try {
+                        if ( in!=null ) in.close();
+                    } catch ( IOException ex ) {
+                        logger.log(Level.WARNING, "IOException during close of {0}", f2);
+                    }
+                }
             }
         }
         
