@@ -23,6 +23,7 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 public class Test024 {
 
     public static void example1() throws Exception {
+        System.err.println( "\n= example1 =\n");
         org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
         apds.setDataSetURI("http://www.autoplot.org/data/swe-np.xls?column=data&depend0=dep0");
         apds.doGetDataSet();
@@ -36,6 +37,7 @@ public class Test024 {
     }
 
     public static void example2() throws Exception {
+        System.err.println( "\n= example2 =\n");
         org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
         apds.setDataSetURI("vap+inline:ripples(20)");
         apds.doGetDataSet();
@@ -55,6 +57,7 @@ public class Test024 {
     }
 
     public static void example3() throws Exception {
+        System.err.println( "\n= example3 =\n");
         org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
         apds.setDataSetURI("vap:file:///home/jbf/ct/hudson/data.backup/xls/hourlyForecast.xls?column=Temperature_F&depend0=Rel_Humidity_");
         apds.doGetDataSet();
@@ -86,6 +89,7 @@ public class Test024 {
     }
 
     public static void example4() throws Exception {
+        System.err.println( "\n= example4 =\n");
         org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
         apds.setDataSetURI("vap+inline:ripples(20)");
         apds.doGetDataSet();
@@ -113,6 +117,8 @@ public class Test024 {
      * this was failing in PaPCo because it was clipping off the "http:" part.
      */
     public static void example5() throws InterruptedException, IOException {
+        
+        System.err.println( "\n= example5 =\n");
         org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
         apds.setDataSetURI("http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5.dds?lat");
         apds.doGetDataSet();
@@ -140,6 +146,7 @@ public class Test024 {
      * @throws Exception
      */
     public static void example6() throws Exception {
+        System.err.println( "\n= example6 =\n");
         org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
         apds.setDataSetURI("vap+h5:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux");
         apds.doGetDataSet();
@@ -169,6 +176,7 @@ public class Test024 {
      * were not parsed correctly.
      */
     public static void test6() throws Exception {
+        System.err.println( "\n= test6 =\n");
         {
             DataSource dss= org.virbo.datasource.DataSetURI.getDataSource( "http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5.dds?lat" );
             TimeSeriesBrowse tsb= org.virbo.datasource.DataSourceUtil.getTimeSeriesBrowse(dss);
@@ -187,7 +195,7 @@ public class Test024 {
      * @throws Exception 
      */
     public static void test8() throws Exception {
-
+        System.err.println( "\n= test8 =\n");
         String date="2012-11-02";
 
         String timeformat="seconds since "+date+"T00:00:00";
@@ -221,7 +229,7 @@ public class Test024 {
      * @throws Exception 
      */
     public static void test9() throws Exception {
-
+        System.err.println( "\n= test9 =\n");
         org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
         apds.setDataSetURI( TestSupport.TEST_HOME+"data.backup/cdf/rbsp-a_WFR-waveform-continuous-burst-magnitude_emfisis-L4_20140117T00_v1.3.2.cdf?Epoch" );
         //apds.setDataSetURI( "/home/jbf/tmp/rbsp-a_WFR-waveform-continuous-burst-magnitude_emfisis-L4_20140117T00_v1.3.2.cdf?Epoch" );
@@ -271,12 +279,14 @@ public class Test024 {
     }
 
     public static void test7() throws Exception {
+        System.err.println( "\n= test7 =\n");        
         String uri= "vap+das2server:http://www-pw.physics.uiowa.edu/das/das2Server?dataset=cassini/mag/mag_vectorQ&start_time=2010-01-01T00:00:00.000Z&end_time=2010-01-02T00:00:00.000Z";
         System.err.println( checkAPDS( uri, null ) );
 
     }
 
     public static void testGuessNameFor() {
+        System.err.println( "\n= testGuessNameFor =\n");
         System.err.println( DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux") );
         System.err.println( DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?id=Flux" ) );
         System.err.println( DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/my.txt?column=Flux" ) );
