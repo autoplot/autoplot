@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Aggregation undid all the benefits of the new CDF library.  Here's a blooper from adding special support for aggregation.
+        <p><small>Overplot of coastlines on rainfall NetCDF spectrogram, showing slice to scan through slices in time"
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,10 +20,10 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-01-31 rev 16192):</p>
+        <p>Bugfixes (2015-02-01 rev 16192):</p>
         <ul>    
-            <li>look for AUTOPLOT_DATA/config/logging.properties</li>
-            <li>bug 1327:  blur URI causes das2server to loose resolution </li>
+            <li>look for AUTOPLOT_DATA/config/logging.properties.</li>
+            <li>bug 1327:  blur URI causes das2server to loose resolution.</li>
             <li>correct misspelling/typo of addCapability after years without noticing.  Yeah code completion!</li>
             <li>getDataSet menu option completion now correctly checks for var= to see if the user has already corrected the name.</li>
             <li>1326: aggregations are no longer guarenteed monotonic.  See ensureMonotonic to correct.</li>
@@ -117,7 +117,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>updates to the jnlp, supporting better offline use and named icons.</li>
+            <li>updates to the jnlp/webstart, supporting better offline use and named icons.</li>
             <li>add Jython formUri to provide a nicer way to construct URIs.</li>
             <li>411: add hook to check for logging.properties to make it easier to debug webstart. </li>
             <li>.pngwalk files now have a codebase parameter so that they can be used out-of-context.</li>
