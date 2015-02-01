@@ -23,7 +23,7 @@
     href="autoplot.jnlp">
    
     <information> 
-        <title>Autoplot (v2015a)</title>
+        <title>Autoplot (#{tag})</title>
         <vendor>http://virbo.org/</vendor>
 	<homepage href="http://autoplot.org/" />
         <description>plots data from various sources, such as opendap, cdf, and netcdf using das2</description> 
@@ -33,14 +33,14 @@
         <icon href="logo64x64.gif" width="64" height="64" />
         <icon href="logo128x128.gif" width="128" height="128" />
         <icon href="splash.gif" kind="splash" />
+        <!--X  Uncomment for devel and production (latest) releases
         <offline-allowed/>
-        <!--X
         <shortcut online="true">
             <desktop />
             <menu submenu="autoplot" />
         </shortcut>
         X-->
-        <!--X
+        <!--X  Uncomment production (latest) releases
         <association mime-type="application/autoplot+xml" extensions="vap"/>
         <association mime-type="application/x-cdf" extensions="cdf"/>        
         X-->
@@ -56,7 +56,7 @@
         </j2se>
 
         <jar href="AutoplotVolatile.jar" />
-        <jar href="AutoplotStable.jar" /><!--X
+        <jar href="AutoplotStable.jar" /><!--X   Uncomment for devel and production (latest) releases
         <jar href="../lib/AutoplotStable.20150120.jar" />
         X-->
 
@@ -72,5 +72,5 @@
     <application-desc  main-class="org.virbo.autoplot.AutoplotUI">
         <!-- see http://autoplot.org//developer#Command-Line_Arguments -->
         <argument>--nop</argument>   <!-- this is to support the jnlp-server, which can insert a starting value -->
-    </application-desc>
+    </application-desc>:
 </jnlp> 
