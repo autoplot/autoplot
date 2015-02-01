@@ -35,7 +35,7 @@
         <icon href="splash.gif" kind="splash" />
         <!--X  Uncomment for devel and production (latest) releases
         <offline-allowed/>
-        <shortcut online="true">
+        <shortcut online="false" install="true"> 
             <desktop />
             <menu submenu="autoplot" />
         </shortcut>
