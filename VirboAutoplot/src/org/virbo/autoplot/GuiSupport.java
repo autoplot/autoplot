@@ -321,11 +321,11 @@ public class GuiSupport {
         try {
             factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(furi), new NullProgressMonitor() );
         } catch (IOException ex) {
-            Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         } catch (URISyntaxException ex) {
-            Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
         assert factory!=null; // we checked this earlier.
         TimeSeriesBrowse tsb= factory.getCapability( TimeSeriesBrowse.class );
