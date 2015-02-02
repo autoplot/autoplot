@@ -20,7 +20,7 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-02-01 rev 16206):</p>
+        <p>Bugfixes (2015-02-02 rev 16206):</p>
         <ul>    
             <li>look for AUTOPLOT_DATA/config/logging.properties.</li>
             <li>bug 1327:  blur URI causes das2server to loose resolution.</li>
@@ -120,7 +120,7 @@
             <li>updates to the jnlp/webstart, supporting better offline use and named icons.</li>
             <li>add Jython formUri to provide a nicer way to construct URIs.</li>
             <li>411: add hook to check for logging.properties to make it easier to debug webstart. </li>
-            <li>.pngwalk files now have a codebase parameter so that they can be used out-of-context.</li>
+            <li>.pngwalk files now have a baseurl parameter so that they can be used out-of-context.</li>
             <li>add |getProperty('DEPEND_1') filter so I can easily have a look at timetags.</li>
             <li>BufferDataSet, which uses native-memory-backed-buffers, moved from BinaryDataSource to QDataSet</li>
             <li>allow aggregation reduce to be used when resolution is null, because trim will still have an effect.</li>
