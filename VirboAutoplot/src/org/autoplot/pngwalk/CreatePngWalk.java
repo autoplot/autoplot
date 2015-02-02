@@ -314,7 +314,7 @@ public class CreatePngWalk {
             build.append("--outputFolder=").append(params.outputFolder).append( " ");
             
             ff.println( "# set the following line to the location of the pngwalk");
-            ff.println( "codebase=." );
+            ff.println( "baseurl=." );
             ff.println( "product=" + params.product );
             build.append("--product=").append(params.product).append( " ");
             ff.println( "timeFormat=" + params.timeFormat );
