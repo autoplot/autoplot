@@ -341,12 +341,12 @@ public class GuiSupport {
         Application dom= parent.getDocumentModel();
         String uri= furi;
         DatumRange dr;
-        if ( !dom.getTimeRange().equals( uriRange ) ) {
+        if ( !(dom.getTimeRange()==Application.DEFAULT_TIME_RANGE) && !dom.getTimeRange().equals( uriRange ) ) {
             
             dr= DataSetSelector.pickTimeRange( parent, 
-                    Arrays.asList( dom.getTimeRange(), uriRange ),
-                    Arrays.asList( "Current", "URI" )
-                    );
+                Arrays.asList( dom.getTimeRange(), uriRange ),
+                Arrays.asList( "Current", "URI" )
+                );
             if ( dr!=uriRange ) {
                 try {
                     uri= DataSourceUtil.setTimeRange(uri,dom.getTimeRange(),new NullProgressMonitor());
