@@ -1268,7 +1268,7 @@ public class AutoplotUtil {
                 dd = simpleRange(ds);
                 logger1.log(Level.FINEST, "simpleRange(ds)= {0} - {1}", new Object[]{dd[0], dd[1]});
                 if ( Units.dimensionless.isFill(dd[0]) ) dd[0]= dd[0] / 100; // kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FEDO
-                if ( Units.dimensionless.isFill(dd[1]) ) dd[1]= dd[1] / 100;
+                if ( Units.dimensionless.isFill(dd[1]) ) dd[1]= dd[1] / 100; // work around 2009 bug where DatumRanges cannot contain -1e31.
             } catch (IllegalArgumentException ex) {
                 logger.log(Level.WARNING,ex.getMessage(),ex);
                 if (UnitsUtil.isTimeLocation(u)) {
