@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
+<!-- DELETE ALL COMMENTED JNLP BLOCKS, OR http://autoplot.org/autoplot.jnlp?uri won't work. -->
 <!--
 <jnlp 
     spec="1.0+"
