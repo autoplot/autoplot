@@ -3940,7 +3940,13 @@ private void updateFrameTitle() {
                 System.setProperty( "java.util.logging.config.file", s );
             }
         }        
-
+        
+        if ( logger.isLoggable( Level.INFO ) ) {
+            for ( int i=0; i<args.length; i++ ) {
+                logger.log(Level.INFO, "arg{0}: {1}", new Object[]{i, args[i]});
+            }
+        }
+        
         final ArgumentList alm = new ArgumentList("AutoplotUI");
         alm.addOptionalPositionArgument(0, "URI", null, "initial URI to load");
         alm.addOptionalSwitchArgument("position", null, "position", null, "plot position for the URI, an integer indicating which data position to update.");
