@@ -3941,11 +3941,14 @@ private void updateFrameTitle() {
             }
         }        
         
+        System.err.println("==arguments==");
         if ( logger.isLoggable( Level.INFO ) ) {
             for ( int i=0; i<args.length; i++ ) {
-                logger.log(Level.INFO, "arg{0}: {1}", new Object[]{i, args[i]});
+                //logger.log(Level.INFO, "arg{0}: {1}", new Object[]{i, args[i]});
+                System.err.println("arg"+i+": "+args[i]);
             }
         }
+        System.err.println("==end,arguments==");
         
         final ArgumentList alm = new ArgumentList("AutoplotUI");
         alm.addOptionalPositionArgument(0, "URI", null, "initial URI to load");
