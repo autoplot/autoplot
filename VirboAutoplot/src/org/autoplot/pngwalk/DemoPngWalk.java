@@ -22,6 +22,7 @@ import javax.swing.JMenuBar;
 import org.das2.datum.DatumRange;
 import org.das2.util.ArgumentList;
 import org.das2.datum.TimeParser;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.bookmarks.Bookmark;
@@ -32,7 +33,7 @@ import org.virbo.datasource.DataSetURI;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * @deprecated this class will be removed
  * @author jbf
  */
 public class DemoPngWalk {
@@ -123,6 +124,7 @@ public class DemoPngWalk {
         
         tool.addFileAction( enabler, new AbstractAction("Launch Autoplot") {
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 String s = tool.getSelectedFile();
                 String template = tool.getTemplate();
                 int i0 = template.indexOf("_$Y");
