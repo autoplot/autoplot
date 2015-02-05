@@ -372,7 +372,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                 
             } catch ( org.virbo.qstream.StreamException ex ) {
                 Throwable cause= ex.getCause();
-                mon.finished();
+                if ( !mon.isFinished() ) mon.finished(); // the stream reader probably called it already.
                 if ( cause!=null && ( cause instanceof java.io.InterruptedIOException ) ) { 
                     ex.printStackTrace();
                     //TODO CancelledOperationException
