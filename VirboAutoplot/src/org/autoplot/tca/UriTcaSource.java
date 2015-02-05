@@ -271,7 +271,7 @@ public class UriTcaSource extends AbstractQFunction {
                     }
                 } else {
                     
-                    logger.log( Level.FINER, "findex={0} for {1} {2}", new Object[]{findex, d0, result.value()});
+                    logger.log( Level.FINER, "findex={0} for {1} {2}", new Object[]{findex, d0, result});
                     if ( deltaPlus!=null ) {
                         QDataSet delta= Ops.magnitude( Ops.subtract( d0, dep0.slice(ii) ) );
                         if ( Ops.gt( delta, tlim ).value()==1 ) {
