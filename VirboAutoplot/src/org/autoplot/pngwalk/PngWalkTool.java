@@ -197,6 +197,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
         InputStream in=null;
         try {
             Properties p= new Properties();
+            if ( split.file==null ) {
+                throw new IllegalArgumentException("template does not appear to be files: "+template);
+            }
             File local= FileSystemUtil.doDownload( split.file, new NullProgressMonitor() );
             in= new FileInputStream( local );
             p.load( in );
