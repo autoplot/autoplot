@@ -389,11 +389,13 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         try {
                             ScriptContext.createGui();
                             Window apWindow= ScriptContext.getViewWindow();
-                            if ( suri!=null ) ScriptContext.plot(suri);
+                            if ( suri!=null ) {
+                                raiseApWindowSoon(apWindow);
+                                ScriptContext.plot(suri);
+                            }
                             if ( parent==null ) {
                                 apWindow.setVisible(true);
                             }
-                            raiseApWindowSoon(apWindow);
                         } catch (InterruptedException ex) {
                             logger.log(Level.SEVERE, ex.getMessage(), ex);
                         }
