@@ -20,8 +20,13 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-02-03 rev 16219):</p>
+        <p>Bugfixes (2015-02-05 rev 16230):</p>
         <ul>    
+            <li>look up wwwauthenticate in HTTP header information to make the dialog more like webstart auth dialog.</li>
+            <li>1332: autoplot.jnlp would drop the URI when multiple jnlp blocks were found in the jnlp file, even if the first was commented</li>
+            <li>bugfix: log message assumed that data was rank 0 in the TCA code, causing failure.</li>
+            <li>bugfix: "show in Autoplot" button would now raise the window immediately to show that action has occurred, and progress bars are visible</li>
+            <li>support http://autoplot.org/autoplot.jnlp?version=devel&amp;URI kludge, so that references to this version can be used.</li>
             <li>1331: autorange failure with cdfTT2000 timetags for waveform data on 2014-02-01.  Thanks Patrice for pointing out this bug!</li>
             <li>1330: qds supports aggregation of two time intervals.</li>
             <li>Demo1 then Demo2 showed where DEFAULT_TIME (2010-01-01) was used as an option.</li>
