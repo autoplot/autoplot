@@ -560,12 +560,14 @@ public class URISplit {
 //            caretPos += ( System.getProperty("user.home").length() -1 );
 //        }
 
-        String[] popFront= new String[] { "http://autoplot.org/jnlp.cgi?", "http://autoplot.org/autoplot.jnlp?" };
-        for ( String s: popFront ) {
-            if ( surl.startsWith(s) ) {
-                surl= surl.substring(s.length());
-                caretPos= ( caretPos<s.length() ? 0 : caretPos-s.length() );
-            }
+        if ( surl.startsWith("http://autoplot.org/autoplot.jnlp?") ) {
+            String[] popFront= new String[] { "http://autoplot.org/autoplot.jnlp?version=devel&", "http://autoplot.org/autoplot.jnlp?"  };
+            for ( String s: popFront ) {
+                if ( surl.startsWith(s) ) {
+                    surl= surl.substring(s.length());
+                    caretPos= ( caretPos<s.length() ? 0 : caretPos-s.length() );
+                }
+            }         
         }
 
         URISplit result = maybeAddFile(surl, caretPos);
