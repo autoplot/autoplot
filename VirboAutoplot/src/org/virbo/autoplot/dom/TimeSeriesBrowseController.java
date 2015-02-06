@@ -326,7 +326,7 @@ public class TimeSeriesBrowseController {
                 if ( xAxis.getDLength()>2 ) {
                     newResolution = visibleRange.width().divide(xAxis.getDLength());
                 } else {
-                    logger.fine("WARNING: xaxis isn't sized, loading data at full resolution!"); //TODO: check into this
+                    logger.warning("WARNING: xaxis isn't sized, loading data at full resolution!"); //TODO: check into this
                 }
                 // don't waste time by chasing after 1.0% of a dataset.
                 DatumRange newRange = visibleRange;
