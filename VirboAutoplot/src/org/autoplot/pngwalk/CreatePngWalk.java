@@ -281,6 +281,13 @@ public class CreatePngWalk {
 
         mon.setProgressMessage("synchronize to this application");
 
+        dom2.getCanvases(0).setHeight( readOnlyDom.getCanvases(0).getHeight() );
+        dom2.getCanvases(0).setWidth( readOnlyDom.getCanvases(0).getWidth() );
+        int w0 = dom2.getCanvases(0).getWidth();
+        int h0 = dom2.getCanvases(0).getHeight();
+        dom2.getCanvases(0).getController().getDasCanvas().setSize( w0, h0 );
+        dom2.getCanvases(0).getController().getDasCanvas().revalidate();
+        
         dom2.syncTo( readOnlyDom, java.util.Arrays.asList("id") );
 
         mon.setProgressMessage("write " + params.product + ".vap");
@@ -288,8 +295,6 @@ public class CreatePngWalk {
 
 
         int thumbSize = 400;
-        int w0 = dom2.getCanvases(0).getWidth();
-        int h0 = dom2.getCanvases(0).getHeight();
 
         int thumbH = 0, thumbW = 0;
         if (params.createThumbs) {
