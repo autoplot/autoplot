@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Overplot of coastlines on rainfall NetCDF spectrogram, showing slice to scan through slices in time"
+        <p><small>Pngwalk of last year's Barrel mission where we look for conjunctions between balloons ang RBSP spacecraft
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,8 +20,9 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-02-05 rev 16230):</p>
+        <p>Bugfixes (2015-02-06 rev 16233):</p>
         <ul>    
+            <li>1334: first image of pngwalk would be loaded at the full resolution</li>
             <li>look up wwwauthenticate in HTTP header information to make the dialog more like webstart auth dialog.</li>
             <li>1332: autoplot.jnlp would drop the URI when multiple jnlp blocks were found in the jnlp file, even if the first was commented</li>
             <li>bugfix: log message assumed that data was rank 0 in the TCA code, causing failure.</li>
