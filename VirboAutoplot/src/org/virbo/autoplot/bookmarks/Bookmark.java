@@ -276,6 +276,7 @@ public abstract class Bookmark {
             throw ex;
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             Bookmark.Item err= new Bookmark.Item("");
             err.description= ex.toString();
             err.setTitle(TITLE_ERROR_OCCURRED); // note TITLE_ERROR_OCCURRED is used to detect this bookmark.
@@ -359,11 +360,17 @@ public abstract class Bookmark {
                 if ( n==null ) {
                     n = getChildElement( element,"url");
                 }
-                if ( n.getFirstChild()!=null ) {
-                    s = ((Text) (n.getFirstChild())).getData();
-                    uri = s;
-                } else {
+                if ( n==null ) {
+                    logger.log(Level.WARNING, "bookmarks file contains bookmark without uri: {0} {1}", new Object[]{element.getNodeName(), element.getTextContent()});
                     uri = "???"; // we would have NullPointerException before...
+                } else {
+                    if ( n.getFirstChild()!=null ) {
+                        s = ((Text) (n.getFirstChild())).getData();
+                        uri = s;
+                    } else {
+                        logger.log(Level.WARNING, "bookmarks file contains uri element with no child: {0} {1}", new Object[]{element.getNodeName(), element.getTextContent()});
+                        uri = "???"; // we would have NullPointerException before...
+                    }
                 }
             }
         } else {
