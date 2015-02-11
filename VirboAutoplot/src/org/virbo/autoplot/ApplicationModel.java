@@ -1481,7 +1481,7 @@ public class ApplicationModel {
      * @throws java.lang.InterruptedException
      */
     public void waitUntilIdle(boolean runtimeException) throws InterruptedException {
-        waitUntilIdle();
+        waitUntilIdle(); 
     }
 
     /**
