@@ -1,17 +1,17 @@
 
 package org.virbo.autoplot;
 
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.das2.datum.Units;
 import org.das2.graph.DasCanvas;
 import static org.virbo.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
-import org.das2.util.LoggerManager;
 import org.virbo.autoplot.dom.Application;
 
+//import org.das2.util.LoggerManager;
+//import java.util.logging.ConsoleHandler;
+//import java.util.logging.Level;
+//import java.util.logging.Logger;
 
 /**
  * Server for producing images from Autoplot URIs, first requested by U. Michigan.
@@ -31,7 +31,7 @@ public class AutoplotServer {
 //            l.log(Level.FINE, "Logging at {0}", l.getLevel());
 //        }
           
-        System.err.println("org.virbo.autoplot.AutoplotServer 20140806");
+        System.err.println("org.virbo.autoplot.AutoplotServer 20150210");
 
         ArgumentList alm= new ArgumentList("AutoplotServer");
         alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot");
