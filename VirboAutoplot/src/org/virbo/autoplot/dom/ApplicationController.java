@@ -547,13 +547,17 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @see isPendingChanges.
      */
     public void waitUntilIdle() {
+        int checkCount=0;
         while (this.isPendingChanges()) {
+            checkCount++;
+//            Thread.yield(); // this is not a good idea.
             try {
-                Thread.sleep(30);
+                Thread.sleep(30);    
             } catch (InterruptedException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
+        logger.log(Level.FINE, "waitUntilIdle checkCount={0}", checkCount);
     }
 
     protected synchronized DataSourceFilter addDataSourceFilter() {
