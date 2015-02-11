@@ -326,7 +326,7 @@ public class CreatePngWalk {
             build.append("--timeFormat='").append(params.timeFormat).append( "' ");
             ff.println( "timeRange=" + params.timeRangeStr );
             build.append("--timeRange='").append(params.timeRangeStr).append( "' ");
-            if ( params.batchUri!=null ) {
+            if ( params.batchUri!=null && !params.batchUri.equals("") ) {
                 ff.println( "batchUri=" + params.batchUri );
                 build.append("--batchUri=").append(params.batchUri).append( " ");
             }
