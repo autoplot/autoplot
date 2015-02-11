@@ -685,7 +685,7 @@ public class PlotController extends DomNodeController {
                 if ( e.getPropertyName().equals("Frame.active") ) return;
                 if ( e.getPropertyName().equals(DasAxis.PROP_UNITS)
                         || e.getPropertyName().equals(DasAxis.PROPERTY_DATUMRANGE ) ) {
-                    if ( axis.getDrawTca() && domAxis.getLabel().length()==0 ) {
+                    if ( axis.isDrawTca() && domAxis.getLabel().length()==0 ) {
                         domAxis.setLabel("%{RANGE}");
                     }
                 }
