@@ -59,7 +59,7 @@ public class Test018 {
         
         dom.getDataSourceFilters(0).setUri("file:///home/jbf/ct/hudson/data.backup/qds/series/hyd_%Y%m%d.qds?timerange=2000-01-01 through 2000-01-12");
         
-        getApplicationModel().waitUntilIdle(false); // wait for child plot elements to be created.
+        getApplicationModel().waitUntilIdle(); // wait for child plot elements to be created.
         Axis xaxis= dom.getPlots(0).getXaxis();
 
         ApplicationController controller= dom.getController();

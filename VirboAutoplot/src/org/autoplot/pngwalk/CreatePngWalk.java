@@ -431,7 +431,7 @@ public class CreatePngWalk {
             mon.setProgressMessage( String.format("write %s", filename ) );
             logger.log( Level.FINE, String.format("write %s", filename ) );
 
-            appmodel.waitUntilIdle(false);
+            appmodel.waitUntilIdle();
             if ( params.autorange ) {
                 for ( Plot p: dom2.getPlots() ) {
                     dom2.getController().setPlot(p);
@@ -441,11 +441,11 @@ public class CreatePngWalk {
 
             }
 
-            appmodel.waitUntilIdle(false);
+            appmodel.waitUntilIdle();
 
             if ( atime.equals(times[0]) ) { // resetting zoomY and zoomZ can cause the labels and bounds to change.  Turn off autoranging.
                 dom2.getOptions().setAutolayout(false);
-                appmodel.waitUntilIdle(false);
+                appmodel.waitUntilIdle();
             }
             
             BufferedImage image = null;

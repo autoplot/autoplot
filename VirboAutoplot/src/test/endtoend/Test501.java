@@ -85,7 +85,7 @@ public class Test501 {
         setCanvasSize( 750, 300 );
         int i= uri.lastIndexOf("/");
 
-        getApplicationModel().waitUntilIdle(true);
+        getApplicationModel().waitUntilIdle();
 
         String fileUri= uri.substring(i+1);
 

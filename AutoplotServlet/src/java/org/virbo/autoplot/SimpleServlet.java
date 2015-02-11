@@ -518,7 +518,7 @@ public class SimpleServlet extends HttpServlet {
                 }
 
                 if (!stimeRange.equals("")) {
-                    appmodel.waitUntilIdle(true);
+                    appmodel.waitUntilIdle();
                     if (UnitsUtil.isTimeLocation(dom.getTimeRange().getUnits())) {
                         dom.setTimeRange(timeRange);
                     }
