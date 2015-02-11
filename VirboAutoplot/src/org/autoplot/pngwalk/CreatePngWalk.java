@@ -293,6 +293,8 @@ public class CreatePngWalk {
         dom2.getCanvases(0).getController().getDasCanvas().revalidate();
         
         dom2.syncTo( readOnlyDom, java.util.Arrays.asList("id") );
+        dom2.getController().waitUntilIdle();
+        dom2.syncTo( readOnlyDom, java.util.Arrays.asList("id") ); // work around bug where someone resets the margin column http://jfaden.net:8080/hudson/job/autoplot-test033/5786/artifact/
 
         mon.setProgressMessage("write " + params.product + ".vap");
         logger.log(Level.FINE, "write {0}.vap", params.product);
