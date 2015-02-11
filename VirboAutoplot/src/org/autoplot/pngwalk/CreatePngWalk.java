@@ -26,7 +26,11 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import org.das2.datum.TimeParser;
+import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.datum.format.DatumFormatter;
+import org.das2.datum.format.DefaultDatumFormatter;
+import org.das2.datum.format.FormatStringFormatter;
 import org.das2.graph.EventsRenderer;
 import org.das2.util.ArgumentList;
 import org.das2.util.ExceptionHandler;
@@ -483,12 +487,18 @@ public class CreatePngWalk {
                 }
             }
             double imagesPerSec = count * 1000. / (java.lang.System.currentTimeMillis() - t0);
-            //etaSec= (n-count) / imagesPerSec
-            //etaStr= org.das2.datum.DatumUtil.asOrderOneUnits( Units.seconds.createDatum(etaSec) )
+            double etaSec= (n-count) / imagesPerSec;
+            String etaStr= "";
+            if ( count>3 ) {
+                Datum eta= org.das2.datum.DatumUtil.asOrderOneUnits( Units.seconds.createDatum(etaSec) );
+                DatumFormatter df;
+                df= new FormatStringFormatter("%.1f",true);
+                etaStr= String.format( Locale.US, ", eta %s", df.format(eta) ); 
+            }
             if ( imagesPerSec<1.0 ) {
-                mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/min)", imagesPerSec*60 ) );
+                mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/min%s)", imagesPerSec*60, etaStr ) );
             } else {
-                mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/sec)", imagesPerSec ) );
+                mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/sec%s)", imagesPerSec, etaStr ) );
             }
         }
         mon.finished();
