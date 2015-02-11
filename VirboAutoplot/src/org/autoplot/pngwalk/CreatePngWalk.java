@@ -485,7 +485,11 @@ public class CreatePngWalk {
             double imagesPerSec = count * 1000. / (java.lang.System.currentTimeMillis() - t0);
             //etaSec= (n-count) / imagesPerSec
             //etaStr= org.das2.datum.DatumUtil.asOrderOneUnits( Units.seconds.createDatum(etaSec) )
-            mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/sec)", imagesPerSec));
+            if ( imagesPerSec<1.0 ) {
+                mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/min)", imagesPerSec*60 ) );
+            } else {
+                mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/sec)", imagesPerSec ) );
+            }
         }
         mon.finished();
         
