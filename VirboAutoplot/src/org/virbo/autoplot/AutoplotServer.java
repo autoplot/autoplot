@@ -24,17 +24,16 @@ public class AutoplotServer {
         
     public static void main(String[] args) throws Exception {
 
-        if ( false ) {
-            Logger l= LoggerManager.getLogger("apdss.agg");
-            l.setLevel(Level.ALL);
-            l.addHandler( new ConsoleHandler() );  // I'm not sure when we need this.  This morning I was getting double messages.
-            l.log(Level.FINE, "Logging at {0}", l.getLevel());
-        }
+//        if ( false ) {
+//            Logger l= LoggerManager.getLogger("apdss.agg");
+//            l.setLevel(Level.ALL);
+//            l.addHandler( new ConsoleHandler() );  // I'm not sure when we need this.  This morning I was getting double messages.
+//            l.log(Level.FINE, "Logging at {0}", l.getLevel());
+//        }
           
         System.err.println("org.virbo.autoplot.AutoplotServer 20140806");
 
         ArgumentList alm= new ArgumentList("AutoplotServer");
-        alm.addBooleanSwitchArgument("foo", "x", "foo", "test test");
         alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot");
         alm.addOptionalSwitchArgument("vap", "v", "vap", "", "VAP to plot");
         alm.addOptionalSwitchArgument("width", "w", "width", "-1", "width of result (dflt=700)");
