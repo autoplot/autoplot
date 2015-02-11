@@ -1448,7 +1448,7 @@ public class ApplicationModel {
 
     /**
      * move the cache.
-     * @param n
+     * @param n new location folder.
      * @return true if successful.
      */
     boolean moveCache( File n ) {
@@ -1472,12 +1472,23 @@ public class ApplicationModel {
     /**
      * Utility field used by bound properties.
      */
-    private java.beans.PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
+    private final java.beans.PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
 
     /**
      * wait for Autoplot to settle, waiting for pending changes in the application controller and canvas.
+     * @param runtimeException ignored.
+     * @deprecated use waitUntilIdle() instead.
+     * @throws java.lang.InterruptedException
      */
     public void waitUntilIdle(boolean runtimeException) throws InterruptedException {
+        waitUntilIdle();
+    }
+
+    /**
+     * wait for Autoplot to settle, waiting for pending changes in the application controller and canvas.
+     * @throws java.lang.InterruptedException
+     */    
+    public void waitUntilIdle() throws InterruptedException {
         logger.log(Level.FINE, "enter waitUntilIdle, pendingChanges={0}", dom.getController().isPendingChanges());
         while ( dom.getController().isPendingChanges() ) {
             dom.getController().waitUntilIdle();
@@ -1487,7 +1498,7 @@ public class ApplicationModel {
         canvas.waitUntilIdle();
         logger.fine("done waiting");
     }
-
+    
     public Application getDocumentModel() {
         return dom;
     }
