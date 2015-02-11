@@ -194,8 +194,8 @@ public class Util {
     
     /**
      * copy a branch of files and folders.
-     * @param root
-     * @param dst
+     * @param root root folder.
+     * @param dst destination folder.
      * @return true if successful.
      */
     public static boolean copyFileTree( File root, File dst ) {
