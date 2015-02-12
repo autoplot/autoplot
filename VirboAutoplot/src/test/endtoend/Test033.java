@@ -66,7 +66,7 @@ public class Test033 {
     private static void makePngWalk3() throws Exception {
         Application dom= ScriptContext.getDocumentModel();
 
-        String pwd= new File("pngwalkAscii").getAbsoluteFile().toString();
+        String pwd= new File("pngwalk3").getAbsoluteFile().toString();
 
         CreatePngWalk.Params pp= new CreatePngWalk.Params();
         pp.outputFolder= pwd;
@@ -136,7 +136,7 @@ public class Test033 {
         long t0;
 
         ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
-        
+
         t0= System.currentTimeMillis();
         makePngWalk1();
         System.err.printf( "test 001: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
@@ -152,7 +152,7 @@ public class Test033 {
         t0= System.currentTimeMillis();
         makePngWalk4();
         System.err.printf( "test 004: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
-
+        
         t0= System.currentTimeMillis();
         makePngWalk5();
         System.err.printf( "test 005: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
