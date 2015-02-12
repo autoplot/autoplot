@@ -277,23 +277,32 @@ public class CreatePngWalk {
 
         mon.setProgressMessage("initializing child application");
 
+        TimeParser tp = TimeParser.create(params.timeFormat);
+        Application dom= (Application) readOnlyDom.copy();
+        try {
+            DatumRange tr1= tp.parse(times[0]).getTimeRange(); // set the initial timerange to avoid an extraneous load.
+            dom.setTimeRange(tr1);
+        } catch ( ParseException ex ) {
+            throw new RuntimeException(ex);
+        }
+        
         ApplicationModel appmodel = new ApplicationModel();
         appmodel.addDasPeersToAppAndWait();
-        
+                
         Application dom2 = appmodel.getDocumentModel();
 
         mon.setProgressMessage("synchronize to this application");
 
-        dom2.getCanvases(0).setHeight( readOnlyDom.getCanvases(0).getHeight() );
-        dom2.getCanvases(0).setWidth( readOnlyDom.getCanvases(0).getWidth() );
+        dom2.getCanvases(0).setHeight( dom.getCanvases(0).getHeight() );
+        dom2.getCanvases(0).setWidth( dom.getCanvases(0).getWidth() );
         int w0 = dom2.getCanvases(0).getWidth();
         int h0 = dom2.getCanvases(0).getHeight();
         dom2.getCanvases(0).getController().getDasCanvas().setSize( w0, h0 );
         dom2.getCanvases(0).getController().getDasCanvas().revalidate();
         
-        dom2.syncTo( readOnlyDom, java.util.Arrays.asList("id") );
+        dom2.syncTo( dom, java.util.Arrays.asList("id") );
         dom2.getController().waitUntilIdle();
-        dom2.syncTo( readOnlyDom, java.util.Arrays.asList("id") ); // work around bug where someone resets the margin column http://jfaden.net:8080/hudson/job/autoplot-test033/5786/artifact/
+        dom2.syncTo( dom, java.util.Arrays.asList("id") ); // work around bug where someone resets the margin column http://jfaden.net:8080/hudson/job/autoplot-test033/5786/artifact/
 
         mon.setProgressMessage("write " + params.product + ".vap");
         logger.log(Level.FINE, "write {0}.vap", params.product);
@@ -364,8 +373,6 @@ public class CreatePngWalk {
         dom2.getController().waitUntilIdle();
 
         mon.setProgressMessage("making images");
-
-        TimeParser tp = TimeParser.create(params.timeFormat);
 
         long t0 = java.lang.System.currentTimeMillis();
         int count = 0;
