@@ -586,7 +586,11 @@ public class SimpleServlet extends HttpServlet {
                 dom.getOptions().setForeground(Color.decode(sforegroundColor));
             }
             if (!sbackgroundColor.equals("")) {
-                dom.getOptions().setBackground(Color.decode(sbackgroundColor));
+                if ( sbackgroundColor.equals("none") ) {
+                    dom.getOptions().setBackground(new Color( 255,0,0,0 ) ); // transparent
+                } else {
+                    dom.getOptions().setBackground(Color.decode(sbackgroundColor));
+                }
             }
 
             if ( !grid.equals("") ) {
