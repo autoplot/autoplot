@@ -1960,7 +1960,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * return the binding if the binding exists already.  See also findBindings, which uses different logic.
      * @param s the source.
      * @param sp the source property
-     * @param t the targer
+     * @param t the target
      * @param tp the target property.
      * @return the binding if it exists already.
      */
@@ -2062,7 +2062,17 @@ public class ApplicationController extends DomNodeController implements RunLater
             b.unbind();
         }
         bindingImpls.remove(binding);
-
+        
+        BindingGroup bc= bindingContexts.get(DomUtil.getElementById(application,binding.srcId));
+        if ( bc!=null ) {
+            try {
+                bc.removeBinding(b);
+            } catch ( Exception e ) {
+                logger.fine("deleteBinding still needs attention.");
+            }
+        }
+        bindingContexts.get(binding.dstId);
+        
         List<BindingModel> bindings = DomUtil.asArrayList(application.getBindings());
         bindings.remove(binding);
         application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
