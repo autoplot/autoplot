@@ -29,9 +29,7 @@ import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DatumFormatter;
-import org.das2.datum.format.DefaultDatumFormatter;
 import org.das2.datum.format.FormatStringFormatter;
-import org.das2.graph.EventsRenderer;
 import org.das2.util.ArgumentList;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.FileUtil;
@@ -47,6 +45,7 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
 
 /**
@@ -651,7 +650,12 @@ public class CreatePngWalk {
         params.batchUri= alm.getValue("batchUri");
         if ( params.batchUri!=null && params.batchUri.length()>0 ) params.useBatchUri= true;
         params.outputFormat= alm.getValue("outputFormat");
-        String vap= alm.makeFileReferenceAbsolute( alm.getValue("vap") );
+        String vap= alm.getValue("vap");
+        if ( ( vap.length()>2 && vap.charAt(1)==':' ) ) {
+            logger.fine("reference appears to be absolute (Windows)");
+        } else {
+            vap= URISplit.makeAbsolute(new File(".").getAbsolutePath(),vap);
+        }
         ScriptContext.plot(vap);
 
         int status= doIt( ScriptContext.getDocumentModel(), params );
