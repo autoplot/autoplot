@@ -70,6 +70,11 @@ import org.virbo.dsops.Ops;
  * .vap files and Autoplot URIs.  A simple set of controls is provided
  * to tweak layout when automatic settings are not satisfactory.
  * 
+ * Some known instances:<ul>
+ * <li>http://autoplot.org/plot/
+ * <li>http://jfaden.net:8180/AutoplotServlet/
+ * </ul>
+ * 
  * @author jbf
  */
 public class SimpleServlet extends HttpServlet {
