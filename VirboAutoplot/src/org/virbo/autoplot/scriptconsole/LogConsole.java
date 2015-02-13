@@ -537,7 +537,7 @@ public class LogConsole extends javax.swing.JPanel {
         });
 
         saveButton.setText("Save As...");
-        saveButton.setToolTipText("saves the records to file for use by software support team.");
+        saveButton.setToolTipText("saves the records to file for use by software support team.  (Ctrl+ will load in previously externally saved records.)");
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveButtonActionPerformed(evt);
@@ -636,6 +636,16 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     LoggerManager.logGuiEvent(evt);        
     if ((evt.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
         JFileChooser chooser = new JFileChooser();
+        chooser.addChoosableFileFilter( new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.toString().endsWith(".xml");
+            }
+            @Override
+            public String getDescription() {
+                return "xml files";
+            }
+        });
         if (JFileChooser.APPROVE_OPTION == chooser.showOpenDialog(this)) {
             FileInputStream fo = null;
             try {

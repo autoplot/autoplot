@@ -93,7 +93,7 @@
         <Component class="javax.swing.JButton" name="saveButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="Save As..."/>
-            <Property name="toolTipText" type="java.lang.String" value="saves the records to file for use by software support team."/>
+            <Property name="toolTipText" type="java.lang.String" value="saves the records to file for use by software support team.  (Ctrl+ will load in previously externally saved records.)"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="saveButtonActionPerformed"/>
