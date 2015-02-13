@@ -16,11 +16,14 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
@@ -40,6 +43,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.MutableAttributeSet;
@@ -400,6 +404,50 @@ public class LogConsole extends javax.swing.JPanel {
         }
     }
 
+    private String getRecMsg( long baseTime, LogRecord rec ) {
+        
+        long t= baseTime;
+        boolean timeStamps = showTimeStamps;
+        boolean logLevels = showLevel;
+        boolean threads= showThreads;
+
+        String recMsg;
+        String msg= rec.getMessage();
+        Object[] parms= rec.getParameters();
+        if ( parms==null || parms.length==0 ) {
+            recMsg = msg;
+        } else {
+            recMsg = MessageFormat.format( msg, parms );
+        }
+        String prefix = "";
+        if ( rec.getMessage()==null ) {
+            if ( rec.getThrown()!=null ) {
+                recMsg= recMsg + rec.getThrown().toString();
+            }
+            prefix= prefix+";";
+        }
+        if (showLoggerId) {
+            prefix += rec.getLoggerName() + " ";
+        }
+        if (timeStamps) {
+            prefix += nf.format(( t - rec.getMillis() ) / 1000.) + " "; // the minus sign was unproductive and messed up the formatting. 
+        }
+        if (logLevels) {
+            prefix += rec.getLevel() + " ";
+        }
+        if (threads) {
+            if (rec.getThreadID() == eventThreadId) { 
+                prefix += "(GUI) ";
+            } else {
+                prefix += rec.getThreadID();
+            }
+        } 
+        if (!prefix.equals("")) {
+            recMsg = prefix.trim() + ": " + recMsg;
+        }
+        return recMsg;
+    }
+    
     /**
      * note this is generally called from a timer that coalesces events.  But
      * may be called explicitly in response to a user event as well.  
@@ -413,10 +461,6 @@ public class LogConsole extends javax.swing.JPanel {
         try {
             //long t0= System.currentTimeMillis();
             int n = lrecords.size();
-            long t = n == 0 ? 0 : lrecords.get(n - 1).getMillis();
-            boolean timeStamps = showTimeStamps;
-            boolean logLevels = showLevel;
-            boolean threads= showThreads;
             String st = searchText;
             if (st != null && st.length() == 0) st = null;
             Pattern p = searchTextPattern;
@@ -427,6 +471,8 @@ public class LogConsole extends javax.swing.JPanel {
             MutableAttributeSet highlistAttr = new SimpleAttributeSet();
             StyleConstants.setBackground(highlistAttr, Color.ORANGE);
             
+            long t = n == 0 ? 0 : lrecords.get(0).getMillis();
+            
             for (LogRecord rec : lrecords) {
                 if (rec.getLevel().intValue() >= level) {
 //                    if (lastT != 0 && rec.getMillis() - lastT > 5000) { // TODO replace this with a GUI element, like a divider line on the right.
@@ -435,41 +481,8 @@ public class LogConsole extends javax.swing.JPanel {
 //                    }
                     //lastT = rec.getMillis();
                     
-                    String recMsg;
-                    String msg= rec.getMessage();
-                    Object[] parms= rec.getParameters();
-                    if ( parms==null || parms.length==0 ) {
-                        recMsg = msg;
-                    } else {
-                        recMsg = MessageFormat.format( msg, parms );
-                    }
-                    String prefix = "";
-                    if ( rec.getMessage()==null ) {
-                        if ( rec.getThrown()!=null ) {
-                            recMsg= recMsg + rec.getThrown().toString();
-                        }
-                        prefix= prefix+";";
-                    }
-                    if (showLoggerId) {
-                        prefix += rec.getLoggerName() + " ";
-                    }
-                    if (timeStamps) {
-                        prefix += nf.format(( t - rec.getMillis() ) / 1000.) + " "; // the minus sign was unproductive and messed up the formatting. 
-                    }
-                    if (logLevels) {
-                        prefix += rec.getLevel() + " ";
-                    }
-                    if (threads) {
-                        if (rec.getThreadID() == eventThreadId) { 
-                            prefix += "(GUI) ";
-                        } else {
-                            prefix += rec.getThreadID();
-                        }
-                    } 
-                    if (!prefix.equals("")) {
-                        recMsg = prefix.trim() + ": " + recMsg;
-                    }
-
+                    String recMsg= getRecMsg(t,rec);
+                    
                     AttributeSet attr = null;
                     if (st != null && p.matcher(recMsg).find()) {
                         attr = highlistAttr;
@@ -646,11 +659,38 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         }
     } else {
         JFileChooser chooser = new JFileChooser();
+        chooser.addChoosableFileFilter( new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return f.toString().endsWith(".xml") || f.toString().endsWith(".txt");
+            }
+            @Override
+            public String getDescription() {
+                return "xml files or txt files";
+            }
+        });
         if (JFileChooser.APPROVE_OPTION == chooser.showSaveDialog(this)) {
             FileOutputStream fo = null;
             try {
+                File f= chooser.getSelectedFile();
                 fo = new FileOutputStream(chooser.getSelectedFile());
-                LogConsoleUtil.serializeLogRecords(records, fo);
+                List<LogRecord> copy= new ArrayList(records);
+                if ( f.toString().endsWith(".xml") ) {
+                    LogConsoleUtil.serializeLogRecords(copy, fo);
+                } else {
+                    BufferedWriter write= new BufferedWriter( new OutputStreamWriter(fo) );
+                    if ( copy.size()>0 ) {
+                        long t= copy.get(0).getMillis();
+                        for ( LogRecord rec: copy ) {
+                            if (rec.getLevel().intValue() >= level) {        
+                                String recMsg= getRecMsg(t,rec);
+                                recMsg += "\n";
+                                write.write( recMsg );
+                            }
+                        }
+                        write.close();
+                    }
+                }
             } catch (FileNotFoundException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (IOException ex) {
