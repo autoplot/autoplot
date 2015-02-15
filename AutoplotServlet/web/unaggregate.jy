@@ -16,6 +16,8 @@ if ( False ):
   print '# fast='+fast
 
 if ( fast=='T' ):
+   if ( resourceURI.find('$v')>-1 ):
+       raise Exception("fast mode doesn't support $v")
    tp= TimeParser.create(resourceURI)
    st= tp.format(drtr.min(),None)
    dr= tp.parse( st,None ).getTimeRange()
