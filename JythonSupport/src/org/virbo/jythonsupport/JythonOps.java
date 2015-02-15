@@ -149,6 +149,12 @@ public class JythonOps {
         
     }
 
+    /**
+     * coerce a python array into a QDataSet.
+     * @param arg0 Python object 
+     * @return Datum 
+     * @see org.virbo.dsops.Ops#datum(java.lang.Object) 
+     */
     public static Datum datum( PyObject arg0 ) {
         if ( arg0 instanceof PyQDataSet ) {
             QDataSet ds= ((PyQDataSet)arg0).rods;
@@ -164,11 +170,7 @@ public class JythonOps {
         } else if ( arg0 instanceof PyJavaInstance && ( ((PyJavaInstance)arg0).__tojava__(Datum.class) instanceof Datum ) ) {
             return (Datum)((PyJavaInstance)arg0).__tojava__(org.das2.datum.Datum.class);
         } else if ( arg0 instanceof PyString ) {
-            try {
-               return DataSetUtil.asDatum( DataSetUtil.asDataSet(DatumUtil.parse(arg0.toString())) ); //TODO: someone is going to want lookupUnits that will allocate new units.
-            } catch (ParseException ex) {
-               throw Py.SyntaxError( "unable to parse string: "+arg0 );
-            }
+            return Ops.datum(arg0.toString());
         } else {
             throw Py.TypeError("unable to coerce "+arg0+" to Datum");
         }
