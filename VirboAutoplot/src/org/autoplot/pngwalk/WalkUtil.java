@@ -86,9 +86,13 @@ public class WalkUtil {
      *
      * @param surl an autoplot url with an aggregation specifier.
      * @param timeRange a string that is parsed to a time range, such as "2001", or null.
+     * @param timeRanges list which is populated
+     * @param download (is not used)
+     * @param mon progress monitor
      * @return a list of URLs without the aggregation specifier.
      * @throws java.io.IOException if the remote folder cannot be listed.
      * @throws java.text.ParseException if the timerange cannot be parsed.
+     * @throws java.net.URISyntaxException when the surl cannot be resolved to a web address.
      */
     public static List<URI> getFilesFor( String surl, String timeRange, List<DatumRange> timeRanges, boolean download, ProgressMonitor mon ) throws IOException, ParseException, URISyntaxException {
         DatumRange dr = null;
