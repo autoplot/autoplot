@@ -92,13 +92,13 @@ public class ApplicationController extends DomNodeController implements RunLater
     final Map<Connector, ColumnColumnConnector> connectorImpls;
     private final static Logger logger = LoggerManager.getLogger( "autoplot.dom" );
 
-    private static AtomicInteger canvasIdNum = new AtomicInteger(0);
-    private static AtomicInteger plotIdNum = new AtomicInteger(0);
-    private static AtomicInteger plotElementIdNum = new AtomicInteger(0);
-    private static AtomicInteger dsfIdNum = new AtomicInteger(0);
-    private static AtomicInteger rowIdNum = new AtomicInteger(0);
-    private static AtomicInteger columnIdNum = new AtomicInteger(0);
-    private static AtomicInteger appIdNum= new AtomicInteger(0);
+    private static final AtomicInteger canvasIdNum = new AtomicInteger(0);
+    private static final AtomicInteger plotIdNum = new AtomicInteger(0);
+    private static final AtomicInteger plotElementIdNum = new AtomicInteger(0);
+    private static final AtomicInteger dsfIdNum = new AtomicInteger(0);
+    private static final AtomicInteger rowIdNum = new AtomicInteger(0);
+    private static final AtomicInteger columnIdNum = new AtomicInteger(0);
+    private static final AtomicInteger appIdNum= new AtomicInteger(0);
 
     ApplicationControllerSyncSupport syncSupport;
     ApplicationControllerSupport support;
@@ -458,6 +458,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 LoggerManager.logGuiEvent(e);
                 registerPendingChange( ApplicationController.this, PENDING_BREAK_APART );
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         performingChange(ApplicationController.this, PENDING_BREAK_APART);
                         breakIntoStackPlot(domPlot);
@@ -616,8 +617,8 @@ public class ApplicationController extends DomNodeController implements RunLater
                 // is anyone listening to timerange?
                 boolean noOneListening= true;
                 BindingModel[] bms= application.getBindings();
-                for ( int i=0; i<bms.length; i++ ) {
-                    if ( bms[i].getSrcId().equals( application.getId() ) && bms[i].srcProperty.equals( Application.PROP_TIMERANGE ) ) {
+                for (BindingModel bm : bms) {
+                    if (bm.getSrcId().equals(application.getId()) && bm.srcProperty.equals(Application.PROP_TIMERANGE)) {
                         noOneListening= false;
                         //ss.add( bms[i].getDstId() );
                     }
@@ -1194,10 +1195,13 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
-     * copy doplot and plotElements into a new doplot.
-     * @param domPlot
-     * @param dsf
-     * @return
+     * copy plot and plotElements into a new plot.
+     * @param domPlot copy this plot.
+     * @param dsf if non-null, then use this dataSourceFilter
+     * @param bindx If true, X axes are bound.  If the srcPlot x axis is bound to the
+     *    application timerange, then bind to that instead (kludge--handle higher)
+     * @param bindy If true, Y axes are bound
+     * @return the new plot
      */
     public Plot copyPlotAndPlotElements(Plot domPlot, DataSourceFilter dsf, boolean bindx, boolean bindy) {
         List<PlotElement> srcElements = getPlotElementsFor(domPlot);
@@ -1337,7 +1341,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     /**
      * copy the dataSourceFilter, including its controller and loaded data.
-     * @param dsf
+     * @param dsfsrc the source dataSourceFilter
+     * @param dsfnew the new dataSourceFilter, which will get the URI and loaded data.
      */
     protected void copyDataSourceFilter(DataSourceFilter dsfsrc, DataSourceFilter dsfnew) {
         DomLock lock= dsfnew.getController().mutatorLock();
@@ -1447,6 +1452,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 application.setPlots(plots.toArray(new Plot[plots.size()]));
 
                 if (deleteRow != null) {
+                    assert row!=null;
                     CanvasController cc = row.controller.getCanvas().controller;
                     cc.deleteRow(deleteRow);
                     cc.removeGaps();
@@ -1487,8 +1493,8 @@ public class ApplicationController extends DomNodeController implements RunLater
             application.setDataSourceFilters(dsfs.toArray(new DataSourceFilter[dsfs.size()]));
 
             TimeSeriesBrowseController tsbc;
-            for ( int i=0; i<alsoRemove.size(); i++ ) {
-                tsbc= alsoRemove.get(i).controller.getTimeSeriesBrowseController();
+            for (DataSourceFilter alsoRemove1 : alsoRemove) {
+                tsbc = alsoRemove1.controller.getTimeSeriesBrowseController();
                 if ( tsbc!=null ) tsbc.release();
             }
         }
@@ -1546,8 +1552,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         TimeSeriesBrowseController tsbc= dsf.getController().getTimeSeriesBrowseController();
         if ( tsbc!=null ) tsbc.release();
-        for ( int i=0; i<alsoRemove.size(); i++ ) {
-            tsbc= alsoRemove.get(i).controller.getTimeSeriesBrowseController();
+        for (DataSourceFilter alsoRemove1 : alsoRemove) {
+            tsbc = alsoRemove1.controller.getTimeSeriesBrowseController();
             if ( tsbc!=null ) tsbc.release();
         }
 
@@ -1702,9 +1708,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                     //go ahead and check for leftover das2 plots and renderers that might have been left from a bug.  rfe3324592
                     Canvas c= getCanvas();
                     DasCanvasComponent[] dccs= c.controller.getDasCanvas().getCanvasComponents();
-                    for ( int i=0; i<dccs.length; i++ ) {
-                        if ( dccs[i] instanceof DasPlot ) {
-                            DasPlot p= (DasPlot)dccs[i];
+                    for (DasCanvasComponent dcc : dccs) {
+                        if (dcc instanceof DasPlot) {
+                            DasPlot p = (DasPlot) dcc;
                             boolean okay=false;
                             for ( Plot pp: application.getPlots() ) {
                                 if ( pp.getController().getDasPlot()==p ) okay=true;
@@ -1713,20 +1719,22 @@ public class ApplicationController extends DomNodeController implements RunLater
                                 c.controller.getDasCanvas().remove(p);
                             } else {
                                 Renderer[] rr= p.getRenderers();
-                                for ( int j=0; j<rr.length; j++ ) {
+                                for (Renderer rr1 : rr) {
                                     okay= false;
-                                    for ( PlotElement pes: application.getPlotElements() ) {
-                                       if ( pes.getController().getRenderer()==rr[j] ) okay=true;
+                                    for (PlotElement pes : application.getPlotElements()) {
+                                        if (pes.getController().getRenderer() == rr1) {
+                                            okay=true;
+                                        }
                                     }
-                                    if ( !okay ) {
-                                        p.removeRenderer(rr[j]);
+                                    if (!okay) {
+                                        p.removeRenderer(rr1);
                                     }
                                 }
                                 p.getXAxis().setTickV(null);
                                 p.getYAxis().setTickV(null);
                             }
-                        } else if ( dccs[i] instanceof DasColorBar ) {
-                            ((DasColorBar)dccs[i]).setTickV(null);
+                        } else if (dcc instanceof DasColorBar) {
+                            ((DasColorBar) dcc).setTickV(null);
                         }
                     }
                 }
@@ -2140,7 +2148,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     /**
      * clients can get status here.  
-     *
+     * @return the last status message.
      */
     public String getStatus() {
         return status;
@@ -2260,15 +2268,20 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
 
+    /**
+     * return the PlotElements for the plot, if any.
+     * @param plot
+     * @return list of PlotElements.
+     */
     public List<PlotElement> getPlotElementsFor(Plot plot) {
         return DomUtil.getPlotElementsFor( application, plot );
     }
 
     /**
      * return the DataSourceFilter for the plotElement, or null if none exists.
-     * See also getFirstPlotFor
-     * @param plotElement
-     * @return
+     * @param element
+     * @return the DataSourceFilter to which the plot element refers, or null.
+     * @see #getFirstPlotFor(org.virbo.autoplot.dom.DataSourceFilter) 
      */
     public DataSourceFilter getDataSourceFilterFor(PlotElement element) {
         String id = element.getDataSourceFilterId();
@@ -2285,11 +2298,11 @@ public class ApplicationController extends DomNodeController implements RunLater
     /**
      * return the PlotElements using the DataSourceFilter.  This does not
      * return indirect (via vap+internal) references.
-     * @param plot
-     * @return
+     * @param dsf the data source filter.
+     * @return return the PlotElements for the data source filter, if any.
      */
-    public List<PlotElement> getPlotElementsFor(DataSourceFilter plot) {
-        String id = plot.getId();
+    public List<PlotElement> getPlotElementsFor(DataSourceFilter dsf) {
+        String id = dsf.getId();
         List<PlotElement> result = new ArrayList<PlotElement>();
         for (PlotElement p : application.getPlotElements()) {
             if (p.getDataSourceFilterId().equals(id)) {
@@ -2301,8 +2314,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     /**
      * find the first plot that is connected to this data, following vap+internal
-     * links.  This is used, for example, to get a timerange to control the 
-     * DSF.
+     * links.  This is used, for example, to get a timerange to control the DSF.
      * @param dsf
      * @return
      */
@@ -2419,14 +2431,16 @@ public class ApplicationController extends DomNodeController implements RunLater
     public static final String PROP_PLOT_ELEMENT = "plotElement";
 
     /**
-     * focus plot element
+     * return the focus plot element
+     * @return the focus plot element
      */
     public PlotElement getPlotElement() {
         return plotElement;
     }
 
     /**
-     * focus plot element
+     * set the focus plot element
+     * @param plotElement the new focus plot element.
      */
     public void setPlotElement(PlotElement plotElement) {
         PlotElement oldPlotElement = this.plotElement;
@@ -2477,14 +2491,17 @@ public class ApplicationController extends DomNodeController implements RunLater
     public static final String PROP_CANVAS = "canvas";
 
     /**
-     * focus canvas.
+     * focus canvas.  Note there is only one canvas allowed (for now).
+     * @return the focus canvas.
      */
     public Canvas getCanvas() {
         return canvas;
     }
 
     /**
-     * focus canvas.
+     * set focus canvas, which must be the one of the canvas the application
+     * knows about.
+     * @param canvas the new focus canvas.
      */
     public void setCanvas(Canvas canvas) {
         Canvas oldCanvas = getCanvas();
@@ -2504,14 +2521,16 @@ public class ApplicationController extends DomNodeController implements RunLater
     public static final String PROP_DATASOURCEFILTER = "dataSourceFilter";
 
     /**
-     * focus dataSourceFilter.
+     * return focus dataSourceFilter.
+     * @return the focus dataSourceFilter.
      */
     public DataSourceFilter getDataSourceFilter() {
         return dataSourceFilter;
     }
 
     /**
-     * focus dataSourceFilter.
+     * set the focus dataSourceFilter.
+     * @param dataSourceFilter the focus dataSourceFilter.
      */
     public void setDataSourceFilter(DataSourceFilter dataSourceFilter) {
         DataSourceFilter oldDataSourceFilter = this.dataSourceFilter;
@@ -2526,6 +2545,11 @@ public class ApplicationController extends DomNodeController implements RunLater
         ac.bind(application.options, "canvasFont", canvas, "baseFont", DomUtil.STRING_TO_FONT );
     }
 
+    /**
+     * synchronize to the state "that" excluding any properties listed.
+     * @param that the state
+     * @param exclude list of properties to skip (e.g. options)
+     */
     protected void syncTo( Application that, List<String> exclude ) {
         DomLock lock = changesSupport.mutatorLock();
         lock.lock( "Sync to Application" );
@@ -2586,11 +2610,16 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     /**
      * true if running in headless environment
+     * @return true if running in headless environment
      */
     public boolean isHeadless() {
         return headless;
     }
 
+    /**
+     * return the das canvas.
+     * @return the das canvas.
+     */
     public DasCanvas getDasCanvas() {
         return ((CanvasController)getCanvas().controller).getDasCanvas();
     }
@@ -2611,6 +2640,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         return getCanvas().getMarginColumn().getController().getDasColumn();
     }
 
+    /**
+     * return the source of monitors.
+     * @return the source of monitors.
+     */
     public MonitorFactory getMonitorFactory() {
         return new MonitorFactory() {
             @Override
@@ -2635,10 +2668,10 @@ public class ApplicationController extends DomNodeController implements RunLater
      */
     boolean isConnected( Plot plot ) {
         Connector[] connectors= this.application.getConnectors();
-        for ( int i=0; i<connectors.length; i++ ) {
-            if ( connectors[i].getPlotB().equals(plot.getId()) ) {
+        for (Connector connector : connectors) {
+            if (connector.getPlotB().equals(plot.getId())) {
                 return true;
-            } else if ( connectors[i].getPlotA().equals(plot.getId()) ) {
+            } else if (connector.getPlotA().equals(plot.getId())) {
                 return true;
             }
         }
