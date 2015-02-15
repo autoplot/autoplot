@@ -1554,7 +1554,8 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
-     * resets the dom to the initial state by deleting added plotElements, plots and data sources.
+     * resets the dom to the initial state by deleting added 
+     * plotElements, plots and data sources.
      */
     public void reset() {
         logger.fine("Resetting application...");
@@ -1721,7 +1722,11 @@ public class ApplicationController extends DomNodeController implements RunLater
                                         p.removeRenderer(rr[j]);
                                     }
                                 }
+                                p.getXAxis().setTickV(null);
+                                p.getYAxis().setTickV(null);
                             }
+                        } else if ( dccs[i] instanceof DasColorBar ) {
+                            ((DasColorBar)dccs[i]).setTickV(null);
                         }
                     }
                 }
