@@ -244,7 +244,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
                     ph.setCaption(dr.toString());
                     displayImages.add(ph);
                 } else {
-                    logger.warning("I don't think we should get here.");
+                    logger.fine("I don't think we should get here (but we do, harmless).");
                 }
             }
         } else {
