@@ -9,6 +9,7 @@ package org.autoplot.test;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JList;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
@@ -19,6 +20,8 @@ import org.netbeans.jemmy.operators.JSpinnerOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.netbeans.jemmy.operators.JTreeOperator;
+import javax.swing.tree.TreePath;
+import org.netbeans.jemmy.operators.JListOperator;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
 import static org.virbo.autoplot.ScriptContext.save;
@@ -54,7 +57,8 @@ public class Test_3pt12_FilterChainGUI implements Scenario {
             Thread.sleep(500);
             new JLabelOperator(mainFrame).waitText( AutoplotUI.READY_MESSAGE );
             
-            new JTabbedPaneOperator( app.getTabs() ).selectPage("data");
+            JTabbedPaneOperator tabsPane = new JTabbedPaneOperator( app.getTabs() );
+            tabsPane.selectPage("data");
 
             JButtonOperator search = new JButtonOperator(mainFrame,7);
             search.pushNoBlock();
@@ -63,12 +67,16 @@ public class Test_3pt12_FilterChainGUI implements Scenario {
             DialogOperator editFilterFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );           
             new JButtonOperator(editFilterFrame).push();           
             DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser( "Add Filter") );           
-            JTreeOperator filterTree = new JTreeOperator(addFilterFrame);
-            filterTree.clickOnPath(filterTree.getPathForRow(2), 2);  //open Data Set Operations branch
-            filterTree.selectRow(11); //select Slice0
+            new JTabbedPaneOperator( addFilterFrame ).selectPage("Alpha");
+            JListOperator filterList = new JListOperator(addFilterFrame);
+            filterList.selectItem(filterList.findItemIndex("Slice0", true, false));
             new JButtonOperator(addFilterFrame,"OK").clickMouse();           
             new JSpinnerOperator(editFilterFrame).getIncreaseOperator().clickMouse(10);
             new JButtonOperator(editFilterFrame, "OK").clickMouse();
+            
+            tabsPane.selectPage("canvas");
+            Thread.sleep(1000);
+            tabsPane.selectPage("data");
             
             search.pushNoBlock();
             
@@ -76,13 +84,15 @@ public class Test_3pt12_FilterChainGUI implements Scenario {
             editFilterFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );           
             new JButtonOperator(editFilterFrame).push();
             addFilterFrame = new DialogOperator( new RegexComponentChooser( "Add Filter") );
-            filterTree = new JTreeOperator(addFilterFrame);
-            filterTree.selectRow(7); //select Add
+            new JTabbedPaneOperator( addFilterFrame ).selectPage("Alpha");
+            filterList = new JListOperator(addFilterFrame);
+            filterList.selectItem(filterList.findItemIndex("Add", true, false)); //select Add
             new JButtonOperator(addFilterFrame,"OK").clickMouse();
-            new JTextFieldOperator(editFilterFrame, "1.").setText("5");
+            new JTextFieldOperator(editFilterFrame, "1.").setText("10");
+            Thread.sleep(500);
             new JButtonOperator(editFilterFrame, "OK").clickMouse();
             
-            new JTabbedPaneOperator( app.getTabs() ).selectPage("canvas");
+            tabsPane.selectPage("canvas");
             Thread.sleep(5000);
             System.err.println("Done!");
             
