@@ -243,6 +243,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
                     WalkImage ph = new WalkImage(null,haveThumbs400);
                     ph.setCaption(dr.toString());
                     displayImages.add(ph);
+                } else {
+                    logger.warning("I don't think we should get here.");
                 }
             }
         } else {
