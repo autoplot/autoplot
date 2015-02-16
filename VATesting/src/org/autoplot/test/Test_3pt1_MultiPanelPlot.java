@@ -112,6 +112,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             
             //Open Plot Elements Tree
             domTable.selectCell(domTable.findCellRow("plotElements[]"), 0);
+
             
             //Plot Element 1
             domTable.selectCell(domTable.findCellRow("plotElements[0]"), 0);
@@ -122,69 +123,22 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             domTable.selectCell(domTable.findCellRow("plotElements[0]"),0);
             Thread.sleep(400);
             
+            for( int i = 1; i<6 ; i = i + 1)
+            {
+                domTable.selectCell(domTable.findCellRow("plotElements[" + i + "]"), 0);
+                domTable.selectCell(domTable.findCellRow("component", true, true),1);
+                domTable.selectCell(domTable.findCellRow("component", true, true),1);
+                component = new JTextFieldOperator(domTable);
+                component.setText("slice0(" + i + ")");
+                Thread.sleep(400);
+                domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
+                new JTextFieldOperator(domTable).setText("data_1");
+                domTable.selectCell(domTable.findCellRow("plotElements[" + i + "]"), 0);
+                Thread.sleep(400);
+            } 
             
-            //Plot Element 2
-            domTable.selectCell(domTable.findCellRow("plotElements[1]"), 0);
-            domTable.selectCell(domTable.findCellRow("component", true, true),1);
-            domTable.selectCell(domTable.findCellRow("component", true, true),1);
-            component = new JTextFieldOperator(domTable);
-            component.setText("slice0(1)");
-            Thread.sleep(400);
-            domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
-            new JTextFieldOperator(domTable).setText("data_1");
-            domTable.selectCell(domTable.findCellRow("plotElements[1]"), 0);
-            Thread.sleep(400);
             
-            //Plot Element 3
-            domTable.selectCell(domTable.findCellRow("plotElements[2]"), 0);
-            domTable.selectCell(domTable.findCellRow("component", true, true),1);
-            domTable.selectCell(domTable.findCellRow("component", true, true),1);
-            component = new JTextFieldOperator(domTable);
-            component.setText("slice0(2)");
-            Thread.sleep(400);
-            domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
-            dataSourceFilt = new JTextFieldOperator(domTable);
-            dataSourceFilt.setText("data_1");
-            domTable.selectCell(domTable.findCellRow("plotElements[2]"), 0);
-            Thread.sleep(400);
-            
-            //Plot Element 4
-            domTable.selectCell(domTable.findCellRow("plotElements[3]"), 0);
-            domTable.selectCell(domTable.findCellRow("component", true, true),1);
-            domTable.selectCell(domTable.findCellRow("component", true, true),1);
-            component = new JTextFieldOperator(domTable);
-            component.setText("slice0(3)");
-            Thread.sleep(400);
-            domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
-            dataSourceFilt = new JTextFieldOperator(domTable);
-            dataSourceFilt.setText("data_1");
-            domTable.selectCell(domTable.findCellRow("plotElements[3]"), 0);
-            Thread.sleep(400);
-            
-            //Plot Element 5
-            domTable.selectCell(domTable.findCellRow("plotElements[4]"), 0);
-            domTable.selectCell(domTable.findCellRow("component", true, true),1);
-            domTable.selectCell(domTable.findCellRow("component", true, true),1);
-            component = new JTextFieldOperator(domTable);
-            component.setText("slice0(4)");
-            Thread.sleep(400);
-            domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
-            dataSourceFilt = new JTextFieldOperator(domTable);
-            dataSourceFilt.setText("data_1");
-            domTable.selectCell(domTable.findCellRow("plotElements[4]"), 0);
-            Thread.sleep(400);
-            
-            //Plot Element 6
-            domTable.selectCell(domTable.findCellRow("plotElements[5]"), 0);
-            domTable.selectCell(domTable.findCellRow("component", true, true),1);
-            domTable.selectCell(domTable.findCellRow("component", true, true),1);
-            component = new JTextFieldOperator(domTable);
-            component.setText("slice0(5)");
-            Thread.sleep(400);
-            domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
-            dataSourceFilt = new JTextFieldOperator(domTable);
-            dataSourceFilt.setText("data_1");
-            domTable.selectCell(domTable.findCellRow("plotElements[5]"), 0);
+          
             Thread.sleep(400);
             
             new JButtonOperator(domProps, "Apply").clickMouse();
