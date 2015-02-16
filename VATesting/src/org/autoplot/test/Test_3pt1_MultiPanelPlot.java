@@ -93,7 +93,8 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             
             //for pc
             mainFrame.clickMouse(clickPoint.x+50, clickPoint.y-130, 2);
-            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-130); 
+            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-130);
+            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-130);
             
             JPopupMenuOperator popup1 = new JPopupMenuOperator();
             popup1.pushMenuNoBlock("Plot|Delete", "|");
