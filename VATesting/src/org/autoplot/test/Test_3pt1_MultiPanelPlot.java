@@ -87,14 +87,19 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             
             ScriptContext.plot(1,"vap+fits:http://autoplot.org/data/hsi_qlimg_5050601_001.fits"); // small cheat
             
-            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //right click on plot0 causes it to become unselected
-            mainFrame.clickMouse(clickPoint.x+150, clickPoint.y-110); //click away to get out of the popup
-            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-110); //right click to select plot0 and also call the popup (not easiest way to do this)
+            //for mac 
+            //mainFrame.clickMouse(clickPoint.x+50, clickPoint.y-130); 
+            //mainFrame.clickMouse(clickPoint.x+150, clickPoint.y-110); 
+            
+            //for pc
+            mainFrame.clickMouse(clickPoint.x+50, clickPoint.y-130, 2);
+            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-130); 
+            
             JPopupMenuOperator popup1 = new JPopupMenuOperator();
             popup1.pushMenuNoBlock("Plot|Delete", "|");
             
-            Thread.sleep(500);
-            
+            Thread.sleep(1000);
+            // wait for the application to be in the "ready" state
             ScriptContext.waitUntilIdle();
             
             //Open DOM Properties
@@ -109,8 +114,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             
             //Plot Element 1
             domTable.selectCell(domTable.findCellRow("plotElements[0]"), 0);
-            domTable.selectCell(domTable.findCellRow("slice"),1);
-            domTable.selectCell(domTable.findCellRow("slice"),1);
+            domTable.selectCell(domTable.findCellRow("component", true, true),1);
             JTextFieldOperator component = new JTextFieldOperator(domTable);
             component.setText("slice0(0)");
             Thread.sleep(400);
@@ -126,8 +130,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             component.setText("slice0(1)");
             Thread.sleep(400);
             domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
-            dataSourceFilt = new JTextFieldOperator(domTable, "data_2");
-            dataSourceFilt.setText("data_1");
+            new JTextFieldOperator(domTable).setText("data_1");
             domTable.selectCell(domTable.findCellRow("plotElements[1]"), 0);
             Thread.sleep(400);
             
@@ -139,7 +142,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             component.setText("slice0(2)");
             Thread.sleep(400);
             domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
-            dataSourceFilt = new JTextFieldOperator(domTable, "data_3");
+            dataSourceFilt = new JTextFieldOperator(domTable);
             dataSourceFilt.setText("data_1");
             domTable.selectCell(domTable.findCellRow("plotElements[2]"), 0);
             Thread.sleep(400);
@@ -152,7 +155,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             component.setText("slice0(3)");
             Thread.sleep(400);
             domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
-            dataSourceFilt = new JTextFieldOperator(domTable, "data_4");
+            dataSourceFilt = new JTextFieldOperator(domTable);
             dataSourceFilt.setText("data_1");
             domTable.selectCell(domTable.findCellRow("plotElements[3]"), 0);
             Thread.sleep(400);
@@ -165,7 +168,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             component.setText("slice0(4)");
             Thread.sleep(400);
             domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
-            dataSourceFilt = new JTextFieldOperator(domTable, "data_5");
+            dataSourceFilt = new JTextFieldOperator(domTable);
             dataSourceFilt.setText("data_1");
             domTable.selectCell(domTable.findCellRow("plotElements[4]"), 0);
             Thread.sleep(400);
@@ -178,7 +181,7 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             component.setText("slice0(5)");
             Thread.sleep(400);
             domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
-            dataSourceFilt = new JTextFieldOperator(domTable, "data_6");
+            dataSourceFilt = new JTextFieldOperator(domTable);
             dataSourceFilt.setText("data_1");
             domTable.selectCell(domTable.findCellRow("plotElements[5]"), 0);
             Thread.sleep(400);
