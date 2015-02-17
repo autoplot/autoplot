@@ -470,20 +470,27 @@ public class CdfUtil {
         
         String stype = getTargetType( cdf.getType(svariable) );
         ByteBuffer buff2;
-        if ( recInterval>1 ) {
-            buff2= ByteBuffer.allocate((int)(recLenBytes*rc));
+
+        long t0= System.currentTimeMillis();
+        logger.entering("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
+        buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, true );
+        logger.exiting("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
+        logger.log(Level.FINE, "read variable {0} in (ms): {1}", new Object[]{svariable, System.currentTimeMillis()-t0});
+        
+        if ( recInterval>1 ) { //TODO: this needs to be done as we read in the data.
+            ByteBuffer newBuf= ByteBuffer.allocateDirect((int)rc*recLenBytes);
             for ( int i=0; i<rc; i++ ) {
                 int recNum= (int)recStart+(int)recInterval*i;
-                ByteBuffer buff1= cdf.getBuffer( svariable, stype, new int[] { recNum,recNum }, true );
-                buff2.put(buff1);
-                if ( i==0 ) buff2.order(buff1.order());
+                buff2.limit( recNum * recLenBytes + recLenBytes );
+                buff2.position( recNum * recLenBytes );
+                ByteBuffer buff1= buff2.slice();
+                newBuf.put(buff1);
+                if ( i==0 ) newBuf.order(buff2.order());
             }
+            buff2= newBuf;
             buff2.flip();
-        } else {
-            logger.entering("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
-            buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, true );
-            logger.exiting("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
         }
+        
         buf= new ByteBuffer[] { buff2 };
 
         MutablePropertyDataSet result;
