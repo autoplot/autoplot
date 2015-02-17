@@ -15,14 +15,24 @@
         </p>
 
         <p>This is the Autoplot2015a branch.  This is an update to the production version containing bugfixes and minor new features.
-            Java 6 is now required.
+            Java 6 is now required.  Java 7 will be required in May!
         </p>
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-02-06 rev 16233):</p>
+        <p>Bugfixes (2015-02-16 r16276):</p>
         <ul>    
-            <li>1334: first image of pngwalk would be loaded at the full resolution</li>
+            <li>1341: CDF subsample was terribly slow, because subsampling/5M record file.  Now just read in all the data, then subsample.  Thanks Kristoff!</li>
+            <li>pngwalk generation would fail when years were 2008-2014, because it was counting off in 365-day, not yearly increments.</li>
+            <li>add Ops.datum after seeing that dataset('2011-06-08T01:54') would parse but datum('2011-06-08T01:54') would not.</li>
+            <li>1339:  LANL rank 4 cdf file shows that DataSetWrapper rank 4 was never implemented.  Thanks Brian!</li>
+            <li>createPngWalk code used to assume vap argument was local reference, which needn't be the case.  This may cause problems on Windows.</li>
+            <li>set the initial timerange to avoid extraneous load.  Thanks Reiner!</li>
+            <li>initially set it to slices0(:) GUI correctly.</li>
+            <li>1334: first image of pngwalk would be loaded at the full resolution.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>look up wwwauthenticate in HTTP header information to make the dialog more like webstart auth dialog.</li>
             <li>1332: autoplot.jnlp would drop the URI when multiple jnlp blocks were found in the jnlp file, even if the first was commented</li>
             <li>bugfix: log message assumed that data was rank 0 in the TCA code, causing failure.</li>
@@ -51,81 +61,17 @@
             <li>Thin client support finally catches errors instead of leaving the progress wheel spinning.</li>
             <li>corrections to FiltersEditorPanel, such as allowing for float arguments and medianFilter.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>remove the dtd from internal filters.xml, which was preventing use on Seth's computer.</li>
-            <li>1312: tearing off tabs before initialization results in tiny tab</li>
-            <li>1311: new user data tab enabled after the initial data load resulted in RTE</li>
-            <li>Copy data to local variables after seeing nullPointerException in test002</li>
-            <li>update to new CDFJ library which fixes synchronization problems</li>
-            <li>energy channels were reported as ranges in MAGEIS plots, because of BIN_PLUS and BIN_MINUS.</li>
-            <li>the new addFilter dialog to match Tools->Filters menu</li>
-            <li>rfe407: deleting a filter would also loose track of the input dataset.</li>
-            <li>slices GUI was not tested thoroughly</li>
-            <li>1308:  Demo 12 never completes when Data tab is torn off.</li>
-            <li>remove confusing prompt to save and show new script or cancel, when a new script is referenced</li>
-            <li>In PNGWalk, set window ancestor properly for "Unable to find any images" message.</li>
-            <li>plotx(2,'vap+inline:ripples(20)') would always plot in the 0th position.</li>
-            <li>support fill in non-ISTP HDF files, using _FillVal metadata.</li>
-            <li>1306: automatically set the width of any time columns in export to Excel.</li>
-            <li>remove stderr noise from WriteIDLSav.</li>
-            <li>1305: das2server URIs would loose their parameters, because TSB.getURI was called before getDataSet</li>
-            <li>1304: Partial vap support introduced bug where linestyle setting would be reset for time series browsing.</li>
-            <li>synchronize cdf reads because of occasional RTE shown in test500.</li>
-            <li>das2server reader _res switch is not sent to the server.</li>
-            <li>rte_2124254968: Das2Server editor panel allowed folders to be selected, causing RTE.  Thanks Dan!</li>
-            <li>dashed property was reset when browsing to the next day.</li>
-            <li>Add pow and sqrt to list of filters.  Thanks Allison!</li>
-            <li>Fix CDAWeb demo in thin client</li>
-            <li>In PNGWalk, NullPointerException when image with time axis was digitized, but the granule didn't have a corresponding timerange, (e.g. *.png)</li>
-            <li>1303: jyds scripts with SimpleServlet.  Allow relative reference to scripts/data/, introduce whitelist.txt.</li>
-            <li>correct progress feedback in demo 1</li>
-            <li>1302: indicate busy when Autoplot is launched with URI.  There was a ~5 second period where no feedback was provided.</li>
-            <li>1301: redo mechanism that resolves the same file downloaded from two Autoplot instances, by allowing simultaneous loads and resolving the results.  Thanks, Bill!</li>
-            <li>1300: strange export data behavior on Mac, where somehow discovery mechanism was getting the wrong type</li>
-            <li>1299: where trimProperties would drop the original properties</li>
-            <li>fix the labels for Seth's data with Rank 2 DEPEND_1, where stack of lineplots were not given unique labels</li>
-            <li>1251: reuse of monitors</li>
-            <li>bugfix: pickFont can return null.</li>
-            <li>revert the message about varying slice locations.</li>
-            <li>fix hang when thumbnailer code would get stuck in infinite loop (with small canvas).</li>
-            <li>fix failure to update when canvas size is set explicitly.</li>
-            <li>bugfix: rank 1, one-element DELTA_PLUS in vap+cdaweb:ds=C3_PP_CIS&amp;id=T_p_par__C3_PP_CIS</li>
-            <li>bug with rank 1 data and data gap for ephemeris ticks resolved.  Thanks Joe!</li>
-            <li>1098: improve feedback as to where the two timeranges options are coming from in the query.</li>
-            <li>1295: get rid of Thread.sleep use by using new java.util.Timer aptimer. </li>
-            <li>contoursRenderer accepts pre-contoured data, like the output of the contours filter</li>
-            <li>CDFJ getPlottable was returning the LABL_PTR_1 variables, when it shouldn't be</li>
-            <li>214: correct for bold and italic when printing</li>
-            <li>bugfix: filters recentComboBox didn't show the new value.  I think it has always like this, but I just noticed this with the new editor.</li>
-            <li>restore inspect (browse) behavior for .jy files.</li>
-            <li>1291: filters loose ranging too easily</li>
-            <li>bugfix where &amp;script=foo.jyds would be lost when entering the Jython datasource editor</li>
-            <li>cleanup of hudson tests test017 and test021.</li>
-            <li>rfe405: a number of the hudson tests showed problems in corner cases.</li>
-            <li>bugfix in fits where height and width were exchanged.</li>
-            <li>rfe405: Kristoff pointed out where new code ensuring monotonic from aggregations would clip almost all the data.</li>
-            <li>improve handling and transparency when PDSPPI is down</li>
-            <li>1290: jython script editor left in read-only mode </li>
-            <li>Correction to the CDAWeb plugin URL used, thanks Tami!</li>
-            <li>aggregation works with ordinal data again.</li>
-            <li>reform just returns the dataset when there are no indeces with just one element, thanks Bill!</li>
-            <li>minor corrections to d2s parsing when each plane has a name</li>
-            <li>the result of aggregations will now always be monotonically increasing.</li>
-            <li>rte_0253344792: catch code fragment unintentionally evaluated with highlite in Jython editor.  Thanks Kristoff!</li>
-            <li>CDF where supports rank 1 where with rank 2 data.</li>
-            <li>script name appears in stack traces now, to aid in debugging</li>
-            <li>Improve support for ordinal data in CDF where keyword.</li>
-            <li>get completions only returns completions where plottable=true, so scripts can once again verify contents of CDF files.</li>
-            <li>legend plot symbol for dotdash linestyle was barely visible.  Thanks Kristoff!</li>
-            <li>das2server with stream defect could leave client in endless loop</li>
-            <li>1284: round of cleanup with PNGWalkTool</li>
-            <li>1288: setDepend0Cadence supports join-of-qubes datasets</li>
-            <li>bugfix: restore ctrl+mouse wheel pan behavior.</li>
-            <li>bugfix in aggregation completion, where the path is not part of the completion.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>ticks can be set manually from scripts.</li>
+            <li>console GUI can export records as XML or flat ascii file now</li>
+            <li>Autoplot servlet supports backgroundColor=none for transparent backgrounds</li>
+            <li>pngwalk create speed is reported in images per minute instead of .1/sec</li>
+            <li>add fftPower that matches the filter call.</li>
+            <li>javadoc improvements to DasCore</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>           
             <li>updates to the jnlp/webstart, supporting better offline use and named icons.</li>
             <li>add Jython formUri to provide a nicer way to construct URIs.</li>
             <li>411: add hook to check for logging.properties to make it easier to debug webstart. </li>
@@ -134,45 +80,6 @@
             <li>BufferDataSet, which uses native-memory-backed-buffers, moved from BinaryDataSource to QDataSet</li>
             <li>allow aggregation reduce to be used when resolution is null, because trim will still have an effect.</li>
             <li>SimpleServlet will figure out if URI is a vap file, to support the thin client and to match the Autoplot interface.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>           
-            <li>reference cache is enabled for new users.</li>
-            <li>1313: switch to new version of OpenDAP library.  Support grids.</li>
-            <li>1310: add jython sleep command which is often imported</li>            
-            <li>support Time and TimeRange qualifiers in Das2Streams</li>
-            <li>completions servlet will support the thin client.</li>
-            <li>das2server data source code supports 401 and conventional authentication</li>
-            <li>add intrinsic=true to das2server data source.</li>            
-            <li>add leap second for July 1, 2015</li>
-            <li>update RBSP orbits to 2015-01-13</li>
-            <li>Start more Jemmy GUI testing.  Thanks Kenzie!</li>
-            <li>logging cleanup</li>
-            <li>Code cleanup in Java CDF library</li>
-            <li>Filters editor panel provides small GUIs to control each filter.</li>
-            <li>Add smoothfit function to filters.</li>
-            <li>don't include iconified window area in CreateScreenShot code</li>
-            <li>Introduce Jython writeToSvg to support future servers.</li>
-            <li>Update to the new version of CDFJ library</li>
-            <li>put in label to show the canvas size in inches or centimeters.</li>
-            <li>minor improvements to getParam insert in Jython editor.</li>
-            <li>add branch for total(dsr2,1) where dsr2 is a rank 2 dataset, to get BMag from components of huge magnetometer dataset.</li>
-            <li>experimental reluctantLegendIcons=true (autoplot_data/config/system.properties) hides icon when there is only one renderer</li>
-            <li>URIs update with TSB, removing mistakes the old URI would cause.</li>
-            <li>Export now supports aggregation</li>
-            <li>New Pure-Java CDF library is in production, improving speed and memory use.  Old library is removed.</li>
-            <li>setDepend1Cadence added</li>
-            <li>ImageDataSource keyword plotInfo=1 leverages JSON metadata to extract plots from images with lost data or vap files.</li>
-            <li>Two PngWalkTools can be bound together to make comparisons of like filenames.</li>
-            <li>PngWalkTool1 is finally renamed PngWalkTool</li>
-            <li>SimpleServlet supports non-file resources like vap+inline, vap+jyds is disabled.</li>
-            <li>PNGWalkTool supports digitizing, add jump to selected and white/black lines</li>
-            <li>script parameter can now be relative path (e.g. --script=myscript.jy)</li>
-            <li>addPlots(2,'below') in jython scripts</li>
-            <li>any URI ending in .png .jpg or .gif that contains an asterisk is handled by the pngwalk tool</li>
-            <li>add shift+mousewheel nudge behavior</li>
-            <li>das2servers can return non-200 error codes.</li>
-            <li>PNGWalkTool digitizer looks up plot coordinates when axis metadata is found.</li>
         </ul>
 
         <p>Known issues:</p>
