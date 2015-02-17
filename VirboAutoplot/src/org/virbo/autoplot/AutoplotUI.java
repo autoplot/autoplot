@@ -3862,8 +3862,12 @@ private void updateFrameTitle() {
             @Override
             public void run() {
                 try {
+                    List<String> lscriptArgs= new ArrayList(scriptArgs);
+                    String pwd= new File(".").getAbsolutePath();
+                    if ( pwd.endsWith(".") ) pwd= pwd.substring(0,pwd.length()-1);
+                    lscriptArgs.add("PWD="+pwd);
                     ScriptContext.setApplicationModel(model); // initialize
-                    JythonUtil.runScript( model, script, scriptArgs.toArray(new String[scriptArgs.size()]) );
+                    JythonUtil.runScript( model, script, lscriptArgs.toArray(new String[lscriptArgs.size()]) );
                     if ( app!=null ) app.setStatus( READY_MESSAGE );
                     if ( quit ) { 
                         AppManager.getInstance().quit();
