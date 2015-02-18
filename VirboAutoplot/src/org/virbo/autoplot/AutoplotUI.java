@@ -1678,6 +1678,8 @@ APSplash.checkTime("init 52.9");
         //Logger.getLogger("qdataset").setLevel(Level.INFO);
         Logger.getLogger("qdataset").addHandler(h);
         //Logger.getLogger("autoplot").setLevel(Level.INFO);
+        Logger.getLogger("qstream").addHandler(h);
+        
         Logger.getLogger("autoplot").addHandler(h);
         //Logger.getLogger("apdss").setLevel(Level.INFO);
         Logger.getLogger("apdss").addHandler(h);
@@ -3927,7 +3929,7 @@ private void updateFrameTitle() {
                     } catch ( IOException ex ) {
                         logger.log(Level.WARNING, "IOException during close of {0}", f2);
                     }
-                }
+                }                
             }
         }
         
