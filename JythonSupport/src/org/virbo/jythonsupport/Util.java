@@ -67,6 +67,7 @@ public class Util {
      * @param stimeRange a string representing the timerange to load, such as 2012-02-02/2012-02-03
      * @param mon progress monitor object.
      * @return QDataSet from the load.
+     * @throws java.lang.Exception plug-in readers can throw exception.
      */
     public static QDataSet getDataSet( String suri, String stimeRange, ProgressMonitor mon ) throws Exception {
         DatumRange timeRange= DatumRangeUtil.parseTimeRange(stimeRange);
@@ -77,7 +78,7 @@ public class Util {
      * return a dataset that we know is writable.  If the dataset is Writable and isImmutable is false, then 
      * the dataset is returned.
      * @param rds any dataset.
-     * @return a writeable dataset that is either the original one 
+     * @return a writable dataset that is either the original one 
      */
     private static WritableDataSet ensureWritable( QDataSet rds ) {
         if ( rds instanceof WritableDataSet && (((WritableDataSet)rds).isImmutable()==false) ) {
@@ -98,6 +99,8 @@ public class Util {
      * @param suri the URI of the dataset, such as "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
      * @param timeRange the timerange to load, if the data supports time series browsing.
      * @param monitor progress monitor object.
+     * @return dataset or null.
+     * @throws java.lang.Exception plug-in readers can throw exception.
      */
     public static QDataSet getDataSet( String suri, DatumRange timeRange, ProgressMonitor monitor ) throws Exception {
         long t0= System.currentTimeMillis();
@@ -150,7 +153,8 @@ public class Util {
      * monitor the load.
      * @param suri the data address to load.
      * @param mon null or a progress monitor to monitor the load
-     * @return the dataset.
+     * @return the dataset, or null.
+     * @throws java.lang.Exception plug-in readers can throw exception.
      */
     public static QDataSet getDataSet(String suri, ProgressMonitor mon) throws Exception {
         long t0= System.currentTimeMillis();
@@ -195,7 +199,7 @@ public class Util {
 
     /**
      * experiment with multiple, simultaneous reads in Jython codes.  This will read all the data
-     * at once, returning all data or throwing one an exception.
+     * at once, returning all data or throwing one of the exceptions.
      *
      * @param uris a list of URI strings.
      * @param mon monitor for the aggregate load.  Each uri is given equal shares of the task.
@@ -209,6 +213,7 @@ public class Util {
             final int fi= i;
             result.add(fi,null);
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     QDataSet ds;
                     try {
@@ -246,8 +251,8 @@ public class Util {
             
     /**
      * returns the dataSource for the given URI.  This will include capabilities, like TimeSeriesBrowse.
-     * @param suri
-     * @return
+     * @param suri the data address to load.
+     * @return the DataSource to load the URI.
      * @throws Exception
      */
     public static DataSource getDataSource( String suri ) throws Exception {
@@ -261,7 +266,7 @@ public class Util {
     /**
      * get the TimeSeriesBrowse capability, if available.  Null (None) is returned if it is not found.
      * @param ds the data source.
-     * @return
+     * @return the TimeSeriesBrowse if available, or null (None)
      */
     public static TimeSeriesBrowse getTimeSeriesBrowse( DataSource ds ) {
         TimeSeriesBrowse tsb= ds.getCapability( TimeSeriesBrowse.class );
@@ -277,8 +282,12 @@ public class Util {
      * load the metadata for the url.  This can be called independently from getDataSet,
      * and data sources should not assume that getDataSet is called before getMetaData.
      * Some may, in which case a bug report should be submitted.
-     * @param suri
-     * @param mon
+     * 
+     * The metadata is a tree of name/value pairs, for human consumption, and
+     * used when a particular metadata model is expects.
+     * 
+     * @param suri the data address to load.
+     * @param mon monitor 
      * @return metadata tree created by the data source.
      * @throws java.lang.Exception
      */
@@ -304,7 +313,7 @@ public class Util {
     /**
      * load the data specified by URL into Autoplot's internal data model.  This will
      * block until the load is complete.
-     * @param suri
+     * @param suri the data address to load.
      * @return data set for the URL.
      * @throws Exception depending on data source.
      */
@@ -348,7 +357,7 @@ public class Util {
      * @param spec the extension and any parsing parameters, such as "vap+bin:?recLength=2000&rank2=1:"
      * @param in the input stream
      * @param mon a progress monitor.
-     * @return QDataSet
+     * @return QDataSet the dataset or null.
      * @throws java.lang.Exception
      */
     public static QDataSet getDataSet( String spec, InputStream in, ProgressMonitor mon ) throws Exception {
@@ -377,41 +386,22 @@ public class Util {
             chin.close();
         }
     }
-    
-//
-//    /**
-//     *
-//     * @param surl
-//     * @return
-//     * @throws IOException
-//     * @throws URISyntaxException
-//     * @deprecated use listDirectory instead
-//     */
-//    public static String[] list( String surl ) throws IOException, URISyntaxException {
-//        logger.info("======================================================");
-//        logger.info("list( String ) command that lists files is deprecated--use listDirectory( String ) instead.");
-//        logger.info("native python list command will be available soon.  Contact faden @ cottagesystems.com if you need assistance.");
-//        logger.info("  sleeping for 3 seconds.");
-//        logger.info("======================================================");
-//        try {
-//            Thread.sleep(3000);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        return listDirectory( surl );
-//    }
+
 
     /**
-     * returns a list of the files in the local or remote filesystem pointed to by surl.
+     * returns an array of the files in the local or remote filesystem pointed to by surl.
+     *
+     * <p><blockquote><pre>
      * print listDirectory( 'http://autoplot.org/data/pngwalk/' )
      *  --> 'product.vap', 'product_20080101.png', 'product_20080102.png', ...
      * print listDirectory( 'http://autoplot.org/data/pngwalk/*.png' )
      *  --> 'product_20080101.png', 'product_20080102.png', ...
-     *
-     * @param surl
-     * @return 
+     * </pre></blockquote><p>
+     * @param surl local or web directory.
+     * @return an array of the files pointed to by surl.
      * @throws java.net.MalformedURLException
-     * @throws java.io.IOException
+     * @throws java.net.URISyntaxException when surl is not well formed.
+     * @throws java.io.IOException when listing cannot be done
      */
     public static String[] listDirectory(String surl) throws IOException, URISyntaxException {
         logger.log(Level.FINE, "listDirectory(\"{0}\")", surl);
