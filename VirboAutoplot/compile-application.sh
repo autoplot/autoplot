@@ -301,6 +301,8 @@ fi
 if [ "$justCompile" = "1" ]; then
   echo "justCompile set to 1, stopping"
   exit 0
+else
+  echo "justCompile not set to 1, continue on"
 fi
 
 
