@@ -298,6 +298,12 @@ if [ $hasErrors -eq 1 ]; then
   exit 1 
 fi
 
+if [ "$justCompile" = "1" ]; then
+  echo "justCompile set to 1, stopping"
+  exit 0
+fi
+
+
 #Don't do this, since we modify the jnlp file to make a release.
 #echo "=== make signed jnlp file..."  # http://www.coderanch.com/t/554729/JNLP-Web-Start/java/Signing-JNLP-JNLP-INF-directory
 #mkdir temp-volatile-classes/JNLP-INF
