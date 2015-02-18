@@ -6,6 +6,7 @@
 package org.autoplot.test;
 
 
+import java.awt.Component;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,7 +22,9 @@ import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.netbeans.jemmy.operators.JTreeOperator;
 import javax.swing.tree.TreePath;
+import org.netbeans.jemmy.operators.JComponentOperator;
 import org.netbeans.jemmy.operators.JListOperator;
+import org.netbeans.jemmy.operators.JScrollPaneOperator;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
 import static org.virbo.autoplot.ScriptContext.save;
@@ -59,41 +62,45 @@ public class Test_3pt12_FilterChainGUI implements Scenario {
             
             JTabbedPaneOperator tabsPane = new JTabbedPaneOperator( app.getTabs() );
             tabsPane.selectPage("data");
-
-            JButtonOperator search = new JButtonOperator(mainFrame,7);
-            search.pushNoBlock();
             
-            //add the "slice0()" filter
-            DialogOperator editFilterFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );           
-            new JButtonOperator(editFilterFrame).push();           
+
+            JScrollPaneOperator scrollPane = new JScrollPaneOperator(mainFrame, 1);
+            
+            JButtonOperator subAdd = new JButtonOperator(scrollPane);
+            subAdd.pushNoBlock();
+            Thread.sleep(1000);
+            
+            //add the "slice0()" filter      
             DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser( "Add Filter") );           
             new JTabbedPaneOperator( addFilterFrame ).selectPage("Alpha");
             JListOperator filterList = new JListOperator(addFilterFrame);
             filterList.selectItem(filterList.findItemIndex("Slice0", true, false));
             new JButtonOperator(addFilterFrame,"OK").clickMouse();           
-            new JSpinnerOperator(editFilterFrame).getIncreaseOperator().clickMouse(10);
-            new JButtonOperator(editFilterFrame, "OK").clickMouse();
+            new JSpinnerOperator(scrollPane).getIncreaseOperator().clickMouse(10);
+            //new JButtonOperator(scrollPane, "OK").clickMouse();
             
+            //Display canvas to show changes made my filter
             tabsPane.selectPage("canvas");
             Thread.sleep(1000);
             tabsPane.selectPage("data");
             
-            search.pushNoBlock();
+            new JButtonOperator(scrollPane).pushNoBlock();
             
             //add the "add" filter
-            editFilterFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );           
-            new JButtonOperator(editFilterFrame).push();
             addFilterFrame = new DialogOperator( new RegexComponentChooser( "Add Filter") );
             new JTabbedPaneOperator( addFilterFrame ).selectPage("Alpha");
             filterList = new JListOperator(addFilterFrame);
             filterList.selectItem(filterList.findItemIndex("Add", true, false)); //select Add
             new JButtonOperator(addFilterFrame,"OK").clickMouse();
-            new JTextFieldOperator(editFilterFrame, "1.").setText("10");
+            new JTextFieldOperator(scrollPane, "1.").setText("10");
             Thread.sleep(500);
-            new JButtonOperator(editFilterFrame, "OK").clickMouse();
             
+            //Display canvas to show changes made my filter
             tabsPane.selectPage("canvas");
             Thread.sleep(5000);
+            tabsPane.selectPage("data");
+            Thread.sleep(5000);
+            
             System.err.println("Done!");
             
             writeToPng("Test_3pt12_FilterChainGUI.png"); // Leave artifacts for testing.
