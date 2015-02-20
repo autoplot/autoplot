@@ -1555,22 +1555,10 @@ APSplash.checkTime("init 52.7");
         fileMenu.addSeparator();
 APSplash.checkTime("init 52.8");
         
-        AbstractAction printAction= new AbstractAction( "Print...") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                org.das2.util.LoggerManager.logGuiEvent(e);                                
-                applicationModel.getCanvas().makeCurrent();
-                DasCanvas.PRINT_ACTION.actionPerformed(e);
-            }
-        };
-        mi= new JMenuItem( printAction );
-        mi.setToolTipText("Print to printer");
-        fileMenu.add( mi );
-
         JMenu printToMenu = new JMenu("Print to");
         printToMenu.setToolTipText("Print to file");
         fileMenu.add(printToMenu);
-
+        
         Component focus= AutoplotUI.this;
         JMenuItem item = new JMenuItem( GuiSupport.getPrintAction(dom, focus, "pdf" ) );
         item.setText("PDF...");
@@ -1584,6 +1572,18 @@ APSplash.checkTime("init 52.8");
         item.setText("PNG...");
         printToMenu.add(item);
 
+        AbstractAction printAction= new AbstractAction( "Printer...") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                                
+                applicationModel.getCanvas().makeCurrent();
+                DasCanvas.PRINT_ACTION.actionPerformed(e);
+            }
+        };
+        mi= new JMenuItem( printAction );
+        mi.setToolTipText("Print to printer");
+        printToMenu.add( mi );
+        
         fileMenu.addSeparator();
 
         //mi= new JMenuItem( support.getDumpDataAction() );
