@@ -126,15 +126,16 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             for( int i = 1; i<6 ; i = i + 1)
             {
                 domTable.selectCell(domTable.findCellRow("plotElements[" + i + "]"), 0);
+                domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
+                new JTextFieldOperator(domTable).setText("data_1");
+                Thread.sleep(400);
                 domTable.selectCell(domTable.findCellRow("component", true, true),1);
                 domTable.selectCell(domTable.findCellRow("component", true, true),1);
                 component = new JTextFieldOperator(domTable);
                 component.setText("slice0(" + i + ")");
-                Thread.sleep(400);
-                domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
-                new JTextFieldOperator(domTable).setText("data_1");
                 domTable.selectCell(domTable.findCellRow("plotElements[" + i + "]"), 0);
                 Thread.sleep(400);
+
             } 
             
             
