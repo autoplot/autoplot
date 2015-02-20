@@ -6,11 +6,9 @@
 package org.autoplot.test;
 
 
-import java.awt.Component;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JList;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
@@ -20,9 +18,6 @@ import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JSpinnerOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import org.netbeans.jemmy.operators.JTreeOperator;
-import javax.swing.tree.TreePath;
-import org.netbeans.jemmy.operators.JComponentOperator;
 import org.netbeans.jemmy.operators.JListOperator;
 import org.netbeans.jemmy.operators.JScrollPaneOperator;
 import org.virbo.autoplot.AutoplotUI;
@@ -52,6 +47,7 @@ public class Test_3pt12_FilterChainGUI implements Scenario {
             
             Thread.sleep(500);
             
+            // plot test dataset
             new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("vap+inline:ripples(100,110)+randn(100)/50+outerProduct(ones(100),randn(110)/50)");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
@@ -105,17 +101,6 @@ public class Test_3pt12_FilterChainGUI implements Scenario {
             
             writeToPng("Test_3pt12_FilterChainGUI.png"); // Leave artifacts for testing.
             save("Test_3pt12_FilterChainGUI.vap");
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
             
             
             return(0);
