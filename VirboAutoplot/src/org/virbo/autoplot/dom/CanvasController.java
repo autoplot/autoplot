@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import jdk.nashorn.internal.runtime.arrays.ArrayLikeIterator;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
@@ -236,10 +237,12 @@ public class CanvasController extends DomNodeController {
 
     /**
      * reset this stack of rows, trying to preserve weights.
-     * @param rows
+     * @param rows the rows.
      */
     private static void removeGapsAndOverlaps( Application dom, List<Row> rows, Row newRow, boolean preserveOverlaps) {
 
+        if ( rows.isEmpty() ) return;
+        
         int[] weights = new int[rows.size()]; // in per milli.
 
         int totalWeight = 0;
@@ -333,10 +336,12 @@ public class CanvasController extends DomNodeController {
 
     /**
      * reset this stack of columns, trying to preserve weights.
-     * @param columns
+     * @param columns the columns
      */
     static void removeGapsAndOverlapsInColumns(List<Column> columns) {
 
+        if ( columns.isEmpty() ) return;
+        
         int[] weights = new int[columns.size()]; // in per milli.
 
         int totalWeight = 0;
@@ -372,8 +377,25 @@ public class CanvasController extends DomNodeController {
         }
     }
 
+    /**
+     * return the list of rows attached to the marginRow.
+     * @return the list of rows attached to the marginRow.
+     */    
+    private List<Row> getRowsWithMarginParent() {
+        List<Row> result= new ArrayList(canvas.getRows().length);
+        for ( Row r: canvas.getRows() ) {
+            if ( r.getParent().equals(canvas.getMarginRow().getId()) ) {
+                result.add(r);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * remove the gaps and overlaps of the plots attached to the marginRow.
+     */
     void removeGaps() {
-        removeGapsAndOverlaps( this.application, Arrays.asList(canvas.getRows()), null, true);
+        removeGapsAndOverlaps( this.application, getRowsWithMarginParent(), null, true);
         repaintSoon();
     }
 
@@ -410,7 +432,7 @@ public class CanvasController extends DomNodeController {
             if (d.size() > 0) {
                 row.syncTo(trow, Arrays.asList("id")); // kludge to get around bug where das2 essentially vetos the top
             }
-            removeGapsAndOverlaps( this.application, rows, row, true );
+            removeGapsAndOverlaps( this.application, getRowsWithMarginParent(), row, true );
         } finally {
             lock.unlock();
         }
@@ -790,6 +812,91 @@ public class CanvasController extends DomNodeController {
     @Override
     public String toString() {
         return "" + canvas + " controller";
+    }
+
+    /**
+     * add a column with the spec (e.g. "30%+1em,60%-4em").  If another column with 
+     * the same spec is found, then just return that column.
+     * @param spec spec like "30%+1em,60%-4em"
+     * @return a column that implements.
+     */
+    public Column maybeAddColumn(String spec) {
+        String[] ss= spec.split(",");
+        if ( ss.length!=2 ) {
+            throw new IllegalArgumentException("spec format error, expected comma: "+spec);
+        }
+        try {
+            for ( Column c: canvas.getColumns() ) {
+                if ( c.controller.isLayoutEqual( spec ) ) return c;
+            }
+        } catch ( ParseException ex ) { 
+            throw new RuntimeException(ex);
+        }
+        final Column column = new Column();
+        DomLock lock = changesSupport.mutatorLock();
+        lock.lock("Maybe Add Column");
+        try {
+            column.setParent("");
+            new ColumnController(column).createDasPeer(this.canvas, null );
+
+            this.application.getController().assignId(column);
+
+            List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+            columns.add(column);
+            canvas.setColumns(columns.toArray(new Column[columns.size()]));
+
+            this.application.getController().assignId(column);
+            column.setLeft(ss[0]);
+            column.setRight(ss[1]);
+            
+        } finally {
+            lock.unlock();         
+        }
+        return column;        
+    }
+
+    /**
+     * add a row with the spec (e.g. "30%+1em,60%-4em").  If another row with 
+     * the same spec is found, then just return that row.
+     * @param spec spec like "30%+1em,60%-4em"
+     * @return a row that implements.
+     */
+    public Row maybeAddRow(String spec) {
+        String[] ss= spec.split(",");
+        if ( ss.length!=2 ) {
+            throw new IllegalArgumentException("spec format error, expected comma: "+spec);
+        }
+        try {
+            for ( Row r: canvas.getRows() ) {
+                if ( r.controller.isLayoutEqual( spec ) ) return r;
+            }
+        } catch ( ParseException ex ) { 
+            throw new RuntimeException(ex);
+        }        
+        
+        final Row row = new Row();
+        
+        DomLock lock = changesSupport.mutatorLock();
+        lock.lock("Maybe Add Row");
+        try {
+            row.setParent("");
+            new RowController(row).createDasPeer(this.canvas, null );
+
+            this.application.getController().assignId(row);
+
+            List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
+            rows.add(row);
+            canvas.setRows(rows.toArray(new Row[rows.size()]));
+
+            this.application.getController().assignId(row);
+            row.setTop(ss[0]);
+            row.setBottom(ss[1]);
+            
+        } finally {
+            lock.unlock();         
+        }
+        
+        return row;
     }
 
 }
