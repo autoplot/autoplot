@@ -26,11 +26,14 @@
         <br>
         <textarea rows="1" cols="120" id="resourceURI" name="resourceURI" >http://autoplot.org/data/versioning/data_$Y_$m_$d_v$v.qds</textarea><br>
         <br>Enter ISO8601 Time Range: <br>
-        <textarea rows="1" cols="120" name="timerange" >2010-03-01/2010-03-10</textarea><br>
-        <br><input type="checkbox" checked="false" name="fast"/>Fast, format template string instead of parsing remote listings.
+        <textarea rows="1" cols="50" name="timerange" >2010-03-01/2010-03-10</textarea><br>
+        <br><input type="checkbox" name="fast"/>Fast, format template string instead of parsing remote listings.
         <br>
         <input type="hidden" name="scriptFile" value="unaggregate.jy" />
+        <br>
         <input type="submit" value="Execute" />
     </form>
+        <br><br>
+    <small>v20150221</small>
     </body>
 </html>
