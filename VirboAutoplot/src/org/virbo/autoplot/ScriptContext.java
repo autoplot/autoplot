@@ -436,13 +436,7 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * commented codes removed that would plot(double[],double[])...  These
-     * were commented out for a while, because there are better ways to do this
-     * better.
-     */
-
-    /**
-     * set the autoplot status bar string.  Use the prefixes "busy:", "warning:"
+     * set the Autoplot status bar string.  Use the prefixes "busy:", "warning:"
      * and "error:" to set icons.
      * @param message
      */
@@ -451,8 +445,7 @@ public class ScriptContext extends PyJavaInstance {
     }
     
     /**
-     * show a popup that you know the user will see.  Note HTML code will
-     * work.
+     * show a popup that you know the user will see.  Note HTML code will work.
      * @param message 
      */
     public static void alert( String message ) {
@@ -764,7 +757,7 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
-    public static void writeToPdf( OutputStream out ) throws InterruptedException, IOException, IllegalAccessException {
+    public static void writeToPdf( OutputStream out ) throws InterruptedException, IOException {
         waitUntilIdle();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
@@ -772,7 +765,6 @@ public class ScriptContext extends PyJavaInstance {
         model.getCanvas().validate();
         waitUntilIdle();
         model.getCanvas().writeToGraphicsOutput( out, new PdfGraphicsOutput() );
-        
     }
 
     /**
@@ -1007,7 +999,7 @@ public class ScriptContext extends PyJavaInstance {
      *
      * @param ds The dataset to stream.  Note all schemes should be streamable, but
      *   some bugs exist that may prevent this.
-     * @param output stream, such as "System.out"
+     * @param out stream, such as "System.out"
      * @param ascii use ascii transfer types, otherwise binary are used.
      */
     public static void dumpToQStream( QDataSet ds, OutputStream out, boolean ascii ) throws IOException {
@@ -1064,6 +1056,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param ds
      * @param file the file target for the stream.
      * @param ascii use ascii transfer types.
+     * @throws java.io.IOException
      */
     public static void dumpToDas2Stream(QDataSet ds, String file, boolean ascii) throws IOException {
 
@@ -1088,7 +1081,7 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * make the directory.  This must be a local file right now, but may start with "file://"
-     * @param dir
+     * @param dir the directory
      */
     public static void mkdir( String dir ) {
         
@@ -1133,6 +1126,8 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * wait until the application is idle.  The id is a convenience to 
      * developers when debugging, for example used to trigger breakpoints.
+     * @param id string for debugging.
+     * @throws InterruptedException
      *@see http://autoplot.org/data/tools/reloadAll.jy
      */
     public static void waitUntilIdle( String id ) throws InterruptedException {
@@ -1148,6 +1143,7 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * save the current state as a vap file
      * @param filename
+     * @throws java.io.IOException
      */
     public static void save( String filename ) throws IOException {
         maybeInitModel();
@@ -1168,13 +1164,14 @@ public class ScriptContext extends PyJavaInstance {
      * valid are returned.
      * @param file, for example http://autoplot.org/data/somedata.cdf?
      * @return list of completions, containing the entire URI.
+     * @throws java.lang.Exception any exception thrown by the data source.
      */
     public static String[] getCompletions( String file ) throws Exception {
         List<CompletionResult> cc= DataSetURI.getCompletions( file, file.length(), new NullProgressMonitor() );
         List<CompletionResult> resultList= new ArrayList<CompletionResult>();
-        for ( int i=0; i<cc.size(); i++ ) {
-            if ( cc.get(i).maybePlot==true ) {
-                resultList.add(cc.get(i));
+        for (CompletionResult cc1 : cc) {
+            if (cc1.maybePlot == true) {
+                resultList.add(cc1);
             }
         }
 
@@ -1252,6 +1249,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param nrows number of rows
      * @param ncolumns number of columns
      * @param dir below or above, or null (None in Jython) to replace the current plot.
+     * @return the new plots.
      */
     public static List<Plot> addPlots( int nrows, int ncolumns, String dir ) {
         Plot d= null;
@@ -1268,6 +1266,7 @@ public class ScriptContext extends PyJavaInstance {
     
     /**
      * make a single plot with so many plot elements.
+     * @param nplotElement the number of plotElements on the one plot.
      */
     public static void setLayoutOverplot( int nplotElement ) {
         reset();
