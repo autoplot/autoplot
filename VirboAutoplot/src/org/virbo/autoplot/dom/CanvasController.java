@@ -421,7 +421,7 @@ public class CanvasController extends DomNodeController {
         DomLock lock = changesSupport.mutatorLock();
         lock.lock("Insert Gap For");
         try {
-            List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
+            List<Row> rows = getRowsWithMarginParent();
 
             int ipos;
             if (position == LayoutConstants.BELOW) {
@@ -436,7 +436,7 @@ public class CanvasController extends DomNodeController {
             if (d.size() > 0) {
                 row.syncTo(trow, Arrays.asList("id")); // kludge to get around bug where das2 essentially vetos the top
             }
-            removeGapsAndOverlaps( this.application, getRowsWithMarginParent(), row, true );
+            removeGapsAndOverlaps( this.application, rows, row, true );
         } finally {
             lock.unlock();
         }
