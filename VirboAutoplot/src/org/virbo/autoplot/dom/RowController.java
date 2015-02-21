@@ -70,6 +70,21 @@ public class RowController extends DomNodeController {
         row.addPropertyChangeListener(Row.PROP_TOP,list);
         this.canvas= canvas;
     }
+    
+    /**
+     * returns true if the spec is the same.
+     * @param spec spec like "30%+1em,60%-4em"
+     * @return true if they are equal.
+     * @throws ParseException 
+     */
+    public boolean isLayoutEqual( String spec ) throws ParseException {
+        String[] ss= spec.split(",");
+        String s1= DasDevicePosition.formatFormatStr( DasDevicePosition.parseLayoutStr(ss[0]) );
+        if ( !this.row.top.equals(s1) ) return false;
+        s1= DasDevicePosition.formatFormatStr( DasDevicePosition.parseLayoutStr(ss[1]) );
+        if ( !this.row.bottom.equals(s1) ) return false;
+        return true;
+    }    
 
     public DasRow getDasRow() {
         return dasRow;
