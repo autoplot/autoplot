@@ -27,18 +27,21 @@ import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.CanvasUtil;
+import org.virbo.autoplot.dom.Column;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
+import org.virbo.autoplot.dom.Row;
 import org.virbo.dataset.QDataSet;
 import org.virbo.jythonsupport.JythonOps;
 
 /**
- * new implementation of the plot command allows for keywords.
+ * new implementation of the plot command allows for keywords in the
+ * Jython environment.
+ *<blockquote><pre><small>{@code
  * plotx( 0, ripples(20) )
  * plotx( 1, ripples(20), renderType='color:blue' )
- * xx= outerProduct( 
- * plotx( 2, ripples(20), renderType=
+ *}</small></pre></blockquote>
  * @author jbf
  */
 public class PlotCommand extends PyObject {
@@ -79,10 +82,10 @@ public class PlotCommand extends PyObject {
     }
 
     /**
-     * return the object or null for this string  "RED" -> Color.RED
-     * @param c
-     * @param ele
-     * @return
+     * return the object or null for this string  "RED" -&gt; Color.RED
+     * @param c the class defining the target type
+     * @param ele the string representation to be interpreted for this type.
+     * @return the instance of the type.
      */
     private Object getEnumElement( Class c, String ele ) {
         int PUBLIC_STATIC_FINAL = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
@@ -120,38 +123,43 @@ public class PlotCommand extends PyObject {
         return null;
     }
 
+    /**
+     * implement the python call.
+     * @param args
+     * @param keywords
+     * @return 
+     */
     @Override
     public PyObject __call__(PyObject[] args, String[] keywords) {
 
         PyObject False= Py.newBoolean(false);
 
         FunctionSupport fs= new FunctionSupport( "plotx", 
-                new String[] { "x", "y", "z",
-                "xtitle", "xrange",
-                "ytitle", "yrange",
-                "ztitle", "zrange",
-                "xlog", "ylog", "zlog",
-                "title",
-                "renderType",
-                "color", "fillColor",
-                "symsize","linewidth",
-                "symbol",
-                "isotropic",
+            new String[] { "x", "y", "z",
+            "xtitle", "xrange",
+            "ytitle", "yrange",
+            "ztitle", "zrange",
+            "xlog", "ylog", "zlog",
+            "title",
+            "renderType",
+            "color", "fillColor",
+            "symsize","linewidth",
+            "symbol",
+            "isotropic", "xpos", "ypos"
         },
-                new PyObject[] { Py.None, Py.None,
-                        Py.None, Py.None,
-                        Py.None, Py.None,
-                        Py.None, Py.None,
-                        False, False, False,
-                        Py.None,
-                        Py.None,
-                        Py.None,Py.None,
-                        Py.None,Py.None,
-                        Py.None,
-                        Py.None,
+        new PyObject[] { Py.None, Py.None,
+            Py.None, Py.None,
+            Py.None, Py.None,
+            Py.None, Py.None,
+            False, False, False,
+            Py.None,
+            Py.None,
+            Py.None,Py.None,
+            Py.None,Py.None,
+            Py.None,
+            Py.None, Py.None, Py.None
         } );
-        //Map<String,PyObject> foo= fs.args( args, keywords );
-        //TODO: check on this with Ed.
+        
         fs.args( args, keywords );
         
         int nparm= args.length - keywords.length;
@@ -179,21 +187,49 @@ public class PlotCommand extends PyObject {
             po0= args[0];
         }
         
+        Row row=null; // these will be set when xpos and ypos are used.
+        Column column=null;
+        
+        Application dom= ScriptContext.getDocumentModel();
         String renderType=null;
         for ( int i=0; i<keywords.length; i++  ) {
             if ( keywords[i].equals("renderType" ) ) {
                 renderType= args[i+nparm].toString();
+            } else if ( keywords[i].equals("xpos" ) ) {
+                String spec= args[i+nparm].toString();
+                column= dom.getCanvases(0).getController().maybeAddColumn( spec );
+                if ( row==null ) row=dom.getCanvases(0).getMarginRow();
+            } else if ( keywords[i].equals("ypos")) {
+                String spec= args[i+nparm].toString();
+                row= dom.getCanvases(0).getController().maybeAddRow( spec );
+                if ( column==null ) column=dom.getCanvases(0).getMarginColumn();
             }
         }
-        
-        //if ( args[nargs-1] instanceof PyInteger ) {  // NEW! last positional argument can be plot position.  Where is this used?  I think it should go away.
-        //    iplot= ((PyInteger)args[nargs-1]).getValue();
-        //    nargs= nargs-1;
-        //}
+        if ( row!=null ) {
+            assert column!=null;
+            Plot p= null;
+            for ( Plot p1: dom.getPlots() ) {
+                if ( p1.getRowId().equals(row.getId()) && p1.getColumnId().equals(column.getId()) ) {
+                    p=p1;
+                }
+            }
+            if ( p==null ) p= dom.getController().addPlot( row, column );
+            while ( dom.getDataSourceFilters().length <= iplot ) {
+                dom.getController().addDataSourceFilter();
+            }
+            PlotElement pe= dom.getController().addPlotElement( p, dom.getDataSourceFilters(iplot) );
+            List<PlotElement> pes= dom.getController().getPlotElementsFor( dom.getDataSourceFilters(iplot) );
+            pes.remove(pe);
+            for ( PlotElement rm: pes ) {
+                Plot prm= dom.getController().getPlotFor(rm);
+                dom.getController().deletePlotElement(rm);
+                if ( dom.getController().getPlotElementsFor(prm).isEmpty() ) {
+                    dom.getController().deletePlot(prm);
+                }
+            }
+        }
 
         QDataSet[] qargs= new QDataSet[nargs];
-
-        Application dom= ScriptContext.getDocumentModel();
 
         if ( nargs==1 && po0 instanceof PyString ) {
             try {
