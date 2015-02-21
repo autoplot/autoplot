@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
-import org.das2.graph.DasCanvas;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PlotSymbol;
 import org.python.core.Py;
@@ -125,9 +124,9 @@ public class PlotCommand extends PyObject {
 
     /**
      * implement the python call.
-     * @param args
-     * @param keywords
-     * @return 
+     * @param args the "rightmost" elements are the keyword values.
+     * @param keywords the names for the keywords.
+     * @return Py.None
      */
     @Override
     public PyObject __call__(PyObject[] args, String[] keywords) {
