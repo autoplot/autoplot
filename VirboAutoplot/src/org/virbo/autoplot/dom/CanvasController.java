@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import jdk.nashorn.internal.runtime.arrays.ArrayLikeIterator;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
@@ -42,15 +41,15 @@ import static org.virbo.autoplot.dom.DomNodeController.logger;
 import org.virbo.autoplot.layout.LayoutConstants;
 
 /**
- *
+ * Controller for canvases.
  * @author jbf
  */
 public class CanvasController extends DomNodeController {
 
     DasCanvas dasCanvas;
-    private Application application;
-    private Canvas canvas;
-    private Timer repaintSoonTimer;
+    private final Application application;
+    private final Canvas canvas;
+    private final Timer repaintSoonTimer;
 
     public CanvasController(Application dom, Canvas canvas) {
         super(canvas);
@@ -58,6 +57,7 @@ public class CanvasController extends DomNodeController {
         this.canvas = canvas;
         canvas.controller = this;
         repaintSoonTimer= new Timer(100, new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                dasCanvas.repaint();
             }
@@ -223,11 +223,15 @@ public class CanvasController extends DomNodeController {
         String[] overlaps= overlap.split(" ");
         double min=1;
         double max=0;
-        for ( int i=0; i<overlaps.length; i++ ) {
-            for ( int j=0; j<rows.size(); j++ ) {
-                if ( rows.get(j).getId().equals(overlaps[i]) ) {
-                    if ( rows.get(j).getController().getDasRow().getMinimum()<min ) min= rows.get(j).getController().getDasRow().getMinimum();
-                    if ( rows.get(j).getController().getDasRow().getMaximum()>max ) max= rows.get(j).getController().getDasRow().getMaximum();
+        for (String overlap1 : overlaps) {
+            for (Row row1 : rows) {
+                if (row1.getId().equals(overlap1)) {
+                    if (row1.getController().getDasRow().getMinimum() < min) {
+                        min = row1.getController().getDasRow().getMinimum();
+                    }
+                    if (row1.getController().getDasRow().getMaximum() > max) {
+                        max = row1.getController().getDasRow().getMaximum();
+                    }
                 }
             }
         }
@@ -475,6 +479,7 @@ public class CanvasController extends DomNodeController {
      * insert the row into the other rows by shrinking them to make room.
      * @param trow row to position above or below, or null if we don't care.
      * @param position LayoutConstants.ABOVE, LayoutConstants.BELOW
+     * @return the new Row.
      */
     protected Row addInsertRow(Row trow, Object position) {
         final Row row = new Row();
@@ -517,6 +522,7 @@ public class CanvasController extends DomNodeController {
      * insert the column into the other columns by shrinking them to make room.
      * @param tcolumn column to position right or left, or null if we don't care.
      * @param position LayoutConstants.RIGHT, LayoutConstants.LEFT
+     * @return the new Column.
      */
     protected Column addInsertColumn(Column tcolumn, Object position) {
         final Column column = new Column();
@@ -590,6 +596,7 @@ public class CanvasController extends DomNodeController {
     /**
      * add columns to the current plot.
      * @param count number of columns to add
+     * @return a list of the new Columns.
      */
     public List<Column> addColumns(int count) {
         List<Column> result = new ArrayList();
@@ -629,14 +636,17 @@ public class CanvasController extends DomNodeController {
 
     }
 
-
-   public Column addColumn() {
+    /**
+     * add a column to the application to the right of the other columns.
+     * @return the column
+     */
+    public Column addColumn() {
         return addInsertColumn( null,null );
     }
 
     /**
      * add a row to the application, below.
-     * @return
+     * @return the row
      */
     public Row addRow() {
         return addInsertRow(null, null);
@@ -684,7 +694,7 @@ public class CanvasController extends DomNodeController {
                 }
                 d.doDiff(this.canvas);
             } catch (RuntimeException ex) {
-                ex.printStackTrace();
+                logger.log( Level.WARNING, null, ex );
                 d.doDiff(this.canvas); // for debugging TODO remove
             }
         }
@@ -703,6 +713,11 @@ public class CanvasController extends DomNodeController {
     private List<DomNode> currentSelectionItems;
     private long currentSelectionBirthtime=0;
 
+    /**
+     * flash the selected plots and plotElements, by temporarily 
+     * adding a painter to the canvas.
+     * @param selectedItems the items to flash.
+     */
     public void indicateSelection( List<DomNode> selectedItems ) {
 
         if ( !dasCanvas.isShowing() ) return;
