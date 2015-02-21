@@ -561,7 +561,11 @@ public class ApplicationController extends DomNodeController implements RunLater
         logger.log(Level.FINE, "waitUntilIdle checkCount={0}", checkCount);
     }
 
-    protected synchronized DataSourceFilter addDataSourceFilter() {
+    /**
+     * add a DataSourceFilter to the dom.
+     * @return the new DataSourceFilter
+     */
+    public synchronized DataSourceFilter addDataSourceFilter() {
         DataSourceFilter dsf = new DataSourceFilter();
         DataSourceController dsfc= new DataSourceController(this.model, dsf);
         dsf.controller = dsfc;
