@@ -14,6 +14,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import org.das2.graph.DasAnnotation;
 
 /**
  * utility methods for adjusting canvas layout.
@@ -91,6 +92,7 @@ public class LayoutUtil {
         
         Rectangle bounds;
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
+            if ( cc instanceof DasAnnotation ) continue; // there's a set of components we want to ignore because it's easy to mess up.
             if (cc.getColumn() == c && cc.isVisible()) {
                 bounds = cc.getBounds();
                 
@@ -101,8 +103,8 @@ public class LayoutUtil {
                     xmax = Math.max(xmax, bounds.x + bounds.width);
                     
                     if ( Math.abs(xmin)>9999 ) {
-                        logger.finer("component messes up bounds: "+cc);
-                        bounds = cc.getBounds();
+                        logger.log(Level.FINER, "component messes up bounds: {0}", cc);
+                        //bounds = cc.getBounds(); // for debugging.
                     }
                 }
             }
