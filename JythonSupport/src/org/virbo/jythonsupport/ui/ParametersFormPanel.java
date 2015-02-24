@@ -296,7 +296,11 @@ public class ParametersFormPanel {
                     if ( !parm.label.equals(parm.name) ) {
                         doc= doc + " ("+parm.label+" inside the script)";
                     }
-                    label= "<html>" + parm.name + ", <i>" + doc + "</i>"+colon+"</html>";
+                    if ( doc.length()>0 ) {
+                        label= "<html>" + parm.name + ", <i>" + doc + "</i>"+colon+"</html>";
+                    } else {
+                        label= "<html>" + parm.name + colon+"</html>";
+                    }
                 }      
                 
                 if ( !isBool ) {
