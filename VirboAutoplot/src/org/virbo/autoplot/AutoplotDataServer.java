@@ -35,6 +35,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSetURI;
@@ -218,7 +219,7 @@ public class AutoplotDataServer {
             if ( ds.property( QDataSet.DEPEND_1 )!=null && ds.property( QDataSet.BUNDLE_1 )!=null ) {
                 logger.info("dropping BUNDLE_1 when DEPEND_1 is present");
                 ds= Ops.maybeCopy(ds);
-                ((ArrayDataSet)ds).putProperty(QDataSet.BUNDLE_1,null);
+                ((MutablePropertyDataSet)ds).putProperty(QDataSet.BUNDLE_1,null);
             }
             new SimpleStreamFormatter().format(ds, out, ascii );
             
