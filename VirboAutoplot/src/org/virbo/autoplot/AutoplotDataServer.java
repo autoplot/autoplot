@@ -117,7 +117,9 @@ public class AutoplotDataServer {
                 logger.fine( String.format( "getDataSet('%s','%s')", suri, dr ) );
                 QDataSet ds1= null;
                 try {
+                    
                     ds1= org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
+                    
                 } catch ( Exception ex ) {
                     logger.log( Level.WARNING, "execption when trying to read "+dr, ex ); 
                 }
@@ -140,7 +142,9 @@ public class AutoplotDataServer {
                         logger.log(Level.FINE, "loaded ds={0}  bounds: {1}", new Object[]{ds1, range});
                         logger.log( Level.FINE, "time at read done read of {0}= {1}\n", new Object[]{ dr.toString(), System.currentTimeMillis()-t0 } );
                     }
+                    
                     writeData( format, out, ds1, ascii );
+                    
                     outEmpty.add("out is no longer empty");
                     someValid= true;
                 }
@@ -207,19 +211,25 @@ public class AutoplotDataServer {
 
     private static void writeData( String format, OutputStream out, QDataSet ds, boolean ascii ) throws Exception {
         if ( format.equals(FORM_D2S) ) {
+            
             formatD2S( ds, out, ascii );
+            
         } else if ( format.equals(FORM_QDS) ) {
             if ( ds.property( QDataSet.DEPEND_1 )!=null && ds.property( QDataSet.BUNDLE_1 )!=null ) {
                 logger.info("dropping BUNDLE_1 when DEPEND_1 is present");
-                ds= ArrayDataSet.maybeCopy(ds);
+                ds= Ops.maybeCopy(ds);
                 ((ArrayDataSet)ds).putProperty(QDataSet.BUNDLE_1,null);
             }
             new SimpleStreamFormatter().format(ds, out, ascii );
+            
         } else if ( format.equals("dat") || format.equals("xls") || format.equals("bin") ) {
             File file= File.createTempFile( "autoplotDataServer", "."+format );
+            
             formatDataSet( ds, file.toString() );
+            
             FileInputStream fin= new FileInputStream(file);
             DataSourceUtil.transfer( fin, out );
+            
         } else {
             throw new IllegalAccessException("bad format: "+format );
         }
