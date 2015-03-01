@@ -749,7 +749,7 @@ public class DataSourceUtil {
                         Units u1= (Units) bundle1.property(QDataSet.UNITS,1);
                         if ( u1==null ) u1= Units.dimensionless;
                         Units u3= (Units) bundle1.property(QDataSet.UNITS,bundle1.length()-1);
-                        if ( u3!=null && UnitsUtil.isOrdinalMeasurement(u3) && u0.getOffsetUnits().isConvertableTo(u1) ) {
+                        if ( u3!=null && UnitsUtil.isOrdinalMeasurement(u3) && u0.getOffsetUnits().isConvertibleTo(u1) ) {
                             spec= "eventsBar";
                         }
                     }

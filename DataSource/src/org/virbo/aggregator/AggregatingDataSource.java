@@ -694,7 +694,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     if ( d!=null ) dep0units= SemanticOps.getUnits(d);
                     if ( dep0!=null ) dep0.putProperty(QDataSet.UNITS, dep0units );
                 }
-                if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
+                if ( dep0 != null && cacheRange1.getUnits().isConvertibleTo( dep0units ) ) {
                     dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1,reduce?lresolution:null));
                     dep0.putProperty(QDataSet.TYPICAL_MIN, lviewRange.min().doubleValue(dep0units) );
                     dep0.putProperty(QDataSet.TYPICAL_MAX, lviewRange.max().doubleValue(dep0units) );
@@ -711,7 +711,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
             } else {
                 MutablePropertyDataSet dep0 = result == null ? null : (MutablePropertyDataSet) result.property(DDataSet.DEPEND_0);
                 Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
-                if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
+                if ( dep0 != null && cacheRange1.getUnits().isConvertibleTo( dep0units ) ) {
                     dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, reduce?lresolution:null));
                     dep0.putProperty(QDataSet.TYPICAL_MIN, lviewRange.min().doubleValue(dep0units) );
                     dep0.putProperty(QDataSet.TYPICAL_MAX, lviewRange.max().doubleValue(dep0units) );

@@ -218,7 +218,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                     colors= Ops.replicate( 0x808080, xmins.length() );
                     Units u0= SemanticOps.getUnits(xmins );
                     Units u1= SemanticOps.getUnits(xmaxs );
-                    if ( !u1.isConvertableTo(u0) && u1.isConvertableTo(u0.getOffsetUnits()) ) {
+                    if ( !u1.isConvertibleTo(u0) && u1.isConvertibleTo(u0.getOffsetUnits()) ) {
                         xmaxs= Ops.add( xmins, xmaxs );
                     }
                 } else {
@@ -249,7 +249,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                     xmaxs= DataSetOps.slice1( dep0, 1 );
                     Units u0= SemanticOps.getUnits(xmins );
                     Units u1= SemanticOps.getUnits(xmaxs );
-                    if ( !u1.isConvertableTo(u0) && u1.isConvertableTo(u0.getOffsetUnits()) ) {
+                    if ( !u1.isConvertibleTo(u0) && u1.isConvertibleTo(u0.getOffsetUnits()) ) {
                         xmaxs= Ops.add( xmins, xmaxs );
                     }
                     msgs= vds;
@@ -293,7 +293,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         Units u0= SemanticOps.getUnits( xmins );
         Units u1= SemanticOps.getUnits( xmaxs );
 
-        if ( u1.isConvertableTo( u0.getOffsetUnits() ) && !u1.isConvertableTo(u0) ) { // maxes are dt instead of stopt.
+        if ( u1.isConvertibleTo( u0.getOffsetUnits() ) && !u1.isConvertibleTo(u0) ) { // maxes are dt instead of stopt.
             xmaxs= Ops.add( xmins, xmaxs );
         }
 
