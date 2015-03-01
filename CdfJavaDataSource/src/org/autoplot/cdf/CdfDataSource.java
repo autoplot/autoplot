@@ -918,7 +918,7 @@ public class CdfDataSource extends AbstractDataSource {
                 QDataSet delta= getDeltaPlusMinus( cdf, result, (String)deltaPlus, constraints ); //TODO: slice1
                 Units deltaUnits= SemanticOps.getUnits(delta);
                 if ( UnitsUtil.isRatioMeasurement(deltaUnits)
-                        && deltaUnits.isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() )
+                        && deltaUnits.isConvertibleTo( SemanticOps.getUnits(result).getOffsetUnits() )
                         && ( delta.rank()==0 || result.length()==delta.length() ) ) {
                     result.putProperty( QDataSet.BIN_PLUS, delta );
                     if ( !deltaMinus.equals(deltaPlus) ) {
@@ -927,7 +927,7 @@ public class CdfDataSource extends AbstractDataSource {
                            delta= delta.slice(0); //vap+cdaweb:ds=C3_PP_CIS&id=T_p_par__C3_PP_CIS&timerange=2005-09-07+through+2005-09-19
                         }
                     }
-                    if ( SemanticOps.getUnits(delta).isConvertableTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
+                    if ( SemanticOps.getUnits(delta).isConvertibleTo( SemanticOps.getUnits(result).getOffsetUnits() ) ) {
                         result.putProperty( QDataSet.BIN_MINUS, delta );
                     } else {
                         result.putProperty( QDataSet.BIN_PLUS, null );
