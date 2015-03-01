@@ -185,7 +185,7 @@ public class DomUtil {
         Datum w0 = DatumUtil.asOrderOneUnits(w);
         Datum base;
         Units hu = w0.getUnits();
-        if (range.getUnits().isConvertableTo(Units.us2000)) {
+        if (range.getUnits().isConvertibleTo(Units.us2000)) {
             base = TimeUtil.prevMidnight(range.min());
         } else {
             base = w.getUnits().createDatum(0);
@@ -196,7 +196,7 @@ public class DomUtil {
     }
 
     public static String describe(DatumRange init, DatumRange fin) {
-        if (init.getUnits().isConvertableTo(fin.getUnits())) {
+        if (init.getUnits().isConvertibleTo(fin.getUnits())) {
             String scaleString = "";
             if (UnitsUtil.isTimeLocation(fin.getUnits())) {
                 Datum scale = DatumUtil.asOrderOneUnits(round(fin).width());
@@ -660,9 +660,9 @@ public class DomUtil {
         for ( int i=0; i<dom.plots.size(); i++ ) {
             Plot pd= dom.plots.get(i);
             Plot ps= state.plots.get(i);
-            if ( ! pd.getXaxis().getRange().getUnits().isConvertableTo( ps.getXaxis().getRange().getUnits() ) ) return true;
-            if ( ! pd.getYaxis().getRange().getUnits().isConvertableTo( ps.getYaxis().getRange().getUnits() ) ) return true;
-            if ( ! pd.getZaxis().getRange().getUnits().isConvertableTo( ps.getZaxis().getRange().getUnits() ) ) return true;
+            if ( ! pd.getXaxis().getRange().getUnits().isConvertibleTo( ps.getXaxis().getRange().getUnits() ) ) return true;
+            if ( ! pd.getYaxis().getRange().getUnits().isConvertibleTo( ps.getYaxis().getRange().getUnits() ) ) return true;
+            if ( ! pd.getZaxis().getRange().getUnits().isConvertibleTo( ps.getZaxis().getRange().getUnits() ) ) return true;
         }
         return false;
     }

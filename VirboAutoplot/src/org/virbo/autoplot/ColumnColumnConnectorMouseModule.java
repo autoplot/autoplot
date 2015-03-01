@@ -103,7 +103,7 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
         super.mouseDragged(e);
         Point p2 = e.getPoint();
         if (panAxis != null) {
-            if ( !panAxis.getUnits().isConvertableTo(oppositeAxis.getUnits()) ) return;
+            if ( !panAxis.getUnits().isConvertibleTo(oppositeAxis.getUnits()) ) return;
             DatumRange dr;
             if (panAxis.isLog()) {
                 Datum delta = oppositeAxis.invTransform(p0.getX()).divide(oppositeAxis.invTransform(p2.getX()));
@@ -115,7 +115,7 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
             panAxis.setDatumRange(dr);
         }
         if (panAxisV != null) {
-            if ( !panAxisV.getUnits().isConvertableTo(oppositeAxisV.getUnits()) ) return;
+            if ( !panAxisV.getUnits().isConvertibleTo(oppositeAxisV.getUnits()) ) return;
             DatumRange dr;
             if (panAxisV.isLog()) {
                 if ( UnitsUtil.isTimeLocation( panAxisV.getUnits()) ) {
@@ -142,9 +142,9 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
         } else {
             Point p= e.getPoint();
             p= SwingUtilities.convertPoint( e.getComponent(), p, bottomPlot.getCanvas() );
-            boolean doHoriz= topPlot.getXAxis().getUnits().isConvertableTo( bottomPlot.getXAxis().getUnits() )
+            boolean doHoriz= topPlot.getXAxis().getUnits().isConvertibleTo( bottomPlot.getXAxis().getUnits() )
                     && topPlot.getXAxis().getDatumRange().contains( bottomPlot.getXAxis().invTransform( p.getX() ) );
-            boolean doVert= topPlot.getYAxis().getUnits().isConvertableTo( bottomPlot.getYAxis().getUnits() )
+            boolean doVert= topPlot.getYAxis().getUnits().isConvertibleTo( bottomPlot.getYAxis().getUnits() )
                     && topPlot.getYAxis().getDatumRange().contains( bottomPlot.getYAxis().invTransform( p.getY() ) );
             if ( doHoriz ) {
                 panAxis = topPlot.getXAxis();

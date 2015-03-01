@@ -287,7 +287,7 @@ public class PlotController extends DomNodeController {
         if ( ds!=null &&  ds.rank()>0 ) {
             try {
                 QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-                if ( !validBounds(bounds) || !SemanticOps.getUnits(bounds).isConvertableTo(dr.getUnits() ) || !DataSetUtil.asDatumRange(bounds).contains(dr) ) {
+                if ( !validBounds(bounds) || !SemanticOps.getUnits(bounds).isConvertibleTo(dr.getUnits() ) || !DataSetUtil.asDatumRange(bounds).contains(dr) ) {
                     dr= dr.next();
                 } else {
                     DatumRange limit= DataSetUtil.asDatumRange(bounds);
@@ -333,7 +333,7 @@ public class PlotController extends DomNodeController {
         if ( ds!=null &&  ds.rank()>0 ) {
             try {
                 QDataSet bounds= SemanticOps.bounds(ds).slice(0);
-                if ( !validBounds(bounds) || !SemanticOps.getUnits(bounds).isConvertableTo(dr.getUnits() ) || !DataSetUtil.asDatumRange(bounds).contains(dr) ) {
+                if ( !validBounds(bounds) || !SemanticOps.getUnits(bounds).isConvertibleTo(dr.getUnits() ) || !DataSetUtil.asDatumRange(bounds).contains(dr) ) {
                     dr= dr.previous();
                 } else {
                     DatumRange limit= DataSetUtil.asDatumRange(bounds);
@@ -1279,19 +1279,19 @@ public class PlotController extends DomNodeController {
             if ( !plot.controller.getApplication().getController().isValueAdjusting() ) {
                 // I would reset the autorange property here for unbound axes before v2013a_16.  I'm not sure why...
                 if ( !this.dom.getController().isBoundAxis(plot.getXaxis()) ) {
-                    if ( !defaults.getXaxis().getRange().getUnits().isConvertableTo( plot.getXaxis().getRange().getUnits() ) ) {
+                    if ( !defaults.getXaxis().getRange().getUnits().isConvertibleTo( plot.getXaxis().getRange().getUnits() ) ) {
                         plot.getXaxis().setAutoRange(true);
                     }
                 }
 
                 if ( !this.dom.getController().isBoundAxis(plot.getYaxis()) ) {
-                    if ( !defaults.getYaxis().getRange().getUnits().isConvertableTo( plot.getYaxis().getRange().getUnits() ) ) {
+                    if ( !defaults.getYaxis().getRange().getUnits().isConvertibleTo( plot.getYaxis().getRange().getUnits() ) ) {
                         plot.getYaxis().setAutoRange(true);
                     }
                 }
 
                 if ( !this.dom.getController().isBoundAxis(plot.getZaxis()) ) {
-                    if ( !defaults.getZaxis().getRange().getUnits().isConvertableTo( plot.getZaxis().getRange().getUnits() ) ) {
+                    if ( !defaults.getZaxis().getRange().getUnits().isConvertibleTo( plot.getZaxis().getRange().getUnits() ) ) {
                         plot.getZaxis().setAutoRange(true);
                     }
                 }
@@ -1405,7 +1405,7 @@ public class PlotController extends DomNodeController {
         // if we aren't autoranging, then only change the bindings if there will be a conflict.
         if ( plot.getXaxis().isAutoRange()==false ) {
             shouldBindX= bm!=null;
-            if ( bm!=null && !newSettings.getXaxis().getRange().getUnits().isConvertableTo( plot.getXaxis().getRange().getUnits() ) ) {
+            if ( bm!=null && !newSettings.getXaxis().getRange().getUnits().isConvertibleTo( plot.getXaxis().getRange().getUnits() ) ) {
                 shouldBindX= false;
                 logger.finer("remove timerange binding that would cause inconvertable units");
             }
@@ -1423,7 +1423,7 @@ public class PlotController extends DomNodeController {
                 plot.getXaxis().setAutoRange(true); // setting the time range would clear autoRange here.
             }
             DatumRange xrange= newSettings.getXaxis().getRange();
-            if ( dom.timeRange.getUnits().isConvertableTo(xrange.getUnits()) &&
+            if ( dom.timeRange.getUnits().isConvertibleTo(xrange.getUnits()) &&
                     UnitsUtil.isTimeLocation(xrange.getUnits()) ) {
                 if ( dom.controller.isConnected( plot ) ) {
                     logger.log(Level.FINER, "not binding because plot is connected: {0}", plot);

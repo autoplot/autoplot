@@ -62,7 +62,7 @@ public class PlotElementUtil {
     protected static void unitsCheck(Map properties, QDataSet dataset) {
         Units u0 = (Units) dataset.property(QDataSet.UNITS);
         Units u1 = (Units) properties.get(QDataSet.UNITS);
-        if (u0 == null || u1 == null || !u0.isConvertableTo(u1)) {
+        if (u0 == null || u1 == null || !u0.isConvertibleTo(u1)) {
             properties.put(QDataSet.UNITS, u0);
         }
         for (int i = 0; i < QDataSet.MAX_RANK; i++) {

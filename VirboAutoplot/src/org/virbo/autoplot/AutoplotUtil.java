@@ -1233,7 +1233,7 @@ public class AutoplotUtil {
                             double factor = (cu.convertDoubleTo(Units.percentIncrease, dcadence) + 100) / 100.;
                             dd = new double[]{min / factor, max * factor};
                         } else {
-                            if ( cu.isConvertableTo(u.getOffsetUnits() ) ) { // TODO: we need separate code to make datasets valid
+                            if ( cu.isConvertibleTo(u.getOffsetUnits() ) ) { // TODO: we need separate code to make datasets valid
                                 dcadence= cu.convertDoubleTo( u.getOffsetUnits(), dcadence );
                                 dd = new double[]{min - dcadence, max + dcadence};
                                 if ( dd[0]<0 ) {
@@ -1480,7 +1480,7 @@ public class AutoplotUtil {
                             && d2 < 1.14  // and the top isn't clipping data badly  //TODO: we really need to be more robust about this.  hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ION_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109 was failing because a small number of points was messing this up.
                             && d1 > -0.1 // and the bottom isn't clipping data badly
                             && d1 < 1.   // and the stats min is less then the typical range max().
-                            && uu.isConvertableTo( u ) ) {  // and we ARE talking about the same thing
+                            && uu.isConvertibleTo( u ) ) {  // and we ARE talking about the same thing
                         result.range = range;
                         // just use the metadata settings.
                         logger1.fine("using TYPICAL_MIN, TYPICAL_MAX from metadata");
@@ -1868,7 +1868,7 @@ public class AutoplotUtil {
                         Units u1= (Units) bundle1.property(QDataSet.UNITS,1);
                         if ( u1==null ) u1= Units.dimensionless;
                         Units u3= (Units) bundle1.property(QDataSet.UNITS,bundle1.length()-1);
-                        if ( u3!=null && UnitsUtil.isOrdinalMeasurement(u3) && u0.getOffsetUnits().isConvertableTo(u1) ) {
+                        if ( u3!=null && UnitsUtil.isOrdinalMeasurement(u3) && u0.getOffsetUnits().isConvertibleTo(u1) ) {
                             spec= RenderType.eventsBar;
                         }
                     } else {

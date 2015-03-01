@@ -214,7 +214,7 @@ public class Test011 {
 
             Units u= SemanticOps.lookupUnits("[foos]");
             Units u2= SemanticOps.lookupUnits("foos");
-            if ( !u.isConvertableTo(u2) ) {
+            if ( !u.isConvertibleTo(u2) ) {
                 throw new IllegalArgumentException("[foos] is not convertable to foos");
             }
 

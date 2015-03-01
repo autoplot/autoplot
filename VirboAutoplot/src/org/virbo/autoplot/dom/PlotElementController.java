@@ -1266,7 +1266,7 @@ public class PlotElementController extends DomNodeController {
                 if ( dep0!=null && dep1!=null ) {
                     Units dep0units= SemanticOps.getUnits( dep0 );
                     Units dep1units= SemanticOps.getUnits( dep1 );
-                    if ( dep0units!=Units.dimensionless && dep1units.isConvertableTo( dep0units.getOffsetUnits() ) ) {
+                    if ( dep0units!=Units.dimensionless && dep1units.isConvertibleTo( dep0units.getOffsetUnits() ) ) {
                         isWaveform= true;
                     }
                 }
@@ -2178,7 +2178,7 @@ public class PlotElementController extends DomNodeController {
                     ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, fillDs.length(0)-1 ), props, ignoreDsProps ); 
                     for ( int i=fillDs.length(0)-2; i>=0; i-- ) {
                        AutoplotUtil.AutoRangeDescriptor ydesc1= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props, ignoreDsProps );
-                       if ( ydesc1.range.getUnits().isConvertableTo(ydesc.range.getUnits()) ) {
+                       if ( ydesc1.range.getUnits().isConvertibleTo(ydesc.range.getUnits()) ) {
                            ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
                        } else {
                            break;
@@ -2377,15 +2377,15 @@ public class PlotElementController extends DomNodeController {
         }
 
         boolean change= false;
-        if ( xrange.getUnits()==Units.dimensionless && !UnitsUtil.isTimeLocation(xunits) && !UnitsUtil.isOrdinalMeasurement(xunits) && !xunits.isConvertableTo( xrange.getUnits() ) ) {
+        if ( xrange.getUnits()==Units.dimensionless && !UnitsUtil.isTimeLocation(xunits) && !UnitsUtil.isOrdinalMeasurement(xunits) && !xunits.isConvertibleTo( xrange.getUnits() ) ) {
             plotElement.getPlotDefaults().getXaxis().setRange( new DatumRange( xrange.min().doubleValue(Units.dimensionless), xrange.max().doubleValue(Units.dimensionless), xunits ) );
             change= true;
         }
-        if ( yrange.getUnits()==Units.dimensionless && !UnitsUtil.isTimeLocation(yunits) && !UnitsUtil.isOrdinalMeasurement(yunits) && !yunits.isConvertableTo( yrange.getUnits() ) ) {
+        if ( yrange.getUnits()==Units.dimensionless && !UnitsUtil.isTimeLocation(yunits) && !UnitsUtil.isOrdinalMeasurement(yunits) && !yunits.isConvertibleTo( yrange.getUnits() ) ) {
             plotElement.getPlotDefaults().getYaxis().setRange( new DatumRange( yrange.min().doubleValue(Units.dimensionless), yrange.max().doubleValue(Units.dimensionless), yunits ) );
             change= true;
         }
-        if ( zrange.getUnits()==Units.dimensionless && !UnitsUtil.isTimeLocation(zunits) && !UnitsUtil.isOrdinalMeasurement(zunits) && !zunits.isConvertableTo( zrange.getUnits() ) ) {
+        if ( zrange.getUnits()==Units.dimensionless && !UnitsUtil.isTimeLocation(zunits) && !UnitsUtil.isOrdinalMeasurement(zunits) && !zunits.isConvertibleTo( zrange.getUnits() ) ) {
             plotElement.getPlotDefaults().getZaxis().setRange( new DatumRange( zrange.min().doubleValue(Units.dimensionless), zrange.max().doubleValue(Units.dimensionless), zunits ) );
             change= true;
         }

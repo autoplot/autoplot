@@ -44,7 +44,7 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
         DatumRange dr1= (DatumRange) o1;
         DatumRange dr2= (DatumRange) o2;
 
-        if ( !dr1.getUnits().isConvertableTo(dr2.getUnits()) ) return false;
+        if ( !dr1.getUnits().isConvertibleTo(dr2.getUnits()) ) return false;
         Datum w= dr1.width();
         if ( w.doubleValue( w.getUnits() )==0 ) {
             return dr1.equals(dr2) && dr2.width()==w;

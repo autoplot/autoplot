@@ -237,7 +237,7 @@ public class TimeSeriesBrowseController {
                 if ( this.domPlot.getXaxis().isAutoRange() && !valueWasAdjusting ) {
                     BindingModel[] bms= dsf.getController().getApplication().getBindings();
                     DatumRange appRange= dsf.getController().getApplication().getTimeRange();
-                    if ( appRange.getUnits().isConvertableTo( tr.getUnits() )
+                    if ( appRange.getUnits().isConvertibleTo( tr.getUnits() )
                             && isBoundTimeRange( bms, this.domPlot.getXaxis().getId() ) ) { // check to see if the dom has a compatible timerange.
                         this.plot.getXAxis().resetRange(appRange);
                     } else {

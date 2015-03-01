@@ -150,7 +150,7 @@ public class ClickDigitizer {
             
         }        
         
-        if ( range.getUnits().isConvertableTo(datum.getUnits()) && range.contains(datum) ) {
+        if ( range.getUnits().isConvertibleTo(datum.getUnits()) && range.contains(datum) ) {
             if ( log ) {
                 double d= DatumRangeUtil.normalizeLog( range, datum );
                 return (int)( axis.getInt(smaller) + d * (axis.getInt(bigger)-axis.getInt(smaller)) );
