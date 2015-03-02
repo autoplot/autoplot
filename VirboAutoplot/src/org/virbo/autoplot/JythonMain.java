@@ -40,13 +40,19 @@ public class JythonMain {
 
         InputStream in;
         String name= null;
+        String pwd;
         if ( args.length==0 ) {
             in= System.in;
+            pwd= new File(".").getAbsolutePath();
+            pwd= pwd.substring(0,pwd.length()-1);
         } else {
-            in= new FileInputStream( new File( args[0] ) );
-            name= new File( args[0] ).getName();
+            File f= new File( args[0] );
+            f= f.getAbsoluteFile();
+            in= new FileInputStream( f );
+            name= f.getName();
+            pwd= f.getParent();
         }
-        JythonUtil.runScript( model, in, name, argv );
+        JythonUtil.runScript(model, in, name, argv, pwd );
 
         in.close();
         System.exit(0);
