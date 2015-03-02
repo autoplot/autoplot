@@ -15,18 +15,27 @@ import java.io.InputStream;
 
 
 /**
- * Support for invoking Jython script.  This is Just ".../AutoplotIU --script ..." stripped down, and was rewritten after Bob and Jeremy
- * would see inconsistent behavior between:
- *   /usr/local/jre1.6.0_25/bin/java -cp ./autoplot.jar -Djava.awt.headless=true org.virbo.autoplot.JythonMain `pwd`/testVars.jy   (and)
- *   /usr/local/jre1.6.0_25/bin/java -cp ./autoplot.jar -Djava.awt.headless=true org.virbo.autoplot.AutoplotUI --script=`pwd`/testVars.jy
+ * Support for invoking Jython script.  This is Just ".../AutoplotUI --script ..." stripped down, and was rewritten after Bob and Jeremy
+ * would see inconsistent behavior between:<pre>
+ *  /usr/local/jre1.6.0_25/bin/java -cp ./autoplot.jar -Djava.awt.headless=true org.virbo.autoplot.JythonMain `pwd`/testVars.jy   (and)
+ *  /usr/local/jre1.6.0_25/bin/java -cp ./autoplot.jar -Djava.awt.headless=true org.virbo.autoplot.AutoplotUI --script=`pwd`/testVars.jy
+ * </pre>
  * @author jbf
  */
 public class JythonMain {
     
-    /** Creates a new instance of JythonLauncher */
     public JythonMain() {
     }
     
+    /**
+     * org.virbo.autoplot.JythonMain 
+     * <ul>
+     * <li>no args, get input from stdin
+     * <li>one arg is the name of a local file containing the script.
+     * </ul>
+     * @param args zero or one command line argument.
+     * @throws Exception 
+     */
     public static void main(String[] args) throws Exception {
 
         System.err.println("org.virbo.autoplot.JythonMain "+APSplash.getVersion());
