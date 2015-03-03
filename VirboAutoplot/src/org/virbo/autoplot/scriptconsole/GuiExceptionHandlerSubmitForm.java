@@ -98,13 +98,14 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
         jScrollPane2.setViewportView(dataTextArea);
 
         jLabel3.setText("Your Email Address (optional):");
+        jLabel3.setToolTipText("<html>Your email address is kept private, and will only provide a means<br>\nfor us to contact you if we have additional questions.  <br>\nAny feedback is helpful, but we are often unable reproduce <br>\nerrors when data is not available.\n");
 
         jLabel4.setText("Your Username (optional):");
         jLabel4.setToolTipText("Your username is read from the system properties.");
 
         submitDOMCB.setSelected(true);
-        submitDOMCB.setText("Submit DOM and Undo Info");
-        submitDOMCB.setToolTipText("Submit the DOM which is the current application state, which contains references to data you are using.  Undo info contains changes which lead to the current state, and may contain references to data.  The preview area below shows exactly what will be submitted.\n");
+        submitDOMCB.setText("Submit .vap and Undo Info");
+        submitDOMCB.setToolTipText("<html>Submit the DOM which is the current application state, <br>which contains references to data you are using.  Undo info contains <br>changes which lead to the current state, and may contain references to data.   <br>The preview area below shows exactly what will be submitted.\n");
 
         updateButton.setText("Update Preview");
         updateButton.setToolTipText("Update data preview area below, showing exactly what data is submitted.");
@@ -114,29 +115,24 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
             }
         });
 
-        jLabel5.setText("Comments:");
+        jLabel5.setText("Comments (optional):");
 
         screenshotCB.setText("Submit Application Screenshot");
+        screenshotCB.setToolTipText("<html>Grab a screenshot and embed it within the report.  <br>\nTo see this content, save exception report to a local file, then <br>\nuse uudeview on Linux to extract the png image.  ");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jScrollPane1)
             .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 679, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(jLabel2)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 318, Short.MAX_VALUE)
-                        .add(updateButton))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE)
-                    .add(jLabel5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(jLabel4)
                                     .add(jLabel3))
@@ -144,11 +140,15 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(emailTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 349, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                     .add(usernameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 133, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                            .add(layout.createSequentialGroup()
                                 .add(submitDOMCB)
                                 .add(62, 62, 62)
                                 .add(screenshotCB)))
-                        .add(0, 0, Short.MAX_VALUE)))
+                        .add(0, 139, Short.MAX_VALUE))
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel2)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(updateButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -158,7 +158,7 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel5)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 73, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel4)
@@ -171,12 +171,12 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(submitDOMCB)
                     .add(screenshotCB))
-                .add(10, 10, 10)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
                     .add(updateButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE))
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
