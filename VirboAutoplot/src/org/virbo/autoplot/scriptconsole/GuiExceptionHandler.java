@@ -682,7 +682,25 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             ex.printStackTrace();
         }
 
-        return out.toString();
+//        byte[] bytes= out.toByteArray();
+//        for ( int i=0; i<bytes.length-2; i++ ) {
+//            if ( ((int)bytes[i] & 0xFF)==0xE2 ) {
+//                if ( ((int)bytes[i+1] & 0xFF)==0x86 ) {
+//                    if ( ((int)bytes[i+2] & 0xFF)==0x92 ) {
+//                        System.err.println("here is the right arrow at index="+i);
+//                    }
+//                }
+//            }
+//        }
+        // the above code verifies that Windows properly encodes the byte stream.
+                
+        String s="";
+        try {
+            s= out.toString("UTF-8");
+        } catch ( UnsupportedEncodingException ex ) {
+            s= out.toString(); 
+        }
+        return s;
     }
 
     javax.swing.filechooser.FileFilter getFileNameExtensionFilter( final String desc, final String[] exts ) {
