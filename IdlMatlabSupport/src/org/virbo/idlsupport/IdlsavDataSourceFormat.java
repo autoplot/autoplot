@@ -17,7 +17,7 @@ import org.virbo.datasource.AbstractDataSourceFormat;
 import org.virbo.dsops.Ops;
 
 /**
- * Export to idlsav support.
+ * Export to idlsav support.  rank 1 datasets, and rank 2 bundles are supported.
  * @author jbf
  */
 public class IdlsavDataSourceFormat extends AbstractDataSourceFormat {
