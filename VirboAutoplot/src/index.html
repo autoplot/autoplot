@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Pngwalk of last year's Barrel mission where we look for conjunctions between balloons ang RBSP spacecraft
+        <p><small>new xpos and ypos switches for plotx command allow more flexible layout.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,8 +20,13 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-02-16 r16276):</p>
+        <p>Bugfixes (2015-03-02 r16352):</p>
         <ul>    
+            <li>RGBRenderer checks for log/linear match and prints a warning when they don't match</li>
+            <li>within function would incorrectly perform where command, when result should have been zeros and non-zeros.  This will affect scripts that use this command.</li>
+            <li>clean up javadoc for ArrayDataSet.  Make ArrayDataSet implementations consistent with one another.</li>
+            <li>introduce org.virbo.dataset.examples.Schemes.java, so that javadoc can refer to it.</li>
+            <li>PWD was not available when --script was used.</li>
             <li>1341: CDF subsample was terribly slow, because subsampling/5M record file.  Now just read in all the data, then subsample.  Thanks Kristoff!</li>
             <li>pngwalk generation would fail when years were 2008-2014, because it was counting off in 365-day, not yearly increments.</li>
             <li>add Ops.datum after seeing that dataset('2011-06-08T01:54') would parse but datum('2011-06-08T01:54') would not.</li>
@@ -63,6 +68,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>javadoc improvements throughout dasCore and QDataSet packages</li>
+            <li>DataSetBuilder add nextRecord( Object ... values ) to provide efficient way to define bundles in scripts<li>
+            <li>415: plotx(xpos='50%,100%-5em',ypos='20%,50%') allows direct specification of layout.</li>
             <li>ticks can be set manually from scripts.</li>
             <li>console GUI can export records as XML or flat ascii file now</li>
             <li>Autoplot servlet supports backgroundColor=none for transparent backgrounds</li>
