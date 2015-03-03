@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.UnitsUtil;
+import org.das2.util.LatexToGranny;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -261,6 +262,9 @@ public class IstpMetadataModel extends MetadataModel {
         if ( title.trim().length()>0 ) title= title+"  "; // add two spaces to delimit S/C name and instrument from description
         s= (String)attrs.get("CATDESC");
         if ( s!=null ) {
+            if ( LatexToGranny.isLatex(s) ) {
+                s= LatexToGranny.latexToGranny(s);
+            }
             title= title + s.trim();
         }
 
@@ -320,9 +324,12 @@ public class IstpMetadataModel extends MetadataModel {
         }
         
         sunits= sunits.trim();
+        if ( LatexToGranny.isLatex(sunits) ) {
+            sunits= LatexToGranny.latexToGranny(sunits);
+        }
         
         try {
-            units = SemanticOps.lookupUnits(DataSourceUtil.unquote(sunits));
+            units = Units.lookupUnits(DataSourceUtil.unquote(sunits));
         } catch (IllegalArgumentException e) {
             units = Units.dimensionless;
         }
@@ -371,6 +378,11 @@ public class IstpMetadataModel extends MetadataModel {
                     }
                 }
             }
+            if ( label!=null ) {
+                if ( LatexToGranny.isLatex(label) ) {
+                    label= LatexToGranny.latexToGranny(label);
+                }
+            }
             if (label == null) {
                 label = sunits;
             } else {
@@ -380,9 +392,9 @@ public class IstpMetadataModel extends MetadataModel {
                 }
             }
             properties.put(QDataSet.LABEL, label);
-        }        
-        properties.put(QDataSet.UNITS, units);
+        }
         
+        properties.put(QDataSet.UNITS, units);
 
         if ( UnitsUtil.isTimeLocation(units) && !doRecurse && properties.containsKey(QDataSet.LABEL) ) {
             properties.remove(QDataSet.LABEL);
