@@ -15,7 +15,9 @@ import org.das2.util.monitor.ProgressMonitor;
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.net.URI;
 import java.text.ParseException;
@@ -26,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -144,6 +145,7 @@ public class CdfDataSource extends AbstractDataSource {
      * open and closed three times during the load.  See http://sourceforge.net/p/autoplot/bugs/1002.
      */
     public static final TickleTimer timer= new TickleTimer( 10000, new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             logger.log(Level.FINER, "unloading CDF cache to resolve bug 1002" );
             synchronized (lock ) {
@@ -240,6 +242,9 @@ public class CdfDataSource extends AbstractDataSource {
 
             Map map = getParams();
 
+            //try this some time.
+            //checkCdf( cdfFile );
+            
             CDFReader cdf= getCdfFile(fileName);
             logger.log(Level.FINE, "got cdf file for {0} {1}", new Object[]{fileName, cdf});
 
@@ -308,7 +313,7 @@ public class CdfDataSource extends AbstractDataSource {
     public QDataSet getDataSet( ProgressMonitor mon, Map<String,Object> attr1 ) throws Exception {
 
         String lsurl= uri.toString();
-        MutablePropertyDataSet cached=null;
+        MutablePropertyDataSet cached;
         synchronized ( dslock ) {
             cached= dsCache.get(lsurl);
             if ( cached!=null ) { // this cache is only populated with DEPEND_0 vars for now.
@@ -642,7 +647,7 @@ public class CdfDataSource extends AbstractDataSource {
                     Object attrv = cdf.getAttribute( var, vv[i]);
                     boolean isDep= p.matcher(vv[i]).matches() & depth == 0;
                     if ( ipass==0 && isDep ) {
-                        String name = (String) ((Vector)attrv).get(0); //TODO: still vector?
+                        String name = (String) ((List)attrv).get(0); //TODO: still vector?
                         if ( hasVariable(cdf, name) ) {
                             Map<String, Object> newVal = readAttributes(cdf, name, depth + 1);
                             newVal.put("NAME", name); // tuck it away, we'll need it later.
@@ -652,7 +657,7 @@ public class CdfDataSource extends AbstractDataSource {
                         }
 
                     } else if ( ipass==1 && !isDep ) {
-                        Object val= ((Vector)attrv).get(0);
+                        Object val= ((List)attrv).get(0);
                         if ( val==null ) {
                             continue; // v0.9 version of CDF-Java returns null in Test032_016.
                         }
@@ -869,7 +874,8 @@ public class CdfDataSource extends AbstractDataSource {
                         okay= false;
                     }
                     if ( okay ) {
-                        units= SemanticOps.lookupUnits( DataSetUtil.getStringValue( s, s.value(0) ) );
+                        assert s!=null;
+                        units= Units.lookupUnits( DataSetUtil.getStringValue( s, s.value(0) ) );
                         result.putProperty(QDataSet.UNITS, units);
                     } else {
                         units= SemanticOps.getUnits(result); // do what we did before...
@@ -1238,6 +1244,31 @@ public class CdfDataSource extends AbstractDataSource {
         }
         return result;
 
+    }
+
+    /**
+     * check if the file really is a CDF, and throw IllegalArgumentException if it is not.
+     * @param cdfFile 
+     */
+    private void checkCdf(File cdfFile) throws IOException {
+        byte[] magic= new byte[2];
+        if ( cdfFile.length()<2 ) {
+            throw new IllegalArgumentException("CDF file is empty");
+        }
+        InputStream in=null;
+        try {
+            in= new FileInputStream(cdfFile);
+            int n= in.read(magic);
+            if ( n==2 ) {
+                if ( magic[0]==205 && magic[1]==242 ) {
+                    
+                } else {
+                    throw new IllegalArgumentException("CDF files start with 205 then 242");
+                }
+            }
+        } finally {
+            if ( in!=null ) in.close();
+        }
     }
 
 }
