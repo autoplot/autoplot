@@ -694,7 +694,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 //        }
         // the above code verifies that Windows properly encodes the byte stream.
                 
-        String s="";
+        String s;
         try {
             s= out.toString("UTF-8");
         } catch ( UnsupportedEncodingException ex ) {
