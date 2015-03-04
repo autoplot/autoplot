@@ -1248,22 +1248,24 @@ public class CdfDataSource extends AbstractDataSource {
 
     /**
      * check if the file really is a CDF, and throw IllegalArgumentException if it is not.
-     * @param cdfFile 
+     * @param cdfFile a CDF file (or not)
+     * @throws IllegalArgumentException when the file is not a CDF.
+     * @throws IOException when the file cannot be read.
      */
-    private void checkCdf(File cdfFile) throws IOException {
-        byte[] magic= new byte[2];
-        if ( cdfFile.length()<2 ) {
+    public static void checkCdf(File cdfFile) throws IOException {
+        byte[] magic= new byte[4];
+        if ( cdfFile.length()<4 ) {
             throw new IllegalArgumentException("CDF file is empty");
         }
         InputStream in=null;
         try {
             in= new FileInputStream(cdfFile);
             int n= in.read(magic);
-            if ( n==2 ) {
-                if ( magic[0]==205 && magic[1]==242 ) {
+            if ( n==4 ) {
+                if ( ( magic[0] & 0xFF )==205 && ( magic[1] & 0xF0 ) ==240 ) {
                     
                 } else {
-                    throw new IllegalArgumentException("CDF files start with 205 then 242");
+                    throw new IllegalArgumentException("CDF magic number not found, expected 205 then one of 242 243 ");
                 }
             }
         } finally {
