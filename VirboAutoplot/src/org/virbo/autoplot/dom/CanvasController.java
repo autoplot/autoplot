@@ -754,9 +754,14 @@ public class CanvasController extends DomNodeController {
                 if ( p==null ) return; // transitional case
                 Rectangle r= p.getBounds();
                 GeneralPath result= new GeneralPath();
-                GraphUtil.reducePath( SelectionUtil.getSelectionArea( rend ).getPathIterator(null), result, 10 );
-                sel.add( result );
-                clip.add( r );
+                Shape gp= SelectionUtil.getSelectionArea( rend );
+                if ( gp!=null ) {
+                    GraphUtil.reducePath( gp.getPathIterator(null), result, 10 );
+                    sel.add( result );
+                    clip.add( r );
+                } else {
+                    logger.warning("reducePath contract broken by renderer that returns null.");
+                }
             }
         }
         
