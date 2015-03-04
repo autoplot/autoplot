@@ -20,7 +20,7 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-03-02 r16352):</p>
+        <p>Bugfixes (2015-03-04 r16370):</p>
         <ul>    
             <li>RGBRenderer checks for log/linear match and prints a warning when they don't match</li>
             <li>within function would incorrectly perform where command, when result should have been zeros and non-zeros.  This will affect scripts that use this command.</li>
@@ -68,6 +68,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>support rank 2 bundle in export to IDLSAV</li>
+            <li>CDF reader detects HDF and NetCDF files with .cdf extension</li>
             <li>add origin and clockwise controls to pitch angle distribution renderer</li>
             <li>406: CDF files support some LaTeX for MMS labels</li>
             <li>format to idlsav supports bundles</li>
