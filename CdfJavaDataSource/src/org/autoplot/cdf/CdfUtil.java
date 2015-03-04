@@ -1025,7 +1025,7 @@ public class CdfUtil {
             String desc = svar;
             if (xDependVariable != null) {
                 desc += "(" + xDependVariable;
-                if ( xMaxRec>0 || !isMaster ) { // small kludge for CDAWeb, where we expect masters to be empty.
+                if ( ( xMaxRec>0 || !isMaster ) && xMaxRec==maxRec ) { // small kludge for CDAWeb, where we expect masters to be empty.
                     desc+= "=" + (xMaxRec);
                 }
                 if ( dep1desc.dep != null) {
