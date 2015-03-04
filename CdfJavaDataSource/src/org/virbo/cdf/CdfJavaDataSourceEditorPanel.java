@@ -19,7 +19,6 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
@@ -43,7 +42,9 @@ import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
 
 /**
- *
+ * Editor panel for CDF files.  The "Java" part of the name comes from this is a
+ * second implementation of the CDF reader, where the first was a native reader
+ * interfaced to Autoplot via Java Native Interface.
  * @author jbf
  */
 public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
@@ -298,9 +299,11 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public JPanel getPanel() {
         if (showAllInitially) {
             SwingUtilities.invokeLater( new Runnable() {
+                @Override
                 public void run() {
                     showAllVarTypeCB.setSelected(true);
                     setURI( getURI() );
@@ -354,6 +357,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         showAllVarTypeCB.setVisible(v);
     }
     
+    @Override
     public boolean reject( String url ) throws IOException, URISyntaxException {
         split = URISplit.parse(url);
         FileSystem fs = FileSystem.create( DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI() );
@@ -363,6 +367,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         return false;
     }
 
+    @Override
     public boolean prepare( String url,  java.awt.Window parent, ProgressMonitor mon) throws Exception {
         split= URISplit.parse(url);
 
@@ -371,6 +376,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
         logger.log(Level.FINE, "opening cdf file {0}", cdfFile.toString());
         try {
+            CdfDataSource.checkCdf(cdfFile);
             cdf = CdfDataSource.getCdfFile(cdfFile.toString());
             if ( cdf==null ) {
                 throw new IllegalArgumentException("file is not a CDF file");
@@ -382,6 +388,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         return true;
     }
 
+    @Override
     public void setURI(String url) {
         split= URISplit.parse(url);
         params= URISplit.parseParams(split.params);
@@ -404,8 +411,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     
             if ( cdfException!=null ) {
                 this.selectVariableLabel.setText( " " );
-                this.parameterTree.setModel( new DefaultTreeModel( new DefaultMutableTreeNode("Error") ) );
-                this.paramInfo.setText( "\nUnable to read CDF file." );
+                this.parameterTree.setModel( new DefaultTreeModel( new DefaultMutableTreeNode("") ) );
+                this.paramInfo.setText( "<html>Unable to read CDF file:<br>"+cdfException.getMessage() );
+                
                 return;
             }
             
@@ -516,6 +524,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
     }
 
+    @Override
     public String getURI() {
         String slice= subsetComboBox.getSelectedItem().toString().trim();
         if ( slice.length()>0 && slice.charAt(0)!='[' ) {
@@ -561,6 +570,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         return URISplit.format(split);
     }
 
+    @Override
     public void markProblems(List<String> problems) {
         
     }
@@ -575,10 +585,10 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
            try {
                 Object oattr= cdf.getAttribute( e.getKey(), "LABL_PTR_1");
                 String lablPtr1=null;
-                if ( oattr!=null && oattr instanceof Vector ) {
-                    Vector voattr= (Vector)oattr;
+                if ( oattr!=null && oattr instanceof List ) {
+                    List voattr= (List)oattr;
                     if ( voattr.size()>0 ) {
-                        lablPtr1= (String)((Vector)oattr).get(0);
+                        lablPtr1= (String)((List)oattr).get(0);
                     } else {
                         oattr= null;
                     }
