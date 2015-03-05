@@ -693,6 +693,15 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if (o != null) {
             column = o;
         }
+        
+        o = params.get( "arg_0" );
+        if ( o!=null && !o.equals("rank2") ) {
+            column = o;
+            timeColumn= 0;
+            final Units u = Units.t2000;
+            parser.setUnits(0, u);
+            depend0= "0";
+        } 
 
         o = params.get("rank2");
         if (o != null) {
@@ -830,7 +839,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         o = params.get("units");
         if (o != null) {
             String sunits = o;
-            Units u = SemanticOps.lookupUnits(sunits);
+            Units u = Units.lookupUnits(sunits);
             if (column != null) {
                 int icol = parser.getFieldIndex(column);
                 parser.setUnits(icol, u);
@@ -945,8 +954,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
      * <li>  a column index (0 is the first column)
      * <li>  a negative column index (-1 is the last column)
      * </ul>
-     * @param name
-     * @param count
+     * @param name the column name 
+     * @param count the number of columns (for negative column numbers)
      * @return the index of the field.
      */
     private int columnIndex( String name, int count ) {
