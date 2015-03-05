@@ -45,13 +45,18 @@ import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.ReferenceCache;
+//import org.virbo.datasource.ReferenceCache;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AsciiHeadersParser;
 import org.virbo.dsutil.AsciiParser.FieldParser;
 
 /**
- *
+ * DataSource for reading data in ASCII files, where each record is 
+ * one line of the file, and each record has the same number of fields.  
+ * This reads in each record and splits on the delimiter, which is typically
+ * guessed by examining the first 5 viable records.  This also supports
+ * synthesizing times that are in several fields.  
+ * 
  * @author jbf
  */
 public class AsciiTableDataSource extends AbstractDataSource {
@@ -118,7 +123,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
     }
  
-   public QDataSet getDataSet(ProgressMonitor mon) throws IOException, CancelledOperationException, NoDataInIntervalException {
+    @Override
+    public QDataSet getDataSet(ProgressMonitor mon) throws IOException, CancelledOperationException, NoDataInIntervalException {
        
 //        boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
 //
@@ -933,11 +939,12 @@ public class AsciiTableDataSource extends AbstractDataSource {
     }
 
     /**
-     * returns the field index of the name, which can be:
-     *   a column name
-     *   an implicit column name "field1"
-     *   a column index (0 is the first column)
-     *   a negative column index (-1 is the last column)
+     * returns the field index of the name, which can be:<ul>
+     * <li>  a column name
+     * <li>  an implicit column name "field1"
+     * <li>  a column index (0 is the first column)
+     * <li>  a negative column index (-1 is the last column)
+     * </ul>
      * @param name
      * @param count
      * @return the index of the field.
@@ -959,9 +966,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
      * parse range strings like "3:6", "3:-5", and "Bx_gsm-Bz_gsm"
      * if the delimiter is colon, then the end is exclusive.  If it is "-",
      * then it is inclusive.
-     * @param o
+     * @param o the string with the spec.
      * @param columnCount
-     * @return
+     * @return two-element int array of the first and last indeces+1.
      * @throws java.lang.NumberFormatException
      */
     private int[] parseRangeStr(String o, int columnCount) throws NumberFormatException {
