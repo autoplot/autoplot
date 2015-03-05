@@ -29,7 +29,7 @@ import org.virbo.dsutil.AsciiParser;
 import org.virbo.dsutil.AsciiParser.DelimParser;
 
 /**
- *
+ * Factory for AsciiTableDataSource readers for the ascii table reader.
  * @author jbf
  */
 public class AsciiTableDataSourceFactory implements DataSourceFactory {
@@ -38,6 +38,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
     public AsciiTableDataSourceFactory() {
     }
 
+    @Override
     public DataSource getDataSource(URI uri) throws FileNotFoundException, IOException {
         return new AsciiTableDataSource(uri);
     }
@@ -50,6 +51,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         return MetadataModel.createNullModel();
     }
 
+    @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
             List<CompletionContext> result = new ArrayList<CompletionContext>();
@@ -184,6 +186,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         }
     }
 
+    @Override
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         try {
             URISplit split = URISplit.parse(surl);
@@ -281,10 +284,12 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
 
     }
 
+    @Override
     public <T> T getCapability(Class<T> clazz) {
         return null;
     }
 
+    @Override
     public boolean supportsDiscovery() {
         return false;
     }
