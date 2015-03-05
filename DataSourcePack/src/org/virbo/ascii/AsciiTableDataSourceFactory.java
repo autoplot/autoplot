@@ -211,6 +211,11 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 if ( params.get("column")!=null ) {
                     return false;
                 } else {
+                    for (CompletionContext cc1 : cc) {
+                        if (cc1.completable.equals(arg_0)) {
+                            return false;
+                        }
+                    }
                     return true;
                 }
             }
