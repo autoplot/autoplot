@@ -48,9 +48,9 @@ public class MyDDSParser {
     }
 
     /**
-     * return the dimensions, or null for Sequences
+     * return the dimensions, or null for Sequences or Grids
      * @param variable
-     * @return
+     * @return the dimensions, or null for Sequences or Grids
      * @throws opendap.dap.NoSuchVariableException
      */
     public int[] getRecDims(String variable) throws NoSuchVariableException {
@@ -60,7 +60,7 @@ public class MyDDSParser {
             return null;
             
         } else if ( t instanceof DGrid ) {
-            DGrid dgrid = (DGrid) t;
+            //DGrid dgrid = (DGrid) t;
             return null;
             
         } else {
