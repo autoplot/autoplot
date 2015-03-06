@@ -2464,7 +2464,7 @@ public class PlotElementController extends DomNodeController {
                 if ( processDataSet!=null ) {
                     size= processDataSet.length();   
                 } else if ( dataSet!=null ) {
-                    size= dataSet.length();   
+                    size= dataSet.rank()>0 ? dataSet.length() : 1;
                 }
             }
             if ( size>SYMSIZE_DATAPOINT_COUNT ) {
