@@ -881,6 +881,18 @@ private void validMaxTextFieldActionPerformed(java.awt.event.ActionEvent evt) {/
     // TODO add your handling code here:
 }//GEN-LAST:event_validMaxTextFieldActionPerformed
 
+private boolean isIso8601TimeField0() {
+    int i= getSkipLines();
+    int nl= this.jTable1.getRowCount();
+    String text1= String.valueOf( this.jTable1.getValueAt( i,0 ) );
+    String text2= String.valueOf( this.jTable1.getValueAt( nl>(i+1) ? (i+1) : i, 0 ) );
+    if ( !text1.equals(text2) && TimeParser.isIso8601String(text1) && TimeParser.isIso8601String(text2) ) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 private void guessTimeFormatButtonAP( ) {
     String text= timeFormatTextField.getText().trim();
     String[] ss= text.split("\\+");
@@ -888,11 +900,10 @@ private void guessTimeFormatButtonAP( ) {
     StringBuilder template= new StringBuilder();
     boolean giveUp= false;
     if ( ss.length==1 ) {
-        try {
-            String s= TimeParser.iso8601String(ss[0]);
+        if ( TimeParser.isIso8601String(ss[0]) ) {
             timeFormatTextField.setText("ISO8601");
             return;
-        } catch ( IllegalArgumentException ex ) {
+        } else {
             logger.fine( "time does not appear to be iso8601" );
         }
     }
@@ -1152,6 +1163,9 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             if (params.containsKey("column")) {
                 setColumn(params.get("column"));
             }
+            if ( params.containsKey("arg_0") ) {
+                setColumn(params.get("arg_0"));
+            }
             if (params.containsKey("rank2")) {
                 setColumn(params.get("rank2"));
             }
@@ -1260,7 +1274,11 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                 params.put("rank2", getColumn());
             }
         } else {
-            params.put("column", getColumn());
+            if ( isIso8601TimeField0() ) {
+                params.put("arg_0", getColumn());
+            } else {
+                params.put("column", getColumn());
+            }
             params.remove("rank2");
             params.remove("bundle");
         }
