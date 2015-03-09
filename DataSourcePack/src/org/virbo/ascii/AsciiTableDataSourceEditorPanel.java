@@ -1204,7 +1204,6 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
 
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
-            ex.printStackTrace();
             throw new RuntimeException(ex);
         }
 
