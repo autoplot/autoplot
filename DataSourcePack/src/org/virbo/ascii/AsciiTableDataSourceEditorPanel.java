@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ComboBoxModel;
@@ -55,7 +54,7 @@ import org.virbo.dsutil.AutoHistogram;
 import org.virbo.dsutil.DataSetBuilder;
 
 /**
- *
+ * editor panel for managing ASCII table URIs.
  * @author  jbf
  */
 public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
@@ -67,6 +66,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
     boolean focusDep0 = false;
     TableCellRenderer defaultCellRenderer;
 
+    @Override
     public void markProblems(List<String> problems) {
         
     }
@@ -82,7 +82,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     Action createToolAction(final String label, final Tool t) {
         return new AbstractAction(label) {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if ( e.getSource() instanceof JToggleButton ) {
                     if ( jTable1.getSelectionModel().isSelectionEmpty() ) {
@@ -216,7 +216,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jScrollPane1.setRowHeaderView( new TableRowHeader(jTable1) );
 
         model.addPropertyChangeListener(new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent e) {
                 if (columns != null) {
                     updateColumns();
@@ -230,7 +230,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jTable1.getTableHeader().setReorderingAllowed(false);
 
         jTable1.getColumnModel().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 if ( e.getValueIsAdjusting() ) return;
                 doSelect( currentTool );
@@ -239,7 +239,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
 
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) return;
                 doSelect( currentTool );
@@ -832,8 +832,8 @@ private void guessFillButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
     fillValueTextField.setText( "moment..." );
     guessFillButton.setEnabled(false);
     Runnable run= new Runnable() {
+        @Override
         public void run() {
-
             ProgressMonitor mon= null;
             try {
                 DataSetBuilder builder= new DataSetBuilder( 1, 100 );
@@ -1109,10 +1109,12 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         firePropertyChange(PROP_DEP0, oldDep0, dep0);
     }
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
 
+    @Override
     public boolean reject( String url ) throws IOException, URISyntaxException {
         split = URISplit.parse(url);
         FileSystem fs = FileSystem.create( DataSetURI.toUri(split.path) );
@@ -1122,6 +1124,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         return false;
     }
 
+    @Override
     public boolean prepare( String url, java.awt.Window parent, ProgressMonitor mon) throws Exception {
         split = URISplit.parse(url);
         DataSetURI.getFile( DataSetURI.toUri(split.file), mon );
@@ -1224,6 +1227,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         }
     }
 
+    @Override
     public String getURI() {
 
         if ( skipLines > 0 ) {
