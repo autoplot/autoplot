@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>new xpos and ypos switches for plotx command allow more flexible layout.
+        <p><small>The NetCDF file reader will be getting more attention.</small>
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,8 +20,12 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-03-04 r16370):</p>
+        <p>Bugfixes (2015-03-09 r16405):</p>
         <ul>    
+            <li>divp implementation fixed</li>
+            <li>modp correctly supports seconds-since units to provide easy method for getting hours since midnight.</li>
+            <li>don't show number of Epoch records when variable record count doesn't match</li>
+            <li>Improve feedback when NetCDF file is mistaken for CDF file</li>
             <li>RGBRenderer checks for log/linear match and prints a warning when they don't match</li>
             <li>within function would incorrectly perform where command, when result should have been zeros and non-zeros.  This will affect scripts that use this command.</li>
             <li>clean up javadoc for ArrayDataSet.  Make ArrayDataSet implementations consistent with one another.</li>
@@ -68,6 +72,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>putBundleProperty and putIndexedProperty added to make it easier to build bundles.</li>
+            <li>random sequences used for randn can now be reset.</li>
+            <li>Ascii Table data URIs now support arg_0 to match CDF, which automatically gets the ISO8601 column 0 dependence.</li>
             <li>support rank 2 bundle in export to IDLSAV</li>
             <li>CDF reader detects HDF and NetCDF files with .cdf extension</li>
             <li>add origin and clockwise controls to pitch angle distribution renderer</li>
