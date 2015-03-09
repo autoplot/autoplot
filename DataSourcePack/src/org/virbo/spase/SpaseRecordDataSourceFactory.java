@@ -63,9 +63,7 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
                         String c= label;
                         if ( !Ops.safeName(label).equals(label) ) {
                             label= label+" ("+name+")";
-                        } else {
-                            label= label+" ("+name+")";
-                        }
+                        } 
                         if ( title==null ) {
                             title= label;
                         }
