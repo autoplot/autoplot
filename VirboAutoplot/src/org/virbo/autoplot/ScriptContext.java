@@ -1260,7 +1260,7 @@ public class ScriptContext extends PyJavaInstance {
         if ( dir==null ) {
             dom.getController().deletePlot(d);
         }
-        dom.getController().setPlot(result.get(0));
+        if ( result.size()>0 ) dom.getController().setPlot(result.get(0));
         return result;
     }
     

@@ -2276,6 +2276,7 @@ public class AutoplotUtil {
         dia.setLayout( new BorderLayout() );
         final JPanel pc= new JPanel();
         final List<Integer> result= new ArrayList(1);
+        result.add( JOptionPane.CANCEL_OPTION );
         BoxLayout b= new BoxLayout(pc,BoxLayout.X_AXIS);
         pc.setLayout( b );
         pc.add( Box.createGlue() );
@@ -2283,7 +2284,6 @@ public class AutoplotUtil {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                        
-                result.add( JOptionPane.CANCEL_OPTION );
                 dia.setVisible(false);
             }
         }) );
@@ -2292,7 +2292,7 @@ public class AutoplotUtil {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);        
-                result.add( JOptionPane.OK_OPTION );
+                result.set( 0, JOptionPane.OK_OPTION );
                 dia.setVisible(false);
             }
         }) );
