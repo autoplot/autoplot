@@ -1751,7 +1751,7 @@ public class PlotElementController extends DomNodeController {
                 
                 RenderType rt= peleCopy.getRenderType();
                 if ( rt==RenderType.series || rt==RenderType.colorScatter || rt==RenderType.hugeScatter || rt==RenderType.fillToZero || rt==RenderType.stairSteps ) {
-                    if (fillDs.length() > LARGE_DATASET_COUNT) {
+                    if (fillDs.length() > LARGE_DATASET_COUNT && !( rt==RenderType.colorScatter ) ) {
                         logger.fine("dataset has many points, turning off psym");
                         peleCopy.getStyle().setSymbolConnector(PsymConnector.SOLID);  // Interesting...  This was exactly the opposite of what I should do...
                         peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.NONE);   
