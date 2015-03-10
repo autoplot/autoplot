@@ -150,6 +150,16 @@ public class Test009 {
         dom.getPlotElements(0).getStyle().setSymbolSize(2);
         writePng("test009_017.png");
 
+        int nn= 50000; // greater than PlotElementController.LARGE_DATASET_COUNT
+        QDataSet yy = Ops.randomn(-12344, nn );
+        QDataSet zz = Ops.add( yy, Ops.divide( Ops.randomn(-12345, nn ), 10 ) );
+        QDataSet tt= Ops.putProperty( Ops.indgen(nn), QDataSet.UNITS, Units.t2010 );
+        
+        ScriptContext.plot( tt, yy, zz );
+        
+        ScriptContext.setRenderStyle("colorScatter");
+        writePng("test009_018.png");
+        
         //dom.getPlots(0).getXaxis().setLog( true );
         //writePng( "test009_017.png" );
         //dom.getPlots(0).getXaxis().setRange( DatumRangeUtil.parseTimeRangeValid("1990-01-01 03:15:01 to 03:15:02") );
