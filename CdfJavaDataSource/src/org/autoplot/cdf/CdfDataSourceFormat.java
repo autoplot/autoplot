@@ -12,7 +12,6 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
@@ -70,6 +69,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         return name;
     }
 
+    @Override
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws Exception {
 
         URISplit split= URISplit.parse( uri );
@@ -240,7 +240,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     }
     
     /**
-     * cdf library needs array in double or triple arrays.  
+     * CDF library needs array in double or triple arrays.  
      * 
      * @param ds the dataset.
      * @param uc UnitsConverter in case we need to handle times.
@@ -340,7 +340,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     }
     
     /**
-     * cdf library needs array in double or triple arrays.  
+     * CDF library needs array in double or triple arrays.  
      * 
      * @param ds the dataset.
      * @param uc UnitsConverter in case we need to handle times.
@@ -509,6 +509,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             } else {
                 cdf.addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, "ms" );
             }
+        } else {
+            cdf.addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, " " );
         }
         String label = (String) ds.property(QDataSet.LABEL);
         if (label != null && label.length()>0 ) {
@@ -584,10 +586,12 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
     }
 
+    @Override
     public boolean canFormat(QDataSet ds) {
         return ! ( ds.rank()==0  || SemanticOps.isJoin(ds) );
     }
 
+    @Override
     public String getDescription() {
         return "NASA Common Data Format";
     }
