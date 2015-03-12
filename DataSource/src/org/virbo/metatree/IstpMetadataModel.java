@@ -30,7 +30,12 @@ import org.virbo.datasource.LogNames;
 import org.virbo.dsops.Ops;
 
 /**
- *
+ * Metadata model for ISTP conventions.  For example, FIELDNAM is mapped to QDataSet.NAME, SCALEMIN is 
+ * mapped to TYPICAL_MIN, etc.  When LaTeX fragments are found in axis titles 
+ * {@code (s.contains("^{") || s.contains("_{"))}, then this is converted 
+ * into Granny control strings.
+ 
+ * 
  * @author Jeremy
  *
  */
@@ -60,27 +65,18 @@ public class IstpMetadataModel extends MetadataModel {
      * returns the Entry that is convertible to double as a double.
      * When there is an array, throw IllegalArgumentException
      * @param o the datum in double, int, String, array, etc.
-     * @param units the units of the datum
+     * @param units the units of the datum, result is returned in these units.
      * @param deflt the default value
      * @param minmax VALUE_MIN or VALUE_MAX or null.
+     * @return the double or 
      * @throws IllegalArgumentException for strings
      */
-    public static double doubleValue(Object o, Units units, double deflt, Object minmax ) {
+    private static double doubleValue(Object o, Units units, double deflt, Object minmax ) {
         if (o == null) {
             return deflt;
         }
-        if (o instanceof Float) {
-            return ((Float) o).doubleValue();
-        } else if (o instanceof Double) {
-            return ((Double) o).doubleValue();
-        } else if (o instanceof Short) {
-            return ((Short) o).doubleValue();
-        } else if (o instanceof Integer) {
-            return ((Integer) o).doubleValue();
-        } else if (o instanceof Long) {
-            return ((Long) o).doubleValue();
-        } else if (o instanceof Byte) {
-            return ((Byte) o).doubleValue();
+        if (o instanceof Number) {
+            return ((Number) o).doubleValue();
         } else if (o instanceof String) {
             String s = (String) o;
             if (s.startsWith("CDF_PARSE_EPOCH(")) {  // hack for Onera CDFs
@@ -134,7 +130,7 @@ public class IstpMetadataModel extends MetadataModel {
      * Return the range from VALIDMIN to VALIDMAX.  If the unit is an ordinal unit (see LABL_PTR_1), then return null.
      * Note QDataSet only allows times from 1000AD to 9000AD when Units are TimeLocationUnits.
      */
-    public static DatumRange getValidRange(Map attrs, Units units) {
+    private static DatumRange getValidRange(Map attrs, Units units) {
         double max = doubleValue(attrs.get("VALIDMAX"), units, Double.MAX_VALUE, VALUE_MAX );
         double min = doubleValue(attrs.get("VALIDMIN"), units, -1e29, VALUE_MIN ); //TODO: remove limitation
         if ( units.isFill(min) ) min= min / 100; // kludge because DatumRanges cannot contain fill.
@@ -298,6 +294,9 @@ public class IstpMetadataModel extends MetadataModel {
         String sunits= "";
         if (attrs.containsKey("UNITS")) {
             sunits = String.valueOf( attrs.get("UNITS") );
+            if ( LatexToGranny.isLatex(sunits) ) {
+                sunits= LatexToGranny.latexToGranny(sunits);
+            }
         } else {
             logger.log(Level.FINE, "UNITS are missing for {0}", name );
         }
