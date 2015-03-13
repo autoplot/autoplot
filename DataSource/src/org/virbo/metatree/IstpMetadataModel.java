@@ -63,7 +63,8 @@ public class IstpMetadataModel extends MetadataModel {
 
     /**
      * returns the Entry that is convertible to double as a double.
-     * When there is an array, throw IllegalArgumentException
+     * When there is an array, throw IllegalArgumentException.
+     * Note this is used in CdfDataSource and other projects.
      * @param o the datum in double, int, String, array, etc.
      * @param units the units of the datum, result is returned in these units.
      * @param deflt the default value
@@ -71,7 +72,7 @@ public class IstpMetadataModel extends MetadataModel {
      * @return the double or 
      * @throws IllegalArgumentException for strings
      */
-    private static double doubleValue(Object o, Units units, double deflt, Object minmax ) {
+    public static double doubleValue(Object o, Units units, double deflt, Object minmax ) {
         if (o == null) {
             return deflt;
         }
@@ -129,8 +130,12 @@ public class IstpMetadataModel extends MetadataModel {
     /**
      * Return the range from VALIDMIN to VALIDMAX.  If the unit is an ordinal unit (see LABL_PTR_1), then return null.
      * Note QDataSet only allows times from 1000AD to 9000AD when Units are TimeLocationUnits.
+     * Note this is used in CdfDataSource and other projects.
+     * @param attrs the ISTP attributes
+     * @param units the units for this variable, used to interpret doubles.
+     * @return the range.
      */
-    private static DatumRange getValidRange(Map attrs, Units units) {
+    public static DatumRange getValidRange(Map attrs, Units units) {
         double max = doubleValue(attrs.get("VALIDMAX"), units, Double.MAX_VALUE, VALUE_MAX );
         double min = doubleValue(attrs.get("VALIDMIN"), units, -1e29, VALUE_MIN ); //TODO: remove limitation
         if ( units.isFill(min) ) min= min / 100; // kludge because DatumRanges cannot contain fill.
