@@ -480,17 +480,18 @@ public class DataSourceController extends DomNodeController {
     /**
      * set the new dataset, do autoranging and autolabelling.
      * 
-     * preconditions: 
-     *   autoplot is displaying any dataset.  
-     *   A new DataSource has been set, but the dataset is generally not from the DataSource.
-     *   
-     * postconditions: 
-     *  the dataset is set
-     *  labels are set, axes are set.  
-     *  Labels reset might have triggered a timer that will redo layout.
-     *  slice dimensions are set for dataset.
-     * 
-     * @param ds
+     * preconditions: <ul>
+     *  <li> autoplot is displaying any dataset.  
+     *  <li> A new DataSource has been set, but the dataset is generally not from the DataSource.
+     * </ul>
+     * postconditions: <ul>
+     *  <li> the dataset is set
+     *  <li> labels are set, axes are set.  
+     *  <li> Labels reset might have triggered a timer that will redo layout.
+     *  <li> slice dimensions are set for dataset.
+     * </ul>
+     * @param ds the dataset.
+     * @param rawProperties additional properties provided by the data source.
      * @param immediately if false, then this is done after the application is done adjusting.
      */
     public void setDataSetInternal( QDataSet ds, Map<String,Object> rawProperties, boolean immediately) {
