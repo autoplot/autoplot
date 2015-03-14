@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The NetCDF file reader will be getting more attention.</small>
+        <p><small>Interpolate function used to sample points from a spectrogram.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,8 +20,11 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-03-09 r16405):</p>
-        <ul>    
+        <p>Bugfixes (2015-03-14 r16445):</p>
+        <ul>   
+            <li>CDF file units can now contain LaTeX code as well.</li>
+            <li>Corrections to QStreams containing bundles.</li>
+            <li>rte 2071287514: cancel dialog by closing window caused RTE.  Check for other places where it is assumed at least one element is returned.  Thanks Bob!</li>
             <li>divp implementation fixed</li>
             <li>modp correctly supports seconds-since units to provide easy method for getting hours since midnight.</li>
             <li>don't show number of Epoch records when variable record count doesn't match</li>
@@ -54,7 +57,7 @@
             <li>bug 1327:  blur URI causes das2server to loose resolution.</li>
             <li>correct misspelling/typo of addCapability after years without noticing.  Yeah code completion!</li>
             <li>getDataSet menu option completion now correctly checks for var= to see if the user has already corrected the name.</li>
-            <li>1326: aggregations are no longer guarenteed monotonic.  See ensureMonotonic to correct.</li>
+            <li>1326: aggregations are no longer guaranteed monotonic.  See ensureMonotonic to correct.</li>
             <li>allow vap+qds:/tmp/foo.dqt to work.  Before it was using the extension.</li>
             <li>bugfix: support eventsListUri in vap file.</li>
             <li>1326: new aggregation monotonic rule causes too many problems.  Initial code to just sort the data.</li>
@@ -72,9 +75,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>more dasCore code cleanup</li>
+            <li>Ascii Table data URIs now support arg_0 to match CDF, which automatically gets the ISO8601 column 0 dependence.</li>
             <li>putBundleProperty and putIndexedProperty added to make it easier to build bundles.</li>
             <li>random sequences used for randn can now be reset.</li>
-            <li>Ascii Table data URIs now support arg_0 to match CDF, which automatically gets the ISO8601 column 0 dependence.</li>
             <li>support rank 2 bundle in export to IDLSAV</li>
             <li>CDF reader detects HDF and NetCDF files with .cdf extension</li>
             <li>add origin and clockwise controls to pitch angle distribution renderer</li>
