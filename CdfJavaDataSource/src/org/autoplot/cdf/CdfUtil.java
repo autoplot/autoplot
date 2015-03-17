@@ -397,14 +397,14 @@ public class CdfUtil {
      * @param recCount the number of records to retrieve
      * @param recInterval the number of records to increment, typically 1 (e.g. 2= every other record).
      * @param slice1 if non-negative, return the slice at this point.
-     * @param isDep if true, don't do the non-varying expansion.
+     * @param depend if false, don't do the non-varying expansion.
      * @param mon progress monitor (currently not used), or null.
      * @return the dataset
      * @throws Exception
      */
     public static synchronized MutablePropertyDataSet wrapCdfData(
             CDFReader cdf, String svariable, long recStart, long recCount, long recInterval, 
-            int slice1, boolean isDep, ProgressMonitor mon) throws Exception {
+            int slice1, boolean depend, ProgressMonitor mon) throws Exception {
 
         logger.log( Level.FINE, "wrapCdfData {0}[{1}:{2}:{3}]", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
                  ""+(recCount+recStart), recInterval } );
@@ -576,7 +576,7 @@ public class CdfUtil {
             }
         }
         
-        if ( !isDep ) {
+        if ( depend ) {
             for ( int i=0; i<repeatDimensions.length; i++ ) {
                 if ( repeatDimensions[i]>1 ) {
                     result= new RepeatIndexDataSet( result, i+1, repeatDimensions[i] );
