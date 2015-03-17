@@ -37,6 +37,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.Slice0DataSet;
+import org.virbo.dataset.RepeatIndexDataSet;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.dsops.Ops;
 
@@ -326,9 +327,10 @@ public class CdfUtil {
 
     /**
      * returns effective rank.  Nand's code looks for 1-element dimensions, which messes up Seth's file rbspb_pre_ect-mageisHIGH.
-     * See files 
-     *  vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
-     *  vap+cdfj:file:///home/jbf/ct/autoplot/data.backup/examples/cdf/seth/rbspb_pre_ect-mageisHIGH-sp-L1_20130709_v1.0.0.cdf?Histogram_prot
+     * See files:<ul> 
+     * <li>vap+cdfj:ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/lep/2011/ge_k0_lep_20111016_v01.cdf?V0
+     * <li>vap+cdfj:file:///home/jbf/ct/autoplot/data.backup/examples/cdf/seth/rbspb_pre_ect-mageisHIGH-sp-L1_20130709_v1.0.0.cdf?Histogram_prot
+     * </ul>
      */
     private static int getEffectiveRank( boolean[] varies ) {
         int rank = 0;
@@ -419,10 +421,11 @@ public class CdfUtil {
 //        }
         
         long varType = cdf.getType(svariable);
-
         
         int[] dimSizes = cdf.getDimensions(svariable);
         boolean[] dimVaries= cdf.getVarys(svariable);
+        int[] repeatDimensions= new int[dimVaries.length]; // number of times to repeat because we didn't remove the dimension.
+        for ( int i=0; i<repeatDimensions.length; i++ ) repeatDimensions[i]= 1;
 
         int dims;
         if (dimSizes == null) {
@@ -441,6 +444,8 @@ public class CdfUtil {
                 if ( varies[i] && dimensions[i] != 1 ) {
                     dimSizes1[k]= dimSizes[i];
                     k++;
+                } else {
+                    repeatDimensions[i]= dimSizes[i]; 
                 }
             }
             dimSizes= dimSizes1;
@@ -561,6 +566,12 @@ public class CdfUtil {
                 result= BufferDataSet.makeDataSet(qube.length, recLenBytes, 0, 
                         qube,
                         buf[0], bbType );
+            }
+        }
+        
+        for ( int i=0; i<repeatDimensions.length; i++ ) {
+            if ( repeatDimensions[i]>1 ) {
+                result= new RepeatIndexDataSet( result, i+1, repeatDimensions[i] );
             }
         }
 
