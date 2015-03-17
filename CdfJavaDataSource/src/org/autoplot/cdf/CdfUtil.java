@@ -405,10 +405,7 @@ public class CdfUtil {
     public static synchronized MutablePropertyDataSet wrapCdfData(
             CDFReader cdf, String svariable, long recStart, long recCount, long recInterval, 
             int slice1, boolean isDep, ProgressMonitor mon) throws Exception {
-        
-        if ( svariable.startsWith("Epo") ) {
-            System.err.println("HEREHERE");
-        }
+
         logger.log( Level.FINE, "wrapCdfData {0}[{1}:{2}:{3}]", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
                  ""+(recCount+recStart), recInterval } );
         
