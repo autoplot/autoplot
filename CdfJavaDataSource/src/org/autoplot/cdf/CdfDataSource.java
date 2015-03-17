@@ -818,14 +818,14 @@ public class CdfDataSource extends AbstractDataSource {
 
         if (reform) {
             //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.
-            result = CdfUtil.wrapCdfData(cdf,svariable, 0, -1, 1, slice1, new NullProgressMonitor() );
+            result = CdfUtil.wrapCdfData(cdf,svariable, 0, -1, 1, slice1, depend, new NullProgressMonitor() );
         } else {
             long recCount = (recs[1] - recs[0]) / recs[2];
             if ( slice ) {
                 recCount= -1;
                 recs[2]= 1;
             }
-            result = CdfUtil.wrapCdfData(cdf,svariable, recs[0], recCount, recs[2], slice1, mon);
+            result = CdfUtil.wrapCdfData(cdf,svariable, recs[0], recCount, recs[2], slice1, depend, mon);
             //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
         }
         result.putProperty(QDataSet.NAME, svariable);
@@ -856,7 +856,7 @@ public class CdfDataSource extends AbstractDataSource {
                     QDataSet s=null;
                     try {
                         if ( hasVariable(cdf, svar) ) {
-                            s= CdfUtil.wrapCdfData( cdf, svar, 0, 1, 1, -1, new NullProgressMonitor() );
+                            s= CdfUtil.wrapCdfData( cdf, svar, 0, 1, 1, -1, true, new NullProgressMonitor() );
                             s= s.slice(0);
                             double s1= s.value(0);
                             for ( int i=1; i<s.length(); i++ ) {
