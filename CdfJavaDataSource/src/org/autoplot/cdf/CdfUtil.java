@@ -582,12 +582,13 @@ public class CdfUtil {
         }
         
         
-        if ( depend ) { 
-            for ( int i=1; i<repeatDimensions.length; i++ ) {
+        if ( depend && repeatDimensions.length==qube.length ) { 
+            //for ( int i=1; i<repeatDimensions.length; i++ ) {
+            int i= repeatDimensions.length-1;
                 if ( repeatDimensions[i]>1 ) {
                     result= new RepeatIndexDataSet( result, i+1, repeatDimensions[i] );
                 }
-            }
+            //}
         }
 
         if ( varType == CDFConstants.CDF_CHAR || varType==CDFConstants.CDF_UCHAR ) {
