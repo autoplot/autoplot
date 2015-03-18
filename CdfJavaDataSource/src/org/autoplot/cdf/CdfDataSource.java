@@ -748,17 +748,16 @@ public class CdfDataSource extends AbstractDataSource {
     /**
      * Read the variable into a QDataSet, possibly recursing to get depend variables.
      *
-     * @param cdf
+     * @param cdf the CDFReader
      * @param svariable the name of the variable to read
      * @param constraints null or a constraint string like "[0:10000]" to read a subset of records.
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
      * @param depend if true, recurse to read variables this depends on.
      * @param slice1 if >-1, then slice on the first dimension.  This is to support extracting components.
-     * @return
+     * @return the dataset 
      * @throws CDFException
      * @throws ParseException
      */
-    
     private synchronized MutablePropertyDataSet wrapDataSet(final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> thisAttributes, int slice1, ProgressMonitor mon) throws Exception, ParseException {
 
         if ( !hasVariable(cdf, svariable) ) {
@@ -1178,6 +1177,11 @@ public class CdfDataSource extends AbstractDataSource {
         return result;
     }
 
+    /**
+     * {@inheritDoc }
+     * @return an IstpMetadataModel
+     * @see IstpMetadataModel
+     */
     @Override
     public MetadataModel getMetadataModel() {
         return new IstpMetadataModel();
@@ -1248,7 +1252,7 @@ public class CdfDataSource extends AbstractDataSource {
 
     /**
      * check if the file really is a CDF, and throw IllegalArgumentException if it is not.
-     * NetCDF files once commonly occasionally the extension .cdf.
+     * NetCDF files occasionally use the extension .cdf.
      * @param cdfFile a CDF file (or not)
      * @throws IllegalArgumentException when the file is not a CDF.
      * @throws IOException when the file cannot be read.
