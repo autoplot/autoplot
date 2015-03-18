@@ -581,8 +581,9 @@ public class CdfUtil {
             }
         }
         
-        if ( depend ) {
-            for ( int i=0; i<repeatDimensions.length; i++ ) {
+        
+        if ( depend ) { 
+            for ( int i=1; i<repeatDimensions.length; i++ ) {
                 if ( repeatDimensions[i]>1 ) {
                     result= new RepeatIndexDataSet( result, i+1, repeatDimensions[i] );
                 }
