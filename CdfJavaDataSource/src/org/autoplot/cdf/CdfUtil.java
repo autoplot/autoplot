@@ -387,6 +387,26 @@ public class CdfUtil {
         return wrapCdfData(cdf, svariable, recStart, recCount, recInterval, slice1, false, mon);
     }
     
+    private static synchronized MutablePropertyDataSet maybeGetCached( CDFReader cdf, String svariable, 
+            long recStart, long recCount, long recInterval ) throws Exception {
+        String cdfFile;
+        synchronized ( CdfDataSource.lock ) {
+            cdfFile= CdfDataSource.openFilesRev.get(cdf);
+        }
+
+        if ( false && cdfFile!=null ) { //TODO: explore why enabling the cache causes problems with test autoplot-test034.
+            String uri= cdfFile + "?" + svariable;
+            if ( recStart!=0 || recCount!=cdf.getNumberOfValues(svariable) || recInterval>1 ) {
+                uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
+            }
+            synchronized ( CdfDataSource.dslock ) {
+                MutablePropertyDataSet result= CdfDataSource.dsCache.get( uri );
+                if ( result!=null ) return result;
+            }
+        }
+        return null;
+    }
+    
     /**
      * Return the named variable as a QDataSet.  This does not look at the
      * metadata for DEPEND_0, etc, and only adds metadata to represent time units
@@ -409,23 +429,8 @@ public class CdfUtil {
         logger.log( Level.FINE, "wrapCdfData {0}[{1}:{2}:{3}]", new Object[] { svariable, String.valueOf(recStart), // no commas in {1}
                  ""+(recCount+recStart), recInterval } );
         
-//        {
-//            String cdfFile;
-//            synchronized ( CdfDataSource.lock ) {
-//                cdfFile= CdfDataSource.openFilesRev.get(cdf);
-//            }
-//            
-//            if ( false && cdfFile!=null ) { //TODO: explore why enabling the cache causes problems with test autoplot-test034.
-//                String uri= cdfFile + "?" + svariable;
-//                if ( recStart!=0 || recCount!=cdf.getNumberOfValues(svariable) || recInterval>1 ) {
-//                    uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
-//                }
-//                synchronized ( CdfDataSource.dslock ) {
-//                    MutablePropertyDataSet result= CdfDataSource.dsCache.get( uri );
-//                    if ( result!=null ) return result;
-//                }
-//            }
-//        }
+        //MutablePropertyDataSet cresult= maybeGetCached( cdf, svariable, recStart, recCount, recInterval );
+        //if ( cresult!=null ) return cresult;
         
         long varType = cdf.getType(svariable);
         
