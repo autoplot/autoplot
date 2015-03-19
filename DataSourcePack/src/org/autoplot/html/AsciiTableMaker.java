@@ -41,6 +41,9 @@ public class AsciiTableMaker {
                 if ( field.contains("T") ) { // allow ISO8601 times.
                     Units.us2000.parse(field);
                     isTime= true;
+                } else if ( field.matches("\\d+/\\d+/\\d+") ) {
+                    Units.us2000.parse(field);
+                    isTime= true;
                 }
             } catch (ParseException ex) {
                 Logger.getLogger(AsciiTableMaker.class.getName()).log(Level.SEVERE, null, ex);
