@@ -582,14 +582,16 @@ public class CdfUtil {
         }
         
         
-        if ( depend && repeatDimensions.length==qube.length ) { 
-            //for ( int i=1; i<repeatDimensions.length; i++ ) {
-            int i= repeatDimensions.length-1;
-                if ( repeatDimensions[i]>1 ) {
-                    result= new RepeatIndexDataSet( result, i+1, repeatDimensions[i] );
-                }
-            //}
-        }
+        //TODO: we need to figure out why the native library would implement dimvary=false
+        //See https://sourceforge.net/p/autoplot/bugs/1351/
+//        if ( false && depend && repeatDimensions.length==qube.length ) { 
+//            //for ( int i=1; i<repeatDimensions.length; i++ ) {
+//            int i= repeatDimensions.length-1;
+//                if ( repeatDimensions[i]>1 ) {
+//                    result= new RepeatIndexDataSet( result, i+1, repeatDimensions[i] );
+//                }
+//            //}
+//        }
 
         if ( varType == CDFConstants.CDF_CHAR || varType==CDFConstants.CDF_UCHAR ) {
             EnumerationUnits units = EnumerationUnits.create(svariable);
