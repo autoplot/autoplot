@@ -357,7 +357,9 @@ public class CDAWebDataSource extends AbstractDataSource {
                     user.put( "delegate_10", (files.length-10) + " more files from " + base + "/" + tmpl );
                 }
 
-                result.putProperty( QDataSet.USER_PROPERTIES, user );
+                if ( !result.isImmutable() ) {
+                    result.putProperty( QDataSet.USER_PROPERTIES, user );
+                }
             }
         } finally {
             mon.finished();
