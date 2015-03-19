@@ -24,7 +24,7 @@ public class HtmlTableParserFactory extends AbstractDataSourceFactory {
 
     @Override
     public DataSource getDataSource(URI uri) throws Exception {
-        return new HtmlTableParser( uri );
+        return new HtmlTableDataSource( uri );
     }
 
     @Override

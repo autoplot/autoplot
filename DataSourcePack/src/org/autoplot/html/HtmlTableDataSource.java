@@ -9,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
 import javax.swing.text.html.parser.ParserDelegator;
@@ -20,10 +19,11 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 
 /**
- *
+ * Data source for extracting data from html tables.  This has been used
+ * for looking at real estate sales and weather history.
  * @author jbf
  */
-public class HtmlTableParser extends AbstractDataSource {
+public class HtmlTableDataSource extends AbstractDataSource {
 
     /**
      * the parameter name (not label) to plot
@@ -31,7 +31,7 @@ public class HtmlTableParser extends AbstractDataSource {
     public static final String PARAM_COLUMN= "column";
     public static final String PARAM_TABLE= "table";
 
-    public HtmlTableParser(URI uri) {
+    public HtmlTableDataSource(URI uri) {
         super(uri);
     }
 

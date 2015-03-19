@@ -381,9 +381,9 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
         URISplit lsplit= URISplit.parse(uri);
         Map<String,String> lparams= URISplit.parseParams(lsplit.params);
 
-        HtmlTableParser parser;
+        HtmlTableDataSource parser;
         try {
-            parser=  new HtmlTableParser(DataSetURI.getURIValid(uri));
+            parser=  new HtmlTableDataSource(DataSetURI.getURIValid(uri));
 
             tableComboBox.setModel( new DefaultComboBoxModel( parser.getTables().toArray( )) );
             String ltable= lparams.get("table");
@@ -409,9 +409,9 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
         Map<String,String> lparams= URISplit.parseParams(lsplit.params);
 
         QDataSet tds;
-        HtmlTableParser parser;
+        HtmlTableDataSource parser;
         try {
-            parser=  new HtmlTableParser(DataSetURI.getURIValid(uri));
+            parser=  new HtmlTableDataSource(DataSetURI.getURIValid(uri));
 
             tds = parser.getTable(new NullProgressMonitor());
 
