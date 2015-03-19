@@ -712,7 +712,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
                 QDataSet notes= notesBuilder.getDataSet();
                 if ( result!=null && notes.length()>0 ) result.putProperty( QDataSet.NOTES, notes );
-                if ( result!=null ) result.putProperty( QDataSet.USER_PROPERTIES, userProps );
+                if ( result!=null && !result.isImmutable() ) result.putProperty( QDataSet.USER_PROPERTIES, userProps );
                 if ( cacheEntry!=null ) cacheEntry.finished(result);
                 
                 // check to see if all the notes are the same explaining the exception
