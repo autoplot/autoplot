@@ -57,6 +57,7 @@ public class HtmlTableParser extends AbstractDataSource {
         }
     }
 
+    @Override
     public QDataSet getDataSet( ProgressMonitor mon ) throws IOException {
         QDataSet ds = getTable( mon );
 
