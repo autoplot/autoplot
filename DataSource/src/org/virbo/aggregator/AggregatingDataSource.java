@@ -598,7 +598,9 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                     //ads1= (BufferDataSet)checkSort(ads1);
                                     
                                     QDataSet saveDep0= (QDataSet) saveAds1.property(QDataSet.DEPEND_0);
-                                    logger.log(Level.WARNING, "data trimmed from dataset to avoid overlap at {0}", saveDep0.slice(0));
+                                    if ( saveDep0!=null ) { // rte_1262492185_20150313_155657_dgcrawfo.xml
+                                        logger.log(Level.WARNING, "data trimmed from dataset to avoid overlap at {0}", saveDep0.slice(0));
+                                    }
                                     
                                     bresult.append( ads1 );
                                 } else {
