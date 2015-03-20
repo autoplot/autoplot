@@ -14,6 +14,7 @@ import java.nio.channels.FileChannel.MapMode;
 import org.autoplot.bufferdataset.BufferDataSet;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.AbstractRank1DataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.IndexGenDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -285,7 +286,7 @@ public class BinaryDataSource extends AbstractDataSource {
             if ( reportOffset ) {
                 final int finalRecSizeBytes= recSizeBytes;
                 final int finalRecOffset= recOffset;
-                IndexGenDataSet dep0ds= new IndexGenDataSet(frecCount) {
+                MutablePropertyDataSet dep0ds= new AbstractRank1DataSet(frecCount) {
                     @Override
                     public double value(int i) {
                         return offset + finalRecOffset + i * finalRecSizeBytes;
