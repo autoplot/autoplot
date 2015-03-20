@@ -16,7 +16,6 @@ import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractRank1DataSet;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.IndexGenDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -89,25 +88,23 @@ public class BinaryDataSource extends AbstractDataSource {
         String[] ss= recFormat.split(",");
         int ioff=0;
         int ifield=0;
-        for ( int i=0; i<ss.length; i++ ) {
-
+        for (String s : ss) {
             int repeat;
-            int n= ss[i].length();
+            int n = s.length();
             Object type;
             String code;
-            if ( n>1 && ss[i].charAt(n-2)=='u' ) {
-                code= ss[i].substring(n-2);
+            if (n>1 && s.charAt(n-2) == 'u') {
+                code = s.substring(n-2);
             } else {
-                code= ss[i].substring(n-1);
+                code = s.substring(n-1);
             }
-            if ( code.length()==n ) {
+            if (code.length()==n) {
                 repeat= 1;
                 type= getTypeFromCode( code );
             } else {
                 type= getTypeFromCode( code );
-                repeat= Integer.parseInt( ss[i].substring(0,n-code.length()) );
-            } 
-
+                repeat = Integer.parseInt(s.substring(0, n-code.length()));
+            }
             offsets[ifield]= ioff;
             for ( int j=0; j<repeat; j++ ) {
                 if ( type!=null ) {
@@ -277,7 +274,7 @@ public class BinaryDataSource extends AbstractDataSource {
             String dep0Units= getParameter("depend0Units", "" );
             if ( dep0Units.length()>0 ) {
                 dep0Units= dep0Units.replaceAll("\\+", " ");
-                Units dep0u= SemanticOps.lookupUnits(dep0Units);
+                Units dep0u= Units.lookupUnits(dep0Units);
                 dep0ds.putProperty( QDataSet.UNITS, dep0u );
             }
             ds.putProperty(QDataSet.DEPEND_0, dep0ds);
