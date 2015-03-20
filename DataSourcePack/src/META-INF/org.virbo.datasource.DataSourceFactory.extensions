@@ -1,6 +1,6 @@
 org.virbo.ascii.AsciiTableDataSourceFactory dat txt
 org.virbo.das2Stream.Das2StreamDataSourceFactory d2s d2t das2Stream das2stream qds qdst
 org.virbo.spase.SpaseRecordDataSourceFactory xml
-org.autoplot.html.HtmlTableDataSource htm
+org.autoplot.html.HtmlTableDataSourceFactory htm
 org.autoplot.csv.CsvDataSourceFactory csv
 org.autoplot.orbit.OrbitDataSourceFactory orbit

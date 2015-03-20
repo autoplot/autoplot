@@ -20,7 +20,7 @@ import org.virbo.datasource.URISplit;
  *
  * @author jbf
  */
-public class HtmlTableParserFactory extends AbstractDataSourceFactory {
+public class HtmlTableDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
     public DataSource getDataSource(URI uri) throws Exception {
