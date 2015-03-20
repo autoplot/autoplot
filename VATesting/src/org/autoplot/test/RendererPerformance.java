@@ -17,7 +17,7 @@ import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.PlotElementController;
-import test.endtoend.Test009;
+import vatest.endtoend.Test009;
 
 /**
  * Introduce test to keep track of rendering performance.
