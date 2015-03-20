@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Interpolate function used to sample points from a spectrogram.
+        <p><small>The huge scatter renderer now properly implemented for flipped axes.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,7 @@
 
         <p>Bugfixes (2015-03-14 r16445):</p>
         <ul>
+            <li>huge scatter properly implements flipped</li>
             <li>magic number check on CDF files would fail with old CDF files</li>
             <li>IndexGenDataSet is now final, more operations try to preserve internal types to save memory.</li>
             <li>CDF file units can now contain LaTeX code as well.</li>
