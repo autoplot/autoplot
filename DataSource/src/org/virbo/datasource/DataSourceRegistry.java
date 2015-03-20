@@ -574,6 +574,9 @@ public class DataSourceRegistry {
         DataSourceFactory result;
         if (o instanceof String) {
             try {
+                if ( ((String)o).endsWith("DataSource") ) {
+                    throw new IllegalArgumentException("DataSourceFactory names cannot end in DataSource: "+o);
+                }
                 Class clas = Class.forName((String) o);
                 Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
                 result = (DataSourceFactory) constructor.newInstance(new Object[]{});
