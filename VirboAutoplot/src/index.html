@@ -21,9 +21,11 @@
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
         <p>Bugfixes (2015-03-14 r16445):</p>
-        <ul>   
+        <ul>
+            <li>magic number check on CDF files would fail with old CDF files</li>
+            <li>IndexGenDataSet is now final, more operations try to preserve internal types to save memory.</li>
             <li>CDF file units can now contain LaTeX code as well.</li>
-            <li>Corrections to QStreams containing bundles.</li>
+            <li>1350: Corrections to QStreams containing bundles.</li>
             <li>rte 2071287514: cancel dialog by closing window caused RTE.  Check for other places where it is assumed at least one element is returned.  Thanks Bob!</li>
             <li>divp implementation fixed</li>
             <li>modp correctly supports seconds-since units to provide easy method for getting hours since midnight.</li>
