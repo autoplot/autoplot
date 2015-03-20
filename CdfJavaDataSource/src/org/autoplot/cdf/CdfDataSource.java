@@ -1267,13 +1267,18 @@ public class CdfDataSource extends AbstractDataSource {
             in= new FileInputStream(cdfFile);
             int n= in.read(magic);
             if ( n==4 ) {
-                if ( ( magic[0] & 0xFF )==205 && ( magic[1] & 0xF0 ) ==240 ) {
+                if ( ( magic[0] & 0xFF )==0xCD && ( magic[1] & 0xFF )==0xF3 ) {
+                    logger.fine("V2.6 or newer");
                 } else if ( magic[0]==67 && magic[1]==68 && magic[2]==70 ) {
                     throw new IllegalArgumentException("File appears to be NetCDF, use vap+nc:");
                 } else if ( magic[1]==72 && magic[2]==68 && magic[3]==70 ) {
                     throw new IllegalArgumentException("File appears to be NetCDF (on HDF), use vap+nc:");
+                } else if ( magic[0]==0 && magic[1]==0 && magic[2]==-1 && magic[3]==-1 ) {
+                    logger.fine("pre-V2.6");
+                } else if ( ( magic[0] & 0xFF )==0xCC && ( magic[1] & 0xFF )==0xCC && ( magic[2] & 0xFF )==0x00 && ( magic[3] & 0xFF )==0x01  ) {
+                    logger.fine("compressed");
                 } else {
-                    throw new IllegalArgumentException("CDF magic number not found, expected 205 then 24x");
+                    // assume it's the old version of CDF that didn't have a magic number.
                 }
             }
         } finally {
