@@ -5,7 +5,6 @@
 package vatest.endtoend;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.ScriptContext;
@@ -13,6 +12,8 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
+import static vatest.endtoend.VATestSupport.TEST_DATA;
+import static vatest.endtoend.VATestSupport.TEST_VAP;
 
 /**
  * Test Autoplot including:
@@ -56,31 +57,34 @@ public class Test002 {
 
     private static void testVaps() throws Exception {
         String[] uris = new String[]{
-            "000 file:///home/jbf/ct/hudson/vap/lon/thb_l2_esa_20080907_electrons_less.vap",
-            "001 file:///home/jbf/ct/hudson/vap/energyCompareHydra.vap",
+            "000 " + TEST_VAP + "lon/thb_l2_esa_20080907_electrons_less.vap",
+            "001 " + TEST_VAP + "energyCompareHydra.vap",
             ///"002 file:///home/jbf/ct/autoplot/demos/cdaweb/ISS_DOSANL_TEPC_2_burst.vap",
-            "003 file:///home/jbf/ct/hudson/vap/hydra4.vap",
-            "004 file:///home/jbf/ct/hudson/vap/autoSlice.vap", // legacy vap shows adapt slice
-            "005 file:///home/jbf/ct/hudson/vap/jon-test_v1_07.vap",
-            "006 file:///home/jbf/ct/hudson/vap/omni_1978_v1_07.vap",
+            "003 " + TEST_VAP + "hydra4.vap",
+            "004 " + TEST_VAP + "autoSlice.vap", // legacy vap shows adapt slice
+            "005 " + TEST_VAP + "jon-test_v1_07.vap",
+            "006 " + TEST_VAP + "omni_1978_v1_07.vap",
             //mem "007 file:///home/jbf/ct/hudsonvap/Cluster1_HEEA_slices.vap",
-            "008 file:///home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap",
-            "009 file:///home/jbf/ct/hudson/vap/ninePanels.vap",
+            "008 " + TEST_VAP + "lanl/lanlGeoEpDemo4.vap",
+            "009 " + TEST_VAP + "ninePanels.vap",
             "010 http://autoplot.org/data/autoplot-applet.vap",
-            "011 file:///home/jbf/ct/hudson/vap/twoConnectorsOneDataSource.v1_07.vap",
-            "012 file:///home/jbf/ct/hudson/vap/cassini_kp.vap", // das2Server
-            "013 file:///home/jbf/ct/autoplot/demos/science/de_eics_species.vap",
+            "011 " + TEST_VAP + "twoConnectorsOneDataSource.v1_07.vap",
+            "012 " + TEST_VAP + "cassini_kp.vap", // das2Server
+            //TODO: move this file into testing tree.
+            //"013 file:///home/jbf/ct/autoplot/demos/science/de_eics_species.vap",
          //TODO: why does this rerange?   "014 file:///home/jbf/ct/hudsonvap/garageTemps_v1_07.vap",
             //mem "014 file:///home/jbf/ct/autoplot/demos/polarUvi.vap",
-            "015 file:///home/jbf/ct/autoplot/demos/polar.vap",
-            "020 file:///home/jbf/ct/hudson/vap/auto3.vap",
-            "021 file:///home/jbf/ct/hudson/vap/auto4.v1_07.vap",
-            "022 file:///home/jbf/ct/hudson/vap/tt2000.vap",
-            "023 file:///home/jbf/ct/hudson/vap/seth/multiScheme.vap",
-            "024 file:///home/jbf/ct/hudson/vap/demos/eventsBarForAvailability3.vap",
-            "025 file:///home/jbf/ct/hudson/vap/seth/mageis_rank2_labels.vap",
+            //TODO: move this file into testing tree.
+            //"015 file:///home/jbf/ct/autoplot/demos/polar.vap",
+            "020 " + TEST_VAP + "auto3.vap",
+            "021 " + TEST_VAP + "auto4.v1_07.vap",
+            "022 " + TEST_VAP + "tt2000.vap",
+            "023 " + TEST_VAP + "seth/multiScheme.vap",
+            //TODO: Test 24 uses local 1wire data source
+            //"024 " + TEST_VAP + "demos/eventsBarForAvailability3.vap",
+            "025 " + TEST_VAP + "seth/mageis_rank2_labels.vap",
             //This fails when user tomcat6 tries to run it.  disable for now.
-            //"026 file:///home/jbf/ct/hudson/vap/rbsp/efwComponents.vap", // not getting units...
+            //"026 " + TEST_VAP + "rbsp/efwComponents.vap", // not getting units...
         };
 
 
@@ -116,7 +120,7 @@ public class Test002 {
 
     private static void oldTests() throws Exception, IOException, InterruptedException {
 
-        QDataSet ds = Util.getDataSet("file:///home/jbf/ct/hudson/data.backup/wav/fireworks.wav");
+        QDataSet ds = Util.getDataSet(TEST_DATA + "wav/fireworks.wav");
         final Application dom = ScriptContext.getDocumentModel();
         dom.getCanvases(0).setFitted(false);
         ScriptContext.setCanvasSize(400, 800);
