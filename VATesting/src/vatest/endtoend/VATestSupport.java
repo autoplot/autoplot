@@ -18,7 +18,6 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
-import static test.endtoend.TestSupport.TEST_HOME;
 
 /**
  *
@@ -30,8 +29,7 @@ public class VATestSupport {
     /**
      * input vaps for testing.
      */
-    public static final String TEST_HOME= "/home/dgcrawfo/Physics_and_Astronomy/hudsonAPData/";
-
+    public static final String TEST_HOME= System.getenv("AP_TEST_HOME");
 
     /**
      * input data for testing
