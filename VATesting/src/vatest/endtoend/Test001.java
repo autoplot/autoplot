@@ -5,15 +5,21 @@
 
 package vatest.endtoend;
 
-import java.io.IOException;
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.lang.System.err;
+import static java.lang.System.exit;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import static org.virbo.dsops.Ops.*;
 import static org.virbo.autoplot.ScriptContext.*;
-import org.virbo.dsops.Ops;
-import org.virbo.jythonsupport.Util;
+import static org.virbo.dataset.QDataSet.DEPEND_0;
+import static org.virbo.dataset.QDataSet.DEPEND_1;
+import static org.virbo.dataset.QDataSet.SCALE_TYPE;
+import static org.virbo.dsops.Ops.FFTFilterType.Hanning;
+import static org.virbo.jythonsupport.Util.getDataSet;
+import static vatest.endtoend.VATestSupport.TEST_DATA;
 
 /**
  * Test Autoplot
@@ -27,55 +33,55 @@ public class Test001 {
             
             long t0;
             
-            System.err.println( "--- test001_001 ---" );
-            t0= System.currentTimeMillis();
-            QDataSet ds= Util.getDataSet( "http://www.autoplot.org/data/fireworks.wav" );
+            err.println( "--- test001_001 ---" );
+            t0= currentTimeMillis();
+            QDataSet ds= getDataSet( "http://www.autoplot.org/data/fireworks.wav" );
             plot( 0, ds );
             plot( 1, fftWindow( ds, 512 ) );
             setCanvasSize( 800, 600 );
             writeToPng( "test001_001.png" );
-            System.err.println( String.format( "test001_001 completed in %d ms", System.currentTimeMillis()-t0 ) );
+            err.println(format("test001_001 completed in %d ms", currentTimeMillis()-t0 ) );
             
-            System.err.println( "--- test001_004 ---" );
-            t0= System.currentTimeMillis();
-            ds= Util.getDataSet( "http://www.autoplot.org/data/fireworks.wav" );
+            err.println( "--- test001_004 ---" );
+            t0= currentTimeMillis();
+            ds= getDataSet( "http://www.autoplot.org/data/fireworks.wav" );
             plot( 0, ds );
-            plot( 1, fftPower( ds, Ops.windowFunction( FFTFilterType.Hanning, 1024 ), 2, new NullProgressMonitor() ) );
+            plot(1, fftPower(ds, windowFunction(Hanning, 1024 ), 2, new NullProgressMonitor() ) );
             setCanvasSize( 800, 600 );
             writeToPng( "test001_004.png" );
-            System.err.println( String.format( "test001_004 completed in %d ms", System.currentTimeMillis()-t0 ) );            
+            err.println(format("test001_004 completed in %d ms", currentTimeMillis()-t0 ) );            
                   
             
-            System.err.println( "--- test001_002 ---" );
-            t0= System.currentTimeMillis();
-            ds= Util.getDataSet( VATestSupport.TEST_DATA+"xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency" );
+            err.println( "--- test001_002 ---" );
+            t0= currentTimeMillis();
+            ds= getDataSet(TEST_DATA+"xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency" );
             plot( 0, "xaxis should be log", ds );
 
             MutablePropertyDataSet mds= (MutablePropertyDataSet) findgen(50,50);
             MutablePropertyDataSet xds= (MutablePropertyDataSet) exp10( linspace( 0, 2, 50 ) );
-            xds.putProperty( QDataSet.SCALE_TYPE, "log" );
+            xds.putProperty(SCALE_TYPE, "log" );
             MutablePropertyDataSet yds= (MutablePropertyDataSet) exp10( linspace( 0, 5, 50 ) );
-            yds.putProperty( QDataSet.SCALE_TYPE, "log" );
-            mds.putProperty( QDataSet.DEPEND_0, xds );
-            mds.putProperty( QDataSet.DEPEND_1, yds );
+            yds.putProperty(SCALE_TYPE, "log" );
+            mds.putProperty(DEPEND_0, xds );
+            mds.putProperty(DEPEND_1, yds );
             plot( 1, "log-log spectrogram", mds );
 
             setCanvasSize( 800, 600 );
             writeToPng( "test001_002.png" );
-            System.err.println( String.format( "test001_002 completed in %d ms", System.currentTimeMillis()-t0 ) );            
+            err.println(format("test001_002 completed in %d ms", currentTimeMillis()-t0 ) );            
 
             reset();
-            System.err.println( "--- test001_003 ---" );
-            plot( VATestSupport.TEST_DATA+"xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency" );
+            err.println( "--- test001_003 ---" );
+            plot(TEST_DATA+"xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency" );
             // this causes bad things as of 2009-08-12.
-            plot( VATestSupport.TEST_DATA+"qds/hist2.qds" );
+            plot(TEST_DATA+"qds/hist2.qds" );
             writeToPng( "test001_003.png" );
-            System.err.println( String.format( "test001_003 completed in %d ms", System.currentTimeMillis()-t0 ) );
+            err.println(format("test001_003 completed in %d ms", currentTimeMillis()-t0 ) );
 
-            System.exit(0);  // TODO: something is firing up the event thread
+            exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex ) {
             ex.printStackTrace();
-            System.exit(1);
+            exit(1);
         }
     }
 }
