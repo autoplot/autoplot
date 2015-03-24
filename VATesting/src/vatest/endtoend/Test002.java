@@ -112,12 +112,11 @@ public class Test002 {
                 doTest(s, label);
 
             } catch (Exception ex) {
-                PrintWriter pw = new PrintWriter(label + ".error");
-                pw.println(s);
-                pw.println("");
-                ex.printStackTrace(pw);
-
-                pw.close();
+                try (PrintWriter pw = new PrintWriter(label + ".error")) {
+                    pw.println(s);
+                    pw.println("");
+                    ex.printStackTrace(pw);
+                }
 
                 ex.printStackTrace();
 
