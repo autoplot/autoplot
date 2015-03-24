@@ -67,15 +67,14 @@ public class Test002 {
             //mem "007 file:///home/jbf/ct/hudsonvap/Cluster1_HEEA_slices.vap",
             "008 " + TEST_VAP + "lanl/lanlGeoEpDemo4.vap",
             "009 " + TEST_VAP + "ninePanels.vap",
-            "010 http://autoplot.org/data/autoplot-applet.vap",
+            "010 " + TEST_VAP + "test002_10.vap",
             "011 " + TEST_VAP + "twoConnectorsOneDataSource.v1_07.vap",
             "012 " + TEST_VAP + "cassini_kp.vap", // das2Server
-            //TODO: move this file into testing tree.
-            //"013 file:///home/jbf/ct/autoplot/demos/science/de_eics_species.vap",
+            //Test 013 uses CDAWEB data
+            "013 " + TEST_VAP + "de_eics_species.vap",
          //TODO: why does this rerange?   "014 file:///home/jbf/ct/hudsonvap/garageTemps_v1_07.vap",
             //mem "014 file:///home/jbf/ct/autoplot/demos/polarUvi.vap",
-            //TODO: move this file into testing tree.
-            //"015 file:///home/jbf/ct/autoplot/demos/polar.vap",
+            "015 " + TEST_VAP + "polar.vap",
             "020 " + TEST_VAP + "auto3.vap",
             "021 " + TEST_VAP + "auto4.v1_07.vap",
             "022 " + TEST_VAP + "tt2000.vap",
