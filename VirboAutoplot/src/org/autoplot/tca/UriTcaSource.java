@@ -235,7 +235,12 @@ public class UriTcaSource extends AbstractQFunction {
                 logger.fine("dataset dependence is not monotonic");
                 return new BundleDataSet( nonMonoDs );
             }
-            QDataSet findex= Ops.findex( dep0, d0 ); 
+            QDataSet findex;
+            if ( dep0.length()==1 ) {
+                findex= Ops.dataset(0);
+            } else {
+                findex= Ops.findex( dep0, d0 );
+            }
             
             QDataSet result;
             if ( findex.value()>=-0.5 && findex.value()<dep0.length()-0.5 ) {
