@@ -6,12 +6,23 @@ package vatest.endtoend;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import org.virbo.autoplot.RenderType;
-import org.virbo.autoplot.ScriptContext;
+import static java.lang.Integer.parseInt;
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.lang.System.err;
+import static java.lang.System.exit;
+import static org.virbo.autoplot.RenderType.fillToZero;
+import static org.virbo.autoplot.ScriptContext.getDocumentModel;
+import static org.virbo.autoplot.ScriptContext.load;
+import static org.virbo.autoplot.ScriptContext.plot;
+import static org.virbo.autoplot.ScriptContext.setCanvasSize;
+import static org.virbo.autoplot.ScriptContext.writeToPng;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
-import org.virbo.jythonsupport.Util;
+import static org.virbo.dsops.Ops.autoHistogram;
+import static org.virbo.dsops.Ops.fftWindow;
+import static org.virbo.dsops.Ops.log10;
+import static org.virbo.jythonsupport.Util.getDataSet;
 import static vatest.endtoend.VATestSupport.TEST_DATA;
 import static vatest.endtoend.VATestSupport.TEST_VAP;
 
@@ -25,32 +36,32 @@ public class Test002 {
 
     public static void main(String[] args) {
         try {
-            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
-            ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             oldTests();
             testVaps();
-            System.exit(0);  // TODO: something is firing up the event thread
+            exit(0);  // TODO: something is firing up the event thread
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.exit(1);
+            exit(1);
         }
     }
-    static long t0 = System.currentTimeMillis();
+    static long t0 = currentTimeMillis();
 
     public static void xxx(String id) {
-        System.err.println("-- timer -- " + id + " --: " + (System.currentTimeMillis() - t0));
-        t0 = System.currentTimeMillis();
+        err.println("-- timer -- " + id + " --: " + (currentTimeMillis() - t0));
+        t0 = currentTimeMillis();
     }
 
     private static void doTest(final String s, final String label) throws IOException, InterruptedException, Exception {
 
-        ScriptContext.load(s);
-        int width = ScriptContext.getDocumentModel().getCanvases(0).getWidth();
-        int height = ScriptContext.getDocumentModel().getCanvases(0).getHeight();
-        ScriptContext.setCanvasSize(width, height); // TODO: why?  I shouldn't have to set this...
-        ScriptContext.writeToPng(label + ".png");
+        load(s);
+        int width = getDocumentModel().getCanvases(0).getWidth();
+        int height = getDocumentModel().getCanvases(0).getHeight();
+        setCanvasSize(width, height); // TODO: why?  I shouldn't have to set this...
+        writeToPng(label + ".png");
 
-        System.err.printf("wrote to %s.png %dx%d\n", label, width, height);
+        err.printf("wrote to %s.png %dx%d\n", label, width, height);
 
 
     }
@@ -89,12 +100,12 @@ public class Test002 {
 
         for (String s : uris) {
 
-            int count = Integer.parseInt(s.substring(0, 4).trim());
+            int count = parseInt(s.substring(0, 4).trim());
             s = s.substring(4);
 
-            System.err.printf( "=== test002_%03d %s ===\n", count, s );
+            err.printf( "=== test002_%03d %s ===\n", count, s );
 
-            String label = String.format("test002_%03d", count);
+            String label = format("test002_%03d", count);
 
             try {
 
@@ -119,21 +130,21 @@ public class Test002 {
 
     private static void oldTests() throws Exception, IOException, InterruptedException {
 
-        QDataSet ds = Util.getDataSet(TEST_DATA + "wav/fireworks.wav");
-        final Application dom = ScriptContext.getDocumentModel();
+        QDataSet ds = getDataSet(TEST_DATA + "wav/fireworks.wav");
+        final Application dom = getDocumentModel();
         dom.getCanvases(0).setFitted(false);
-        ScriptContext.setCanvasSize(400, 800);
-        ScriptContext.plot(0, Ops.autoHistogram(ds));
+        setCanvasSize(400, 800);
+        plot(0, autoHistogram(ds));
         dom.getPlots(0).getXaxis().getController().getDasAxis().setUseDomainDivider(true);
-        dom.getPlotElements(0).setRenderType(RenderType.fillToZero);
+        dom.getPlotElements(0).setRenderType(fillToZero);
         dom.getPlots(0).getYaxis().setLabel("auto histogram of!chttp://www.autoplot.org/data/fireworks.wav");
-        QDataSet ds2 = Ops.autoHistogram(Ops.log10(Ops.fftWindow(ds, 512)));
-        ScriptContext.plot(1, ds2);
+        QDataSet ds2 = autoHistogram(log10(fftWindow(ds, 512)));
+        plot(1, ds2);
         dom.getPlots(1).getXaxis().getController().getDasAxis().setUseDomainDivider(true);
-        dom.getPlotElements(1).setRenderType(RenderType.fillToZero);
+        dom.getPlotElements(1).setRenderType(fillToZero);
         dom.getPlots(1).getYaxis().setLabel("auto histogram of!cpower spectrum");
         dom.getPlots(1).getXaxis().setLabel("log(Ops.fftWindow(512)");
-        ScriptContext.writeToPng("test002.png");
+        writeToPng("test002.png");
 
     }
 }
