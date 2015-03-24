@@ -5,17 +5,28 @@
 package vatest.endtoend;
 
 import java.io.IOException;
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.lang.System.err;
+import static java.lang.System.exit;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.das2.datum.DatumRangeUtil;
+import static java.util.logging.Level.SEVERE;
+import static org.das2.datum.DatumRangeUtil.parseTimeRangeValid;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.KeyChain;
+import static org.das2.util.filesystem.FileSystem.peekInstances;
+import static org.das2.util.filesystem.FileSystem.settings;
+import static org.das2.util.filesystem.KeyChain.getDefault;
 import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.monitor.CancelledOperationException;
-import org.virbo.autoplot.ScriptContext;
-import org.virbo.datasource.DataSetURI;
+import static org.virbo.autoplot.ScriptContext.createGui;
+import static org.virbo.autoplot.ScriptContext.getDocumentModel;
+import static org.virbo.autoplot.ScriptContext.load;
+import static org.virbo.autoplot.ScriptContext.reset;
+import static org.virbo.autoplot.ScriptContext.setCanvasSize;
+import static org.virbo.autoplot.ScriptContext.writeToPng;
+import static org.virbo.datasource.DataSetURI.getExplicitExt;
+import static vatest.endtoend.VATestSupport.logger;
 
 /**
  * Reiner's stuff, other vap files.
@@ -25,15 +36,13 @@ public class Test003 {
 
     public static void doit(int id, String uri) {
         try {
-            System.err.println( String.format( "== %03d == ", id ) );
-            long t0= System.currentTimeMillis();
-            System.err.println("uri: "+uri);
-            ScriptContext.load(uri);
-            ScriptContext.writeToPng("test003_" + String.format("%03d", id) + ".png");
-            System.err.println( String.format( "test003_%03d read in %.2f sec", id, ( System.currentTimeMillis()-t0 )/1000. ) );
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
+            err.println(format( "== %03d == ", id ) );
+            long t0= currentTimeMillis();
+            err.println("uri: "+uri);
+            load(uri);
+            writeToPng("test003_" + format("%03d", id) + ".png");
+            err.println(format("test003_%03d read in %.2f sec", id, ( currentTimeMillis()-t0 )/1000. ) );
+        } catch (InterruptedException | IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -45,26 +54,24 @@ public class Test003 {
         boolean loginBeforeTest= false;
         if ( loginBeforeTest ) {
             try {
-                DataSetURI.getExplicitExt("foo.dat"); // trigger initialization of Autoplot settings.
-                KeyChain.getDefault().getUserInfo( new URL("http://ectsoc@www.rbsp-ect.lanl.gov/") );
-                KeyChain.getDefault().getUserInfo( new URL("http://ectrept@www.rbsp-ect.lanl.gov/") );
-                KeyChain.getDefault().getUserInfo( new URL("http://www.rbsp-ect.lanl.gov/") );
-                KeyChain.getDefault().getUserInfo( new URL("http://ectmageis@www.rbsp-ect.lanl.gov/") );
-                KeyChain.getDefault().getUserInfo( new URL("http://ecthope@www.rbsp-ect.lanl.gov/") );
-            } catch (CancelledOperationException ex) {
-                VATestSupport.logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (MalformedURLException ex) {
-                VATestSupport.logger.log(Level.SEVERE, ex.getMessage(), ex);
+                getExplicitExt("foo.dat"); // trigger initialization of Autoplot settings.
+                getDefault().getUserInfo( new URL("http://ectsoc@www.rbsp-ect.lanl.gov/") );
+                getDefault().getUserInfo( new URL("http://ectrept@www.rbsp-ect.lanl.gov/") );
+                getDefault().getUserInfo( new URL("http://www.rbsp-ect.lanl.gov/") );
+                getDefault().getUserInfo( new URL("http://ectmageis@www.rbsp-ect.lanl.gov/") );
+                getDefault().getUserInfo( new URL("http://ecthope@www.rbsp-ect.lanl.gov/") );
+            } catch (CancelledOperationException | MalformedURLException ex) {
+                logger.log(SEVERE, ex.getMessage(), ex);
             }
         }
         
         try {
             if (!headless) {
-                ScriptContext.createGui();
+                createGui();
             }
 
-            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
-            ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             
             //doit(26, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts/rbsp_ect-rept-lvt.jyds" );
             doit(26, "http://www.rbsp-ect.lanl.gov/data_pub/autoplot/scripts//rbsp_ect-rept-lvt.jyds?timerange=2012-10-15" );
@@ -105,63 +112,63 @@ public class Test003 {
             doit(25, "file:///home/jbf/ct/lanl/rbsp/fixvaps20130423/rbspa_pre_ect-rept-sci-ion-L2.vap");
             
             
-            ScriptContext.getDocumentModel().getCanvases(0).setFitted(false);
-            ScriptContext.setCanvasSize(800, 600);
+            getDocumentModel().getCanvases(0).setFitted(false);
+            setCanvasSize(800, 600);
 
-            ScriptContext.load("file:///home/jbf/ct/hudson/vap/geo_pitch_stack_test1_local_1.vap");
-            ScriptContext.setCanvasSize(800, 600);
-            ScriptContext.writeToPng("test003_001.png");
+            load("file:///home/jbf/ct/hudson/vap/geo_pitch_stack_test1_local_1.vap");
+            setCanvasSize(800, 600);
+            writeToPng("test003_001.png");
 
-            ScriptContext.reset();
+            reset();
 
-            ScriptContext.load("file:///home/jbf/ct/hudson/vap/contextOverview2_v1.03a.vap");
-            ScriptContext.setCanvasSize(800, 600);
-            ScriptContext.writeToPng("test003_002.png");
+            load("file:///home/jbf/ct/hudson/vap/contextOverview2_v1.03a.vap");
+            setCanvasSize(800, 600);
+            writeToPng("test003_002.png");
 
-            ScriptContext.reset();
+            reset();
 
-            ScriptContext.load("file:///home/jbf/ct/hudson/vap/lanl_97A_sopa_panel_slices_3_v1.03a.vap");
-            ScriptContext.setCanvasSize(800, 600);
-            ScriptContext.writeToPng("test003_003.png");
+            load("file:///home/jbf/ct/hudson/vap/lanl_97A_sopa_panel_slices_3_v1.03a.vap");
+            setCanvasSize(800, 600);
+            writeToPng("test003_003.png");
 
-            ScriptContext.reset();
+            reset();
 
-            ScriptContext.load("file:///home/jbf/ct/hudson/vap/energyCompareHydra.vap");
-            ScriptContext.writeToPng("test003_004.png");
+            load("file:///home/jbf/ct/hudson/vap/energyCompareHydra.vap");
+            writeToPng("test003_004.png");
 
-            ScriptContext.getDocumentModel().getPlots(0).getXaxis().setRange(DatumRangeUtil.parseTimeRangeValid("2000-01-09 10:00 to 12:00"));
-            ScriptContext.writeToPng("test003_004a.png");
+            getDocumentModel().getPlots(0).getXaxis().setRange(parseTimeRangeValid("2000-01-09 10:00 to 12:00"));
+            writeToPng("test003_004a.png");
 
-            ScriptContext.reset();
+            reset();
 
-            ScriptContext.load("file:///home/jbf/ct/hudson/vap/lanl/cpaRichHeaders.vap");
-            ScriptContext.writeToPng("test003_006.png");
+            load("file:///home/jbf/ct/hudson/vap/lanl/cpaRichHeaders.vap");
+            writeToPng("test003_006.png");
 
             //ScriptContext.reset();
 
             //ScriptContext.load( "http://sarahandjeremy.net/~jbf/autoplot/data/gz/test_rank1.qds" ); // the .gz version of this file exists.  Autoplot should find and use it.
             //ScriptContext.writeToPng( "test003_007.png" );
 
-            ScriptContext.reset();
-            ScriptContext.load("http://cdaweb.gsfc.nasa.gov/istp_public/data/crres/particle_mea/mea_h0_cdaweb/$Y/crres_h0_mea_$Y$m$(d,span=10)_v01.cdf?B&timerange=1991-01-15");
-            ScriptContext.writeToPng("test003_008.png");
+            reset();
+            load("http://cdaweb.gsfc.nasa.gov/istp_public/data/crres/particle_mea/mea_h0_cdaweb/$Y/crres_h0_mea_$Y$m$(d,span=10)_v01.cdf?B&timerange=1991-01-15");
+            writeToPng("test003_008.png");
 
-            System.err.println("Local Cache Dir: "+FileSystem.settings().getLocalCacheDir());
-            FileSystem[] fss= FileSystem.peekInstances();
+            err.println("Local Cache Dir: "+settings().getLocalCacheDir());
+            FileSystem[] fss= peekInstances();
             for ( FileSystem fs: fss ) {
                 if ( fs instanceof WebFileSystem ) {
-                    System.err.println( fs.toString() + ":\t" + ( ((WebFileSystem)fs).isOffline() ? "offline" : "ok" ) );
+                    err.println( fs.toString() + ":\t" + ( ((WebFileSystem)fs).isOffline() ? "offline" : "ok" ) );
                 }
             }
                     
             if (headless) {
-                System.exit(0);
+                exit(0);
             }
 
-        } catch (Exception ex) {
+        } catch (InterruptedException | IOException ex) {
             ex.printStackTrace();
             if (headless) {
-                System.exit(1);
+                exit(1);
             }
         }
     }
