@@ -20,8 +20,10 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-03-21 r16501):</p>
+        <p>Bugfixes (2015-03-24 r16512):</p>
         <ul>
+            <li>1353: corrections to huge scatter where large waveform packets were preventing it from painting individual points.</li>
+            <li>bugfix: single-tag dataset for ephemeris would result in RTE.</li>
             <li>HtmlTableDataSource name changes, improved support for dates.</li>
             <li>huge scatter properly implements flipped</li>
             <li>magic number check on CDF files would fail with old CDF files</li>
