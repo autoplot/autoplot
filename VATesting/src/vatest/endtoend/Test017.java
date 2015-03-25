@@ -4,20 +4,30 @@
  */
 package vatest.endtoend;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import static java.lang.Integer.parseInt;
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.lang.System.err;
+import static java.lang.System.exit;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.logging.Level.SEVERE;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
-import org.virbo.jythonsupport.Util;
+import static org.virbo.dataset.QDataSet.DEPEND_0;
+import static org.virbo.dataset.QDataSet.LABEL;
+import static org.virbo.dataset.QDataSet.TITLE;
+import static org.virbo.dsops.Ops.autoHistogram;
+import static org.virbo.jythonsupport.Util.getDataSet;
+import static org.virbo.jythonsupport.Util.listDirectory;
+import static vatest.endtoend.VATestSupport.logger;
 
 /**
  * giant list of URIs for testing.  These are generally URIs that caused problems in the past, so
@@ -26,14 +36,14 @@ import org.virbo.jythonsupport.Util;
  */
 public class Test017 {
 
-    static long t0 = System.currentTimeMillis();
+    static long t0 = currentTimeMillis();
 
     public static void xxx(String id) {
-        System.err.println("timer: in " + (System.currentTimeMillis() - t0) + "ms finished " + id  );
-        t0 = System.currentTimeMillis();
+        err.println("timer: in " + (currentTimeMillis() - t0) + "ms finished " + id  );
+        t0 = currentTimeMillis();
     }
 
-    public static void main(String[] args)  {
+    public static void main(String[] args) throws FileNotFoundException  {
 
         try {
 
@@ -48,38 +58,36 @@ public class Test017 {
 
         xxx("start");
 
-        ThreadPoolExecutor exec= new ThreadPoolExecutor(12,12,3600,TimeUnit.SECONDS, new SynchronousQueue<Runnable>() );
+        ThreadPoolExecutor exec= new ThreadPoolExecutor(12,12,3600, SECONDS, new SynchronousQueue<>() );
 
         for (String s : uris) {
 
-            count= Integer.parseInt( s.substring(0,4).trim() );
+            count= parseInt( s.substring(0,4).trim() );
             s= s.substring(4);
 
-            String label = String.format("test017_%03d", count);
+            String label = format("test017_%03d", count);
 
             try {
                 
                 if (s.startsWith("CC ")) {
-                    String[] list = org.virbo.jythonsupport.Util.listDirectory(s.substring(3));
-                    PrintWriter out = new PrintWriter( label+".txt" );
-                    for (String l : list) {
-                        out.println(l);
-                    }
-                    out.close();
+                    String[] list = listDirectory(s.substring(3));
+                        try (PrintWriter out = new PrintWriter( label+".txt" )) {
+                            for (String l : list) {
+                                out.println(l);
+                            }   }
                 } else if (s.contains("file:/") && !s.contains("/home/jbf/ct/hudson") ) {
                     // we'll just skip these odd local file references for now.
-                    System.err.println("skipping local " + s);
+                        err.println("skipping local " + s);
                 } else {
                     doTest( s, label,exec );
 
                 }
             } catch (Exception ex) {
-                PrintWriter pw = new PrintWriter(label + ".error");
-                pw.println(s);
-                pw.println("");
-                ex.printStackTrace(pw);
-
-                pw.close();
+                    try (PrintWriter pw = new PrintWriter(label + ".error")) {
+                        pw.println(s);
+                        pw.println("");
+                        ex.printStackTrace(pw);
+                    }
 
                 ex.printStackTrace();
                 
@@ -88,11 +96,11 @@ public class Test017 {
             xxx( label + ": "+ s );
 
         }
-        } catch ( Exception ex ) {
+        } catch ( InterruptedException | NumberFormatException ex ) {
             ex.printStackTrace();
-            System.exit(1);
+            exit(1);
         }
-        System.exit(0);  // TODO: something is firing up the event thread
+        exit(0);  // TODO: something is firing up the event thread
     }
     
     static String[] uris = new String[]{
@@ -264,33 +272,30 @@ public class Test017 {
     };
 
     private static Runnable getRunnable( final String uri, final String id ) {
-        Runnable run= new Runnable() {
-            public void run()  {
-                try {
-                    QDataSet ds;
-                    ds = Util.getDataSet(uri);
-                    MutablePropertyDataSet hist = (MutablePropertyDataSet) Ops.autoHistogram(ds);
-                    hist.putProperty(QDataSet.TITLE, uri);
-                    hist.putProperty(QDataSet.LABEL, id);
-                    formatDataSet(hist, id + ".qds");
-                    QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
-                    if (dep0 != null) {
-                        MutablePropertyDataSet hist2 = (MutablePropertyDataSet) Ops.autoHistogram(dep0);
-                        formatDataSet(hist2, id + ".dep0.qds");
-                    } else {
-                        PrintWriter pw = new PrintWriter(id + ".dep0.qds");
+        Runnable run= () -> {
+            try {
+                QDataSet ds;
+                ds = getDataSet(uri);
+                MutablePropertyDataSet hist = (MutablePropertyDataSet) autoHistogram(ds);
+                hist.putProperty(TITLE, uri);
+                hist.putProperty(LABEL, id);
+                formatDataSet(hist, id + ".qds");
+                QDataSet dep0 = (QDataSet) ds.property(DEPEND_0);
+                if (dep0 != null) {
+                    MutablePropertyDataSet hist2 = (MutablePropertyDataSet) autoHistogram(dep0);
+                    formatDataSet(hist2, id + ".dep0.qds");
+                } else {
+                    try (PrintWriter pw = new PrintWriter(id + ".dep0.qds")) {
                         pw.println("no dep0");
-                        pw.close();
                     }
-                    plot(ds);
-                    setCanvasSize(750, 300);
-                    int i = uri.lastIndexOf("/");
-                    setTitle(uri.substring(i + 1));
-                    writeToPng(id + ".png");
-
-                } catch (Exception ex) {
-                    VATestSupport.logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
+                plot(ds);
+                setCanvasSize(750, 300);
+                int i = uri.lastIndexOf("/");
+                setTitle(uri.substring(i + 1));
+                writeToPng(id + ".png");
+            } catch (Exception ex) {
+                logger.log(SEVERE, ex.getMessage(), ex);
             }
         };
         return run;
@@ -298,8 +303,8 @@ public class Test017 {
 
     private static void doTest( final String uri, final String id, ThreadPoolExecutor exec ) throws IOException, InterruptedException, Exception {
 
-        System.err.printf( "== %s ==\n", id );
-        System.err.printf( "uri: %s\n", uri );
+        err.printf( "== %s ==\n", id );
+        err.printf( "uri: %s\n", uri );
         
         Runnable run= getRunnable( uri, id );
         int timeoutSeconds= 180;
@@ -312,19 +317,18 @@ public class Test017 {
             }
             catch (RejectedExecutionException ex) {
                 if (exec.isShutdown()) break;
-                System.err.println("Thread pool is full. Retrying...");
+                err.println("Thread pool is full. Retrying...");
                 Thread.sleep(100);
             }
         }
 
-        if ( f!=null && "Success!".equals(f.get(  timeoutSeconds, TimeUnit.SECONDS ) ) ) { //findbugs wrong
-            System.err.println("okay!");
+        if ( f!=null && "Success!".equals(f.get(timeoutSeconds, SECONDS) ) ) { //findbugs wrong
+            err.println("okay!");
         } else {
-            PrintWriter pw = new PrintWriter(id + ".error");
-            pw.println(uri);
-            pw.println("\ntimeout in "+timeoutSeconds+" seconds.");
-
-            pw.close();
+            try (PrintWriter pw = new PrintWriter(id + ".error")) {
+                pw.println(uri);
+                pw.println("\ntimeout in "+timeoutSeconds+" seconds.");
+            }
         }
 
 
