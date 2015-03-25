@@ -359,7 +359,7 @@ public class ScriptPanelSupport {
             //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
             annotationsSupport.annotateLine(lineno, "error", ex.toString(),interp);
         } else {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            //logger.log(Level.SEVERE, ex.getMessage(), ex);
             PyObject otraceback= ex.traceback;
             int line=0;
             int count=0; // just in case limit to three, because of recursion, etc.
@@ -598,7 +598,7 @@ public class ScriptPanelSupport {
                             } catch (PyException ex) {
                                 if ( !mon.isFinished() ) mon.finished();
                                 annotateError(ex, offset, interp );
-                                logger.log(Level.WARNING, ex.getMessage(), ex );
+                                //logger.log(Level.WARNING, ex.getMessage(), ex );
                                 applicationController.setStatus("error: " + ex.toString());
                             }
                         } catch (IOException ex) {
