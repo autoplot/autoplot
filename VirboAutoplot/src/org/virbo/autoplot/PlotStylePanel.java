@@ -66,7 +66,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
     Application dom;
     private StylePanel currentEditorPanel;
 
-    interface StylePanel {
+    public static interface StylePanel {
         public abstract void doElementBindings(PlotElement element);
         public abstract void releaseElementBindings();
     }
@@ -219,20 +219,8 @@ public class PlotStylePanel extends javax.swing.JPanel {
             public String toString() { return "doElementBindingsRunnable";  }
             @Override
             public void run() {
-            StylePanel editorPanel;
-            if ( element.getRenderType()==RenderType.spectrogram || element.getRenderType()==RenderType.nnSpectrogram ) {
-                editorPanel= new SpectrogramStylePanel(applicationModel);
-            } else if ( element.getRenderType()==RenderType.pitchAngleDistribution ) {
-                editorPanel= new SpectrogramStylePanel(applicationModel);
-            } else if ( element.getRenderType()==RenderType.hugeScatter ) {
-                editorPanel= new HugeScatterStylePanel(applicationModel);
-            } else if ( element.getRenderType()==RenderType.colorScatter ) {
-                editorPanel= new ColorScatterStylePanel(applicationModel);
-            } else {
-                //TODO: consider generic style panel that is based on completions of Renderer control.
-                editorPanel= new SeriesStylePanel(applicationModel);
-            }
-
+            StylePanel editorPanel= GuiSupport.getStylePanel( element.getRenderType() );
+            
             if ( currentEditorPanel==null || ( PlotStylePanel.this.currentElement!=element ) || ( !( currentEditorPanel.getClass()==editorPanel.getClass() ) ) ) {
                 editorPanel.doElementBindings(element);
 

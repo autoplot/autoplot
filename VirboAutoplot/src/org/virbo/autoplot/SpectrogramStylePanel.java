@@ -9,7 +9,6 @@ import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
-import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementStyle;
 
@@ -19,18 +18,12 @@ import org.virbo.autoplot.dom.PlotElementStyle;
  */
 public class SpectrogramStylePanel extends javax.swing.JPanel implements PlotStylePanel.StylePanel {
 
-    ApplicationModel applicationModel;
-    
     EnumerationEditor edit;
     EnumerationEditor rebin;
     BindingGroup elementBindingContext;
 
-    Application dom;
-    
     /** Creates new form PlotStylePanel */
-    public SpectrogramStylePanel(final ApplicationModel applicationModel) {
-        this.applicationModel = applicationModel;
-        this.dom= applicationModel.getDocumentModel();
+    public SpectrogramStylePanel() {
                 
         initComponents();
 

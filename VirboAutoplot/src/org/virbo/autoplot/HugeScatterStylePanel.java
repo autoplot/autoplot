@@ -13,7 +13,6 @@ import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
-import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementStyle;
 
@@ -23,17 +22,12 @@ import org.virbo.autoplot.dom.PlotElementStyle;
  */
 public class HugeScatterStylePanel extends javax.swing.JPanel implements PlotStylePanel.StylePanel {
 
-    ApplicationModel applicationModel;
-    
     ColorEditor colorEditor;
     BindingGroup elementBindingContext;
-
-    Application dom;
     
-    /** Creates new form PlotStylePanel */
-    public HugeScatterStylePanel(final ApplicationModel applicationModel) {
-        this.applicationModel = applicationModel;
-        this.dom= applicationModel.getDocumentModel();
+    /** Creates new form PlotStylePanel
+     */
+    public HugeScatterStylePanel( ) {
         
         initComponents();
 

@@ -34,8 +34,6 @@ import org.virbo.autoplot.dom.PlotElementStyle;
  * @author  jbf
  */
 public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotStylePanel.StylePanel {
-
-    ApplicationModel applicationModel;
     
     EnumerationEditor psymEditor;
     EnumerationEditor lineEditor;
@@ -46,12 +44,8 @@ public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotSt
     DatumEditor referenceEditor;
     BindingGroup elementBindingContext;
 
-    Application dom;
-    
     /** Creates new form PlotStylePanel */
-    public ColorScatterStylePanel(final ApplicationModel applicationModel) {
-        this.applicationModel = applicationModel;
-        this.dom= applicationModel.getDocumentModel();
+    public ColorScatterStylePanel( ) {
                 
         initComponents();
 

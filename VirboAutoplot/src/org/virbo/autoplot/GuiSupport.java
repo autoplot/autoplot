@@ -57,6 +57,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -205,6 +206,28 @@ public class GuiSupport {
         }
     }
 
+    /**
+     * return a GUI controller for the RenderType.
+     * @param renderType the render type, such as RenderType.colorScatter
+     * @return the GUI controller.
+     */
+    public static PlotStylePanel.StylePanel getStylePanel( RenderType renderType ) { 
+            PlotStylePanel.StylePanel editorPanel;
+            if ( renderType==RenderType.spectrogram || renderType==RenderType.nnSpectrogram ) {
+                editorPanel= new SpectrogramStylePanel( );
+            } else if ( renderType==RenderType.pitchAngleDistribution ) {
+                editorPanel= new SpectrogramStylePanel(  );
+            } else if ( renderType==RenderType.hugeScatter ) {
+                editorPanel= new HugeScatterStylePanel( );
+            } else if ( renderType==RenderType.colorScatter ) {
+                editorPanel= new ColorScatterStylePanel( );
+            } else {
+                //TODO: consider generic style panel that is based on completions of Renderer control.
+                editorPanel= new SeriesStylePanel( );
+            }
+            return editorPanel;
+    }
+    
     public static void editPlotElement( ApplicationModel applicationModel, Component parent ) {
         
         Application dom = applicationModel.dom;
@@ -1479,8 +1502,9 @@ public class GuiSupport {
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 PlotElement p = controller.getPlotElement();
-                PropertyEditor pp = new PropertyEditor(p.getStyle());
-                pp.showDialog(plot.getCanvas());
+                PlotStylePanel.StylePanel editorPanel= getStylePanel( p.getRenderType() );
+                editorPanel.doElementBindings(p);
+                JOptionPane.showMessageDialog( null, editorPanel );
             }
         });
         plotController.setPlotElementPropsMenuItem(panelPropsMenuItem);        
