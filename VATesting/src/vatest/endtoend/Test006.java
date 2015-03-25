@@ -17,6 +17,7 @@ import static org.virbo.dataset.QDataSet.LABEL;
 import static org.virbo.dataset.QDataSet.TITLE;
 import static org.virbo.dsops.Ops.autoHistogram;
 import static org.virbo.jythonsupport.Util.getDataSet;
+import static vatest.endtoend.VATestSupport.TEST_DATA;
 
 /**
  * Misc tests
@@ -60,10 +61,10 @@ public class Test006 {
 
             Exception e=null;
             e= doTest( 0, "ftp://spdf.gsfc.nasa.gov/pub/data/omni/low_res_omni/omni2_$Y.dat?column=field17&timerange=1963&timeFormat=$Y+$j+$H&time=field0&validMax=999", e );
-            e= doTest( 1, "http://goes.ngdc.noaa.gov/data/avg/2004/A1050412.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD", e );
-            e= doTest( 2, "vap+dat:file:///home/jbf/ct/hudson/data.backup/dat/V11979066.CSV?depend0=field0&column=field13", e );
-            e= doTest( 3, "file:///home/jbf/ct/hudson/data.backup/dat/power.dat.txt", e );  //case where guess cadence is failing, though it shouldn't.
-            e= doTest( 4, "vap+csv:file:///home/jbf/ct/hudson/data.backup/dat/V11979066.CSV?depend0=field0&column=field13", e );
+            e= doTest( 1, "http://satdat.ngdc.noaa.gov/sem/goes/data/avg/2004/A1050412.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD", e );
+            e= doTest( 2, "vap+dat:" + TEST_DATA + "/dat/V11979066.CSV?depend0=field0&column=field13", e );
+            e= doTest( 3, TEST_DATA + "/dat/power.dat.txt", e );  //case where guess cadence is failing, though it shouldn't.
+            e= doTest( 4, "vap+csv:" + TEST_DATA + "/dat/V11979066.CSV?depend0=field0&column=field13", e );
 
             //doTest( 2, "vap:http://vho.nasa.gov/mission/soho/celias_pm_30sec/1998.txt?time=YY&column=GSE_X&timeFormat=$y+$b+$d+$(ignore):$H:$M:$S" );
 
