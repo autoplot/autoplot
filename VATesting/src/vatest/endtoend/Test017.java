@@ -27,6 +27,9 @@ import static org.virbo.dataset.QDataSet.TITLE;
 import static org.virbo.dsops.Ops.autoHistogram;
 import static org.virbo.jythonsupport.Util.getDataSet;
 import static org.virbo.jythonsupport.Util.listDirectory;
+import static vatest.endtoend.VATestSupport.TEST_DATA;
+import static vatest.endtoend.VATestSupport.TEST_DATA_SMALL;
+import static vatest.endtoend.VATestSupport.TEST_VAP;
 import static vatest.endtoend.VATestSupport.logger;
 
 /**
@@ -127,13 +130,13 @@ public class Test017 {
 
         "008 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/mari_mag/1994/cn_k0_mari_19940122_v01.cdf?Epoch",
         "009 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/bars/%Y/cn_k0_bars_%Y%m%d_v...cdf?E_vel&timerange=1993-01-02+through+1993-01-14",
-        "010 CC ftp://cdaweb.gsfc.nasa.gov/pub/data/imp/imp8/mag_15sec/1973/i8_15sec_mag_19731030_v02.cdf",
+        "010 "+ TEST_DATA + "/cdf/i8_15sec_mag_19731030_v02.cdf",
         //No data is drawn:
         //this data no longer exists: "011 ftp://cdaweb.gsfc.nasa.gov/pub/data/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse",
         //IndexOutOfBoundsException:
         "012 http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/cis/2003/c2_pp_cis_20030104_v02.cdf?N_p__C2_PP_CIS",
-        //Suspect problem identifying valid data: "" +
-        "013 http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/fgm/2003/c2_pp_fgm_20030114_v01.cdf?Epoch__C2_PP_FGM",
+        //data no longer exists:
+        //"013 http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/fgm/2003/c2_pp_fgm_20030114_v01.cdf?Epoch__C2_PP_FGM",
         //Fails to guess cadence:
         "014 ftp://cdaweb.gsfc.nasa.gov/pub/data/imp/imp8/mag/mag_15sec_cdaweb/2000/i8_15sec_mag_20000101_v03.cdf?F1_Average_B_15s",
         //Strange message:
@@ -162,7 +165,7 @@ public class Test017 {
         //This fails because negative CADENCE and MONOTONIC=true.
 
         // This shows that I'm doing something wrong with fits files.  Using FITS liberator it looks good, with AP it is distorted.
-        "020 http://www.spacetelescope.org/static/projects/fits_liberator/datasets/m42/m42_40min_red.zip/m42_40min_red.fits",
+        "020 "+ TEST_DATA + "/fits/m42_40min_red.fits",
         //"020 vap:http://www.astro.princeton.edu/~frei/Gcat_htm/Catalog/Fits/n4013_lR.fits",
 
         //TEST DATA SOURCE TYPE: 6 ASCII
@@ -195,10 +198,10 @@ public class Test017 {
         "029 http://wind.nasa.gov/swe_apbimax/wi_swe_fc_apbimax.2001017.txt?column=field2&comment=;&time=field0&timeFormat=$Y+$j",
         //"Value must not be negative". No feedback on line number:
 
-        "030 http://vho.nasa.gov/mission/soho/celias_pm_30sec/1998.txt?time=YY&column=GSE_X&timeFormat=$y+$b+$d+$(ignore):$H:$M:$S",
+        "030 "+ TEST_DATA + "/dat/1998.txt?time=YY&column=GSE_X&timeFormat=$y+$b+$d+$(ignore):$H:$M:$S",
         //From VHO:
 
-        "031 ftp://nis-ftp.lanl.gov/pub/projects/genesis/3dmom/gim-3dl2-2002-01_v02.txt?skip=68&time=field0&timeFormat=$Y+$j+$H+$M+$S&column=field8&fill=-9999.0",
+        "031 "+ TEST_DATA + "/dat/test021/gim-3dl2-2002-01_v02.txt?skip=68&time=field0&timeFormat=$Y+$j+$H+$M+$S&column=field8&fill=-9999.0",
         //TEST DATA SOURCE TYPE: 7 Excel
 
         //German umlaut is not handled when creating column name:
@@ -219,7 +222,7 @@ public class Test017 {
         //"035 vap+txt:file:///opt/project/galileo/data/lrsudr/g7/eden/pws$y$j.data?timeRange=1997-049",
         //Though "Dec 2004" is requested, "Nov 2004 through Jan 2005" is loaded:
 
-        "036 vap+dat:http://goes.ngdc.noaa.gov/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&fill=32700&timerange=Dec+2004",
+        "036 vap+dat:"+ TEST_DATA + "/txt/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&fill=32700&timerange=Dec+2004",
         //TEST DATA SOURCE TYPE: 9 File System Completions
 
         //fails:
@@ -236,7 +239,7 @@ public class Test017 {
 
         //The Time parameter is irregular:
 
-        "041 file:///media/mini/data.backup/examples/xls/2008-lion%20and%20tiger%20summary.xls?sheet=Samantha+tiger+lp+lofreq&column=Elastic_Modulus&firstRow=53&depend0=Time",
+        "041 " + TEST_DATA + "/examples/xls/2008-lion%20and%20tiger%20summary.xls?sheet=Samantha+tiger+lp+lofreq&column=Elastic_Modulus&firstRow=53&depend0=Time",
         //TEST DATA SOURCE TYPE: 12 Issues with URIs
 
         //It would be nice to support plus notation with excel spreadsheets. Also, this shows an issue with the excel data source which
@@ -252,7 +255,7 @@ public class Test017 {
 
         //Demonstrates problem with AutoHistogram:
 
-        "045 http://goes.ngdc.noaa.gov/data/avg/2004/A1050402.TXT",
+        "045 "+ TEST_DATA + "/txt/A1050402.TXT",
         //TEST DATA SOURCE TYPE: 14 VAPs in the wild
 
         //VAP files are Autoplot configuration files, an xml version of the DOM tree. I'd expect these to be very fragile right now, but I'll try to support them:
@@ -262,12 +265,12 @@ public class Test017 {
         //"046 http://vmo.nasa.gov/vxotmp/vap/VMO/Granule/OMNI/PT1H/omni2_1994.vap",
 
         //vaps with modifiers and recent ISO8601 parsing.
-        "050 file:/home/jbf/ct/hudson/vap/cdaweb_ace.vap?timerange=2010-10-20+12:00+to+18:00",
-        "051 file:/home/jbf/ct/hudson/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/2010-10-20T18:00",
-        "052 file:/home/jbf/ct/hudson/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/PT6H",
+        "050 " + TEST_VAP + "/cdaweb_ace.vap?timerange=2010-10-20+12:00+to+18:00",
+        "051 " + TEST_VAP + "/cdaweb_ace.vap?timerange=2010-10-20T12:00/2010-10-20T18:00",
+        "052 " + TEST_VAP + "/cdaweb_ace.vap?timerange=2010-10-20T12:00/PT6H",
 
         // these are known to cause faults
-        "100 file:///home/jbf/ct/hudson/data/csv/pw/2011_08_23T20.hrs_rec.coeff.csv?depend0=SCET&column=Pkt%20%26%20Src%20ID", //No Datum exists for this ordinal: -1
+        "100 " + TEST_DATA_SMALL + "/csv/pw/2011_08_23T20.hrs_rec.coeff.csv?depend0=SCET&column=Pkt%20%26%20Src%20ID", //No Datum exists for this ordinal: -1
 
     };
 
