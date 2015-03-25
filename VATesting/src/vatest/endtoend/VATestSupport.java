@@ -118,7 +118,7 @@ public class VATestSupport {
             Method[] tests= new Method[] {
                 Test001.class.getMethod( "main",args.getClass()),
                 Test002.class.getMethod( "main",args.getClass()),
-                Test003.class.getMethod( "main",args.getClass()),
+                //Test003.class.getMethod( "main",args.getClass()),
                 Test004.class.getMethod( "main",args.getClass()),
                 Test005.class.getMethod( "main",args.getClass()),
                 Test006.class.getMethod( "main",args.getClass()),
@@ -151,6 +151,7 @@ public class VATestSupport {
             };
 
             final SecurityManager securityManager = new SecurityManager() {
+                @Override
                 public void checkPermission(java.security.Permission permission) {
                     if (permission.getName().startsWith("exitVM")) {
                         throw new SecurityException(
