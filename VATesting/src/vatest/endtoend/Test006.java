@@ -60,8 +60,11 @@ public class Test006 {
         try {
 
             Exception e=null;
-            e= doTest( 0, "ftp://spdf.gsfc.nasa.gov/pub/data/omni/low_res_omni/omni2_$Y.dat?column=field17&timerange=1963&timeFormat=$Y+$j+$H&time=field0&validMax=999", e );
-            e= doTest( 1, "http://satdat.ngdc.noaa.gov/sem/goes/data/avg/2004/A1050412.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD", e );
+//Moved these data sets into local tree.
+//            e= doTest( 0, "ftp://spdf.gsfc.nasa.gov/pub/data/omni/low_res_omni/omni2_$Y.dat?column=field17&timerange=1963&timeFormat=$Y+$j+$H&time=field0&validMax=999", e );
+//            e= doTest( 1, "http://satdat.ngdc.noaa.gov/sem/goes/data/avg/2004/A1050412.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD", e );
+            e= doTest( 0, TEST_DATA + "/dat/omni2_$Y.dat?column=field17&timerange=1963&timeFormat=$Y+$j+$H&time=field0&validMax=999", e );
+            e= doTest( 1, TEST_DATA + "/txt/A1050412.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD", e );
             e= doTest( 2, "vap+dat:" + TEST_DATA + "/dat/V11979066.CSV?depend0=field0&column=field13", e );
             e= doTest( 3, TEST_DATA + "/dat/power.dat.txt", e );  //case where guess cadence is failing, though it shouldn't.
             e= doTest( 4, "vap+csv:" + TEST_DATA + "/dat/V11979066.CSV?depend0=field0&column=field13", e );
