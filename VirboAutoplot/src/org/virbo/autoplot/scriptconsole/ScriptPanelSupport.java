@@ -206,7 +206,12 @@ public class ScriptPanelSupport {
         return true;
     }
 
-    
+    /**
+     * get the save file name with a save file dialog.
+     * @return response code, such as JFileChooser.APPROVE_OPTION or JFileChooser.CANCEL_OPTION
+     * @throws IOException 
+     * @see javax.swing.JFileChooser#showSaveDialog(java.awt.Component) 
+     */
     public int getSaveFile() throws IOException {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(getFileFilter());
@@ -1061,6 +1066,9 @@ public class ScriptPanelSupport {
         }
     }
 
+    /**
+     * interrupt the running script.
+     */
     void interrupt() {
         InteractiveInterpreter interp= getInterruptible();
         if ( interp!=null ) {
@@ -1069,7 +1077,9 @@ public class ScriptPanelSupport {
     }
 
     public static final String PROP_INTERRUPTABLE= "interruptable";
+    
     /**
+     * return the interruptible InteractiveInterpreter that runs the script.
      * @return the interruptible
      */
     public InteractiveInterpreter getInterruptible() {
@@ -1082,7 +1092,7 @@ public class ScriptPanelSupport {
         propertyChangeSupport.firePropertyChange( PROP_INTERRUPTABLE, old, interruptable );
     }
 
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
