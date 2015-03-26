@@ -230,7 +230,7 @@ public class Test017 {
         "037 CC ftp://ftp.nmh.ac.uk/wdc/obsdata/hourval/single_year/",
         //fails to read zip, but does read locally:
 
-        "038 http://www-pw.physics.uiowa.edu/helios/data1/data/average/a7510-12.zip/av751229.dat?depend0=field0&rank2=1:",
+        "038 "+ TEST_DATA + "/dat/a7510-12.zip/av751229.dat?depend0=field0&rank2=1:",
         //perhaps one day this will work:
 
         "040 http://www-pw.physics.uiowa.edu/helios/data1/data/average/a$y$m-...zip/av$y$m$d.dat?rank2=1:&time=field0&timerange=1975-oct",
