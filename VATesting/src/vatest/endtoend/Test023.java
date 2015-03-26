@@ -4,13 +4,14 @@
  */
 package vatest.endtoend;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
+import static vatest.endtoend.VATestSupport.TEST_DATA;
+import static vatest.endtoend.VATestSupport.TEST_DATA_SMALL;
 
 /**
  * Tests of HDF5 products
@@ -56,8 +57,8 @@ public class Test023 {
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
-            doTest( 0, "file:///home/jbf/ct/hudson/data.backup/h5/SourceAcronym_Subset1-1-v0.h5?ExtendibleArray" );
-            doTest( 1, "file:///home/jbf/ct/hudson/data/ncml/ap_service_provider_agg.ncml?Elastischer_Modul" );
+            doTest( 0, TEST_DATA + "/h5/SourceAcronym_Subset1-1-v0.h5?ExtendibleArray" );
+            doTest( 1, TEST_DATA_SMALL + "/ncml/ap_service_provider_agg.ncml?Elastischer_Modul" );
 
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex ) {
