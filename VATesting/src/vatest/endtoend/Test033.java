@@ -10,6 +10,7 @@ import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
 import java.io.File;
 import org.das2.datum.DatumRangeUtil;
+import static vatest.endtoend.VATestSupport.TEST_VAP;
 
 
 /**
@@ -30,7 +31,7 @@ public class Test033 {
         pp.timeFormat= "$Y$m$d";
         pp.timeRangeStr= "2006-dec-2 to 2006-dec-22";
 
-        ScriptContext.load( "file:/home/jbf/ct/hudson/vap/cassini_kp.vap" );
+        ScriptContext.load( TEST_VAP + "/cassini_kp.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -52,7 +53,7 @@ public class Test033 {
         pp.timeFormat= "$Y$m$d-$(H,span=2)";
         pp.timeRangeStr= "2006-dec-2 to 2006-dec-5";
 
-        ScriptContext.load( "file:/home/jbf/ct/hudson/vap/cassini_kp.vap" );
+        ScriptContext.load( TEST_VAP + "/cassini_kp.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -74,7 +75,7 @@ public class Test033 {
         pp.timeFormat= "$Y$m";
         pp.timeRangeStr= "2005 through 2007";
 
-        ScriptContext.load( "file:///home/jbf/ct/hudson/vap/kp_dst.vap" );
+        ScriptContext.load( TEST_VAP + "/kp_dst.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
@@ -96,7 +97,7 @@ public class Test033 {
         pp.timeFormat= "$Y$m$d-$(H,span=6)";
         pp.timeRangeStr= "1984-01-14 through 1984-01-23";
 
-        ScriptContext.load( "file:/home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap" );
+        ScriptContext.load( TEST_VAP + "/lanl/lanlGeoEpDemo4.vap" );
 
         dom.getPlots(1).getXaxis().setRange( DatumRangeUtil.parseTimeRange("1984-01-14 through 1984-01-23") );
         System.err.println("writing pngwalk at "+pwd );
@@ -123,7 +124,7 @@ public class Test033 {
         pp.autorange= true;
         pp.version= "v1.2";
 
-        ScriptContext.load( "file:///home/jbf/ct/hudson/vap/kp_dst.vap" );
+        ScriptContext.load( TEST_VAP + "/kp_dst.vap" );
 
         System.err.println("writing pngwalk at "+pwd );
         CreatePngWalk.doIt( dom, pp );
