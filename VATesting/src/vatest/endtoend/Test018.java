@@ -23,6 +23,9 @@ import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import static vatest.endtoend.VATestSupport.TEST_DATA;
+import static vatest.endtoend.VATestSupport.TEST_DATA_SMALL;
+import static vatest.endtoend.VATestSupport.TEST_VAP;
 
 /**
  * build up a dom programmatically to test dom operators.
@@ -57,7 +60,7 @@ public class Test018 {
         Application dom = getDocumentModel();
         dom.getController().reset(); 
         
-        dom.getDataSourceFilters(0).setUri("file:///home/jbf/ct/hudson/data.backup/qds/series/hyd_%Y%m%d.qds?timerange=2000-01-01 through 2000-01-12");
+        dom.getDataSourceFilters(0).setUri(TEST_DATA + "/qds/series/hyd_%Y%m%d.qds?timerange=2000-01-01 through 2000-01-12");
         
         getApplicationModel().waitUntilIdle(); // wait for child plot elements to be created.
         Axis xaxis= dom.getPlots(0).getXaxis();
@@ -97,7 +100,7 @@ public class Test018 {
         reset();
         Application dom = getDocumentModel();
 
-        dom.getDataSourceFilters(0).setUri("file:///home/jbf/ct/hudson/data.backup/cdf/ac_k0_mfi_20080602_v01.cdf?BGSEc");
+        dom.getDataSourceFilters(0).setUri(TEST_DATA + "/cdf/ac_k0_mfi_20080602_v01.cdf?BGSEc");
         dom.getPlots(0).getYaxis().setRange(new DatumRange(-10, 10, SemanticOps.lookupUnits("nT")));
         dom.getController().waitUntilIdle(); // wait for child plot elements to be created.
         writeToPng(testId + "_000.png");
@@ -129,16 +132,16 @@ public class Test018 {
 
         System.err.println("+++++++++++++++++++++++++");
         // this transition works fine
-        plot(0,"http://autoplot.org/data/autoplot.cdf?BGSM");
+        plot(0,TEST_DATA_SMALL + "/cdf/autoplot.cdf?BGSM");
         waitUntilIdle();
-        plot(0,"http://autoplot.org/data/autoplot.cdf?BGSEc");
+        plot(0,TEST_DATA_SMALL + "/cdf/autoplot.cdf?BGSEc");
         waitUntilIdle();
         writeToPng(testId + "_004a.png");
 
         System.err.println("+++++++++++++++++++++++++");
-        plot(0,"vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/lon/thb_l2_esa_20080907_v01.cdf?thb_peef_velocity_dsl");
+        plot(0,"vap+cdfj:" + TEST_DATA + "/cdf/lon/thb_l2_esa_20080907_v01.cdf?thb_peef_velocity_dsl");
         waitUntilIdle();
-        plot(0,"vap+cdf:file:///home/jbf/ct/hudson/data.backup/cdf/lon/thb_l2_esa_20080907_v01.cdf?thb_peef_velocity_dsl");
+        plot(0,"vap+cdf:" + TEST_DATA + "/cdf/lon/thb_l2_esa_20080907_v01.cdf?thb_peef_velocity_dsl");
         waitUntilIdle();
         writeToPng(testId + "_004.png");
         System.err.println("+++++++++++++++++++++++++");
@@ -165,7 +168,7 @@ public class Test018 {
     public static void test6( String testId ) throws Exception {
         System.err.println("=== test018 test6 ===");
         reset();
-        plot( "http://autoplot.org/vap/swpc.vap?timeRange=2012-04-07+through+2012-04-17" );
+        plot( TEST_VAP + "/swpc.vap?timeRange=2012-04-07+through+2012-04-17" );
         waitUntilIdle();
         plot( 0, "vap+tsds:http://tsds.net/cgi-bin/get.cgi?StartDate=19910101&EndDate=20041231&ext=bin&out=tsml&ppd=24&filter=mean&param1=Augsburg_ULF-1-v1" );
         writeToPng(testId + "_006.png");
