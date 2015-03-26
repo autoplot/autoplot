@@ -15,6 +15,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import static vatest.endtoend.VATestSupport.TEST_DATA;
 
 /**
  * Tests of the IDL/Matlab interface.
@@ -59,7 +60,7 @@ public class Test024 {
     public static void example3() throws Exception {
         System.err.println( "\n= example3 =\n");
         org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
-        apds.setDataSetURI("vap:file:///home/jbf/ct/hudson/data.backup/xls/hourlyForecast.xls?column=Temperature_F&depend0=Rel_Humidity_");
+        apds.setDataSetURI("vap:" + TEST_DATA + "/xls/hourlyForecast.xls?column=Temperature_F&depend0=Rel_Humidity_");
         apds.doGetDataSet();
         System.err.println( apds.toString() );
 
@@ -148,7 +149,7 @@ public class Test024 {
     public static void example6() throws Exception {
         System.err.println( "\n= example6 =\n");
         org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
-        apds.setDataSetURI("vap+h5:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux");
+        apds.setDataSetURI("vap+h5:" + TEST_DATA + "/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux");
         apds.doGetDataSet();
         if ( apds.getStatus()!=0 ) {
             System.err.println( apds.getStatusMessage() );
@@ -287,14 +288,14 @@ public class Test024 {
 
     public static void testGuessNameFor() {
         System.err.println( "\n= testGuessNameFor =\n");
-        System.err.println( DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux") );
-        System.err.println( DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?id=Flux" ) );
-        System.err.println( DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/my.txt?column=Flux" ) );
-        System.err.println( DataSourceUtil.guessNameFor("vap+cdf:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.cdf?Flux[::2]" ) );
+        System.err.println( DataSourceUtil.guessNameFor("vap+nc:" + TEST_DATA + "/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux") );
+        System.err.println( DataSourceUtil.guessNameFor("vap+nc:" + TEST_DATA + "/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?id=Flux" ) );
+        System.err.println( DataSourceUtil.guessNameFor("vap+nc:" + TEST_DATA + "/examples/my.txt?column=Flux" ) );
+        System.err.println( DataSourceUtil.guessNameFor("vap+cdf:" + TEST_DATA + "/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.cdf?Flux[::2]" ) );
         System.err.println( DataSourceUtil.guessNameFor("vap+inline:sin(linspace(0,1000,2000))" ) );
         System.err.println( DataSourceUtil.guessNameFor("" ) );
 
-        DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux");
+        DataSourceUtil.guessNameFor("vap+nc:" + TEST_DATA + "/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux");
 
     }
     public static void main( String[] args )  {
