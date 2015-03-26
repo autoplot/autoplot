@@ -70,13 +70,13 @@
     nbproject/build-impl.xml file. 
 
     -->
-<!--
+
     <property environment="env"/>
     <property name="VATestFiles" location="/"/>
     <target name="-post-clean">
         <delete>
-            <fileset dir="${VATestFiles}" includes="*.png"/>
+            <fileset dir="" includes="test*.png test*.txt test*.qds test*.vap test*.pdf"/>
         </delete>
-    </target>-->
+    </target>
 
 </project>
