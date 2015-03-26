@@ -10,6 +10,7 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
+import static vatest.endtoend.VATestSupport.TEST_HOME;
 
 /**
  * Tests of Jython scripting
@@ -58,14 +59,14 @@ public class Test025 {
             getDocumentModel().getCanvases(0).getMarginRow().setTop("0%+2em");
             getDocumentModel().getCanvases(0).getMarginRow().setBottom("100%-3em");
             
-            doTest( 0, "file:///home/jbf/ct/hudson/jyds/test025_000.jyds?ds1" );
-            doTest( 1, "file:///home/jbf/ct/hudson/jyds/test025_000.jyds?ds2" );
+            doTest( 0, "file:" + TEST_HOME  + "/jyds/test025_000.jyds?ds1" );
+            doTest( 1, "file:" + TEST_HOME  + "/jyds/test025_000.jyds?ds2" );
             setCanvasSize(500,500);
-            doTest( 2, "file:///home/jbf/ct/hudson/jyds/lambda.jyds?yy" );
-            doTest( 3, "file:///home/jbf/ct/hudson/jyds/lambda.jyds?zz" );
-            doTest( 4, "file:///home/jbf/ct/hudson/jyds/lambda.jyds?zz2" );
+            doTest( 2, "file:" + TEST_HOME  + "/jyds/lambda.jyds?yy" );
+            doTest( 3, "file:" + TEST_HOME  + "/jyds/lambda.jyds?zz" );
+            doTest( 4, "file:" + TEST_HOME  + "/jyds/lambda.jyds?zz2" );
             doTest( 5, "http://autoplot.org/data/imageDiff.jyds" );
-            doTest( 6, "file:///home/jbf/ct/hudson/jyds/test025_001.jyds?ds2");
+            doTest( 6, "file:" + TEST_HOME  + "/jyds/test025_001.jyds?ds2");
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (Exception ex) {
             ex.printStackTrace();
