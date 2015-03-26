@@ -11,6 +11,7 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
+import static vatest.endtoend.VATestSupport.TEST_DATA;
 
 /**
  * Tests of CEF read performance
@@ -54,9 +55,9 @@ public class Test015 {
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             
-            doTest( 0, "vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_PEA_CP3DXPH_DNFlux__20020811_140000_20020811_150000_V061018.cef?Data__C1_CP_PEA_CP3DXPH_DNFlux" );
-            doTest( 1, "vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_CIS-CODIF_HS_H1_PSD__20020117_000000_20020117_240000_V070824.cef?3d_ions__C1_CP_CIS-CODIF_HS_H1_PSD");
-            doTest( 2, "vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_EDI_EGD__20050215_V03.cef?tof__C1_CP_EDI_EGD" );
+            doTest( 0, "vap+cef:" + TEST_DATA + "/cef/C1_CP_PEA_CP3DXPH_DNFlux__20020811_140000_20020811_150000_V061018.cef?Data__C1_CP_PEA_CP3DXPH_DNFlux" );
+            doTest( 1, "vap+cef:" + TEST_DATA + "/cef/C1_CP_CIS-CODIF_HS_H1_PSD__20020117_000000_20020117_240000_V070824.cef?3d_ions__C1_CP_CIS-CODIF_HS_H1_PSD");
+            doTest( 2, "vap+cef:" + TEST_DATA + "/cef/C1_CP_EDI_EGD__20050215_V03.cef?tof__C1_CP_EDI_EGD" );
             
             //doTest( 4, "vap+tsds:http://timeseries.org/get3.cgi?StartDate=19950101&EndDate=20050201&ppd=24&ext=bin&out=ncml&param1=Kanekal_SAMPEX_elo_1hour-1-v0" );
 
