@@ -43,6 +43,7 @@ import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
 import org.virbo.qstream.StreamTool;
 import test.BundleBinsDemo;
+import static vatest.endtoend.VATestSupport.TEST_HOME;
 
 /**
  * Test013--QStream correctness and performance
@@ -381,7 +382,7 @@ public class Test013 {
 
     private static void writeLimitPrecision() throws StreamException, IOException {
         QDataSetStreamHandler handler = new QDataSetStreamHandler();
-        StreamTool.readStream(Channels.newChannel( new FileInputStream( "/home/jbf/ct/hudson/data.backup/qds/too_many_decimals.qds") ), handler);
+        StreamTool.readStream(Channels.newChannel( new FileInputStream( TEST_HOME + "/data.backup/qds/too_many_decimals.qds") ), handler);
 
         File f = new File("test013_writeLimitPrecision.qds");
 
