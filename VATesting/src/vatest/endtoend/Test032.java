@@ -9,6 +9,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSourceRegistry;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.jythonsupport.Util;
+import static vatest.endtoend.VATestSupport.TEST_DATA;
 
 /**
  * tests of the Java-based cdf reader
@@ -51,7 +52,7 @@ public class Test032 {
 
     // verify Ecounts[1] is the same dataset as Ecounts|slice(1)
     public static void test1() throws Exception {
-        String uri= "vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Ecounts";
+        String uri= "vap+cdfj:" + TEST_DATA + "/cdf/l1_h0_mpa_20020202_v02.cdf?Ecounts";
         QDataSet ds1;
         long t0= System.currentTimeMillis();
 
@@ -59,7 +60,7 @@ public class Test032 {
         ds2= Util.getDataSet( uri + "" );
         ds1= Util.getDataSet( uri + "[2]" );
 
-        QDataSet Ecounts= Util.getDataSet("vap+cdf:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Ecounts");
+        QDataSet Ecounts= Util.getDataSet("vap+cdf:" + TEST_DATA + "/cdf/l1_h0_mpa_20020202_v02.cdf?Ecounts");
         
         System.err.println("Ecounts[0,0,0,0]= "+Ecounts.value(0,0,0,0) + "    = 2.8333332538604736 at rev 15298" );
         System.err.println("Ecounts[0,1,0,0]= "+Ecounts.value(0,1,0,0) + "    = 4.833333492279053 at rev 15298" );
@@ -93,7 +94,7 @@ public class Test032 {
 
     // same test, but for rank 3 not rank 4.
     public static void test1_b() throws Exception {
-        String uri= "vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Azangle";
+        String uri= "vap+cdfj:" + TEST_DATA + "/cdf/l1_h0_mpa_20020202_v02.cdf?Azangle";
         QDataSet ds1;
         long t0= System.currentTimeMillis();
         ds1= Util.getDataSet( uri + "[2]" );
@@ -125,10 +126,10 @@ public class Test032 {
 
         long t0= System.currentTimeMillis();
 
-        ds1= Util.getDataSet( "vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Ecounts[2]" );
+        ds1= Util.getDataSet( "vap+cdfj:" + TEST_DATA + "/cdf/l1_h0_mpa_20020202_v02.cdf?Ecounts[2]" );
 
         QDataSet ds2;
-        ds2= Util.getDataSet("vap+cdf:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Ecounts[2]" );
+        ds2= Util.getDataSet("vap+cdf:" + TEST_DATA + "/cdf/l1_h0_mpa_20020202_v02.cdf?Ecounts[2]" );
 
         System.err.println( System.getProperty("java.version") + " " + System.getProperty("os.arch") );
         System.err.println( "java Ecounts[2].slice(20)=" + ds1.slice(20) );
@@ -146,10 +147,10 @@ public class Test032 {
 
         long t0= System.currentTimeMillis();
 
-        ds1= Util.getDataSet( "vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Azangle[2]" );
+        ds1= Util.getDataSet( "vap+cdfj:" + TEST_DATA + "/cdf/l1_h0_mpa_20020202_v02.cdf?Azangle[2]" );
 
         QDataSet ds2;
-        ds2= Util.getDataSet("vap+cdf:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Azangle[2]" );
+        ds2= Util.getDataSet("vap+cdf:" + TEST_DATA + "/cdf/l1_h0_mpa_20020202_v02.cdf?Azangle[2]" );
 
         System.err.println( System.getProperty("java.version") + " " + System.getProperty("os.arch") );
         System.err.println( "java Azangle[2].slice(20)=" + ds1.slice(20) );
@@ -170,8 +171,8 @@ public class Test032 {
 
         System.err.println( "== col major slice(2) ==" );
 
-        ds1= Util.getDataSet( "vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/testCdfColMajor.cdf?rank4float" );
-        ds2= Util.getDataSet(  "vap+cdf:file:///home/jbf/ct/hudson/data.backup/cdf/testCdfColMajor.cdf?rank4float" );
+        ds1= Util.getDataSet( "vap+cdfj:" + TEST_DATA + "/cdf/testCdfColMajor.cdf?rank4float" );
+        ds2= Util.getDataSet(  "vap+cdf:" + TEST_DATA + "/cdf/testCdfColMajor.cdf?rank4float" );
 
         //test1_dump( ds1 );
         
@@ -191,8 +192,8 @@ public class Test032 {
 
         System.err.println( "== row major slice(2) ==" );
 
-        ds1= Util.getDataSet( "vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/testCdfRowMajor.cdf?rank4float" );
-        ds2= Util.getDataSet(  "vap+cdf:file:///home/jbf/ct/hudson/data.backup/cdf/testCdfRowMajor.cdf?rank4float" );
+        ds1= Util.getDataSet( "vap+cdfj:" + TEST_DATA + "/cdf/testCdfRowMajor.cdf?rank4float" );
+        ds2= Util.getDataSet(  "vap+cdf:" + TEST_DATA + "/cdf/testCdfRowMajor.cdf?rank4float" );
 
         System.err.println( "java =" + ds1 );
         test1_dump( ds1.slice(2) );
