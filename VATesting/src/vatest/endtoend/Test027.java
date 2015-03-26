@@ -5,13 +5,17 @@
 package vatest.endtoend;
 
 import java.io.PrintWriter;
-import java.util.Arrays;
+import static java.lang.String.format;
+import static java.lang.System.err;
+import static java.lang.System.exit;
 import java.util.List;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSetURI.CompletionResult;
+import static org.virbo.datasource.DataSetURI.getCompletions;
 import org.virbo.datasource.URISplit;
+import static org.virbo.datasource.URISplit.format;
+import static org.virbo.datasource.URISplit.implicitVapScheme;
+import static org.virbo.datasource.URISplit.parse;
 
 /**
  * Tests of URI parsing. This should have been done ages ago, but better late than never. This is
@@ -31,35 +35,30 @@ public class Test027 {
         
         int cp= uri.length()/2;
 
-        PrintWriter out = new PrintWriter( String.format( "test027_%03d.txt",id) );
-        out.println("===");
-        out.println(uri);
-        out.println( spaces.substring(0,cp) + "^" );
-
-        split= URISplit.parse( uri, cp, true );
-
-        out.println( URISplit.format(split) );
-
-        out.println( spaces.substring(0,split.formatCarotPos) + "^" );
-        out.println( URISplit.implicitVapScheme(split) );
-        out.println("===");
-        
-        out.println(split);
-
-        out.close();
+        try (PrintWriter out = new PrintWriter(format("test027_%03d.txt", id))) {
+            out.println("===");
+            out.println(uri);
+            out.println( spaces.substring(0,cp) + "^" );
+            split = parse(uri, cp, true);
+            out.println(format(split));
+            out.println( spaces.substring(0,split.formatCarotPos) + "^" );
+            out.println(implicitVapScheme(split));
+            out.println("===");
+            out.println(split);
+        }
 
     }
 
     private static void doTestComp( int id, String uri ) throws Exception {
         // test completions
-        System.err.print( String.format( "=== %d %s ===", id, uri ) );
+        err.print(format( "=== %d %s ===", id, uri ) );
         for ( int i=0; i<uri.length(); i++ ) {
             try {
-                System.err.print( uri.substring(0,i)+"<C>...");
-                List<CompletionResult> result= DataSetURI.getCompletions(uri.substring(0,i), i, new NullProgressMonitor() );
-                System.err.println( result.size() );
+                err.print( uri.substring(0,i)+"<C>...");
+                List<CompletionResult> result= getCompletions(uri.substring(0,i), i, new NullProgressMonitor() );
+                err.println( result.size() );
             } catch ( Exception e ) {
-                System.err.println( e.getMessage() );
+                err.println( e.getMessage() );
                 e.printStackTrace();
             }
         }
@@ -97,10 +96,10 @@ public class Test027 {
             doTestComp( 101, "Enter Data Set" );
             doTestComp( 103, "papco@mrfrench.lanl.gov/" );
 
-            System.exit(0);  // TODO: something is firing up the event thread
+            exit(0);  // TODO: something is firing up the event thread
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.exit(1);
+            exit(1);
         }
     }
 }
