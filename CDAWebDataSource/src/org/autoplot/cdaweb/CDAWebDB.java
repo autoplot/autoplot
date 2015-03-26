@@ -31,7 +31,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import javax.xml.xpath.XPathFactoryConfigurationException;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -63,14 +62,14 @@ public class CDAWebDB {
     private static final Logger logger= LoggerManager.getLogger("apdss.cdaweb");
     
     private static CDAWebDB instance=null;
-    private static String dbloc= "http://cdaweb.gsfc.nasa.gov/pub/catalogs/all.xml";
+    public static final String dbloc= "http://cdaweb.gsfc.nasa.gov/pub/catalogs/all.xml";
 
     //private String version;
     private Document document; // should consume ~ 2 MB
     private Map<String,String> ids;  // serviceproviderId,Id
     private long refreshTime=0;
-    private Map<String,String> bases= new HashMap();
-    private Map<String,String> tmpls= new HashMap();
+    private final Map<String,String> bases= new HashMap();
+    private final Map<String,String> tmpls= new HashMap();
 
     public static synchronized CDAWebDB getInstance() {
         if ( instance==null ) {
@@ -84,6 +83,7 @@ public class CDAWebDB {
      * often.  Note it only takes a few seconds to refresh, plus download time,
      * but we don't want to pound on the CDAWeb server needlessly.
      * @param mon
+     * @throws java.io.IOException when reading dbloc file.
      */
     public synchronized void maybeRefresh( ProgressMonitor mon ) throws IOException {
         long t= System.currentTimeMillis();
@@ -263,8 +263,9 @@ public class CDAWebDB {
             logger.log( Level.FINE, "subdividedby={0}", subdividedby);
             logger.log( Level.FINE, "filenamimg={0}", filenaming);
             
-            if ( filenaming.contains("%Q"))
-            filenaming= filenaming.replaceFirst("%Q.*\\.cdf", "?%(v,sep).cdf"); // templates don't quite match
+            if ( filenaming.contains("%Q") ) {
+                filenaming= filenaming.replaceFirst("%Q.*\\.cdf", "?%(v,sep).cdf"); // templates don't quite match
+            }
             if ( subdividedby.equals("None") ) {
                 return filenaming;
             } else {
@@ -344,7 +345,7 @@ public class CDAWebDB {
             String tmpl= getNaming( spid );
             String base= getBaseUrl( spid );
 
-            Datum width= null;
+            Datum width;
             FileSystem fs;
             try {
                 fs = FileSystem.create(new URI(base));
@@ -509,11 +510,11 @@ public class CDAWebDB {
 
     /**
      * return the list of IDs that this reader can consume.
-     * We apply a number of constraints:
-     * 1. files must end in .cdf
-     * 2. timerange_start and timerange_stop must be ISO8601 times.
-     * 3. URL must start with a /, and may not be another website.
-     * @return
+     * We apply a number of constraints: <ol>
+     * <li> files must end in .cdf
+     * <li> timerange_start and timerange_stop must be ISO8601 times.
+     * <li> URL must start with a /, and may not be another website.
+     * </ol>
      * @throws IOException
      */
     public void refreshServiceProviderIds() throws IOException {
@@ -549,14 +550,14 @@ public class CDAWebDB {
                         }
                     }
                 } catch ( Exception ex2 ) {
-                    ex2.printStackTrace();
+                    logger.log( Level.WARNING, "exception", ex2 );
                 }
             }
 
             ids= result;
 
         } catch (XPathExpressionException ex) {
-            ex.printStackTrace();
+            logger.log( Level.WARNING, "serviceprovider_IDs exception", ex );
             throw new IOException("unable to read serviceprovider_IDs");
         }
 
@@ -566,6 +567,7 @@ public class CDAWebDB {
      * 4.2 seconds before getting description.  After too!
      * @param args
      * @throws IOException
+     * @throws java.text.ParseException
      */
     public static void main( String [] args ) throws IOException, ParseException {
         CDAWebDB db= getInstance();
