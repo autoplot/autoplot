@@ -25,7 +25,7 @@ import org.das2.graph.DasDevicePosition;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
-import static test.datum.TestDatumRangeUtil.testParse8601_1;
+import static vatest.endtoend.VATestSupport.TEST_DATA_SMALL;
 
 /**
  * tests of das2 internals.  These are tests of non-graphic parts (see test009 for this), and does not include
@@ -121,7 +121,7 @@ public class Test019 {
     }
 
     public static void testFileSystemModel() throws Exception {
-        FileStorageModel fsm= FileStorageModel.create( FileSystem.create( "file:///home/jbf/ct/hudson/data/dat/span/omni2/" ),
+        FileStorageModel fsm= FileStorageModel.create( FileSystem.create( TEST_DATA_SMALL + "/dat/span/omni2/" ),
                 "omni2_h0_mrg1hr_$Y$(m,span=6)$d_v01.cdf" );
         System.err.println( fsm );
 
