@@ -13,6 +13,8 @@ import org.das2.datum.DatumRange;
 import org.virbo.autoplot.dom.Application;
 
 import static org.virbo.autoplot.ScriptContext.*;
+import static vatest.endtoend.VATestSupport.TEST_DATA;
+import static vatest.endtoend.VATestSupport.TEST_VAP;
 
 /**
  * Test tool to simulate more sophistocated GUI operations
@@ -21,8 +23,8 @@ import static org.virbo.autoplot.ScriptContext.*;
  */
 public class Test034 {
 
-    private final static String tsbURI= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109";
-    private final static String noTsbURI= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX";
+    private final static String tsbURI= TEST_DATA + "/cdf/po_hyd/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109";
+    private final static String noTsbURI= TEST_DATA + "/cdf/po_hyd/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX";
 
     private static void test001() throws Exception {
         reset();
@@ -73,7 +75,7 @@ public class Test034 {
     private static void test004() throws Exception {
         reset();
         Application dom= getDocumentModel();
-        plot( "file:/home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap" );
+        plot( TEST_VAP + "/lanl/lanlGeoEpDemo4.vap" );
         writeToPng( "test034_004a.png" );
         DatumRange tr= dom.getTimeRange();
         tr= DatumRangeUtil.rescale( tr, -0.7, 0.3 );
