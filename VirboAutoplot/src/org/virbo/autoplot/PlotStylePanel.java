@@ -222,11 +222,14 @@ public class PlotStylePanel extends javax.swing.JPanel {
             currentElement.getStyle().removePropertyChangeListener(PlotElementStyle.PROP_COLOR, colorListener);
             currentElement.removePropertyChangeListener(PlotElement.PROP_RENDERTYPE, renderTypeListener); // remove it if it's there already
         }
-
+        
         final PlotElement element = dom.getController().getPlotElement();
         if (element == null) {
             return;
         }
+
+        element.addPropertyChangeListener(PlotElement.PROP_RENDERTYPE, renderTypeListener);
+        element.getStyle().addPropertyChangeListener(PlotElementStyle.PROP_COLOR, colorListener);        
 
         Runnable run = new Runnable() {
             @Override
@@ -256,15 +259,16 @@ public class PlotStylePanel extends javax.swing.JPanel {
                     stylePanel.add((JPanel) editorPanel, BorderLayout.CENTER);
 
                     currentElement = element;
+                    
                 }
 
-                element.addPropertyChangeListener(PlotElement.PROP_RENDERTYPE, renderTypeListener);
-                element.getStyle().addPropertyChangeListener(PlotElementStyle.PROP_COLOR, colorListener);
 
                 repaint();
                 validate(); // paint the new GUI
             }
         };
+        
+        System.err.println("psp270");
         SwingUtilities.invokeLater(run);
 
     }
