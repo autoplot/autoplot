@@ -44,6 +44,7 @@ import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.dsops.Ops;
 import org.virbo.metatree.IstpMetadataModel;
 
 /**
@@ -290,7 +291,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                         allSame= false;
                     }
                 }
-                if ( allSame ) result.putProperty( QDataSet.UNITS, SemanticOps.lookupUnits(unitss.slice(0).toString()) );
+                if ( allSame ) result= Ops.putProperty( result, QDataSet.UNITS, Units.lookupUnits(unitss.slice(0).toString()) );
             } 
 
             if ( result!=null && result.property(QDataSet.DEPEND_1)==null ) { // kludge to learn about master file new HFR-SPECTRA_EMFISIS
@@ -300,7 +301,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     String master= db.getMasterFile( ds.toUpperCase(), new NullProgressMonitor() );
                     DataSource masterSource= cdfFileDataSourceFactory.getDataSource( new URI( master+"?"+dep1+"[0]&doDep=no" ) );
                     QDataSet ds1= (MutablePropertyDataSet)masterSource.getDataSet( new NullProgressMonitor() );
-                    result.putProperty( QDataSet.DEPEND_1, ds1 );
+                    result= Ops.putProperty( result, QDataSet.DEPEND_1, ds1 );
                 }
             }
             
@@ -318,7 +319,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
                     if ( labelDs!=null ) {
                         if ( labelDs.rank()>1 && labelDs.length()==1 ) labelDs= labelDs.slice(0);
-                        result.putProperty( QDataSet.DEPEND_1, labelDs );
+                        result= Ops.putProperty( result, QDataSet.DEPEND_1, labelDs );
                     }
                 }
             }
@@ -334,7 +335,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
                     if ( labelDs!=null ) {
                         if ( labelDs.rank()>1 && labelDs.length()==1 ) labelDs= labelDs.slice(0);
-                        result.putProperty( QDataSet.LABEL, DataSetUtil.getStringValue(labelDs.slice(islice1)).trim() );
+                        result= Ops.putProperty( result, QDataSet.LABEL, DataSetUtil.getStringValue(labelDs.slice(islice1)).trim() );
                     }
                 }
                 
@@ -345,8 +346,9 @@ public class CDAWebDataSource extends AbstractDataSource {
                 MutablePropertyDataSet dep0= (MutablePropertyDataSet) result.property(QDataSet.DEPEND_0);
                 if ( dep0!=null && range!=null ) {
                     Units dep0units= (Units) dep0.property(QDataSet.UNITS);
-                    dep0.putProperty( QDataSet.TYPICAL_MIN, range.min().doubleValue(dep0units) );
-                    dep0.putProperty( QDataSet.TYPICAL_MAX, range.max().doubleValue(dep0units) );
+                    dep0= Ops.putProperty( dep0, QDataSet.TYPICAL_MIN, range.min().doubleValue(dep0units) );
+                    dep0= Ops.putProperty( dep0, QDataSet.TYPICAL_MAX, range.max().doubleValue(dep0units) );
+                    result= Ops.putProperty( result, QDataSet.DEPEND_0, dep0 );
                 }
 
                 Map<String,String> user= new HashMap<String, String>();
@@ -375,8 +377,8 @@ public class CDAWebDataSource extends AbstractDataSource {
                     if ( dep1==null || !UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(dep1)) ) nphys++;
                 }
                 if ( nphys==0 ) {
-                    logger.fine("removing display type becuayse of ordinal units");
-                    result.putProperty( QDataSet.RENDER_TYPE,null );
+                    logger.fine("removing display type because of ordinal units");
+                    result= Ops.putProperty( result, QDataSet.RENDER_TYPE,null );
                 }
 
             }
