@@ -229,6 +229,7 @@ public class PlotElementController extends DomNodeController {
                         resetPlotElement( sliceDs, plotElement.getRenderType(), ""); // I'm assuming that getDataSet() has been set already, which should be the case.
                     }
                 }
+                updateDataSet();
             } else {
                 doResetRenderType(newRenderType);
                 updateDataSet();
