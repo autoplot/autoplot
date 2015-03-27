@@ -211,7 +211,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     JTextField editor;
     DataSetSelectorSupport support = new DataSetSelectorSupport(this);
     public static final String PROPERTY_MESSAGE = "message";
-    static final Logger logger = Logger.getLogger("apdss.gui.dss");
+    static final Logger logger = LoggerManager.getLogger("apdss.gui.dss");
     MonitorFactory monitorFactory = null;
     Timer maybePlotTimer;
     int keyModifiers = 0;
@@ -1702,6 +1702,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      * @param value New value of property value.
      */
     public void setValue(String value) {
+        logger.log(Level.FINE, "setValue to \"{0}\"", value);
         //String oldvalue= this.editor.getText();
         this.lastValue= value;
         if (value == null) {
