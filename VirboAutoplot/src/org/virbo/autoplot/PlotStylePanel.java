@@ -268,7 +268,6 @@ public class PlotStylePanel extends javax.swing.JPanel {
             }
         };
         
-        System.err.println("psp270");
         SwingUtilities.invokeLater(run);
 
     }
