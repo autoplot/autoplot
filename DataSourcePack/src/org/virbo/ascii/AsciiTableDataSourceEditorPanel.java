@@ -886,11 +886,7 @@ private boolean isIso8601TimeField0() {
     int nl= this.jTable1.getRowCount();
     String text1= String.valueOf( this.jTable1.getValueAt( i,0 ) );
     String text2= String.valueOf( this.jTable1.getValueAt( nl>(i+1) ? (i+1) : i, 0 ) );
-    if ( !text1.equals(text2) && TimeParser.isIso8601String(text1) && TimeParser.isIso8601String(text2) ) {
-        return true;
-    } else {
-        return false;
-    }
+    return !text1.equals(text2) && TimeParser.isIso8601String(text1) && TimeParser.isIso8601String(text2);
 }
 
 private void guessTimeFormatButtonAP( ) {
