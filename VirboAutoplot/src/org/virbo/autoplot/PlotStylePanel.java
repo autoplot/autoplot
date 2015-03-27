@@ -17,6 +17,8 @@ import org.das2.components.propertyeditor.EnumerationEditor;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
@@ -25,6 +27,7 @@ import javax.swing.SwingUtilities;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.GraphUtil;
+import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -45,6 +48,8 @@ import org.virbo.autoplot.dom.PlotElementStyle;
  */
 public class PlotStylePanel extends javax.swing.JPanel {
 
+    private static final Logger logger= LoggerManager.getLogger("autoplot.gui");
+    
     private final static int ICON_SIZE=16;
     private final static Color[] fores = new Color[]{Color.BLACK, Color.WHITE, Color.WHITE};
     private final static Color[] backs = new Color[]{Color.WHITE, Color.BLACK, Color.BLUE.darker()};
@@ -219,6 +224,9 @@ public class PlotStylePanel extends javax.swing.JPanel {
             public String toString() { return "doElementBindingsRunnable";  }
             @Override
             public void run() {
+                
+                logger.log( Level.FINE, "doElementBindingsRunnable (bug1356)" );
+                
             StylePanel editorPanel= GuiSupport.getStylePanel( element.getRenderType() );
             
             if ( currentEditorPanel==null || ( PlotStylePanel.this.currentElement!=element ) || ( !( currentEditorPanel.getClass()==editorPanel.getClass() ) ) ) {
