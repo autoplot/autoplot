@@ -2693,7 +2693,8 @@ public class PlotElementController extends DomNodeController {
         if ( getRenderer()!=null && getRenderer()!=oldRenderer ) {
             QDataSet oldDs= getDataSet(); // TODO: this needs review.  There was a comment about slices, but this works fine.  Old code 
             if ( oldDs!=null ) {
-                getRenderer().setDataSet(oldDs);
+                //bug1355: This should not be done, I think.
+                //getRenderer().setDataSet(oldDs);
             }
         }        
     }
