@@ -44,20 +44,20 @@ import org.virbo.autoplot.dom.PlotElementStyle;
 
 /**
  *
- * @author  jbf
+ * @author jbf
  */
 public class PlotStylePanel extends javax.swing.JPanel {
 
-    private static final Logger logger= LoggerManager.getLogger("autoplot.gui");
-    
-    private final static int ICON_SIZE=16;
+    private static final Logger logger = LoggerManager.getLogger("autoplot.gui");
+
+    private final static int ICON_SIZE = 16;
     private final static Color[] fores = new Color[]{Color.BLACK, Color.WHITE, Color.WHITE};
     private final static Color[] backs = new Color[]{Color.WHITE, Color.BLACK, Color.BLUE.darker()};
 
     public static final String STYLEPANEL_HELP_ID = "stylePanel";
 
     ApplicationModel applicationModel;
-    
+
     EnumerationEditor psymEditor;
     EnumerationEditor lineEditor;
     EnumerationEditor edit;
@@ -72,44 +72,50 @@ public class PlotStylePanel extends javax.swing.JPanel {
     private StylePanel currentEditorPanel;
 
     public static interface StylePanel {
+
         public abstract void doElementBindings(PlotElement element);
+
         public abstract void releaseElementBindings();
     }
-    
-    private boolean initializing= true;
-    
-    /** Creates new form PlotStylePanel */
+
+    private boolean initializing = true;
+
+    /**
+     * Creates new form PlotStylePanel
+     */
     public PlotStylePanel(final ApplicationModel applicationModel) {
-        
+
         //initializing= false;  // explore red flash bug https://sourceforge.net/p/autoplot/bugs/1055/
-        
         this.applicationModel = applicationModel;
-        this.dom= applicationModel.getDocumentModel();
-        
-        this.dom.getController().addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
+        this.dom = applicationModel.getDocumentModel();
+
+        this.dom.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 doElementBindings();
             }
         });
-        
+
         initComponents();
 
         validate();
 
-        Runnable run= new Runnable() {
+        Runnable run = new Runnable() {
             @Override
-            public String toString() { return "initPlotStyleBindings"; }
+            public String toString() {
+                return "initPlotStyleBindings";
+            }
+
             @Override
             public void run() {
                 doOptionsBindings();
                 doElementBindings();
 
-                String ff= dom.getController().getCanvas().getFont();
+                String ff = dom.getController().getCanvas().getFont();
                 fontLabel.setText(ff);
                 //guiFontLabel.setText( parent.getFont().toString());
 
-                DasCanvas c= dom.getController().getDasCanvas();
+                DasCanvas c = dom.getController().getDasCanvas();
                 int index = 3; // custom
                 for (int i = 0; i < fores.length; i++) {
                     if (fores[i].equals(c.getForeground()) && backs[i].equals(c.getBackground())) {
@@ -121,30 +127,31 @@ public class PlotStylePanel extends javax.swing.JPanel {
         };
         //SwingUtilities.invokeLater(run);
         run.run();
-        AutoplotHelpSystem.getHelpSystem().registerHelpID( plotPanel, "stylePanel");
-        AutoplotHelpSystem.getHelpSystem().registerHelpID( this, "stylePanel" );
-        initializing= false;
+        AutoplotHelpSystem.getHelpSystem().registerHelpID(plotPanel, "stylePanel");
+        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "stylePanel");
+        initializing = false;
 
     }
 
-    private synchronized void doOptionsBindings( ) {
+    private synchronized void doOptionsBindings() {
         BindingGroup bc = new BindingGroup();
         Binding b;
 
-        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create( Options.PROP_DRAWGRID ), majorTicksCheckBox, BeanProperty.create("selected") );
+        b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create(Options.PROP_DRAWGRID), majorTicksCheckBox, BeanProperty.create("selected"));
         bc.addBinding(b);
-        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create( Options.PROP_DRAWMINORGRID ), minorGridCheckBox, BeanProperty.create("selected") );
+        b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create(Options.PROP_DRAWMINORGRID), minorGridCheckBox, BeanProperty.create("selected"));
         bc.addBinding(b);
-        Converter colorIconConverter= new Converter() {
+        Converter colorIconConverter = new Converter() {
             @Override
             public Object convertForward(Object s) {
-                return GraphUtil.colorIcon( ((Color)s), ICON_SIZE, ICON_SIZE );
+                return GraphUtil.colorIcon(((Color) s), ICON_SIZE, ICON_SIZE);
             }
+
             @Override
             public Object convertReverse(Object t) {
-                Image image= ((ImageIcon)t).getImage();
-                int rgb= ((BufferedImage)image).getRGB( ICON_SIZE/2,ICON_SIZE/2 );
-                return new Color( rgb );// shouldn't enter here.  But it does! https://sourceforge.net/p/autoplot/bugs/1055/
+                Image image = ((ImageIcon) t).getImage();
+                int rgb = ((BufferedImage) image).getRGB(ICON_SIZE / 2, ICON_SIZE / 2);
+                return new Color(rgb);// shouldn't enter here.  But it does! https://sourceforge.net/p/autoplot/bugs/1055/
             }
         };
 //        Converter unitsConverter= new Converter() {
@@ -167,148 +174,158 @@ public class PlotStylePanel extends javax.swing.JPanel {
 //                }
 //            }            
 //        };
-        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create( Options.PROP_FOREGROUND ), foregroundColorButton, BeanProperty.create("icon") );
-        b.setConverter( colorIconConverter );
+        b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create(Options.PROP_FOREGROUND), foregroundColorButton, BeanProperty.create("icon"));
+        b.setConverter(colorIconConverter);
         bc.addBinding(b);
-        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create( Options.PROP_BACKGROUND ), backgroundColorButton, BeanProperty.create("icon") );
-        b.setConverter( colorIconConverter );
+        b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create(Options.PROP_BACKGROUND), backgroundColorButton, BeanProperty.create("icon"));
+        b.setConverter(colorIconConverter);
         bc.addBinding(b);
-        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_FONT ), fontLabel, BeanProperty.create("text") );
+        b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create(Canvas.PROP_FONT), fontLabel, BeanProperty.create("text"));
         bc.addBinding(b);
-        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_FITTED ), fittedCB, BeanProperty.create("selected") );
+        b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create(Canvas.PROP_FITTED), fittedCB, BeanProperty.create("selected"));
         bc.addBinding(b);
-        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_HEIGHT ), heightTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST") );
+        b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create(Canvas.PROP_HEIGHT), heightTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST"));
         //b.setConverter(unitsConverter);
         bc.addBinding(b);
-        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create( Canvas.PROP_WIDTH ), widthTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST") );
+        b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, dom.getCanvases(0), BeanProperty.create(Canvas.PROP_WIDTH), widthTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST"));
         //b.setConverter(unitsConverter);
         bc.addBinding(b);
         bc.bind();
-        dom.getCanvases(0).getController().getDasCanvas().addPropertyChangeListener( "preferredSize", new PropertyChangeListener() {
+        dom.getCanvases(0).getController().getDasCanvas().addPropertyChangeListener("preferredSize", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 updateSize();
             }
-        } );
+        });
         updateSize();
     }
 
-    private transient PropertyChangeListener renderTypeListener= new PropertyChangeListener() {
+    private transient PropertyChangeListener renderTypeListener = new PropertyChangeListener() {
         @Override
-        public void propertyChange( PropertyChangeEvent ev ) {
+        public void propertyChange(PropertyChangeEvent ev) {
             doElementBindings();
         }
     };
 
-    private transient PropertyChangeListener colorListener= new PropertyChangeListener() {
+    private transient PropertyChangeListener colorListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            if ( checkColors() ) {
-                dom.getController().setStatus( "warning: Background and foreground colors are the same");
+            if (checkColors()) {
+                dom.getController().setStatus("warning: Background and foreground colors are the same");
             }
         }
     };
 
     private synchronized void doElementBindings() {
 
-        if ( currentElement!=null ) {
-            currentElement.getStyle().removePropertyChangeListener( PlotElementStyle.PROP_COLOR, colorListener);
-            currentElement.removePropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener ); // remove it if it's there already
+        if (currentElement != null) {
+            currentElement.getStyle().removePropertyChangeListener(PlotElementStyle.PROP_COLOR, colorListener);
+            currentElement.removePropertyChangeListener(PlotElement.PROP_RENDERTYPE, renderTypeListener); // remove it if it's there already
         }
 
-        final PlotElement element= dom.getController().getPlotElement();
-        if ( element==null ) return;
+        final PlotElement element = dom.getController().getPlotElement();
+        if (element == null) {
+            return;
+        }
 
-        Runnable run = new Runnable() { 
+        Runnable run = new Runnable() {
             @Override
-            public String toString() { return "doElementBindingsRunnable";  }
-            @Override
-            public void run() {
-                
-                logger.log( Level.FINE, "doElementBindingsRunnable (bug1356)" );
-                
-            StylePanel editorPanel= GuiSupport.getStylePanel( element.getRenderType() );
-            
-            if ( currentEditorPanel==null || ( PlotStylePanel.this.currentElement!=element ) || ( !( currentEditorPanel.getClass()==editorPanel.getClass() ) ) ) {
-                editorPanel.doElementBindings(element);
-
-                if ( currentEditorPanel!=null ) {
-                    currentEditorPanel.releaseElementBindings();
-                }
-                currentEditorPanel= editorPanel;
-
-                if ( stylePanel.getComponentCount()==1 ) {
-                    stylePanel.remove( stylePanel.getComponent(0) );
-                }
-
-                stylePanel.add((JPanel)editorPanel,BorderLayout.CENTER);
-
-                currentElement= element;
+            public String toString() {
+                return "doElementBindingsRunnable";
             }
 
-            element.addPropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
-            element.getStyle().addPropertyChangeListener( PlotElementStyle.PROP_COLOR, colorListener );
+            @Override
+            public void run() {
 
-            repaint();
-            validate(); // paint the new GUI
-        } };
+                logger.log(Level.FINE, "doElementBindingsRunnable (bug1356)");
+
+                StylePanel editorPanel = GuiSupport.getStylePanel(element.getRenderType());
+
+                if (currentEditorPanel == null || (PlotStylePanel.this.currentElement != element) || (!(currentEditorPanel.getClass() == editorPanel.getClass()))) {
+                    editorPanel.doElementBindings(element);
+
+                    if (currentEditorPanel != null) {
+                        currentEditorPanel.releaseElementBindings();
+                    }
+                    currentEditorPanel = editorPanel;
+
+                    if (stylePanel.getComponentCount() == 1) {
+                        stylePanel.remove(stylePanel.getComponent(0));
+                    }
+
+                    stylePanel.add((JPanel) editorPanel, BorderLayout.CENTER);
+
+                    currentElement = element;
+                }
+
+                element.addPropertyChangeListener(PlotElement.PROP_RENDERTYPE, renderTypeListener);
+                element.getStyle().addPropertyChangeListener(PlotElementStyle.PROP_COLOR, colorListener);
+
+                repaint();
+                validate(); // paint the new GUI
+            }
+        };
         SwingUtilities.invokeLater(run);
 
     }
 
     /**
      * return true if the colors are unacceptably close.
+     *
      * @param cA
      * @param cB
      * @return
      */
-    private static boolean closeColors( Color cA, Color cB ) {
-        if ( cA.equals(cB) ) return true;
-        float[] colorA = new float[] { cA.getRed(), cA.getGreen(), cA.getBlue() };
-        float[] colorB = new float[] { cB.getRed(), cB.getGreen(), cB.getBlue() };
-        double dist= Math.sqrt( Math.pow( colorA[0]-colorB[0], 2 )
-                + Math.pow( colorA[1]-colorB[1], 2 )
-                + Math.pow( colorA[2]-colorB[2], 2 ) );
-        return ( dist<5 ) ;
+    private static boolean closeColors(Color cA, Color cB) {
+        if (cA.equals(cB)) {
+            return true;
+        }
+        float[] colorA = new float[]{cA.getRed(), cA.getGreen(), cA.getBlue()};
+        float[] colorB = new float[]{cB.getRed(), cB.getGreen(), cB.getBlue()};
+        double dist = Math.sqrt(Math.pow(colorA[0] - colorB[0], 2)
+                + Math.pow(colorA[1] - colorB[1], 2)
+                + Math.pow(colorA[2] - colorB[2], 2));
+        return (dist < 5);
     }
 
     /**
-     * check to see that foreground!=background.  Check for each plot element, foreground!=background
+     * check to see that foreground!=background. Check for each plot element,
+     * foreground!=background
      */
     private boolean checkColors() {
-        Color back= dom.getOptions().getBackground();
-        Color fore= dom.getOptions().getForeground();
-        Color color= dom.getOptions().getColor();
+        Color back = dom.getOptions().getBackground();
+        Color fore = dom.getOptions().getForeground();
+        Color color = dom.getOptions().getColor();
 
-        if ( closeColors( fore, back ) ) {
-            if ( back.getRed()<128 ) {
-                fore= Color.WHITE;
+        if (closeColors(fore, back)) {
+            if (back.getRed() < 128) {
+                fore = Color.WHITE;
             } else {
-                fore= Color.BLACK;
+                fore = Color.BLACK;
             }
             dom.getOptions().setForeground(fore);
         }
-        if ( closeColors( color, back ) ) {
-            if ( back.getRed()<128 ) {
-                color= Color.WHITE;
+        if (closeColors(color, back)) {
+            if (back.getRed() < 128) {
+                color = Color.WHITE;
             } else {
-                color= Color.BLACK;
+                color = Color.BLACK;
             }
             dom.getOptions().setColor(color);
         }
-        List<PlotElement> pe= Arrays.asList( dom.getPlotElements() );
-        for ( PlotElement p: pe ) {
-            if ( closeColors( p.getStyle().getColor(), back ) ) {
+        List<PlotElement> pe = Arrays.asList(dom.getPlotElements());
+        for (PlotElement p : pe) {
+            if (closeColors(p.getStyle().getColor(), back)) {
                 return true;
             }
         }
         return false;
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -565,16 +582,16 @@ public class PlotStylePanel extends javax.swing.JPanel {
     private void foreBackColorsListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foreBackColorsListActionPerformed
         int i = foreBackColorsList.getSelectedIndex();
 
-        if ( initializing ) {
+        if (initializing) {
             return;
         }
-        
+
         if (i < fores.length) {
-            foregroundColorButton.setIcon( GraphUtil.colorIcon( fores[i], ICON_SIZE, ICON_SIZE ) );
-            backgroundColorButton.setIcon( GraphUtil.colorIcon( backs[i], ICON_SIZE, ICON_SIZE ) );
-            List<PlotElement> pe= Arrays.asList( dom.getPlotElements() );
-            for ( PlotElement p: pe ) {
-                if (p.getStyle().getColor().equals( dom.getCanvases(0).getController().getDasCanvas().getForeground())) {
+            foregroundColorButton.setIcon(GraphUtil.colorIcon(fores[i], ICON_SIZE, ICON_SIZE));
+            backgroundColorButton.setIcon(GraphUtil.colorIcon(backs[i], ICON_SIZE, ICON_SIZE));
+            List<PlotElement> pe = Arrays.asList(dom.getPlotElements());
+            for (PlotElement p : pe) {
+                if (p.getStyle().getColor().equals(dom.getCanvases(0).getController().getDasCanvas().getForeground())) {
                     p.getStyle().setColor(fores[i]);
                 }
             }
@@ -582,50 +599,52 @@ public class PlotStylePanel extends javax.swing.JPanel {
             dom.getOptions().setColor(fores[i]);
             dom.getOptions().setBackground(backs[i]);
         }
-        if ( checkColors() ) {
-            dom.getController().setStatus( "warning: Background and foreground colors are the same");
+        if (checkColors()) {
+            dom.getController().setStatus("warning: Background and foreground colors are the same");
         }
 }//GEN-LAST:event_foreBackColorsListActionPerformed
 
     private void foregroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foregroundColorButtonActionPerformed
         Color c = JColorChooser.showDialog(this, "Foreground Color", foregroundColorButton.getBackground());
-        if ( c!=null ) {
+        if (c != null) {
             foreBackColorsList.setSelectedIndex(fores.length);
-            List<PlotElement> pe= Arrays.asList( dom.getPlotElements() );
-            for ( PlotElement p: pe ) {
-                if ( p.getStyle().getColor().equals( dom.getOptions().getForeground() ) ) {
+            List<PlotElement> pe = Arrays.asList(dom.getPlotElements());
+            for (PlotElement p : pe) {
+                if (p.getStyle().getColor().equals(dom.getOptions().getForeground())) {
                     p.getStyle().setColor(c);
                 }
             }
-            foregroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
+            foregroundColorButton.setIcon(GraphUtil.colorIcon(c, ICON_SIZE, ICON_SIZE));
             dom.getCanvases(0).getController().getDasCanvas().setForeground(c);
             dom.getOptions().setForeground(c);
             dom.getOptions().setColor(c);
-            if ( checkColors() ) {
-                dom.getController().setStatus( "warning: Background and foreground colors are the same");
+            if (checkColors()) {
+                dom.getController().setStatus("warning: Background and foreground colors are the same");
             }
         }
 }//GEN-LAST:event_foregroundColorButtonActionPerformed
 
     private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
         Color c = JColorChooser.showDialog(this, "Background Color", backgroundColorButton.getBackground());
-        if ( c!=null ) {
+        if (c != null) {
             foreBackColorsList.setSelectedIndex(fores.length);
-            backgroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
+            backgroundColorButton.setIcon(GraphUtil.colorIcon(c, ICON_SIZE, ICON_SIZE));
             dom.getOptions().setBackground(c);
-            if ( checkColors() ) {
-                dom.getController().setStatus( "warning: Background and foreground colors are the same");
+            if (checkColors()) {
+                dom.getController().setStatus("warning: Background and foreground colors are the same");
             }
         }
     }//GEN-LAST:event_backgroundColorButtonActionPerformed
 
     private void pickFontButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickFontButtonActionPerformed
-        Font f= GuiSupport.pickFont( (JFrame) SwingUtilities.getWindowAncestor(this), applicationModel );
-        if ( f!=null ) fontLabel.setText( DomUtil.encodeFont(f));
+        Font f = GuiSupport.pickFont((JFrame) SwingUtilities.getWindowAncestor(this), applicationModel);
+        if (f != null) {
+            fontLabel.setText(DomUtil.encodeFont(f));
+        }
 }//GEN-LAST:event_pickFontButtonActionPerformed
 
     private void fittedCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fittedCBActionPerformed
-        boolean s= ! fittedCB.isSelected();
+        boolean s = !fittedCB.isSelected();
         widthTextField.setEnabled(s);
         heightTextField.setEnabled(s);
         widthLabel.setEnabled(s);
@@ -633,23 +652,23 @@ public class PlotStylePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_fittedCBActionPerformed
 
     private void updateSize() {
-        int wpixels= dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().width;
-        int hpixels= dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().height;
-        if ( unitsCB.getSelectedIndex()==0 ) {
-            sizeLabel.setText( String.format( "w=%d by h=%d points",wpixels,hpixels ) );
-        } else if ( unitsCB.getSelectedIndex()==1 ) {
-            sizeLabel.setText( String.format( "w=%.2f by h=%.2f inches",wpixels/72.,hpixels/72. ) );
+        int wpixels = dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().width;
+        int hpixels = dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().height;
+        if (unitsCB.getSelectedIndex() == 0) {
+            sizeLabel.setText(String.format("w=%d by h=%d points", wpixels, hpixels));
+        } else if (unitsCB.getSelectedIndex() == 1) {
+            sizeLabel.setText(String.format("w=%.2f by h=%.2f inches", wpixels / 72., hpixels / 72.));
         } else {
-            sizeLabel.setText( String.format( "w=%.1f by h=%.1f cm",wpixels/72*2.54,hpixels/72*2.54 ) );
+            sizeLabel.setText(String.format("w=%.1f by h=%.1f cm", wpixels / 72 * 2.54, hpixels / 72 * 2.54));
         }
     }
-    
+
     private void widthTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_widthTextFieldActionPerformed
-        dom.getCanvases(0).getController().getDasCanvas().setPreferredWidth( Integer.parseInt(widthTextField.getText()) );
+        dom.getCanvases(0).getController().getDasCanvas().setPreferredWidth(Integer.parseInt(widthTextField.getText()));
     }//GEN-LAST:event_widthTextFieldActionPerformed
 
     private void heightTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_heightTextFieldActionPerformed
-        dom.getCanvases(0).getController().getDasCanvas().setPreferredHeight( Integer.parseInt(heightTextField.getText()) );
+        dom.getCanvases(0).getController().getDasCanvas().setPreferredHeight(Integer.parseInt(heightTextField.getText()));
     }//GEN-LAST:event_heightTextFieldActionPerformed
 
     private void unitsCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unitsCBActionPerformed
