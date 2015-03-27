@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The huge scatter renderer now properly implemented for flipped axes.
+        <p><small>Data from NetCDF file.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,9 +20,14 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-03-24 r16512):</p>
+        <p>Bugfixes (2015-03-27 r16561):</p>
         <ul>
+            <li>minor performance enhancements for huge scatter renderer</li>
+            <li>1357: avoid nasty messages about immutable datasets, where CDAWeb plugin was modifying data that will soon be immutable.</li>
+            <li>1356: clean up code where the listener would add another listener.</li>
+            <li>1355: old renderer would paint new dataset, which could hang the event thread</li>
             <li>1353: corrections to huge scatter where large waveform packets were preventing it from painting individual points.</li>
+            <li>1354: edit style properties now brings up custom editor.</li>
             <li>bugfix: single-tag dataset for ephemeris would result in RTE.</li>
             <li>HtmlTableDataSource name changes, improved support for dates.</li>
             <li>huge scatter properly implements flipped</li>
