@@ -74,6 +74,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
+import org.autoplot.render.ContourStylePanel;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.DatumRange;
@@ -221,6 +222,8 @@ public class GuiSupport {
                 editorPanel= new HugeScatterStylePanel( );
             } else if ( renderType==RenderType.colorScatter ) {
                 editorPanel= new ColorScatterStylePanel( );
+            } else if ( renderType==RenderType.contour ) {
+                editorPanel= new ContourStylePanel( );
             } else {
                 //TODO: consider generic style panel that is based on completions of Renderer control.
                 editorPanel= new SeriesStylePanel( );
@@ -1077,7 +1080,7 @@ public class GuiSupport {
     private static void mergeVap( Application dom, Plot plot, PlotElement pelement, String vap ) {
         try {
             ImportVapDialog d = new ImportVapDialog();
-            if ( vap.indexOf("?")!=-1 ) {
+            if ( vap.contains("?") ) {
                 int i= vap.indexOf("?");
                 vap= vap.substring(0,i);
             }
@@ -1572,6 +1575,7 @@ public class GuiSupport {
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         Plot newPlot= controller.copyPlotAndPlotElements(domPlot, null, false, false);
                         Application dom= domPlot.getController().getApplication();
