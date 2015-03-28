@@ -74,7 +74,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
-import org.autoplot.render.ContourStylePanel;
+import org.autoplot.renderer.ContourStylePanel;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.DatumRange;
