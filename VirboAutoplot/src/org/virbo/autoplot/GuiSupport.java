@@ -75,6 +75,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
 import org.autoplot.renderer.ContourStylePanel;
+import org.autoplot.renderer.EventsStylePanel;
 import org.autoplot.renderer.PitchAngleDistributionStylePanel;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.propertyeditor.PropertyEditor;
@@ -225,6 +226,8 @@ public class GuiSupport {
                 editorPanel= new ColorScatterStylePanel( );
             } else if ( renderType==RenderType.contour ) {
                 editorPanel= new ContourStylePanel( );
+            } else if ( renderType==RenderType.eventsBar ) {
+                editorPanel= new EventsStylePanel( );
             } else {
                 //TODO: consider generic style panel that is based on completions of Renderer control.
                 editorPanel= new SeriesStylePanel( );
