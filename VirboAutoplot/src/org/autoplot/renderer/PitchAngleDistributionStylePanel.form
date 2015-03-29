@@ -57,7 +57,7 @@
                                   <Component id="originDL" min="-2" pref="110" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace min="0" pref="196" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="162" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -115,12 +115,14 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Origin:"/>
+            <Property name="text" type="java.lang.String" value="Angle Zero:"/>
+            <Property name="toolTipText" type="java.lang.String" value="The direction from the center of the origin of the angle."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="drawPolarAxesCB">
           <Properties>
             <Property name="text" type="java.lang.String" value="Draw Polar Axes"/>
+            <Property name="toolTipText" type="java.lang.String" value="Draw additional axes at 0,30,60,... degrees."/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="drawPolarAxesCBActionPerformed"/>

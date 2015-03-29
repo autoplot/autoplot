@@ -77,9 +77,11 @@ public class PitchAngleDistributionStylePanel extends javax.swing.JPanel impleme
             }
         });
 
-        jLabel1.setText("Origin:");
+        jLabel1.setText("Angle Zero:");
+        jLabel1.setToolTipText("The direction from the center of the origin of the angle.");
 
         drawPolarAxesCB.setText("Draw Polar Axes");
+        drawPolarAxesCB.setToolTipText("Draw additional axes at 0,30,60,... degrees.");
         drawPolarAxesCB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 drawPolarAxesCBActionPerformed(evt);
@@ -118,7 +120,7 @@ public class PitchAngleDistributionStylePanel extends javax.swing.JPanel impleme
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(originDL, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 196, Short.MAX_VALUE)))
+                        .addGap(0, 162, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
