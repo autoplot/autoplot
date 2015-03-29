@@ -75,6 +75,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
 import org.autoplot.renderer.ContourStylePanel;
+import org.autoplot.renderer.PitchAngleDistributionStylePanel;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.DatumRange;
@@ -217,7 +218,7 @@ public class GuiSupport {
             if ( renderType==RenderType.spectrogram || renderType==RenderType.nnSpectrogram ) {
                 editorPanel= new SpectrogramStylePanel( );
             } else if ( renderType==RenderType.pitchAngleDistribution ) {
-                editorPanel= new SpectrogramStylePanel(  );
+                editorPanel= new PitchAngleDistributionStylePanel( );
             } else if ( renderType==RenderType.hugeScatter ) {
                 editorPanel= new HugeScatterStylePanel( );
             } else if ( renderType==RenderType.colorScatter ) {
