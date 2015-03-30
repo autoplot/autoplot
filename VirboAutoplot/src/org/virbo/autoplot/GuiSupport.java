@@ -1511,7 +1511,7 @@ public class GuiSupport {
                 PlotElement p = controller.getPlotElement();
                 PlotStylePanel.StylePanel editorPanel= getStylePanel( p.getRenderType() );
                 editorPanel.doElementBindings(p);
-                JOptionPane.showMessageDialog( null, editorPanel );
+                AutoplotUtil.showMessageDialog( app, editorPanel, p.getRenderType() + " Style", JOptionPane.OK_OPTION );
             }
         });
         plotController.setPlotElementPropsMenuItem(panelPropsMenuItem);        
