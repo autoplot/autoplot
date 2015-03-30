@@ -6,8 +6,11 @@
 package org.autoplot.renderer;
 
 import java.awt.Color;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.das2.components.propertyeditor.ColorEditor;
 import org.das2.graph.Renderer;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -27,6 +30,15 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
      */
     public EventsStylePanel() {
         initComponents();
+        colorEditor1= new ColorEditor();
+        colorEditor1.setValue(Color.BLACK);
+        colorPanel.add( colorEditor1.getSmallEditor() );
+        colorEditor1.addPropertyChangeListener( new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                update();
+            }
+        });
     }
 
     /**
@@ -43,6 +55,8 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         fontSizeTF = new javax.swing.JTextField();
         orbitModeCB = new javax.swing.JCheckBox();
         ganttModeCB = new javax.swing.JCheckBox();
+        colorPanel = new javax.swing.JPanel();
+        colorCB = new javax.swing.JCheckBox();
 
         showLabelsCB.setText("Show Labels");
         showLabelsCB.setToolTipText("Show event labels along with bar.");
@@ -82,6 +96,15 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
             }
         });
 
+        colorPanel.setLayout(new java.awt.BorderLayout());
+
+        colorCB.setText("Color:");
+        colorCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                colorCBActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -90,13 +113,18 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(showLabelsCB)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(fontSizeTF, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(orbitModeCB)
-                    .addComponent(ganttModeCB))
-                .addContainerGap(227, Short.MAX_VALUE))
+                    .addComponent(ganttModeCB)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addComponent(colorCB)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addComponent(jLabel1)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(fontSizeTF, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(225, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -111,7 +139,14 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
                 .addComponent(orbitModeCB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(ganttModeCB)
-                .addContainerGap(171, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(11, 11, 11)
+                        .addComponent(colorCB))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(128, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -137,8 +172,14 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         update();
     }//GEN-LAST:event_ganttModeCBActionPerformed
 
+    private void colorCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorCBActionPerformed
+        update();
+    }//GEN-LAST:event_colorCBActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox colorCB;
+    private javax.swing.JPanel colorPanel;
     private javax.swing.JTextField fontSizeTF;
     private javax.swing.JCheckBox ganttModeCB;
     private javax.swing.JLabel jLabel1;
@@ -149,6 +190,7 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
     BindingGroup elementBindingContext;
     
     Renderer renderer;
+    ColorEditor colorEditor1;
     
     private String control = "";
 
@@ -177,6 +219,9 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         controls.put( "showLabels", Renderer.encodeBooleanControl( showLabelsCB.isSelected() ) );
         controls.put( "orbitMode", Renderer.encodeBooleanControl( orbitModeCB.isSelected() ) );
         controls.put( "ganttMode", Renderer.encodeBooleanControl( ganttModeCB.isSelected() ) );
+        if ( colorCB.isSelected() ) {
+            controls.put( Renderer.CONTROL_KEY_COLOR, Renderer.encodeColorControl( (Color)colorEditor1.getValue() ) );
+        }
         String c= Renderer.formatControl(controls);
         this.control= c;
         firePropertyChange( Renderer.PROP_CONTROL, oldValue, c );
@@ -188,6 +233,10 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         showLabelsCB.setSelected( renderer.getBooleanControl("showLabels", false) );
         orbitModeCB.setSelected( renderer.getBooleanControl("orbitMode", false ) );
         ganttModeCB.setSelected( renderer.getBooleanControl("ganttMode", false ) );
+        if ( renderer.hasControl( Renderer.CONTROL_KEY_COLOR ) ) {
+            colorCB.setSelected(true);
+            colorEditor1.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, Color.BLACK ) );
+        }
     }
     
 
