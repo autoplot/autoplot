@@ -55,6 +55,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
 import org.das2.graph.Renderer;
+import static org.virbo.autoplot.GuiSupport.getStylePanel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.BindingModel;
@@ -291,16 +292,17 @@ public class LayoutPanel extends javax.swing.JPanel {
                 Object[] os= panelListComponent.getSelectedValues();
                 PlotElement p= (PlotElement)panelListComponent.getSelectedValue();
                 PropertyEditor edit;
-                if ( os.length==0 ) {
-                    return;
-                } else if ( os.length==1 ) {
-                    edit = new PropertyEditor(p.getStyle());
-                } else {
+                if ( os.length==1 ) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);
+                    PlotStylePanel.StylePanel editorPanel= getStylePanel( p.getRenderType() );
+                    editorPanel.doElementBindings(p);
+                    AutoplotUtil.showMessageDialog( LayoutPanel.this, editorPanel, p.getRenderType() + " Style", JOptionPane.OK_OPTION );
+                } else if ( os.length>1 ) {
                     PlotElementStyle[] peers= new PlotElementStyle[os.length];
                     for ( int i=0; i<os.length; i++ ) peers[i]= ((PlotElement)os[i]).getStyle();
                     edit= PropertyEditor.createPeersEditor( p.getStyle(), peers );
+                    edit.showDialog(LayoutPanel.this);
                 }
-                edit.showDialog(LayoutPanel.this);
             }
         });
 
