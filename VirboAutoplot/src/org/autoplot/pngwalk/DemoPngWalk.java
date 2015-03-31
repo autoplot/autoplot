@@ -144,14 +144,11 @@ public class DemoPngWalk {
                 final String suri = productFile + "?timeRange=" + timeRange;
 
                 Runnable run = new Runnable() {
+                    @Override
                     public void run() {
-                        try {
-                            ScriptContext.createGui();
-                            ScriptContext.plot(suri);
-                            ((JFrame)ScriptContext.getViewWindow()).setDefaultCloseOperation(op);
-                        } catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, ex.getMessage(), ex);
-                        }
+                        ScriptContext.createGui();
+                        ScriptContext.plot(suri);
+                        ((JFrame)ScriptContext.getViewWindow()).setDefaultCloseOperation(op);
                     }
                 };
                 new Thread(run).start();

@@ -385,19 +385,16 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 }
 
                 Runnable run = new Runnable() {
+                    @Override
                     public void run() {
-                        try {
-                            ScriptContext.createGui();
-                            Window apWindow= ScriptContext.getViewWindow();
-                            if ( suri!=null ) {
-                                raiseApWindowSoon(apWindow);
-                                ScriptContext.plot(suri);
-                            }
-                            if ( parent==null ) {
-                                apWindow.setVisible(true);
-                            }
-                        } catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, ex.getMessage(), ex);
+                        ScriptContext.createGui();
+                        Window apWindow= ScriptContext.getViewWindow();
+                        if ( suri!=null ) {
+                            raiseApWindowSoon(apWindow);
+                            ScriptContext.plot(suri);
+                        }
+                        if ( parent==null ) {
+                            apWindow.setVisible(true);
                         }
                     }
                 };
