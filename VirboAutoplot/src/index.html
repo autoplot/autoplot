@@ -22,6 +22,11 @@
 
         <p>Bugfixes (2015-03-27 r16561):</p>
         <ul>
+            <li>clarify smax&lt;smin message in eventsRenderer</li>
+            <li>bugfix when very small times were used and seconds was 0. with parse and format times.</li>
+            <li>correct where $(subseconds,places=6) was ignoring the frational part of the seconds field, and was just using the micros.</li>
+            <li>1359: trim() supports waveform dataset, which was causing scan to next to fail.</li>
+            <li>unsigned bytes, shorts and ints in HDF5 files are corrected.</li>
             <li>minor performance enhancements for huge scatter renderer</li>
             <li>1357: avoid nasty messages about immutable datasets, where CDAWeb plugin was modifying data that will soon be immutable.</li>
             <li>1356: clean up code where the listener would add another listener.</li>
@@ -86,6 +91,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>get rid of extraneous InterruptedExceptions which were thrown from the bowels, and needn't be propogated to the more abstract waitUntilIdle</li>
+            <li>renderer style panels for Contour, PitchAngleDistribution, and EventsBar styles.</li>
             <li>more dasCore code cleanup</li>
             <li>Ascii Table data URIs now support arg_0 to match CDF, which automatically gets the ISO8601 column 0 dependence.</li>
             <li>putBundleProperty and putIndexedProperty added to make it easier to build bundles.</li>
