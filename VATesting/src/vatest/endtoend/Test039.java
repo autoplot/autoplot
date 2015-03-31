@@ -178,6 +178,15 @@ public class Test039 {
 
     }
 
+    /**
+     * Javadoc for SDI is at:
+     * http://sarahandjeremy.net/jeremy/autoplot/ScienceDataInterfaces/javadoc/
+     * 
+     * Javadoc for QDataSet adapter is at:
+     * http://sarahandjeremy.net/jeremy/autoplot/QDataSetScienceDataInterfaces/javadoc/
+     * 
+     * @throws Exception 
+     */
     private static void demoSdi1() throws Exception {
         XYMetadata xymetadata = new XYMetadata() {
 
