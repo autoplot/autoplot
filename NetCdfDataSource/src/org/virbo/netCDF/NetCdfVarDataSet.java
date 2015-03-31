@@ -121,6 +121,14 @@ public class NetCdfVarDataSet extends AbstractDataSet {
          return result;
      }
 
+     private double[] unsigned( double[] data, long limit ) {
+         for ( int i=0; i<data.length; i++ ) {
+             double b= data[i];
+             if ( b < 0 ) data[i]= b + limit;
+         }
+         return data;
+     }
+     
     /**
      * Read the NetCDF data.
      * @param variable
@@ -175,6 +183,15 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         try {
             if ( a.getElementType()==char.class ) { // NASA/Goddard formats times as ISO8601 times.
                 cdata= (char[])a.get1DJavaArray( char.class );
+            } else if ( a.isUnsigned() && ( a.getElementType()==byte.class || a.getElementType()==short.class || a.getElementType()==int.class ) ) {
+                data= (double[])a.get1DJavaArray( Double.class ); // TODO: reimplement with BufferDataSet which handles unsigned.
+                if ( a.getElementType()==byte.class ) {
+                    data= unsigned( data, 256L );
+                } else if ( a.getElementType()==short.class ) {
+                    data= unsigned( data, 256L*256L );
+                } else if ( a.getElementType()==int.class ) {
+                    data= unsigned( data, 256L*256L*256L*256L );
+                }
             } else {
                 data= (double[])a.get1DJavaArray( Double.class );
             }
