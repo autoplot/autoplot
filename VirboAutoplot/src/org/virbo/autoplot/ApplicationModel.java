@@ -1488,7 +1488,7 @@ public class ApplicationModel {
      * wait for Autoplot to settle, waiting for pending changes in the application controller and canvas.
      * @throws java.lang.InterruptedException
      */    
-    public void waitUntilIdle() throws InterruptedException {
+    public void waitUntilIdle() {
         logger.log(Level.FINE, "enter waitUntilIdle, pendingChanges={0}", dom.getController().isPendingChanges());
         while ( dom.getController().isPendingChanges() ) {
             dom.getController().waitUntilIdle();
