@@ -116,7 +116,11 @@ public class ScriptContext extends PyJavaInstance {
         }
     }
 
-    protected static void setApplicationModel(ApplicationModel m) {
+    /**
+     * set the focus for scripts.
+     * @param m the application model.
+     */
+    public static void setApplicationModel(ApplicationModel m) {
         model = m;
         dom= m.getDocumentModel();
     }
@@ -181,21 +185,20 @@ public class ScriptContext extends PyJavaInstance {
      * @param width the width of the canvas
      * @param height the height of the canvas
      */
-    public static void setCanvasSize(int width, int height) throws InterruptedException {
+    public static void setCanvasSize(int width, int height) {
         maybeInitModel();
         model.canvas.setSize(width, height);
         model.getDocumentModel().getCanvases(0).setSize(width,height);
-        model.waitUntilIdle();        
+        model.waitUntilIdle(); 
     }
 
     /**
      * set the internal model's url to surl.  The data set will be loaded,
      * and writeToPng and writeToSvg can be used in headless mode.
      * @param surl
-     * @throws java.lang.InterruptedException
      * @Deprecated use plot instead;
      */
-    public static void setDataSourceURL(String surl) throws InterruptedException {
+    public static void setDataSourceURL(String surl) {
         model.setDataSourceURL(surl);
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
@@ -205,9 +208,8 @@ public class ScriptContext extends PyJavaInstance {
      * asynchronously, so errors thrown during the load cannot be caught here.
      * See getDataSet to load data synchronously.
      * @param suri a URI or vap file
-     * @throws java.lang.InterruptedException
      */
-    public static void plot(String suri) throws InterruptedException {
+    public static void plot(String suri) {
         maybeInitModel();
         if ( view!=null ) {
             view.dataSetSelector.setValue(suri);
@@ -221,9 +223,8 @@ public class ScriptContext extends PyJavaInstance {
      * Introduced for testing non-time axis TSBs.
      * @param surl1 the independent variable dataset (generally used for X)
      * @param surl2 the dependent variable dataset (generally used for Y, but can be rank 2).
-     * @throws java.lang.InterruptedException
      */
-    public static void plot(String surl1, String surl2) throws InterruptedException {
+    public static void plot(String surl1, String surl2) {
         maybeInitModel();
         if ( surl1.endsWith(".vap") || surl1.contains(".vap?")  ) {
             throw new IllegalArgumentException("cannot load vap here in two-argument plot");
@@ -242,9 +243,8 @@ public class ScriptContext extends PyJavaInstance {
      * bring up the autoplot with the specified URL.
      * @param chNum the data source number to reset the URI.
      * @param surl a URI to use
-     * @throws java.lang.InterruptedException
      */
-    public static void plot(int chNum, String surl) throws InterruptedException {
+    public static void plot(int chNum, String surl) {
         maybeInitModel();
         model.setDataSet( chNum, null, surl );
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
@@ -255,9 +255,8 @@ public class ScriptContext extends PyJavaInstance {
      * @param chNum the data source number to reset the URI.
      * @param label for the plot.
      * @param surl a URI to use
-     * @throws java.lang.InterruptedException
      */
-    public static void plot(int chNum, String label, String surl) throws InterruptedException {
+    public static void plot(int chNum, String label, String surl) {
         maybeInitModel();
         model.setDataSet( chNum, label, surl );
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
@@ -266,9 +265,8 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * plot the dataset in the first dataSource node.
      * @param ds QDataSet to plot
-     * @throws java.lang.InterruptedException
      */
-    public static void plot(QDataSet ds) throws InterruptedException {
+    public static void plot(QDataSet ds) {
         plot( 0, (String)null, ds );
     }
 
@@ -276,9 +274,8 @@ public class ScriptContext extends PyJavaInstance {
      * plot the dataset in the first dataSource node.
      * @param x QDataSet for the independent parameter
      * @param y QDataSet for the dependent parameter
-     * @throws java.lang.InterruptedException
      */
-    public static void plot( QDataSet x, QDataSet y ) throws InterruptedException {
+    public static void plot( QDataSet x, QDataSet y )  {
         plot( 0, (String)null, x, y );
     }
     
@@ -287,9 +284,8 @@ public class ScriptContext extends PyJavaInstance {
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
-     * @throws java.lang.InterruptedException
      */
-    public static void plot( QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
+    public static void plot( QDataSet x, QDataSet y, QDataSet z ) {
         plot( 0, (String)null, x, y, z );
     }
 
@@ -297,9 +293,8 @@ public class ScriptContext extends PyJavaInstance {
      * plot the dataset in the specified dataSource node.
      * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param ds dataset to plot.
-     * @throws java.lang.InterruptedException
      */
-    public static void plot( int chNum, QDataSet ds) throws InterruptedException {
+    public static void plot( int chNum, QDataSet ds)  {
         plot( chNum, (String)null, ds );
     }
 
@@ -308,9 +303,8 @@ public class ScriptContext extends PyJavaInstance {
      * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
-     * @throws java.lang.InterruptedException
      */
-    public static void plot( int chNum, QDataSet x, QDataSet y ) throws InterruptedException {
+    public static void plot( int chNum, QDataSet x, QDataSet y )  {
         plot( chNum, (String)null, x, y );
     }
 
@@ -320,9 +314,8 @@ public class ScriptContext extends PyJavaInstance {
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
-     * @throws java.lang.InterruptedException
      */
-    public static void plot( int chNum, QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
+    public static void plot( int chNum, QDataSet x, QDataSet y, QDataSet z ) {
         plot( chNum, (String)null, x, y, z );
     }
 
@@ -331,9 +324,8 @@ public class ScriptContext extends PyJavaInstance {
      * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param label the label for the plot dependent parameter
      * @param ds the dataset to use.
-     * @throws java.lang.InterruptedException
      */
-    public static void plot( int chNum, String label, QDataSet ds) throws InterruptedException {
+    public static void plot( int chNum, String label, QDataSet ds) {
         maybeInitModel();
         model.setDataSet( chNum, label, ds );
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
@@ -345,9 +337,8 @@ public class ScriptContext extends PyJavaInstance {
      * @param label the label for the plot dependent parameter
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
-     * @throws java.lang.InterruptedException
      */
-    public static void plot( int chNum, String label, QDataSet x, QDataSet y ) throws InterruptedException {
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y ) {
         maybeInitModel();
         ArrayDataSet yds= ArrayDataSet.copy(y);
         if ( x!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
@@ -362,9 +353,8 @@ public class ScriptContext extends PyJavaInstance {
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      * @param renderType string explicitly controlling the renderType and hints.
-     * @throws java.lang.InterruptedException
      */    
-    public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType ) throws InterruptedException {
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType ) {
         maybeInitModel();
         ArrayDataSet yds= ArrayDataSet.copy(y);
         if ( x!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
@@ -380,9 +370,8 @@ public class ScriptContext extends PyJavaInstance {
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
-     * @throws java.lang.InterruptedException
      */
-    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z ) {
         maybeInitModel();
         if ( z.rank()==1 ) {
             ArrayDataSet yds= ArrayDataSet.copy(y);
@@ -415,9 +404,8 @@ public class ScriptContext extends PyJavaInstance {
      * @param y QDataSet for the independent parameter for the Y values
      * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
      * @param renderType hint at the render type to use, such as "nnSpectrogram" or "digital", 
-     * @throws java.lang.InterruptedException
      */
-    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType ) throws InterruptedException {
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType ) {
         maybeInitModel();
         if ( z.rank()==1 ) {
             ArrayDataSet yds= ArrayDataSet.copy(y);
@@ -559,10 +547,9 @@ public class ScriptContext extends PyJavaInstance {
      *  See writeToPdf(String filename), which appears to have a fix for this that
      *  would affect how this is resolved.
      * @param filename The name of a local file
-     * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
-    public static void writeToPng(String filename) throws InterruptedException, IOException {
+    public static void writeToPng(String filename) throws IOException {
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
             filename= filename + ".png";
         }
@@ -598,10 +585,9 @@ public class ScriptContext extends PyJavaInstance {
      * @param filename The name of a local file
      * @param width the width in pixels of the png
      * @param height the height in pixels of the png
-     * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
-    public static void writeToPng( String filename, int width, int height ) throws InterruptedException, IOException {
+    public static void writeToPng( String filename, int width, int height ) throws IOException {
         filename= getLocalFilename(filename);
         
         BufferedImage image = model.canvas.getImage( width, height );
@@ -618,9 +604,8 @@ public class ScriptContext extends PyJavaInstance {
      * @param filename the name of the output file.
      * @param metadata if non-null, then write name/values pairs into the PNG Metadata. "Creation Time" is always added.  http://englishjavadrinker.blogspot.com/2010/09/png-keywords_12.html
      * @throws IOException
-     * @throws InterruptedException 
      */
-    public static void writeToPng( BufferedImage image, String filename, Map<String,String> metadata ) throws IOException, InterruptedException {
+    public static void writeToPng( BufferedImage image, String filename, Map<String,String> metadata ) throws IOException {
 
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
             filename= filename + ".png";
@@ -657,10 +642,9 @@ public class ScriptContext extends PyJavaInstance {
      * write out the current canvas to stdout.  This is introduced to support servers.
      * TODO: this has issues with the size.  See writeToPng(filename).
      * @param out the OutputStream accepting the data, which is not closed.
-     * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
-    public static void writeToPng(OutputStream out) throws InterruptedException, IOException {
+    public static void writeToPng(OutputStream out) throws IOException {
         waitUntilIdle();
 
         DasCanvas c = model.getCanvas();
@@ -681,10 +665,9 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * write out the current canvas to a svg file.
      * @param filename the local file to write the file.
-     * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */    
-    public static void writeToSvg( String filename ) throws InterruptedException, IOException {
+    public static void writeToSvg( String filename ) throws IOException {
         if ( !( filename.endsWith(".svg") || filename.endsWith(".SVG") ) ) {
             filename= filename + ".svg";
         }
@@ -706,10 +689,9 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * write out the current canvas to stdout.  This is introduced to support servers.
      * @param out the OutputStream accepting the data, which is not closed.
-     * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
-    public static void writeToSvg(OutputStream out) throws InterruptedException, IOException {
+    public static void writeToSvg(OutputStream out) throws IOException {
         waitUntilIdle();
 
         int width= model.getDocumentModel().getCanvases(0).getWidth();
@@ -726,10 +708,9 @@ public class ScriptContext extends PyJavaInstance {
      * TODO: this has issues with the size.  See writeToPng(filename).  It looks
      *   like this might be handled here
      * @param filename the local file to write the file.
-     * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
-    public static void writeToPdf(String filename) throws InterruptedException, IOException {
+    public static void writeToPdf(String filename) throws IOException {
         if ( !( filename.endsWith(".pdf") || filename.endsWith(".PDF") ) ) {
             filename= filename + ".pdf";
         }
@@ -754,10 +735,9 @@ public class ScriptContext extends PyJavaInstance {
      * TODO: this has issues with the size.  See writeToPng(filename).  It looks
      *   like this might be handled here
      * @param out the OutputStream
-     * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
-    public static void writeToPdf( OutputStream out ) throws InterruptedException, IOException {
+    public static void writeToPdf( OutputStream out ) throws IOException {
         waitUntilIdle();
         int width= model.getDocumentModel().getCanvases(0).getWidth();
         int height= model.getDocumentModel().getCanvases(0).getHeight();
@@ -792,7 +772,7 @@ public class ScriptContext extends PyJavaInstance {
      * convenient method for getting an image from the current canvas.
      * @return
      */
-    public static BufferedImage writeToBufferedImage( ) throws InterruptedException {
+    public static BufferedImage writeToBufferedImage( ) {
         waitUntilIdle();
         
         int height= model.getDocumentModel().getCanvases(0).getHeight();
@@ -1001,6 +981,7 @@ public class ScriptContext extends PyJavaInstance {
      *   some bugs exist that may prevent this.
      * @param out stream, such as "System.out"
      * @param ascii use ascii transfer types, otherwise binary are used.
+     * @throws java.io.IOException 
      */
     public static void dumpToQStream( QDataSet ds, OutputStream out, boolean ascii ) throws IOException {
         try {
@@ -1114,10 +1095,14 @@ public class ScriptContext extends PyJavaInstance {
      * wait until the application is idle.  This does a model.waitUntilIdle,
      * but also checks for the DataSetSelector for pending operations.
      */
-    public static void waitUntilIdle() throws InterruptedException {
+    public static void waitUntilIdle() {
         if ( view!=null ) {
             while ( view.getDataSetSelector().isPendingChanges() ) {
-                Thread.sleep(100);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
             }
         }
         model.waitUntilIdle();
@@ -1127,14 +1112,17 @@ public class ScriptContext extends PyJavaInstance {
      * wait until the application is idle.  The id is a convenience to 
      * developers when debugging, for example used to trigger breakpoints.
      * @param id string for debugging.
-     * @throws InterruptedException
      *@see http://autoplot.org/data/tools/reloadAll.jy
      */
-    public static void waitUntilIdle( String id ) throws InterruptedException {
+    public static void waitUntilIdle( String id ) {
         logger.log(Level.INFO, "waitUntilIdle({0})", id);
         if ( view!=null ) {
             while ( view.getDataSetSelector().isPendingChanges() ) {
-                Thread.sleep(100);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         model.waitUntilIdle();
@@ -1190,11 +1178,7 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.io.IOException
      */
     public static void load( String filename ) throws IOException {
-        try {
-            plot(filename);
-        } catch (InterruptedException ex) {
-            throw new RuntimeException(ex);
-        }
+        plot(filename);
     }
     
     /**
@@ -1236,11 +1220,7 @@ public class ScriptContext extends PyJavaInstance {
             lock.unlock();
             canvasLock.unlock();
         }
-        try {
-            waitUntilIdle();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        waitUntilIdle();
     }
     
     /**
