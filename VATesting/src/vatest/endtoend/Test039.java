@@ -7,6 +7,7 @@ package vatest.endtoend;
 import java.awt.BorderLayout;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -21,10 +22,16 @@ import org.das2.graph.DasRow;
 import org.das2.graph.GraphUtil;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
+import org.das2.sdi.Adapter;
+import org.das2.sdi.XYDataAdapter;
 import org.das2.util.AboutUtil;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
+import sdi.data.FillDetector;
+import sdi.data.UncertaintyProvider;
+import sdi.data.XYData;
+import sdi.data.XYMetadata;
 import test.graph.QFunctionLarry;
 
 /**
@@ -171,6 +178,109 @@ public class Test039 {
 
     }
 
+    private static void demoSdi1() throws Exception {
+        XYMetadata xymetadata = new XYMetadata() {
+
+            @Override
+            public sdi.data.Units getXUnits() {
+                return new sdi.data.Units("seconds since 2015-04-01");
+            }
+
+            @Override
+            public sdi.data.Units getYUnits() {
+                return new sdi.data.Units("eV");
+            }
+
+            @Override
+            public String getXName() {
+                return "x";
+            }
+
+            @Override
+            public String getYName() {
+                return "y";
+            }
+
+            @Override
+            public String getXLabel() {
+                return "x";
+            }
+
+            @Override
+            public String getYLabel() {
+                return "y";
+            }
+
+            @Override
+            public String getName() {
+                return "demo";
+            }
+        };
+
+        XYData xydata = new XYData() {
+
+            @Override
+            public Optional<FillDetector> getFillDetector() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<UncertaintyProvider> getXUncertProvider() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Optional<UncertaintyProvider> getYUncertProvider() {
+                return Optional.empty();
+            }
+
+            @Override
+            public XYMetadata getMetadata() {
+                return xymetadata;
+            }
+
+            @Override
+            public int size() {
+                return 40;
+            }
+
+            @Override
+            public double getX(int i) {
+                return 3600 + 3600 * i; // "seconds since 2015-04-01"
+            }
+
+            @Override
+            public double getY(int i) {
+                return Math.pow(10, 2 + Math.sin(getX(i) / 3600));
+            }
+        };
+
+        QDataSet ds = XYDataAdapter.adapt(xydata);
+
+        DasAxis xaxis = GraphUtil.guessXAxis(ds);
+        DasAxis yaxis = new DasAxis(
+                Datum.create(1e0, Units.eV),
+                Datum.create(1e4, Units.eV), DasAxis.VERTICAL, true);
+        DasPlot plot = new DasPlot(xaxis, yaxis);
+
+        Renderer r = GraphUtil.guessRenderer(ds);
+        plot.addRenderer(r);
+        plot.setPreviewEnabled(true); // this should probably be the default now.
+
+        DasCanvas canvas = new DasCanvas(600, 400);
+        canvas.add(plot,
+                DasRow.create(canvas, null, "0%+2em", "100%-5em"),
+                DasColumn.create(canvas, null, "0%+7em", "100%-4em"));
+        canvas.setPrintingTag("demoSdi1");
+
+        canvas.writeToPng("test039_demoSdi1.png");
+
+        if (!headless) {
+            JOptionPane.showMessageDialog(null, canvas);
+        }
+
+    }
+
     private static final boolean headless = "true".equals(System.getProperty("java.awt.headless"));
 
     /**
@@ -201,6 +311,10 @@ public class Test039 {
 
         if (args.length == 0 || args[0].contains("ticks")) {
             demoTicks();
+        }
+
+        if (args.length == 0 || args[0].contains("sdi1")) {
+            demoSdi1();
         }
 
         System.exit(0);
