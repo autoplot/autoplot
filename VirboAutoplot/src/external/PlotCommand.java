@@ -231,30 +231,21 @@ public class PlotCommand extends PyObject {
         QDataSet[] qargs= new QDataSet[nargs];
 
         if ( nargs==1 && po0 instanceof PyString ) {
-            try {
-                ScriptContext.plot( iplot, ((PyString) po0).toString());
-            } catch (InterruptedException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            }
+            ScriptContext.plot( iplot, ((PyString) po0).toString());
         } else {
             for ( int i=0; i<nargs; i++ ) {
                 QDataSet ds= coerceIt(args[i]);
                 qargs[i]= ds;
             }
 
-            try {
-                if ( nargs==1 ) {  // x
-                    ScriptContext.plot( iplot, null, null, qargs[0], renderType );
-                } else if ( nargs==2 ) {  // x, y
-                    ScriptContext.plot( iplot, null, qargs[0], qargs[1], renderType );
-                } else if ( nargs==3 ) {  // x, y, z
-                    ScriptContext.plot( iplot, null, qargs[0], qargs[1], qargs[2], renderType );
-                }
-
-            } catch ( InterruptedException ex ) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                throw new RuntimeException(ex);
+            if ( nargs==1 ) {  // x
+                ScriptContext.plot( iplot, null, null, qargs[0], renderType );
+            } else if ( nargs==2 ) {  // x, y
+                ScriptContext.plot( iplot, null, qargs[0], qargs[1], renderType );
+            } else if ( nargs==3 ) {  // x, y, z
+                ScriptContext.plot( iplot, null, qargs[0], qargs[1], qargs[2], renderType );
             }
+
         }
         // we're done plotting, now for the arguments 
 
