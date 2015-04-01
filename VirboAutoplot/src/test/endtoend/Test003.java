@@ -31,8 +31,6 @@ public class Test003 {
             ScriptContext.load(uri);
             ScriptContext.writeToPng("test003_" + String.format("%03d", id) + ".png");
             System.err.println( String.format( "test003_%03d read in %.2f sec", id, ( System.currentTimeMillis()-t0 )/1000. ) );
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
