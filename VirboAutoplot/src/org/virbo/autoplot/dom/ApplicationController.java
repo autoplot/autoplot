@@ -1425,7 +1425,11 @@ public class ApplicationController extends DomNodeController implements RunLater
             } else {
                 domPlot.controller.removeBindings();
                 final DasPlot p = domPlot.controller.getDasPlot();
+                p.getDasMouseInputAdapter().releaseAll();
+                p.getXAxis().getDasMouseInputAdapter().releaseAll();
+                p.getYAxis().getDasMouseInputAdapter().releaseAll();
                 final DasColorBar cb = domPlot.controller.getDasColorBar();
+                cb.getDasMouseInputAdapter().releaseAll();
                 final DasCanvas lcanvas= this.getDasCanvas();
                 final ArrayList<Component> deleteKids= new ArrayList();
                 deleteKids.add( p );
