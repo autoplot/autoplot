@@ -2019,6 +2019,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                             logger.log(Level.WARNING,ex.getMessage(),ex);
                         }
                         bindingImpls.remove(b);
+                        logger.fine("bindingImpls.size()="+bindingImpls.size());
                     }
                     changed= true;
                 }
@@ -2083,7 +2084,8 @@ public class ApplicationController extends DomNodeController implements RunLater
             b.unbind();
         }
         bindingImpls.remove(binding);
-        
+        logger.fine("bindingImpls.size()="+bindingImpls.size());
+
         BindingGroup bc= bindingContexts.get(DomUtil.getElementById(application,binding.srcId));
         if ( bc!=null ) {
             try {
