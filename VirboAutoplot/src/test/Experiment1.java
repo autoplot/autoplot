@@ -26,9 +26,10 @@ import org.virbo.dsops.Ops;
 public class Experiment1 {
 
     private static ProgressMonitor getMonitor(String label) {
-        DasProgressPanel p = DasProgressPanel.createFramed(label);
-        p.setVisible(true);
-        return p;
+        //DasProgressPanel p = DasProgressPanel.createFramed(label);
+        //p.setVisible(true);
+        return new NullProgressMonitorImpl(label);
+        //return p;
 
     }
 
@@ -38,7 +39,7 @@ public class Experiment1 {
         
         try {
             
-            int size = 12;
+            int size = 500;
             args= new String[] { "multi" };
           
             
@@ -50,9 +51,10 @@ public class Experiment1 {
             if (args[0].equals("multi")) {
                 double[] speedArrayMulti = new double[size];
                 for (int i = 0; i < size; i = i + 1) {
+                    System.err.println("=== "+ i+ " ===");
                     fftMultiThread(8);
                     speedArrayMulti[i] = speed;
-                    System.err.println("Multi threads:" + i);
+                    System.err.println("Multi threads: " + i + " " + speed );
                     QDataSet timesMulti = Ops.dataset(speedArrayMulti);
                     ScriptContext.formatDataSet( timesMulti, "/tmp/multi.txt" );
                 }
@@ -457,5 +459,26 @@ public class Experiment1 {
             if ( m.isFinished()==false ) finished= false;
         }
         return finished;
+    }
+
+    private static class NullProgressMonitorImpl extends NullProgressMonitor {
+
+        long t0= System.currentTimeMillis();
+        String label;
+        
+        public NullProgressMonitorImpl( String label ) {
+            this.label= label;
+        }
+
+        @Override
+        public void setTaskProgress(long position) throws IllegalArgumentException {
+            long t= System.currentTimeMillis();
+            if ( t-t0 > 500 ) {
+                t0= t;
+                System.err.println( label + " " + position + " of " + getTaskSize() );
+            }
+        }
+        
+        
     }
 }
