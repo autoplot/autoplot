@@ -241,6 +241,7 @@ public class BindingSupport {
                 //System.err.println("implBindingContexts.size="+implBindingContexts.size());
             }
             list.add(bi);
+            logger.log(Level.FINE, "adding binding to BindingImpls for {0} size={1} {2}", new Object[]{src, list.size(), src.hashCode()});
         }
 
     }
@@ -274,6 +275,7 @@ public class BindingSupport {
             }
             list.clear();
             implBindingContexts.remove(master);
+            logger.log(Level.FINE, "remove binding to BindingImpls for {0} size={1} {2}", new Object[]{master, list.size(), implBindingContexts.size() });
             //sources.remove(master); // leave in code for future testing to find leaks.
         }
     }
@@ -305,6 +307,7 @@ public class BindingSupport {
                     list2.remove(bi);
                 }
             }
+            logger.log(Level.FINE, "remove binding to BindingImpls for {0} size={1} {2}", new Object[]{master, list.size(), implBindingContexts.size() });
             if ( list2.isEmpty() ) {
                 implBindingContexts.remove(master);
                 //sources.remove(master);
