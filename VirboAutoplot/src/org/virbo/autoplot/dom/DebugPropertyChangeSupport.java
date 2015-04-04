@@ -18,10 +18,16 @@ import java.util.List;
  */
 public class DebugPropertyChangeSupport extends PropertyChangeSupport {
 
+    static long t0= System.currentTimeMillis();
+    
+    String myBean;
+    public long t= System.currentTimeMillis() - t0;
+    
     List<String> propNames= new ArrayList();
 
     public DebugPropertyChangeSupport( Object bean ) {
         super(bean);
+        myBean= bean.toString();
     }
 
     @Override
