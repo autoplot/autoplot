@@ -19,19 +19,14 @@ import static vatest.endtoend.VATestSupport.TEST_VAP;
  * @author jbf
  */
 public class Test004 {
-    public static void main(String[] args) {
-        try {
-            getDocumentModel().getOptions().setAutolayout(false);
-            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+    public static void main(String[] args) throws IOException {
+        getDocumentModel().getOptions().setAutolayout(false);
+        getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
-            load( TEST_VAP + "merka_celias_test004_v1.04.vap" );
-            err.println("#### model pending changes: " + getDocumentModel().getController().isPendingChanges() );
-            setCanvasSize( 992, 711 );
-            writeToPng( "test004.png" );
-            exit(0);  // TODO: something is firing up the event thread
-        } catch ( IOException | InterruptedException ex ) {
-            ex.printStackTrace();
-            exit(1);
-        }
+        load( TEST_VAP + "merka_celias_test004_v1.04.vap" );
+        err.println("#### model pending changes: " + getDocumentModel().getController().isPendingChanges() );
+        setCanvasSize( 992, 711 );
+        writeToPng( "test004.png" );
+        exit(0);  // TODO: something is firing up the event thread
     }
 }

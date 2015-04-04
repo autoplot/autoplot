@@ -42,7 +42,7 @@ public class Test003 {
             load(uri);
             writeToPng("test003_" + format("%03d", id) + ".png");
             err.println(format("test003_%03d read in %.2f sec", id, ( currentTimeMillis()-t0 )/1000. ) );
-        } catch (InterruptedException | IOException ex) {
+        } catch ( IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -165,7 +165,7 @@ public class Test003 {
                 exit(0);
             }
 
-        } catch (InterruptedException | IOException ex) {
+        } catch ( IOException ex) {
             ex.printStackTrace();
             if (headless) {
                 exit(1);

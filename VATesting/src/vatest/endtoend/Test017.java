@@ -99,7 +99,7 @@ public class Test017 {
             xxx( label + ": "+ s );
 
         }
-        } catch ( InterruptedException | NumberFormatException ex ) {
+        } catch ( NumberFormatException ex ) {
             ex.printStackTrace();
             exit(1);
         }
