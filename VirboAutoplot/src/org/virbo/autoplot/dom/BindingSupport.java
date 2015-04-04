@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jdesktop.beansbinding.Converter;
@@ -320,5 +321,29 @@ public class BindingSupport {
     @Override
     public String toString() {
         return "== BindingSupport: ==\n"+implBindingContexts.size() ;
+    }
+    
+    /**
+     * print the status of all the bindings.
+     */
+    public void printStatus() {
+        int total= 0;
+        Map<Object,List<BindingImpl>> copy;
+        synchronized (implBindingContexts) {
+            copy= new HashMap(implBindingContexts);
+            for ( Entry<Object,List<BindingImpl>> e: copy.entrySet() ) {
+                e.setValue( new ArrayList(e.getValue()) );
+            }
+        }
+        
+        for ( Entry<Object,List<BindingImpl>> e: copy.entrySet() ) {
+            int s= e.getValue().size();
+            System.err.println( "--- "+e.getKey()+" ("+s+" bindings) ---");
+            total+= s;
+            for ( BindingImpl l: e.getValue() ) {
+                System.err.println( l );
+            }
+        }
+        System.err.println( "BindingSupport contains "+copy.size()+" groups of "+total+" bindings." );
     }
 }
