@@ -1499,6 +1499,7 @@ public class PlotController extends DomNodeController {
         final DasPlot p = getDasPlot();
         final DasColorBar cb = getDasColorBar();
         final DasCanvas c= p.getCanvas();
+        p.getDasMouseInputAdapter().setFeedback( null );
         if ( c!=null ) {
             SwingUtilities.invokeLater( new Runnable() {
                 @Override
@@ -1616,6 +1617,7 @@ public class PlotController extends DomNodeController {
         ac.unbind(dom.options, Options.PROP_TICKLEN, p.getXAxis(), "tickLength");
         ac.unbind(dom.options, Options.PROP_TICKLEN, p.getYAxis(), "tickLength");
         ac.unbind(dom.options, Options.PROP_TICKLEN, this.dasColorBar, "tickLength");
+        ac.unbind( dom.options, Options.PROP_MULTILINETEXTALIGNMENT, p, DasPlot.PROP_MULTILINETEXTALIGNMENT );
         ac.unbind( dom.options, Options.PROP_PRINTINGLOGLEVEL, p, DasPlot.PROP_PRINTINGLOGLEVEL );
         ac.unbind( dom.options, Options.PROP_DISPLAYLOGLEVEL, p, DasPlot.PROP_LOG_LEVEL );
         ac.unbind( dom.options, Options.PROP_LOGMESSAGETIMEOUTSEC, p, DasPlot.PROP_LOG_TIMEOUT_SEC );
