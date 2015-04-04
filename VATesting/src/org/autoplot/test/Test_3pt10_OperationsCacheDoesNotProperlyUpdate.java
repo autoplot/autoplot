@@ -48,9 +48,6 @@ public class Test_3pt10_OperationsCacheDoesNotProperlyUpdate implements Scenario
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             return 1;
-        } catch (InterruptedException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            return 1;
         }
     }
 

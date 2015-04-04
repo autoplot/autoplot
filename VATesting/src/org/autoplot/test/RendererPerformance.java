@@ -36,11 +36,7 @@ public class RendererPerformance {
             
     private static void setUp( String uri ) {
         System.err.println("uri: "+uri);
-        try {
-            ScriptContext.plot( uri );
-        } catch (InterruptedException ex) {
-            Logger.getLogger(RendererPerformance.class.getName()).log(Level.SEVERE, null, ex);
-        }   
+        ScriptContext.plot( uri );
     }
     
     private static void stressIt( ) {

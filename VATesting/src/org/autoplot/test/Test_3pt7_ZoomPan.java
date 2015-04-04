@@ -79,9 +79,6 @@ public class Test_3pt7_ZoomPan implements Scenario {
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             return 1;
-        } catch (InterruptedException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            return 1;
         }
 
     }

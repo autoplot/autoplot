@@ -83,9 +83,6 @@ public class Test_3pt5_3533882_timerange_reset implements Scenario {
         } catch (ParseException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             return -2;
-        } catch (InterruptedException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            return -1;
         }
         
     }
