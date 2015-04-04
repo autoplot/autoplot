@@ -29,15 +29,15 @@ if ( fast=='T' ):
       count= count+1
 
 else:
-    from org.das2.fsm import FileStorageModelNew
+    from org.das2.fsm import FileStorageModel
     from org.das2.util.filesystem import FileSystem
-    i= FileStorageModelNew.splitIndex( resourceURI )
+    i= FileStorageModel.splitIndex( resourceURI )
 
     root= resourceURI[0:i]      # the static part of the name
     template= resourceURI[i:]   # the templated part of the name
 
     fs= FileSystem.create( root )
-    fsm= FileStorageModelNew.create( fs, template )
+    fsm= FileStorageModel.create( fs, template )
 
     names= fsm.getNamesFor( DatumRangeUtil.parseTimeRange(timerange) )
 
