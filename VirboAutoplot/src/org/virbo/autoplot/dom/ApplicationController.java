@@ -1375,6 +1375,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     /**
      * delete the plot from the application.
+     * TODO: this should really call the plot.controller.deleteDasPeer()
      * @param domPlot
      */
     public void deletePlot(Plot domPlot) {
