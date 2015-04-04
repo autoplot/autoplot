@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.awt.Component;
 import java.beans.IntrospectionException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.graph.DasCanvasComponent;
 import org.jdesktop.beansbinding.Converter;
 
 /**
@@ -47,7 +49,15 @@ public class BindingSupport {
         Method srcGetter;
         @Override
         public String toString() {
-            return src+"."+srcProp+"==dst."+dstProp;
+            if ( dst instanceof DomNode ) {
+                return src+"."+srcProp+" \u2194\t"+dst+"."+dstProp;
+            } else if ( dst instanceof DasCanvasComponent ) {
+                return src+"."+srcProp+" \u2194\t\""+((DasCanvasComponent)dst).getDasName()+"\"."+dstProp;
+            } else if ( dst instanceof Component ) {
+                return src+"."+srcProp+" \u2194\t\""+((Component)dst).getName()+"\"."+dstProp;
+            } else {
+                return src+"."+srcProp+" \u2194\t\""+dst+"\"."+dstProp;
+            }
         }
     }
 
