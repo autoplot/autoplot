@@ -354,6 +354,29 @@ public class BindingSupport {
                 System.err.println( l );
             }
         }
-        System.err.println( "BindingSupport contains "+copy.size()+" groups of "+total+" bindings." );
+        System.err.println( "\nBindingSupport contains "+copy.size()+" groups of "+total+" bindings." );
+    }
+    
+    /**
+     * return the total number of bindings implemented in this facility.
+     * This was introduced to aid in debugging, when trying to identify memory 
+     * leaks.  https://sourceforge.net/p/autoplot/bugs/1362/
+     * @return the total number of bindings implemented in this facility.
+     */
+    public int totalBindings() {
+        int total= 0;
+        Map<Object,List<BindingImpl>> copy;
+        synchronized (implBindingContexts) {
+            copy= new HashMap(implBindingContexts);
+            for ( Entry<Object,List<BindingImpl>> e: copy.entrySet() ) {
+                e.setValue( new ArrayList(e.getValue()) );
+            }
+        }
+        for ( Entry<Object,List<BindingImpl>> e: copy.entrySet() ) {
+            int s= e.getValue().size();
+            total+= s;
+        }
+        System.err.println( "\nBindingSupport contains "+copy.size()+" groups of "+total+" bindings." );
+        return total;
     }
 }
