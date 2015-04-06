@@ -22,6 +22,10 @@ import java.beans.PropertyChangeEvent;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -101,18 +105,22 @@ public class RowPngWalkView extends PngWalkView {
         });
 
         scrollPane.getHorizontalScrollBar().getModel().addChangeListener(new ChangeListener() {
-            Timer repaintTimer = new Timer("RowViewRepaintDelay", true);
-            TimerTask task;
+            //Timer repaintTimer = new Timer("RowViewRepaintDelay", true);
+            //ScheduledThreadPoolExecutor xrepaintTimer = new ScheduledThreadPoolExecutor("RowViewRepaintDelay", true);
+            ScheduledExecutorService ex = Executors.newSingleThreadScheduledExecutor();
+            //TimerTask task;
 
+            @Override
             public void stateChanged(ChangeEvent e) {
                 // Cancel any pending timer events
-                if (task != null) task.cancel();
+                //if (task != null) task.cancel();
                 if (seq == null) return;
                 if ( !canvas.isShowing() ) return;
                 
                 // Schedule a new one
-                task = new TimerTask() {
-
+                //task = new TimerTask() {
+                Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         Rectangle bounds = scrollPane.getViewport().getViewRect();
                         int first = Math.max( 0, ( bounds.x - bounds.width ) / cellSize );
@@ -122,7 +130,8 @@ public class RowPngWalkView extends PngWalkView {
                         }
                     }
                 };
-                repaintTimer.schedule(task, 200L);
+                ex.schedule( run, 200, TimeUnit.MILLISECONDS );
+                //repaintTimer.schedule(task, 200L);
             }
         });
 
