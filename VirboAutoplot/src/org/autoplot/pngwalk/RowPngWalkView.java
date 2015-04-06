@@ -175,21 +175,25 @@ public class RowPngWalkView extends PngWalkView {
         seq.setIndex(n);
     }
 
+    @Override
     int getNextInterval(int index) {
         int i= getVisibleRect().width / cellSize;
         return index+i;
     }
 
+    @Override
     int getNextPage(int index) {
         int i= getVisibleRect().width / cellSize;
         return index+i*4;
     }
 
+    @Override
     int getPrevInterval(int index) {
         int i= getVisibleRect().width / cellSize;
         return index-i;
     }
 
+    @Override
     int getPrevPage(int index) {
         int i= getVisibleRect().width / cellSize;
         return index-i*4;
@@ -227,13 +231,14 @@ public class RowPngWalkView extends PngWalkView {
 
 
     private class Canvas extends JPanel implements Scrollable {
-        private Font smallFont = new Font("Dialog", Font.PLAIN, 6);  //for use with small thumbnails
-        private Font normalFont = new Font("Dialog", Font.PLAIN, 12); // this is the Java default
+        private final Font smallFont = new Font("Dialog", Font.PLAIN, 6);  //for use with small thumbnails
+        private final Font normalFont = new Font("Dialog", Font.PLAIN, 12); // this is the Java default
 
         public Canvas() {
             this.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 
             repaintTimer = new javax.swing.Timer( 300, new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     repaint();
                 }
@@ -362,25 +367,30 @@ public class RowPngWalkView extends PngWalkView {
             }
         }
 
+        @Override
         public Dimension getPreferredScrollableViewportSize() {
             //System.err.println("getPreferredScrollableViewportSize called: preferredSize=" + getPreferredSize());
             return getPreferredSize();
         }
 
+        @Override
         public int getScrollableUnitIncrement(Rectangle arg0, int arg1, int arg2) {
             return cellSize;
         }
 
+        @Override
         public int getScrollableBlockIncrement(Rectangle arg0, int arg1, int arg2) {
             // There is integer division here, so not as redundant as it looks
             int x= (scrollPane.getHorizontalScrollBar().getVisibleAmount() / cellSize ) * cellSize;
             return x;
         }
 
+        @Override
         public boolean getScrollableTracksViewportWidth() {
             return false;
         }
 
+        @Override
         public boolean getScrollableTracksViewportHeight() {
             return true;
         }
