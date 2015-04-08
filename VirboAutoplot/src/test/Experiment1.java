@@ -5,7 +5,10 @@
  */
 package test;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,15 +36,16 @@ public class Experiment1 {
 
     }
 
-    private static double speed;
 
     public static void main(String[] args) throws InterruptedException {
         
         try {
             
-            int size = 500;
+            int size = 5;
+            int numThreads = 8;
             args= new String[] { "multi" };
-          
+            
+
             
             if ( args.length==0 ) {
                 System.err.println("args[0] should be four,eight or, multi");
@@ -49,40 +53,69 @@ public class Experiment1 {
             }
             
             if (args[0].equals("multi")) {
-                double[] speedArrayMulti = new double[size];
+                PrintWriter fw= new PrintWriter( new FileWriter("/tmp/multi.txt"));
+                //double[] speedArrayMulti = new double[size];
                 for (int i = 0; i < size; i = i + 1) {
                     System.err.println("=== "+ i+ " ===");
-                    fftMultiThread(8);
-                    speedArrayMulti[i] = speed;
+                    double speed = fftMultiThread(numThreads);
+                    //speedArrayMulti[i] = speed;
                     System.err.println("Multi threads: " + i + " " + speed );
-                    QDataSet timesMulti = Ops.dataset(speedArrayMulti);
-                    ScriptContext.formatDataSet( timesMulti, "/tmp/multi.txt" );
+                    QDataSet timesMulti = Ops.dataset(speed);
+                        //for ( int j=0; j<10; j++ ) {
+                    fw.println(numThreads + "   " + speed);       
                 }
+                numThreads = 4;
+                for (int i = 0; i < size; i = i + 1) {
+                    System.err.println("=== "+ i+ " ===");
+                    double speed = fftMultiThread(numThreads);
+                    //speedArrayMulti[i] = speed;
+                    System.err.println("Multi threads: " + i + " " + speed );
+                    QDataSet timesMulti = Ops.dataset(speed);
+                    fw.println(numThreads + "   " + speed);       
+                }
+                numThreads = 2;
+                for (int i = 0; i < size; i = i + 1) {
+                    System.err.println("=== "+ i+ " ===");
+                    double speed = fftMultiThread(numThreads);
+                    //speedArrayMulti[i] = speed;
+                    System.err.println("Multi threads: " + i + " " + speed );
+                    QDataSet timesMulti = Ops.dataset(speed);
+                    fw.println(numThreads + "   " + speed);       
+                }
+                numThreads = 1;
+                for (int i = 0; i < size; i = i + 1) {
+                    System.err.println("=== "+ i+ " ===");
+                    double speed = fftMultiThread(numThreads);
+                    //speedArrayMulti[i] = speed;
+                    System.err.println("Multi threads: " + i + " " + speed );
+                    QDataSet timesMulti = Ops.dataset(speed);
+                    fw.println(numThreads + "   " + speed);       
+                }
+                fw.close();
                 
             } else if (args[0].equals("two")) {
-                double[] speedArray2 = new double[size];
+                //double[] speedArray2 = new double[size];
                 for( int i = 0; i< size ; i = i + 1) {
-                    doTwoThreads();
-                    speedArray2[i] = speed;
-                    QDataSet timesTwo = Ops.dataset(speedArray2);
+                    double speed = doTwoThreads(); 
+                    //speedArray2[i] = speed;
+                    QDataSet timesTwo = Ops.dataset(speed);
                     ScriptContext.formatDataSet( timesTwo, "/tmp/twoThreads.txt" );
                 }
               
             } else if (args[0].equals("four")) {
-                double[] speedArray4 = new double[size];
+                //double[] speedArray4 = new double[size];
                 for( int i = 0; i< size ; i = i + 1) {
-                    doFourThreads();
-                    speedArray4[i] = speed;
-                    QDataSet timesFour = Ops.dataset(speedArray4);
+                    double speed = doFourThreads();
+                    QDataSet timesFour = Ops.dataset(speed);
                     ScriptContext.formatDataSet( timesFour, "/tmp/fourThreads.txt" );
                 }
                  
             } else if (args[0].equals("eight")) {
-                double[] speedArray8 = new double[size];
+                //double[] speedArray8 = new double[size];
                 for (int i = 0; i < size; i = i + 1) {
-                    doEightThreads();
-                    speedArray8[i] = speed;
-                    QDataSet timesEight = Ops.dataset(speedArray8);
+                    double speed = doEightThreads();
+                    //speedArray8[i] = speed;
+                    QDataSet timesEight = Ops.dataset(speed);
                     ScriptContext.formatDataSet( timesEight, "/tmp/eightThreads.txt" );
                 }
             } else {
@@ -111,7 +144,7 @@ public class Experiment1 {
 
     }
 
-    private static void doTwoThreads() throws InterruptedException {
+    private static double doTwoThreads() throws InterruptedException {
         //ScriptContext.createGui();
         final QDataSet ds = Ops.ripplesWaveformTimeSeries(DATASET_SIZE);
 
@@ -165,11 +198,13 @@ public class Experiment1 {
             Thread.sleep(200);
         }
         long time1 = System.currentTimeMillis() - t0;
-        speed = ((double) time) / time1;
+        double speed = ((double) time) / time1;
+        
+        return speed;
     }
     private static final int DATASET_SIZE = 10000;
 
-    private static void fftMultiThread(int threads) throws InterruptedException {
+    private static double fftMultiThread(int threads) throws InterruptedException {
         final ArrayList<Runnable> run = new ArrayList<Runnable>();
         final ArrayList<ProgressMonitor> mon = new ArrayList<ProgressMonitor>();
 
@@ -185,8 +220,10 @@ public class Experiment1 {
         out[0] = Ops.fftPower(ds, 512, mon.get(0));
 
         while (!mon.get(0).isFinished()) {
-            Thread.sleep(200);
+            Thread.sleep(50);
         }
+        
+        // time is the time of the original task that only uses one thread in millis
         long time = System.currentTimeMillis() - t0;
 
         ScriptContext.setLayout(threads + 1, 1);
@@ -203,7 +240,6 @@ public class Experiment1 {
                 public void run() {
                     try {
                         out[j] = Ops.fftPower(ds.trim(((j - 1) * DATASET_SIZE) / thr, (j * DATASET_SIZE) / thr), 512, mon.get(j));
-                        ScriptContext.plot(j, out[j]);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -215,24 +251,32 @@ public class Experiment1 {
             }
             new Thread(run.get(i)).start();
         }
-        
+        //ScriptContext.plot(j, out[j]);
         System.err.println("time: "+(System.currentTimeMillis()-time0));
 
         while ( !isFinished(mon.toArray(new ProgressMonitor[mon.size()]) ) ) {
-            Thread.sleep(200);
+            Thread.sleep(50);
         }
         
+        // time1 stores the time it takes to run the task using multiple threads
         long time1 = System.currentTimeMillis() - t0;
-        speed = ((double) time) / time1;
+        
+        // speed stores the relationship between time (one thread) and time1 (multiplethreads)
+        // for example, if the multi-threaded task took half as much time as the single-threaded task, speed = 2
+        double speed = ((double) time) / time1;
 
+        
         try {
             ScriptContext.writeToPng("/tmp/Experiment1_graphs.png");
         } catch (IOException ex) {
             Logger.getLogger(Experiment1.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        return speed;
+        
     }
 
-    private static void doFourThreads() throws InterruptedException {
+    private static double doFourThreads() throws InterruptedException {
         //ScriptContext.createGui();
         final QDataSet ds = Ops.ripplesWaveformTimeSeries(DATASET_SIZE);
 
@@ -312,10 +356,12 @@ public class Experiment1 {
             Thread.sleep(200);
         }
         long time1 = System.currentTimeMillis() - t0;
-        speed = ((double) time) / time1;
+        double speed = ((double) time) / time1;
+        
+        return speed;
     }
 
-    private static void doEightThreads() throws InterruptedException {
+    private static double doEightThreads() throws InterruptedException {
         //ScriptContext.createGui();
         final QDataSet ds = Ops.ripplesWaveformTimeSeries(DATASET_SIZE);
 
@@ -449,7 +495,9 @@ public class Experiment1 {
         }
         
         long time1 = System.currentTimeMillis() - t0;
-        speed = ((double) time) / time1;
+        double speed = ((double) time) / time1;
+        
+        return speed;
     }
     
     private static boolean isFinished( ProgressMonitor[] mons ) {
@@ -475,7 +523,7 @@ public class Experiment1 {
             long t= System.currentTimeMillis();
             if ( t-t0 > 500 ) {
                 t0= t;
-                System.err.println( label + " " + position + " of " + getTaskSize() );
+                System.err.println( label + ": " + position + " of " + getTaskSize() );
             }
         }
         
