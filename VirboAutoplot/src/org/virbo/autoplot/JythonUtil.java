@@ -318,38 +318,39 @@ public class JythonUtil {
             fd=  pfp.doVariables( env, file, vars, null );
         }
         
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, mon );
-                    logger.log(Level.FINE, "invokeScriptSoon({0})", url);
-                    for ( Map.Entry<String,String> v: fvars.entrySet() ) {
-                        try {
-                            fd.implement( interp, v.getKey(), v.getValue() );
-                        } catch ( ParseException ex ) {
-                            logger.log( Level.WARNING, null, ex );
-                        }
-                    }
-                    URISplit split= URISplit.parse(url.toString());
-                    interp.set( "dom", dom );
-                    interp.set( "PWD", split.path );   
-                    FileInputStream in= new FileInputStream(file);
-                    try {
-                        interp.execfile( in, url.toString());
-                    } finally {
-                        in.close();
-                    }
-                    //TODO: error annotations on the editor.
-                    if ( !mon.isFinished() ) mon.finished();
-                } catch (IOException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                }
-            }
-        };
         if ( response==JOptionPane.OK_OPTION ) {
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, mon );
+                        logger.log(Level.FINE, "invokeScriptSoon({0})", url);
+                        for ( Map.Entry<String,String> v: fvars.entrySet() ) {
+                            try {
+                                fd.implement( interp, v.getKey(), v.getValue() );
+                            } catch ( ParseException ex ) {
+                                logger.log( Level.WARNING, null, ex );
+                            }
+                        }
+                        URISplit split= URISplit.parse(url.toString());
+                        interp.set( "dom", dom );
+                        interp.set( "PWD", split.path );  
+                        FileInputStream in= new FileInputStream(file);
+                        try {
+                            interp.execfile( in, url.toString());
+                        } finally {
+                            in.close();
+                        }
+                        //TODO: error annotations on the editor.
+                        if ( !mon.isFinished() ) mon.finished();
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, ex.getMessage(), ex);
+                    }
+                }
+            };
             RequestProcessor.invokeLater(run);
         }
+        
         return response;
     }
 }
