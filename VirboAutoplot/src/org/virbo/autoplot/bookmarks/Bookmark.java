@@ -468,8 +468,8 @@ public abstract class Bookmark {
             String remoteStatusMsg= "";
             RemoteStatus rs;
 
-            if ( remoteUrlNode!=null ) { // 2984078
-
+            if ( remoteUrlNode!=null ) { // 2984078 http://sourceforge.net/p/autoplot/feature-requests/81/
+                
                 remoteUrl= vers.equals("") ? URLDecoder.decode( remoteUrlNode.getNodeValue(), "UTF-8" ) : remoteUrlNode.getNodeValue();
 
                 if ( remoteLevel>0 ) {
