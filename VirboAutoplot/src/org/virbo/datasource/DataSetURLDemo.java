@@ -71,7 +71,7 @@ public class DataSetURLDemo {
                 throw new IllegalArgumentException("bad test number");
         }
 
-        List<DataSetURI.CompletionResult> ccs = DataSetURI.getFactoryCompletions(context, carotPos, new DasProgressPanel("completions"));
+        List<DataSetURI.CompletionResult> ccs = DataSetURI.getFactoryCompletions(context, carotPos, DasProgressPanel.createFramed("completions"));
 
         System.err.println(context);
         System.err.println(spaces.substring(0, carotPos) + "L");
