@@ -5007,7 +5007,7 @@ APSplash.checkTime("init 240");
     private void runScript( final String script ) {
         try {
             final URISplit split= URISplit.parse(script);
-            final File ff = DataSetURI.getFile(DataSetURI.getURI(script), new DasProgressPanel("downloading script"));
+            final File ff = DataSetURI.getFile(DataSetURI.getURI(script), DasProgressPanel.createFramed(AutoplotUI.this,"downloading script"));
             final RunScriptPanel pp = new RunScriptPanel();
             final HashMap params= URISplit.parseParams(split.params);
             pp.loadFile(ff);
@@ -5015,7 +5015,7 @@ APSplash.checkTime("init 240");
                 @Override
                 public void run() {
                     try {
-                        ProgressMonitor mon= new DasProgressPanel("Running script "+ff );
+                        ProgressMonitor mon= DasProgressPanel.createFramed(AutoplotUI.this,"Running script "+ff );
                         File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
                         
                         boolean isTool= split.path.contains(tools.toString()); // here is the trust...
