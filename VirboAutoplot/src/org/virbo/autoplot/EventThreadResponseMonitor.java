@@ -8,7 +8,6 @@ package org.virbo.autoplot;
 import java.awt.AWTEvent;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,12 +15,19 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
+import org.das2.datum.LoggerManager;
+import org.das2.util.AboutUtil;
+import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
@@ -30,28 +36,40 @@ import org.virbo.datasource.AutoplotSettings;
  * See org.das2.util.awt.LoggingEventQueue, which was a similar experiment from 2005.
  * This now monitors the event thread for hung events.
  *
- * Bugs found:
- *   https://sourceforge.net/tracker/index.php?func=detail&aid=3510248&group_id=199733&atid=970682
+ * Bugs found: http://sourceforge.net/p/autoplot/bugs/863/
  *
  * @author jbf
  */
 public final class EventThreadResponseMonitor {
 
+    private static final Logger logger= LoggerManager.getLogger("autoplot.splash");
+    
     private long lastPost;
     private long response;
 
+    private Map<String,Object> map; // various information about the process.
+    
     private static final int TEST_CLEAR_EVENT_QUEUE_PERIOD_MILLIS = 100;
     private static final int WARN_LEVEL_MILLIS= 500; // acceptable millisecond delay in processing
     private static final int ERROR_LEVEL_MILLIS= 10000; // unacceptable delay in processing, and an error is submitted.
     private static final int WATCH_INTERVAL_MILLIS = 1000;
 
-    public EventThreadResponseMonitor() {
-        
+    public EventThreadResponseMonitor( ) {
+        this.map= new HashMap();
     }
 
     public void start() {
         new Thread( createRunnable(), "eventThreadResponseMonitor"  ).start();
         new Thread( watchEventThreadRunnable(), "watchEventThread" ).start();
+    }
+    
+    /**
+     * add to the information.
+     * @param key see GuiExceptionManager
+     * @param value 
+     */
+    public void addToMap( String key, Object value ) {
+        this.map.put( key, value );
     }
 
     public static synchronized String dumpPendingEvents() {
@@ -85,6 +103,7 @@ public final class EventThreadResponseMonitor {
     Runnable createRunnable() {
         lastPost= System.currentTimeMillis();
         return new Runnable() {
+            @Override
             public void run() {
                 while ( true ) {
                     try {
@@ -117,6 +136,7 @@ public final class EventThreadResponseMonitor {
      */
     private Runnable responseRunnable( final String pending ) {
         return new Runnable() {
+            @Override
             public void run() {
                 response= System.currentTimeMillis();
                 long levelms= response-lastPost;
@@ -142,11 +162,11 @@ public final class EventThreadResponseMonitor {
      * the watchEventThreadRunnable watches the current event on the event thread, and if it doesn't change within a given
      * interval (WATCH_INTERVAL_MILLIS) start printing errors and eventually (ERROR_LEVEL_MILLIS) log an error because the thread appears to
      * be hung.
-     * @return
+     * @return the Runnable
      */
-
     Runnable watchEventThreadRunnable() {
         return new Runnable() {
+            @Override
             public void run() {
                 AWTEvent currentEvent= null;
                 String reportedEventId= "";      // toString showing the last reported error.
@@ -174,10 +194,22 @@ public final class EventThreadResponseMonitor {
                                 return;
                             }
 
-                            String id= "anon";
-                            id= System.getProperty("user.name");
+                            String id= System.getProperty("user.name");
 
-                            String fname= "hang_"+ id.replaceAll(" ","_") + "_"+ timeStamp + ".txt";
+                            map.put( GuiExceptionHandler.USER_ID, id );
+                            
+                            try {
+                                List<String> bis = AboutUtil.getBuildInfos();
+                                map.put( GuiExceptionHandler.BUILD_INFO, bis );
+                            } catch (IOException ex) {
+                                logger.log(Level.SEVERE, ex.getMessage(), ex);
+                            }
+                            int appCount= AppManager.getInstance().getApplicationCount();
+                            map.put( GuiExceptionHandler.APP_COUNT, appCount );
+                                                                
+                            String s= GuiExceptionHandler.formatReport( map, false, "Autoplot detected hang" );
+                            
+                            String fname= "rte_0000000001" + "_"+ timeStamp + "_"+id.replaceAll(" ","_")+ ".xml";
 
                             File logdir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "log" );
                             if ( !logdir.exists() ) {
@@ -187,28 +219,16 @@ public final class EventThreadResponseMonitor {
                             }
 
                             File f= new File( logdir, fname );
-                            Map<Thread,StackTraceElement[]> ttt= Thread.getAllStackTraces();
-
+                            PrintWriter out=null;
                             try {
-                                PrintWriter out= new PrintWriter( new FileOutputStream(f) );
-
-                                for ( Entry<Thread,StackTraceElement[]> tt : ttt.entrySet() ) {
-                                    Thread t= tt.getKey();
-                                    StackTraceElement[] stes= tt.getValue();
-                                    out.println( t.getName() );
-                                    for ( StackTraceElement ste : stes) {
-                                        out.println("\tat " + ste);
-                                    }
-                                    out.println( "\n" );
-                                }
-
-                                out.close();
-                                
+                                out= new PrintWriter( new FileOutputStream(f) );
+                                out.write(s);
                             } catch ( IOException ex ) {
-                                ex.printStackTrace();
-                                
+                                logger.log( Level.WARNING, null, ex );
+                            } finally {
+                                if ( out!=null ) out.close();
                             }
-
+                            
                             reportedEventId= eventId;
                             
                             currentEvent= null;
