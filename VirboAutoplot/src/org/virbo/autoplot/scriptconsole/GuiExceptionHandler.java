@@ -136,14 +136,19 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         "and platform information.\n\n";
 
     private JButton submitButton;
-    private static final String USER_ID= "USER_ID";
-    private static final String EMAIL="EMAIL";
-    private static final String FOCUS_URI="FOCUS_URI";
-    private static final String PENDING_FOCUS_URI="PENDING_FOCUS_URI";    
-    private static final String APP_COUNT="APP_COUNT";    // number of apps/pngwalks open
-    private static final String INCLDOM= "INCLDOM";
-    private static final String INCLSCREEN= "INCLSCREEN";
-
+    public static final String USER_ID= "USER_ID";
+    public static final String EMAIL="EMAIL";
+    public static final String FOCUS_URI="FOCUS_URI";
+    public static final String PENDING_FOCUS_URI="PENDING_FOCUS_URI";    
+    public static final String APP_COUNT="APP_COUNT";    // number of apps/pngwalks open
+    public static final String INCLDOM= "INCLDOM";
+    public static final String INCLSCREEN= "INCLSCREEN";
+    public static final String APP_MODEL= "APP_MODEL"; // application model
+    public static final String UNDO_REDO_SUPPORT= "UNDO_REDO_SUPPORT"; // the DOM.
+    public static final String THROWABLE="throwable";
+    public static final String BUILD_INFO="build_info";
+    public static final String LOG_RECORDS= "log_records"; // list of log records.    
+    
     private ApplicationModel appModel=null;
     private UndoRedoSupport undoRedoSupport= null;
 
@@ -168,7 +173,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         }
     }
 
-    private Map<Integer,DiaDescriptor> dialogs= Collections.synchronizedMap( new HashMap<Integer, DiaDescriptor>() );
+    private final Map<Integer,DiaDescriptor> dialogs= Collections.synchronizedMap( new HashMap<Integer, DiaDescriptor>() );
 
     private DiaDescriptor createDialog( final Throwable throwable, final boolean uncaught ) {
         final DiaDescriptor diaDescriptor= new DiaDescriptor();
@@ -352,18 +357,26 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
     }
 
-    private static int hashCode( Throwable t ) {
+    /**
+     * create a hashCode identifying the stack trace location.
+     * @param ee the stack trace.
+     * @return the hash
+     */
+    public static int hashCode( StackTraceElement[] ee ) {        
         int rteHash= 0;
-        if ( t.getCause()!=null ) {
-            t= t.getCause();
-        }
-
-        StackTraceElement[] ee= t.getStackTrace();
         for ( int i=0; i<ee.length && i<5; i++ ) {
             rteHash= 31*rteHash + hashCode(ee[i]);
         }
         rteHash= Math.abs(rteHash) + ( ee.length>0 ? ee[0].getLineNumber() : 0 );
         return rteHash;
+    }
+    
+    private static int hashCode( Throwable t ) {
+        if ( t.getCause()!=null ) {
+            t= t.getCause();
+        }
+        StackTraceElement[] ee= t.getStackTrace();
+        return hashCode(ee);
     }
 
     private static int hashCode( StackTraceElement e ) {
@@ -382,7 +395,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         this.focusURI= uri;
     }
 
-    private void formatException( Document doc, Element parent, Throwable th ) {
+    private static void formatException( Document doc, Element parent, Throwable th ) {
         Element ex= doc.createElement("exception");
         Element type= doc.createElement("type");
         type.appendChild( doc.createTextNode(th.getClass().getName()) );
@@ -442,7 +455,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         parent.appendChild(ex);
     }
 
-    private void formatBuildInfos( Document doc, Element parent, List<String> bis ) {
+    private static void formatBuildInfos( Document doc, Element parent, List<String> bis ) {
         Element pp= doc.createElement("buildInfos");
         try {
             Element tag= doc.createElement("releaseTag");
@@ -463,14 +476,14 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
     }
 
-    private void formatSysProp( Document doc, Element parent,String prop ) {
+    private static void formatSysProp( Document doc, Element parent,String prop ) {
         Element ele= doc.createElement("property");
         ele.setAttribute( "name", prop );
         ele.setAttribute( "value",System.getProperty(prop) );
         parent.appendChild(ele);
     }
 
-    private void formatPlatform( Document doc, Element parent  ) {
+    private static void formatPlatform( Document doc, Element parent  ) {
         Element p= doc.createElement("platform");
         formatSysProp( doc, p, "java.version" );
         formatSysProp( doc, p, "java.vendor" );
@@ -502,7 +515,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
      * @param doc
      * @param parent 
      */
-    private void formatThreads( Document doc, Element parent ) {
+    private static void formatThreads( Document doc, Element parent ) {
         Element ele= doc.createElement("threads");
         Map<Thread,StackTraceElement[]> threads= Thread.getAllStackTraces();
         for ( Entry<Thread,StackTraceElement[]> ent: threads.entrySet() ) {
@@ -526,7 +539,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         parent.appendChild(ele);
     }
     
-    private void formatUndos( Document doc, Element parent, UndoRedoSupport undo ) {
+    private static void formatUndos( Document doc, Element parent, UndoRedoSupport undo ) {
         Element ele= doc.createElement("states");
         for ( int i= undo.getDepth()-1; i>0; i-- ) {
             Element ele1= doc.createElement("undo");
@@ -537,7 +550,54 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         parent.appendChild(ele);
     }
 
-    private String formatReport( Throwable t, List<String> bis, List<LogRecord> recs, Map<String,Object> data, boolean uncaught, String userComments ) {
+    /**
+     * data is a map containing the keys:<ul>
+     * <li>THROWABLE, the throwable
+     * <li>BUILD_INFO, string array of human-readable build information
+     * <li>LOG_RECORDS, list of log records.
+     * <li>USER_ID, user id.
+     * <li>EMAIL, email.
+     * <li>FOCUS_URI the current focus uri.
+     * <li>PENDING_FOCUS_URI the pending focus uri 
+     * <li>APP_COUNT the number of instances running.
+     * <li>INCLSCREEN Boolean.TRUE if the user should include a screen shot.
+     * <li>APP_MODEL the application object.
+     * </ul>
+     * @param data map of data
+     * @param uncaught true if the exception was uncaught
+     * @param userComments additional comments from the user.
+     * @return the formatted report.
+     */    
+    public static String formatReport( Map<String,Object> data, boolean uncaught, String userComments ) {
+        Throwable t= (Throwable)data.get(THROWABLE);
+        if ( t==null ) t= new RuntimeException("");
+        List<String> bis= (List<String>) data.get( BUILD_INFO );
+        if ( bis==null ) bis= Collections.emptyList();
+        List<LogRecord> recs= (List<LogRecord>) data.get( LOG_RECORDS );
+        if ( recs==null ) recs= Collections.emptyList();
+        return formatReport( t, bis, recs, data, uncaught, userComments );
+    }
+    
+    /**
+     * data is a map containing the keys:<ul>
+     * <li>USER_ID, user id
+     * <li>EMAIL, email
+     * <li>FOCUS_URI the current focus uri.
+     * <li>PENDING_FOCUS_URI the pending focus uri 
+     * <li>APP_COUNT the number of instances running.
+     * <li>INCLSCREEN Boolean.TRUE if the user should include a screen shot.
+     * <li>APP_MODEL the application object.
+     * </ul>
+     * 
+     * @param t the throwable
+     * @param bis list of build information
+     * @param recs list of log records
+     * @param data map of data
+     * @param uncaught true if the exception was uncaught
+     * @param userComments additional comments from the user.
+     * @return 
+     */
+    private static String formatReport( Throwable t, List<String> bis, List<LogRecord> recs, Map<String,Object> data, boolean uncaught, String userComments ) {
 
         ByteArrayOutputStream out= new ByteArrayOutputStream();
 
@@ -589,6 +649,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             e.appendChild(ele);
 
             if ( data.get(INCLDOM)==null || (Boolean)data.get( INCLDOM ) ) {
+                ApplicationModel appModel= (ApplicationModel) data.get( APP_MODEL );
                 if ( appModel!=null ) {
                     Application state= (Application)appModel.getDocumentModel();
 
@@ -613,13 +674,14 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
                 formatThreads(doc,e);
                 
+                UndoRedoSupport undoRedoSupport= (UndoRedoSupport)data.get( UNDO_REDO_SUPPORT );
                 if ( undoRedoSupport!=null ) {
                     formatUndos( doc, e, undoRedoSupport );
                 }
             }
 
             if ( data.get(INCLSCREEN)!=null && (Boolean)data.get( INCLSCREEN ) ) {
-
+                ApplicationModel appModel= (ApplicationModel) data.get( APP_MODEL );
                 if ( appModel!=null ) {
                     Window w= SwingUtilities.getWindowAncestor( appModel.getCanvas() );
 
@@ -740,7 +802,6 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         map.put( EMAIL, email );
 
         map.put( INCLSCREEN, form.isAllowScreenshot() );
-
         String report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
         logger.log(Level.FINE, "indexOf arrow= {0}", report.indexOf( (char)8594 ));
         return report;
@@ -776,6 +837,9 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         map=new HashMap();
 
+        map.put( APP_MODEL, appModel );
+        map.put( UNDO_REDO_SUPPORT, undoRedoSupport );
+        
         String id;
         id= System.getProperty("user.name");
 
