@@ -183,7 +183,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
     ApplicationModel applicationModel;
     Application dom;
     PersistentStateSupport stateSupport;
-    UndoRedoSupport undoRedoSupport;
+    final UndoRedoSupport undoRedoSupport;
     TickleTimer tickleTimer;
     GuiSupport support;
     LayoutListener autoLayout;
@@ -228,7 +228,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
      */
     public static final Icon WARNING_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"warning-icon.png") );
     /**
-     * red stop sign with exclaimation point, using to indicate error condition.
+     * red stop sign with exclamation point, using to indicate error condition.
      */
     public static final Icon ERROR_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"error-icon.png") );
     /**
@@ -4222,13 +4222,18 @@ APSplash.checkTime("init 220");
                                         || finitialURL.endsWith(".pngwalk") 
                                         || finitialURL.contains(".pngwalk?" ) ) ) app.setVisible(true);
                             }
-                            if ( alm.getBooleanValue("eventThreadMonitor") ) new EventThreadResponseMonitor().start();
+                            //if ( alm.getBooleanValue("eventThreadMonitor") ) new EventThreadResponseMonitor().start();
                         }
                     };
                     repaintRunnable.run();
                     //SwingUtilities.invokeLater(repaintRunnable);
 
-
+                    
+                    EventThreadResponseMonitor emon= new EventThreadResponseMonitor();
+                    emon.addToMap( GuiExceptionHandler.UNDO_REDO_SUPPORT, app.undoRedoSupport );
+                    emon.addToMap( GuiExceptionHandler.APP_MODEL, app.applicationModel );
+                    emon.start();
+                    
                     logger.fine("UI is visible");
                     APSplash.hideSplash();
                     logger.removeHandler( APSplash.getInstance().getLogHandler() );
