@@ -313,6 +313,11 @@ public class Test019 {
         norm= DatumRangeUtil.parseTimeRange( "2015-05-05T00:00/2015-06-02T00:00" );
         if ( !norm.equals( DatumRangeUtil.parseDatumRange( "2015-05-05T00:00/2015-06-02T00:00" ) ) ) throw new RuntimeException("ex5");
         
+        norm= DatumRangeUtil.parseTimeRange( "2014-01-01T00:00/2016-01-01T00:00" );
+        if ( !norm.equals( DatumRangeUtil.parseDatumRange("2014 to 2016 UTC") ) ) throw new RuntimeException("ex6");
+        
+        norm= DatumRangeUtil.parseDatumRange( "2014. to 2016.", Units.dimensionless );
+        if ( !norm.equals( DatumRangeUtil.parseDatumRange("2014 to 2016") ) ) throw new RuntimeException("ex7");
         
     }
     
