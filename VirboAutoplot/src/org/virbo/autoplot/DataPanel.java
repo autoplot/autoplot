@@ -496,6 +496,8 @@ public class DataPanel extends javax.swing.JPanel {
         dataSetLabel.setText( ds==null ? "(no dataset)" : ds.toString() );
         
         newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_FILLDATASET, fillDataSetListener );
+        filtersChainPanel1.setInput(null);
+        filtersChainPanel1.setFilter("");
         filtersChainPanel1.setInput(ds);
 
         BindingGroup bc = new BindingGroup();
