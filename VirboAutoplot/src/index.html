@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Data from NetCDF file.
+        <p><small>Netbeans Profiler is used to fix memory leaks in Autoplot.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,6 +22,9 @@
 
         <p>Bugfixes (2015-04-04 r16608):</p>
         <ul>
+            <li>rte_1630095413: clean up transition by clearing input and filter.  Before the wrong dataset was sent to the filter.</li>
+            <li>1366 DasProgressPanel constructor should be protected.  Jython scripts would sometimes not have a showing progress bar</li>
+            <li>aggregation of two QStreams would fail because of change to when join datasets are flattened.</li>
             <li>1362: memory leaks shown by Kenzie's FFT process.</li>
             <li>1359: scan buttons get into funky state demonstration</li>
             <li>clarify smax&lt;smin message in eventsRenderer</li>
@@ -93,6 +96,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>introduce DatumRangeUtil.parseDatumRange(String) which detects ISO8601 times or units equal to UTC.</li>
+            <li>automatic hang detection writes RTE to autoplot_data/log/ when app hangs for 10 seconds.</li>
+            <li>added BindingSupport.printStatus() to help find memory leaks caused by bindings</li>
             <li>get rid of extraneous InterruptedExceptions which were thrown from the bowels, and needn't be propagated to the more abstract waitUntilIdle</li>
             <li>renderer style panels for Contour, PitchAngleDistribution, and EventsBar styles.</li>
             <li>more dasCore code cleanup</li>
