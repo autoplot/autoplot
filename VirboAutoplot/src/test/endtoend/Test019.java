@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -20,12 +21,12 @@ import org.das2.datum.DatumRangeUtil;
 import static org.das2.datum.DatumRangeUtil.parseISO8601Range;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModel;
 import org.das2.graph.DasDevicePosition;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
-import static test.datum.TestDatumRangeUtil.testParse8601_1;
 
 /**
  * tests of das2 internals.  These are tests of non-graphic parts (see test009 for this), and does not include
@@ -106,18 +107,19 @@ public class Test019 {
     }
     
     public static void testLayout( ) throws ParseException {
-        double [] res0, res1, res2;
-        res0= DasDevicePosition.parseLayoutStr("100 % -5 em +4 px");
+        double [] res0, res1, res2, res3;
         res0= DasDevicePosition.parseLayoutStr("100% -5em +4px");
+        res3= DasDevicePosition.parseLayoutStr("100 % -5 em +4 px"); // demo that spaces are tolerated
         res1= DasDevicePosition.parseLayoutStr("100%-5em+4pt");
         res2= DasDevicePosition.parseLayoutStr("+4pt-5em+100%");
         for ( int i=0; i<3; i++ ) {
             if ( res0[i]!=res1[i] ) throw new IllegalArgumentException("layout parsing res0!=res1");
             if ( res0[i]!=res2[i] ) throw new IllegalArgumentException("layout parsing res0!=res2");
+            if ( res0[i]!=res3[i] ) throw new IllegalArgumentException("layout parsing res0!=res3");
         }
-        res0= DasDevicePosition.parseLayoutStr("100%");
-        res0= DasDevicePosition.parseLayoutStr("0%");
-        res0= DasDevicePosition.parseLayoutStr(""); // should be same as "0%"
+        if ( !Arrays.equals( DasDevicePosition.parseLayoutStr("100%"), new double[] { 1., 0, 0 } ) ) throw new RuntimeException();
+        if ( !Arrays.equals( DasDevicePosition.parseLayoutStr("0%"), new double[] { 0, 0, 0 } ) ) throw new RuntimeException();
+        if ( !Arrays.equals( DasDevicePosition.parseLayoutStr(""), new double[] { 0, 0, 0 } ) ) throw new RuntimeException();
     }
 
     public static void testFileSystemModel() throws Exception {
@@ -282,8 +284,43 @@ public class Test019 {
         System.err.println( fo.getSize() );
     }
 
+    
+    public static void testParseDatumRange() throws ParseException {
+        
+        String statement= "ISO8601 times must contain $Y-$m-$dT$H:$M or $Y-$dT$H:$M";
+        if ( TimeParser.isIso8601String("2015")==true ) throw new RuntimeException(statement);
+        if ( TimeParser.isIso8601String("2015-001")==true ) throw new RuntimeException(statement);
+        if ( TimeParser.isIso8601String("2015-1-1")==true ) throw new RuntimeException(statement);
+        if ( TimeParser.isIso8601String("2015-001T00:00")==false ) throw new RuntimeException(statement);
+        if ( TimeParser.isIso8601String("2015-1-1T00:00")==false) throw new RuntimeException(statement);
+        
+        DatumRange norm;
+        norm= new DatumRange( 0,10,Units.keV );
+        if ( !norm.equals( DatumRangeUtil.parseDatumRange( "0 to 10 keV" ) ) ) throw new RuntimeException("0 to 10 keV");
+        if ( !norm.equals( DatumRangeUtil.parseDatumRange( "0 to 10", Units.keV ) ) ) throw new RuntimeException("0 to 10 keV");        
+        if ( !norm.equals( DatumRangeUtil.parseDatumRange( "0 to 10", norm ) ) ) throw new RuntimeException("0 to 10 keV");
+        
+        norm= DatumRangeUtil.parseTimeRange( "2014-02-02T00:00 to 2014-02-02T12:00" );
+        if ( !norm.equals( DatumRangeUtil.parseDatumRange( "2014-02-02T00:00 to 2014-02-02T12:00", norm ) ) ) throw new RuntimeException("time1");
+        if ( !norm.equals( DatumRangeUtil.parseDatumRange( "2014-02-02T00:00 to 2014-02-02T12:00 UTC" ) ) ) throw new RuntimeException("time2");
+        if ( !norm.equals( DatumRangeUtil.parseDatumRange( "2014-02-02T00:00 to 2014-02-02T12:00" ) ) ) throw new RuntimeException("time2");
+        if ( !norm.equals( DatumRangeUtil.parseDatumRange( "2014-02-02T00:00/2014-02-02T12:00", norm ) ) ) throw new RuntimeException("time3");
+        
+        norm= DatumRangeUtil.parseTimeRange( "2013-01-01T00:00 to 2015-01-01T00:00" );
+        if ( !norm.equals( DatumRangeUtil.parseDatumRange( "2013 to 2015 UTC" ) ) ) throw new RuntimeException("time4");
+        norm= DatumRangeUtil.parseDatumRange( "3 to 4 kg", Units.lookupUnits("kg") );
+        if ( !norm.equals( DatumRangeUtil.parseDatumRange( "3 to 4 kg" ) ) ) throw new RuntimeException("ex4");
+        norm= DatumRangeUtil.parseTimeRange( "2015-05-05T00:00/2015-06-02T00:00" );
+        if ( !norm.equals( DatumRangeUtil.parseDatumRange( "2015-05-05T00:00/2015-06-02T00:00" ) ) ) throw new RuntimeException("ex5");
+        
+        
+    }
+    
     public static void main( String[] args ) {
         try {
+            System.err.println( "=testParseDatumRange=" );
+            testParseDatumRange();
+            
             System.err.println( "=testDeadFileSystemListing=" );
             testDeadFileSystemListing();
             TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
