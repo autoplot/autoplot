@@ -143,10 +143,10 @@ public final class EventThreadResponseMonitor {
                 long levelms= response-lastPost;
                 eventQueue= Thread.currentThread();
                 if ( levelms>WARN_LEVEL_MILLIS ) {
-                    System.err.printf( "CURRENT EVENT QUEUE CLEAR TIME: %5.3f sec\n", levelms/1000. );
+                    logger.log(Level.FINE, "CURRENT EVENT QUEUE CLEAR TIME: {0} sec\n", levelms/1000);
                     if ( pending!=null ) {
-                        System.err.printf( "events pending:\n");
-                        System.err.printf( pending );
+                        logger.log(Level.FINE, "events pending:\n");
+                        logger.log(Level.FINE, pending );
                     }
                 } else {
                     //System.err.printf( "current event queue clear time: %5.3f sec\n", levelms/1000. );
@@ -176,15 +176,15 @@ public final class EventThreadResponseMonitor {
                     EventQueue instance= Toolkit.getDefaultToolkit().getSystemEventQueue();
                     AWTEvent test= instance.peekEvent(); // Ed says: one peekEvent for every getSystemEventQueue.
                     if ( currentEvent!=null && test==currentEvent ) { // we should have processed this event by now.
-                        System.err.println("====  long job to process ====");
-                        System.err.println(test);
-                        System.err.println("====  end, long job to process ====");
+                        logger.log(Level.FINE, "====  long job to process ====");
+                        logger.log(Level.FINE, test.toString() );
+                        logger.log(Level.FINE, "====  end, long job to process ====");
 
                         String eventId= test.toString();
                         boolean hungProcess= System.currentTimeMillis()-currentRequestStartTime > ERROR_LEVEL_MILLIS;
                         if ( hungProcess && ! eventId.equals(reportedEventId) ) {
 
-                            System.err.printf( "PATHOLOGICAL EVENT QUEUE CLEAR TIME, WRITING REPORT...\n" );
+                            logger.log(Level.INFO, "PATHOLOGICAL EVENT QUEUE CLEAR TIME, WRITING REPORT TO autoplot_data/logs/...\n" );
 
                             Date now= new Date();
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
