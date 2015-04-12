@@ -46,6 +46,7 @@ public final class EventThreadResponseMonitor {
     
     private long lastPost;
     private long response;
+    private Thread eventQueue; // This is the event thread we are monitoring.
 
     private Map<String,Object> map; // various information about the process.
     
@@ -140,14 +141,13 @@ public final class EventThreadResponseMonitor {
             public void run() {
                 response= System.currentTimeMillis();
                 long levelms= response-lastPost;
-
+                eventQueue= Thread.currentThread();
                 if ( levelms>WARN_LEVEL_MILLIS ) {
                     System.err.printf( "CURRENT EVENT QUEUE CLEAR TIME: %5.3f sec\n", levelms/1000. );
                     if ( pending!=null ) {
                         System.err.printf( "events pending:\n");
                         System.err.printf( pending );
                     }
-
                 } else {
                     //System.err.printf( "current event queue clear time: %5.3f sec\n", levelms/1000. );
                 }
@@ -208,13 +208,14 @@ public final class EventThreadResponseMonitor {
                             map.put( GuiExceptionHandler.APP_COUNT, appCount );
                                                                 
                             String s= GuiExceptionHandler.formatReport( map, false, "Autoplot detected hang" );
+                            int hash= eventQueue==null ? 1 : GuiExceptionHandler.hashCode( eventQueue.getStackTrace() );
                             
-                            String fname= "rte_0000000001" + "_"+ timeStamp + "_"+id.replaceAll(" ","_")+ ".xml";
+                            String fname= String.format("hang_%010d_%s_%s.xml", Integer.valueOf(hash), timeStamp, id.replaceAll(" ","_") );
 
                             File logdir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "log" );
                             if ( !logdir.exists() ) {
                                 if ( !logdir.mkdirs() ) {
-                                    throw new IllegalStateException("Unable to mkdir "+logdir);
+                                    return;
                                 }
                             }
 
