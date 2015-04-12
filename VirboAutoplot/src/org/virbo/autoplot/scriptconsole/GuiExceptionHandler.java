@@ -380,8 +380,12 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     }
 
     private static int hashCode( StackTraceElement e ) {
-        int result = 31*e.getClassName().hashCode() + e.getMethodName().hashCode();
-        return result;
+        try {
+            int result = 31*e.getClassName().hashCode() + e.getMethodName().hashCode();
+            return result;
+        } catch ( NullPointerException ex ) {
+            return 1;
+        }
     }
 
     private LogConsole lc;
