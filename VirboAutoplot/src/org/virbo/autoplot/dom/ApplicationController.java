@@ -308,6 +308,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     FocusAdapter focusAdapter = new FocusAdapter() {
         @Override
         public void focusGained(FocusEvent e) {
+            LoggerManager.logGuiEvent(e);
             super.focusGained(e);
 
             if ( e.getComponent() instanceof ColumnColumnConnector ) {
@@ -366,7 +367,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             } else {
                 setStatus("" + domPlot + " selected");
             }
-
+            LoggerManager.logExitGuiEvent(e);
         }
     };
     
