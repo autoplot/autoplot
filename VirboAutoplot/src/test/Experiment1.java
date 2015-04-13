@@ -27,12 +27,14 @@ import org.virbo.dsops.Ops;
  * @author mmclouth
  */
 public class Experiment1 {
+    private static long time;
 
     private static ProgressMonitor getMonitor(String label) {
         //DasProgressPanel p = DasProgressPanel.createFramed(label);
         //p.setVisible(true);
         return new NullProgressMonitorImpl(label);
         //return p;
+        
 
     }
 
@@ -41,8 +43,22 @@ public class Experiment1 {
         
         try {
             
-            int size = 5;
-            int numThreads = 8;
+            
+            final QDataSet ds = Ops.ripplesWaveformTimeSeries(DATASET_SIZE);
+
+            ProgressMonitor temp = getMonitor("original task");
+            long t0 = System.currentTimeMillis();
+            QDataSet output = Ops.fftPower(ds, 512, temp);
+
+            while (!temp.isFinished()) {
+                Thread.sleep(50);
+            }
+        
+            // time is the time of the original task that only uses one thread in millis
+            time = System.currentTimeMillis() - t0;
+            
+            
+            int size = 10;  //number of times the fft is calculated
             args= new String[] { "multi" };
             
 
@@ -51,47 +67,65 @@ public class Experiment1 {
                 System.err.println("args[0] should be four,eight or, multi");
                 System.exit(1);
             }
-            
+            PrintWriter fw= new PrintWriter( new FileWriter("/tmp/multiThreadedFFT_TestData.txt"));
             if (args[0].equals("multi")) {
-                PrintWriter fw= new PrintWriter( new FileWriter("/tmp/multi.txt"));
-                //double[] speedArrayMulti = new double[size];
+                int numThreads = 8;  //Amount of threads used to run the fft
                 for (int i = 0; i < size; i = i + 1) {
                     System.err.println("=== "+ i+ " ===");
                     double speed = fftMultiThread(numThreads);
-                    //speedArrayMulti[i] = speed;
                     System.err.println("Multi threads: " + i + " " + speed );
                     QDataSet timesMulti = Ops.dataset(speed);
-                        //for ( int j=0; j<10; j++ ) {
-                    fw.println(numThreads + "   " + speed);       
+                    fw.println(numThreads + "   " + speed);     
                 }
                 numThreads = 4;
                 for (int i = 0; i < size; i = i + 1) {
                     System.err.println("=== "+ i+ " ===");
                     double speed = fftMultiThread(numThreads);
-                    //speedArrayMulti[i] = speed;
                     System.err.println("Multi threads: " + i + " " + speed );
                     QDataSet timesMulti = Ops.dataset(speed);
-                    fw.println(numThreads + "   " + speed);       
+                    fw.println(numThreads + "   " + speed);  
                 }
                 numThreads = 2;
                 for (int i = 0; i < size; i = i + 1) {
                     System.err.println("=== "+ i+ " ===");
                     double speed = fftMultiThread(numThreads);
-                    //speedArrayMulti[i] = speed;
                     System.err.println("Multi threads: " + i + " " + speed );
                     QDataSet timesMulti = Ops.dataset(speed);
-                    fw.println(numThreads + "   " + speed);       
+                    fw.println(numThreads + "   " + speed);
                 }
                 numThreads = 1;
                 for (int i = 0; i < size; i = i + 1) {
-                    System.err.println("=== "+ i+ " ===");
                     double speed = fftMultiThread(numThreads);
-                    //speedArrayMulti[i] = speed;
+                    System.err.println("=== "+ i+ " ===");
                     System.err.println("Multi threads: " + i + " " + speed );
                     QDataSet timesMulti = Ops.dataset(speed);
-                    fw.println(numThreads + "   " + speed);       
+                    fw.println(numThreads + "   " + speed);  
                 }
-                fw.close();
+                numThreads = 12;
+                for (int i = 0; i < size; i = i + 1) {
+                    double speed = fftMultiThread(numThreads);
+                    System.err.println("=== "+ i+ " ===");
+                    System.err.println("Multi threads: " + i + " " + speed );
+                    QDataSet timesMulti = Ops.dataset(speed);
+                    fw.println(numThreads + "   " + speed);  
+                }
+                numThreads = 16;
+                for (int i = 0; i < size; i = i + 1) {
+                    double speed = fftMultiThread(numThreads);
+                    System.err.println("=== "+ i+ " ===");
+                    System.err.println("Multi threads: " + i + " " + speed );
+                    QDataSet timesMulti = Ops.dataset(speed);
+                    fw.println(numThreads + "   " + speed); 
+                }
+                numThreads = 20;
+                for (int i = 0; i < size; i = i + 1) {
+                    double speed = fftMultiThread(numThreads);
+                    System.err.println("=== "+ i+ " ===");
+                    System.err.println("Multi threads: " + i + " " + speed );
+                    QDataSet timesMulti = Ops.dataset(speed);
+                    fw.println(numThreads + "   " + speed);   
+                }
+                
                 
             } else if (args[0].equals("two")) {
                 //double[] speedArray2 = new double[size];
@@ -99,7 +133,7 @@ public class Experiment1 {
                     double speed = doTwoThreads(); 
                     //speedArray2[i] = speed;
                     QDataSet timesTwo = Ops.dataset(speed);
-                    ScriptContext.formatDataSet( timesTwo, "/tmp/twoThreads.txt" );
+                    fw.println(2 + "   " + speed + "   *doTwoThreads()*");
                 }
               
             } else if (args[0].equals("four")) {
@@ -107,7 +141,7 @@ public class Experiment1 {
                 for( int i = 0; i< size ; i = i + 1) {
                     double speed = doFourThreads();
                     QDataSet timesFour = Ops.dataset(speed);
-                    ScriptContext.formatDataSet( timesFour, "/tmp/fourThreads.txt" );
+                    fw.println(4 + "   " + speed + "   *doFourThreads()*");
                 }
                  
             } else if (args[0].equals("eight")) {
@@ -116,13 +150,13 @@ public class Experiment1 {
                     double speed = doEightThreads();
                     //speedArray8[i] = speed;
                     QDataSet timesEight = Ops.dataset(speed);
-                    ScriptContext.formatDataSet( timesEight, "/tmp/eightThreads.txt" );
+                    fw.println(8 + "   " + speed + "   *doEightThreads()*");
                 }
             } else {
                 System.err.println("args[0] should be four,eight or, multi");
             }
 
-            
+            fw.close();
             ScriptContext.setLayout(4, 1);
 
             
@@ -145,26 +179,14 @@ public class Experiment1 {
     }
 
     private static double doTwoThreads() throws InterruptedException {
-        //ScriptContext.createGui();
+        
         final QDataSet ds = Ops.ripplesWaveformTimeSeries(DATASET_SIZE);
 
-        final ProgressMonitor mon0 = getMonitor("original task");
-        long t0 = System.currentTimeMillis();
-        QDataSet out = Ops.fftPower(ds, 512, mon0);
-
-        while (!mon0.isFinished()) {
-            Thread.sleep(200);
-        }
-        long time = System.currentTimeMillis() - t0;
-        //System.err.println("Time for original task: " + time);
-
-        ScriptContext.setLayout(3, 1);
-
-        ScriptContext.plot(0, out);
 
         final ProgressMonitor mon1 = getMonitor("task 1");
         final ProgressMonitor mon2 = getMonitor("task 2");
 
+        // Perfrom the fft filter using two threads
         Runnable run1 = new Runnable() {
             @Override
             public void run() {
@@ -189,7 +211,7 @@ public class Experiment1 {
             }
         };
 
-        t0 = System.currentTimeMillis();
+        long t0 = System.currentTimeMillis();  // Record time before starting the runnable for each thread
         new Thread(run1).start();
 
         new Thread(run2).start();
@@ -198,6 +220,9 @@ public class Experiment1 {
             Thread.sleep(200);
         }
         long time1 = System.currentTimeMillis() - t0;
+        
+        // speed stores the relationship between time (one thread) and time1 (multiplethreads)
+        // for example, if the multi-threaded task took half as much time as the single-threaded task, speed = 2
         double speed = ((double) time) / time1;
         
         return speed;
@@ -213,33 +238,26 @@ public class Experiment1 {
 
         final QDataSet ds = Ops.ripplesWaveformTimeSeries(DATASET_SIZE);
 
-        final QDataSet[] out = new QDataSet[threads + 1];
         ProgressMonitor temp = getMonitor("original task");
-        mon.add(temp);
-        long t0 = System.currentTimeMillis();
-        out[0] = Ops.fftPower(ds, 512, mon.get(0));
-
-        while (!mon.get(0).isFinished()) {
-            Thread.sleep(50);
-        }
-        
-        // time is the time of the original task that only uses one thread in millis
-        long time = System.currentTimeMillis() - t0;
+        final QDataSet[] out = new QDataSet[threads + 1];
+        long t0 = 0;
 
         ScriptContext.setLayout(threads + 1, 1);
         ScriptContext.plot(0, out[0]);
 
-        long time0= System.currentTimeMillis();
+        long time0= System.currentTimeMillis();  // time0 records time before the multithreaded task starts
         for (int i = 0; i < threads; i = i + 1) {
             temp = getMonitor("task" + (i + 1));
             mon.add(temp);
-            final int j = i + 1;
+            final int j = i;
             final int thr = threads;
+            
+            // Create a runnable for each thread to be used
             Runnable run0 = new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        out[j] = Ops.fftPower(ds.trim(((j - 1) * DATASET_SIZE) / thr, (j * DATASET_SIZE) / thr), 512, mon.get(j));
+                        out[j] = Ops.fftPower(ds.trim((j * DATASET_SIZE) / thr, ((j+1) * DATASET_SIZE) / thr), 512, mon.get(j));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -247,15 +265,15 @@ public class Experiment1 {
             };
             run.add(run0);
             if (i == 0) {
-                t0 = System.currentTimeMillis();
+                t0 = System.currentTimeMillis(); //t0 records the time right before the first runnable starts
             }
             new Thread(run.get(i)).start();
         }
-        //ScriptContext.plot(j, out[j]);
+
         System.err.println("time: "+(System.currentTimeMillis()-time0));
 
         while ( !isFinished(mon.toArray(new ProgressMonitor[mon.size()]) ) ) {
-            Thread.sleep(50);
+            Thread.sleep(10);
         }
         
         // time1 stores the time it takes to run the task using multiple threads
@@ -356,6 +374,9 @@ public class Experiment1 {
             Thread.sleep(200);
         }
         long time1 = System.currentTimeMillis() - t0;
+        
+        // speed stores the relationship between time (one thread) and time1 (multiplethreads)
+        // for example, if the multi-threaded task took half as much time as the single-threaded task, speed = 2
         double speed = ((double) time) / time1;
         
         return speed;
@@ -480,7 +501,7 @@ public class Experiment1 {
             }
         };
 
-        t0 = System.currentTimeMillis();
+        t0 = System.currentTimeMillis();  //t0 records the tiem before the first runnable starts
         new Thread(run1).start();
         new Thread(run2).start();
         new Thread(run3).start();
@@ -494,7 +515,10 @@ public class Experiment1 {
             Thread.sleep(200);
         }
         
-        long time1 = System.currentTimeMillis() - t0;
+        long time1 = System.currentTimeMillis() - t0;  // time1 records the time it took to perform the multi-threaded task
+        
+        // speed stores the relationship between time (one thread) and time1 (multiplethreads)
+        // for example, if the multi-threaded task took half as much time as the single-threaded task, speed = 2
         double speed = ((double) time) / time1;
         
         return speed;
@@ -529,4 +553,30 @@ public class Experiment1 {
         
         
     }
+    /****************************************************************************
+    
+            // Perform the fft filter using only one thread. 
+        final ProgressMonitor mon0 = getMonitor("original task");
+        long t0 = System.currentTimeMillis(); //record time at beginning of operation
+        QDataSet out = Ops.fftPower(ds, 512, mon0);
+
+        while (!mon0.isFinished()) {
+            Thread.sleep(200);
+        }
+        long time = System.currentTimeMillis() - t0;  // compute how long the operation took
+        
+                ProgressMonitor temp = getMonitor("original task");
+        mon.add(temp);
+        long t0 = System.currentTimeMillis();
+        out[0] = Ops.fftPower(ds, 512, mon.get(0));
+
+        while (!mon.get(0).isFinished()) {
+            Thread.sleep(50);
+        }
+        
+        // time is the time of the original task that only uses one thread in millis
+        long time = System.currentTimeMillis() - t0;
+        
+    ************************************************************************************/
+
 }
