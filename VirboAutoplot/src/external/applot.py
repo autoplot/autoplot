@@ -1,6 +1,13 @@
 # Write from python to d2s.  This will not work on Windows because of linefeeds.  (Ask Chris
 # how to write out 0x10 and doubles.)
 
+# Review of how to send data to the Autoplot port:
+#import socket
+#s = socket.socket()
+#s.connect(('localhost',12345))
+#cmd='plot(dataset([1,2,3,2,1]))\n'
+#s.send( cmd )  
+
 ### for rank 2, ytags must be specified
 ## ascii, boolean, use ascii transfer types
 
@@ -200,6 +207,7 @@ def qstream( dataStruct, filename, ytags=None, ascii=True, xunits='', delta_plus
    format=['%24.12f']
    reclen= 4 + 24 + (nt-1) * 20
 
+   i=1
    for tag in tags[1:]:
       d= dataStruct[tag]
       if ( isinstance( d, list ) ):
@@ -237,6 +245,7 @@ def qstream( dataStruct, filename, ytags=None, ascii=True, xunits='', delta_plus
          for i in xrange(1,nitems):
             format.append('e16.4')
          totalItems+= nitems
+      i=i+1
    packetDescriptor.append(  '</packet>' )
 
    contentLength= -10 # don't include the packet tag and content length
@@ -340,7 +349,9 @@ def tryPortConnect( host, port ):
    s.close()
 
 def sendCommand( s, cmd ):
+   print cmd 
    s.send( cmd )
+   print 'done'
    
 
 #function kwToString, keywords
@@ -413,7 +424,7 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
      import datetime
      dt= datetime.datetime.today()
      tag= dt.strftime("%Y%m%dT%H%M%S")
-     tmpfile= '/tmp/' + 'autoplot.' + tag + '.001.'+ext
+     tmpfile= '/tmp/' + 'autoplot.' + tag + '.001.'+ext   # TODO: IDL version handles multiple plots in one second.
    else:
      if ( tmpfile.index('.'+ext) != len(tmpfile)-4 ):
        tmpfile= tmpfile + '.'+ext  # add the extension
@@ -442,7 +453,7 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
 
    if ( True ):
      if ( ext != 'qds' ):
-         raise Exception('internal error, ext does should be qds')
+         raise Exception('internal error, extension should be qds')
      
      if np==3:
        data= { 'x':xx, 'z':zz, 'tags':['x','z'] }
@@ -460,8 +471,13 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
          data= { 'x':range(len(xx)), 'z':xx, 'tags':['x','z'] }
          qstream( data, tmpfile, ytags=findgen(s[2]), ascii=ascii, xunits='' )
        else:
-         data= { 'x':range(len(xx)), 'y':xx, 'delta_plus':delta_plus, 'delta_minus':delta_minus, 'tags':['x','z','delta_plus','delta_minus']  }
-         qstream( data, tmpfile, ascii=ascii, xunits='', delta_plus='delta_plus', delta_minus='delta_minus' )
+         if ( delta_plus!=None and delta_minus!=None ):
+            data= { 'x':range(len(xx)), 'y':xx, 'delta_plus':delta_plus, 'delta_minus':delta_minus, 'tags':['x','y','delta_plus','delta_minus']  }
+            qstream( data, tmpfile, ascii=ascii, xunits='', delta_plus='delta_plus', delta_minus='delta_minus' )
+         else:
+            data= { 'x':range(len(xx)), 'y':xx, 'tags':['x','y']  }
+            qstream( data, tmpfile, ascii=ascii, xunits='' )
+             
    else:
      if np==3:
         data= { 'x':xx, 'z':zz, 'tags':['x','z']  }
@@ -488,18 +504,19 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
        s.connect(('localhost',port))
 
        if ( pos>-1 ):
-           cmd= 'plotx( '+pos.trim()+', "file:'+tmpfile+'" );'  # semicolon means no echo
+           cmd= 'plotx( '+pos.trim()+', "file:'+tmpfile+'" );\n'  # semicolon means no echo
 
        else:
-           cmd= 'plotx( "file:'+tmpfile+'" );'  # semicolon means no echo
+           cmd= 'plotx( "file:'+tmpfile+'" );\n'  # semicolon means no echo
 
        foo= sendCommand( s, cmd )
+       s.shutdown(1)
+       s.close()
 
    else:
       raise Exception( 'error encountered!' )
       
 #import pdb; pdb.set_trace()
-applot( [1,2,3,4,5] )
 
 #   # clean up old tmp files more than 10 minutes old.
 #   caldat, systime(1, /julian) - 10/1440., Mon, D, Y, H, Min  # ten minutes ago
@@ -514,4 +531,7 @@ applot( [1,2,3,4,5] )
 #   endfor
 
 #test_dump()
-applot( [1,2,3,4,5], [2,4,2,4,2] )
+#applot( [1,2,3,6,3,3] )
+#applot( [1,2,3,4,5], [2,4,2,4,2], delta_plus=[.1,.2,.2,.2,.1], delta_minus= [.1,.2,.2,.2,.1],)
+#applot( [1,2,3,4,6], [2,4,2,4,2] )
+#applot( [[1,2,3,4,6], [2,4,2,4,2] )
