@@ -1372,8 +1372,10 @@ public class PlotElementController extends DomNodeController {
                     for ( int i=0;i<lnames.length; i++ ) {
                         if ( AutoplotUtil.isParsableDouble( lnames[i] ) ) uniqLabels= false;
                         if ( p.matcher(lnames[i]).matches() ) uniqLabels= false;
-                        for ( int j=i+1; j<lnames.length; j++ ) {
-                            if ( lnames[i].equals(lnames[j]) ) uniqLabels= false;
+                        if ( uniqLabels ) {
+                            for ( int j=i+1; j<lnames.length; j++ ) {
+                                if ( lnames[i].equals(lnames[j]) ) uniqLabels= false;
+                            }
                         }
                     }
                     
@@ -1422,6 +1424,8 @@ public class PlotElementController extends DomNodeController {
                                             label1= context.toString(); // rank 0.
                                         }
                                     }
+                                } else {
+                                    label1= llabels[i];
                                 }
                                 s= lnames[i];
                             } else {
