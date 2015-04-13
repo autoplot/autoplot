@@ -72,6 +72,13 @@ public class DataPanel extends javax.swing.JPanel {
     ApplicationController applicationController;
     DataSourceFilter dsf; // current focus
     BindingGroup dataSourceFilterBindingGroup;
+    
+    /**
+     * To suppress extraneous GUI events when binding to combo boxes,
+     * this is true while we are binding.
+     */
+    boolean bindingTransitionalState= false; 
+    
     PlotElement element;// current focus
     DataSetSelector dataSetSelector;
     JTextField componentTextField1;
@@ -500,6 +507,7 @@ public class DataPanel extends javax.swing.JPanel {
         filtersChainPanel1.setFilter("");
         filtersChainPanel1.setInput(ds);
 
+        bindingTransitionalState= true;
         BindingGroup bc = new BindingGroup();
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("fill"), this.fillValueComboBox, BeanProperty.create("selectedItem")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("validRange"), this.validRangeComboBox, BeanProperty.create("selectedItem")));
@@ -514,7 +522,8 @@ public class DataPanel extends javax.swing.JPanel {
             throw e;
         }
         dataSourceFilterBindingGroup = bc;
-
+        bindingTransitionalState= false;
+                
         dsfListener= new PropertyChangeListener() {
 
             @Override
@@ -807,6 +816,7 @@ public class DataPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void validRangeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_validRangeComboBoxActionPerformed
+        if ( bindingTransitionalState ) return;
         org.das2.util.LoggerManager.logGuiEvent(evt);                
         String s = (String) validRangeComboBox.getSelectedItem();
         if (s.equals("(none)")) s = "";
@@ -814,6 +824,7 @@ public class DataPanel extends javax.swing.JPanel {
 }//GEN-LAST:event_validRangeComboBoxActionPerformed
 
     private void fillValueComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fillValueComboBoxActionPerformed
+        if ( bindingTransitionalState ) return;
         org.das2.util.LoggerManager.logGuiEvent(evt);                
         String s = (String) fillValueComboBox.getSelectedItem();
         if (s.equals("(none)")) s = "";
