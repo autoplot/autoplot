@@ -83,7 +83,10 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
                 d1= Ops.dataset(n);
             }
             if ( u==null )  u= SemanticOps.getUnits(d1);
-          
+
+            if ( d1.rank()>0 ) {
+                throw new IllegalArgumentException("pyArray must be 1-D array of numbers");
+            }
             j[i]= d1.value();   
         }
         DDataSet q= DDataSet.wrap( j );
