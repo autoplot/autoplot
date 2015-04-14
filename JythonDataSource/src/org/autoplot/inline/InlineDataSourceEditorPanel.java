@@ -57,6 +57,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         addButton = new javax.swing.JButton();
         deleteSelectedButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
+        directionsLabel = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
@@ -108,6 +109,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
         jLabel2.setText("Dataset Type:");
 
+        directionsLabel.setText("jLabel3");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -115,16 +118,19 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(directionsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(deleteSelectedButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(schemeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(deleteSelectedButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(addButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(schemeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -135,13 +141,15 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(schemeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(directionsLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(addButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(deleteSelectedButton)
-                        .addGap(0, 203, Short.MAX_VALUE)))
+                        .addGap(0, 180, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -196,7 +204,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -316,8 +324,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         LoggerManager.logGuiEvent(evt);
         if ( schemeComboBox.getSelectedIndex()==0 ) {
             tm= toTableModel( new String[0] );
+            directionsLabel.setText("<html><i>Enter a list of times or points</i></html>");
         } else if ( schemeComboBox.getSelectedIndex()==1 ) {
             tm= toTableModel( 0, 2 );
+            directionsLabel.setText("<html><i>Enter a list X and Y values</i></html>");
         }
         table.setModel( tm );
     }//GEN-LAST:event_schemeComboBoxActionPerformed
@@ -325,16 +335,23 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     private void examplesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_examplesButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
         final String t1= "linspace(0,5*PI,100)\nsin(linspace(0,5*PI,100))";
+        final String t2= "t=linspace(0,5*PI,100)\nt,sin(t)";
+        final String t3= "createEvent('2014-005',0x00FF00,'On')";
+        final String t4= "ds=createEvent('2014-005T12:00/12:10',0x00FF00,'Instrument On')\nds=createEvent(ds,'2014-005T13:00/13:10',0xFF0000,'Instrument Off')\nds=createEvent(ds,'2014-005T14:00/14:10',0x00FF00,'Instrument On')\nds";
         final JTextArea tf1= new JTextArea(5,40);
         tf1.setText(t1);
-        final JComboBox examples= new JComboBox( new DefaultComboBoxModel( new Object[] { "ex1","ex2" }) );
+        final JComboBox examples= new JComboBox( new DefaultComboBoxModel( new Object[] { "Sine","Sine With Variable","createEvent","multiple events" }) );
         examples.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if ( examples.getSelectedIndex()==0 ) {
                     tf1.setText(t1);
                 } else if ( examples.getSelectedIndex()==1 ) {
-                    tf1.setText("t=linspace(0,5*PI,100)\nt,sin(t)");
+                    tf1.setText(t2);
+                } else if ( examples.getSelectedIndex()==2 ) {
+                    tf1.setText(t3);
+                } else if ( examples.getSelectedIndex()==3 ) {
+                    tf1.setText(t4);
                 }
             }
         } );
@@ -350,6 +367,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JButton deleteSelectedButton;
+    private javax.swing.JLabel directionsLabel;
     private javax.swing.JButton examplesButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
