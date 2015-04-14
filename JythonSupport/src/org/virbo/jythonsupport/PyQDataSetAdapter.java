@@ -12,8 +12,10 @@ import org.python.core.PyArray;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.adapter.PyObjectAdapter;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
@@ -73,25 +75,42 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
     protected static QDataSet adaptArray(PyArray pyArray) {
         Object arr= pyArray.getArray();
         double[] j= new double[ pyArray.__len__() ];
+        JoinDataSet jds=null;
         QDataSet d1;
         Units u= null;
         for ( int i=0; i<pyArray.__len__(); i++ ) {
             Object n= Array.get( arr, i );
             if ( n instanceof PyObject ) {
                 d1= JythonOps.dataset((PyObject)n);
+            } else if ( n.getClass().isArray() ) {
+                d1= Ops.dataset(n);
+                if ( jds==null ) {
+                    jds = new JoinDataSet(d1);
+                } else {
+                    jds.join(d1);
+                }
             } else {
                 d1= Ops.dataset(n);
             }
             if ( u==null )  u= SemanticOps.getUnits(d1);
 
-            if ( d1.rank()>0 ) {
-                throw new IllegalArgumentException("pyArray must be 1-D array of numbers");
+            if ( d1.rank()==0 ) {
+                j[i]= d1.value(); 
             }
-            j[i]= d1.value();   
+            
         }
-        DDataSet q= DDataSet.wrap( j );
-        q.putProperty( QDataSet.UNITS, u );
-        return q;
+        
+        if ( jds!=null ) {
+            jds.putProperty( QDataSet.UNITS, u );
+            //TODO: QUBE property would be nice.
+            jds.putProperty( QDataSet.JOIN_0, null );
+            return ArrayDataSet.copy(jds);
+        } else {
+            DDataSet q= DDataSet.wrap( j );
+            q.putProperty( QDataSet.UNITS, u );
+            return q;
+        }
+            
     }
     
 }
