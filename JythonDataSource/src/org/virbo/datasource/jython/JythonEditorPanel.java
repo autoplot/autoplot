@@ -46,6 +46,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.BadLocationException;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.jythoncompletion.nbadapt.Utilities;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -405,6 +406,14 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 } else if ( parm.type=='U' ) {
                     final DataSetSelector sel= new DataSetSelector();
                     sel.setPlotItButtonVisible(false);
+                    JythonUtil.Param timerange= parms.get("timerange");
+                    if ( timerange!=null ) {
+                        try {
+                            sel.setTimeRange( DatumRangeUtil.parseTimeRange(String.valueOf(timerange.deft)) );
+                        } catch ( ParseException ex ) {
+                            logger.log(Level.WARNING, "unable to parse as time range: {0}", timerange.deft);
+                        }
+                    }
                     String val;
                     if (params.get(vname)!=null ) {
                         val= params.get(vname);
@@ -601,6 +610,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 value= ((JTextField)jc).getText();
             } else if ( jc instanceof DataSetSelector ) {
                 value= ((DataSetSelector)jc).getValue();
+                if ( params.get("timerange")!=null ) {
+                    value= DataSetURI.blurTsbUri(value);
+                }
             } else if ( jc instanceof JComboBox ) {
                 value= String.valueOf( ((JComboBox)jc).getSelectedItem() );
             } else if ( jc instanceof JCheckBox ) {
