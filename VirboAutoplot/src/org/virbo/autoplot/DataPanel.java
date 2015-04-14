@@ -369,12 +369,12 @@ public class DataPanel extends javax.swing.JPanel {
         if ( lelement==null ) {
             return;
         }
-        String fcpf= filtersChainPanel1.getFilter();
-        final String newf= componentTextField1.getText();
-        if ( !fcpf.equals(newf) ) {
-            Runnable run= new Runnable() {
-                @Override
-                public void run() {
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                String fcpf= filtersChainPanel1.getFilter();
+                final String newf= componentTextField1.getText();
+                if ( !fcpf.equals(newf) ) {
                     filtersChainPanel1.setFilter(newf);
                     if ( dsf!=null ) {
                         filtersChainPanel1.setInput(null);
@@ -384,11 +384,11 @@ public class DataPanel extends javax.swing.JPanel {
                     }
                 }
             };
-            if ( EventQueue.isDispatchThread() ) {
-                run.run();
-            } else {
-                SwingUtilities.invokeLater(run);
-            }
+        };
+        if ( EventQueue.isDispatchThread() ) {
+            run.run();
+        } else {
+            SwingUtilities.invokeLater(run);
         }
         
     }
@@ -435,8 +435,18 @@ public class DataPanel extends javax.swing.JPanel {
     private final transient PropertyChangeListener fillDataSetListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            QDataSet ds= (QDataSet)evt.getNewValue();
-            filtersChainPanel1.setInput(ds);
+            final QDataSet ds= (QDataSet)evt.getNewValue();
+            Runnable run= new Runnable() {
+                public void run() {
+                    filtersChainPanel1.setInput(ds);
+                }
+            };
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                run.run();
+            } else {
+                SwingUtilities.invokeLater(run);
+            }
+            
         }
     };
     
@@ -499,13 +509,20 @@ public class DataPanel extends javax.swing.JPanel {
             return;
         }
 
-        QDataSet ds= newDsf.getController().getFillDataSet();
+        final QDataSet ds= newDsf.getController().getFillDataSet();
         dataSetLabel.setText( ds==null ? "(no dataset)" : ds.toString() );
         
         newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_FILLDATASET, fillDataSetListener );
-        filtersChainPanel1.setInput(null);
-        filtersChainPanel1.setFilter("");
-        filtersChainPanel1.setInput(ds);
+        
+        
+        Runnable run= new Runnable() {
+            public void run() {
+                filtersChainPanel1.setInput(null);
+                filtersChainPanel1.setFilter("");
+                filtersChainPanel1.setInput(ds);                
+            }
+        };
+        SwingUtilities.invokeLater(run);
 
         bindingTransitionalState= true;
         BindingGroup bc = new BindingGroup();
