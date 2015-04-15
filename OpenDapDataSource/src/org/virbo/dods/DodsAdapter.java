@@ -412,24 +412,6 @@ public class DodsAdapter {
         }
 
         QDataSet ds = zds;
-        if (zds.rank() == 3) {
-            DDataSet reduce = DDataSet.createRank2(zds.length(), zds.length(0));
-            for (int i = 0; i < zds.length(); i++) {
-                for (int j = 0; j < zds.length(0); j++) {
-                    reduce.putValue(i, j, zds.value(i, j, 0));
-                }
-            }
-            ds = reduce;
-        } else if (zds.rank() == 4) {
-            DDataSet reduce = DDataSet.createRank2(zds.length(), zds.length(0));
-            for (int i = 0; i < zds.length(); i++) {
-                for (int j = 0; j < zds.length(0); j++) {
-                    reduce.putValue(i, j, zds.value(i, j, 0, 0));
-                }
-            }
-            ds = reduce;
-        }
-
 
         return ds;
     }
