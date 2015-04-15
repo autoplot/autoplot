@@ -169,6 +169,23 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     }
 
     /**
+     * see UIntDataSet in BufferDataSet
+     * @param d the double to encode
+     * @return the unsigned integer bit equivalent.
+     */
+    private int encodeUINT4( double d ) {
+        return (int)( d > 2147483648. ? d - 4294967296. : d );
+    }
+
+    private short encodeUINT2( double d ) {
+        return (short)( d > 32768 ? d - 65536 : d );
+    }
+    
+    private byte encodeUINT1( double d ) {
+        return (byte)( d > 128 ? d - 256 : d );
+    }
+    
+    /**
      * convert the rank 1 dataset to a buffer.
      * @param ds rank 1 dataset
      * @param uc units converter to convert the type.
@@ -228,6 +245,33 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             while (iter.hasNext()) {
                 iter.next();
                 buf.put( (byte)uc.convert(iter.getValue(ds) ) );
+            }
+            export= buf;
+
+        } else if ( type==CDFDataType.UINT4 ) {
+            ByteBuffer buf= ByteBuffer.allocate( ds.length()*4 );
+            buf.order( ByteOrder.LITTLE_ENDIAN );
+            while (iter.hasNext()) {
+                iter.next();
+                buf.putInt( encodeUINT4( uc.convert(iter.getValue(ds) ) ) );
+            }
+            export= buf;
+
+        } else if ( type==CDFDataType.UINT2 ) {
+            ByteBuffer buf= ByteBuffer.allocate( ds.length()*2 );
+            buf.order( ByteOrder.LITTLE_ENDIAN );
+            while (iter.hasNext()) {
+                iter.next();
+                buf.putShort(encodeUINT2( uc.convert(iter.getValue(ds) ) ) );
+            }
+            export= buf;
+
+        } else if ( type==CDFDataType.UINT1 ) {
+            ByteBuffer buf= ByteBuffer.allocate( ds.length()*1 );
+            //buf.order( ByteOrder.LITTLE_ENDIAN );
+            while (iter.hasNext()) {
+                iter.next();
+                buf.put( encodeUINT1( uc.convert(iter.getValue(ds) ) ) );
             }
             export= buf;
 
@@ -432,10 +476,18 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 type= CDFDataType.FLOAT;
             } else if ( t.equals("byte")) {
                 type= CDFDataType.INT1;
+            } else if ( t.equals("int1")) {
+                type= CDFDataType.INT1;
             } else if ( t.equals("int2")) {
                 type= CDFDataType.INT2;
             } else if ( t.equals("int4")) {
                 type= CDFDataType.INT4;
+            } else if ( t.equals("uint1")) {
+                type= CDFDataType.UINT1;
+            } else if ( t.equals("uint2")) {
+                type= CDFDataType.UINT2;
+            } else if ( t.equals("uint4")) {
+                type= CDFDataType.UINT4;
             } else if ( t.equals("double")) {
                 type= CDFDataType.DOUBLE;
             }
