@@ -116,11 +116,18 @@ public class RecentComboBox extends JComboBox {
                 if ( !nitems.contains(item) ) nitems.add(item);
             }
             items= nitems;
-            
+            final List<String> fitems= items;
+                    
             int n= items.size();
             if ( n>RECENT_SIZE ) items= items.subList(0,RECENT_SIZE);
 
-            setModel( new DefaultComboBoxModel( items.toArray() ) );
+            Runnable run= new Runnable() {
+                public void run() {
+                    setModel( new DefaultComboBoxModel( fitems.toArray() ) );
+                }
+            };
+            SwingUtilities.invokeLater(run);
+            
             saveRecent(items);
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
