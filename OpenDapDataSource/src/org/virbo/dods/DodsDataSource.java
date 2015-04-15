@@ -18,6 +18,7 @@ import opendap.dap.parser.ParseException;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -401,7 +402,7 @@ public class DodsDataSource extends AbstractDataSource {
      * @param variable
      * @return
      */
-    private Map<String, Object> getMetaData(String variable) {
+    protected Map<String, Object> getMetaData(String variable) {
         try {
             AttributeTable at = das.getAttributeTable(variable);
             return getMetaData(at);
@@ -467,14 +468,21 @@ public class DodsDataSource extends AbstractDataSource {
         if (metadata == null) {
             MyDASParser parser = new MyDASParser();
             URL url = new URL(adapter.getSource().toString() + ".das");
-            parser.parse(url.openStream());
+            
+            InputStream in= url.openStream();
+            try {
+//TODO: openStream is never explicitly closed.
+                parser.parse(url.openStream());
 
-            das = parser.getDAS();
-            if ( variable==null ) {
-                variable= (String) das.getNames().nextElement();
-                adapter.setVariable(variable);
+                das = parser.getDAS();
+                if ( variable==null ) {
+                    variable= (String) das.getNames().nextElement();
+                    adapter.setVariable(variable);
+                }
+                metadata = getMetaData(variable);  
+            } finally {
+                in.close();
             }
-            metadata = getMetaData(variable);  
         }
 
         return metadata;
