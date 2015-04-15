@@ -16,7 +16,9 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import java.lang.reflect.Array;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -63,7 +65,7 @@ public class CdfUtil {
         } else if ( type==CDFConstants.CDF_FLOAT || type==CDFConstants.CDF_REAL4 ) {
             return "float";
         } else if ( type==CDFConstants.CDF_UINT4 ) {
-            return "double";
+            return "long";
         } else if ( type==CDFConstants.CDF_INT8 || type==CDFConstants.CDF_TT2000 ) {
             return "long";
         } else if ( type==CDFConstants.CDF_INT4 || type==CDFConstants.CDF_UINT2 ) {
@@ -85,7 +87,7 @@ public class CdfUtil {
         } else if ( type==CDFConstants.CDF_FLOAT || type==CDFConstants.CDF_REAL4 ) {
             return BufferDataSet.FLOAT;
         } else if ( type==CDFConstants.CDF_UINT4) {
-            return BufferDataSet.DOUBLE;
+            return BufferDataSet.LONG;
         } else if ( type==CDFConstants.CDF_INT8 || type==CDFConstants.CDF_TT2000 ) {
             return BufferDataSet.LONG;
         } else if ( type==CDFConstants.CDF_INT4 || type==CDFConstants.CDF_UINT2 ) {
@@ -166,6 +168,64 @@ public class CdfUtil {
         }
         result.flip();
         
+        return result;
+    }
+
+    /**
+     * 
+     * @param cdf the cdf file.
+     * @param svariable the variable name
+     * @param recStart the first index to read
+     * @param recStop the exclusive index
+     * @param recInterval the interval to read
+     * @return a ByteBuffer of the variable type.
+     * @throws gov.nasa.gsfc.spdf.cdfj.CDFException.ReaderError 
+     */
+    private static ByteBuffer myGetBuffer( CDFReader cdf, String svariable, long recStart, int recStop, int recInterval ) throws CDFException.ReaderError {
+        String stype= getTargetType( cdf.getType(svariable) );
+        Object buff3= cdf.getSampled( svariable, (int)recStart, (int)(recStop-1), (int)recInterval, stype, true );
+        
+        ByteBuffer result;
+        int type= cdf.getType(svariable);
+        switch ( type ) {
+            case (int)CDFConstants.CDF_DOUBLE:
+            case (int)CDFConstants.CDF_EPOCH:
+                double[] array= (double[])buff3;
+                result= ByteBuffer.allocate( 8* array.length );
+                for ( double a: array ) result.putDouble(a);
+                break;
+            case (int)CDFConstants.CDF_FLOAT:
+                float[] farray= (float[])buff3;
+                result= ByteBuffer.allocate( 4* farray.length );
+                for ( float a: farray ) result.putFloat(a);
+                break;
+            case (int)CDFConstants.CDF_INT8:
+            case (int)CDFConstants.CDF_UINT4:
+                long[] larray= (long[])buff3;
+                result= ByteBuffer.allocate( 8* larray.length );
+                for ( long a: larray ) result.putLong(a);
+                break;
+            case (int)CDFConstants.CDF_INT4:
+            case (int)CDFConstants.CDF_UINT2:
+                int[] iarray= (int[])buff3;
+                result= ByteBuffer.allocate( 4* iarray.length );
+                for ( int a: iarray ) result.putInt(a);
+                break;
+            case (int)CDFConstants.CDF_INT2:
+            case (int)CDFConstants.CDF_UINT1:
+                short[] sarray= (short[])buff3;
+                result= ByteBuffer.allocate( 2* sarray.length );
+                for ( short a: sarray ) result.putShort(a);
+                break;
+            case (int)CDFConstants.CDF_INT1:
+                byte[] barray= (byte[])buff3;
+                result= ByteBuffer.allocate( 1* barray.length );
+                for ( byte a: barray ) result.put(a);                
+                break;
+            default:
+                throw new IllegalArgumentException("not implemented: "+type);
+        }
+        result.flip();
         return result;
     }
     
@@ -490,24 +550,16 @@ public class CdfUtil {
 
         long t0= System.currentTimeMillis();
         logger.entering("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
-        buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, true );
-        logger.exiting("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
-        logger.log(Level.FINE, "read variable {0} in (ms): {1}", new Object[]{svariable, System.currentTimeMillis()-t0});
         
-        if ( recInterval>1 ) { //TODO: this needs to be done as we read in the data.
-            ByteBuffer newBuf= ByteBuffer.allocateDirect((int)rc*recLenBytes);
-            for ( int i=0; i<rc; i++ ) {
-                int recNum= (int)recStart+(int)recInterval*i;
-                buff2.limit( recNum * recLenBytes + recLenBytes );
-                buff2.position( recNum * recLenBytes );
-                ByteBuffer buff1= buff2.slice();
-                newBuf.put(buff1);
-                if ( i==0 ) newBuf.order(buff2.order());
-            }
-            buff2= newBuf;
-            buff2.flip();
+        if ( recInterval==1 ) {
+            buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, true );
+        } else {
+            buff2= myGetBuffer( cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
         }
         
+        logger.exiting("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
+        logger.log(Level.FINE, "read variable {0} in (ms): {1}", new Object[]{svariable, System.currentTimeMillis()-t0});
+                
         buf= new ByteBuffer[] { buff2 };
 
         MutablePropertyDataSet result;
