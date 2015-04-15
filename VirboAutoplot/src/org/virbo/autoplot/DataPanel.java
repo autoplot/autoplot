@@ -112,7 +112,12 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
         
-        recentComboBox.setPreferenceNode("operations");
+        Runnable run= new Runnable() {
+            public void run() {
+                recentComboBox.setPreferenceNode("operations");
+            }
+        };
+        new Thread(run).start();
         
         recentComboBox.getEditor().getEditorComponent().addFocusListener( new FocusAdapter() {
             @Override
