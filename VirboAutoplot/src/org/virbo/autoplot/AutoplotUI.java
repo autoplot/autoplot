@@ -4454,8 +4454,14 @@ APSplash.checkTime("init 240");
                         return;
                     }
                     Socket socket= rlistener.getSocket();
-                    logger.log(Level.FINE, "connection from {0}", socket);
-                    rhandler.handleRequest( socket.getInputStream(), model, socket.getOutputStream());
+                    if ( !socket.getInetAddress().isLoopbackAddress() ) {
+                        logger.log(Level.FINE, "connection from {0}", socket);
+                        socket.getOutputStream().write("\nConnections to Autoplot are only allowed from localhost\n\n".getBytes());
+                        socket.close();
+                    } else {
+                        logger.log(Level.FINE, "connection from {0}", socket);
+                        rhandler.handleRequest( socket.getInputStream(), model, socket.getOutputStream());
+                    }
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
