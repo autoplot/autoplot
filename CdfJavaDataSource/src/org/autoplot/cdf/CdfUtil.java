@@ -190,6 +190,7 @@ public class CdfUtil {
         switch ( type ) {
             case (int)CDFConstants.CDF_DOUBLE:
             case (int)CDFConstants.CDF_EPOCH:
+            case (int)CDFConstants.CDF_EPOCH16:
                 double[] array= (double[])buff3;
                 result= ByteBuffer.allocate( 8* array.length );
                 for ( double a: array ) result.putDouble(a);
@@ -201,6 +202,7 @@ public class CdfUtil {
                 break;
             case (int)CDFConstants.CDF_INT8:
             case (int)CDFConstants.CDF_UINT4:
+            case (int)CDFConstants.CDF_TT2000:
                 long[] larray= (long[])buff3;
                 result= ByteBuffer.allocate( 8* larray.length );
                 for ( long a: larray ) result.putLong(a);
@@ -217,7 +219,10 @@ public class CdfUtil {
                 result= ByteBuffer.allocate( 2* sarray.length );
                 for ( short a: sarray ) result.putShort(a);
                 break;
-            case (int)CDFConstants.CDF_INT1:
+            case (int)CDFConstants.CDF_INT1:                
+            case (int)CDFConstants.CDF_BYTE:
+            case (int)CDFConstants.CDF_CHAR:
+            case (int)CDFConstants.CDF_UCHAR:
                 byte[] barray= (byte[])buff3;
                 result= ByteBuffer.allocate( 1* barray.length );
                 for ( byte a: barray ) result.put(a);                
