@@ -124,6 +124,11 @@ public class JythonUtil {
 
         InteractiveInterpreter interp = new InteractiveInterpreter( null, pySys );
         
+//        try {
+//            System.err.println("java1-> "+interp.eval("java") );
+//        } catch ( Exception ex ) {
+//            System.err.println("java1-> ok!" );
+//        }
         boolean loadAutoplotStuff= true;
         if ( loadAutoplotStuff ) {
             Py.getAdapter().addPostClass(new PyQDataSetAdapter());
@@ -141,7 +146,13 @@ public class JythonUtil {
             }
         }
 
-
+//        try {
+        interp.exec("java=1"); // destroy the java symbol, which should not be imported, but I'm not sure who is importing it.
+//            System.err.println("java2-> "+interp.eval("java") );
+//        } catch ( Exception ex ) {
+//            System.err.println("java2-> ok!" );
+//        }
+        
         return interp;
 
     }
