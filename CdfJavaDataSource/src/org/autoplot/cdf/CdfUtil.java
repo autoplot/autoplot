@@ -191,11 +191,13 @@ public class CdfUtil {
             case (int)CDFConstants.CDF_DOUBLE:
             case (int)CDFConstants.CDF_EPOCH:
             case (int)CDFConstants.CDF_EPOCH16:
+            case (int)CDFConstants.CDF_REAL8:
                 double[] array= (double[])buff3;
                 result= ByteBuffer.allocate( 8* array.length );
                 for ( double a: array ) result.putDouble(a);
                 break;
             case (int)CDFConstants.CDF_FLOAT:
+            case (int)CDFConstants.CDF_REAL4:
                 float[] farray= (float[])buff3;
                 result= ByteBuffer.allocate( 4* farray.length );
                 for ( float a: farray ) result.putFloat(a);
