@@ -114,7 +114,6 @@ public class DataSourceController extends DomNodeController {
             if (e.getNewValue() == null && e.getOldValue() == null) {
                 // do nothing
             } else {
-                DataSourceController.this.changesSupport.registerPendingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                 List<Object> whoIsChanging= changesSupport.whoIsChanging( PENDING_SET_DATA_SOURCE );
                 if ( whoIsChanging.size()>0 ) {
                     logger.log(Level.WARNING, "!!! someone is changing: {0} !!!  ignoring event.", whoIsChanging); // we probably need to do something with this.
@@ -123,6 +122,7 @@ public class DataSourceController extends DomNodeController {
                     logger.log(Level.WARNING, " !! {0}", e.getOldValue());
                     return;
                 }
+                DataSourceController.this.changesSupport.registerPendingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                 setUriNeedsResolution(true);
                 if (!dom.controller.isValueAdjusting()) {
                     try {
