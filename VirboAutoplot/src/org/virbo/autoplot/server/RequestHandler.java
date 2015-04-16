@@ -75,7 +75,7 @@ public class RequestHandler {
                 try {
                     echo = !s.trim().endsWith(";");
                     if ( s.contains("import") ) {
-                        if ( echo ) out.write("# rejecting command with import.\n ".getBytes());
+                        if ( echo ) out.write("# rejecting command with import.\n".getBytes());
                     } else {
                         interp.exec(s);
                     }
