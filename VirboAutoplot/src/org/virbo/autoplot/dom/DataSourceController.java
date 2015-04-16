@@ -1132,18 +1132,20 @@ public class DataSourceController extends DomNodeController {
                     }
                 }
 
-                if ( ds instanceof MutablePropertyDataSet && !((MutablePropertyDataSet)ds).isImmutable() ) {
-                    fillDs = Ops.copy( ds );
-                } else {
-                    fillDs= DataSetOps.makePropertiesMutable( ds );
-                }
+                fillDs = DataSetOps.makePropertiesMutable( ds );
+//                if ( ds instanceof MutablePropertyDataSet && !((MutablePropertyDataSet)ds).isImmutable() ) {
+//                    fillDs = Ops.copy( ds );
+//                } else {
+//                    fillDs= DataSetOps.makePropertiesMutable( ds );
+//                }
 
             } else {
-                if ( ds instanceof MutablePropertyDataSet && !((MutablePropertyDataSet)ds).isImmutable() ) {
-                    fillDs= Ops.copy( ds );
-                } else {
-                    fillDs= DataSetOps.makePropertiesMutable( ds );
-                }
+                fillDs = DataSetOps.makePropertiesMutable( ds );
+//                if ( ds instanceof MutablePropertyDataSet && !((MutablePropertyDataSet)ds).isImmutable() ) {
+//                    fillDs= Ops.copy( ds );
+//                } else {
+//                    fillDs= DataSetOps.makePropertiesMutable( ds );
+//                }
                 setReduceDataSetString(null);
                 
             }
