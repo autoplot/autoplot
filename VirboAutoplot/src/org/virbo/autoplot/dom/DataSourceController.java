@@ -53,6 +53,7 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
+import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AutoHistogram;
 
 /**
@@ -1131,10 +1132,18 @@ public class DataSourceController extends DomNodeController {
                     }
                 }
 
-                fillDs = DataSetOps.makePropertiesMutable( ds );
+                if ( ds instanceof MutablePropertyDataSet && !((MutablePropertyDataSet)ds).isImmutable() ) {
+                    fillDs = Ops.copy( ds );
+                } else {
+                    fillDs= DataSetOps.makePropertiesMutable( ds );
+                }
 
             } else {
-                fillDs = DataSetOps.makePropertiesMutable( ds );
+                if ( ds instanceof MutablePropertyDataSet && !((MutablePropertyDataSet)ds).isImmutable() ) {
+                    fillDs= Ops.copy( ds );
+                } else {
+                    fillDs= DataSetOps.makePropertiesMutable( ds );
+                }
                 setReduceDataSetString(null);
                 
             }
