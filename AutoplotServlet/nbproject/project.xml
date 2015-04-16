@@ -103,11 +103,11 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.cdfj_20150116.jar}</file>
+                    <file>${file.reference.jfits-0.93.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.jfits-0.93.jar}</file>
+                    <file>${file.reference.cdfj-20150401.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
