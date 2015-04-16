@@ -177,6 +177,7 @@ public final class ChangesSupport {
     /**
      * someone has registered a pending change.
      * See getChangesPending.
+     * @return true if someone has registered a pending change.
      */
     public boolean isPendingChanges() {
         if ( changesPending.size() > 0 ) {
@@ -189,7 +190,7 @@ public final class ChangesSupport {
     /**
      * return a map listing the pending changes.  This is a thread-safe
      * read-only copy.
-     * @return Map
+     * @return a map listing the pending changes.
      */
     public synchronized Map getChangesPending() {
         if ( changesPending.size() > 0 ) {
@@ -216,7 +217,7 @@ public final class ChangesSupport {
 
     private String valueIsAdjusting = null;
 
-    private DomLock mutatorLock = new DomLock();
+    private final DomLock mutatorLock = new DomLock();
 
     public class DomLock extends ReentrantLock {
 
@@ -265,7 +266,7 @@ public final class ChangesSupport {
     }
 
     
-    private PropertyChangeSupport propertyChangeSupport;
+    private final PropertyChangeSupport propertyChangeSupport;
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
