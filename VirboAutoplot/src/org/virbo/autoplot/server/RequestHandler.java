@@ -73,8 +73,12 @@ public class RequestHandler {
             String s= reader.readLine();
             while ( s!=null ) {
                 try {
-                    if ( s.trim().endsWith(";") ) echo= false; else echo=true;
-                    interp.exec(s);
+                    echo = !s.trim().endsWith(";");
+                    if ( s.contains("import") ) {
+                        if ( echo ) out.write("# rejecting command with import.\n ".getBytes());
+                    } else {
+                        interp.exec(s);
+                    }
                 } catch ( RuntimeException ex ) {
                     ex.printStackTrace( new PrintStream( out ) );
                     ex.printStackTrace();
