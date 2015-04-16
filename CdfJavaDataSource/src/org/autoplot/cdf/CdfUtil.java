@@ -39,7 +39,6 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.Slice0DataSet;
-import org.virbo.dataset.RepeatIndexDataSet;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.dsops.Ops;
 
@@ -65,7 +64,7 @@ public class CdfUtil {
         } else if ( type==CDFConstants.CDF_FLOAT || type==CDFConstants.CDF_REAL4 ) {
             return "float";
         } else if ( type==CDFConstants.CDF_UINT4 ) {
-            return "long";
+            return "double";
         } else if ( type==CDFConstants.CDF_INT8 || type==CDFConstants.CDF_TT2000 ) {
             return "long";
         } else if ( type==CDFConstants.CDF_INT4 || type==CDFConstants.CDF_UINT2 ) {
@@ -87,7 +86,7 @@ public class CdfUtil {
         } else if ( type==CDFConstants.CDF_FLOAT || type==CDFConstants.CDF_REAL4 ) {
             return BufferDataSet.FLOAT;
         } else if ( type==CDFConstants.CDF_UINT4) {
-            return BufferDataSet.LONG;
+            return BufferDataSet.DOUBLE;
         } else if ( type==CDFConstants.CDF_INT8 || type==CDFConstants.CDF_TT2000 ) {
             return BufferDataSet.LONG;
         } else if ( type==CDFConstants.CDF_INT4 || type==CDFConstants.CDF_UINT2 ) {
@@ -192,6 +191,7 @@ public class CdfUtil {
             case (int)CDFConstants.CDF_EPOCH:
             case (int)CDFConstants.CDF_EPOCH16:
             case (int)CDFConstants.CDF_REAL8:
+            case (int)CDFConstants.CDF_UINT4:
                 double[] array= (double[])buff3;
                 result= ByteBuffer.allocate( 8* array.length );
                 for ( double a: array ) result.putDouble(a);
@@ -203,7 +203,6 @@ public class CdfUtil {
                 for ( float a: farray ) result.putFloat(a);
                 break;
             case (int)CDFConstants.CDF_INT8:
-            case (int)CDFConstants.CDF_UINT4:
             case (int)CDFConstants.CDF_TT2000:
                 long[] larray= (long[])buff3;
                 result= ByteBuffer.allocate( 8* larray.length );
@@ -559,7 +558,11 @@ public class CdfUtil {
         logger.entering("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
         
         if ( recInterval==1 ) {
-            buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, true );
+            try {
+                buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, true );
+            } catch ( CDFException ex ) {
+                buff2= myGetBuffer( cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
+            }
         } else {
             buff2= myGetBuffer( cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
         }
