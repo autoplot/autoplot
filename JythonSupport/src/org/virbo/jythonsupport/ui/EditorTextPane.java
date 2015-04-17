@@ -68,17 +68,20 @@ public class EditorTextPane extends JEditorPane {
     public EditorTextPane() {
 
         Runnable run= new Runnable() {
+            @Override
             public void run() {
 
                 final UndoManager undo = new UndoManager();
 
                 getActionMap().put( "undo", new AbstractAction( undo.getUndoPresentationName() ) {
+                    @Override
                     public void actionPerformed( ActionEvent e ) {
                         if ( undo.canUndo() ) undo.undo();
                     }
                 });
 
                 getActionMap().put( "redo", new AbstractAction( undo.getRedoPresentationName() ) {
+                    @Override
                     public void actionPerformed( ActionEvent e ) {
                        try {
                             if ( undo.canRedo() ) undo.redo();
@@ -89,6 +92,7 @@ public class EditorTextPane extends JEditorPane {
                 });
 
                 getActionMap().put( "biggerFont", new AbstractAction( "Text Size Bigger" ) {
+                    @Override
                     public void actionPerformed( ActionEvent e ) {
                        Font f= getFont();
                        float size= f.getSize2D();
@@ -98,6 +102,7 @@ public class EditorTextPane extends JEditorPane {
                 } );
 
                 getActionMap().put( "smallerFont", new AbstractAction( "Text Size Smaller" ) {
+                    @Override
                     public void actionPerformed( ActionEvent e ) {
                        Font f= getFont();
                        float size= f.getSize2D();
@@ -107,6 +112,7 @@ public class EditorTextPane extends JEditorPane {
                 } );
 
                 getActionMap().put( "settings", new AbstractAction( "settings" ) {
+                    @Override
                     public void actionPerformed( ActionEvent e ) {
                        CompletionSettings settings= JythonCompletionProvider.getInstance().settings();
                         PropertyEditor p= new PropertyEditor(settings);
@@ -147,7 +153,7 @@ public class EditorTextPane extends JEditorPane {
 
     @Override
     public String getToolTipText( MouseEvent event ) {
-        return support.getToolTipText(event);
+         return support.getToolTipText(event);
     }
 
     public void setEditorAnnotationsSupport( EditorAnnotationsSupport support ) {
@@ -215,6 +221,7 @@ public class EditorTextPane extends JEditorPane {
             throw new IllegalArgumentException("Session is not running.  There must be an active debugger to plot variables.");
         }
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 plot(doThis);
             }
@@ -248,6 +255,7 @@ public class EditorTextPane extends JEditorPane {
                 d.insertString( 0, s, null );
             } else {
                 SwingUtilities.invokeLater( new Runnable() { 
+                    @Override
                     public void run() {
                         try {
                             Document d = EditorTextPane.this.getDocument();
