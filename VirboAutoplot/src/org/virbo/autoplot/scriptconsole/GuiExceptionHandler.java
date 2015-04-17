@@ -95,7 +95,6 @@ import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.state.SerializeUtil;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.state.UndoRedoSupport;
-import org.virbo.dsops.Ops;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -242,6 +241,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         message.setPreferredSize(size);
 
         ok.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dialog.dispose();
                 dialogs.remove( diaDescriptor.hash );
@@ -249,6 +249,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         });
 
         details.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (details.isSelected()) {
                     details.setText("Less Details");
@@ -264,6 +265,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         });
 
         dump.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 String text = traceArea.getText();
                 System.err.print(text); // Note this is useful when debugging in an IDE.
@@ -271,6 +273,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         });
 
         submit.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 submitRuntimeException(throwable,uncaught);
             }
@@ -306,7 +309,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     
     private void showExceptionDialog( final Throwable t, String extraInfo ) {
 
-        final boolean uncaught= extraInfo.equals(UNCAUGHT);
+        final boolean isUncaught= extraInfo.equals(UNCAUGHT);
 
         int hash= hashCode(t);
         
@@ -340,7 +343,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         }
 
         if ( dia1==null ) {
-            dia1= createDialog( t, uncaught );
+            dia1= createDialog( t, isUncaught );
         }
 
         final JDialog dialog = dia1.dialog;
@@ -372,9 +375,9 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     }
     
     private static int hashCode( Throwable t ) {
-        if ( t.getCause()!=null ) {
-            t= t.getCause();
-        }
+//        if ( t.getCause()!=null ) {
+//            t= t.getCause();
+//        }
         StackTraceElement[] ee= t.getStackTrace();
         return hashCode(ee);
     }
@@ -534,8 +537,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             ele1.appendChild( ste );
             StackTraceElement[] st= ent.getValue();
             StringBuilder b= new StringBuilder();
-            for ( int i=0; i<st.length; i++ ) {
-                b.append( st[i].toString() ).append("\n");
+            for (StackTraceElement st1 : st) {
+                b.append(st1.toString()).append("\n");                
             }
             ste.appendChild( doc.createTextNode( b.toString() ) );
             ele.appendChild(ele1);
@@ -710,7 +713,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                         e.appendChild(screen);
 
                     } catch ( IOException ex ) {
-                        ex.printStackTrace();
+                        logger.log(Level.WARNING, null, ex );
                     }
 
                 } else {
@@ -771,15 +774,15 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
     javax.swing.filechooser.FileFilter getFileNameExtensionFilter( final String desc, final String[] exts ) {
         return new javax.swing.filechooser.FileFilter() {
+            @Override
             public boolean accept(File pathname) {
                 if ( pathname.isFile() ) return true;
-                for ( int i=0; i<exts.length; i++ ) {
-                    if ( exts[i].length()>1 && exts[i].charAt(0)=='.' ) {
-                        return ( pathname.toString().endsWith( exts[i] ) );
+                for (String ext : exts) {
+                    if (ext.length() > 1 && ext.charAt(0) == '.') {
+                        return pathname.toString().endsWith(ext);
                     } else {
-                        return ( pathname.toString().endsWith( "." + exts[i] ) );
+                        return pathname.toString().endsWith("." + ext);
                     }
-                    
                 }
                 return false;
             }
@@ -981,6 +984,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                 StringSelection stringSelection = new StringSelection(report);
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(stringSelection, new ClipboardOwner() {
+                    @Override
                     public void lostOwnership(Clipboard clipboard, Transferable contents) {
                     }
                 } );
@@ -1008,6 +1012,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     private static void syncroTest() {
         final ExceptionHandler eh= new GuiExceptionHandler();
         Runnable run1= new Runnable() {
+            @Override
             public void run() {
                 for ( int i=0; i<10; i++ ) {
                     eh.handle( new RuntimeException("sync test ex 1!") ); 
@@ -1015,6 +1020,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             }
         };
         Runnable run2= new Runnable() {
+            @Override
             public void run() {
                 for ( int i=0; i<10; i++ ) {
                     eh.handle( new RuntimeException("sync test ex 2!") ); 
