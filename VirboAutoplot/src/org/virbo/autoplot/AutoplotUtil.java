@@ -705,6 +705,10 @@ public class AutoplotUtil {
                 w.println("");
                 w.println("# don't show icon in legend when there is only one renderer.");
                 w.println("#reluctantLegendIcons=true");
+                w.println("");
+                w.println("# monitor the event thread for hangs.");
+                w.println("#enableResponseMonitor=true");
+                w.println("");
                 w.close();
             } catch ( IOException ex ) {
                 logger.log(Level.WARNING, "write initial {0} failed", propFile );
