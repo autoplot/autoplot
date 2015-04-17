@@ -113,6 +113,7 @@ public class DataPanel extends javax.swing.JPanel {
         });
         
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 recentComboBox.setPreferenceNode("operations");
             }
@@ -137,7 +138,9 @@ public class DataPanel extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
-                applicationController.getPlotElement().setComponentAutomatically( (String)recentComboBox.getSelectedItem() );
+                if ( applicationController!=null ) {
+                    applicationController.getPlotElement().setComponentAutomatically( (String)recentComboBox.getSelectedItem() );
+                }
                 setAdjusting(false);
                 componentChanged();
                 setAdjusting(recentComboBox.getEditor().getEditorComponent().hasFocus());
@@ -152,7 +155,8 @@ public class DataPanel extends javax.swing.JPanel {
         });
         
         componentTextField1= ((JTextField)recentComboBox.getEditor().getEditorComponent());
-        
+        recentComboBox.setSelectedItem("");
+
         //dataSetSelector= new DataSetSelector();
         //dataAddressPanel.add( dataSetSelector, BorderLayout.NORTH );
         
@@ -442,8 +446,10 @@ public class DataPanel extends javax.swing.JPanel {
         public void propertyChange(PropertyChangeEvent evt) {
             final QDataSet ds= (QDataSet)evt.getNewValue();
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     filtersChainPanel1.setInput(ds);
+                    recentComboBox.setSelectedItem("");
                 }
             };
             if ( SwingUtilities.isEventDispatchThread() ) {
@@ -521,6 +527,7 @@ public class DataPanel extends javax.swing.JPanel {
         
         
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 filtersChainPanel1.setInput(null);
                 filtersChainPanel1.setFilter("");
