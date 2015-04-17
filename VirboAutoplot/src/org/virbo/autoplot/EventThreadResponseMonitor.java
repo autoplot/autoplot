@@ -118,8 +118,8 @@ public final class EventThreadResponseMonitor {
 
                         //System.err.print( dumpPendingEvents() );
 
-                        String pending= dumpPendingEvents();
-                        SwingUtilities.invokeAndWait( responseRunnable(pending) );
+                        //String pending= dumpPendingEvents();
+                        SwingUtilities.invokeAndWait( responseRunnable("") );
                         
                     } catch ( InterruptedException ex ) {
 
