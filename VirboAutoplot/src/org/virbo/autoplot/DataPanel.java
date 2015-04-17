@@ -843,6 +843,7 @@ public class DataPanel extends javax.swing.JPanel {
         String s = (String) validRangeComboBox.getSelectedItem();
         if (s.equals("(none)")) s = "";
         applicationController.getDataSourceFilter().setValidRange(s);
+        applicationController.getDataSourceFilter().getController().update(); // TODO: review this kludge...
 }//GEN-LAST:event_validRangeComboBoxActionPerformed
 
     private void fillValueComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fillValueComboBoxActionPerformed
@@ -851,6 +852,7 @@ public class DataPanel extends javax.swing.JPanel {
         String s = (String) fillValueComboBox.getSelectedItem();
         if (s.equals("(none)")) s = "";
         applicationController.getDataSourceFilter().setFill(s);
+        applicationController.getDataSourceFilter().getController().update(); // TODO: review this kludge...
 }//GEN-LAST:event_fillValueComboBoxActionPerformed
     
     private void editComponentPanelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editComponentPanelActionPerformed
