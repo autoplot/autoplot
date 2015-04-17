@@ -20,8 +20,13 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-04-12 r16638):</p>
+        <p>Bugfixes (2015-04-17 r16688):</p>
         <ul>
+            <li>OpenDAP support would collapse rank 3 and rank 4 data, because early version of Autoplot only supported rank 2 data.</li>
+            <li>switch to latest version of Java CDF library</li>
+            <li>Autoplot server only accepts connections from localhost, and doesn't allow imports.</li>
+            <li>correct branch where names were used instead of labels for x,y,z plots from das2server.</li>
+            <li>kludge in update to force repaint when valid range and fill value fields are changed.</li>
             <li>rte_1630095413: clean up transition by clearing input and filter.  Before the wrong dataset was sent to the filter.</li>
             <li>1366 DasProgressPanel constructor should be protected.  Jython scripts would sometimes not have a showing progress bar</li>
             <li>aggregation of two QStreams would fail because of change to when join datasets are flattened.</li>
@@ -46,6 +51,9 @@
             <li>CDF file units can now contain LaTeX code as well.</li>
             <li>1350: Corrections to QStreams containing bundles.</li>
             <li>rte 2071287514: cancel dialog by closing window caused RTE.  Check for other places where it is assumed at least one element is returned.  Thanks Bob!</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>divp implementation fixed</li>
             <li>modp correctly supports seconds-since units to provide easy method for getting hours since midnight.</li>
             <li>don't show number of Epoch records when variable record count doesn't match</li>
@@ -64,44 +72,22 @@
             <li>initially set it to slices0(:) GUI correctly.</li>
             <li>1334: first image of pngwalk would be loaded at the full resolution.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>look up wwwauthenticate in HTTP header information to make the dialog more like webstart auth dialog.</li>
-            <li>1332: autoplot.jnlp would drop the URI when multiple jnlp blocks were found in the jnlp file, even if the first was commented</li>
-            <li>bugfix: log message assumed that data was rank 0 in the TCA code, causing failure.</li>
-            <li>bugfix: "show in Autoplot" button would now raise the window immediately to show that action has occurred, and progress bars are visible</li>
-            <li>support http://autoplot.org/autoplot.jnlp?version=devel&amp;URI kludge, so that references to this version can be used.</li>
-            <li>1331: autorange failure with cdfTT2000 timetags for waveform data on 2014-02-01.  Thanks Patrice for pointing out this bug!</li>
-            <li>1330: qds supports aggregation of two time intervals.</li>
-            <li>Demo1 then Demo2 showed where DEFAULT_TIME (2010-01-01) was used as an option.</li>
-            <li>look for AUTOPLOT_DATA/config/logging.properties.</li>
-            <li>bug 1327:  blur URI causes das2server to loose resolution.</li>
-            <li>correct misspelling/typo of addCapability after years without noticing.  Yeah code completion!</li>
-            <li>getDataSet menu option completion now correctly checks for var= to see if the user has already corrected the name.</li>
-            <li>1326: aggregations are no longer guaranteed monotonic.  See ensureMonotonic to correct.</li>
-            <li>allow vap+qds:/tmp/foo.dqt to work.  Before it was using the extension.</li>
-            <li>bugfix: support eventsListUri in vap file.</li>
-            <li>1326: new aggregation monotonic rule causes too many problems.  Initial code to just sort the data.</li>
-            <li>das2stream reader detects when a qstream is input.</li>
-            <li>Events List tool handles exceptions properly.</li>
-            <li>1321: improvements to the IDL bridge, after trying to read 5M points of magnetometer data.  Thanks, Kris!</li>
-            <li>1321: IDL bridge preserves TT2000 longs. </li>
-            <li>1322: aggregation supports NIO BufferDataSets that come out of the CDF reader. (Whoops!)</li>
-            <li>1323: "no valid y tags" message caused by fill in DELTA_PLUS when DELTA_PLUS wasn't really needed.  Thanks, Seth!</li>
-            <li>1317: result of fftPower hints that log scale type should be used.</li>
-            <li>1315: keep track of das2server key so the user is prompted just once per session.</li>
-            <li>turn on word wrap in runtime error submit form.</li>
-            <li>Thin client support finally catches errors instead of leaving the progress wheel spinning.</li>
-            <li>corrections to FiltersEditorPanel, such as allowing for float arguments and medianFilter.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>update RBSP orbits to 2015-05-01</li>
+            <li>finish off applot.py support for Autoplot in native SciPy applications, using Autoplot server.</li>
+            <li>export to CDF supports UINT1, UINT2, and UINT4 data types.</li>
+            <li>add more examples to InlineDataSource editor panel, to add colored events bar.</li>
+            <li>add PutPropertyFilterEditorPanel, which allows valid ranges and missing metadata to be specified</li>
             <li>introduce DatumRangeUtil.parseDatumRange(String) which detects ISO8601 times or units equal to UTC.</li>
             <li>automatic hang detection writes RTE to autoplot_data/log/ when app hangs for 10 seconds.</li>
             <li>added BindingSupport.printStatus() to help find memory leaks caused by bindings</li>
             <li>get rid of extraneous InterruptedExceptions which were thrown from the bowels, and needn't be propagated to the more abstract waitUntilIdle</li>
             <li>renderer style panels for Contour, PitchAngleDistribution, and EventsBar styles.</li>
             <li>more dasCore code cleanup</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>           
             <li>Ascii Table data URIs now support arg_0 to match CDF, which automatically gets the ISO8601 column 0 dependence.</li>
             <li>putBundleProperty and putIndexedProperty added to make it easier to build bundles.</li>
             <li>random sequences used for randn can now be reset.</li>
@@ -119,17 +105,6 @@
             <li>pngwalk create speed is reported in images per minute instead of .1/sec</li>
             <li>add fftPower that matches the filter call.</li>
             <li>javadoc improvements to DasCore</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>           
-            <li>updates to the jnlp/webstart, supporting better offline use and named icons.</li>
-            <li>add Jython formUri to provide a nicer way to construct URIs.</li>
-            <li>411: add hook to check for logging.properties to make it easier to debug webstart. </li>
-            <li>.pngwalk files now have a baseurl parameter so that they can be used out-of-context.</li>
-            <li>add |getProperty('DEPEND_1') filter so I can easily have a look at timetags.</li>
-            <li>BufferDataSet, which uses native-memory-backed-buffers, moved from BinaryDataSource to QDataSet</li>
-            <li>allow aggregation reduce to be used when resolution is null, because trim will still have an effect.</li>
-            <li>SimpleServlet will figure out if URI is a vap file, to support the thin client and to match the Autoplot interface.</li>
         </ul>
 
         <p>Known issues:</p>
