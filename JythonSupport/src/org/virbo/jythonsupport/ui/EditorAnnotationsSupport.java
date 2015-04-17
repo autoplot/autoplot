@@ -73,23 +73,27 @@ public class EditorAnnotationsSupport {
         return s.substring(i0,i);
     }
 
-    private JEditorPane editorPanel;
+    private final JEditorPane editorPanel;
 
     EditorAnnotationsSupport(JEditorPane editorPanel) {
         this.editorPanel = editorPanel;
         final DocumentListener annoList= new DocumentListener() {
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 clearAnnotations(e.getOffset());
             }
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 clearAnnotations(e.getOffset());
             }
+            @Override
             public void changedUpdate(DocumentEvent e) {
                 clearAnnotations(e.getOffset());
             }
         };
         editorPanel.getDocument().addDocumentListener(annoList);
         this.editorPanel.addPropertyChangeListener( "document", new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getOldValue()!=null ) {
                     ((Document)evt.getOldValue()).removeDocumentListener(annoList);
@@ -110,6 +114,7 @@ public class EditorAnnotationsSupport {
             editorPanel.getHighlighter().removeAllHighlights();
         } else {
            SwingUtilities.invokeLater( new Runnable() {
+                @Override
                 public void run() {
                     Markers.removeMarkers(editorPanel);
                     editorPanel.getHighlighter().removeAllHighlights();
@@ -169,6 +174,7 @@ public class EditorAnnotationsSupport {
      * @param line the line number to highlite.  1 is the first line.
      * @param name the name of the style, including "error" and "programCounter"
      * @param text annotation to display when hovering. Currently ignored.
+     * @throws javax.swing.text.BadLocationException
      */
     public void annotateLine(int line, String name, String text) throws BadLocationException {
         annotateLine( line, name, text, null );
@@ -198,6 +204,7 @@ public class EditorAnnotationsSupport {
         }
         
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 Document doc = editorPanel.getDocument();
                 Element root = editorPanel.getDocument().getDefaultRootElement();
@@ -264,6 +271,7 @@ public class EditorAnnotationsSupport {
      */
     public void annotateChars( final int line, final int i0, final int i1, final String name, final String text, final PythonInterpreter interp ) {
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 Document doc = editorPanel.getDocument();
                 Element root = editorPanel.getDocument().getDefaultRootElement();
@@ -298,6 +306,7 @@ public class EditorAnnotationsSupport {
      */
     public void annotateChars( final int i0, final int i1, final String name, final String text, final PythonInterpreter interp ) {
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
 
                 SimpleMarker mark;
@@ -370,6 +379,7 @@ public class EditorAnnotationsSupport {
     
     public ExpressionLookup getForInterp( final PythonInterpreter interp ) {
         return new ExpressionLookup() {
+            @Override
             public PyObject lookup(String expr) {
                 try {
                     PyObject po= interp.eval(expr);
