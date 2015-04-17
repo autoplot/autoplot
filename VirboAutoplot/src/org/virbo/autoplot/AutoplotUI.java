@@ -4229,11 +4229,12 @@ APSplash.checkTime("init 220");
                     repaintRunnable.run();
                     //SwingUtilities.invokeLater(repaintRunnable);
 
-                    
-                    EventThreadResponseMonitor emon= new EventThreadResponseMonitor();
-                    emon.addToMap( GuiExceptionHandler.UNDO_REDO_SUPPORT, app.undoRedoSupport );
-                    emon.addToMap( GuiExceptionHandler.APP_MODEL, app.applicationModel );
-                    emon.start();
+                    if ( System.getProperty("enableResponseMonitor","false").equals("true") ) {
+                        EventThreadResponseMonitor emon= new EventThreadResponseMonitor();
+                        emon.addToMap( GuiExceptionHandler.UNDO_REDO_SUPPORT, app.undoRedoSupport );
+                        emon.addToMap( GuiExceptionHandler.APP_MODEL, app.applicationModel );
+                        emon.start();
+                    }
                     
                     logger.fine("UI is visible");
                     APSplash.hideSplash();
