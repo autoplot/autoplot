@@ -400,13 +400,13 @@ public class EditorAnnotationsSupport {
      */
     public String getToolTipText(MouseEvent me) {
         int offset= editorPanel.viewToModel(me.getPoint());
-        if ( editorPanel.getSelectionStart()<=offset && offset<editorPanel.getSelectionEnd() ) {
+        if ( editorPanel.getSelectionStart()<=offset && offset<=editorPanel.getSelectionEnd() ) {
             String expr= editorPanel.getSelectedText();
             if ( expressionLookup!=null ) {
                 PyObject po= expressionLookup.lookup(expr);
                 String peek;
                 peek= String.valueOf( po.__str__() );
-                return peek;
+                return expr+"="+peek;
             } else {
                 return "Interpreter is not active";
             }
