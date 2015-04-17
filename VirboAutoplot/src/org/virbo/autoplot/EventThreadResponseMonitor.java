@@ -48,9 +48,9 @@ public final class EventThreadResponseMonitor {
     private long response;
     private Thread eventQueue; // This is the event thread we are monitoring.
 
-    private Map<String,Object> map; // various information about the process.
+    private final Map<String,Object> map; // various information about the process.
     
-    private static final int TEST_CLEAR_EVENT_QUEUE_PERIOD_MILLIS = 100;
+    private static final int TEST_CLEAR_EVENT_QUEUE_PERIOD_MILLIS = 300;
     private static final int WARN_LEVEL_MILLIS= 500; // acceptable millisecond delay in processing
     private static final int ERROR_LEVEL_MILLIS= 10000; // unacceptable delay in processing, and an error is submitted.
     private static final int WATCH_INTERVAL_MILLIS = 1000;
@@ -106,25 +106,31 @@ public final class EventThreadResponseMonitor {
         return new Runnable() {
             @Override
             public void run() {
-                while ( true ) {
-                    try {
-                        long nextPost= lastPost+TEST_CLEAR_EVENT_QUEUE_PERIOD_MILLIS;
-                        long sleep= nextPost - System.currentTimeMillis();
-                        while ( sleep > 0 ) {
-                            Thread.sleep( sleep );
-                            sleep= nextPost - System.currentTimeMillis();
+                synchronized ( EventThreadResponseMonitor.this ) {
+                    while ( true ) {
+                        try {
+                            long nextPost= lastPost+TEST_CLEAR_EVENT_QUEUE_PERIOD_MILLIS;
+                            long sleep= nextPost - System.currentTimeMillis();
+                            
+                            while ( sleep>0 ) {
+                                EventThreadResponseMonitor.this.wait(sleep);
+                                sleep= nextPost - System.currentTimeMillis();
+                            }
+                            
+                            //System.err.println("t: "+ ( System.currentTimeMillis() % 10000 ) );
+
+                            lastPost= System.currentTimeMillis();
+
+                            //System.err.print( dumpPendingEvents() );
+
+                            //String pending= dumpPendingEvents();
+                            SwingUtilities.invokeAndWait( responseRunnable("") );
+
+                        } catch ( InterruptedException ex ) {
+
+                        } catch ( InvocationTargetException ex ) {
+
                         }
-                        lastPost= System.currentTimeMillis();
-
-                        //System.err.print( dumpPendingEvents() );
-
-                        //String pending= dumpPendingEvents();
-                        SwingUtilities.invokeAndWait( responseRunnable("") );
-                        
-                    } catch ( InterruptedException ex ) {
-
-                    } catch ( InvocationTargetException ex ) {
-
                     }
                 }
             }
