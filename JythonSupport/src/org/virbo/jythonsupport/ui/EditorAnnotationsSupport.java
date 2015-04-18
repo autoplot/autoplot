@@ -132,6 +132,7 @@ public class EditorAnnotationsSupport {
         final Annotation ann = annotationAt(pos);
         if (ann != null) {
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                     Markers.removeMarkers(editorPanel,ann.marker);
                     annotations.remove(ann.offset);
@@ -406,7 +407,11 @@ public class EditorAnnotationsSupport {
                 PyObject po= expressionLookup.lookup(expr);
                 String peek;
                 peek= String.valueOf( po.__str__() );
-                return expr+"="+peek;
+                if ( peek.startsWith("<html>" ) ) {
+                    return peek;
+                } else {
+                    return expr+"="+peek;
+                }
             } else {
                 return "Interpreter is not active";
             }
