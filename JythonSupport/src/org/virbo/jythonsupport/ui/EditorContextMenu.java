@@ -21,6 +21,7 @@ import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
@@ -549,6 +550,23 @@ public class EditorContextMenu {
             mi.setToolTipText("Pick Font for editor");
             settingsMenu.add( mi );
 
+            mi = new JMenuItem(new AbstractAction("Keyboard shortcuts...") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);
+                    String msg = "<html><b>Keyboard Shortcuts:</b><br>"
+                            + "META-Z undo <br>"
+                            + "META-Y redo  <br>"
+                            + "META-EQUALS biggerFont  <br>"
+                            + "META-MINUS smallerFont  <br>"
+                            + "SHIFT-F5 settings  <br>"
+                            + "CTRL-SHIFT-C plot expression via server mode (See [menubar]->Options->Enable Feature->Server)\"  <br>";
+                    JOptionPane.showMessageDialog( actionsMenu, msg );
+                }
+            });
+            mi.setToolTipText("Show shortcuts");
+            settingsMenu.add( mi );
+            
             menu.add( settingsMenu );
 
             menu.addSeparator();

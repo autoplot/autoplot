@@ -114,11 +114,21 @@ public class EditorTextPane extends JEditorPane {
                 getActionMap().put( "settings", new AbstractAction( "settings" ) {
                     @Override
                     public void actionPerformed( ActionEvent e ) {
-                       CompletionSettings settings= JythonCompletionProvider.getInstance().settings();
+                        CompletionSettings settings= JythonCompletionProvider.getInstance().settings();
                         PropertyEditor p= new PropertyEditor(settings);
                         p.showModalDialog(EditorTextPane.this);
                     }
                 } );
+                
+                getActionMap().put( "inspect", new AbstractAction( "inspect" ) {
+                    @Override
+                    public void actionPerformed( ActionEvent e ) {
+                        LoggerManager.logGuiEvent(e);                
+                        String doThis= getSelectedText();
+                        if ( doThis==null ) return;
+                        plotSoon(doThis);
+                    }
+                } );                
 
                 Toolkit tk= Toolkit.getDefaultToolkit();
 
@@ -127,6 +137,7 @@ public class EditorTextPane extends JEditorPane {
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, tk.getMenuShortcutKeyMask() ), "biggerFont" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask() ), "smallerFont" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK ), "settings" );
+                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "inspect" );
 
                 doLayout(); // kludge for DefaultSyntaxKit
                 DefaultSyntaxKit.initKit();
