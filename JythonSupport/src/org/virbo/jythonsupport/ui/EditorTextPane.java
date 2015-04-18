@@ -43,9 +43,11 @@ import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
 import org.python.core.PyObject;
+import org.python.parser.SimpleNode;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.PyQDataSet;
 import org.virbo.qstream.StreamException;
 
@@ -130,6 +132,14 @@ public class EditorTextPane extends JEditorPane {
                     }
                 } );                
 
+                getActionMap().put( "usages", new AbstractAction( "usages" ) {
+                    @Override
+                    public void actionPerformed( ActionEvent e ) {
+                        LoggerManager.logGuiEvent(e);  
+                        showUsages();
+                    }
+                } );                
+
                 Toolkit tk= Toolkit.getDefaultToolkit();
 
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Z,tk.getMenuShortcutKeyMask() ), "undo" );
@@ -138,7 +148,8 @@ public class EditorTextPane extends JEditorPane {
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask() ), "smallerFont" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK ), "settings" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "inspect" );
-
+                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "usages" );
+                
                 doLayout(); // kludge for DefaultSyntaxKit
                 DefaultSyntaxKit.initKit();
 
@@ -161,6 +172,18 @@ public class EditorTextPane extends JEditorPane {
 
     }
 
+    private void showUsages() {
+        String script= getText();
+        String var= getSelectedText();
+        if ( var==null || var.length()==0 ) {
+            var= EditorAnnotationsSupport.getSymbolAt( this );
+        }
+        support.clearAnnotations();
+        List<SimpleNode> usages= JythonUtil.showUsage( script,var );
+        for ( SimpleNode n: usages ) {
+            support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
+        }
+    }
 
     @Override
     public String getToolTipText( MouseEvent event ) {

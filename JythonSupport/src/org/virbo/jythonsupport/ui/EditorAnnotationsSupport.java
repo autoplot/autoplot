@@ -397,7 +397,7 @@ public class EditorAnnotationsSupport {
     /**
      * The editor component should delegate to these.
      * @param me
-     * @return
+     * @return the text
      */
     public String getToolTipText(MouseEvent me) {
         int offset= editorPanel.viewToModel(me.getPoint());
@@ -431,8 +431,7 @@ public class EditorAnnotationsSupport {
     
     /**
      * The editor component should delegate to these.
-     * @param me
-     * @return
+     * @return the preferred size
      */
     public Dimension getPreferredSize() {
         return new Dimension(350,250);

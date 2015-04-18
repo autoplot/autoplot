@@ -560,7 +560,9 @@ public class EditorContextMenu {
                             + "META-EQUALS biggerFont  <br>"
                             + "META-MINUS smallerFont  <br>"
                             + "SHIFT-F5 settings  <br>"
-                            + "CTRL-SHIFT-C plot expression via server mode (See [menubar]->Options->Enable Feature->Server)\"  <br>";
+                            + "ALT-F7 show usages<br>"
+                            + "CTRL-SHIFT-C plot expression via server mode (See [menubar]->Options->Enable Feature->Server)\"  <br>"
+                            + "CTRL-SHIFT-U show usages of a variable<br>";
                     JOptionPane.showMessageDialog( actionsMenu, msg );
                 }
             });
