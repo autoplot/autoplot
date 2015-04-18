@@ -112,6 +112,13 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
         
+        recentComboBox.setVerifier( new InputVerifier() {
+            @Override
+            public boolean verify(String value) {
+                return ( value.trim().length()>0 && value.length()<70 ); // long operations mess up the droplist.
+            }
+        });
+        
         Runnable run= new Runnable() {
             @Override
             public void run() {
@@ -144,13 +151,6 @@ public class DataPanel extends javax.swing.JPanel {
                 setAdjusting(false);
                 componentChanged();
                 setAdjusting(recentComboBox.getEditor().getEditorComponent().hasFocus());
-            }
-        });
-
-        recentComboBox.setVerifier( new InputVerifier() {
-            @Override
-            public boolean verify(String value) {
-                return ( value.trim().length()>0 );
             }
         });
         
