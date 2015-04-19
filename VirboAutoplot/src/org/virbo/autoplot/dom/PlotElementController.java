@@ -1768,7 +1768,11 @@ public class PlotElementController extends DomNodeController {
                         } else {
                             logger.fine("dataset has few points, using small large symbols");
                             peleCopy.getStyle().setSymbolSize(3.0);
-                            peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
+                            if ( rt==RenderType.stairSteps ) {
+                                peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.NONE);
+                            } else {
+                                peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
+                            }
                         }
                     }
                 }
@@ -2484,6 +2488,7 @@ public class PlotElementController extends DomNodeController {
             s.setFillToReference(false);
         } else if ( ele.getRenderType()==RenderType.stairSteps ) {
             s.setSymbolConnector(PsymConnector.SOLID);
+            s.setPlotSymbol(DefaultPlotSymbol.NONE);
             s.setFillToReference(true);
         } else if ( ele.getRenderType()==RenderType.fillToZero ) {
             s.setSymbolConnector(PsymConnector.SOLID);
