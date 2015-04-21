@@ -12,15 +12,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -44,7 +44,7 @@ public final class EventThreadResponseMonitor {
 
     private static final Logger logger= LoggerManager.getLogger("autoplot.splash");
     
-    private long lastPost;
+    private long lastPost; // roughly the start time of the current request, when it looks like it is slow
     private long response;
     private Thread eventQueue; // This is the event thread we are monitoring.
 
@@ -55,13 +55,23 @@ public final class EventThreadResponseMonitor {
     private static final int ERROR_LEVEL_MILLIS= 10000; // unacceptable delay in processing, and an error is submitted.
     private static final int WATCH_INTERVAL_MILLIS = 1000;
 
+    ScheduledThreadPoolExecutor exec;
+    
+    AWTEvent currentEvent= null;    
+    String reportedEventId= "";      // toString showing the last reported error.
+    boolean pleasePostEvent= true;   // another event ought to be posted.
+    
     public EventThreadResponseMonitor( ) {
         this.map= new HashMap();
+        lastPost= System.currentTimeMillis();
     }
 
     public void start() {
-        new Thread( createRunnable(), "eventThreadResponseMonitor"  ).start();
-        new Thread( watchEventThreadRunnable(), "watchEventThread" ).start();
+        //new Thread( createRunnable(), "eventThreadResponseMonitor"  ).start();
+        //new Thread( watchEventThreadRunnable(), "watchEventThread" ).start();
+        exec= new ScheduledThreadPoolExecutor(1);
+        exec.scheduleAtFixedRate( maybeCreateEventThreadRunnable(), 4000, TEST_CLEAR_EVENT_QUEUE_PERIOD_MILLIS, TimeUnit.MILLISECONDS );
+        exec.scheduleAtFixedRate( checkEventThreadRunnable(), 4000, WATCH_INTERVAL_MILLIS, TimeUnit.MILLISECONDS );
     }
     
     /**
@@ -73,6 +83,11 @@ public final class EventThreadResponseMonitor {
         this.map.put( key, value );
     }
 
+    /**
+     * show all the events on the event thread by unqueuing and requeuing them.  This
+     * should not be used in production use.
+     * @return String representation
+     */
     public static synchronized String dumpPendingEvents() {
         StringBuilder buf= new StringBuilder();
         Queue queue= new LinkedList();
@@ -101,36 +116,21 @@ public final class EventThreadResponseMonitor {
         return buf.toString();
     }
 
-    Runnable createRunnable() {
-        lastPost= System.currentTimeMillis();
+    /**
+     * This runnable posts the marker runnable on to the event thread.  This runnable's 
+     * lifetime will be that of the application...
+     * 
+     * @return the runnable.
+     */
+    private Runnable maybeCreateEventThreadRunnable() {
         return new Runnable() {
             @Override
             public void run() {
                 synchronized ( EventThreadResponseMonitor.this ) {
-                    while ( true ) {
-                        try {
-                            long nextPost= lastPost+TEST_CLEAR_EVENT_QUEUE_PERIOD_MILLIS;
-                            long sleep= nextPost - System.currentTimeMillis();
-                            
-                            while ( sleep>0 ) {
-                                EventThreadResponseMonitor.this.wait(sleep);
-                                sleep= nextPost - System.currentTimeMillis();
-                            }
-                            
-                            //System.err.println("t: "+ ( System.currentTimeMillis() % 10000 ) );
-
-                            lastPost= System.currentTimeMillis();
-
-                            //System.err.print( dumpPendingEvents() );
-
-                            //String pending= dumpPendingEvents();
-                            SwingUtilities.invokeAndWait( responseRunnable("") );
-
-                        } catch ( InterruptedException ex ) {
-
-                        } catch ( InvocationTargetException ex ) {
-
-                        }
+                    if ( pleasePostEvent ) {
+                        pleasePostEvent= false;
+                        lastPost= System.currentTimeMillis();
+                        SwingUtilities.invokeLater( responseRunnable("") );
                     }
                 }
             }
@@ -139,7 +139,8 @@ public final class EventThreadResponseMonitor {
 
     /**
      * the response runnable simply measures how long it takes for an event to be processed by the event thread.
-     * @return
+     * This is the runnable that is put onto the event thread.
+     * @return a Runnable.
      */
     private Runnable responseRunnable( final String pending ) {
         return new Runnable() {
@@ -157,7 +158,8 @@ public final class EventThreadResponseMonitor {
                 } else {
                     //System.err.printf( "current event queue clear time: %5.3f sec\n", levelms/1000. );
                 }
-
+                pleasePostEvent= true;
+                
                 //pending= dumpPendingEvents();
                 //TODO: this would be the correct time to dumpPendingEvents.
             }
@@ -170,91 +172,77 @@ public final class EventThreadResponseMonitor {
      * be hung.
      * @return the Runnable
      */
-    Runnable watchEventThreadRunnable() {
+    private Runnable checkEventThreadRunnable() {
         return new Runnable() {
             @Override
             public void run() {
-                AWTEvent currentEvent= null;
-                String reportedEventId= "";      // toString showing the last reported error.
-                long currentRequestStartTime= 0; // roughly the start time of the current request, when it looks like it is slow
 
-                while (true) {
-                    EventQueue instance= Toolkit.getDefaultToolkit().getSystemEventQueue();
-                    AWTEvent test= instance.peekEvent(); // Ed says: one peekEvent for every getSystemEventQueue.
-                    if ( currentEvent!=null && test==currentEvent ) { // we should have processed this event by now.
-                        logger.log(Level.FINE, "====  long job to process ====");
-                        logger.log(Level.FINE, test.toString() );
-                        logger.log(Level.FINE, "====  end, long job to process ====");
+                EventQueue instance= Toolkit.getDefaultToolkit().getSystemEventQueue();
+                AWTEvent test= instance.peekEvent(); // Ed says: one peekEvent for every getSystemEventQueue.
+                if ( currentEvent!=null && test==currentEvent ) { // we should have processed this event by now.
+                    logger.log(Level.FINE, "====  long job to process ====");
+                    logger.log(Level.FINE, test.toString() );
+                    logger.log(Level.FINE, "====  end, long job to process ====");
 
-                        String eventId= test.toString();
-                        boolean hungProcess= System.currentTimeMillis()-currentRequestStartTime > ERROR_LEVEL_MILLIS;
-                        if ( hungProcess && ! eventId.equals(reportedEventId) ) {
+                    String eventId= test.toString();
+                    boolean hungProcess= System.currentTimeMillis()-lastPost > ERROR_LEVEL_MILLIS;
+                    if ( hungProcess && ! eventId.equals(reportedEventId) ) {
 
-                            logger.log(Level.INFO, "PATHOLOGICAL EVENT QUEUE CLEAR TIME, WRITING REPORT TO autoplot_data/logs/...\n" );
+                        logger.log(Level.INFO, "PATHOLOGICAL EVENT QUEUE CLEAR TIME, WRITING REPORT TO autoplot_data/logs/...\n" );
 
-                            Date now= new Date();
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-                            String timeStamp= sdf.format( now );
+                        Date now= new Date();
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+                        String timeStamp= sdf.format( now );
 
-                            if ( !DasApplication.hasAllPermission() ) {
+                        if ( !DasApplication.hasAllPermission() ) {
+                            return;
+                        }
+
+                        String id= System.getProperty("user.name");
+
+                        map.put( GuiExceptionHandler.USER_ID, id );
+
+                        try {
+                            List<String> bis = AboutUtil.getBuildInfos();
+                            map.put( GuiExceptionHandler.BUILD_INFO, bis );
+                        } catch (IOException ex) {
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
+                        }
+                        int appCount= AppManager.getInstance().getApplicationCount();
+                        map.put( GuiExceptionHandler.APP_COUNT, appCount );
+
+                        String s= GuiExceptionHandler.formatReport( map, false, "Autoplot detected hang" );
+                        int hash= eventQueue==null ? 1 : GuiExceptionHandler.hashCode( eventQueue.getStackTrace() );
+
+                        String fname= String.format("hang_%010d_%s_%s.xml", Integer.valueOf(hash), timeStamp, id.replaceAll(" ","_") );
+
+                        File logdir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "log" );
+                        if ( !logdir.exists() ) {
+                            if ( !logdir.mkdirs() ) {
                                 return;
                             }
-
-                            String id= System.getProperty("user.name");
-
-                            map.put( GuiExceptionHandler.USER_ID, id );
-                            
-                            try {
-                                List<String> bis = AboutUtil.getBuildInfos();
-                                map.put( GuiExceptionHandler.BUILD_INFO, bis );
-                            } catch (IOException ex) {
-                                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                            }
-                            int appCount= AppManager.getInstance().getApplicationCount();
-                            map.put( GuiExceptionHandler.APP_COUNT, appCount );
-                                                                
-                            String s= GuiExceptionHandler.formatReport( map, false, "Autoplot detected hang" );
-                            int hash= eventQueue==null ? 1 : GuiExceptionHandler.hashCode( eventQueue.getStackTrace() );
-                            
-                            String fname= String.format("hang_%010d_%s_%s.xml", Integer.valueOf(hash), timeStamp, id.replaceAll(" ","_") );
-
-                            File logdir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "log" );
-                            if ( !logdir.exists() ) {
-                                if ( !logdir.mkdirs() ) {
-                                    return;
-                                }
-                            }
-
-                            File f= new File( logdir, fname );
-                            PrintWriter out=null;
-                            try {
-                                out= new PrintWriter( new FileOutputStream(f) );
-                                out.write(s);
-                            } catch ( IOException ex ) {
-                                logger.log( Level.WARNING, null, ex );
-                            } finally {
-                                if ( out!=null ) out.close();
-                            }
-                            
-                            reportedEventId= eventId;
-                            
-                            currentEvent= null;
-                            
                         }
-                    } else {
-                        currentRequestStartTime= System.currentTimeMillis();
+
+                        File f= new File( logdir, fname );
+                        PrintWriter out=null;
+                        try {
+                            out= new PrintWriter( new FileOutputStream(f) );
+                            out.write(s);
+                        } catch ( IOException ex ) {
+                            logger.log( Level.WARNING, null, ex );
+                        } finally {
+                            if ( out!=null ) out.close();
+                        }
+
+                        reportedEventId= eventId;
+
+                        currentEvent= null;
 
                     }
+                } 
 
-                    if ( test!=currentEvent ) {
+                currentEvent=  test;
 
-                    }
-                    currentEvent=  test;
-                    try {
-                        Thread.sleep(WATCH_INTERVAL_MILLIS);
-                    } catch ( InterruptedException ex ) {
-                    }
-                }
             }
         };
     }
