@@ -1131,6 +1131,8 @@ public class DataSetURI {
                 DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
                 fail= false;
                 logger.log(Level.FINE,"downloadResourceAsTempFile-> transfer was successful");
+            } catch ( IOException ex ) { 
+                throw new IOException(url.toString(),ex);
             } finally {
                 if ( fail ) { // clean up if there was an exception
                     if ( !tempfile.delete() ) {
