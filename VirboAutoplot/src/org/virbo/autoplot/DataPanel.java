@@ -332,6 +332,13 @@ public class DataPanel extends javax.swing.JPanel {
             }
         }
     } );
+    
+    TickleTimer operationsHistoryTimer= new TickleTimer( 500, new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            recentComboBox.addToRecent(filtersChainPanel1.getFilter());
+        }
+    } );
 
     /**
      * encourage making local copies for thread safety.
@@ -421,6 +428,7 @@ public class DataPanel extends javax.swing.JPanel {
             return;
         }
         resetFiltersChain();
+        this.operationsHistoryTimer.tickle();
     }
 
     protected boolean adjusting = false;
