@@ -372,12 +372,11 @@ public class DataPanel extends javax.swing.JPanel {
         }
     }
 
-    private void componentChanged() {
-        if ( adjusting ) return;
-        PlotElement lelement= getElement();
-        if ( lelement==null ) {
-            return;
-        }
+    /**
+     * set up the filters chain.  This must be called from the event 
+     * thread, and while the filter chain is not bound
+     */
+    private void resetFiltersChain() {
         Runnable run= new Runnable() {
             @Override
             public void run() {
@@ -398,8 +397,30 @@ public class DataPanel extends javax.swing.JPanel {
             run.run();
         } else {
             SwingUtilities.invokeLater(run);
+        }        
+    }
+    
+    private void resetFiltersChainDataSet( final QDataSet ds ) {
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                String filter= filtersChainPanel1.getFilter();
+                filtersChainPanel1.setFilter("");
+                filtersChainPanel1.setInput(null);
+                filtersChainPanel1.setFilter(filter);
+                filtersChainPanel1.setInput(ds);  
+            }
+        };
+        SwingUtilities.invokeLater(run);        
+    }
+    
+    private void componentChanged() {
+        if ( adjusting ) return;
+        PlotElement lelement= getElement();
+        if ( lelement==null ) {
+            return;
         }
-        
+        resetFiltersChain();
     }
 
     protected boolean adjusting = false;
@@ -479,6 +500,7 @@ public class DataPanel extends javax.swing.JPanel {
     private synchronized void doPlotElementBindings() {
         BindingGroup bc = new BindingGroup();
         if (elementBindingGroup != null) elementBindingGroup.unbind();
+        setAdjusting( true ); // suppress events
         if ( element!=null ) {
             element.removePropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
             element.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, contextListener );
@@ -489,7 +511,7 @@ public class DataPanel extends javax.swing.JPanel {
 
         componentTextField1.setText(p.getComponent());
 
-        componentChanged();
+        filtersChainPanel1.setFilter(p.getComponent()); // because adjusting==true.
         
         element.addPropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
         bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, element, BeanProperty.create("component"), this.componentTextField1, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")) );
@@ -497,7 +519,8 @@ public class DataPanel extends javax.swing.JPanel {
 
         elementBindingGroup = bc;
         bc.bind();
-
+        setAdjusting( false );
+        
         p.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, contextListener );
         updateProcessDataSetLabel();
 
@@ -525,16 +548,7 @@ public class DataPanel extends javax.swing.JPanel {
         
         newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_FILLDATASET, fillDataSetListener );
         
-        
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                filtersChainPanel1.setInput(null);
-                filtersChainPanel1.setFilter("");
-                filtersChainPanel1.setInput(ds);                
-            }
-        };
-        SwingUtilities.invokeLater(run);
+        resetFiltersChainDataSet(ds);
 
         bindingTransitionalState= true;
         BindingGroup bc = new BindingGroup();
