@@ -481,10 +481,11 @@ public class ScreenshotsTool extends EventQueue {
 
         int i = active;
         mode = gs[i].getDisplayMode();
-        bounds = new Rectangle(0, 0, mode.getWidth(), mode.getHeight());
+        //bounds = new Rectangle( 0, 0, mode.getWidth(), mode.getHeight());
         PointerInfo info= MouseInfo.getPointerInfo();
         Point p= info.getLocation();
-        Rectangle b= info.getDevice().getDefaultConfiguration().getBounds();
+        bounds= gs[i].getDefaultConfiguration().getBounds();
+        Rectangle b= bounds;
         try {
             screenshot = new Robot(gs[i]).createScreenCapture(bounds);
         } catch (AWTException ex) {
