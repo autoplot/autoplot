@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Round-to-n places from python is replicated.
+        <p><small>Code experiments with multi-threaded Python scripts, in this case executing the same work in a fifth of the time.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,8 +20,12 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-04-18 r16711):</p>
+        <p>Bugfixes (2015-04-22 r16723):</p>
         <ul>
+            <li>QStreams with just one rank 2 dataset would flatten the QDataSet to rank 1 mistakenly.</li>
+            <li>bugfix: screenshots tool would always grab from the first display.</li>
+            <li>slice filter editor panel shouldn't use commas in the index.</li>
+            <li>1375: operations GUIs are incorrectly set as focus is switched. </li>
             <li>remove long operations from the droplist of recent operations.  They mess up the layout of the GUI, and are probably difficult to interpret anyway.</li>
             <li>add round(n,1) to match Python round function.</li>
             <li>allow single-letter variable name lookups.</li>
@@ -104,7 +108,7 @@
             <li>406: CDF files support some LaTeX for MMS labels</li>
             <li>format to idlsav supports bundles</li>
             <li>javadoc improvements throughout dasCore and QDataSet packages</li>
-            <li>DataSetBuilder add nextRecord( Object ... values ) to provide efficient way to define bundles in scripts<li>
+            <li>DataSetBuilder add nextRecord( Object ... values ) to provide efficient way to define bundles in scripts</li>
             <li>415: plotx(xpos='50%,100%-5em',ypos='20%,50%') allows direct specification of layout.</li>
             <li>ticks can be set manually from scripts.</li>
             <li>console GUI can export records as XML or flat ascii file now</li>
