@@ -1478,15 +1478,13 @@ public class ApplicationModel {
      * wait for Autoplot to settle, waiting for pending changes in the application controller and canvas.
      * @param runtimeException ignored.
      * @deprecated use waitUntilIdle() instead.
-     * @throws java.lang.InterruptedException
      */
-    public void waitUntilIdle(boolean runtimeException) throws InterruptedException {
+    public void waitUntilIdle(boolean runtimeException) {
         waitUntilIdle(); 
     }
 
     /**
      * wait for Autoplot to settle, waiting for pending changes in the application controller and canvas.
-     * @throws java.lang.InterruptedException
      */    
     public void waitUntilIdle() {
         logger.log(Level.FINE, "enter waitUntilIdle, pendingChanges={0}", dom.getController().isPendingChanges());
