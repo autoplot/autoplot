@@ -64,9 +64,9 @@ public class Das2StreamDataSource extends AbstractDataSource {
                 }
 
                 // check if we can flatten rank 2 join that comes from aggregation
-                if ( QDataSetStreamHandler.isFlattenableJoin(result) ) {
-                    result= h.flattenJoin(result);
-                }
+                //if ( QDataSetStreamHandler.isFlattenableJoin(result) ) {
+                //    result= h.flattenJoin(result);
+                //}
 
                 return result;
                 
