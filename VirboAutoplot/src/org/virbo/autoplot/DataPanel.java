@@ -156,7 +156,9 @@ public class DataPanel extends javax.swing.JPanel {
         
         componentTextField1= ((JTextField)recentComboBox.getEditor().getEditorComponent());
         recentComboBox.setSelectedItem("");
-
+        componentTextField1.setText("");
+        filtersChainPanel1.setFilter("");
+        
         //dataSetSelector= new DataSetSelector();
         //dataAddressPanel.add( dataSetSelector, BorderLayout.NORTH );
         
@@ -452,7 +454,9 @@ public class DataPanel extends javax.swing.JPanel {
     transient PropertyChangeListener dsfListener= new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-
+                DataPanel.this.componentTextField1.setText("");
+                DataPanel.this.filtersChainPanel1.setFilter("");
+                DataPanel.this.filtersChainPanel1.setInput(null);
             }
         };
 
@@ -478,7 +482,6 @@ public class DataPanel extends javax.swing.JPanel {
                 @Override
                 public void run() {
                     filtersChainPanel1.setInput(ds);
-                    recentComboBox.setSelectedItem("");
                 }
             };
             if ( SwingUtilities.isEventDispatchThread() ) {
@@ -539,7 +542,7 @@ public class DataPanel extends javax.swing.JPanel {
         if (dataSourceFilterBindingGroup != null) dataSourceFilterBindingGroup.unbind();
 
         if ( dsf!=null ) {
-            dsf.getController().removePropertyChangeListener(dsfListener);
+            dsf.getController().removePropertyChangeListener(DataSourceController.PROP_DATASOURCE,dsfListener);
             dsf.getController().removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener );
         }
         
@@ -555,6 +558,7 @@ public class DataPanel extends javax.swing.JPanel {
         dataSetLabel.setText( ds==null ? "(no dataset)" : ds.toString() );
         
         newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_FILLDATASET, fillDataSetListener );
+        newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_DATASOURCE, dsfListener );
         
         resetFiltersChainDataSet(ds);
 
@@ -704,6 +708,12 @@ public class DataPanel extends javax.swing.JPanel {
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, filtersChainPanel1, org.jdesktop.beansbinding.ELProperty.create("${filter}"), recentComboBox, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         bindingGroup.addBinding(binding);
+
+        recentComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                recentComboBoxActionPerformed(evt);
+            }
+        });
 
         processDataSetLabel.setFont(processDataSetLabel.getFont().deriveFont(processDataSetLabel.getFont().getSize()-4f));
         processDataSetLabel.setText("(filtered dataset will go here)");
@@ -914,6 +924,10 @@ public class DataPanel extends javax.swing.JPanel {
             recentComboBox.addToRecent( newFilter );
         }
     }//GEN-LAST:event_editComponentPanelActionPerformed
+
+    private void recentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_recentComboBoxActionPerformed
+        System.err.println( "rcb: " + recentComboBox.getSelectedItem() );
+    }//GEN-LAST:event_recentComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dataSetLabel;
