@@ -338,7 +338,7 @@ public class DataPanel extends javax.swing.JPanel {
     TickleTimer operationsHistoryTimer= new TickleTimer( 500, new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            operatorsComboBox.addToRecent(filtersChainPanel.getFilter());
+            //operatorsComboBox.addToRecent(filtersChainPanel.getFilter());
         }
     } );
 
@@ -454,9 +454,19 @@ public class DataPanel extends javax.swing.JPanel {
     transient PropertyChangeListener dsfListener= new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                DataPanel.this.operatorsTextField.setText("");
-                DataPanel.this.filtersChainPanel.setFilter("");
-                DataPanel.this.filtersChainPanel.setInput(null);
+                Runnable run = new Runnable() {
+                    @Override
+                    public void run() {
+                        DataPanel.this.operatorsTextField.setText("");
+                        DataPanel.this.filtersChainPanel.setFilter("");
+                        DataPanel.this.filtersChainPanel.setInput(null);
+                    }
+                };
+                if ( SwingUtilities.isEventDispatchThread() ) {
+                    run.run();
+                } else {
+                    SwingUtilities.invokeLater(run);
+                }
             }
         };
 
@@ -522,7 +532,17 @@ public class DataPanel extends javax.swing.JPanel {
 
         operatorsTextField.setText(p.getComponent());
 
-        filtersChainPanel.setFilter(p.getComponent()); // because adjusting==true.
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                filtersChainPanel.setFilter(element.getComponent()); // because adjusting==true.
+            }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            SwingUtilities.invokeLater(run);
+        }
         
         element.addPropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
         bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, element, BeanProperty.create("component"), this.operatorsTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")) );
