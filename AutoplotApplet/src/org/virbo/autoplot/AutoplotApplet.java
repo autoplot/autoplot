@@ -612,7 +612,7 @@ public class AutoplotApplet extends JApplet {
         }
 
 
-        if (srenderType != null && !srenderType.equals("")) {
+        if ( !srenderType.equals("")) {
             try {
                 RenderType renderType = RenderType.valueOf(srenderType);
                 dom.getController().getPlotElement().setRenderType(renderType);
@@ -999,8 +999,9 @@ public class AutoplotApplet extends JApplet {
     }
 
     /**
-     * plot the data in the string.
-     * @param sdata
+     * plot the data in the string.  Data is split on
+     * semicolons or newlines.
+     * @param fsdata
      */
     public void plotData(final String fsdata) {
         Runnable run = new Runnable() {
