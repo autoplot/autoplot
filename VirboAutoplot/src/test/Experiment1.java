@@ -276,11 +276,11 @@ public class Experiment1 {
         double speed = ((double) time) / time1;
 
         
-        try {
-            ScriptContext.writeToPng("/tmp/Experiment1_graphs.png");
-        } catch (IOException ex) {
-            Logger.getLogger(Experiment1.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        //try {
+        //    ScriptContext.writeToPng("/tmp/Experiment1_graphs.png");
+        //} catch (IOException ex) {
+        //    Logger.getLogger(Experiment1.class.getName()).log(Level.SEVERE, null, ex);
+        //}
         
         return speed;
         
