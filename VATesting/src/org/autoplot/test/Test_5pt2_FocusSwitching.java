@@ -81,6 +81,7 @@ public class Test_5pt2_FocusSwitching implements Scenario {
             BufferedImage image= ScreenshotsTool.getScreenShot();
             ImageIO.write( image, "png", new File( "Test_5pt2_FocusSwitching_Screen.png" ) );
             
+            System.err.println( "filter: " + app.getDataPanel().getFiltersChainPanel().getFilter() );
             System.err.println("Done!");
             
             writeToPng("Test_5pt2_FocusSwitching.png"); // Leave artifacts for testing.
