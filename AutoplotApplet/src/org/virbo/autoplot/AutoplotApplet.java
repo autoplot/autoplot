@@ -381,15 +381,13 @@ public class AutoplotApplet extends JApplet {
                 appmodel.doOpen(in, null);
                 logger.log(Level.FINE, "done open vap @ {0} msec", (System.currentTimeMillis() - t0));
                 
-                appmodel.waitUntilIdle(false);
+                appmodel.waitUntilIdle();
                 logger.log(Level.FINE, "done load vap and waitUntilIdle @ {0} msec", (System.currentTimeMillis() - t0));
                 Canvas cc= appmodel.getDocumentModel().getCanvases(0);
                 logger.log(Level.FINE, "vap height, width= {0},{1}", new Object[]{cc.getHeight(), cc.getWidth()});
                 width= getIntParameter( "width", cc.getWidth() );
                 height= getIntParameter( "height", cc.getHeight() );
                 logger.log(Level.FINE, "output height, width= {0},{1}", new Object[]{width, height});
-            } catch ( InterruptedException ex ) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch ( IOException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             } finally {
@@ -533,14 +531,10 @@ public class AutoplotApplet extends JApplet {
 
             setInitializationStatus("dataSourceSet");
 
-            if (stimeRange != null && !stimeRange.equals("")) {
-                try {
-                    logger.log(Level.FINE, "wait for idle @ {0} msec (due to stimeRange)", (System.currentTimeMillis() - t0));
-                    appmodel.waitUntilIdle(true);
-                    logger.log(Level.FINE, "done wait for idle @ {0} msec", (System.currentTimeMillis() - t0));
-                } catch (InterruptedException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                }
+            if (!stimeRange.equals("")) {
+                logger.log(Level.FINE, "wait for idle @ {0} msec (due to stimeRange)", (System.currentTimeMillis() - t0));
+                appmodel.waitUntilIdle();
+                logger.log(Level.FINE, "done wait for idle @ {0} msec", (System.currentTimeMillis() - t0));
                 if (UnitsUtil.isTimeLocation(dom.getTimeRange().getUnits())) {
                     dom.setTimeRange(timeRange1);
                 }
