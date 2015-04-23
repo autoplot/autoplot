@@ -929,6 +929,14 @@ public class DataPanel extends javax.swing.JPanel {
         System.err.println( "rcb: " + recentComboBox.getSelectedItem() );
     }//GEN-LAST:event_recentComboBoxActionPerformed
 
+    /**
+     * for testing, provide access.
+     * @return the FiltersChainPanel
+     */
+    public FiltersChainPanel getFiltersChainPanel() {
+        return this.filtersChainPanel1;
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dataSetLabel;
     private javax.swing.JButton editComponentPanel;
