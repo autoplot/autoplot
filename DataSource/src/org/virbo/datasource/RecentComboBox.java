@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.MutableComboBoxModel;
 import javax.swing.SwingUtilities;
 import org.das2.datum.LoggerManager;
 
@@ -123,7 +124,15 @@ public class RecentComboBox extends JComboBox {
 
             Runnable run= new Runnable() {
                 public void run() {
-                    setModel( new DefaultComboBoxModel( fitems.toArray() ) );
+                    ComboBoxModel cbm= getModel();
+                    if ( cbm instanceof MutableComboBoxModel ) {
+                        MutableComboBoxModel mcbm= (MutableComboBoxModel)cbm;
+                        int n= mcbm.getSize();
+                        for ( int i=0; i<n; i++ ) mcbm.removeElementAt(0);
+                        for (String fitem : fitems) mcbm.addElement(fitem);
+                    } else {
+                        setModel( new DefaultComboBoxModel( fitems.toArray() ) );
+                    }
                 }
             };
             SwingUtilities.invokeLater(run);
