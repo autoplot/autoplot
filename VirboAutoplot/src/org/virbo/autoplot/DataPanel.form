@@ -54,7 +54,7 @@
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <Component id="filtersChainPanel1" max="32767" attributes="0"/>
+                          <Component id="filtersChainPanel" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
@@ -63,7 +63,7 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="operationsLabel" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                                  <Component id="recentComboBox" max="32767" attributes="0"/>
+                                  <Component id="operatorsComboBox" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -94,11 +94,11 @@
                       <Component id="editComponentPanel" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="103" alignment="1" groupAlignment="3" attributes="0">
                           <Component id="operationsLabel" alignment="3" min="-2" max="-2" attributes="1"/>
-                          <Component id="recentComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="operatorsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="filtersChainPanel1" pref="161" max="32767" attributes="0"/>
+                  <Component id="filtersChainPanel" pref="161" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="sliceAutorangesCB" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -155,15 +155,15 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editComponentPanelActionPerformed"/>
           </Events>
         </Component>
-        <Component class="org.virbo.datasource.RecentComboBox" name="recentComboBox">
+        <Component class="org.virbo.datasource.RecentComboBox" name="operatorsComboBox">
           <Properties>
-            <Property name="name" type="java.lang.String" value="recentComboBox" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="operatorsComboBox" noResource="true"/>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="selectedItem" source="filtersChainPanel1" sourcePath="${filter}" target="recentComboBox" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="selectedItem" source="filtersChainPanel" sourcePath="${filter}" target="operatorsComboBox" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
           </BindingProperties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="recentComboBoxActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="operatorsComboBoxActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="processDataSetLabel">
@@ -176,7 +176,7 @@
             <Property name="text" type="java.lang.String" value="(filtered dataset will go here)"/>
           </Properties>
         </Component>
-        <Container class="org.virbo.filters.FiltersChainPanel" name="filtersChainPanel1">
+        <Container class="org.virbo.filters.FiltersChainPanel" name="filtersChainPanel">
           <Properties>
             <Property name="name" type="java.lang.String" value="filtersChainPanel" noResource="true"/>
           </Properties>
