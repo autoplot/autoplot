@@ -4853,6 +4853,15 @@ APSplash.checkTime("init 240");
     public TimeRangeEditor getTimeRangeEditor() {
         return this.timeRangeEditor;
     }
+    
+    /**
+     * return the data panel (for testing).
+     * @return the data panel.
+     */
+    public DataPanel getDataPanel() {
+        return dataPanel;
+    }
+
 
     /**
      * turn on basic mode, where users can only use the app for browsing existing products.
