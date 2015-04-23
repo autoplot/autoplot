@@ -41,7 +41,7 @@ public class Experiment1 {
         
         try {
             
-            int size = 15;
+            int size = 10;
             int numThreads = 8;
             args= new String[] { "multi" };
             
@@ -91,14 +91,6 @@ public class Experiment1 {
                     QDataSet timesMulti = Ops.dataset(speed);
                     fw.println(numThreads + "   " + speed);       
                 }numThreads = 16;
-                for (int i = 0; i < size; i = i + 1) {
-                    System.err.println("=== "+ i+ " ===");
-                    double speed = fftMultiThread(numThreads);
-                    //speedArrayMulti[i] = speed;
-                    System.err.println("Multi threads: " + i + " " + speed );
-                    QDataSet timesMulti = Ops.dataset(speed);
-                    fw.println(numThreads + "   " + speed);       
-                }numThreads = 20;
                 for (int i = 0; i < size; i = i + 1) {
                     System.err.println("=== "+ i+ " ===");
                     double speed = fftMultiThread(numThreads);
@@ -242,8 +234,8 @@ public class Experiment1 {
         // time is the time of the original task that only uses one thread in millis
         long time = System.currentTimeMillis() - t0;
 
-        ScriptContext.setLayout(threads + 1, 1);
-        ScriptContext.plot(0, out[0]);
+        //ScriptContext.setLayout(threads + 1, 1);
+        //ScriptContext.plot(0, out[0]);
 
         long time0= System.currentTimeMillis();
         for (int i = 0; i < threads; i = i + 1) {
@@ -262,6 +254,8 @@ public class Experiment1 {
                 }
             };
             run.add(run0);
+            
+            //if the first runnable was just created, start the timer before running it
             if (i == 0) {
                 t0 = System.currentTimeMillis();
             }
