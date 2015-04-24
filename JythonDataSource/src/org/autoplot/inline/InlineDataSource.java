@@ -152,7 +152,11 @@ public class InlineDataSource extends AbstractDataSource {
 
 
         if ( isCommand ) {  // we'll use a jython interpretter in the future
-            return jyCommand(s);
+            try {
+                return jyCommand(s);
+            } catch ( Exception ex ) {
+                throw new IllegalArgumentException( "inline jython code raises exception", ex );
+            }
         }
 
         String[] ss= s.split(";");
