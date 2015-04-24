@@ -946,7 +946,7 @@ public class DataPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_editComponentPanelActionPerformed
 
     private void operatorsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operatorsComboBoxActionPerformed
-        System.err.println( "rcb: " + operatorsComboBox.getSelectedItem() );
+        logger.log(Level.FINE, "operatorsComboBox: {0}", operatorsComboBox.getSelectedItem());
     }//GEN-LAST:event_operatorsComboBoxActionPerformed
 
     /**
