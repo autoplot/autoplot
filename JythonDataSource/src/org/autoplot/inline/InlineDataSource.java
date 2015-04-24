@@ -280,7 +280,11 @@ public class InlineDataSource extends AbstractDataSource {
                             p.put(propName,propValue);
                             continue;
                         } else {
-                            interp.exec(arg);
+                            try {
+                                interp.exec(arg);
+                            } catch ( Exception ex ) {
+                                throw ex; // https://sourceforge.net/p/autoplot/bugs/1376/
+                            }
                         }
                     }
                 } else {
