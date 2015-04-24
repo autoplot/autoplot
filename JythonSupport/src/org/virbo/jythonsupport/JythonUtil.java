@@ -139,7 +139,7 @@ public class JythonUtil {
                 }
                 InputStream in = imports.openStream();
                 try {
-                    interp.execfile(imports.openStream(), "imports.py");
+                    interp.execfile( in, "imports.py");
                 } finally {
                     in.close();
                 }
@@ -208,7 +208,7 @@ public class JythonUtil {
      */
     private static void transferStream( InputStream in, OutputStream out ) throws IOException {
         byte[] buf= new byte[2048];
-        int n=0;
+        int n;
         try {
             n= in.read(buf);
             while ( n>-1 ) {
@@ -420,10 +420,14 @@ public class JythonUtil {
 
     /**
      * scrape through the script looking for documentation declarations
-     * returns an array, possibly containing:
-     *   LABEL few words
-     *   TITLE sentence
-     *   DESCRIPTION short paragraph
+     * returns an array, possibly containing:<ul>
+     *  <li>LABEL few words
+     *  <li>TITLE sentence
+     *  <li>DESCRIPTION short paragraph
+     * </ul>
+     * @param reader
+     * @return 
+     * @throws java.io.IOException 
      */
      public static Map<String,String> getDocumentation( BufferedReader reader ) throws IOException {
 
@@ -450,7 +454,7 @@ public class JythonUtil {
      //there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as the string.upper() function.
      //The commas are to guard against the id being a subset of another id ("lower," does not match "lowercase").
      //TODO: update this after Python upgrade.
-     private static String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper,", "URI,", "DatumRangeUtil," };
+     private static final String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper,", "URI,", "DatumRangeUtil," };
      
      /**
       * return true if the function call is trivial to execute and can be evaluated within a few milliseconds.
@@ -661,31 +665,31 @@ public class JythonUtil {
                  if ( !simplifyScriptToGetParamsCanResolve(a.value, variableNames ) ) {
                      return false;
                  }
-                 for ( int i=0; i<a.targets.length; i++ ) {
-                    exprType et= ((exprType)a.targets[i]);
-                    if ( et instanceof Name ) {
-                        String id= ((Name)a.targets[i]).id;
-                        variableNames.add(id);
-                        logger.log(Level.FINEST, "assign to variable {0}", id);
-                    } else if ( et instanceof Attribute ) {
-                        Attribute at= (Attribute)et;
-                        while ( at.value instanceof Attribute || at.value instanceof Subscript ) {
-                            if ( at.value instanceof Attribute ) {
-                                at= (Attribute)at.value;
-                            } else {
-                                Subscript s= (Subscript)at.value;
-                                if ( s.value instanceof Attribute ) {
-                                    at= (Attribute)s.value;
-                                } else {
-                                    return false; // oh just give up...
-                                }
-                            }
-                        }
-                        if ( at.value instanceof Name ) {
-                            Name n= (Name)at.value;
-                            if ( !variableNames.contains( n.id ) ) return false;
-                        }
-                    }
+                 for (exprType target : a.targets) {
+                     exprType et = (exprType) target;
+                     if (et instanceof Name) {
+                         String id = ((Name) target).id;
+                         variableNames.add(id);
+                         logger.log(Level.FINEST, "assign to variable {0}", id);
+                     } else if ( et instanceof Attribute ) {
+                         Attribute at= (Attribute)et;
+                         while ( at.value instanceof Attribute || at.value instanceof Subscript ) {
+                             if ( at.value instanceof Attribute ) {
+                                 at= (Attribute)at.value;
+                             } else {
+                                 Subscript s= (Subscript)at.value;
+                                 if ( s.value instanceof Attribute ) {
+                                     at= (Attribute)s.value;
+                                 } else {
+                                     return false; // oh just give up...
+                                 }
+                             }
+                         }
+                         if ( at.value instanceof Name ) {
+                             Name n= (Name)at.value;
+                             if ( !variableNames.contains( n.id ) ) return false;
+                         }
+                     }
                  }
                  return true;
              } else {
@@ -1004,7 +1008,7 @@ public class JythonUtil {
       * that can be executed to get a list of getParam calls.  The user
       * can provide a list of current settings, so that the thread of execution 
       * is matched.
-      * Each parameter is given a type code:<tt>
+      * Each parameter is given a type code:
       **<blockquote><pre><small>{@code
       * R resourceURI, special string
       * T timerange, special string
