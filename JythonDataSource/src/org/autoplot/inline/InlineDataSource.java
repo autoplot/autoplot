@@ -159,14 +159,14 @@ public class InlineDataSource extends AbstractDataSource {
             }
         }
 
-        String[] ss= s.split(";");
+        String[] ss= s.split(";",-2);
         if ( ss.length>1 ) { // rank 2
             BundleDataSet bds= BundleDataSet.createRank1Bundle();
             String[] ss2= ss[0].split(",");
-            int nds= ss2.length;
+            int nds= ss2.length; // number per record
             boolean enumTimeNoChange= true;
             Units ru= null;
-            for ( int j=0; j<ss2.length; j++ ) {
+            for ( int j=0; j<nds; j++ ) {
                 QDataSet result= parseInlineDsSimple(ss2[j]);
                 Units u= SemanticOps.getUnits(result);
                 if ( ru==null ) {
@@ -191,10 +191,16 @@ public class InlineDataSource extends AbstractDataSource {
                     bds.bundle(b.getDataSet());
                 }
             } else {
+                // do each column of the rank two table.
+                int nrec=ss.length;
                 for ( int j=0; j<nds; j++ ) {
-                    DataSetBuilder b= new DataSetBuilder(1,10);
-                    for ( int i=0; i<ss.length; i++ ) {
+                    DataSetBuilder b= new DataSetBuilder(1,ss.length);
+                    for ( int i=0; i<nrec; i++ ) {
                         ss2= ss[i].split(",");
+                        if ( j==0 && ss2[j].trim().length()==0 && i<nrec ) {
+                            nrec=i;
+                            continue;
+                        } // check for empty record after semi: "1.23,134;"
                         QDataSet result= parseInlineDsSimple(ss2[j]);
                         b.putValue(-1,result.value(0));
                         b.putProperty( QDataSet.UNITS, result.property(QDataSet.UNITS) );
@@ -339,15 +345,10 @@ public class InlineDataSource extends AbstractDataSource {
         }
 
         if ( depn[0]==null ) {
-            if ( bundle1==null && ds.rank()==2 && ds.length()==2 ) { //TODO: we should be able to use bundle dataset... kludge
-                MutablePropertyDataSet xx= DDataSet.copy(DataSetOps.slice0(ds,0));
-                MutablePropertyDataSet zz= DDataSet.copy(DataSetOps.slice0(ds,ds.length()-1));
-                zz.putProperty( QDataSet.DEPEND_0, xx );
-                ds= zz;
-            } else if ( bundle1==null && ds.rank()==2 && ds.length(1)==2 ) { //TODO: we should be able to use bundle dataset... kludge
+            if ( bundle1==null && ds.rank()==2 && ds.length(1)==2 ) { //TODO: we should be able to use bundle dataset... kludge
                 if ( Ops.isBundle(ds) ) {
                     MutablePropertyDataSet xx= (MutablePropertyDataSet)DataSetOps.unbundle(ds,0) ;
-                    MutablePropertyDataSet zz= (MutablePropertyDataSet)DataSetOps.unbundle(ds,ds.length(0)-1);
+                    MutablePropertyDataSet zz= (MutablePropertyDataSet)DataSetOps.unbundle(ds,1);
                     zz.putProperty( QDataSet.DEPEND_0, xx );
                     ds= zz;
                 } else if ( ds instanceof BundleDataSet ) { // use unbundle to support TimeLocation and EnumerationUnits types
