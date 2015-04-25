@@ -152,7 +152,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="directionsLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="jLabel3"/>
+                <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;i&gt;Enter a list of times or points&lt;/i&gt;&lt;/html&gt;"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -192,7 +192,7 @@
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane2" pref="210" max="32767" attributes="0"/>
+                      <Component id="jScrollPane2" pref="239" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>

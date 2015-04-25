@@ -19,7 +19,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.event.ListDataListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import org.das2.util.LoggerManager;
@@ -109,7 +108,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
         jLabel2.setText("Dataset Type:");
 
-        directionsLabel.setText("jLabel3");
+        directionsLabel.setText("<html><i>Enter a list of times or points</i></html>");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -118,7 +117,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(directionsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(directionsLabel)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -138,7 +137,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(schemeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(directionsLabel)
+                .addComponent(directionsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
@@ -187,7 +186,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(examplesButton)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -205,12 +204,18 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private static ComboBoxModel getExamplesComboBoxModel() {
-        return new DefaultComboBoxModel( new String[] { 
-            "2014-01-01T01:01Z",
-            "2014-01-01T01:01:01.000Z",
-            "1.23"
-        } );
+    private static ComboBoxModel getExamplesComboBoxModel( int icol ) {
+        if ( icol==0 ) {
+            return new DefaultComboBoxModel( new String[] { 
+                "2014-01-01T01:01Z",
+                "2014-01-01T01:01:01.000Z",
+                "1.23"
+            } );
+        } else {
+            return new DefaultComboBoxModel( new String[] {
+                "1.23"
+            });
+        }
     }
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
@@ -220,7 +225,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         for ( int i=0; i<tm.getColumnCount(); i++ ) {  // load up the last record so it can be edited to make new record
             JComboBox cb1= new JComboBox();
             cb1.setToolTipText("Examples");
-            cb1.setModel( getExamplesComboBoxModel() );
+            cb1.setModel( getExamplesComboBoxModel( i ) );
             cb1.setEditable(true);
             JTextField tf1= ((JTextField)cb1.getEditor().getEditorComponent());
             tf1.setColumns(20);
@@ -260,6 +265,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 tm= toTableModel(ss);
             }
             table.setModel( tm );
+            
         }
         
     }//GEN-LAST:event_addButtonActionPerformed
@@ -317,8 +323,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         }
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
-    private void schemeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_schemeComboBoxActionPerformed
-        LoggerManager.logGuiEvent(evt);
+    private void initializeScheme() {
         if ( schemeComboBox.getSelectedIndex()==0 ) {
             tm= toTableModel( new String[0] );
             directionsLabel.setText("<html><i>Enter a list of times or points</i></html>");
@@ -327,6 +332,11 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             directionsLabel.setText("<html><i>Enter a list X and Y values</i></html>");
         }
         table.setModel( tm );
+    }
+    
+    private void schemeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_schemeComboBoxActionPerformed
+        LoggerManager.logGuiEvent(evt);
+        initializeScheme();
     }//GEN-LAST:event_schemeComboBoxActionPerformed
 
     private void examplesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_examplesButtonActionPerformed
@@ -499,7 +509,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         if ( uri.startsWith("vap+inline:") ) {
             uri= uri.substring(11);
         }
-        if ( uri.length()>0 && Character.isDigit( uri.charAt(0) ) ) {
+        if ( uri.length()==0 || Character.isDigit( uri.charAt(0) ) ) {
             int amp= uri.indexOf("&");
             if ( amp==-1 ) amp= uri.length();
             String lit= uri.substring(0,amp);
@@ -557,11 +567,11 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             StringBuilder s= new StringBuilder( "vap+inline:" );
             for ( int i=0; i<tm.getRowCount(); i++ ) {
                 if ( tm.getColumnCount()>1 ) {
-                    if ( i>0 ) s.append(";");
                     for ( int j=0; j<tm.getColumnCount();j++ ) {
                         if ( j>0 ) s.append(",");
                         s.append(tm.getValueAt(i,j));
                     }
+                    s.append(";");
                 } else {
                     if ( i>0 ) s.append(",");
                     s.append(tm.getValueAt(i,0));
