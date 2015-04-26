@@ -164,19 +164,6 @@ public class InlineDataSource extends AbstractDataSource {
             BundleDataSet bds= BundleDataSet.createRank1Bundle();
             String[] ss2= ss[0].split(",");
             int nds= ss2.length; // number per record
-            boolean enumTimeNoChange= true;
-            Units ru= null;
-            for ( int j=0; j<nds; j++ ) {
-                QDataSet result= parseInlineDsSimple(ss2[j]);
-                Units u= SemanticOps.getUnits(result);
-                if ( ru==null ) {
-                    ru= u;
-                } else {
-                    if ( ru!=u ) {
-                        enumTimeNoChange= false;
-                    }
-                }
-            }
 
             // do each column of the rank two table.
             int nrec=ss.length;
