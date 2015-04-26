@@ -178,37 +178,24 @@ public class InlineDataSource extends AbstractDataSource {
                 }
             }
 
-            if ( enumTimeNoChange ) {
-                for ( int i=0; i<ss.length; i++ ) {
+            // do each column of the rank two table.
+            int nrec=ss.length;
+            for ( int j=0; j<nds; j++ ) {
+                DataSetBuilder b= new DataSetBuilder(1,ss.length);
+                for ( int i=0; i<nrec; i++ ) {
                     ss2= ss[i].split(",");
-                    DataSetBuilder b= new DataSetBuilder(1,10);
-                    for ( int j=0; j<nds; j++ ) {
-                        QDataSet result= parseInlineDsSimple(ss2[j]);
-                        b.putValue(-1,result.value(0));
-                        b.putProperty( QDataSet.UNITS, result.property(QDataSet.UNITS) );
-                        b.nextRecord();
-                    }
-                    bds.bundle(b.getDataSet());
+                    if ( j==0 && ss2[j].trim().length()==0 && i<nrec ) {
+                        nrec=i;
+                        continue;
+                    } // check for empty record after semi: "1.23,134;"
+                    QDataSet result= parseInlineDsSimple(ss2[j]);
+                    b.putValue(-1,result.value(0));
+                    b.putProperty( QDataSet.UNITS, result.property(QDataSet.UNITS) );
+                    b.nextRecord();
                 }
-            } else {
-                // do each column of the rank two table.
-                int nrec=ss.length;
-                for ( int j=0; j<nds; j++ ) {
-                    DataSetBuilder b= new DataSetBuilder(1,ss.length);
-                    for ( int i=0; i<nrec; i++ ) {
-                        ss2= ss[i].split(",");
-                        if ( j==0 && ss2[j].trim().length()==0 && i<nrec ) {
-                            nrec=i;
-                            continue;
-                        } // check for empty record after semi: "1.23,134;"
-                        QDataSet result= parseInlineDsSimple(ss2[j]);
-                        b.putValue(-1,result.value(0));
-                        b.putProperty( QDataSet.UNITS, result.property(QDataSet.UNITS) );
-                        b.nextRecord();
-                    }
-                    bds.bundle(b.getDataSet());
-                }
+                bds.bundle(b.getDataSet());
             }
+
             //bds.putProperty( QDataSet.BUNDLE_1, null );
             return bds;
         } else {
