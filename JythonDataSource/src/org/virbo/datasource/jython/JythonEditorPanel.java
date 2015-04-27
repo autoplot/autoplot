@@ -611,7 +611,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             } else if ( jc instanceof DataSetSelector ) {
                 value= ((DataSetSelector)jc).getValue();
                 if ( params.get("timerange")!=null ) {
-                    value= DataSetURI.blurTsbUri(value);
+                    String blurredValue= DataSetURI.blurTsbUri(value);
+                    if ( blurredValue!=null ) { // if the value URI was not a TSB.
+                        value= blurredValue;
+                    }
                 }
             } else if ( jc instanceof JComboBox ) {
                 value= String.valueOf( ((JComboBox)jc).getSelectedItem() );
