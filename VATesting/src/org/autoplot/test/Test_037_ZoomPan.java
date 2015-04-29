@@ -22,7 +22,7 @@ import static org.virbo.autoplot.ScriptContext.*;
  * verify the zoom pan functions of the mousewheel.
  * @author jbf
  */
-public class Test_3pt7_ZoomPan implements Scenario {
+public class Test_037_ZoomPan implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
@@ -84,7 +84,7 @@ public class Test_3pt7_ZoomPan implements Scenario {
     }
 
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_3pt7_ZoomPan"};
+	String[] params = {"org.autoplot.test.Test_037_ZoomPan"};
 	org.netbeans.jemmy.Test.main(params);
     }
 }

@@ -22,7 +22,7 @@ import util.RegexComponentChooser;
  *
  * @author kenziemclouth
  */
-public class Test_5_FftFilter implements Scenario {
+public class Test_054_FftFilter implements Scenario {
     
     public int runIt(Object o) {
 
@@ -65,7 +65,7 @@ public class Test_5_FftFilter implements Scenario {
     }
     
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_5_FftFilter"};
+	String[] params = {"org.autoplot.test.Test_054_FftFilter"};
 	org.netbeans.jemmy.Test.main(params);
     }
 }

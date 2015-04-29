@@ -27,7 +27,7 @@ import util.RegexComponentChooser;
  *
  * @author mmclouth
  */
-public class Test_3pt9_OperationsCacheReset implements Scenario {
+public class Test_039_OperationsCacheReset implements Scenario {
     
      @Override
     public int runIt(Object o) {
@@ -95,16 +95,16 @@ public class Test_3pt9_OperationsCacheReset implements Scenario {
             
         return(0);
         } catch (InterruptedException ex) {
-            Logger.getLogger(Test_3pt9_OperationsCacheReset.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test_039_OperationsCacheReset.class.getName()).log(Level.SEVERE, null, ex);
             return(1);
         } catch (IOException ex) {
-            Logger.getLogger(Test_3pt9_OperationsCacheReset.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test_039_OperationsCacheReset.class.getName()).log(Level.SEVERE, null, ex);
             return(2);
         }
         
     }
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_3pt9_OperationsCacheReset"};
+	String[] params = {"org.autoplot.test.Test_039_OperationsCacheReset"};
 	org.netbeans.jemmy.Test.main(params);
     }
     

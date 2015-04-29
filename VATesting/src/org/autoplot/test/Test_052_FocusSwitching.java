@@ -34,7 +34,7 @@ import util.RegexComponentChooser;
  * https://sourceforge.net/p/autoplot/bugs/1375/
  * @author Jeremy Faden
  */
-public class Test_5pt2_FocusSwitching implements Scenario {
+public class Test_052_FocusSwitching implements Scenario {
     
     @Override
     public int runIt(Object o) {
@@ -90,10 +90,10 @@ public class Test_5pt2_FocusSwitching implements Scenario {
             return(0);
             
         } catch (IOException ex) {
-            Logger.getLogger(Test_5pt2_FocusSwitching.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test_052_FocusSwitching.class.getName()).log(Level.SEVERE, null, ex);
             return(2);
         } catch (InterruptedException ex) {
-            Logger.getLogger(Test_5pt2_FocusSwitching.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test_052_FocusSwitching.class.getName()).log(Level.SEVERE, null, ex);
             return(3);
         }
     }

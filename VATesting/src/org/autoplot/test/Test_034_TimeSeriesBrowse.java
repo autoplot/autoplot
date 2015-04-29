@@ -30,7 +30,7 @@ import util.RegexComponentChooser;
  *
  * @author jbf
  */
-public class Test_3pt4_TimeSeriesBrowse implements Scenario {
+public class Test_034_TimeSeriesBrowse implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
@@ -112,7 +112,7 @@ public class Test_3pt4_TimeSeriesBrowse implements Scenario {
     }
 
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_3pt4_TimeSeriesBrowse"};
+	String[] params = {"org.autoplot.test.Test_034_TimeSeriesBrowse"};
 	org.netbeans.jemmy.Test.main(params);
     }
 

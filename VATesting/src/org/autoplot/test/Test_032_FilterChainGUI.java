@@ -27,10 +27,10 @@ import static org.virbo.autoplot.ScriptContext.writeToPng;
 import util.RegexComponentChooser;
 
 /**
- *
+ * Test 3pt12
  * @author kenziemclouth
  */
-public class Test_3pt12_FilterChainGUI implements Scenario {
+public class Test_032_FilterChainGUI implements Scenario {
     
     @Override
     public int runIt(Object o) {
@@ -105,16 +105,16 @@ public class Test_3pt12_FilterChainGUI implements Scenario {
             
             return(0);
         } catch (InterruptedException ex) {
-            Logger.getLogger(Test_3pt12_FilterChainGUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test_032_FilterChainGUI.class.getName()).log(Level.SEVERE, null, ex);
             return(1);
         } catch (IOException ex) {
-            Logger.getLogger(Test_3pt12_FilterChainGUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test_032_FilterChainGUI.class.getName()).log(Level.SEVERE, null, ex);
             return(2);
         }
         
     }
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_3pt12_FilterChainGUI"};
+	String[] params = {"org.autoplot.test.Test_033_FilterChainGUI"};
 	org.netbeans.jemmy.Test.main(params);
     }
     

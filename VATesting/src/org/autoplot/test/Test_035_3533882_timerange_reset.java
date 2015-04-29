@@ -29,7 +29,7 @@ import static org.virbo.autoplot.ScriptContext.*;
  *
  * @author jbf
  */
-public class Test_3pt5_3533882_timerange_reset implements Scenario {
+public class Test_035_3533882_timerange_reset implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
@@ -88,7 +88,7 @@ public class Test_3pt5_3533882_timerange_reset implements Scenario {
     }
 
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_3pt5_3533882_timerange_reset"};
+	String[] params = {"org.autoplot.test.Test_035_3533882_timerange_reset"};
 	org.netbeans.jemmy.Test.main(params);
     }
 

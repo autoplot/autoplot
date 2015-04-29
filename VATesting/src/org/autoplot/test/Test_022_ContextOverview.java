@@ -26,7 +26,7 @@ import util.RegexComponentChooser;
  * Do a context overview and some zooming.
  * @author jbf
  */
-public class Test_2pt2_ContextOverview implements Scenario {
+public class Test_022_ContextOverview implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
@@ -126,7 +126,7 @@ public class Test_2pt2_ContextOverview implements Scenario {
     }
 
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_2pt2_ContextOverview"};
+	String[] params = {"org.autoplot.test.Test_022_ContextOverview"};
 	org.netbeans.jemmy.Test.main(params);
     }
 

@@ -6,7 +6,7 @@
 package org.autoplot.test;
 
 /**
- *
+ * Test 2.2
  * @author jbf
  */
 import org.netbeans.jemmy.*;

@@ -33,7 +33,7 @@ import util.RegexComponentChooser;
  *
  * @author kenziemclouth
  */
-public class Test_3pt1_MultiPanelPlot implements Scenario {
+public class Test_031_MultiPanelPlot implements Scenario {
     
         @Override
     public int runIt(Object o) {
@@ -175,16 +175,16 @@ public class Test_3pt1_MultiPanelPlot implements Scenario {
             
             return(0);
         } catch (InterruptedException ex) {
-            Logger.getLogger(Test_3pt1_MultiPanelPlot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test_031_MultiPanelPlot.class.getName()).log(Level.SEVERE, null, ex);
             return(1);
         } catch (IOException ex) {
-            Logger.getLogger(Test_3pt1_MultiPanelPlot.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test_031_MultiPanelPlot.class.getName()).log(Level.SEVERE, null, ex);
             return(2);
         }
     }
     
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_3pt1_MultiPanelPlot"};
+	String[] params = {"org.autoplot.test.Test_031_MultiPanelPlot"};
 	org.netbeans.jemmy.Test.main(params);
     }
     

@@ -19,7 +19,7 @@ import org.virbo.autoplot.dom.Application;
  * Demos new failure for ect-rept-sci-L3_20130915.
  * @author jbf
  */
-public class Test_4pt1_Lanl20140214b implements Scenario {
+public class Test_041_Lanl20140214b implements Scenario {
     
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
@@ -75,7 +75,7 @@ public class Test_4pt1_Lanl20140214b implements Scenario {
     }
 
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_4pt1_Lanl20140214b"};
+	String[] params = {"org.autoplot.test.Test_041_Lanl20140214b"};
         Util.setLAF();
 	org.netbeans.jemmy.Test.main(params);
     }
