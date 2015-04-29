@@ -15,13 +15,16 @@
         </p>
 
         <p>This is the Autoplot2015a branch.  This is an update to the production version containing bugfixes and minor new features.
-            Java 6 is now required.  Java 7 will be required in May!
+            Java 6 is now required.  Java 7 will be required in May!  Java 8 will be required
+            sometime soon.
         </p>
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-04-26 r16756):</p>
+        <p>Bugfixes (2015-04-26 r16761):</p>
         <ul>
+            <li>1381: correct the number of bins reported when DEPEND_2 is rank 2</li>
+            <li>bugfix: correct place where blurTsbURI can return null.</li>
             <li>1377: corrections and clarifications with inline editor panel and URIs.</li>
             <li>1376: RTE caused by inline URI very hard to diagnose in script.</li>
             <li>QStreams with just one rank 2 dataset would flatten the QDataSet to rank 1 mistakenly.</li>
