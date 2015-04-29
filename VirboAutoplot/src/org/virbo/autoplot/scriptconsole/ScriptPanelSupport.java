@@ -361,6 +361,7 @@ public class ScriptPanelSupport {
         if (ex instanceof PySyntaxError) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
+            //String filename= String.valueOf( (ex.value.__getitem__(1).__getitem__(3)) );
             //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
             annotationsSupport.annotateLine(lineno, "error", ex.toString(),interp);
         } else {
