@@ -1029,6 +1029,8 @@ public class JythonUtil {
      public static List<Param> getGetParams( Map<String,Object> env, String script, Map<String,String>params ) throws PyException {        
         String prog= simplifyScriptToGetParams(script, true);  // removes calls to slow methods, and gets the essence of the controls of the script.
 
+        logger.log(Level.FINER, "Simplified script: {0}", prog);
+        
         PythonInterpreter interp;
         try {
             interp= createInterpreter(true);         
