@@ -269,10 +269,10 @@ public class VOTableReader {
                     monitor.setProgressMessage("reading data");
                     state= STATE_DATA;
                     dataSetBuilder= new DataSetBuilder( 2, 100, nelements );
-                } else if ( localName.equals("TR") && state.equals(STATE_DATA) ) {
+                } else if ( localName.equalsIgnoreCase("TR") && state.equals(STATE_DATA) ) {
                     state= STATE_RECORD;
                     index= 0;
-                } else if ( localName.equals("TD") && state.equals(STATE_RECORD) ) {
+                } else if ( localName.equalsIgnoreCase("TD") && state.equals(STATE_RECORD) ) {
                     state= STATE_FIELD;
                     valueBuilder.delete(0, valueBuilder.length() );
                 }
@@ -280,7 +280,7 @@ public class VOTableReader {
 
             @Override
             public void endElement(String uri, String localName, String qName) throws SAXException {
-                if ( localName.equals("TD") ) {
+                if ( localName.equalsIgnoreCase("TD") ) {
                     assert state.equals(STATE_FIELD);
                     String s= valueBuilder.toString();
                     //logger.finest( "index:"+index+ " s:"+s );
@@ -334,7 +334,7 @@ public class VOTableReader {
                     if ( nrec % 1000 == 0 ) {
                         monitor.setProgressMessage("reading data, "+nrec+" records");
                     }
-                } else if ( localName.equals("TR") ) {
+                } else if ( localName.equalsIgnoreCase("TR") ) {
                     assert state.equals(STATE_RECORD);
                     dataSetBuilder.nextRecord();
                     state= STATE_DATA;
