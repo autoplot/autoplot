@@ -56,7 +56,7 @@ import org.virbo.datasource.AutoplotSettings;
  * in UT, not the local time.
  * 
  * This useful dialog needs to be rewritten.  
- * See https://sourceforge.net/tracker/index.php?func=detail&aid=3609545&group_id=199733&atid=970682
+ * See https://sourceforge.net/p/autoplot/bugs/1019/
  * @author jbf
  */
 public class RecentUrisGUI extends javax.swing.JPanel {
@@ -276,6 +276,11 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                             continue; // RTE rte_1707706522_20110907_150419_Terrance*.xml
                         }
                         try {
+                            String suri= ss[1];
+                            if ( suri.startsWith("file://" ) && suri.length()>7 && suri.charAt(7)!='/' ) { // kludge for Windows
+                                suri= "file:/" + suri.substring(7);
+                                ss[1]= suri;
+                            }
                             if ( filtPattern!=null && !filtPattern.matcher(ss[1]).find() ) {
                                 continue;
                             }
