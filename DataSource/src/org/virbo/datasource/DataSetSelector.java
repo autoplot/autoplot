@@ -1693,6 +1693,9 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         if ( val==null ) {
             return "";
         } else {
+            if ( val.startsWith("file://" ) && val.length()>7 && val.charAt(7)!='/' ) { // kludge for Windows
+                val= "file:/" + val.substring(7); //https://sourceforge.net/p/autoplot/bugs/1383/
+            }
             return val.trim();
         }
     }
