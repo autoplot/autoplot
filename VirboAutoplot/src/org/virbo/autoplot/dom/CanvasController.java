@@ -805,7 +805,7 @@ public class CanvasController extends DomNodeController {
         boolean doDecorate= true;
         if ( doDecorate ) {
             logger.log(Level.FINER, "create decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
-            SwingUtilities.invokeLater(  new Runnable() {
+            Runnable run= new Runnable() {
                 @Override
                 public void run() {
                     logger.log(Level.FINER, "add decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
@@ -821,7 +821,13 @@ public class CanvasController extends DomNodeController {
                     clearSelectionTimer.setRepeats(false);
                     clearSelectionTimer.restart();
                 }
-            } );
+            };
+            SwingUtilities.invokeLater( run );
+            //if ( SwingUtilities.isEventDispatchThread() ) {
+            //    run.run();
+            //} else {
+            //    SwingUtilities.invokeLater( run );
+            //}
             logger.log(Level.FINER, "highlite selection in {0}ms", (System.currentTimeMillis()-t1));
         }
 
