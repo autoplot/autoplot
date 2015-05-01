@@ -334,7 +334,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                     // transitional case.  TODO: thread locking would presumably fix this.  
                 }
             }
-            
+
             // if there's just one plotElement in the plot, then go ahead and set the focus uri.
             List<PlotElement> ps = ApplicationController.this.getPlotElementsFor(domPlot);
             if ( p==null && ps.size() == 1) {
@@ -350,14 +350,14 @@ public class ApplicationController extends DomNodeController implements RunLater
                     }
                 }
             }
-
-            setPlot(domPlot);
-
+            
+            final Plot fdomPlot= domPlot;
+            final PlotElement fp;
             if (p != null) {
                 logger.log(Level.FINE, "focus due to plot getting focus: {0}", p);
                 setFocusUri( getFocusUriFor( p ) );
+                fp= p;
                 if ( getPlotElement()!=p ) { 
-                    setPlotElement(p);
                     setStatus("" + domPlot + ", " + p + " selected");
                     if ( ApplicationController.this.getApplication().getPlotElements().length>1 ) {  // don't flash single plot.
                         Canvas c= getCanvas();
@@ -366,7 +366,18 @@ public class ApplicationController extends DomNodeController implements RunLater
                 }
             } else {
                 setStatus("" + domPlot + " selected");
+                fp= null;
             }
+
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    setPlot(fdomPlot);
+                    if ( fp!=null ) setPlotElement(fp);
+                }
+            };
+            new Thread(run,"focusPlot").start();
+            
             LoggerManager.logExitGuiEvent(e);
         }
     };
@@ -2488,6 +2499,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         return plot;
     }
 
+    /**
+     * This can take a while and should not be called on the event thread.
+     * @param plot 
+     */
     public void setPlot(Plot plot) {
         Plot oldPlot = this.plot;
         if ( SwingUtilities.isEventDispatchThread() && ( oldPlot!=plot ) ) {
