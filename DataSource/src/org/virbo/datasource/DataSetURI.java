@@ -608,7 +608,12 @@ public class DataSetURI {
      * @return 
      */
     public static String fromFile( File file ) {
-        return "file://"+file.getAbsolutePath().replaceAll("\\\\","/");
+        String s= file.getAbsolutePath().replaceAll("\\\\","/");
+        if ( s.length()>0 && s.charAt(0)!='/' ) {
+            return "file:///"+s; // Windows C:/tmp/myfile.vap
+        } else {
+            return "file://"+s;
+        }
     }
 
     /**
