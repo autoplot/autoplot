@@ -771,6 +771,8 @@ public class CanvasController extends DomNodeController {
             public void paint(Graphics2D g) {
                 long t0= System.currentTimeMillis();
                 
+                logger.log(Level.FINER,"enter paint decorator");
+                
                 // note it's non-trivial to apply transforms as the plot moves.
                 if ( dasCanvas.lisPaintingForPrint() ) {
                     logger.fine("not painting select");
