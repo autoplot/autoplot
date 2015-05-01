@@ -471,7 +471,7 @@ public class LogConsole extends javax.swing.JPanel {
             MutableAttributeSet highlistAttr = new SimpleAttributeSet();
             StyleConstants.setBackground(highlistAttr, Color.ORANGE);
             
-            long t = n == 0 ? 0 : lrecords.get(0).getMillis();
+            long t = n == 0 ? 0 : lrecords.get(n-1).getMillis();
             
             for (LogRecord rec : lrecords) {
                 if (rec.getLevel().intValue() >= level) {
@@ -690,7 +690,7 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 } else {
                     BufferedWriter write= new BufferedWriter( new OutputStreamWriter(fo) );
                     if ( copy.size()>0 ) {
-                        long t= copy.get(0).getMillis();
+                        long t= copy.get(copy.size()-1).getMillis();
                         for ( LogRecord rec: copy ) {
                             if (rec.getLevel().intValue() >= level) {        
                                 String recMsg= getRecMsg(t,rec);
