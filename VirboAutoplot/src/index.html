@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>An ancient bug where the context overview would mess up the menus is finally fixed.
+        <p><small>A year one bug where the context overview would mess up the menus is finally fixed.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,11 +21,13 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-04-30 r16770):</p>
+        <p>Bugfixes (2015-05-01 r16778):</p>
         <ul>
+            <li>1383: double slash in history on Windows</li>
+            <li>1387: vertical slicer should keep labels</li>
             <li>context overview doesn't mess up the menus like it has done since 2008.</li>
             <li>1385: VOTables contained lower case tr tags, where the parser assumed they would be upper case.</li>
-            <li>1381: rebin propogates the labels and units.</li>
+            <li>1381: rebin propagates the labels and units.</li>
             <li>1380: correct the number of bins reported when DEPEND_2 is rank 2</li>
             <li>bugfix: correct place where blurTsbURI can return null.</li>
             <li>1377: corrections and clarifications with inline editor panel and URIs.</li>
