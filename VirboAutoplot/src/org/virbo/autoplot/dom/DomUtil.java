@@ -720,7 +720,7 @@ public class DomUtil {
                 while ( i3>-1 ) {
                     String propName1= propName.substring(0,i3);
                     props1= (Map<String, Object>) props.get(propName1);
-                    propName= propName1;
+                    propName= propName.substring(i3+1);
                     i3= propName.indexOf(".");
                 }
                 String prop= String.valueOf( props1.get(propName) );
