@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.autoplot.dom;
 
@@ -19,6 +15,7 @@ public class PlotElementControllerUtil {
      * return the DatumRange for the plot element's data.  When there is a
      * TimeSeriesBrowse, this is it's timerange, otherwise it comes from
      * the data.  If none is found, then null is returned.
+     * @param dom
      * @param pe
      * @return the DatumRange or null.
      */
@@ -44,8 +41,6 @@ public class PlotElementControllerUtil {
             }
 
         }
-
-
 
     }
 }
