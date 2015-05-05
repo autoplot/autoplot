@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2793,78 +2794,14 @@ public class PlotElementController extends DomNodeController {
      * special converter that fills in %{CONTEXT} macro, or inserts it when 
      * label is consistent with macro.  Also now does %{COMPONENT}.  Note
      * this won't do both right now.
-     * @return
+     * @return JavaBeans property converter.
      */
     private Converter getLabelConverter() {
-        return new Converter() {
-            @Override
-            public Object convertForward(Object value) {
-                String title= (String)value;
-                if ( title.contains("CONTEXT" ) ) {
-                    if ( plotElement!=null ) {
-                        if ( dataSet!=null ) {
-                            String contextStr= DataSetUtil.contextAsString(dataSet);
-                            title= insertString( title, "CONTEXT", contextStr );
-                        }
-                    }
-                }
-                if ( title.contains("USER_PROPERTIES" ) ) {
-                    if ( plotElement!=null ) {
-                        if ( dataSet!=null ) {
-                            Map<String,Object> props= (Map<String, Object>) dataSet.property(QDataSet.USER_PROPERTIES);
-                            title= DomUtil.resolveProperties( title, "USER_PROPERTIES", props );
-                        }
-                    }
-                }
-                if ( title.contains("METADATA" ) ) {
-                    if ( plotElement!=null ) {
-                        if ( dataSet!=null ) {
-                            DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, plotElement.getDataSourceFilterId() );
-                            if ( dsf!=null ) { // ought not to be!
-                                Map<String,Object> props= (Map<String, Object>) dsf.getController().getRawProperties(); //TODO: this is a really old name that needs updating...
-                                title= DomUtil.resolveProperties( title, "METADATA", props );
-                            }
-                        }
-                    }
-                }
-                if ( title.contains("TIMERANGE") ) {
-                    DatumRange tr= PlotElementControllerUtil.getTimeRange( dom, plotElement );
-                    if ( tr==null ) {
-                        title= insertString( title, "TIMERANGE", "(no timerange)" );
-                    } else {
-                        title= insertString( title, "TIMERANGE",tr.toString() );
-                    }
-                }
-                //logger.fine("<--"+value + "-->"+title );
-                //see convertReverse, which must be done as well.
-                if ( title.contains("COMPONENT") ) {
-                    String ss="";
-                    if ( plotElement!=null ) {
-                        ss= plotElement.getComponent();
-                    }
-                    title= insertString( title, "COMPONENT", ss );
-                }
-                return title;
-            }
-
-            @Override
-            public Object convertReverse(Object value) {
-                String title= (String)value;
-                String ptitle=  plotElement.getLegendLabel();
-                if ( containsString( ptitle, "CONTEXT", title) ) {
-                    title= ptitle;
-                } else if ( ptitle.contains( "%{USER_PROPERTIES" ) ) { //kludgy
-                    title= ptitle;
-                } else if ( ptitle.contains( "%{METADATA" ) ) { //kludgy
-                    title= ptitle;
-                } else if ( containsString( ptitle, "TIMERANGE", title ) ) {
-                    title= ptitle;
-                } else if ( containsString( ptitle, "COMPONENT", title ) ) {
-                    title= ptitle;
-                }
-                return title;
-            }
-        };
+        LabelConverter r= new LabelConverter();
+        r.plotElement= this.plotElement;
+        r.plot= null;
+        r.dom= dom;
+        return r;
     }
 
     @Override
