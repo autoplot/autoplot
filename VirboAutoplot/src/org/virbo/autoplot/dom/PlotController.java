@@ -62,7 +62,8 @@ public class PlotController extends DomNodeController {
     Plot plot;
     private DasPlot dasPlot;
     private DasColorBar dasColorBar;
-    
+    private LabelConverter titleConverter;
+            
     /**
      * if the user clicks on the axis "previous" button, which interval should 
      * be shown.
@@ -606,7 +607,7 @@ public class PlotController extends DomNodeController {
 
         ac.bind(this.plot, Plot.PROP_VISIBLE, dasPlot1, "visible" );
         ac.bind(this.plot, Plot.PROP_COLORTABLE, colorbar, "type" );
-        
+
         dasPlot1.addPropertyChangeListener(listener);
         dasPlot1.getXAxis().addPropertyChangeListener(listener);
         dasPlot1.getYAxis().addPropertyChangeListener(listener);
@@ -925,39 +926,13 @@ public class PlotController extends DomNodeController {
     private PropertyChangeListener plotElementDataSetListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            String contextStr;
-            String shortContextStr;
             if ( plotElement==null ) {
                 System.err.println("whoops, getting there");
                 return;
             }
+            dasPlot.setTitle( (String)titleConverter.convertForward( plot.getTitle() ) );
             QDataSet pds= plotElement.getController().getDataSet();
             logger.log( Level.FINE, "{0} dataSetListener", plot);
-            if ( pds!=null ) {
-                contextStr= DataSetUtil.contextAsString(pds);
-                shortContextStr= contextStr;
-                if ( !contextStr.equals("") ) {
-                    String[] ss= contextStr.split("=");
-                    if ( ss.length==2 ) {
-                        shortContextStr= ss[1];
-                    }
-                }
-            } else {
-                contextStr= "";
-                shortContextStr= "";
-            }
-            if ( plot.getTitle().contains("CONTEXT" ) ) {
-                String title= insertString( plot.getTitle(), "CONTEXT", contextStr );
-                dasPlot.setTitle(title);
-            }
-            if ( plot.getYaxis().getLabel().contains("CONTEXT") ) {
-                String title= insertString( plot.getYaxis().getLabel(), "CONTEXT", shortContextStr );
-                dasPlot.getYAxis().setLabel(title);
-            }
-            if ( plot.getXaxis().getLabel().contains("CONTEXT") ) {
-                String title= insertString( plot.getXaxis().getLabel(), "CONTEXT", shortContextStr );
-                dasPlot.getXAxis().setLabel(title);
-            }
             updateNextPrevious( plot.getXaxis().getRange(), pds );
         }
     };
@@ -1512,41 +1487,6 @@ public class PlotController extends DomNodeController {
     }
 
 
-    /**
-     * TODO: this is really confusing, because the plot has a CONTEXT property and the
-     * there's DataSetUtil.contextAsString(ds).
-     */
-    Converter contextConverter= new Converter() {
-        @Override
-        public Object convertForward(Object value) {
-            String title= (String)value;
-            if ( title.contains("%{CONTEXT}" ) ) {
-                String contextStr="";
-                if ( plotElement!=null && plotElement.getController()!=null ) {
-                    QDataSet ds= plotElement.getController().getDataSet();
-                    if ( ds!=null ) {
-                        contextStr= DataSetUtil.contextAsString(ds);
-                    }
-                }
-                title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
-            }
-            return title;
-        }
-
-        @Override
-        public Object convertReverse(Object value) {
-            String title= (String)value;
-            String ptitle=  plot.getTitle();
-            if (ptitle.contains("%{CONTEXT}") ) {
-                String[] ss= ptitle.split("%\\{CONTEXT\\}",-2);
-                if ( title.startsWith(ss[0]) && title.endsWith(ss[1]) ) {
-                    return ptitle;
-                }
-            }
-            return title;
-        }
-    };
-
     Converter labelContextConverter( final Axis axis ) {
         return new Converter() {
             @Override
@@ -1588,7 +1528,10 @@ public class PlotController extends DomNodeController {
 
     private synchronized void bindTo(DasPlot p) {
         ApplicationController ac= dom.controller;
-        ac.bind( this.plot, Plot.PROP_TITLE, p, DasPlot.PROP_TITLE, contextConverter ); // %{CONTEXT} indicates the DataSet CONTEXT property, not the control.
+        titleConverter= new LabelConverter();
+        titleConverter.dom= dom;
+        titleConverter.plot= plot;
+        ac.bind( this.plot, Plot.PROP_TITLE, p, DasPlot.PROP_TITLE, titleConverter );
         ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT );
         ac.bind( this.plot, Plot.PROP_ISOTROPIC, p, DasPlot.PROP_ISOTROPIC );
         ac.bind( this.plot, Plot.PROP_DISPLAYTITLE, p, DasPlot.PROP_DISPLAYTITLE );
