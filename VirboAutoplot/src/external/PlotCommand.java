@@ -18,6 +18,7 @@ import org.das2.datum.Units;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PlotSymbol;
 import org.python.core.Py;
+import org.python.core.PyFloat;
 import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
@@ -33,6 +34,7 @@ import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Row;
 import org.virbo.dataset.QDataSet;
 import org.virbo.jythonsupport.JythonOps;
+import org.virbo.jythonsupport.PyQDataSet;
 
 /**
  * new implementation of the plot command allows for keywords in the
@@ -313,18 +315,32 @@ public class PlotCommand extends PyObject {
                 } else if ( kw.equals("zlog") ) {
                     plot.getZaxis().setLog( "1".equals(sval) );
                 } else if ( kw.equals("color" ) ) {
-                    if ( sval!=null ) {
-                       Color c;
-                       try {
-                           c= Color.decode( sval );
-                       } catch ( NumberFormatException ex ) {
-                           c= (Color)getEnumElement( Color.class, sval );
-                       }
-                       if ( c!=null ) {
-                           elements.get(0).getStyle().setColor( c );
-                       } else {
-                           throw new IllegalArgumentException("unable to identify color: "+sval);
-                       }
+                    if ( val.__tojava__(Color.class)!=Py.NoConversion ) {
+                        Color c= (Color) val.__tojava__(Color.class);
+                        elements.get(0).getStyle().setColor( c );
+                    } else if ( val instanceof PyFloat ) {
+                        Color c= new Color( (int)((PyFloat)val).getValue() );
+                        elements.get(0).getStyle().setColor( c );
+                    } else if ( val instanceof PyInteger ) {
+                        Color c= new Color( ((PyInteger)val).getValue() );
+                        elements.get(0).getStyle().setColor( c );
+                    } else if ( val instanceof PyQDataSet ) {
+                        Color c= new Color( (int)((PyQDataSet)val).getQDataSet().value() );
+                        elements.get(0).getStyle().setColor( c );
+                    } else {
+                        if ( sval!=null ) {
+                           Color c;
+                           try {
+                               c= Color.decode( sval );
+                           } catch ( NumberFormatException ex ) {
+                               c= (Color)getEnumElement( Color.class, sval );
+                           }
+                           if ( c!=null ) {
+                               elements.get(0).getStyle().setColor( c );
+                           } else {
+                               throw new IllegalArgumentException("unable to identify color: "+sval);
+                           }
+                        }
                     }
                 } else if ( kw.equals("fillColor" ) ) { // because you can specify renderType=stairSteps, we need fillColor.
                     if ( sval!=null ) {
