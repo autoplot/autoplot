@@ -1722,6 +1722,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             //bc.unbind();
             bind( application, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
 
+            c.controller.getDasCanvas().removeBottomDecorators();
+            c.controller.getDasCanvas().removeTopDecorators();
+                    
             // reset das2 stuff which may be in a bad state.  This must be done on the event thread.
             Runnable run= new Runnable() {
                 @Override
