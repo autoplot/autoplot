@@ -22,6 +22,7 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 import jsyntaxpane.components.Markers;
 import jsyntaxpane.components.Markers.SimpleMarker;
+import org.python.core.PyJavaInstance;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.util.PythonInterpreter;
@@ -410,7 +411,11 @@ public class EditorAnnotationsSupport {
                 if ( peek.startsWith("<html>" ) ) {
                     return peek;
                 } else {
-                    return expr+"="+peek;
+                    if ( po instanceof PyJavaInstance ) {
+                        return "<html>"+expr+"="+peek+"<br>"+((PyJavaInstance)po).instclass.safeRepr();
+                    } else {
+                        return "<html>"+expr+"="+peek+"<br>"+po.getType();
+                    }
                 }
             } else {
                 return "Interpreter is not active";
