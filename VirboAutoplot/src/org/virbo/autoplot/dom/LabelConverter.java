@@ -25,9 +25,11 @@ public class LabelConverter extends Converter {
     PlotElement plotElement;
     Plot plot;
     Application dom;
+    boolean multiplePEWarning= false;
     
     private PlotElement getFocusPlotElement() {
         PlotElement pe;
+        multiplePEWarning= false;
         if ( plotElement!=null ) {
             pe= plotElement;
         } else {
@@ -37,8 +39,8 @@ public class LabelConverter extends Converter {
             } else if ( pes.isEmpty() ) {
                 pe= null;
             } else {
-                logger.warning("multiple plot elements found, using first");
                 pe= pes.get(0);
+                multiplePEWarning= true;
             }
         }
         return pe;
@@ -96,6 +98,10 @@ public class LabelConverter extends Converter {
             title= insertString( title, "COMPONENT", ss );
         }
         
+        if ( multiplePEWarning && ! title.equals(value) ) {
+            logger.fine("multiple plot elements found, using first");
+        }
+        
         return title;
     }
 
@@ -121,6 +127,10 @@ public class LabelConverter extends Converter {
             title= ptitle;
         } else if ( containsString( ptitle, "COMPONENT", title ) ) {
             title= ptitle;
+        }
+        
+        if ( multiplePEWarning && !title.equals(value) ) {
+            logger.fine("multiple plot elements found, using first");              
         }
         return title;
     }
