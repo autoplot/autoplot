@@ -37,7 +37,7 @@ public class LabelConverter extends Converter {
             } else if ( pes.isEmpty() ) {
                 pe= null;
             } else {
-                logger.warning("multple plot elements found, using first");
+                logger.warning("multiple plot elements found, using first");
                 pe= pes.get(0);
             }
         }
