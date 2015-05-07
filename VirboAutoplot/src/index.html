@@ -23,6 +23,10 @@
 
         <p>Bugfixes (2015-05-02 r16788):</p>
         <ul>
+            <li>TickCurveRenderer code that detected breaks initializes properly now.</li>
+            <li>reset() method clears top and bottom decorators as well.</li>
+            <li>top and bottom decorator access is thread-safe</li>
+            <li>1392: reducex GUI resets with "60s"</li>
             <li>Slice filter GUI now supports slice at time or Datum.</li>
             <li>1383: double slash in history on Windows</li>
             <li>1387: vertical slicer should keep labels</li>
@@ -93,6 +97,12 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add (µs) as a unit.</li>
+            <li>UTC is allowed where units are found, so that times can be explicitly parsed as such.</li>
+            <li>plotx color keyword parameter can now be a float, int, rank 0 dataset, or Color.</li>
+            <li>426: extract macro converter logic, and make plot title and plotElement label macros consistent.</li>
+            <li>426: support macros for METADATA and USER_PROPERTIES, like %{METADATA.GlobalAttributes.Mission_group}</li>
+            <li>putProperty( ds, QDataSet.USER_PROPERTIES, PyDict )</li>
             <li>stairSteps mode doesn't show dot plot symbols, to better support histograms.</li>
             <li>add more shortcuts to jython editor, and screen showing shortcuts.</li>
             <li>applot.py matured and improves support for SciPy.</li>
