@@ -1106,13 +1106,16 @@ public class DataSetURI {
             boolean fail= true;
             InputStream in=null;
             try {
+                Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
                 mon.setProgressMessage("downloading "+url);
                 mon.started();
                 logger.log(Level.FINEST,"downloadResourceAsTempFile-> transfer");
                 logger.log(Level.FINE, "reading URL {0}", url);
+                loggerUrl.log(Level.FINE,"openConnection {0}", url);
                 URLConnection urlc= url.openConnection();
                 urlc.setRequestProperty("Accept-Encoding", "gzip"); // RFE
                 urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() ); // Reiner describes hang at LANL
+                loggerUrl.log(Level.FINE,"getInputStream {0}", url);
                 in= urlc.getInputStream();
                 Map<String, List<String>> headers = urlc.getHeaderFields();
                 List<String> contentEncodings=headers.get("Content-Encoding");
