@@ -2025,6 +2025,7 @@ APSplash.checkTime("init 52.9");
             toolsManager= new BookmarksManager(AutoplotUI.this, false, "Tools");
             toolsManager.setTitle("Tools Manager");
             toolsManager.setPrefNode("tools");
+            //toolsManager.
 
             Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, applicationModel, BeanProperty.create( "tools" ), toolsManager.getModel(), BeanProperty.create("list")); 
             b.bind();
@@ -4745,10 +4746,10 @@ APSplash.checkTime("init 240");
         File booksDir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
         
         if ( !toolsDir.exists() ) {
-            if ( !toolsDir.mkdir() ) {
-                logger.log(Level.WARNING, "unable to mkdir tools folder: {0}", toolsDir);
-            }
+            // don't import old tools if they don't exist.
+            return Collections.emptyList();
         }
+        
         if ( booksDir.exists() ) {
             File toolsFile= new File( booksDir, "tools.xml" );
             if ( toolsFile.exists() ) {
@@ -4794,6 +4795,16 @@ APSplash.checkTime("init 240");
                         tools.add(book);
                     }   
                 }
+                
+                try {
+                    URL url = new URL("http://autoplot.org/data/tools.xml");
+                    Document doc = AutoplotUtil.readDoc(url.openStream());
+                    List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
+                    tools.addAll(importBook);
+                } catch ( Exception ex ) {
+                    ex.printStackTrace();
+                }
+            
                 FileOutputStream fout=null;
                 try {
                     fout= new FileOutputStream(toolsFile);
