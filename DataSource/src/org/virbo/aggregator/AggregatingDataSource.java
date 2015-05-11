@@ -67,7 +67,8 @@ import org.virbo.dsutil.Reduction;
  * data server.
  * 
  * The result of this is not guaranteed to be monotonically increasing in 
- * time.  See 
+ * time.  See https://sourceforge.net/p/autoplot/bugs/1326/
+ * 
  * @author jbf
  */
 public final class AggregatingDataSource extends AbstractDataSource {
@@ -671,6 +672,10 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     }
                 }
 
+                if ( true ) {
+                    System.gc(); // bug 1395: where NIO direct memory can run out because Java GC hasn't run finalize on old classes.
+                }
+                
             }
 
             mon.finished();
