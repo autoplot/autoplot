@@ -1562,6 +1562,23 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                 }
                 
                 List<Bookmark> book= Bookmark.parseBookmarks(buff.toString(),depth);
+                
+                if ( book.isEmpty() && nodeName.equals("tools") ) {
+                    URL url = new URL(defaultUrl); // TODO: this is on the event thread!
+                    Document doc;
+                    InputStream ins=null;
+                    try {
+                        ins= url.openStream();
+                        doc = AutoplotUtil.readDoc(ins);
+                        List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
+                        book.addAll(importBook);                
+                    } catch (ParserConfigurationException ex) {
+                        Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                    } finally {
+                        if ( ins!=null ) ins.close();
+                    }
+                }
+                
                 model.setList(book);
 
                 boolean unresolved;
