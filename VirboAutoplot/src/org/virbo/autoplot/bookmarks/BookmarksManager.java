@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -1568,7 +1569,11 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                     Document doc;
                     InputStream ins=null;
                     try {
-                        ins= url.openStream();
+                        URLConnection urlc= url.openConnection();
+                        urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() );
+                        urlc.setReadTimeout( FileSystem.settings().getConnectTimeoutMs() );
+                        ins= urlc.getInputStream();
+                        
                         doc = AutoplotUtil.readDoc(ins);
                         List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
                         book.addAll(importBook);                
