@@ -1523,7 +1523,11 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
      */
     public void setPrefNode( String nodeName ) {
         
-        defaultUrl= AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://autoplot.org/data/demos.xml");
+        if ( nodeName.equals("bookmarks") ) {
+            defaultUrl= AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://autoplot.org/data/demos.xml");
+        } else {
+            defaultUrl= AutoplotUtil.getProperty("autoplot.default."+nodeName, "http://autoplot.org/data/"+nodeName+".xml");
+        }
         
         prefNode= nodeName;
         
