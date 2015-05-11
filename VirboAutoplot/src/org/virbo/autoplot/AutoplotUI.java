@@ -4796,13 +4796,21 @@ APSplash.checkTime("init 240");
                     }   
                 }
                 
+                InputStream ins=null;
                 try {
                     URL url = new URL("http://autoplot.org/data/tools.xml");
-                    Document doc = AutoplotUtil.readDoc(url.openStream());
+                    ins= url.openStream();
+                    Document doc = AutoplotUtil.readDoc(ins);
                     List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
                     tools.addAll(importBook);
                 } catch ( Exception ex ) {
-                    ex.printStackTrace();
+                    logger.log(Level.SEVERE,null,ex);
+                } finally {
+                    if ( ins!=null ) try {
+                        ins.close();
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
                 }
             
                 FileOutputStream fout=null;
