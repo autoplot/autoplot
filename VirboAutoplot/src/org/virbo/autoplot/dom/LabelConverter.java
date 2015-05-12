@@ -51,51 +51,83 @@ public class LabelConverter extends Converter {
         PlotElement pe= getFocusPlotElement();
         
         String title= (String)value;
-        if ( title.contains("CONTEXT" ) ) {
-            if ( pe!=null ) {
-                QDataSet dataSet= pe.getController().getDataSet();
-                if ( dataSet!=null ) {
-                    String contextStr= DataSetUtil.contextAsString(dataSet);
-                    title= insertString( title, "CONTEXT", contextStr );
-                }
-            }
-        }
-        if ( title.contains("USER_PROPERTIES" ) ) {
-            if ( pe!=null ) {
-                QDataSet dataSet= pe.getController().getDataSet();
-                if ( dataSet!=null ) {
-                    Map<String,Object> props= (Map<String, Object>) dataSet.property(QDataSet.USER_PROPERTIES);
-                    title= DomUtil.resolveProperties( title, "USER_PROPERTIES", props );
-                }
-            }
-        }
+        boolean done= false;
         
-        if ( title.contains("METADATA" ) ) {
-            if ( pe!=null ) {
-                DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, pe.getDataSourceFilterId() );
-                if ( dsf!=null ) { // ought not to be!
-                    Map<String,Object> props= (Map<String, Object>) dsf.getController().getRawProperties(); //TODO: this is a really old name that needs updating...
-                    title= DomUtil.resolveProperties( title, "METADATA", props );
+        while ( !done ) {
+            int unresolvedIndex= title.indexOf("%{");
+            
+            if ( title.contains("CONTEXT" ) ) {
+                if ( pe!=null ) {
+                    QDataSet dataSet= pe.getController().getDataSet();
+                    if ( dataSet!=null ) {
+                        String contextStr= DataSetUtil.contextAsString(dataSet);
+                        title= insertString( title, "CONTEXT", contextStr );
+                    }
                 }
             }
-        }
-                
-        if ( title.contains("TIMERANGE") ) {
-            DatumRange tr= PlotElementControllerUtil.getTimeRange( dom, pe );
-            if ( tr==null ) {
-                title= insertString( title, "TIMERANGE", "(no timerange)" );
-            } else {
-                title= insertString( title, "TIMERANGE",tr.toString() );
+            if ( title.contains("USER_PROPERTIES" ) ) {
+                if ( pe!=null ) {
+                    QDataSet dataSet= pe.getController().getDataSet();
+                    if ( dataSet!=null ) {
+                        Map<String,Object> props= (Map<String, Object>) dataSet.property(QDataSet.USER_PROPERTIES);
+                        title= DomUtil.resolveProperties( title, "USER_PROPERTIES", props );
+                    }
+                }
             }
-        }
-        //logger.fine("<--"+value + "-->"+title );
-        //see convertReverse, which must be done as well.
-        if ( title.contains("COMPONENT") ) {
-            String ss="";
-            if ( pe!=null ) {
-                ss= pe.getComponent();
+
+            if ( title.contains("METADATA" ) ) {
+                if ( pe!=null ) {
+                    DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, pe.getDataSourceFilterId() );
+                    if ( dsf!=null ) { // ought not to be!
+                        Map<String,Object> props= (Map<String, Object>) dsf.getController().getRawProperties(); //TODO: this is a really old name that needs updating...
+                        title= DomUtil.resolveProperties( title, "METADATA", props );
+                    }
+                }
             }
-            title= insertString( title, "COMPONENT", ss );
+            if ( title.contains("{PROPERTIES" ) ) {  // ${PROPERTIES.DEPEND_0.UNITS}
+                if ( pe!=null ) {
+                    QDataSet dataSet= pe.getController().getDataSet();
+                    int i1= title.indexOf("{PROPERTIES")+12; // 12 includes the dot following
+                    int i2= title.indexOf("}",i1);
+                    String prop= title.substring(i1,i2);
+                    String[] ss= prop.split("\\.",-2);
+                    Object o=null;
+                    if ( dataSet!=null ) {
+                        for (String s : ss) {
+                            o = dataSet.property(s);
+                            if ( o instanceof QDataSet ) {
+                                dataSet= (QDataSet)o;
+                            }
+                            if ( o==null ) break;
+                        }
+                    }
+                    if ( o==null ) o="";
+                    title= insertString( title, title.substring(i1-11,i2), o.toString() );
+                }
+            }
+
+            if ( title.contains("TIMERANGE") ) {
+                DatumRange tr= PlotElementControllerUtil.getTimeRange( dom, pe );
+                if ( tr==null ) {
+                    title= insertString( title, "TIMERANGE", "(no timerange)" );
+                } else {
+                    title= insertString( title, "TIMERANGE",tr.toString() );
+                }
+            }
+            //logger.fine("<--"+value + "-->"+title );
+            //see convertReverse, which must be done as well.
+            if ( title.contains("COMPONENT") ) {
+                String ss="";
+                if ( pe!=null ) {
+                    ss= pe.getComponent();
+                }
+                title= insertString( title, "COMPONENT", ss );
+            }
+            
+            int newUnresolvedIndex= title.indexOf("%{");
+            
+            done= ( newUnresolvedIndex==-1 || newUnresolvedIndex==unresolvedIndex );
+            
         }
         
         if ( multiplePEWarning && ! title.equals(value) ) {
@@ -121,6 +153,8 @@ public class LabelConverter extends Converter {
             title= ptitle;
         } else if ( ptitle.contains( "%{USER_PROPERTIES" ) ) { //kludgy
             title= ptitle;
+        } else if ( ptitle.contains( "%{PROPERTIES" ) ) { //kludgy
+            title= ptitle;
         } else if ( ptitle.contains( "%{METADATA" ) ) { //kludgy
             title= ptitle;
         } else if ( containsString( ptitle, "TIMERANGE", title ) ) {
@@ -137,10 +171,10 @@ public class LabelConverter extends Converter {
 
     /**
      * replace %{LABEL} or $(LABEL) with value.
-     * @param title
-     * @param label
-     * @param value
-     * @return
+     * @param title the string containing the macro.
+     * @param label the label to replace, such as METADATA.SPACECRAFT.
+     * @param value the value to insert
+     * @return the new string with the value inserted.
      */
     protected static String insertString( String title, String label, String value ) {
         String search;
