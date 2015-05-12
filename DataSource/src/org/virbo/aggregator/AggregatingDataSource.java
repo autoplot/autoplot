@@ -671,10 +671,6 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         }
                     }
                 }
-
-                if ( true ) {
-                    System.gc(); // bug 1395: where NIO direct memory can run out because Java GC hasn't run finalize on old classes.
-                }
                 
             }
 
