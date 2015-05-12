@@ -623,17 +623,17 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         if ( hist.exists() ) {
             BufferedReader r=null;
             try {
-                String seek="vap+das2server:";
+                String seek="das2server:";
                 int ttaglen= 25;
                 r = new BufferedReader(new FileReader(hist));
                 String s = r.readLine();
                 LinkedHashSet dss = new LinkedHashSet();
 
                 while (s != null) {
-                    if ( s.length()>ttaglen && s.substring(ttaglen).startsWith(seek)) {
+                    if ( s.length()>ttaglen+15 && s.substring(ttaglen+4,ttaglen+15).equalsIgnoreCase(seek)) {
                         int i= s.indexOf("?");
                         if ( i==-1 ) i= s.length();
-                        String key= s.substring(ttaglen+seek.length(),i);
+                        String key= s.substring(ttaglen+4+seek.length(),i);
                         if ( dss.contains(key) ) dss.remove( key ); // move to the end
                         dss.add( key );
                     }
