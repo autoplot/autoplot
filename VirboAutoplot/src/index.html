@@ -23,6 +23,9 @@
 
         <p>Bugfixes (2015-05-12 r16817):</p>
         <ul>
+            <li>1399: minor das2server bugs such as +20 fixed.  This may introduce new bugs...</li>
+            <li>1398: join of tables containing length 1 dataset would fail to limit interpolation length.</li>
+            <li>1398: xTagWidth property wouldn't be converted into QDataSet for MultiTableDataSet</li>
             <li>478: list subset preserves DEPEND variable.</li>
             <li>1395: out-of-native memory error when lots of data is loaded rapidly because of Java GC doesn't clear references.</li>
             <li>1394: remove excessive traffic with the HTTP server, where GETs were done on the remote folder every ten seconds during aggregation</li>
@@ -102,6 +105,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>macros support %{PROPERTIES.UNITS} %{PROPERTIES.CACHE_TAG}</li>
             <li>add separate logger das2.url that logs all external connections.</li>
             <li>add (µs) as a unit.</li>
             <li>UTC is allowed where units are found, so that times can be explicitly parsed as such.</li>
