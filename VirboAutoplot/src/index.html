@@ -21,8 +21,13 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-05-07 r16806):</p>
+        <p>Bugfixes (2015-05-12 r16817):</p>
         <ul>
+            <li>478: list subset preserves DEPEND variable.</li>
+            <li>1395: out-of-native memory error when lots of data is loaded rapidly because of Java GC doesn't clear references.</li>
+            <li>1394: remove excessive traffic with the HTTP server, where GETs were done on the remote folder every ten seconds during aggregation</li>
+            <li>1394: expensiveOpCache for getting HTTP freshness didn't authenticate</li>
+            <li>Empty Tools submenu will have "filters" added.</li>
             <li>TickCurveRenderer code that detected breaks initializes properly now.</li>
             <li>reset() method clears top and bottom decorators as well.</li>
             <li>top and bottom decorator access is thread-safe</li>
@@ -97,6 +102,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add separate logger das2.url that logs all external connections.</li>
             <li>add (µs) as a unit.</li>
             <li>UTC is allowed where units are found, so that times can be explicitly parsed as such.</li>
             <li>plotx color keyword parameter can now be a float, int, rank 0 dataset, or Color.</li>
