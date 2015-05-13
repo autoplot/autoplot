@@ -13,6 +13,7 @@ import org.das2.datum.Units;
 import org.virbo.metatree.IstpMetadataModel;
 import org.das2.util.monitor.ProgressMonitor;
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
+import gov.nasa.gsfc.spdf.cdfj.ReaderFactory;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.autoplot.bufferdataset.BufferDataSet;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -156,10 +158,12 @@ public class CdfDataSource extends AbstractDataSource {
         }
     });
 
+    private static int allocateDirect= -1;
+    
     /**
      * get the abstract access object to the given CDF file.  This provides read-only access to the file, and a cache
      * is used to limit the number of references managed.
-     * See bug https://sourceforge.net/tracker/index.php?func=detail&aid=3576013&group_id=199733&atid=970682
+     * See bug http://sourceforge.net/p/autoplot/bugs/922/
      *
      * The result returns a CDF object which contains a read-only memory-mapped byte buffer.
      * 
@@ -168,6 +172,11 @@ public class CdfDataSource extends AbstractDataSource {
      */
     public static CDFReader getCdfFile( String fileName ) {
         CDFReader cdf;
+        
+        if ( allocateDirect==-1 ) {
+            allocateDirect= BufferDataSet.shouldAllocateDirect();
+        }
+        
         try {
             synchronized ( lock ) {
                 cdf= openFiles.get(fileName); logger.log(Level.FINER, "cdf open files cache contained: {0}", cdf);
@@ -177,7 +186,17 @@ public class CdfDataSource extends AbstractDataSource {
                     File cdfFile= new File(fileName);
                     if ( !cdfFile.exists() ) throw new IllegalArgumentException("CDF file does not exist: "+fileName);
                     if ( cdfFile.length()==0 ) throw new IllegalArgumentException("CDF file length is zero: "+fileName);
-                    cdf= new CDFReader(fileName);
+                    
+                    if ( allocateDirect==0 ) {
+                        try {
+                            cdf= ReaderFactory.getReader(fileName);
+                        } catch ( Throwable t ) {
+                            throw new CDFException(t.getMessage());
+                        }
+                    } else {
+                        cdf= new CDFReader(fileName);
+                    }
+                    
                     //cdf = CDFFactory.getCDF(fileName);
                     openFiles.put(fileName, cdf);
                     openFilesRev.put(cdf, fileName);
@@ -191,7 +210,15 @@ public class CdfDataSource extends AbstractDataSource {
                 synchronized (lock) { // freshen reference.
                     Long date= openFilesFresh.get(fileName);
                     if ( date==null || ( new File(fileName).lastModified() > date ) ) {
-                        cdf = new CDFReader(fileName);
+                        if ( allocateDirect==0 ) {
+                            try {
+                                cdf= ReaderFactory.getReader(fileName);
+                            } catch ( Throwable t ) {
+                                throw new CDFException(t.getMessage());
+                            }
+                        } else {
+                            cdf= new CDFReader(fileName);
+                        }
                         openFiles.put(fileName, cdf);
                         openFilesRev.put(cdf, fileName);
                         openFilesFresh.put(fileName,System.currentTimeMillis());
