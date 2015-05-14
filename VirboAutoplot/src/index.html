@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Even the secretive contours renderer has its own GUI now.
+        <p><small>Fun with scripting.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,8 +21,12 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-05-12 r16817):</p>
+        <p>Bugfixes (2015-05-14 r16834):</p>
         <ul>
+            <li>append will preserve BufferDataSets when they are the same type.</li>
+            <li>1349: 32-bit machines will use heap memory instead of accessing native memory.</li>
+            <li>1390: createEvent with the arguments createEvent( ds, DatumRange, color, label ) </li>
+            <li>1390: eventds.slice(0).slice(0) now has correct units.</li>
             <li>1399: minor das2server bugs such as +20 fixed.  This may introduce new bugs...</li>
             <li>1398: join of tables containing length 1 dataset would fail to limit interpolation length.</li>
             <li>1398: xTagWidth property wouldn't be converted into QDataSet for MultiTableDataSet</li>
@@ -105,6 +109,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add grid to match flatten to filters GUI.</li>
             <li>macros support %{PROPERTIES.UNITS} %{PROPERTIES.CACHE_TAG}</li>
             <li>add separate logger das2.url that logs all external connections.</li>
             <li>add (µs) as a unit.</li>
