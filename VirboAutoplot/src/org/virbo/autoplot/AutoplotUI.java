@@ -153,6 +153,8 @@ import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.SourceTypesBrowser;
 import org.virbo.datasource.TimeRangeEditor;
 import org.virbo.datasource.URISplit;
+import org.virbo.filters.AddFilterDialog;
+import org.virbo.filters.FiltersChainPanel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -2255,6 +2257,7 @@ APSplash.checkTime("init 52.9");
         createPngWalkSeparator = new javax.swing.JSeparator();
         aggregateMenuItem = new javax.swing.JMenuItem();
         replaceFileMenuItem = new javax.swing.JMenuItem();
+        filtersMenuItem = new javax.swing.JMenuItem();
         aggSeparator = new javax.swing.JSeparator();
         decodeURLItem = new javax.swing.JMenuItem();
         reloadAllMenuItem = new javax.swing.JMenuItem();
@@ -2796,6 +2799,14 @@ APSplash.checkTime("init 52.9");
             }
         });
         toolsMenu.add(replaceFileMenuItem);
+
+        filtersMenuItem.setText("Filters...");
+        filtersMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filtersMenuItemActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(filtersMenuItem);
         toolsMenu.add(aggSeparator);
 
         decodeURLItem.setText("Decode URL");
@@ -3567,6 +3578,23 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
             }
         }
     }//GEN-LAST:event_formMouseClicked
+
+    private void filtersMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filtersMenuItemActionPerformed
+        String filter= dom.getController().getPlotElement().getComponent();
+        if ( filter.length()==0 ) {
+            AddFilterDialog dia= new AddFilterDialog();
+            if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, dia, "Add Filter", JOptionPane.OK_CANCEL_OPTION ) ) {
+                filter= dia.getValue();
+            } else {
+                return;
+            }
+        }
+        FiltersChainPanel fcp= new FiltersChainPanel();
+        fcp.setFilter(filter);
+        if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, fcp, "Edit Filters", JOptionPane.OK_CANCEL_OPTION ) ) {
+            dom.getController().getPlotElement().setComponent(fcp.getFilter());
+        }
+    }//GEN-LAST:event_filtersMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     @Override
@@ -4560,6 +4588,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenu enableFeatureMenu;
     private javax.swing.JMenuItem exceptionReport;
     private javax.swing.JMenu fileMenu;
+    private javax.swing.JMenuItem filtersMenuItem;
     private javax.swing.JMenuItem fixLayoutMenuItem;
     private javax.swing.JMenuItem fontsAndColorsMenuItem;
     private javax.swing.JMenuItem gettingStartedMenuItem;
