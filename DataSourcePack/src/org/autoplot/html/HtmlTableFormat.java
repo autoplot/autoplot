@@ -34,7 +34,7 @@ public class HtmlTableFormat  extends AbstractDataSourceFormat {
         File f= new File( getResourceURI() );
         BufferedWriter w= new BufferedWriter( new FileWriter(f) );
         QDataSet bds= (QDataSet) data.property(QDataSet.BUNDLE_1);
-        w.write("<body><table>");
+        w.write("<body><table>\n");
         for ( int j=0; j<bds.length(); j++ ) {
             w.append("<th>");
             Units u= (Units) bds.property(QDataSet.UNITS,j);
@@ -48,9 +48,9 @@ public class HtmlTableFormat  extends AbstractDataSourceFormat {
                 w.append(u.toString());
                 w.append(")");
             }
-            w.append("</th>");
+            w.append("</th>\n");
         }
-        w.append("</tr>");
+        w.append("</tr>\n");
 
         for ( int i=0; i<data.length(); i++ ) {
             StringBuilder b= new StringBuilder();
@@ -61,9 +61,9 @@ public class HtmlTableFormat  extends AbstractDataSourceFormat {
                 if ( u==null ) u= Units.dimensionless;
                 Datum d= u.createDatum(data.value(i,j));
                 b.append( d.getFormatter().format(d,u) );
-                b.append("</td>");
+                b.append("</td>\n");
             }
-            b.append("</tr>");
+            b.append("</tr>\n");
             w.write( b.toString() );
         }
         w.write("</table></body>");
@@ -80,7 +80,7 @@ public class HtmlTableFormat  extends AbstractDataSourceFormat {
         File f= new File( getResourceURI() );
         
         BufferedWriter w= new BufferedWriter( new FileWriter(f) );
-        w.write("<body><table>");
+        w.write("<body><table>\n");
         w.append("<th>");
         u= SemanticOps.getUnits(dep0);
         String h= (String)dep0.property(QDataSet.LABEL);
@@ -92,7 +92,7 @@ public class HtmlTableFormat  extends AbstractDataSourceFormat {
             w.append(u.toString());
             w.append(")");
         }
-        w.append("</th>");
+        w.append("</th>\n");
         
         w.append("<th>");
         u= SemanticOps.getUnits(data);
@@ -107,7 +107,7 @@ public class HtmlTableFormat  extends AbstractDataSourceFormat {
         }
         w.append("</th>");
         
-        w.append("</tr>");
+        w.append("</tr>\n");
 
         
         for ( int i=0; i<data.length(); i++ ) {
@@ -124,10 +124,10 @@ public class HtmlTableFormat  extends AbstractDataSourceFormat {
             d= u.createDatum(data.value(i));
             b.append( d.getFormatter().format(d,u) );
             b.append("</td>");
-            b.append("</tr>");
+            b.append("</tr>\n");
             w.write( b.toString() );
         }
-        w.write("</table></body>");
+        w.write("</table></body>\n");
         w.close();
     }
     
