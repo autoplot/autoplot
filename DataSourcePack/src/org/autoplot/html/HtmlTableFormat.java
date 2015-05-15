@@ -11,6 +11,7 @@ import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSourceFormat;
 
 /**
@@ -19,7 +20,16 @@ import org.virbo.datasource.AbstractDataSourceFormat;
  */
 public class HtmlTableFormat  extends AbstractDataSourceFormat {
 
+    @Override
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
+        if ( data.rank()==2 ) {
+            formatDataRank2( uri, data, mon );
+        } else if ( data.rank()==1 ) {
+            formatDataRank1( uri, data, mon );
+        }
+    }
+    
+    public void formatDataRank2(String uri, QDataSet data, ProgressMonitor mon) throws Exception {    
         setUri(uri);
         File f= new File( getResourceURI() );
         BufferedWriter w= new BufferedWriter( new FileWriter(f) );
@@ -60,10 +70,73 @@ public class HtmlTableFormat  extends AbstractDataSourceFormat {
         w.close();
     }
 
+    public void formatDataRank1(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
+        QDataSet dep0= SemanticOps.xtagsDataSet(data);
+
+        Units u;
+        Datum d;
+
+        setUri(uri);
+        File f= new File( getResourceURI() );
+        
+        BufferedWriter w= new BufferedWriter( new FileWriter(f) );
+        w.write("<body><table>");
+        w.append("<th>");
+        u= SemanticOps.getUnits(dep0);
+        String h= (String)dep0.property(QDataSet.LABEL);
+        if ( h!=null ) {
+            w.append(h);
+        }
+        if ( u!=Units.dimensionless ){
+            w.append("(");
+            w.append(u.toString());
+            w.append(")");
+        }
+        w.append("</th>");
+        
+        w.append("<th>");
+        u= SemanticOps.getUnits(data);
+        h= (String)data.property(QDataSet.LABEL);
+        if ( h!=null ) {
+            w.append(h);
+        }
+        if ( u!=Units.dimensionless ){
+            w.append("(");
+            w.append(u.toString());
+            w.append(")");
+        }
+        w.append("</th>");
+        
+        w.append("</tr>");
+
+        
+        for ( int i=0; i<data.length(); i++ ) {
+            StringBuilder b= new StringBuilder();
+            b.append("<tr>");
+            b.append("<td>");
+            u= SemanticOps.getUnits(dep0);
+            if ( u==null ) u= Units.dimensionless;
+            d= u.createDatum(dep0.value(i));
+            b.append( d.getFormatter().format(d,u) );
+            b.append("</td>");
+            b.append("<td>");
+            u= SemanticOps.getUnits(data);
+            d= u.createDatum(data.value(i));
+            b.append( d.getFormatter().format(d,u) );
+            b.append("</td>");
+            b.append("</tr>");
+            w.write( b.toString() );
+        }
+        w.write("</table></body>");
+        w.close();
+    }
+    
+    @Override
     public boolean canFormat(QDataSet ds) {
-        return ds.rank()==2;
+        return ds.rank()==2 || ds.rank()==1;
     }
 
+    @Override
     public String getDescription() {
         return "HTML Table";
     }
