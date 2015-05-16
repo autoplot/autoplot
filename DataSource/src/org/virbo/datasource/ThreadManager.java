@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class ThreadManager {
     
-    private Map<String,Thread> active;
+    private final Map<String,Thread> active;
     
     private static ThreadManager instance;
     
@@ -32,9 +32,10 @@ public class ThreadManager {
     
     private Runnable wrapRunnable( final Runnable run, final String t ) {
         return new Runnable() {
+            @Override
             public void run() {
                 run.run();
-                synchronized (this) {
+                synchronized (ThreadManager.this) {
                     active.remove(t);
                 }
             }
