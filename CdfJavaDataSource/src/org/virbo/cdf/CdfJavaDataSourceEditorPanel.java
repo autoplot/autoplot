@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import org.autoplot.cdf.CdfDataSource;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.util.DasExceptionHandler;
@@ -60,6 +61,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     /** Creates new form AggregatingDataSourceEditorPanel */
     public CdfJavaDataSourceEditorPanel() {
         initComponents();
+        parameterTree.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
         jPanel3.setVisible(false);
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "cdf_main");
     }
