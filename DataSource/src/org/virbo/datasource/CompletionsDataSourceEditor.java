@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -32,7 +31,8 @@ import javax.swing.JTextField;
 import org.das2.util.monitor.ProgressMonitor;
 
 /**
- * Generic Editor based on completions was first developed with JunoWavesDataSource, now will be used instead of completions
+ * Generic Editor based on completions was first developed with 
+ * JunoWavesDataSource, now will be used instead of completions
  * when file icon is used.
  * @author jbf
  */
@@ -163,7 +163,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
 
     }
 
-    public void populateFromCompletions( DataSourceFactory dsf, ProgressMonitor mon ) throws URISyntaxException, Exception {
+    private void populateFromCompletions( DataSourceFactory dsf, ProgressMonitor mon ) throws URISyntaxException, Exception {
 
         int i= suri.indexOf("?");
         if ( i==-1 ) {
@@ -235,17 +235,20 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                     //jcheckBox.setSelected(true);
                 }
 
-                String sel= null;
+                //String sel= null;
                 int isel= -1;
                 String deft=null;
 
                 for ( int ii=0; ii<second.size(); ii++ ) {
                     CompletionContext cc3= second.get(ii);
-                    String ss2= CompletionContext.insert( cc2, cc3 );
+                    //String ss2= CompletionContext.insert( cc2, cc3 );
                     if ( cc3.completable.equals(val) ) isel= ii;
                     if ( cc3.label.startsWith( cc3.completable+":" ) ) {
                         options.add( cc3.label );
                     } else {
+                        if ( cc3.completable.equals(cc3.label) ) {
+                            cc3.label= null;
+                        }                        
                         if ( cc3.completable.equals(cc3.label ) ) {
                             options.add( cc3.label );
                         } else {
@@ -307,6 +310,9 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             int isel=-1;
             List<String> arg0options= new ArrayList();
             for ( int ii=0; ii<arg0.size(); ii++ ) {
+                if ( arg0.get(ii).completable.equals(arg0.get(ii).label) ) {
+                    arg0.get(ii).label= null;
+                }
                 if ( arg0.get(ii).label!=null ) {
                     arg0options.add( arg0.get(ii).completable + ": " +arg0.get(ii).label );
                 } else {
@@ -474,7 +480,8 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         jScrollPane1 = new javax.swing.JScrollPane();
         optionsPanel = new javax.swing.JPanel();
 
-        jLabel1.setText("<html>This is an editor created automatically based on the completions the data source reports.  This will attempt to create a GUI that is not optimal, but is better than nothing. ");
+        jLabel1.setText("<html>Autoplot has attempted to create a GUI editor based on the completions model of the data source.  This a GUI that is not optimal, but is still useful.");
+        jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         optionsPanel.setAlignmentY(0.0F);
         optionsPanel.setLayout(new javax.swing.BoxLayout(optionsPanel, javax.swing.BoxLayout.Y_AXIS));

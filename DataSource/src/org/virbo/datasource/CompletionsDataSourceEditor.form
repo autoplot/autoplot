@@ -40,7 +40,8 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;This is an editor created automatically based on the completions the data source reports.  This will attempt to create a GUI that is not optimal, but is better than nothing. "/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;Autoplot has attempted to create a GUI editor based on the completions model of the data source.  This a GUI that is not optimal, but is still useful."/>
+        <Property name="verticalAlignment" type="int" value="1"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
