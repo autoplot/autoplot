@@ -34,9 +34,12 @@ public class ThreadManager {
         return new Runnable() {
             @Override
             public void run() {
-                run.run();
-                synchronized (ThreadManager.this) {
-                    active.remove(t);
+                try {
+                    run.run();
+                } finally {
+                    synchronized (ThreadManager.this) {
+                        active.remove(t);
+                    }
                 }
             }
         };
