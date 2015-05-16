@@ -414,10 +414,16 @@ public class DataSourceUtil {
      *y= makeAggregation("file:/tmp/20091102.dat")       // file:/tmp/$Y$m$d.dat?timerange=2009-11-02
      *x= makeAggregation("file:/tmp/20091102T02.dat");   // file:/tmp/$Y$m$dT$H.dat?timerange=2009-11-02 2:00 to 3:00
      *}</small></pre></blockquote>
-     * @param surl
-     * @return the string with aggregations ($Y.dat) instead of filename (1999.dat) or null, or the original filename.
+     * @param surl the URI.
+     * @return null or the string with aggregations ($Y.dat) instead of filename (1999.dat), or the original filename.
      */
     public static String makeAggregation( String surl ) {
+        
+        URISplit split= URISplit.parse(surl);
+        if ( split.file==null ) {
+            return surl;
+        }
+            
         String yyyy= "/(19|20)\\d{2}/";
 
         String yyyymmdd= "(?<!\\d)(19|20)(\\d{6})(?!\\d)"; //"(\\d{8})";
@@ -433,13 +439,11 @@ public class DataSourceUtil {
         String version= "([Vv])\\d{2}";                // $v
         String vsep= "([Vv])(\\d+\\.\\d+(\\.\\d+)+)";  // $(v,sep)
 
-        String result= surl;
-
         String[] abs= new String[] { yyyymmdd_HHMM, yyyymmdd_HH, yyyy_mm_dd, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm };
 
         String timeRange=null;
-        for ( int i= 0; i<abs.length; i++ ) {
-            Matcher m= Pattern.compile(abs[i]).matcher(surl);
+        for ( String ab : abs ) {
+            Matcher m = Pattern.compile(ab).matcher(surl);
             if ( m.find() ) {
                 timeRange= m.group(0);
                 break; // we found something
@@ -457,14 +461,14 @@ public class DataSourceUtil {
         List<String> search= new ArrayList( Arrays.asList( yyyymmdd_HHMM, yyyymmdd_HH, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm_dd, yyyy ) );
         List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$3\\$H\\$M", "\\$Y\\$m\\$d$3\\$H", "\\$Y$2\\$j", "\\$Y\\$m\\$d","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d","/\\$Y/" ) );
         List<Integer> resol= new ArrayList( Arrays.asList( minute, hour, day, day, day, month, day, year ) );
-        String s= replaceLast( result, 
+        String s= replaceLast( split.file, 
                 search,
                 replac,
                 resol );
 
         try {
             TimeParser tp= TimeParser.create(s);
-            timeRange= tp.parse(surl).getTimeRange().toString();
+            timeRange= tp.parse( split.file ).getTimeRange().toString();
             //s= s.replaceFirst(version, "$1\\$2v"); //TODO: version causes problems elsewhere, see line 189.  Why?
 
             Matcher m;
@@ -477,19 +481,23 @@ public class DataSourceUtil {
                 s= s.replaceFirst( m.group(), Matcher.quoteReplacement(m.group(1)+"$v") );
             }
             
-            result= s;
-
-            if ( !result.contains("timerange=") ) {
-                result= result
-                    + ( result.contains("?") ? "&" : "?" )
-                    + "timerange="+timeRange;
+            split.file= s;
+            Map<String,String> params= URISplit.parseParams(split.params);
+            if ( !params.containsKey("timerange") ) {
+                params.put( "timerange", timeRange );
+                split.params= URISplit.formatParams(params);
             }
+
+            String result= URISplit.format(split);
+            
             return result;
+            
         } catch ( IllegalArgumentException ex ) {
             return null; // I had the file in my directory: "file:///home/jbf/das2Server?dataset=juno%2Fwaves%2Fflight%2Fsurvey.dsdf;start_time=$Y-$m-$dT15:00:00.000Z;end_time=$Y-$m-$dT19:00:00.000Z;params=EINT;server=dataset"
         } catch ( ParseException ex ) {
             return null;
         }
+        
     }
     
     /** 
