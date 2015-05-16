@@ -3591,6 +3591,10 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         }
         FiltersChainPanel fcp= new FiltersChainPanel();
         fcp.setFilter(filter);
+        DataSourceFilter dsf= dom.getController().getDataSourceFilterFor(dom.getController().getPlotElement());
+        if ( dsf!=null ) {
+            fcp.setInput(dsf.getController().getFillDataSet());
+        }
         if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, fcp, "Edit Filters", JOptionPane.OK_CANCEL_OPTION ) ) {
             dom.getController().getPlotElement().setComponent(fcp.getFilter());
         }
