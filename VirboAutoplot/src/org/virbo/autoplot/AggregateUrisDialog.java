@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
  * AggregateUrisDialog.java
@@ -17,7 +13,6 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -29,12 +24,15 @@ import javax.swing.SwingUtilities;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomOps;
-import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.ThreadManager;
 
 /**
- *
+ * Dialog assisting the scientists in creating aggregations for file
+ * URIS.  This uses org.virbo.datasource.DataSourceUtil.makeAggregation
+ * to look for parts of filenames that look like dates, for example 20150516
+ * would be replaced with $Y$m$d.
+ * 
  * @author jbf
  */
 public class AggregateUrisDialog extends javax.swing.JPanel {
@@ -42,7 +40,11 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
     private final Application dom;
     private final DataSetSelector dataSetSelector;
 
-    /** Creates new form AggregateUrisDialog */
+    /** 
+     * Creates new form AggregateUrisDialog
+     * @param dom the application
+     * @param sel it's dataset selector
+     */
     public AggregateUrisDialog( Application dom, DataSetSelector sel ) {
         initComponents();
         this.dom= dom;
@@ -90,6 +92,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         buttons.setLayout( new FlowLayout( FlowLayout.RIGHT ) );
         JButton cancel= new JButton("Cancel");
         cancel.setAction( new AbstractAction("Cancel") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 dialog.setVisible(false);
                 dialog.dispose();
@@ -99,6 +102,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         
         JButton help= new JButton("Help");
         help.setAction( new AbstractAction("Help") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 AutoplotUtil.openBrowser( "http://autoplot.org/help#Aggregation" );
             }
@@ -280,6 +284,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         if ( f==-1 ) throw new IllegalArgumentException("bad state ..");
         dom2.getDataSourceFilters(f).setUri(newUri);
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 dom.syncTo(dom2);
                 DataSourceFilter[] dsfs= dom.getDataSourceFilters();
@@ -289,9 +294,10 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
             }
         };
         if ( ! ThreadManager.getInstance().run( run, "aggregateUris" ) ) {
-            JOptionPane.showConfirmDialog( this, "Operation is currently busy.");
+            JOptionPane.showMessageDialog( this, "Operation is currently busy.");
         }
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 SwingUtilities.getWindowAncestor(AggregateUrisDialog.this).setVisible(false);
             }
@@ -303,6 +309,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
         final Application dom2= (Application)dom.copy();
         DomOps.aggregateAll(dom2);
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 dom.syncTo(dom2);
                 DataSourceFilter[] dsfs= dom.getDataSourceFilters();
@@ -316,6 +323,7 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
             JOptionPane.showConfirmDialog( this, "Operation is currently busy.");
         }
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 SwingUtilities.getWindowAncestor(AggregateUrisDialog.this).setVisible(false);
             }
