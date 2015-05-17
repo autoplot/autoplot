@@ -705,8 +705,8 @@ public class GuiSupport {
     }
 
     /**
-     * clone the application into a new AutoplotUI
-     * @return
+     * create a new AutoplotUI
+     * @return the new ApplicationModel
      */
     ApplicationModel newApplication() {
         final ApplicationModel model = new ApplicationModel();
