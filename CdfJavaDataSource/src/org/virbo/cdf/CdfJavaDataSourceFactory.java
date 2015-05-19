@@ -63,10 +63,14 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
 
             CDFReader cdf;
 
+            if ( !mon.isFinished() ) mon.started();
+            mon.setProgressMessage("opening CDF file");
             cdf = CdfDataSource.getCdfFile(fileName);
 
             logger.finest("inspect cdf for plottable parameters");
             Map<String,String> result= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, 4 );
+            
+            mon.finished();
             
             logger.finest("close cdf");
             //cdf.close();
