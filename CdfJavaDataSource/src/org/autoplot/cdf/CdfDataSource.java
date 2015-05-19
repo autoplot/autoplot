@@ -190,6 +190,8 @@ public class CdfDataSource extends AbstractDataSource {
                     if ( allocateDirect==0 ) {
                         try {
                             cdf= ReaderFactory.getReader(fileName);
+                        } catch ( Exception e ) {
+                            throw e;
                         } catch ( Throwable t ) {
                             throw new CDFException(t.getMessage());
                         }
@@ -213,6 +215,8 @@ public class CdfDataSource extends AbstractDataSource {
                         if ( allocateDirect==0 ) {
                             try {
                                 cdf= ReaderFactory.getReader(fileName);
+                            } catch ( Exception e ) {
+                                throw e;
                             } catch ( Throwable t ) {
                                 throw new CDFException(t.getMessage());
                             }
@@ -261,7 +265,7 @@ public class CdfDataSource extends AbstractDataSource {
         try {
             
             File cdfFile;
-            cdfFile = getFile(mon);
+            cdfFile = getFile(mon.getSubtaskMonitor("download file"));
 
             logger.log(Level.FINE, "getDataSet ({0})", getURI() );
 
@@ -272,7 +276,9 @@ public class CdfDataSource extends AbstractDataSource {
             //try this some time.
             //checkCdf( cdfFile );
             
+            mon.setProgressMessage("open CDF file");
             CDFReader cdf= getCdfFile(fileName);
+            
             logger.log(Level.FINE, "got cdf file for {0} {1}", new Object[]{fileName, cdf});
 
             String svariable = (String) map.get(PARAM_ID);
@@ -355,6 +361,7 @@ public class CdfDataSource extends AbstractDataSource {
         
         Map map = getParams();
 
+        mon.setProgressMessage("open CDF file");
         CDFReader cdf= getCdfFile(fileName);
 
         String svariable = (String) map.get(PARAM_ID);
