@@ -454,7 +454,7 @@ public class JythonUtil {
      //there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as the string.upper() function.
      //The commas are to guard against the id being a subset of another id ("lower," does not match "lowercase").
      //TODO: update this after Python upgrade.
-     private static final String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper,", "URI,", "DatumRangeUtil," };
+     private static final String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper,", "URI,", "DatumRangeUtil,", "TimeParser" };
      
      /**
       * return true if the function call is trivial to execute and can be evaluated within a few milliseconds.
@@ -465,9 +465,16 @@ public class JythonUtil {
          if ( sn instanceof Call ) {
              Call c= (Call)sn;
              boolean klugdyOkay= false;
+             String ss= c.func.toString();
              for ( String s: okay ) {
-                if ( c.func.toString().contains(s) ) klugdyOkay= true;
+                if ( ss.contains(s) ) klugdyOkay= true;
              }
+             if ( klugdyOkay==false ) {
+                 if ( ss.contains("TimeUtil") && ss.contains("now")  ) {
+                     klugdyOkay= true;
+                 }
+             }
+             logger.log(Level.FINER, "trivialFunctionCall={0} for {1}", new Object[]{klugdyOkay, c.func.toString()});
              return klugdyOkay;
          } else {
              return false;
