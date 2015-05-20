@@ -51,7 +51,7 @@ public class PlotCommand extends PyObject {
     
     public static PyString __doc__ =
         new PyString("<html>plotx is an experimental extension of the plot command that uses Python features like keywords.\n"
-            + "<br>plotx(x,y,z,[keywords])\n"
+            + "<br>plotx([pos],x,y,z,[keywords])\n"
             + "<br>keywords:\n"
             + "<table>"
             + "<tr><td>xlog ylog zlog </td><td>explicitly set this axis to log (or linear when set equal to 0.).</td></tr>\n"
@@ -65,6 +65,8 @@ public class PlotCommand extends PyObject {
             + " <tr><td> symbol      </td><td>the symbol, e.g. dots triangles cross\n</td></tr>"
             + " <tr><td> isotropic   </td><td>constrain the ratio between the x and y axes.\n</td></tr>"
             + " <tr><td> title   </td><td>title for the plot\n</td></tr>"
+            + " <tr><td> xpos    </td><td>override horizontal position of plot, eg. '50%+1em,100%-2em'\n</td>"
+            + " <tr><td> ypos    </td><td>override vertical position of plot, eg. '0%+1em,25%-2em', 0 is top\n</td>"
             + "</table>");
 
     private static QDataSet coerceIt( PyObject arg0 ) {
