@@ -684,16 +684,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
             timeParser = null;
         }
 
-        o = params.get("depend0");
-        if (o != null) {
-            depend0 = o;
-        }
-
-        o = params.get("column");
-        if (o != null) {
-            column = o;
-        }
-        
         o = params.get( "arg_0" );
         if ( o!=null && !o.equals("rank2") ) {
             column = o;
@@ -702,6 +692,16 @@ public class AsciiTableDataSource extends AbstractDataSource {
             parser.setUnits(0, u);
             depend0= "0";
         } 
+
+        o = params.get("column");
+        if (o != null) {
+            column = o;
+        }
+        
+        o = params.get("depend0");
+        if (o != null) {
+            depend0 = o;
+        }
 
         o = params.get("rank2");
         if (o != null) {
