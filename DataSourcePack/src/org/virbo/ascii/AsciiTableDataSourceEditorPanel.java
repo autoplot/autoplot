@@ -664,7 +664,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                             .add(dep0timeCheckBox)
                             .add(jToggleButton3))))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(dataStatusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 16, Short.MAX_VALUE))
+                .add(dataStatusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 4, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("data", jPanel1);
@@ -701,16 +701,13 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(jPanel4Layout.createSequentialGroup()
                         .add(jLabel13)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(depend0unitsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 52, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(depend0unitsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 234, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(jPanel4Layout.createSequentialGroup()
                         .add(jLabel12)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(unitsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 73, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(184, Short.MAX_VALUE))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
-
-        jPanel4Layout.linkSize(new java.awt.Component[] {depend0unitsTF, unitsTF}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel4Layout.createSequentialGroup()
@@ -728,7 +725,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                         .add(jLabel13)
                         .add(depend0unitsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("labels", jPanel4);
@@ -745,9 +742,9 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 118, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 106, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE))
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1261,9 +1258,9 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         }
 
         params.remove("arg_0");
+        params.remove("column");
 
         if (getColumn().contains(":") || getColumn().contains("-")) {
-            params.remove("column");
             if ( bundleCheckBox.isSelected() ) {
                 params.put("bundle", getColumn());
             } else {
@@ -1271,7 +1268,12 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             }
         } else {
             if ( isIso8601TimeField0() ) {
-                params.put("arg_0", getColumn());
+                if ( this.getDep0().equals("") || this.getDep0().equals("field0") ) {
+                    params.put("arg_0", getColumn());
+                    params.remove("depend0");
+                } else {
+                    params.put("column", getColumn());
+                }
             } else {
                 params.put("column", getColumn());
             }
