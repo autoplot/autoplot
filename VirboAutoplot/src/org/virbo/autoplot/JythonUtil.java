@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -181,6 +183,13 @@ public class JythonUtil {
         invokeScriptSoon( url, dom, new HashMap(), false, false, mon );
     }
     
+    private static final HashMap<String,String> okayed= new HashMap();
+    
+    private static boolean isScriptOkayed( String filename, String contents ) {
+        String okayedContents= okayed.get(filename);
+        return contents.equals( okayedContents  );
+    }
+            
     /**
      * show the script and the variables (like we have always done with jyds scripts), and offer to run the script.
      * @param parent parent GUI to follow 
@@ -193,6 +202,7 @@ public class JythonUtil {
     private static int showScriptDialog( Component parent, Map<String,Object> env, File file, Map<String,String> fvars, boolean makeTool, final URI resourceUri ) throws IOException {
         
         JPanel p= new JPanel();
+        p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
         
         ParametersFormPanel fpf= new org.virbo.jythonsupport.ui.ParametersFormPanel();
         ParametersFormPanel.FormData fd=  fpf.doVariables( env, file, fvars, p );
@@ -204,6 +214,8 @@ public class JythonUtil {
         JPanel scriptPanel= new JPanel( new BorderLayout() );
         JTabbedPane tp= new JTabbedPane();
         org.virbo.jythonsupport.ui.EditorTextPane textArea= new EditorTextPane();
+        
+        String theScript= EditorTextPane.loadFileToString( file ) ;
         try {
             textArea.loadFile(file);
         } catch (FileNotFoundException ex) {
@@ -231,8 +243,17 @@ public class JythonUtil {
         JScrollPane params= new JScrollPane(p); // TODO: why do I need this?
         params.setMinimumSize( new Dimension(640,480) );
         tp.add( params, "params" );
+        
         if ( makeTool ) {
-            tp.setSelectedIndex(0);
+            if ( isScriptOkayed( file.toString(), theScript ) ) {
+                tp.setSelectedIndex(1);
+                p.add( Box.createGlue() );
+                JLabel l= new JLabel("You have run this script before.");
+                l.setAlignmentX( 0.0f );
+                p.add( l );
+            } else {
+                tp.setSelectedIndex(0);
+            }
         } else {
             tp.setSelectedIndex(1);
         }
@@ -252,7 +273,7 @@ public class JythonUtil {
                     }
                 }
             }
-
+            okayed.put( file.toString(), theScript );
         }
         return result;
     }
