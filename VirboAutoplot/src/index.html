@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Fun with scripting.
+        <p><small>Bug 1393, where Webstart would prevent new versions from propagating over HTTP, is finally fixed.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,9 +21,13 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-05-14 r16834):</p>
+        <p>Bugfixes (2015-05-21 r16865):</p>
         <ul>
+            <li>1393: WebStart caching has a bug where updates aren't seen, urlc.setUseCaches(false) fixes.</li>
+            <li>1310: keep track of scripts that have been approved by the operator, reducing tedium and enhancing security</li>
+            <li>1402: recent change in ascii URIs breaks editor when DEPEND_0 is not the zeroth column.</li>
             <li>append will preserve BufferDataSets when they are the same type.</li>
+            <li>CDF editor only allows one item to be selected.</li>
             <li>1349: 32-bit machines will use heap memory instead of accessing native memory.</li>
             <li>1390: createEvent with the arguments createEvent( ds, DatumRange, color, label ) </li>
             <li>1390: eventds.slice(0).slice(0) now has correct units.</li>
@@ -109,6 +113,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Chris added support for macros in das2streams.</li>
+            <li>format to HTML supports rank 1 data.</li>
             <li>Add Tools->Filters... so new users needn't understand the data tab</li>
             <li>add grid to match flatten to filters GUI.</li>
             <li>macros support %{PROPERTIES.UNITS} %{PROPERTIES.CACHE_TAG}</li>
