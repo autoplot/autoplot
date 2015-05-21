@@ -48,7 +48,6 @@ import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.JythonUtil.Param;
 import static org.virbo.jythonsupport.ui.Util.getParams;
-import static org.virbo.jythonsupport.ui.Util.getParams;
 
 /**
  *
@@ -66,11 +65,7 @@ public class ParametersFormPanel {
     private static final Logger logger= LoggerManager.getLogger("jython");
 
     private static boolean isBoolean( List<Object> parms ) {
-        if ( parms.size()==2 && parms.contains("T") && parms.contains("F") ) {
-            return true;
-        } else {
-            return false;
-        }
+        return parms.size()==2 && parms.contains("T") && parms.contains("F");
     }
     
     private static JComponent getSpacer() {
@@ -93,15 +88,23 @@ public class ParametersFormPanel {
         public int count;
         
         /**
+         * Convert the parameter to Jython types.
+         *<blockquote><pre>
          * T (TimeRange), A (String), F (Double or Integer), or R (URI)
          * D Datum
          * S DatumRange
+         * </pre></blockquote>
+         * 
+         * @param interp the interpreter
+         * @param param the param name
+         * @param value the param value
+         * @throws java.text.ParseException
          */
         public void implement( PythonInterpreter interp, String param, String value ) throws ParseException {
             PyDictionary paramsDictionary= ((PyDictionary)interp.get( "params" ));
             for ( int i=0; i<paramsList.size(); i++ ) {
                 if ( paramsList.get(i).equals(param) ) {
-                    Object deft= deftObjectList.get(i);;
+                    Object deft= deftObjectList.get(i);
                     if ( typesList.get(i).equals('T') && value.length()>1 && value.charAt(0)!='\'' && value.charAt(value.length()-1)!='\'' ) {
                         paramsDictionary.__setitem__( param, Py.java2py( value ) );
                     } else if ( typesList.get(i).equals('D') ) {
@@ -177,7 +180,8 @@ public class ParametersFormPanel {
      * @param f the file containing the script.
      * @param params map containing any settings for the variables.
      * @param paramsPanel 
-     * @return 
+     * @return the FormData from the initial view, since some clients will not show a GUI when there are no parameters.
+     * @throws java.io.IOException when reading the file.
      */
     public FormData doVariables( Map<String,Object> env, File f, Map<String,String> params, final JPanel paramsPanel ) throws IOException {
         StringBuilder build= new StringBuilder();
@@ -229,7 +233,8 @@ public class ParametersFormPanel {
     }
     
     /**
-     * Populates the JPanel with options.  See org.virbo.jythonsupport.ui.Util.createForm, this is only used with the .jyds.  TODO: Fix this!!!
+     * Populates the JPanel with options.  See org.virbo.jythonsupport.ui.Util.createForm, this is only used 
+     * with the .jyds.  TODO: Fix this!!!
      * 
      * @param env null or an map containing variables like "dom" and "PWD"
      * @param src the script loaded into a string.
@@ -345,6 +350,7 @@ public class ParametersFormPanel {
                     Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/virbo/datasource/jython/file2.png"));
                     JButton filesButton= new JButton( fileIcon );
                     filesButton.addActionListener( new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             JFileChooser c= new JFileChooser();
                             URISplit split2= URISplit.parse(fval);
@@ -409,6 +415,7 @@ public class ParametersFormPanel {
                     Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/virbo/datasource/calendar.png"));
                     JButton button= new JButton( fileIcon );
                     button.addActionListener( new ActionListener() {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             TimeRangeTool tt= new TimeRangeTool();
                             tt.setSelectedRange(tf.getText());
@@ -447,7 +454,7 @@ public class ParametersFormPanel {
                         } else {
                             JComboBox jcb= new JComboBox(parm.enums.toArray());
                             jcb.setEditable(false);
-                            Object oval=null;
+                            Object oval;
                             if ( parm.deft instanceof Long ) {
                                 oval = Long.valueOf(val);
                             } else if ( parm.deft instanceof Integer ) {
@@ -495,6 +502,7 @@ public class ParametersFormPanel {
                 final String fvalue= String.valueOf(parm.deft);
                 final JComponent ftf= ctf;
                 JButton defaultButton= new JButton( new AbstractAction( fdeft ) {
+                    @Override
                     public void actionPerformed( ActionEvent e ) {
                         if ( ftf instanceof DataSetSelector ) {
                             ((DataSetSelector)ftf).setValue(fvalue);
