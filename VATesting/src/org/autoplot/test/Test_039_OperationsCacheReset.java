@@ -22,6 +22,7 @@ import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
 import static org.virbo.autoplot.ScriptContext.save;
 import static org.virbo.autoplot.ScriptContext.writeToPng;
+import util.FiltersTreePicker;
 import util.RegexComponentChooser;
 
 /**
@@ -53,16 +54,8 @@ public class Test_039_OperationsCacheReset implements Scenario {
             JTabbedPaneOperator tabs = new JTabbedPaneOperator( app.getTabs() );
             
             {
-                // Implement reducex() filter
-                new JMenuBarOperator( mainFrame ).pushMenuNoBlock("Tools|Filters...");
-            
-                DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser("Add Filter" ) );
-            
-                JTreeOperator tree= new JTreeOperator( addFilterFrame );
-                tree.clickMouse();
-                tree.selectPath(tree.findPath( new String[] { "Filters", "Data Set Operations", "Reduce in Zeroth Dimension" } ) );
-                Thread.sleep(500);
-                new JButtonOperator( addFilterFrame, "OK" ).clickMouse();
+
+                FiltersTreePicker.pickFilter( mainFrame, new String[] { "Filters", "Data Set Operations", "Reduce in Zeroth Dimension" } );
             
                 Thread.sleep(500);
             
@@ -89,14 +82,9 @@ public class Test_039_OperationsCacheReset implements Scenario {
             ScriptContext.waitUntilIdle();
              
             {
-                new JMenuBarOperator( mainFrame ).pushMenuNoBlock("Tools|Filters...");
-                DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser("Add Filter" ) );
-
-                JTreeOperator tree= new JTreeOperator( addFilterFrame );
-                tree.clickMouse();
-                tree.selectPath(tree.findPath( new String[] { "Filters", "Data Set Operations", "Reduce in Zeroth Dimension" } ) );
+                FiltersTreePicker.pickFilter( mainFrame, new String[] { "Filters", "Data Set Operations", "Reduce in Zeroth Dimension" } );
+               
                 Thread.sleep(500);
-                new JButtonOperator( addFilterFrame, "OK" ).clickMouse();
 
                 DialogOperator reduceFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
                 new JTextFieldOperator(reduceFrame, "1").setText("360");
