@@ -17,9 +17,9 @@ public class FiltersTreePicker {
      * find the filter and select it from the Tools->Filters gui.
      * @param mainFrame
      * @param path
-     * @throws InterruptedException 
      */
-    public static void pickFilter(JFrameOperator mainFrame, String[] path  ) throws InterruptedException {
+    public static void pickFilter(JFrameOperator mainFrame, String[] path  ) {
+        try {
             // Implement reducex() filter
             new JMenuBarOperator( mainFrame ).pushMenuNoBlock("Tools|Filters...");
 
@@ -33,5 +33,8 @@ public class FiltersTreePicker {
 
             Thread.sleep(500);
 
+        } catch ( InterruptedException ex ) {
+            throw new RuntimeException(ex);
         }
+    }
 }
