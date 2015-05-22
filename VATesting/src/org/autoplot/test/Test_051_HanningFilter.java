@@ -21,6 +21,7 @@ import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
 import static org.virbo.autoplot.ScriptContext.save;
 import static org.virbo.autoplot.ScriptContext.writeToPng;
+import util.FiltersTreePicker;
 import util.RegexComponentChooser;
 
 /**
@@ -48,9 +49,10 @@ public class Test_051_HanningFilter implements Scenario {
             //need to use different dataset for this test
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/2012/12/01/rbsp-a_magnetometer_1sec-gei_emfisis-L3_20121201_v1.3.2.cdf?Magnitude");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
-            new JMenuBarOperator( mainFrame ).pushMenu("Tools|Filters|Fourier Filtering|Hanning", "|");
+            
+            FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Filtering|Hanning".split("\\|") );
         
-            DialogOperator hanningFrame = new DialogOperator( new RegexComponentChooser( "Hanning Filter Parameters") );
+            DialogOperator hanningFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
         
             new JTextComponentOperator(hanningFrame).setText("100");
         
