@@ -54,7 +54,7 @@ public class Test_022_ContextOverview implements Scenario {
 
             DatumRange range0= dom.getPlots(0).getXaxis().getRange();
             
-            if ( range0.getUnits().isConvertableTo(Units.dimensionless) ) {
+            if ( range0.getUnits().isConvertibleTo(Units.dimensionless) ) {
                 System.err.println("** xaxis is not a time axis");
             } else {
                 System.err.println("after wait, data loaded. "+range0);
