@@ -16,6 +16,7 @@ import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
+import util.FiltersTreePicker;
 import util.RegexComponentChooser;
 
 /**
@@ -24,6 +25,7 @@ import util.RegexComponentChooser;
  */
 public class Test_054_FftFilter implements Scenario {
     
+    @Override
     public int runIt(Object o) {
 
         ScriptContext.createGui();
@@ -37,10 +39,9 @@ public class Test_054_FftFilter implements Scenario {
         new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("vap+cdfj:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109");
         new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
         
-        JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
-        menuBar.pushMenu("Tools|Filters|Fourier Filtering|FFT", "|");
+        FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Filtering|FFT with sliding window".split("\\|") );
         
-        DialogOperator fftFrame = new DialogOperator( new RegexComponentChooser( "FFT Power Filter Parameters") );
+        DialogOperator fftFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
         
         JTextComponentOperator size = new JTextComponentOperator(fftFrame);
         size.setText("100");
@@ -50,9 +51,7 @@ public class Test_054_FftFilter implements Scenario {
         JComboBoxOperator slide = new JComboBoxOperator(fftFrame, 1);
         slide.selectItem(1);
 
-        
-        
-        new JButtonOperator( fftFrame, "Ok" ).clickMouse();
+        new JButtonOperator( fftFrame, "OK" ).clickMouse();
        
         
         new JTabbedPaneOperator( app.getTabs() ).selectPage("data");
