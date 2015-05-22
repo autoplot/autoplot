@@ -165,19 +165,14 @@ public class DataSetSelector extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent ev) {
                 // some DataSource constructors do not return in interactive time, so create a new thread for now.
                 LoggerManager.logGuiEvent(ev);
-                Runnable run = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            maybePlotImmediately();
-                        } finally {
-                            pendingChanges.remove( PENDING_GO );
-                        }
-                    }
-                };
-                RequestProcessor.invokeLater(run);
+                try {
+                    maybePlotImmediately();
+                } finally {
+                    pendingChanges.remove( PENDING_GO );
+                }
             }
         });
+        
         maybePlotTimer.setActionCommand("maybePlot");
         maybePlotTimer.setRepeats(false);
 
@@ -317,30 +312,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         return false;
     }
 
-    /**
-     * See if we can resolve a plottable URI from the selector by identifying
-     * the data source type and calling its reject method, or identifying the
-     * file system type and getting completions on it.  The reject method
-     * is used to identify URIs where we can assist in making it acceptable using
-     * the "browseSourceType" method.
-     *
-     */
-    private void maybePlotImmediately() {
-        String surl = getValue();
-        if (surl.equals("") ) { 
-            logger.finest("empty value, returning");
-            return;
-        }
-
-        if (surl.startsWith("vap+internal:")) {
-            firePlotDataSetURL();
-            return;
-        }
-
-        if ( checkActionTriggers(surl) ) {
-            return;
-        }
-        
+    private void maybePlotImmediatelyOffEvent( String surl ) {
         Pattern accept= acceptPattern==null ? null : Pattern.compile(acceptPattern);
 
         if ( !enableDataSource && ( accept==null || accept.matcher(surl).matches() ) ) { // just fire off an event, don't validate it or do completions.
@@ -513,12 +485,48 @@ public class DataSetSelector extends javax.swing.JPanel {
             logger.log( Level.SEVERE, ex.getMessage(), ex );
             setMessage(ex.getMessage());
         }
+        
+    }
+    
+    /**
+     * See if we can resolve a plottable URI from the selector by identifying
+     * the data source type and calling its reject method, or identifying the
+     * file system type and getting completions on it.  The reject method
+     * is used to identify URIs where we can assist in making it acceptable using
+     * the "browseSourceType" method.
+     *
+     */
+    private void maybePlotImmediately() {
+        final String surl = getValue();
+        if (surl.equals("") ) { 
+            logger.finest("empty value, returning");
+            return;
+        }
 
+        if (surl.startsWith("vap+internal:")) {
+            firePlotDataSetURL();
+            return;
+        }
+
+        if ( checkActionTriggers(surl) ) {
+            return;
+        }
+        
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                maybePlotImmediatelyOffEvent( surl );
+            }
+        };
+        
+        RequestProcessor.invokeLater(run);
+        
     }
 
     /**
      * if the dataset requires parameters that aren't provided, then
      * show completion list.  Otherwise, fire off event.
+     * @param allowModifiers turn off any modifiers like shift or control.
      */
     public void maybePlot(boolean allowModifiers) {
         logger.log(Level.FINE, "go {0}", getValue());
