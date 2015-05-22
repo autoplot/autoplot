@@ -172,6 +172,20 @@ public class EditorTextPane extends JEditorPane {
 
     }
 
+    /**
+     * Ed and I verified that this is being set off of the event thread.
+     * @param doc 
+     */
+    @Override
+    public void setDocument(Document doc) {
+        if ( !SwingUtilities.isEventDispatchThread() ) {
+            logger.fine("called from off the event queue.");
+        }
+        super.setDocument(doc); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
+
     private void showUsages() {
         String script= getText();
         String var= getSelectedText();
