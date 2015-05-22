@@ -99,7 +99,7 @@ public class Test_052_FocusSwitching implements Scenario {
     }
     
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_5pt2_FocusSwitching"};
+	String[] params = {"org.autoplot.test.Test_052_FocusSwitching"};
 	org.netbeans.jemmy.Test.main(params);
     }
 }
