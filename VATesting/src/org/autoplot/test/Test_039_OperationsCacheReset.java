@@ -17,6 +17,7 @@ import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
+import org.netbeans.jemmy.operators.JTreeOperator;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
 import static org.virbo.autoplot.ScriptContext.save;
@@ -48,38 +49,63 @@ public class Test_039_OperationsCacheReset implements Scenario {
             // plot first test dataset
             new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("vap+inline:ripplesTimeSeries(2000)");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
-            
-            // Implement reducex() filter
-            new JMenuBarOperator( mainFrame ).pushMenu("Tools|filters|Data Set Operations|Reduce in Zeroth Dimension", "|");
-            
-            DialogOperator reduceFrame = new DialogOperator( new RegexComponentChooser( "Reducex Filter Parameters") );
-            new JTextFieldOperator(reduceFrame, "1").setText("360"); 
-            new JComboBoxOperator(reduceFrame).selectItem("s", true, true);
-            Thread.sleep(250);
-            new JButtonOperator(reduceFrame, "OK").clickMouse();
-            
+
             JTabbedPaneOperator tabs = new JTabbedPaneOperator( app.getTabs() );
-            tabs.selectPage("canvas");
-            Thread.sleep(1000);
             
-            tabs.selectPage("data");
-            Thread.sleep(750);
+            {
+                // Implement reducex() filter
+                new JMenuBarOperator( mainFrame ).pushMenuNoBlock("Tools|Filters...");
+            
+                DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser("Add Filter" ) );
+            
+                JTreeOperator tree= new JTreeOperator( addFilterFrame );
+                tree.clickMouse();
+                tree.selectPath(tree.findPath( new String[] { "Filters", "Data Set Operations", "Reduce in Zeroth Dimension" } ) );
+                Thread.sleep(500);
+                new JButtonOperator( addFilterFrame, "OK" ).clickMouse();
+            
+                Thread.sleep(500);
+            
+                DialogOperator reduceFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
+                new JTextFieldOperator(reduceFrame, "1").setText("360"); 
+                new JComboBoxOperator(reduceFrame).selectItem("s", true, true);
+                Thread.sleep(250);
+                new JButtonOperator(reduceFrame, "OK").clickMouse();
+            
+                tabs.selectPage("canvas");
+                Thread.sleep(1000);
+            
+                tabs.selectPage("data");
+                Thread.sleep(750);
                 
-            tabs.selectPage("canvas");
+                tabs.selectPage("canvas");
                 
+            }
+            
             // plot second test dataset            
             new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("vap+inline:ripplesSpectrogramTimeSeries(2000)");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
-             
-            // Implement reducex() filter
-            new JMenuBarOperator( mainFrame ).pushMenu("Tools|filters|Data Set Operations|Reduce in Zeroth Dimension", "|");
             
-            reduceFrame = new DialogOperator( new RegexComponentChooser( "Reducex Filter Parameters") );
-            new JTextFieldOperator(reduceFrame, "1").setText("360");
-            new JComboBoxOperator(reduceFrame).selectItem("s", true, true);
-            Thread.sleep(250);
-            new JButtonOperator(reduceFrame, "OK").clickMouse();
+            ScriptContext.waitUntilIdle();
+             
+            {
+                new JMenuBarOperator( mainFrame ).pushMenuNoBlock("Tools|Filters...");
+                DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser("Add Filter" ) );
 
+                JTreeOperator tree= new JTreeOperator( addFilterFrame );
+                tree.clickMouse();
+                tree.selectPath(tree.findPath( new String[] { "Filters", "Data Set Operations", "Reduce in Zeroth Dimension" } ) );
+                Thread.sleep(500);
+                new JButtonOperator( addFilterFrame, "OK" ).clickMouse();
+
+                DialogOperator reduceFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
+                new JTextFieldOperator(reduceFrame, "1").setText("360");
+                new JComboBoxOperator(reduceFrame).selectItem("s", true, true);
+                Thread.sleep(250);
+                new JButtonOperator(reduceFrame, "OK").clickMouse();
+
+            }
+            
             tabs.selectPage("canvas");
             Thread.sleep(1000);
             
