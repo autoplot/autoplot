@@ -5076,6 +5076,7 @@ APSplash.checkTime("init 240");
     /**
      * present the "Run Script" dialog, asking the user to review the 
      * script before running it.
+     * This should be called from the event thread.
      * @param script 
      */
     private void runScript( final String script ) {
@@ -5085,34 +5086,37 @@ APSplash.checkTime("init 240");
             final RunScriptPanel pp = new RunScriptPanel();
             final HashMap params= URISplit.parseParams(split.params);
             pp.loadFile(ff);
+
+            final ProgressMonitor mon= DasProgressPanel.createFramed(AutoplotUI.this,"Running script "+ff );
+            File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
+                        
+            boolean isTool= split.path.contains(tools.toString()); // here is the trust...
+            Bookmark trust= BookmarksManager.findBookmarkByUri( toolsManager.getModel().getList(), script, 1 );
+            isTool = isTool || trust!=null;
+            
+            final boolean fisTool= isTool;
+            
             Runnable run= new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        ProgressMonitor mon= DasProgressPanel.createFramed(AutoplotUI.this,"Running script "+ff );
-                        File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
-                        
-                        boolean isTool= split.path.contains(tools.toString()); // here is the trust...
-                        Bookmark trust= BookmarksManager.findBookmarkByUri( toolsManager.getModel().getList(), script, 1 );
-                        isTool = isTool || trust!=null;
-                        
                         int res= JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
-                                params, true, !isTool, mon );
+                                params, true, !fisTool, mon );
                         if ( res==JOptionPane.OK_OPTION ) {
                             if ( scriptPanel!=null ) {
-                                if ( ! scriptPanel.isDirty() && !isTool ) {
+                                if ( ! scriptPanel.isDirty() && !fisTool ) {
                                     scriptPanel.loadFile(ff);
+                                }
                             }
+                            dom.getController().getApplicationModel().addRecent(script);
                         }
-                        dom.getController().getApplicationModel().addRecent(script);
-                    }
                         //askRunScript( pp, split.resourceUri, ff );
                     } catch ( IOException ex ) {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                 }
             };
-            RequestProcessor.invokeLater(run);
+            SwingUtilities.invokeLater(run);
         } catch (URISyntaxException ex) {
             setMessage(WARNING_ICON,ex.getMessage());
             logger.log(Level.SEVERE, ex.getMessage(), ex);
