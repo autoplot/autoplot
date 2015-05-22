@@ -1,0 +1,37 @@
+
+package util;
+
+import org.netbeans.jemmy.operators.DialogOperator;
+import org.netbeans.jemmy.operators.JButtonOperator;
+import org.netbeans.jemmy.operators.JFrameOperator;
+import org.netbeans.jemmy.operators.JMenuBarOperator;
+import org.netbeans.jemmy.operators.JTreeOperator;
+
+/**
+ *
+ * @author faden@cottagesystems.com
+ */
+public class FiltersTreePicker {
+    
+    /**
+     * find the filter and select it from the Tools->Filters gui.
+     * @param mainFrame
+     * @param path
+     * @throws InterruptedException 
+     */
+    public static void pickFilter(JFrameOperator mainFrame, String[] path  ) throws InterruptedException {
+            // Implement reducex() filter
+            new JMenuBarOperator( mainFrame ).pushMenuNoBlock("Tools|Filters...");
+
+            DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser("Add Filter" ) );
+
+            JTreeOperator tree= new JTreeOperator( addFilterFrame );
+            tree.clickMouse();
+            tree.selectPath(tree.findPath( path ) );
+            Thread.sleep(500);
+            new JButtonOperator( addFilterFrame, "OK" ).clickMouse();
+
+            Thread.sleep(500);
+
+        }
+}
