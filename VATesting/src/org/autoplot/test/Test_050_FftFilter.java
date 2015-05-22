@@ -46,7 +46,7 @@ public class Test_050_FftFilter implements Scenario {
             
             ScriptContext.waitUntilIdle();
             
-            FiltersTreePicker.pick( mainFrame, "Filters|Fourier Filtering|FFT With sliding window".split("\\|") );
+            FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Filtering|FFT With sliding window".split("\\|") );
             
             DialogOperator fftFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
             
