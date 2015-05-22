@@ -50,11 +50,16 @@ public class Test_050_FftFilter implements Scenario {
             
             DialogOperator fftFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
             
+            Thread.sleep(100);
+            
             JTextComponentOperator size = new JTextComponentOperator(fftFrame);
             size.setText("100");
             
             JComboBoxOperator window = new JComboBoxOperator(fftFrame, 0);
             window.selectItem(0);
+            
+            Thread.sleep(500);
+            
             JComboBoxOperator slide = new JComboBoxOperator(fftFrame, 1);
             slide.selectItem(2);
                     
