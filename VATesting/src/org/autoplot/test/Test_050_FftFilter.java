@@ -21,6 +21,7 @@ import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
 import static org.virbo.autoplot.ScriptContext.save;
 import static org.virbo.autoplot.ScriptContext.writeToPng;
+import util.FiltersTreePicker;
 import util.RegexComponentChooser;
 
 /**
@@ -45,10 +46,9 @@ public class Test_050_FftFilter implements Scenario {
             
             ScriptContext.waitUntilIdle();
             
-            JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
-            menuBar.pushMenu("Tools|Filters|Fourier Filtering|FFT", "|");
+            FiltersTreePicker.pick( mainFrame, "Filters|Fourier Filtering|FFT With sliding window".split("\\|") );
             
-            DialogOperator fftFrame = new DialogOperator( new RegexComponentChooser( "FFT Power Filter Parameters") );
+            DialogOperator fftFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
             
             JTextComponentOperator size = new JTextComponentOperator(fftFrame);
             size.setText("100");
@@ -78,7 +78,7 @@ public class Test_050_FftFilter implements Scenario {
     }
     
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_5pt0_FftFilter"};
+	String[] params = {"org.autoplot.test.Test_050_FftFilter"};
 	org.netbeans.jemmy.Test.main(params);
     }
 }
