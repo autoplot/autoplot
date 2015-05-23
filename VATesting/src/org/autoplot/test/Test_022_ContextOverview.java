@@ -50,7 +50,7 @@ public class Test_022_ContextOverview implements Scenario {
                     new ComponentChooser[] { new RegexComponentChooser("Bookmarks"),
                     new RegexComponentChooser("Demos"), new RegexComponentChooser("Demo 5: .*") } );
 
-            Thread.sleep(300);
+            Thread.sleep(1000);
             waitUntilIdle();
 
             DatumRange range0= dom.getPlots(0).getXaxis().getRange();
