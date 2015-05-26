@@ -2,6 +2,7 @@
 package org.virbo.jythonsupport;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,6 +33,7 @@ import org.das2.datum.DatumRange;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.python.core.FileUtil;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
@@ -129,6 +131,7 @@ public class JythonUtil {
 //        } catch ( Exception ex ) {
 //            System.err.println("java1-> ok!" );
 //        }
+        
         boolean loadAutoplotStuff= true;
         if ( loadAutoplotStuff ) {
             Py.getAdapter().addPostClass(new PyQDataSetAdapter());
@@ -136,10 +139,16 @@ public class JythonUtil {
                 URL imports= JythonOps.class.getResource("imports.py");
                 if ( imports==null ) {
                     throw new RuntimeException("unable to locate imports.py on classpath");
+                } else {
+                    logger.log(Level.FINE, "loading imports.py from {0}", imports);
                 }
-                InputStream in = imports.openStream();
+                InputStream in= imports.openStream(); // note this stream will load in another stream.
+                byte[] bimports= FileUtil.readBytes(in);
+                String simports= new String( bimports );
+                logger.log( Level.FINE, simports );
+                //InputStream in = imports.openStream();
                 try {
-                    interp.execfile( in, "imports.py");
+                    interp.execfile( new ByteArrayInputStream(bimports), "imports.py");
                 } finally {
                     in.close();
                 }
@@ -147,7 +156,6 @@ public class JythonUtil {
         }
 
 //        try {
-        interp.exec("java=1"); // destroy the java symbol, which should not be imported, but I'm not sure who is importing it.
 //            System.err.println("java2-> "+interp.eval("java") );
 //        } catch ( Exception ex ) {
 //            System.err.println("java2-> ok!" );
@@ -297,7 +305,7 @@ public class JythonUtil {
         File ff4= new File( ff3, "autoplot.py" );
         String vers= "";
         
-        double currentVersion= 1.22;  //rfe320 improved getParam support.
+        double currentVersion= 1.40;  //rfe320 improved getParam support.
                 
         if ( ff4.exists() ) {
             BufferedReader r= new BufferedReader( new FileReader( ff4 ) );
