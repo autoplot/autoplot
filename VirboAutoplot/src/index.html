@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Bug 1393, where Webstart would prevent new versions from propagating over HTTP, is finally fixed.
+        <p><small>More macros, like %{PROPERTIES.DEPEND_1.NAME}, are allowed.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,6 +23,7 @@
 
         <p>Bugfixes (2015-05-26 r16889):</p>
         <ul>
+            <li>SpectrogramRenderer used code that ignored CADENCE property to judge the distance between measurements</li>
             <li>1403: properly support brackets in filenames (rte1830227625) </li>
             <li>1310: fix accidental java import with "import java.lang.Thread as _Thread instead of "import java.lang.Thread"</li>
             <li>1404: fix occasional Jython GUI error caused by review GUI being created off of the event thread.</li>
