@@ -445,6 +445,15 @@ public class LayoutPanel extends javax.swing.JPanel {
 
         canvasLayoutPanel1.setSelectedComponents( selected );
         canvasLayoutPanel1.setComponent(dasPlot);
+        
+        //deletePlotAction.setEnabled( plotCount>0 );
+        //tallerButton.setEnabled( plotCount>0 );
+        //shorterButton.setEnabled( plotCount>0 );
+        //sameHeightButton.setEnabled( plotCount>1 );
+        deletePlotAction.setEnabled( true );
+        tallerButton.setEnabled( true );
+        shorterButton.setEnabled( true );
+        sameHeightButton.setEnabled( true );
     }
 
     public void setApplication(Application app) {
@@ -613,6 +622,8 @@ public class LayoutPanel extends javax.swing.JPanel {
         tallerButton = new javax.swing.JButton();
         shorterButton = new javax.swing.JButton();
         sameHeightButton = new javax.swing.JButton();
+        addPlotsButton = new javax.swing.JButton();
+        deletePlotButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         bindingListComponent = new javax.swing.JList();
@@ -748,12 +759,12 @@ public class LayoutPanel extends javax.swing.JPanel {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
         );
 
         jSplitPane1.setRightComponent(jPanel2);
 
-        jSplitPane2.setDividerLocation(200);
+        jSplitPane2.setDividerLocation(300);
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane2.setResizeWeight(0.5);
 
@@ -787,31 +798,54 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         });
 
+        addPlotsButton.setAction(addPlotsAction);
+        addPlotsButton.setText("Add Plots...");
+        addPlotsButton.setToolTipText("Add plots around the focus plot");
+
+        deletePlotButton.setAction(deletePlotAction);
+        deletePlotButton.setText("Delete Plots");
+        deletePlotButton.setToolTipText("Delete the selected plot(s)");
+        deletePlotButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deletePlotButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(sameHeightButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(deletePlotButton))
             .add(jPanel1Layout.createSequentialGroup()
                 .add(tallerButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(shorterButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(sameHeightButton)
-                .add(0, 69, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(addPlotsButton))
         );
 
         jPanel1Layout.linkSize(new java.awt.Component[] {shorterButton, tallerButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
+        jPanel1Layout.linkSize(new java.awt.Component[] {addPlotsButton, deletePlotButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(tallerButton)
                     .add(shorterButton)
-                    .add(sameHeightButton)))
+                    .add(addPlotsButton))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(sameHeightButton)
+                    .add(deletePlotButton)))
         );
 
         jSplitPane2.setTopComponent(jPanel1);
@@ -835,7 +869,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 148, Short.MAX_VALUE)
         );
 
         jSplitPane2.setRightComponent(jPanel3);
@@ -1109,27 +1143,33 @@ public class LayoutPanel extends javax.swing.JPanel {
 
     }//GEN-LAST:event_smallerMIActionPerformed
 
-    private void tallerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tallerButtonActionPerformed
-        biggerMIActionPerformed(evt);
-    }//GEN-LAST:event_tallerButtonActionPerformed
-
-    private void shorterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shorterButtonActionPerformed
-        smallerMIActionPerformed(evt);
-    }//GEN-LAST:event_shorterButtonActionPerformed
+    private void deletePlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletePlotButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_deletePlotButtonActionPerformed
 
     private void sameHeightButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sameHeightButtonActionPerformed
         sameSizeMIActionPerformed(evt);
     }//GEN-LAST:event_sameHeightButtonActionPerformed
 
+    private void shorterButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shorterButtonActionPerformed
+        smallerMIActionPerformed(evt);
+    }//GEN-LAST:event_shorterButtonActionPerformed
+
+    private void tallerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tallerButtonActionPerformed
+        biggerMIActionPerformed(evt);
+    }//GEN-LAST:event_tallerButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addHiddenMenuItem;
     private javax.swing.JMenuItem addPlotsBelowMenuItem;
+    private javax.swing.JButton addPlotsButton;
     private javax.swing.JMenuItem biggerMI;
     private javax.swing.JPopupMenu bindingActionsMenu;
     private javax.swing.JList bindingListComponent;
     private org.virbo.autoplot.util.CanvasLayoutPanel canvasLayoutPanel1;
     private javax.swing.JMenuItem deleteBindingsMenuItem;
     private javax.swing.JMenuItem deleteMenuItem;
+    private javax.swing.JButton deletePlotButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -1153,4 +1193,5 @@ public class LayoutPanel extends javax.swing.JPanel {
     private javax.swing.JMenuItem swapMenuItem;
     private javax.swing.JButton tallerButton;
     // End of variables declaration//GEN-END:variables
+
 }

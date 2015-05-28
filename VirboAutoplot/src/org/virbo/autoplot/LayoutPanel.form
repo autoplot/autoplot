@@ -175,7 +175,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jSplitPane1" alignment="0" pref="421" max="32767" attributes="0"/>
+          <Component id="jSplitPane1" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -211,7 +211,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" alignment="1" pref="396" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" alignment="1" pref="454" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -242,7 +242,7 @@
         </Container>
         <Container class="javax.swing.JSplitPane" name="jSplitPane2">
           <Properties>
-            <Property name="dividerLocation" type="int" value="200"/>
+            <Property name="dividerLocation" type="int" value="300"/>
             <Property name="orientation" type="int" value="0"/>
             <Property name="resizeWeight" type="double" value="0.5"/>
           </Properties>
@@ -275,26 +275,36 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="canvasLayoutPanel1" max="32767" attributes="0"/>
-                      <Group type="102" attributes="0">
+                      <Component id="canvasLayoutPanel1" pref="318" max="32767" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="sameHeightButton" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="deletePlotButton" linkSize="2" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
                           <Component id="tallerButton" linkSize="1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="shorterButton" linkSize="1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="sameHeightButton" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="69" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="addPlotsButton" linkSize="2" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="canvasLayoutPanel1" pref="140" max="32767" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="canvasLayoutPanel1" pref="199" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="tallerButton" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="shorterButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="addPlotsButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="sameHeightButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="deletePlotButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -333,6 +343,27 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sameHeightButtonActionPerformed"/>
                   </Events>
                 </Component>
+                <Component class="javax.swing.JButton" name="addPlotsButton">
+                  <Properties>
+                    <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="addPlotsAction" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Add Plots..."/>
+                    <Property name="toolTipText" type="java.lang.String" value="Add plots around the focus plot"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="deletePlotButton">
+                  <Properties>
+                    <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="deletePlotAction" type="code"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Delete Plots"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Delete the selected plot(s)"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="deletePlotButtonActionPerformed"/>
+                  </Events>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="jPanel3">
@@ -358,7 +389,7 @@
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jScrollPane2" alignment="0" pref="190" max="32767" attributes="0"/>
+                      <Component id="jScrollPane2" alignment="1" pref="148" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
               </Layout>
