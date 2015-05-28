@@ -3,9 +3,7 @@ package test;
 
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import gov.nasa.gsfc.spdf.cdfj.ReaderFactory;
-import gov.nasa.gsfc.spdf.cdfj.TimeSeries;
 import java.nio.ByteBuffer;
-import org.autoplot.bufferdataset.BufferDataSet;
 
 /**
  * Demo where the old library fails on 32bit machines, and that 
