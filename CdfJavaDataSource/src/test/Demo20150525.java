@@ -4,6 +4,7 @@ package test;
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import gov.nasa.gsfc.spdf.cdfj.ReaderFactory;
 import java.nio.ByteBuffer;
+import org.autoplot.bufferdataset.BufferDataSet;
 
 /**
  * Demo where the old library fails on 32bit machines, and that 
@@ -23,6 +24,16 @@ public class Demo20150525 {
         
         // This file can be retrieved from http://cdaweb.gsfc.nasa.gov/data/cluster/c1/wbd/2004/04/c1_waveform_wbd_200404032100_v01.cdf
         // wget -O /tmp/c1_waveform_wbd_200404032100_v01.cdf http://cdaweb.gsfc.nasa.gov/data/cluster/c1/wbd/2004/04/c1_waveform_wbd_200404032100_v01.cdf
+
+        System.gc();
+        System.gc();
+        System.gc();
+        
+        
+        System.err.println( "====" );
+        System.err.println( "before totalMemory=" + Runtime.getRuntime().totalMemory() );
+        System.err.println( "before freeMemory=" + Runtime.getRuntime().freeMemory() );
+
         CDFReader cdf;
         if ( !allocateDirect ) {
             cdf= ReaderFactory.getReader("/tmp/c1_waveform_wbd_200404032100_v01.cdf");
@@ -34,8 +45,14 @@ public class Demo20150525 {
         
         ByteBuffer buff= cdf.getBuffer( "WBD_Mag", "double", new int[] { 0, 16465368 }, true );
         System.err.println("cdf.getBuffer WBD_Mag = "+buff);
+        
+        BufferDataSet bds= BufferDataSet.makeDataSet( 1, 8, 0, 16465368+1, 1, 1, 1, buff, BufferDataSet.DOUBLE );
+        System.err.println( String.format( "%f %f", bds.value(695420), bds.value(bds.length()-1) ) );
+        
         ByteBuffer buff2= cdf.getBuffer( "Epoch", "double", new int[] { 0, 16465368 }, true );
         System.err.println("cdf.getBuffer Epoch = "+buff2);
         
+        System.err.println( "after totalMemory=" + Runtime.getRuntime().totalMemory() );
+        System.err.println( "after freeMemory=" + Runtime.getRuntime().freeMemory() );
     }
 }
