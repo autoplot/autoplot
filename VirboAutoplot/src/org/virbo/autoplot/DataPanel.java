@@ -307,6 +307,7 @@ public class DataPanel extends javax.swing.JPanel {
                     if ( dsf!=null ) {
                         filtersChainPanel.setInput(null);
                         filtersChainPanel.setInput(dsf.getController().getFillDataSet());
+                        filtersChainPanel.setFilter(s);
                     }
                 }
                 operatorsTextField.setText(s);
@@ -396,6 +397,7 @@ public class DataPanel extends javax.swing.JPanel {
                     if ( dsf!=null ) {
                         filtersChainPanel.setInput(null);
                         filtersChainPanel.setInput(dsf.getController().getFillDataSet());
+                        filtersChainPanel.setFilter(newf);
                     } else {
                         filtersChainPanel.setInput(null);
                     }
@@ -416,8 +418,8 @@ public class DataPanel extends javax.swing.JPanel {
                 String filter= filtersChainPanel.getFilter();
                 filtersChainPanel.setFilter("");
                 filtersChainPanel.setInput(null);
-                filtersChainPanel.setFilter(filter);
                 filtersChainPanel.setInput(ds);  
+                filtersChainPanel.setFilter(filter);
             }
         };
         SwingUtilities.invokeLater(run);        
@@ -932,6 +934,7 @@ public class DataPanel extends javax.swing.JPanel {
         if ( this.dsf!=null ) {
             QDataSet inputDs= this.dsf.getController().getFillDataSet();
             p.setInput(inputDs); 
+            p.setFilter(operatorsTextField.getText());
         }
         int ret= AutoplotUtil.showConfirmDialog( this, panel, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
         if ( ret==JOptionPane.OK_OPTION ) {
