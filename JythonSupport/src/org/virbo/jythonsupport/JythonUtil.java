@@ -35,6 +35,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.FileUtil;
 import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
@@ -649,15 +650,22 @@ public class JythonUtil {
      */ 
     public static void setParams( PythonInterpreter interp, Map<String,String> paramsl ) {
         interp.exec("import autoplot");
+        PyDictionary dict= new PyDictionary();
         interp.exec("autoplot.params=dict()");
         for ( Entry<String,String> e : paramsl.entrySet()) {
             String s= e.getKey();
-            if (!s.equals("arg_0") && !s.equals("script") ) {
-                String sval= e.getValue();
-                
-                sval= maybeQuoteString( sval );
-                logger.log(Level.FINE, "autoplot.params[''{0}'']={1}", new Object[]{s, sval});
-                interp.exec("autoplot.params['" + s + "']=" + sval);
+            if ( s.length()==0 ) {
+                throw new IllegalArgumentException("param name is \"\": "+s);
+            } 
+            if ( !s.equals("arg_0") && !s.equals("script") ) {
+                try {
+                    String sval= e.getValue();
+                    sval= maybeQuoteString( sval );
+                    logger.log(Level.FINE, "autoplot.params[''{0}'']={1}", new Object[]{s, sval});
+                    interp.exec("autoplot.params['" + s + "']=" + sval);
+                } catch ( Exception ex ) {
+                    logger.warning(ex.getMessage());
+                } 
             }
         }
     }
@@ -1055,7 +1063,13 @@ public class JythonUtil {
         
         if ( env!=null ) {
             for ( Entry<String,Object> ent: env.entrySet() ) {
-                interp.set( ent.getKey(), ent.getValue() );
+                if ( ent.getKey()==null ) {
+                    logger.log( Level.WARNING, "parameter name was null" );
+                } else if ( ent.getValue()==null ) {
+                    logger.log( Level.WARNING, "parameter value was null" );
+                } else {
+                    interp.set( ent.getKey(), ent.getValue() );
+                }
             }
         }
         
