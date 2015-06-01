@@ -121,6 +121,7 @@ import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.xml.sax.SAXException;
@@ -573,6 +574,14 @@ public class GuiSupport {
                         }
 
                         URISplit split= URISplit.parse(name);
+                        if ( split.file==null ) {
+                            name= new File( FileSystemUtil.getPresentWorkingDirectory(), name ).toString(); 
+                            split= URISplit.parse(name);
+                            if ( split.file==null ) {
+                                JOptionPane.showMessageDialog(parent, "Can't use this filename: " + name);
+                                return;
+                            }
+                        }
                         if ( !split.file.endsWith(ext) ) {
                             String s=  split.file;
                             boolean addExt= true;
