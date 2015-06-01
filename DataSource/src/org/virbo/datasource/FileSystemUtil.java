@@ -54,6 +54,24 @@ public class FileSystemUtil {
     }
     
     /**
+     * get the current working directory (pwd)
+     * @return the current working directory.
+     * @throws IOException 
+     */
+    public static File getPresentWorkingDirectory() throws IOException {
+        String pwd= new File(".").getCanonicalPath();
+        if ( pwd.length()>2 ) {
+            if ( pwd.endsWith(".") ) {
+                pwd= pwd.substring(0,pwd.length()-1);
+            }
+            if ( !pwd.endsWith(File.separator) ) {
+                pwd= pwd+File.separator;
+            }
+        }
+        return new File(pwd);               
+    }
+    
+    /**
      * checks to see if the resource uri appears to represent an existing
      * data source.  false indicates that the resource is known to not exist.
      * true indicates that the resource does exist.
