@@ -4,6 +4,7 @@
 from org.virbo.dataset import SemanticOps
 from org.das2.graph import Renderer
 
+import java 
 from java.lang import IllegalArgumentException
 
 cb= dom.plots[0].zaxis.controller.getDasAxis()
