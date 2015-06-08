@@ -3669,8 +3669,19 @@ public static String getProcessId(final String fallback) {
     return fallback;
 }
 
+private static final boolean is32bit;
+static {
+    String s= System.getProperty("sun.arch.data.model");
+    if ( s==null ) { // GNU 1.5? 
+        s= System.getProperty("os.arch");
+        is32bit = !s.contains("64");
+    } else {
+        is32bit = s.equals("32");
+    }     
+}
+
 private void updateFrameTitle() {
-     final String suri= applicationModel.getVapFile();
+    final String suri= applicationModel.getVapFile();
 
     String v= APSplash.getVersion();
     if ( v.equals("untagged_version") ) {
@@ -3684,9 +3695,11 @@ private void updateFrameTitle() {
 
     final String server= rlistener==null ? "" : ( " (port="+rlistener.getPort()+")" );
     
+    final String s32bit= is32bit ? " (32bit)" : "";
+    
     final String theTitle;
     if ( suri==null ) {
-        theTitle=  title0 + isoffline + server;
+        theTitle=  title0 + isoffline + server + s32bit;
     } else {
         URISplit split= URISplit.parse(suri);
 
