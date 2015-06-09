@@ -1,0 +1,9 @@
+# test jyds for testing security.  This returns a trivial dataset.
+
+tr= getParam( 'timerange', '2009-03-10/2009-03-12', 'timerange to load' )
+sensor= getParam( 'sensor', '0B000800408DD710', 'the 1-wire sensor', ['0B000800408DD710','610008002FE00410','8500080044259C10'] )
+
+result= getDataSet( PWD + sensor + '.$Y$m$d.d2s', tr, monitor )
+
+
+
