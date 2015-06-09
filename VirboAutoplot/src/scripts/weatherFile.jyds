@@ -10,8 +10,8 @@ from org.virbo.dataset import DDataSet
 from java.io import File
 from java.io import FileInputStream
 
-file= File( '/home/jbf/20100309_1400.xml' )  # from http://forecast.weather.gov/
-myin= FileInputStream( file )
+fil= File( '/home/jbf/20100309_1400.xml' )  # from http://forecast.weather.gov/
+myin= FileInputStream( fil )
 
 builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 source = InputSource( myin )
