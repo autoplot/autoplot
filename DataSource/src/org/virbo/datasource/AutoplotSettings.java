@@ -40,6 +40,7 @@ public final class AutoplotSettings {
     }
 
     PropertyChangeListener listener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getNewValue() instanceof String ) {
                 prefs.put( evt.getPropertyName(),(String) evt.getNewValue());
