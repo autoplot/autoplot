@@ -8,6 +8,7 @@ package org.virbo.datasource;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import org.das2.util.filesystem.FileSystem;
@@ -66,7 +67,7 @@ public final class AutoplotSettings {
         this.autoplotData= prefs.get( PROP_AUTOPLOTDATA, "${HOME}/autoplot_data" );
         String p= System.getProperty("AUTOPLOT_DATA");
         if ( p!=null ) {
-            logger.warning("AUTOPLOT_DATA system property used to set AUTOPLOT_DATA="+p);
+            logger.log(Level.WARNING, "AUTOPLOT_DATA system property used to set AUTOPLOT_DATA={0}", p);
             this.autoplotData= p;
         }
         this.fscache= prefs.get( PROP_FSCACHE, this.autoplotData+"/fscache" );
