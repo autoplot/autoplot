@@ -35,7 +35,7 @@ public final class AutoplotSettings {
         } catch ( Exception ex ) {
             logger.warning("Problem encountered when attempting to load user preferences, continuing with autoplot_data in $HOME");
             this.autoplotData= "${HOME}/autoplot_data";
-            this.fscache= "${HOME}/autoplot_data/fscache";
+            this.fscache= this.autoplotData + "/fscache";
         }
     }
 
@@ -65,7 +65,10 @@ public final class AutoplotSettings {
     public void loadPreferences() {
         this.autoplotData= prefs.get( PROP_AUTOPLOTDATA, "${HOME}/autoplot_data" );
         String p= System.getProperty("AUTOPLOT_DATA");
-        if ( p!=null ) this.autoplotData= p;
+        if ( p!=null ) {
+            logger.warning("AUTOPLOT_DATA system property used to set AUTOPLOT_DATA="+p);
+            this.autoplotData= p;
+        }
         this.fscache= prefs.get( PROP_FSCACHE, this.autoplotData+"/fscache" );
         p= System.getProperty("AUTOPLOT_FSCACHE");
         if ( p!=null ) this.fscache= p;
