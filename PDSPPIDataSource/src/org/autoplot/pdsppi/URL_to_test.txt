@@ -2,7 +2,7 @@
 http://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&o=txt
 
 # here is a listing of available products.
-http://ppi.pds.nasa.gov/writeFileSYS?id=pds://PPI/CO-V_E_J_S_SS-RPWS-2-REFDR-ALL-V1.0/DATA/RPWS_RAW_COMPLETE
+http://ppi.pds.nasa.gov/ditdos/view?id=pds://PPI/CO-V_E_J_S_SS-RPWS-2-REFDR-ALL-V1.0/DATA/RPWS_RAW_COMPLETE&times=false
 
 # here is a request for a dataset.
 #dataset = top-level collection of products.
@@ -10,3 +10,7 @@ http://ppi.pds.nasa.gov/writeFileSYS?id=pds://PPI/CO-V_E_J_S_SS-RPWS-2-REFDR-ALL
 #product =  one LABEL and TABLE file (or any data files within the dataset).
 #param = one plottable set of data.
 http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
+
+http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://PPI/CO-E_J_S_SW-CAPS-2-UNCALIBRATED-V1.0/DATA/CRUISE/2004/092_121_APR/2004093/ACT_200409300_1  works
+http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://PPI/maven.mag.calibrated/data/pc/2014/11/mvn_mag_l2_2014305pc_20141101_v01_r01.sts   Does not.
+
