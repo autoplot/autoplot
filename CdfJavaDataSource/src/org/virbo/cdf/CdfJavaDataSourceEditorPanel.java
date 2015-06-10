@@ -361,7 +361,12 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     
     @Override
     public boolean reject( String url ) throws IOException, URISyntaxException {
-        split = URISplit.parse(url);
+        split = URISplit.parse(url); 
+
+        if ( split.resourceUri.toURL()==null ) {
+            return true;
+        }
+        
         FileSystem fs = FileSystem.create( DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI() );
         if ( fs.isDirectory( split.file.substring(split.path.length()) ) ) {
             return true;
