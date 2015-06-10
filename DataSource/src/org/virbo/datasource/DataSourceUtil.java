@@ -679,7 +679,9 @@ public class DataSourceUtil {
      * provided to reduce code and for uniform behavior.
      * See CdfJavaDataSource, which is where this was copied from.
      * @param constraint, such as "[0:100:2]" for even records between 0 and 100, non-inclusive.
-     * @return
+     * @param recCount the number of records available for this variable
+     * @return the [startRecord,stopRecordExclusive,stride]
+     * @throws java.text.ParseException when the constraint cannot be parsed.
      */
     public static long[] parseConstraint(String constraint, long recCount) throws ParseException {
         long[] result = new long[]{0, recCount, 1};
@@ -709,6 +711,8 @@ public class DataSourceUtil {
             } catch ( NumberFormatException ex ) {
                 throw new ParseException("expected integer: "+ex.toString(),0);
             }
+            if ( result[0]>recCount ) result[0]= recCount;
+            if ( result[1]>recCount ) result[1]= recCount;
             return result;
         }
     }
