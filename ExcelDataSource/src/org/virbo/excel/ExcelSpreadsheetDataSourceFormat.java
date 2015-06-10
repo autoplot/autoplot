@@ -319,7 +319,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
     }
 
     public boolean canFormat(QDataSet ds) {
-        return ( ds.rank()==1 || ds.rank()==2 ) && ds.length()<65000;
+        return ( ds.rank()==1 || ds.rank()==2 ) && ds.length()<=65000;
     }
 
     public String getDescription() {
