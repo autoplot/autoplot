@@ -53,9 +53,21 @@ public final class AutoplotSettings {
 
     static Preferences prefs;
 
+    /**
+     * load the preferences from Preferences.userNodeForPackage( AutoplotSettings.class ),
+     * which include the location of the autoplot_data directory and fscache.
+     * The system property AUTOPLOT_DATA will override the user preference 
+     * /opt/virbo/datasource/autoplotData which is by default "${HOME}/autoplot_data", and
+     * can be set on the command line.  AUTOPLOT_FSCACHE is the location of the remote
+     * file mirror storing lots of data and can be moved separately.
+     */
     public void loadPreferences() {
         this.autoplotData= prefs.get( PROP_AUTOPLOTDATA, "${HOME}/autoplot_data" );
-        this.fscache= prefs.get( PROP_FSCACHE, "${HOME}/autoplot_data/fscache" );
+        String p= System.getProperty("AUTOPLOT_DATA");
+        if ( p!=null ) this.autoplotData= p;
+        this.fscache= prefs.get( PROP_FSCACHE, this.autoplotData+"/fscache" );
+        p= System.getProperty("AUTOPLOT_FSCACHE");
+        if ( p!=null ) this.fscache= p;
     }
     
     /**
