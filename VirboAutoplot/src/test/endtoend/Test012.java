@@ -134,6 +134,9 @@ public class Test012 {
             // bug 1101: trim/slice wasn't properly supported with rank 2 DEPEND_1.
             doTest( testid, 23, "file:///home/jbf/ct/hudson/data.backup/cdf/lanl/rbspb_ect-hope-sci-L2SA_20121219_v3.0.0.cdf?FPSA[0:100:5]" );
             
+            // bug 1409: subsetting with spectrogram and rank 1 DEPEND_1.
+            doTest( testid, 24, "file:///home/jbf/ct/hudson/data.backup/cdf/rbsp/rbsp-a_HFR-spectra-burst_emfisis-L2_20140121_v1.3.6.cdf?HFR_Spectra[0:100]" );
+            
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
             ex.printStackTrace();
