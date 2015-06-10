@@ -64,7 +64,7 @@ public class PDSPPIFileSystem extends WebFileSystem {
     //http://ppi.pds.nasa.gov/ditdos/inventory?sc=Cassini&facet=SPACECRAFT_NAME&title=Cassini&o=txt
     //http://draft-pdsppi.igpp.ucla.edu:8080/ditdos/inventory?t=Venus&facet=TARGET_NAME&title=Venus&o=txt
     //http://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&facet=SPACECRAFT_NAME&title=Cassini&o=txt
-    private String root= "http://ppi.pds.nasa.gov/writeFileSYS?id=pds:/";
+    private String root= "http://ppi.pds.nasa.gov/ditdos/view?id=pds:/";
     
     @Override
     protected void downloadFile(String filename, File f, File partfile, ProgressMonitor monitor) throws IOException {
