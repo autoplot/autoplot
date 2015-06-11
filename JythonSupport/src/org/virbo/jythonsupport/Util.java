@@ -511,6 +511,46 @@ public class Util {
     }
         
     /**
+     * return a list of completions.  This is useful in the IDL context
+     * as well as Jython scripts.  This will perform the completion for where the carot is
+     * at the end of the string.  Only completions where maybePlot indicates the URI is now 
+     * valid are returned, so for example http://autoplot.org/data/somedata.cdf?noDep is not
+     * returned and http://autoplot.org/data/somedata.cdf?Magnitude is.
+     * @param file, for example http://autoplot.org/data/somedata.cdf?
+     * @return list of completions, containing the entire URI.
+     * @throws java.lang.Exception any exception thrown by the data source.
+     */
+    public static String[] getCompletions( String file ) throws Exception {
+        List<DataSetURI.CompletionResult> cc= DataSetURI.getCompletions( file, file.length(), new NullProgressMonitor() );
+        List<DataSetURI.CompletionResult> resultList= new ArrayList<DataSetURI.CompletionResult>();
+        for (DataSetURI.CompletionResult cc1 : cc) {
+            if (cc1.maybePlot == true) {
+                resultList.add(cc1);
+            }
+        }
+
+        String[] result= new String[resultList.size()];
+        for ( int i=0; i<resultList.size(); i++ ) {
+            result[i]= resultList.get(i).completion;
+        }
+
+        return result;
+    }
+    
+    /**
+     * sleep for so many milliseconds.  This is introduced to avoid the import,
+     * which makes running scripts securely non-trivial.
+     * @param millis number of milliseconds to pause execution
+     */
+    public static void sleep( int millis ) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    /**
      * return true if we should do the imports as before, where all of Autoplot is
      * imported with each session.  This is used to ease migration.
      * @return true if the old behavior should be used.
