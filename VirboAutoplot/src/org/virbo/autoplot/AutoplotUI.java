@@ -560,9 +560,17 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 if ( ScriptContext.getViewWindow()==AutoplotUI.this ) {
                     org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     String s= dataSetSelector.getValue();
+                    Map<String,String> args;
                     try {
-                        JythonUtil.invokeScriptSoon( DataSetURI.getURL(s), dom, 
-                                new HashMap(), true, true, new NullProgressMonitor() );
+                        URISplit split= URISplit.parse(s);        
+                        args= URISplit.parseParams(split.params);
+                        if ( JOptionPane.OK_OPTION==JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
+                                args, true, true, new NullProgressMonitor() ) ) {
+                            split.params= URISplit.formatParams(args);
+                            String history= URISplit.format(split);
+                            dataSetSelector.setValue( history );
+                            applicationModel.addRecent( history );
+                        }
                     } catch ( IOException ex ) { 
                         throw new RuntimeException(ex);
                     }
