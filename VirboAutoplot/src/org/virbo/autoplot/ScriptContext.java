@@ -103,6 +103,7 @@ public class ScriptContext extends PyJavaInstance {
                 if ( !view.isVisible() ) view.setVisible(true);
             } else {
                 SwingUtilities.invokeLater( new Runnable() {
+                    @Override
                     public void run() {
                         if ( !view.isVisible() ) view.setVisible(true);
                     }
@@ -126,6 +127,7 @@ public class ScriptContext extends PyJavaInstance {
         maybeInitModel();
         if (view == null) {
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     view = new AutoplotUI(model);
                     view.setVisible(true);
@@ -148,6 +150,7 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * Used by AutoplotUI to set the view.
+     * @param v the new view.
      */
     protected static void setView(AutoplotUI v) {
         view = v;
