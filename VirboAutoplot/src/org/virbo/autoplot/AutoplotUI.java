@@ -562,7 +562,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     String s= dataSetSelector.getValue();
                     Map<String,String> args;
                     try {
-                        URISplit split= URISplit.parse(s);        
+                        URISplit split= URISplit.parse(s);        //bug 1408--note runScript doesn't account for changes made to the GUI.
                         args= URISplit.parseParams(split.params);
                         if ( JOptionPane.OK_OPTION==JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
                                 args, true, true, new NullProgressMonitor() ) ) {
@@ -5131,6 +5131,7 @@ APSplash.checkTime("init 240");
                                 }
                             }
                             dom.getController().getApplicationModel().addRecent(script);
+                            //TODO: bug 1408: can we not somehow set the address bar URI here?
                         }
                         //askRunScript( pp, split.resourceUri, ff );
                     } catch ( IOException ex ) {
