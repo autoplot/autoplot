@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot;
 
 import java.util.logging.Level;
@@ -22,7 +19,6 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,7 +50,6 @@ import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.URISplit;
 import org.virbo.qstream.SimpleStreamFormatter;
@@ -855,18 +850,14 @@ public class ScriptContext extends PyJavaInstance {
     public static void setTitle(String title) {
         model.getDocumentModel().getController().getPlot().setTitle(title);
     }
-
+    
     /**
      * sleep for so many milliseconds.  This is introduced to avoid the import,
      * which makes running scripts securely non-trivial.
      * @param millis number of milliseconds to pause execution
      */
     public static void sleep( int millis ) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
+        org.virbo.jythonsupport.Util.sleep( millis );
     }
     
     /**
@@ -1145,32 +1136,19 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * return a list of completions.  I was talking to Tom N. who was looking for this
-     * to get a list of CDF variables, and realized this would be useful in the IDL context
-     * as well as python scripts.  This will perform the completion for where the carot is
+     * return a list of completions.  This is useful in the IDL context
+     * as well as Jython scripts.  This will perform the completion for where the carot is
      * at the end of the string.  Only completions where maybePlot indicates the URI is now 
-     * valid are returned.
+     * valid are returned, so for example http://autoplot.org/data/somedata.cdf?noDep is not
+     * returned and http://autoplot.org/data/somedata.cdf?Magnitude is.
+     * Note this is included to continue support as this is described in http://autoplot.org/developer.idlMatlab.
      * @param file, for example http://autoplot.org/data/somedata.cdf?
      * @return list of completions, containing the entire URI.
      * @throws java.lang.Exception any exception thrown by the data source.
      */
     public static String[] getCompletions( String file ) throws Exception {
-        List<CompletionResult> cc= DataSetURI.getCompletions( file, file.length(), new NullProgressMonitor() );
-        List<CompletionResult> resultList= new ArrayList<CompletionResult>();
-        for (CompletionResult cc1 : cc) {
-            if (cc1.maybePlot == true) {
-                resultList.add(cc1);
-            }
-        }
-
-        String[] result= new String[resultList.size()];
-        for ( int i=0; i<resultList.size(); i++ ) {
-            result[i]= resultList.get(i).completion;
-        }
-
-        return result;
+        return org.virbo.jythonsupport.Util.getCompletions(file);
     }
-
 
     /**
      * load the .vap file.  This is implemented by calling plot on the URI.
