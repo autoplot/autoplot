@@ -812,6 +812,30 @@ public class ScriptContext extends PyJavaInstance {
     }
     
     /**
+     * return a list of completions.  This is useful in the IDL context
+     * as well as Jython scripts.  This will perform the completion for where the carot is
+     * at the end of the string.  Only completions where maybePlot indicates the URI is now 
+     * valid are returned, so for example http://autoplot.org/data/somedata.cdf?noDep is not
+     * returned and http://autoplot.org/data/somedata.cdf?Magnitude is.
+     * Note this is included to continue support as this is described in http://autoplot.org/developer.idlMatlab.
+     * @param file, for example http://autoplot.org/data/somedata.cdf?
+     * @return list of completions, containing the entire URI.
+     * @throws java.lang.Exception any exception thrown by the data source.
+     */
+    public static String[] getCompletions( String file ) throws Exception {
+        return org.virbo.jythonsupport.Util.getCompletions(file);
+    }
+    
+    /**
+     * sleep for so many milliseconds.  This is introduced to avoid the import,
+     * which makes running scripts securely non-trivial.
+     * @param millis number of milliseconds to pause execution
+     */
+    public static void sleep( int millis ) {
+        org.virbo.jythonsupport.Util.sleep( millis );
+    }
+    
+    /**
      * Export the data into a format implied by the filename extension.  
      * See the export data dialog for additional parameters available for formatting.
      *
@@ -849,15 +873,6 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void setTitle(String title) {
         model.getDocumentModel().getController().getPlot().setTitle(title);
-    }
-    
-    /**
-     * sleep for so many milliseconds.  This is introduced to avoid the import,
-     * which makes running scripts securely non-trivial.
-     * @param millis number of milliseconds to pause execution
-     */
-    public static void sleep( int millis ) {
-        org.virbo.jythonsupport.Util.sleep( millis );
     }
     
     /**
@@ -1133,21 +1148,6 @@ public class ScriptContext extends PyJavaInstance {
             throw new IllegalArgumentException("filename must end in vap");
 
         model.doSave( new File( filename ) );
-    }
-
-    /**
-     * return a list of completions.  This is useful in the IDL context
-     * as well as Jython scripts.  This will perform the completion for where the carot is
-     * at the end of the string.  Only completions where maybePlot indicates the URI is now 
-     * valid are returned, so for example http://autoplot.org/data/somedata.cdf?noDep is not
-     * returned and http://autoplot.org/data/somedata.cdf?Magnitude is.
-     * Note this is included to continue support as this is described in http://autoplot.org/developer.idlMatlab.
-     * @param file, for example http://autoplot.org/data/somedata.cdf?
-     * @return list of completions, containing the entire URI.
-     * @throws java.lang.Exception any exception thrown by the data source.
-     */
-    public static String[] getCompletions( String file ) throws Exception {
-        return org.virbo.jythonsupport.Util.getCompletions(file);
     }
 
     /**
