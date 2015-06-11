@@ -117,20 +117,22 @@ public class Test029 {
      * tread out into deep water where '2014-01-01T00:00' is a time datum and 
      * '2014-01-01T00:00/2014-01-04T00:00' is a datum range.  We have a
      * system that supports ordinal data, so when is the string now datum from this
-     * ordinal set?
-     *   int, float, double, etc to Rank 0 datasets
-     *   List&lt;Number&gt; to Rank 1 datasets.
-     *   Java arrays of Number to Rank 1-4 qubes datasets
-     *   Strings to rank 0 datasets with units ("5 s" "2014-01-01T00:00")
-     *   Strings to rank 1 bins ('2014-01-01T00:00/2014-01-04T00:00')
-     *   Datums to rank 0 datasets
-     *   DatumRanges to rank 1 bins
-     * Other things to watch out for:
-     *   ':'  Python slice 
-     *   '1996:1998'  Python slice
-     *   '2014'  Is this a year long time range, integer, or ISO8601 date?  (It's an integer.)
-     *   '2014/2016'  Is this an ISO8601 time range, or the ratio of two numbers?  (There was a das2 code that allowed simple expressions).
-     *   '5 to 40 kg' is not supported (presently), because this is completely new water...
+     * ordinal set?<ul>
+     *  <li> int, float, double, etc to Rank 0 datasets
+     *  <li> List&lt;Number&gt; to Rank 1 datasets.
+     *  <li> Java arrays of Number to Rank 1-4 qubes datasets
+     *  <li> Strings to rank 0 datasets with units ("5 s" "2014-01-01T00:00")
+     *  <li> Strings to rank 1 bins ('2014-01-01T00:00/2014-01-04T00:00')
+     *  <li> Datums to rank 0 datasets
+     *  <li> DatumRanges to rank 1 bins
+     * </ul>
+     * Other things to watch out for:<ul>
+     *  <li> ':'  Python slice 
+     *  <li> '1996:1998'  Python slice
+     *  <li> '2014'  Is this a year long time range, integer, or ISO8601 date?  (It's an integer.)
+     *  <li> '2014/2016'  Is this an ISO8601 time range, or the ratio of two numbers?  (There was a das2 code that allowed simple expressions).
+     *  <li> '5 to 40 kg' is not supported (presently), because this is completely new water...
+     * </ul>
      * @return 
      */
     private static int testStringToDataSet() {
@@ -173,5 +175,5 @@ public class Test029 {
         
         return 0;
         
-    }
+    }    
 }
