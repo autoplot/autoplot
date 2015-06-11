@@ -113,7 +113,7 @@ public class JythonOps {
     }
     
     /**
-     * coerce a python array into a QDataSet.
+     * coerce a python array or list into a QDataSet.
      * @param arg0 Python object or Datum
      * @return QDataSet
      * @see org.virbo.dsops.Ops#dataset(java.lang.Object) 
@@ -150,8 +150,8 @@ public class JythonOps {
     }
 
     /**
-     * coerce a python array into a QDataSet.
-     * @param arg0 Python object 
+     * coerce python objects to Datum
+     * @param arg0 Python object, one of rank 0 dataset, int, float, or String.
      * @return Datum 
      * @see org.virbo.dsops.Ops#datum(java.lang.Object) 
      */
@@ -167,13 +167,52 @@ public class JythonOps {
             return Units.dimensionless.createDatum(((PyInteger)arg0).getValue());
         } else if ( arg0 instanceof PyFloat ) {
             return Units.dimensionless.createDatum(((PyFloat)arg0).getValue());
-        } else if ( arg0 instanceof PyJavaInstance && ( ((PyJavaInstance)arg0).__tojava__(Datum.class) instanceof Datum ) ) {
-            return (Datum)((PyJavaInstance)arg0).__tojava__(org.das2.datum.Datum.class);
+        } else if ( arg0 instanceof PyJavaInstance ) {
+            return Ops.datum( ((PyJavaInstance)arg0).__tojava__(java.lang.Object.class) );            
         } else if ( arg0 instanceof PyString ) {
             return Ops.datum(arg0.toString());
         } else {
             throw Py.TypeError("unable to coerce "+arg0+" to Datum");
         }
+    }
+    
+    /**
+     * coerce python objects to DatumRange
+     * See http://jfaden.net:8080/hudson/job/autoplot-test029/
+     * This supports:<ul>
+     *   <li>2-element rank 1 QDataSet
+     *   <li>Strings like ("5 to 15 s" or "2014-01-01")
+     *   <li>2-element arrays and lists
+     * </ul>
+     * @param arg0 None, PyQDataSet, String, array or List.
+     * @throws IllegalArgumentException if the argument cannot be parsed or converted.
+     * @return DatumRange
+     */    
+    public static DatumRange datumRange( PyObject arg0 ) {
+        if ( arg0 instanceof PyQDataSet ) {
+            QDataSet ds= ((PyQDataSet)arg0).rods;
+            if ( ds.rank()>1 ) {
+                throw new IllegalArgumentException("QDataSet is not rank one and cannot be converted to datumRange: "+ds);
+            } else {
+                return DataSetUtil.asDatumRange(ds);
+            }
+        } else if ( arg0 instanceof PyList ) {
+            PyObject p1= ((PyList)arg0).__getitem__(0);
+            PyObject p2= ((PyList)arg0).__getitem__(1);
+            return new DatumRange( datum( p1 ), datum( p2 ) );
+        } else if ( arg0 instanceof PyArray ) {
+            PyObject p1= ((PyArray)arg0).__getitem__(0);
+            PyObject p2= ((PyArray)arg0).__getitem__(1);
+            return new DatumRange( datum( p1 ), datum( p2 ) );
+        } else if ( arg0 instanceof PyJavaInstance ) {
+            return Ops.datumRange( ((PyJavaInstance)arg0).__tojava__(java.lang.Object.class) );
+        } else if ( arg0 instanceof PyString ) {
+            return Ops.datumRange(arg0.toString());
+            
+        } else {
+            throw Py.TypeError("unable to coerce "+arg0+" to DatumRange");
+        }
+        
     }
     
     /**
