@@ -18,8 +18,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import org.virbo.datasource.AutoplotSettings;
+import org.virbo.datasource.URISplit;
 
 /**
  * Utilities for the servlets
@@ -173,6 +175,40 @@ public class ServletUtil {
         }
         return whiteList;
     }    
+    
+    /**
+     * return true if the suri is whitelisted.
+     * @param suri the uri.
+     * @return true if the suri is whitelisted.
+     */
+    public static boolean isWhitelisted(String suri) throws IOException {
+        boolean whiteListed= false;
+        URISplit split= URISplit.parse(suri);
+        String ext= split.ext.substring(1);
+        List<String> wl= getWhiteList();
+        for ( String s: wl ) {
+            if ( !whiteListed && Pattern.matches( s, suri ) ) {
+                whiteListed= true;
+                logger.log(Level.FINE, "uri is whitelisted, matching {0}", s);
+            }
+            if ( !whiteListed && !ext.equals("vap") && Pattern.matches( "vap[\\+ ]"+ext+":"+s, suri ) ) {
+                whiteListed= true;
+                logger.log(Level.FINE, "uri is whitelisted with implicit vap+ext, matching {0}", s);
+            }
+        }     
+        return whiteListed;
+    }
+    
+    /**
+     * dump the whitelist to the logger.
+     */
+    public static void dumpWhitelistToLogger() {
+        logger.log(Level.INFO, "=== the whitelist ===" );
+        for ( String s: whiteList ) {
+            logger.log(Level.INFO, s );
+        }
+        logger.log(Level.INFO, "===" );
+    }
     
     public static File getServletHome() {
         File apd= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) );
