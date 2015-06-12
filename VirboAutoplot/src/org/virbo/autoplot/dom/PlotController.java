@@ -881,6 +881,7 @@ public class PlotController extends DomNodeController {
             plot.getYaxis().setLog( newAxis.isLog() );
             plot.getYaxis().setRange( newAxis.getRange());
             plot.getYaxis().setAutoRange(true);
+            plot.getYaxis().getController().dasAxis.setScanRange(  newAxis.getRange() );
         }
         
         if ( z ) {
@@ -892,6 +893,7 @@ public class PlotController extends DomNodeController {
             plot.getZaxis().setLog( newAxis.isLog() );
             plot.getZaxis().setRange( newAxis.getRange() );
             plot.getZaxis().setAutoRange(true);
+            plot.getZaxis().getController().dasAxis.setScanRange(  newAxis.getRange() );
         }
     }
     
