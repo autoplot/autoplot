@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import org.virbo.datasource.AutoplotSettings;
 
@@ -25,6 +27,8 @@ import org.virbo.datasource.AutoplotSettings;
  */
 public class ServletUtil {
 
+    private static final Logger logger= Logger.getLogger("autoplot.servlet");
+    
     public static int getIntParameter(HttpServletRequest request, String name, int dval) {
         String s = request.getParameter(name);
         if (s == null) return dval;
@@ -140,9 +144,11 @@ public class ServletUtil {
                 if ( whiteList==null || freshNow-whiteListFresh>5000 ) { 
                     List<String> local= new ArrayList<String>(100);
                     try {
+                        logger.log(Level.INFO, "Reading whitelist from {0} ===", ff);
                         BufferedReader r= new BufferedReader( new FileReader( ff ) );
                         String s= r.readLine();
                         while ( s!=null ) {
+                            logger.log(Level.INFO, "{0}", s);
                             int i= s.indexOf("#");
                             if ( i>-1 ) s= s.substring(0,i);
                             s= s.trim();
@@ -156,6 +162,7 @@ public class ServletUtil {
                             }
                             s= r.readLine();
                         }
+                        logger.log(Level.INFO, "Done reading whitelist from {0} ===", ff);
                     } catch ( IOException ex ) {
                         throw ex; 
                     }
