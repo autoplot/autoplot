@@ -292,6 +292,14 @@ public class SimpleServlet extends HttpServlet {
                         logger.fine("uri is whitelisted");
                     }
                 }
+                if ( !whiteListed ) {
+                    logger.log(Level.INFO, "uri is not whitelisted: {0}", suri);
+                    logger.log(Level.INFO, "=== the whitelist ===" );
+                    for ( String s: whiteList ) {
+                        logger.log(Level.INFO, s );
+                    }
+                    logger.log(Level.INFO, "===" );
+                }
             }
             if ( vap!=null ) {
                 List<String> whiteList= ServletUtil.getWhiteList();
@@ -300,6 +308,14 @@ public class SimpleServlet extends HttpServlet {
                         whiteListed= true;
                         logger.fine("vap is whitelisted");
                     }
+                }
+                if ( !whiteListed ) {
+                    logger.log(Level.INFO, "vap is not whitelisted: {0}", suri);
+                    logger.log(Level.INFO, "=== the whitelist ===" );
+                    for ( String s: whiteList ) {
+                        logger.log(Level.INFO, s );
+                    }
+                    logger.log(Level.INFO, "===" );
                 }
                 //TODO: there may be a request that the URIs within the vap are 
                 //verified to be whitelisted.  This is not done.
@@ -455,16 +471,21 @@ public class SimpleServlet extends HttpServlet {
                             File p= new File(data.getAbsolutePath());
                             File f= new File(split.file.substring(7));
                             if ( FileUtil.isParent( p, f ) ) {
-                                logger.fine("file within autoplot_data/server/data folder is allowed");
+                                logger.info("file within autoplot_data/server/data folder is allowed");
+                                logger.log(Level.INFO, "{0}", suri);
                             } else {
                                 // See http://autoplot.org/developer.servletSecurity for more info.
+                                logger.log(Level.INFO, "{0}", suri);
                                 throw new IllegalArgumentException("local resources cannot be served, except via local vap file.  ");
+                                
                             }
                         } else {
                             if ( split.file!=null && split.file.contains("jyds") || ( split.vapScheme!=null && split.vapScheme.equals("jyds") ) ) {
                                 File sd= ServletUtil.getServletHome();
                                 File ff= new File( sd, "whitelist.txt" );
-                                throw new IllegalArgumentException("non-local .jyds scripts are not allowed.  Administrators may wish to whitelist this data, see "+ff+"."); //TODO: this server file reference should be removed.
+                                logger.log(Level.INFO, "non-local .jyds scripts are not allowed.");
+                                logger.log(Level.INFO, "{0}", suri);
+                                throw new IllegalArgumentException("non-local .jyds scripts are not allowed.  Administrators may wish to whitelist this data, see "+ff+", which does not include a match for "+suri); //TODO: this server file reference should be removed.
                             }
                         }
 
