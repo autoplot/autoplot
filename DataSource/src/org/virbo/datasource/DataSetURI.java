@@ -1453,6 +1453,16 @@ public class DataSetURI {
             }
         }
 
+        Collections.sort(completions,new Comparator<CompletionResult>() {
+            @Override
+            public int compare(CompletionResult o1, CompletionResult o2) {                
+                //String[] s1= o1.completion.split("\\.");
+                //String[] s2= o2.completion.split("\\.");
+                //TODO: reverse so these are edu.uiowa.physics, then sort...
+                return o1.completion.compareTo(o2.completion);
+            }
+        });
+        
         return completions;
     }
 
