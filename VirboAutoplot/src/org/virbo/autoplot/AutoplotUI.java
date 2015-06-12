@@ -191,6 +191,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
     LayoutListener autoLayout;
     private boolean dsSelectTimerangeBound= false; // true if there is a binding between the app timerange and the dataSetSelector.
 
+    /**
+     * the vap that is currently loading.  We keep track of this so we can push it to the top of the recent list.
+     */
+    String pendingVap= null; 
+    
     // if non-null, then load this set of initial bookmarks.
     private String initialBookmarksUrl= null;
     
@@ -985,7 +990,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         return p;
     }
     
-    private void addFeatures( ApplicationModel model ) {
+    private void addFeatures( final ApplicationModel model ) {
 
         final JScrollPane flayoutPane;
         if (model.getDocumentModel().getOptions().isLayoutVisible() ) {
@@ -1140,6 +1145,13 @@ APSplash.checkTime("init 270");
                 }
 
                 stateSupport.markDirty();
+                
+                if ( pendingVap!=null ) {  // bug https://sourceforge.net/p/autoplot/bugs/1408/
+                    model.addRecent( pendingVap );
+                    dataSetSelector.setValue( pendingVap );
+                    pendingVap= null;
+                    
+                }
 
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override            
@@ -1188,7 +1200,9 @@ APSplash.checkTime("init 270");
                 } else {
                     String uri= dsf.getUri();
                     if ( uri!=null ) {
-                        dataSetSelector.setValue(uri);
+                        if ( pendingVap==null ) {
+                            dataSetSelector.setValue(uri);
+                        }
                     } else {
                         dataSetSelector.setValue("");
                     }
@@ -1785,6 +1799,7 @@ APSplash.checkTime("init 52.9");
             applicationModel.resetDataSetSourceURL(surl, mon );
             if ( split.file!=null && ( split.file.endsWith(".vap") || split.file.endsWith(".vapx" ) ) ) {
                 tickleTimer.tickle(); 
+                pendingVap= surl;
             }
         } catch (RuntimeException ex) {
             if ( ex.getCause()!=null && ex.getCause() instanceof HtmlResponseIOException ) {
