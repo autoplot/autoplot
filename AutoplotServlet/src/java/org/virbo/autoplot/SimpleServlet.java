@@ -285,37 +285,17 @@ public class SimpleServlet extends HttpServlet {
             
             boolean whiteListed= false;
             if ( suri!=null ) {
-                List<String> whiteList= ServletUtil.getWhiteList();
-                for ( String s: whiteList ) {
-                    if ( Pattern.matches( s, suri ) ) {
-                        whiteListed= true;
-                        logger.fine("uri is whitelisted");
-                    }
-                }
+                whiteListed= ServletUtil.isWhitelisted(suri);
                 if ( !whiteListed ) {
-                    logger.log(Level.INFO, "uri is not whitelisted: {0}", suri);
-                    logger.log(Level.INFO, "=== the whitelist ===" );
-                    for ( String s: whiteList ) {
-                        logger.log(Level.INFO, s );
-                    }
-                    logger.log(Level.INFO, "===" );
+                    logger.log(Level.INFO, "uri is not whitelisted: {0}", suri);                    
+                    ServletUtil.dumpWhitelistToLogger();
                 }
             }
             if ( vap!=null ) {
-                List<String> whiteList= ServletUtil.getWhiteList();
-                for ( String s: whiteList ) {
-                    if ( Pattern.matches( s, vap ) ) {
-                        whiteListed= true;
-                        logger.fine("vap is whitelisted");
-                    }
-                }
+                whiteListed= ServletUtil.isWhitelisted(vap);
                 if ( !whiteListed ) {
-                    logger.log(Level.INFO, "vap is not whitelisted: {0}", suri);
-                    logger.log(Level.INFO, "=== the whitelist ===" );
-                    for ( String s: whiteList ) {
-                        logger.log(Level.INFO, s );
-                    }
-                    logger.log(Level.INFO, "===" );
+                    logger.log(Level.INFO, "vap is not whitelisted: {0}", vap);
+                    ServletUtil.dumpWhitelistToLogger();
                 }
                 //TODO: there may be a request that the URIs within the vap are 
                 //verified to be whitelisted.  This is not done.
