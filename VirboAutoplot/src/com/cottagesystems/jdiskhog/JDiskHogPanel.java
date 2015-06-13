@@ -81,9 +81,8 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                 boolean okay = true;
                 IllegalArgumentException ex = null;
 
-                for (int i = 0; i < paths.length; i++) {
-                    File f = model.getFile(paths[i]);
-
+                for (TreePath path : paths) {
+                    File f = model.getFile(path);
                     if (f.equals(model.root)) {
                         continue;
                     }
@@ -142,9 +141,9 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         boolean acceptOutside= false;
         if (sf.startsWith(cache)) {
             String[] protos = new String[]{"ftp", "http", "https"};
-            for (int i = 0; i < protos.length; i++) {
-                if (outsideName.startsWith("/" + protos[i] + "/")) {
-                    outsideName = protos[i] + "://" + outsideName.substring(protos[i].length() + 2);
+            for (String proto : protos) {
+                if (outsideName.startsWith("/" + proto + "/")) {
+                    outsideName = proto + "://" + outsideName.substring(proto.length() + 2);
                     acceptOutside = true;
                 }
             }
@@ -258,8 +257,8 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                 TreePath[] paths = jtree.getSelectionPaths();
                 if ( paths==null ) return;
 
-                for (int i = 0; i < paths.length; i++) {
-                    File f1 = model.getFile(paths[i]);
+                for (TreePath path : paths) {
+                    File f1 = model.getFile(path);
                     try {
                         FileUtil.fileCopy(f1, destdir);
                     } catch (FileNotFoundException ex1) {
@@ -367,6 +366,7 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         monitor.setLabelComponent(progressLabel);
         
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 dumodel.search(root, 0, monitor );
             }
@@ -379,6 +379,7 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
         }
         model.setHideListingFile(true);
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 jTree1.setModel(model);
                 if ( l==null ) {
@@ -434,7 +435,7 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
             }
         });
 
-        sortCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "File Size", "Alpha" }));
+        sortCB.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "File Size", "Alphabetical" }));
         sortCB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 sortCBActionPerformed(evt);
@@ -454,8 +455,8 @@ public final class JDiskHogPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(sortCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 105, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 67, Short.MAX_VALUE)
+                .add(sortCB, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(progressLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 295, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(goButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 79, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
