@@ -489,6 +489,10 @@ public class PlotController extends DomNodeController {
                     xaxis.setDatumRange(dr.previous());
                 } else {
                     dr= scanPrevRange;
+                    if ( xaxis.isLog() && dr.min().value()<=0 ) {
+                        logger.fine("cannot scan to non-positive with log xaxis");
+                        return;
+                    }
                     if ( !dr.max().equals( xaxis.getDatumRange().min() ) ) {
                         xaxis.setAnimated(true);
                         xaxis.setDataRange( dr.min(), dr.max() );
