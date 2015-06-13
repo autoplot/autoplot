@@ -75,7 +75,7 @@ public class FSTreeModel implements TreeModel {
                 if (f.exists()) {
                     Long usages = model.usage(f);
                     if (usages == null) {
-                        return getName() + " ";
+                        return getName() + "                    ";
                     } else {
                         return getName() + " " + nf.format(model.usage(f)/1000.) + " MB";
                     }
