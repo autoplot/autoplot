@@ -2806,7 +2806,12 @@ public class PlotElementController extends DomNodeController {
 
     @Override
     public boolean isPendingChanges() {
-        return getDataSourceFilter().controller.isPendingChanges() || super.isPendingChanges();
+        DataSourceFilter ldsf= getDataSourceFilter();
+        if ( ldsf!=null ) {
+            return ldsf.controller.isPendingChanges() || super.isPendingChanges();
+        } else {
+            return super.isPendingChanges();
+        }
     }
 
     @Override
