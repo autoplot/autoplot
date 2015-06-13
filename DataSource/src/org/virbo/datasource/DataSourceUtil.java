@@ -534,7 +534,7 @@ public class DataSourceUtil {
         return true;
     }
 
-    private static Pattern doublePattern=null;
+    private static volatile Pattern doublePattern=null; // http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
     
     /**
      * from java.lang.Double javadoc, this tests if a number is a double.
@@ -583,11 +583,8 @@ public class DataSourceUtil {
             }
         }
             
-        if ( doublePattern.matcher(myString).matches() ) {
-            return true;
-        } else {
-            return false;
-        }
+        return doublePattern.matcher(myString).matches();
+        
     }
     
     public static String strjoin(Collection<String> c, String delim) {
