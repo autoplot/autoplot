@@ -35,7 +35,6 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.FileUtil;
 import org.python.core.Py;
-import org.python.core.PyDictionary;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
@@ -650,7 +649,6 @@ public class JythonUtil {
      */ 
     public static void setParams( PythonInterpreter interp, Map<String,String> paramsl ) {
         interp.exec("import autoplot");
-        PyDictionary dict= new PyDictionary();
         interp.exec("autoplot.params=dict()");
         for ( Entry<String,String> e : paramsl.entrySet()) {
             String s= e.getKey();
@@ -1333,7 +1331,7 @@ public class JythonUtil {
             }
             System.err.println( String.format( "read params in %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
         } catch ( Exception ex ) {
-            ex.printStackTrace();
+            logger.log(Level.WARNING,null,ex);
             System.err.println( String.format( "failed within %d millis: %s\n", System.currentTimeMillis()-t0, file ) );
         }
 
