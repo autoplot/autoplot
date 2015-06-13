@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Example script shows digitizer.
+        <p><small>Example script creates digitizer for extracting features.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,8 +21,10 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-06-12 r16954):</p>
+        <p>Bugfixes (2015-06-12 r16961):</p>
         <ul>
+            <li>slices have properly hidden next/previous buttons</li>
+            <li>1408: make sure .vap file name is in address bar after loading.</li>
             <li>move getCompletions and sleep over from the application context to data source context.  Thanks, Simon!</li>
             <li>1408: put the script arguments on the address bar and in history.  Thanks, George!</li>
             <li>label for atan2 function was acos, left over from cut-n-paste code.  Thanks, Dave!</li>
