@@ -188,6 +188,9 @@ public class SimpleServlet extends HttpServlet {
             if ( suri==null ) {
                suri = request.getParameter("url");
             }
+            if ( suri!=null && suri.startsWith("vap ") ) {  // pluses are interpretted as spaces when they are parameters in URLs.  These should have been escaped, but legacy operations require we handle this.
+                suri= suri.replaceAll(" ","+");
+            }
             String id= request.getParameter("id"); // lookup local URIs in table id.txt
             String process = ServletUtil.getStringParameter(request, "process", "");
             String vap = request.getParameter("vap");
