@@ -119,7 +119,7 @@ public class ServletUtil {
      * See HOME/autoplot_data/server/whitelist.txt
      * 
      * @return list of regular expressions to allow.
-     * @throws java.io.IOException
+     * @throws java.io.IOException when the whitelist.txt cannot be written or read.
      */
     public static List<String> getWhiteList() throws IOException {
         long currentTimeMillis= System.currentTimeMillis();
@@ -180,6 +180,7 @@ public class ServletUtil {
      * return true if the suri is whitelisted.
      * @param suri the uri.
      * @return true if the suri is whitelisted.
+     * @throws IOException when the whitelist cannot be read.
      */
     public static boolean isWhitelisted(String suri) throws IOException {
         boolean whiteListed= false;
