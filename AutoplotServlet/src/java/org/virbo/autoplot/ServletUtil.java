@@ -184,14 +184,15 @@ public class ServletUtil {
     public static boolean isWhitelisted(String suri) throws IOException {
         boolean whiteListed= false;
         URISplit split= URISplit.parse(suri);
-        String ext= split.ext.substring(1);
+        String ext= split.ext;
+        if ( ext!=null ) ext= ext.substring(1); // remove . in .vap
         List<String> wl= getWhiteList();
         for ( String s: wl ) {
             if ( !whiteListed && Pattern.matches( s, suri ) ) {
                 whiteListed= true;
                 logger.log(Level.FINE, "uri is whitelisted, matching {0}", s);
             }
-            if ( !whiteListed && !ext.equals("vap") && Pattern.matches( "vap[\\+ ]"+ext+":"+s, suri ) ) {
+            if ( !whiteListed && ext!=null && !ext.equals("vap") && Pattern.matches( "vap\\+"+ext+":"+s, suri ) ) {
                 whiteListed= true;
                 logger.log(Level.FINE, "uri is whitelisted with implicit vap+ext, matching {0}", s);
             }
