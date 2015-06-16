@@ -27,6 +27,7 @@ import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
 import static org.virbo.autoplot.ScriptContext.save;
 import static org.virbo.autoplot.ScriptContext.writeToPng;
+import org.virbo.autoplot.dom.Application;
 import util.RegexComponentChooser;
 
 /**
@@ -62,9 +63,11 @@ public class Test_031_MultiPanelPlot implements Scenario {
             JButtonOperator tallerB = new JButtonOperator( mainFrame, "Taller" );
             tallerB.clickMouse(4); // This is the number of clicks, for example 2 is double-click.
             
-            Point clickPoint= tallerB.getLocation();
+            System.err.println( tallerB.getSource().getParent() );
+            System.err.println( "clickPoint: "+ tallerB.getSource().getParent() );
+            Point clickPoint= tallerB.getSource().getParent().getLocation();
             clickPoint= SwingUtilities.convertPoint( tallerB.getSource().getParent(), clickPoint, mainFrame.getSource() );
-            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-100 );
+            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y+50 );
             
             JPopupMenuOperator popup = new JPopupMenuOperator();
             popup.pushMenuNoBlock("Plot|Add Plots", "|"); // I think because this is a "modal" dialog.
@@ -96,8 +99,11 @@ public class Test_031_MultiPanelPlot implements Scenario {
             mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-130);
             mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-130);
             
-            JPopupMenuOperator popup1 = new JPopupMenuOperator();
-            popup1.pushMenuNoBlock("Plot|Delete", "|");
+            //JPopupMenuOperator popup1 = new JPopupMenuOperator();
+            //popup1.pushMenuNoBlock("Plot|Delete", "|");
+            
+            Application dom= app.getDocumentModel();
+            dom.getController().deletePlot( dom.getPlots(0) );
             
             Thread.sleep(1000);
             // wait for the application to be in the "ready" state
