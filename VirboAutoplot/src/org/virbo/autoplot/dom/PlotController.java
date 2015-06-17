@@ -1400,7 +1400,7 @@ public class PlotController extends DomNodeController {
                 if ( UnitsUtil.isTimeLocation( tr.getUnits() ) ) {
                     dom.setTimeRange( tr ) ; // newSettings.getXaxis().getRange() ); // TimeSeriesBrowse                   
                 } else {
-                     newSettings.getXaxis().getRange();      // fall back to old logic.
+                    dom.setTimeRange( newSettings.getXaxis().getRange() );      // fall back to old logic.
                 }
                 shouldBindX= true;
                 shouldSetAxisRange= true;
