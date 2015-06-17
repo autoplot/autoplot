@@ -7,6 +7,7 @@ package org.autoplot.test;
 
 
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -94,6 +95,8 @@ public class Test_031_MultiPanelPlot implements Scenario {
             //mainFrame.clickMouse(clickPoint.x+50, clickPoint.y-130); 
             //mainFrame.clickMouse(clickPoint.x+150, clickPoint.y-110); 
             
+            System.err.println( "***** clickPoint= x:"+ (clickPoint.x+50) + " y:"+ (clickPoint.y-130)  );
+            
             //for pc
             mainFrame.clickMouse(clickPoint.x+50, clickPoint.y-130, 2);
             mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-130);
@@ -134,13 +137,13 @@ public class Test_031_MultiPanelPlot implements Scenario {
                 domTable.selectCell(domTable.findCellRow("plotElements[" + i + "]"), 0);
                 domTable.selectCell(domTable.findCellRow("dataSourceFilterId", true, true),1);
                 new JTextFieldOperator(domTable).setText("data_1");
-                Thread.sleep(400);
+                Thread.sleep(200);
                 domTable.selectCell(domTable.findCellRow("component", true, true),1);
                 domTable.selectCell(domTable.findCellRow("component", true, true),1);
                 component = new JTextFieldOperator(domTable);
                 component.setText("slice0(" + i + ")");
                 domTable.selectCell(domTable.findCellRow("plotElements[" + i + "]"), 0);
-                Thread.sleep(400);
+                Thread.sleep(200);
 
             } 
             
@@ -156,26 +159,35 @@ public class Test_031_MultiPanelPlot implements Scenario {
                 Thread.sleep(100);  // Why does the press take so long???
             }
             
+            Thread.sleep(1000);
+            
             //Add Hidden Plot to bind all the plot X and Y axes together
-            mainFrame.clickForPopup(clickPoint.x+200, clickPoint.y-100 );
-            popup = new JPopupMenuOperator();
-            popup.pushMenuNoBlock("Canvas|Add Hidden Plot...", "|");
-            Thread.sleep(200);
+            System.err.println( "***** clickPoint AHP= X:"+ (clickPoint.x+60) + " Y:"+ (clickPoint.y-130 ) );
             
-            DialogOperator addhiddenplot = new DialogOperator( new RegexComponentChooser( "Add hidden plot for binding.*") );
-            new JCheckBoxOperator(addhiddenplot, 2).setSelected(false);
-            new JButtonOperator(addhiddenplot, "OK").clickMouse();
+            mainFrame.requestFocus();
+            Thread.sleep(100);
             
-            ScriptContext.waitUntilIdle();
-            while ( addhiddenplot.isVisible() ) {
-                Thread.sleep(100);  // Why does the press take so long???
-            }
+            //mainFrame.clickForPopup(clickPoint.x+200, clickPoint.y );
+            //Thread.sleep(500);
             
-            new JTabbedPaneOperator( app.getTabs() ).selectPage("canvas");
-            Thread.sleep(5000);  
+            //popup = new JPopupMenuOperator();
+            //popup.pushMenuNoBlock("Canvas|Add Hidden Plot...", "|");
+            //Thread.sleep(200);
             
-            System.err.println("Done!");
-            
+//            DialogOperator addhiddenplot = new DialogOperator( new RegexComponentChooser( "Add hidden plot for binding.*") );
+//            new JCheckBoxOperator(addhiddenplot, 2).setSelected(false);
+//            new JButtonOperator(addhiddenplot, "OK").clickMouse();
+//            
+//            ScriptContext.waitUntilIdle();
+//            while ( addhiddenplot.isVisible() ) {
+//                Thread.sleep(100);  // Why does the press take so long???
+//            }
+//            
+//            new JTabbedPaneOperator( app.getTabs() ).selectPage("canvas");
+//            Thread.sleep(5000);  
+//            
+//            System.err.println("Done!");
+//            
             writeToPng("Test_3pt1_MultiPanelPlot.png"); // Leave artifacts for testing.
             save("Test_3pt1_MultiPanelPlot.vap");
             
