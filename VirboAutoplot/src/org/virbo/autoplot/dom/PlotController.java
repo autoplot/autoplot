@@ -1396,8 +1396,12 @@ public class PlotController extends DomNodeController {
         if ( newSettings.getXaxis().isLog()==false && plot.getXaxis().isAutoRange() ) {
             if ( bms.isEmpty() && UnitsUtil.isTimeLocation( newSettings.getXaxis().getRange().getUnits() ) ) {
                 logger.finer("binding axis to timeRange because no one is using it");
-                DatumRange tr= plot.getXaxis().getRange(); // it's already been set!
-                dom.setTimeRange( tr ) ; // newSettings.getXaxis().getRange() );
+                DatumRange tr= plot.getXaxis().getRange(); // it's already been set for TimeSeriesBrowse    
+                if ( UnitsUtil.isTimeLocation( tr.getUnits() ) ) {
+                    dom.setTimeRange( tr ) ; // newSettings.getXaxis().getRange() ); // TimeSeriesBrowse                   
+                } else {
+                     newSettings.getXaxis().getRange();      // fall back to old logic.
+                }
                 shouldBindX= true;
                 shouldSetAxisRange= true;
             }
