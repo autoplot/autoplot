@@ -247,6 +247,10 @@ public class CanvasLayoutPanel extends JLabel {
     
     private Rectangle rectangleSelect=null;
     
+    /**
+     * set the bounds of the selecting rectangle, to provide feedback.
+     * @param r 
+     */
     public void setRectangleSelect( Rectangle r ) {
         this.rectangleSelect=r;
     }
