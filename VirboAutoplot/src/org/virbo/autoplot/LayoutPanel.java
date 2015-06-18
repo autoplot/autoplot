@@ -68,6 +68,7 @@ import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.autoplot.dom.Row;
 import org.virbo.autoplot.util.CanvasLayoutPanel;
+import static org.virbo.autoplot.util.CanvasLayoutPanel.PROP_SELECTEDCOMPONENTS;
 
 /**
  * LayoutPanel shows all the plots and plot elements on the canvas.  
@@ -93,15 +94,30 @@ public class LayoutPanel extends javax.swing.JPanel {
                     app.getController().setPlot(plot);
                     canvasLayoutPanel1.setSelectedComponents(p);
                 }
+                tallerButton.setEnabled(plot!=null);
+                shorterButton.setEnabled(plot!=null);
+                addPlotsButton.setEnabled(plot!=null);
+                addPlotsButton.setEnabled(plot!=null);
+                int count = getSelectedPlots().size();
+                sameHeightButton.setEnabled( count>1 );
             }
         });
         panelListComponent.addListSelectionListener(plotElementSelectionListener);
 
+        canvasLayoutPanel1.addPropertyChangeListener(CanvasLayoutPanel.PROP_SELECTEDCOMPONENTS, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                int count = getSelectedPlots().size();
+                sameHeightButton.setEnabled( count>1 );
+            }
+        });
+        
         createPopupMenus();
 
         MouseListener popupTrigger = createPopupTrigger();
         canvasLayoutPanel1.addMouseListener(popupTrigger);
-        canvasLayoutPanel1.addMouseMotionListener( new MouseMotionListener() {
+        
+        canvasLayoutPanel1.addMouseMotionListener( new MouseMotionListener() {  // TODO: this should probably be moved to CanvasLayoutPanel
             @Override
             public void mouseDragged(MouseEvent e) {
                 if ( draggingPlot==null && dragInitialClick==null ) {
@@ -121,6 +137,8 @@ public class LayoutPanel extends javax.swing.JPanel {
                     rect.add( e.getPoint() );
                     canvasLayoutPanel1.setSelectedComponents( rect );
                     canvasLayoutPanel1.setRectangleSelect(rect);
+                    int count = getSelectedPlots().size();
+                    sameHeightButton.setEnabled( count>1 );
                 }
             }
 
@@ -129,6 +147,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 
             }
         });
+        
         panelListComponent.addMouseListener(popupTrigger);
         bindingListComponent.addMouseListener(popupTrigger);
 
