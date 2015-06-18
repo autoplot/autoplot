@@ -814,12 +814,15 @@ public class DataSourceController extends DomNodeController {
         }
         return new HashMap(m);
     }
+    
 
     /**
      * check to see if all the parent sources have updated and have datasets
      * that are compatible, so a new dataset can be created. If there is a
      * TimeSeriesBrowse on this, then attempt to trim the data to the
      * TimeSeriesBrowse.getTimeRange().
+     * 
+     * This may be redone to implement the new unnamed 
      *
      * @return null if everything is okay, error message otherwise
      */
@@ -834,7 +837,9 @@ public class DataSourceController extends DomNodeController {
         Map<String, Object> props = null;
 
         DataSourceFilter[] lparentSources = getParentSources();
-
+        
+        // https://sourceforge.net/p/autoplot/feature-requests/425/ mashing data.  This area needs to be
+        // cleaned up.
         if (lparentSources == null || lparentSources.length == 0) {
             return "no parent sources";
         }
@@ -857,6 +862,7 @@ public class DataSourceController extends DomNodeController {
             z = lparentSources[2].controller.getFillDataSet();
             zprops = maybeCopy(lparentSources[2].controller.getFillProperties());
         }
+        
         if (lparentSources.length == 1) {
             if (x == null) {
                 return "parent dataset is null";
@@ -910,6 +916,7 @@ public class DataSourceController extends DomNodeController {
                 }
             }
         }
+        
         if (ds != null) {
             //TODO: TSB trim dataset.  It's not clear to me that this should be implemented here, but we will for now.
             if (this.tsb != null && this.tsb instanceof InternalTimeSeriesBrowse) {
