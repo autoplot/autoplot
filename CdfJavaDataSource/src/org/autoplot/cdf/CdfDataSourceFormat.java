@@ -107,6 +107,14 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 Map<String,String> params1= new HashMap<String,String>();
                 params1.put( "timeType",params.get("timeType") );
                 addVariableRankN( dep0, name, params1, mon );
+            } else {
+                String name= names.get(dep0); // have we seen this guy already?
+                if ( name==null ) {
+                    name= nameFor(dep0);
+                    Map<String,String> params1= new HashMap<String,String>();
+                    params1.put( "timeType",params.get("timeType") );
+                    addVariableRankN( dep0, name, params1, mon );
+                }
             }
         }
         
