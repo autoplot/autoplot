@@ -37,7 +37,8 @@ public class Test_041_Lanl20140214b implements Scenario {
 
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("http://www.rbsp-ect.lanl.gov/data_pub/rbspa/rept/level3/rbspa_$x_ect-rept-sci-L3_$Y$m$d_v$(v,sep).cdf?FEDU&timerange=20130915");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
-
+            
+            Thread.sleep(3000); // TODO: have a look at the waitUntilIdle and convince self that it shouldn't be considered when blocking.
             waitUntilIdle();
             
             writeToPng( "Test_4pt1_Lanl20140214b.001.png");
