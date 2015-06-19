@@ -106,14 +106,14 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 String name= nameFor(dep0);
                 Map<String,String> params1= new HashMap<String,String>();
                 params1.put( "timeType",params.get("timeType") );
-                addVariableRankN( dep0, name, params1, mon );
+                addVariableRankN( dep0, name, true, params1, mon );
             } else {
                 String name= names.get(dep0); // have we seen this guy already?
                 if ( name==null ) {
                     name= nameFor(dep0);
                     Map<String,String> params1= new HashMap<String,String>();
                     params1.put( "timeType",params.get("timeType") );
-                    addVariableRankN( dep0, name, params1, mon );
+                    addVariableRankN( dep0, name, true, params1, mon );
                 }
             }
         }
@@ -123,7 +123,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if (dep1 != null) {
             if ( !append ) {
                 String name= nameFor(dep1);
-                addVariableRank1NoVary(dep1, name, new HashMap<String,String>(), new NullProgressMonitor() );
+                addVariableRank1NoVary(dep1, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
             }
         }
 
@@ -132,11 +132,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if (dep2 != null) {
             if ( !append ) {
                 String name= nameFor(dep2);
-                addVariableRank1NoVary(dep2, name, new HashMap<String,String>(), new NullProgressMonitor() );
+                addVariableRank1NoVary(dep2, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
             }
         }
 
-        addVariableRankN(data, nameFor(data), params, mon );
+        addVariableRankN(data, nameFor(data), false, params, mon );
         
         try {
             if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
@@ -150,7 +150,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         
     }
 
-    private void addVariableRank1NoVary( QDataSet ds, String name, Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon ) throws Exception {
+    private void addVariableRank1NoVary( QDataSet ds, String name, boolean isSupport, Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon ) throws Exception {
         Units units = (Units) ds.property(QDataSet.UNITS);
         CDFDataType type = CDFDataType.DOUBLE;
 
@@ -172,7 +172,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             throw new IllegalArgumentException("not supported!");
             
         }
-        copyMetadata(units, name, ds);
+        copyMetadata(units, name, isSupport, ds);
         
     }
 
@@ -474,7 +474,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         
     }
 
-    private void addVariableRankN(QDataSet ds, String name, Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
+    private void addVariableRankN(QDataSet ds, String name, boolean isSupport, Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         Units units = (Units) ds.property(QDataSet.UNITS);
         CDFDataType type = CDFDataType.DOUBLE;
 
@@ -550,7 +550,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
         }
 
-        copyMetadata( units, name, ds );
+        copyMetadata( units, name, isSupport, ds );
         
     }
 
@@ -561,7 +561,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
      * @param ds the dataset containing metadata.
      * @throws Exception 
      */
-    private void copyMetadata( Units units, String name, QDataSet ds ) throws Exception {
+    private void copyMetadata( Units units, String name, boolean isSupport, QDataSet ds ) throws Exception {
         
         if ( units!=null ) {
             if (units != Units.cdfEpoch) {
@@ -643,7 +643,9 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             displayType= "time_series";
         }
         cdf.addVariableAttributeEntry( name,"DISPLAY_TYPE", CDFDataType.CHAR, displayType );
-
+        
+        cdf.addVariableAttributeEntry( name,"VAR_TYPE", CDFDataType.CHAR, isSupport ? "support_data" : "data" );
+        
     }
 
     @Override
