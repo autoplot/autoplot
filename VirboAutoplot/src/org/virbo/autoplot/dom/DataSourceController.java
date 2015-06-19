@@ -53,7 +53,6 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
-import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AutoHistogram;
 
 /**
@@ -611,7 +610,7 @@ public class DataSourceController extends DomNodeController {
     }
 
     DataSourceFilter[] parentSources;
-
+    
     /**
      * return the parent sources of data, which may contain null if the
      * reference is not found.
@@ -649,7 +648,7 @@ public class DataSourceController extends DomNodeController {
     }
 
     /**
-     * if the internal dataset points to DSF's with TimeSeriesBrowse, then add
+     * if the internal dataset points to DSFs with TimeSeriesBrowse, then add
      * our own TSB.
      */
     private void maybeAddInternalTimeSeriesBrowse() {
