@@ -5,6 +5,7 @@
 package org.autoplot.cdf;
 
 import gov.nasa.gsfc.spdf.cdfj.CDFDataType;
+import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import gov.nasa.gsfc.spdf.cdfj.CDFWriter;
 import java.lang.reflect.Array;
 import org.virbo.datasource.DataSourceUtil;
@@ -108,12 +109,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 params1.put( "timeType",params.get("timeType") );
                 addVariableRankN( dep0, name, true, params1, mon );
             } else {
-                String name= names.get(dep0); // have we seen this guy already?
-                if ( name==null ) {
-                    name= nameFor(dep0);
-                    Map<String,String> params1= new HashMap<String,String>();
-                    params1.put( "timeType",params.get("timeType") );
+                String name= nameFor(dep0);
+                Map<String,String> params1= new HashMap<String,String>();
+                params1.put( "timeType",params.get("timeType") );
+                try {
                     addVariableRankN( dep0, name, true, params1, mon );
+                } catch ( Exception e ) {
+                    logger.warning("CDF Exception, presumably because the variable already exists.");
                 }
             }
         }
@@ -124,6 +126,14 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             if ( !append ) {
                 String name= nameFor(dep1);
                 addVariableRank1NoVary(dep1, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
+            } else {
+                String name= nameFor(dep1);
+                Map<String,String> params1= new HashMap<String,String>();
+                try {
+                    addVariableRankN( dep1, name, true, params1, mon );
+                } catch ( Exception e ) {
+                    logger.warning("CDF Exception, presumably because the variable already exists.");
+                }                
             }
         }
 
@@ -133,6 +143,14 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             if ( !append ) {
                 String name= nameFor(dep2);
                 addVariableRank1NoVary(dep2, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
+            } else {
+                String name= nameFor(dep2);
+                Map<String,String> params1= new HashMap<String,String>();
+                try {
+                    addVariableRankN( dep2, name, true, params1, mon );
+                } catch ( Exception e ) {
+                    logger.warning("CDF Exception, presumably because the variable already exists.");
+                }                
             }
         }
 
