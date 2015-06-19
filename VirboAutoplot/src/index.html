@@ -7,7 +7,8 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Example script creates digitizer for extracting features.
+        <p><small>Barrel data is used to demo the tweak to the reducex function, which reduces the time resolution to hourly spectra.  
+                The Scratch cat, who helps teach kids to program, peeks from behind.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,8 +22,13 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-06-12 r16961):</p>
+        <p>Bugfixes (2015-06-19 r16973):</p>
         <ul>
+            <li>filters tool keeps alpha list and tree list synchronized to the same selection.</li>
+            <li>1347: finally make the result from reducex have uniform timetags.</li>
+            <li>next/prev buttons check log property so that we avoid RTE with negative numbers.</li>
+            <li>rte_2038937185: handle case where WWWAuthenticate is not provided by HTTP server.</li>
+            <li>use "alphabetical" where "alpha" was used before.  Brevity didn't help and could confuse.</li>
             <li>format to CDF with append multiple sets of timetags.</li>
             <li>Vertical slice on two-record spectrogram can now access the first record.</li>
             <li>1415: plotting one day of data from a yearly aggregation.  The exact URI timerange now appears.</li>
