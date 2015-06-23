@@ -63,7 +63,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         initComponents();
         parameterTree.getSelectionModel().setSelectionMode( TreeSelectionModel.SINGLE_TREE_SELECTION );
         jPanel3.setVisible(false);
-        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "cdf_main");
+        if ( AutoplotHelpSystem.getHelpSystem()!=null ) { // to help with debugging, check for null so we needn't initialize all of Autoplot to debug.
+            AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "cdf_main");
+        }
     }
 
     /** This method is called from within the constructor to
