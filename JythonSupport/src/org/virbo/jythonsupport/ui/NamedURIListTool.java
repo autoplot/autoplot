@@ -25,7 +25,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import org.das2.util.LoggerManager;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
@@ -42,8 +44,8 @@ public class NamedURIListTool extends JPanel {
     private static final String CLASS_NAME = NamedURIListTool.class.getName();    
     
     JScrollPane scrollPane;
-    List<String> uris;
-    List<String> ids;
+    List<String> uris=null;
+    List<String> ids=null;
     
     public NamedURIListTool() {
         scrollPane = new javax.swing.JScrollPane();
@@ -109,7 +111,12 @@ public class NamedURIListTool extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     org.das2.util.LoggerManager.logGuiEvent(e);
-                    //TODO: add URI
+                    List<String> ids= new ArrayList<String>(NamedURIListTool.this.ids);
+                    List<String> uris= new ArrayList<String>(NamedURIListTool.this.uris);
+                    ids.add("ds1");
+                    uris.add("");
+                    setIds(ids);
+                    setUris(uris);
                 }
             } );
            
@@ -135,8 +142,15 @@ public class NamedURIListTool extends JPanel {
         }
 
         if ( fi>=0 ) {
-            DataSetSelector dss= new DataSetSelector();
+            final DataSetSelector dss= new DataSetSelector();
+            dss.setPlotItButtonVisible(false);
             dss.setValue( uris.get(fi) );
+            dss.addActionListener( new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    uris.set( fi,dss.getValue());
+                }
+            });
             sub.add( dss, BorderLayout.CENTER );
 
         } else {
@@ -162,15 +176,26 @@ public class NamedURIListTool extends JPanel {
         DataSourceEditorPanel edit=null;
         try {
             edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel( DataSetURI.getURIValid( uris.get(fi) ) );
-            p.add( edit.getPanel() );
+            try {
+                edit.prepare( uris.get(fi), null, new NullProgressMonitor() );
+                p.add( edit.getPanel() );
+            } catch ( Exception ex ) {
+                ex.printStackTrace(); //TODO
+            }
         } catch (URISyntaxException ex) {
             Logger.getLogger(NamedURIListTool.class.getName()).log(Level.SEVERE, null, ex);
         }
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( scrollPane, p ) ) {
-            ids.set( fi,tf.getName());
+            ids.set( fi,tf.getText() );
             if ( edit!=null ) {
                 uris.set( fi, edit.getURI() );
             }
+            SwingUtilities.invokeLater( new Runnable() {
+                public void run() {
+                    refresh();
+                }
+            });
+            
         }
     }
         
