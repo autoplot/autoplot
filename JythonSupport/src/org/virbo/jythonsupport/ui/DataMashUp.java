@@ -5,17 +5,48 @@
  */
 package org.virbo.jythonsupport.ui;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
+import java.io.IOException;
+import java.util.TooManyListenersException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.tree.TreePath;
+import org.das2.util.LoggerManager;
+
 /**
  *
  * @author jbf
  */
 public class DataMashUp extends javax.swing.JPanel {
 
+    private static final Logger logger = LoggerManager.getLogger("jython.dashup");
+    
     /**
      * Creates new form DataMashUp
      */
     public DataMashUp() {
         initComponents();
+
+        DragSource dragSource = DragSource.getDefaultDragSource();
+        DropTarget dropTarget = new DropTarget();
+        try {
+            dropTarget.addDropTargetListener(createDropTargetListener());
+        } catch (TooManyListenersException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        
+        jTree1.setDropTarget(dropTarget);
+        dragSource.createDefaultDragGestureRecognizer(jTree1, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener());
     }
 
     /**
@@ -28,29 +59,60 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jSplitPane1 = new javax.swing.JSplitPane();
         jSplitPane2 = new javax.swing.JSplitPane();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jList1 = new javax.swing.JList();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTree1 = new javax.swing.JTree();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
+        namedURIListTool1 = new org.virbo.jythonsupport.ui.NamedURIListTool();
 
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane1.setResizeWeight(0.5);
+
+        jSplitPane2.setResizeWeight(0.5);
+        jSplitPane2.setPreferredSize(new java.awt.Dimension(193, 200));
+
+        jList1.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "plus(x,y)", "sin(a)", "atan2(x,y)", "link(x,y,z)" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jList1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jList1MouseDragged(evt);
+            }
+        });
+        jScrollPane3.setViewportView(jList1);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 350, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 270, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 16, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        jSplitPane2.setRightComponent(jPanel1);
+        jTabbedPane1.addTab("tab1", jPanel1);
+
+        jSplitPane2.setLeftComponent(jTabbedPane1);
+
+        jScrollPane2.setViewportView(jTree1);
+
+        jSplitPane2.setRightComponent(jScrollPane2);
 
         jSplitPane1.setBottomComponent(jSplitPane2);
 
         jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.Y_AXIS));
+        jPanel2.add(namedURIListTool1);
+
         jScrollPane1.setViewportView(jPanel2);
 
         jSplitPane1.setTopComponent(jScrollPane1);
@@ -67,12 +129,76 @@ public class DataMashUp extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    final DropTargetListener createDropTargetListener() {
+        return new DropTargetListener() {
+
+            @Override
+            public void dragEnter(DropTargetDragEvent dtde) {
+                if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    dtde.acceptDrag(DnDConstants.ACTION_COPY);
+                }
+            }
+
+            @Override
+            public void dragOver(DropTargetDragEvent dtde) {
+            }
+
+            @Override
+            public void dropActionChanged(DropTargetDragEvent dtde) {
+            }
+
+            @Override
+            public void dragExit(DropTargetEvent dte) {
+            }
+
+            @Override
+            public void drop(DropTargetDropEvent dtde) {
+                try {
+                    boolean readonly= false; // only copy
+                    
+                    String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
+
+                } catch (UnsupportedFlavorException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+
+            }
+        };
+    }
+
+    final DragGestureListener createDragGestureListener() {
+        return new DragGestureListener() {
+
+            @Override
+            public void dragGestureRecognized(DragGestureEvent dge) {
+
+                if ( jTree1.getSelectionCount()==1 ) {
+                    TreePath tp= jTree1.getSelectionPath();
+                    String s= (String)tp.getLastPathComponent();
+                }
+
+            }
+        };
+    };
+    
+    private void jList1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseDragged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jList1MouseDragged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JList jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTree jTree1;
+    private org.virbo.jythonsupport.ui.NamedURIListTool namedURIListTool1;
     // End of variables declaration//GEN-END:variables
 }
