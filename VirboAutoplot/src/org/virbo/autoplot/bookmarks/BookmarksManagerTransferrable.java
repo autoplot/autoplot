@@ -32,8 +32,8 @@ public class BookmarksManagerTransferrable {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.bookmarks");
 
-    private BookmarksManagerModel model;
-    private JTree jTree1;
+    private final BookmarksManagerModel model;
+    private final JTree jTree1;
 
     BookmarksManagerTransferrable(BookmarksManagerModel model, JTree jTree1) {
         this.model = model;
@@ -43,6 +43,7 @@ public class BookmarksManagerTransferrable {
     DropTargetListener createDropTargetListener() {
         return new DropTargetListener() {
 
+            @Override
             public void dragEnter(DropTargetDragEvent dtde) {
                 if (dtde.isDataFlavorSupported(BOOKMARK_FLAVOR)) {
                     dtde.acceptDrag(DnDConstants.ACTION_COPY_OR_MOVE);
@@ -52,15 +53,19 @@ public class BookmarksManagerTransferrable {
                 }
             }
 
+            @Override
             public void dragOver(DropTargetDragEvent dtde) {
             }
 
+            @Override
             public void dropActionChanged(DropTargetDragEvent dtde) {
             }
 
+            @Override
             public void dragExit(DropTargetEvent dte) {
             }
 
+            @Override
             public void drop(DropTargetDropEvent dtde) {
                 try {
                     boolean readonly= false; // only copy
@@ -120,6 +125,7 @@ public class BookmarksManagerTransferrable {
     DragGestureListener createDragGestureListener() {
         return new DragGestureListener() {
 
+            @Override
             public void dragGestureRecognized(DragGestureEvent dge) {
 
                 if ( jTree1.getSelectionCount()==1 ) {
@@ -152,6 +158,7 @@ public class BookmarksManagerTransferrable {
             }
         };
     };
+    
     public static final DataFlavor BOOKMARK_FLAVOR = new DataFlavor(Bookmark.class, "Bookmark");
     public static final DataFlavor BOOKMARK_LIST_FLAVOR = new DataFlavor(List.class, "BookmarkList");
 
@@ -161,14 +168,19 @@ public class BookmarksManagerTransferrable {
         boolean readonly;
 
         /**
-         * @param bookmark
-         * @param readonly  don't attempt delete from the source location.
+         * @param bookmark the bookmark
+         * @param readOnly  don't attempt delete from the source location.
          */
         public BookmarkTransferable( final Bookmark bookmark, boolean readOnly ) {
             this.bookmark= bookmark;
             this.readonly= readOnly;
         }
 
+        /**
+         * return the flavors, either a string (the URI), or the internal BOOKMARK_FLAVOR
+         * @return the flavors
+         */
+        @Override
         public DataFlavor[] getTransferDataFlavors() {
             return new DataFlavor[]{
                         DataFlavor.stringFlavor,
@@ -177,10 +189,12 @@ public class BookmarksManagerTransferrable {
 
         }
 
+        @Override
         public boolean isDataFlavorSupported(DataFlavor flavor) {
             return flavor == DataFlavor.stringFlavor || flavor == BOOKMARK_FLAVOR;
         }
 
+        @Override
         public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
             if ( bookmark instanceof Bookmark.Item ) {
                 if (flavor == DataFlavor.stringFlavor) {
@@ -206,6 +220,7 @@ public class BookmarksManagerTransferrable {
     Transferable createBookmarkListTransferrable(final List<Bookmark> bookmarks) {
         return new Transferable() {
 
+            @Override
             public DataFlavor[] getTransferDataFlavors() {
                 return new DataFlavor[]{
                             DataFlavor.stringFlavor,
@@ -214,10 +229,12 @@ public class BookmarksManagerTransferrable {
 
             }
 
+            @Override
             public boolean isDataFlavorSupported(DataFlavor flavor) {
                 return flavor == BOOKMARK_LIST_FLAVOR || flavor == DataFlavor.stringFlavor;
             }
 
+            @Override
             public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
                 if (flavor == BOOKMARK_LIST_FLAVOR) {
                     return bookmarks;
