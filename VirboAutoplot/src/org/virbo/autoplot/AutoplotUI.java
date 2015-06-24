@@ -755,14 +755,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_RECENT)) {
-                    final List<String> urls = new ArrayList<String>();
-                    List<Bookmark> recent = applicationModel.getRecent();
-                    for (Bookmark b : recent) {
-                        urls.add(((Bookmark.Item) b).getUri());
-                    }
+                    final List<Bookmark> recent = applicationModel.getRecent();
                     SwingUtilities.invokeLater(
                         new Runnable() { public void run() {
-                            dataSetSelector.setRecent(urls);
+                            org.virbo.autoplot.bookmarks.Util.setRecent( dataSetSelector, recent );
+                            //dataSetSelector.setRecent(urls);
                         }
                     } );
                 } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_BOOKMARKS)) {
