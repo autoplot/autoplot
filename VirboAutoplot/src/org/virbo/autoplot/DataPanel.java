@@ -56,7 +56,6 @@ import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.InputVerifier;
 import org.virbo.filters.FiltersChainPanel;
 
@@ -80,7 +79,7 @@ public class DataPanel extends javax.swing.JPanel {
     boolean bindingTransitionalState= false; 
     
     PlotElement element;// current focus
-    DataSetSelector dataSetSelector;
+
     JTextField operatorsTextField;
 
     private final transient PropertyChangeListener compListener; // listen to component property changes
