@@ -8,6 +8,7 @@ package test;
 import java.util.Arrays;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import org.virbo.datasource.DataSetSelector;
 import org.virbo.jythonsupport.ui.DataMashUp;
 import org.virbo.jythonsupport.ui.NamedURIListTool;
 
@@ -18,6 +19,7 @@ import org.virbo.jythonsupport.ui.NamedURIListTool;
 public class TestDashup {
     public static void main( String[] args ) {
         //test1();
+        DataSetSelector.setDefaultRecent( Arrays.asList( "http://autoplot.org/data/autoplot.csv?","http://autoplot.org/data/autoplot.cdf?") );
         test2();
     }
     
@@ -33,7 +35,6 @@ public class TestDashup {
     
     public static void test1() {
         NamedURIListTool n= new NamedURIListTool();
-        
         n.setIds( Arrays.asList( "data1", "data2" ) );
         n.setUris( Arrays.asList("http://autoplot.org/data/autoplot.cdf?","http://autoplot.org/data/autoplot.cdf?") );
         n.refresh();
