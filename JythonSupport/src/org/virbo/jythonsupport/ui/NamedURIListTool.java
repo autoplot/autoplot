@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetSelector;
@@ -145,6 +146,7 @@ public class NamedURIListTool extends JPanel {
             final DataSetSelector dss= new DataSetSelector();
             dss.setPlotItButtonVisible(false);
             dss.setValue( uris.get(fi) );
+            dss.setRecent( DataSetSelector.getDefaultRecent() );
             dss.addActionListener( new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -207,6 +209,18 @@ public class NamedURIListTool extends JPanel {
     public void setUris( List<String> uris ) {
         this.uris= new ArrayList<String>(uris);
         if ( uris.size()==ids.size() ) refresh();
+    }
+
+    /**
+     * return the jython code that gets these.
+     * @return 
+     */
+    String getAsJython() {
+        StringBuilder b= new StringBuilder();
+        for ( int i=0; i<this.uris.size(); i++ ) {
+            b.append( this.ids.get(i) ).append( " = " ).append( "getDataSet(\"").append( this.uris.get(i) ).append("\")\n");
+        }
+        return b.toString();
     }
 
 }
