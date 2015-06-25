@@ -452,6 +452,10 @@ public class ScreenshotsTool extends EventQueue {
         return getScreenShot(active,0,true);
     }
 
+    /** 
+     * get a screenshot of the display Autoplot's main UI is running within, but without the pointer.
+     * @return
+     */
     public static BufferedImage getScreenShotNoPointer(  ) {
         Window w= ScriptContext.getViewWindow();
         int active= getActiveDisplay(w);
