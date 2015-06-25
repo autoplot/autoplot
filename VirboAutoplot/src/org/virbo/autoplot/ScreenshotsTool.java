@@ -449,9 +449,15 @@ public class ScreenshotsTool extends EventQueue {
     public static BufferedImage getScreenShot() {
         Window w= ScriptContext.getViewWindow();
         int active= getActiveDisplay(w);
-        return getScreenShot(active,0);
+        return getScreenShot(active,0,true);
     }
 
+    public static BufferedImage getScreenShotNoPointer(  ) {
+        Window w= ScriptContext.getViewWindow();
+        int active= getActiveDisplay(w);
+        return getScreenShot(active,0,false);        
+    }
+    
     /**
      * Get a screenshot of the display indicated by active.  Only one screen
      * of a dual-head is returned.
@@ -459,9 +465,9 @@ public class ScreenshotsTool extends EventQueue {
      * @return image of the screen.
      */
     public static BufferedImage getScreenShot( int active ) {
-        return getScreenShot( active, 0 );
+        return getScreenShot( active, 0, true );
     }
-
+ 
     /**
      * Get a screenshot of the display indicated by active.  Only one screen
      * of a dual-head is returned.  The buttons integer indicates that button presses
@@ -470,18 +476,16 @@ public class ScreenshotsTool extends EventQueue {
      * @param buttons one of: MouseEvent.BUTTON1_DOWN_MASK, MouseEvent.BUTTON2_DOWN_MASK, MouseEvent.BUTTON3_DOWN_MASK, MOUSE_WHEEL_UP, MOUSE_WHEEL_DOWN
      * @return image of the screen.
      */
-    public static BufferedImage getScreenShot( int active, int buttons ) {
+    public static BufferedImage getScreenShot( int active, int buttons, boolean includePointer ) {
         //http://www.javalobby.org/forums/thread.jspa?threadID=16400&tstart=0
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gs = ge.getScreenDevices();
         BufferedImage screenshot;
 
-        DisplayMode mode;
         Rectangle bounds;
 
         int i = active;
-        mode = gs[i].getDisplayMode();
-        //bounds = new Rectangle( 0, 0, mode.getWidth(), mode.getHeight());
+
         PointerInfo info= MouseInfo.getPointerInfo();
         Point p= info.getLocation();
         bounds= gs[i].getDefaultConfiguration().getBounds();
@@ -493,28 +497,30 @@ public class ScreenshotsTool extends EventQueue {
             screenshot = new BufferedImage( gs[i].getDisplayMode().getWidth(), gs[i].getDisplayMode().getHeight(), BufferedImage.TYPE_INT_ARGB );
         }
 
-        if ( MouseInfo.getPointerInfo().getDevice()==gs[i] ) {
-            // get the mouse info before grabbing the screenshot, which takes several hundred millis.
-            BufferedImage pointer=null;
-            if ( ( button & MouseEvent.BUTTON1_DOWN_MASK ) == MouseEvent.BUTTON1_DOWN_MASK ) {
-                pointer= pnt_b1;
-            } else if ( ( button & MouseEvent.BUTTON2_DOWN_MASK ) == MouseEvent.BUTTON2_DOWN_MASK ) {
-                pointer= pnt_b2;
-            } else if ( ( button & MouseEvent.BUTTON3_DOWN_MASK ) == MouseEvent.BUTTON3_DOWN_MASK ) {
-                pointer= pnt_b3;
-            } else if ( ( button & MOUSE_WHEEL_UP ) == MOUSE_WHEEL_UP ) {
-                pointer= pnt_w1;
-                button= 0;
-            } else if ( ( button & MOUSE_WHEEL_DOWN ) == MOUSE_WHEEL_DOWN ) {
-                pointer= pnt_w2;
-                button= 0;
-            } else {
-                pointer= pnt;
+        if ( includePointer ) {
+            if ( MouseInfo.getPointerInfo().getDevice()==gs[i] ) {
+                // get the mouse info before grabbing the screenshot, which takes several hundred millis.
+                BufferedImage pointer;
+                if ( ( button & MouseEvent.BUTTON1_DOWN_MASK ) == MouseEvent.BUTTON1_DOWN_MASK ) {
+                    pointer= pnt_b1;
+                } else if ( ( button & MouseEvent.BUTTON2_DOWN_MASK ) == MouseEvent.BUTTON2_DOWN_MASK ) {
+                    pointer= pnt_b2;
+                } else if ( ( button & MouseEvent.BUTTON3_DOWN_MASK ) == MouseEvent.BUTTON3_DOWN_MASK ) {
+                    pointer= pnt_b3;
+                } else if ( ( button & MOUSE_WHEEL_UP ) == MOUSE_WHEEL_UP ) {
+                    pointer= pnt_w1;
+                    button= 0;
+                } else if ( ( button & MOUSE_WHEEL_DOWN ) == MOUSE_WHEEL_DOWN ) {
+                    pointer= pnt_w2;
+                    button= 0;
+                } else {
+                    pointer= pnt;
+                }
+                screenshot.getGraphics().drawImage( pointer, p.x - b.x - ptrXOffset, p.y - b.y - ptrYOffset, null );
             }
-            screenshot.getGraphics().drawImage( pointer, p.x - b.x - ptrXOffset, p.y - b.y - ptrYOffset, null );
         }
+        
         filterBackground( (Graphics2D)screenshot.getGraphics(), b );
-
 
         return screenshot;
     }
@@ -534,7 +540,7 @@ public class ScreenshotsTool extends EventQueue {
 
         final File file = new File( outLocationFolder, tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + "_" + String.format("%05d", id ) + ".png" );
 
-        final BufferedImage im = getScreenShot( active, button );
+        final BufferedImage im = getScreenShot( active, button, true );
 
         Rectangle b= getScreenBounds(active);
         Rectangle myBounds= getMyBounds(b);
