@@ -78,7 +78,8 @@ public class Test_052_FocusSwitching implements Scenario {
             
             ScriptContext.waitUntilIdle();
             
-            BufferedImage image= ScreenshotsTool.getScreenShotNoPointer();
+            //BufferedImage image= ScreenshotsTool.getScreenShotNoPointer();
+            BufferedImage image= ScreenshotsTool.getScreenShot();
             
             ImageIO.write( image, "png", new File( "Test_5pt2_FocusSwitching_Screen.png" ) );
             
