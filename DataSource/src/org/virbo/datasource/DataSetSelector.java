@@ -1846,6 +1846,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      * This sets defaultRecent as well, so other clients can get a list of 
      * recent values.
      * @param recent New value of property recent.
+     * @see #getDefaultRecent()
      */
     public void setRecent(List<String> recent) {
         List<String> oldRecent = this.recent;
@@ -1865,12 +1866,16 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     /**
      * allow clients (e.g. Autoplot) to set a list of recent that new
      * instances will use.
+     * @param recent the list
      */
     public static void setDefaultRecent( List<String> recent ) {
         defaultRecent= recent;
     }
     
     public static List<String> getDefaultRecent() {
+        if ( defaultRecent==null ) {
+            throw new IllegalArgumentException("defaultRecent has not been set");
+        }
         return defaultRecent;
     }
     
