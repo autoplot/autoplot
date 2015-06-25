@@ -18,6 +18,7 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.io.IOException;
+import java.util.List;
 import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,6 +33,14 @@ import org.das2.util.LoggerManager;
 public class DataMashUp extends javax.swing.JPanel {
 
     private static final Logger logger = LoggerManager.getLogger("jython.dashup");
+    
+    public void setUris( List<String> uris ) {
+        this.namedURIListTool1.setUris( uris );
+    }
+    
+    public void setIds( List<String> ids ) {
+        this.namedURIListTool1.setIds( ids );
+    }
     
     /**
      * Creates new form DataMashUp
@@ -92,9 +101,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab1", jPanel1);
