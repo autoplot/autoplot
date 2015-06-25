@@ -25,11 +25,17 @@ public class TestDashup {
     
     public static void test2() {
         DataMashUp dmu= new DataMashUp();
+        dmu.setIds( Arrays.asList( "data1", "data2" ) );
+        dmu.setUris( Arrays.asList("http://autoplot.org/data/autoplot.cdf?Magnitude","http://autoplot.org/data/autoplot.cdf?BGSEc&slice1=2") );
         JDialog dia= new JDialog();
         dia.setResizable(true);
         dia.getContentPane().add(dmu);
+        dia.setModal(true);
         dia.pack();
         dia.setVisible(true);
+        
+        System.err.println( dmu.getAsJythonInline() );
+        
         //JOptionPane.showConfirmDialog( null, dmu, "Data Mashup, or Dashup", JOptionPane.OK_OPTION );
     }
     
@@ -41,4 +47,5 @@ public class TestDashup {
         JOptionPane.showConfirmDialog(null,n);
     }
  
+    
 }
