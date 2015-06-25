@@ -78,7 +78,8 @@ public class Test_052_FocusSwitching implements Scenario {
             
             ScriptContext.waitUntilIdle();
             
-            BufferedImage image= ScreenshotsTool.getScreenShot();
+            BufferedImage image= ScreenshotsTool.getScreenShotNoPointer();
+            
             ImageIO.write( image, "png", new File( "Test_5pt2_FocusSwitching_Screen.png" ) );
             
             System.err.println( "filter: " + app.getDataPanel().getFiltersChainPanel().getFilter() );
