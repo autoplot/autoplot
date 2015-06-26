@@ -7,8 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Barrel data is used to demo the tweak to the reducex function, which reduces the time resolution to hourly spectra.  
-                The Scratch cat, who helps teach kids to program, peeks from behind.
+        <p><small>The Scratch cat messes with the last Autoplot screenshot.  Have a great summer kids!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,8 +21,10 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-06-19 r16973):</p>
+        <p>Bugfixes (2015-06-26 r17015):</p>
         <ul>
+            <li>SprectrogramRenderer would incorrectly guess the limit when NN rebinning was used, after new code was added earlier this Spring.</li>
+            <li>USER_PROPERTIES copied over for Juno das2stream in odd branch.</li>
             <li>filters tool keeps alpha list and tree list synchronized to the same selection.</li>
             <li>1347: finally make the result from reducex have uniform timetags.</li>
             <li>next/prev buttons check log property so that we avoid RTE with negative numbers.</li>
