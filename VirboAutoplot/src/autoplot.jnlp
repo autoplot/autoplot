@@ -34,17 +34,17 @@
         <icon href="logo64x64.gif" width="64" height="64" />
         <icon href="logo128x128.gif" width="128" height="128" />
         <icon href="splash.gif" kind="splash" />
-        <!--X  Uncomment for devel and production (latest) releases
+        <!--XXXX  Uncomment for devel and production (latest) releases
         <offline-allowed/>
         <shortcut online="false" install="true"> 
             <desktop />
             <menu submenu="autoplot" />
         </shortcut>
-        X-->
-        <!--X  Uncomment production (latest) releases
+        XXXX-->
+        <!--XX  Uncomment production (latest) releases
         <association mime-type="application/autoplot+xml" extensions="vap"/>
         <association mime-type="application/x-cdf" extensions="cdf"/>        
-        X-->
+        XX-->
     </information>
     
     <security>
@@ -57,9 +57,9 @@
         </j2se>
 
         <jar href="AutoplotVolatile.jar" />
-        <jar href="AutoplotStable.jar" /><!--X   Uncomment for devel and production (latest) releases
+        <jar href="AutoplotStable.jar" /><!--XXXX   Uncomment for devel and production (latest) releases
         <jar href="../lib/AutoplotStable.20150401.jar" />
-        X-->
+        XXXX-->
 
         <property name="jnlp.packEnabled" value="true"/>
 
@@ -75,3 +75,4 @@
         <argument>--nop</argument>   <!-- this is to support the jnlp-server, which can insert a starting value -->
     </application-desc>
 </jnlp> 
+
