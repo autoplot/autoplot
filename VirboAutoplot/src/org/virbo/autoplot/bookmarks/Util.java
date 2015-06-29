@@ -124,8 +124,9 @@ public class Util {
     }
 
     /**
-     * allow List<Bookmark> to be used.  Note presently, this drops any folders.
-     * @param recent
+     * Convenience method allowing List&lt;Bookmark&gt; to be used.  Note presently, this drops any folders.
+     * @param sel the select
+     * @param recent the list of bookmarks
      */
     public static void setRecent( DataSetSelector sel, List<Bookmark> recent ) {
         List<String> result= new ArrayList();
