@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
@@ -198,13 +199,18 @@ public class DataMashUp extends javax.swing.JPanel {
                 try {
                     String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
                     System.err.println("drop "+data);
-                    TreePath tp= jTree1.getClosestPathForLocation( dtde.getLocation().x, dtde.getLocation().y );
+                    final TreePath tp= jTree1.getClosestPathForLocation( dtde.getLocation().x, dtde.getLocation().y );
                     MutableTreeNode mtn= (MutableTreeNode)tp.getLastPathComponent();
                     mtn.setUserObject(data);
                     for ( int i=mtn.getChildCount()-1; i>=0; i-- ) {
                         mtn.remove(i);
                     }
-                    jTree1.treeDidChange();
+                    jTree1.collapsePath(tp);
+                    SwingUtilities.invokeLater( new Runnable() {
+                        public void run() {
+                            jTree1.expandPath(tp);
+                        }
+                    });
                    
                     if ( !data.startsWith("vap+") && data.endsWith(")") ) { //TODO: cheesy vap+ to detect URIs.
                         int i= data.indexOf("(");
@@ -215,9 +221,6 @@ public class DataMashUp extends javax.swing.JPanel {
                             mtn.insert( new DefaultMutableTreeNode(ss[k]), k );
                         }
                     }
-                    jTree1.invalidate();
-                    jTree1.revalidate();
-                    jTree1.repaint();
                     
                 } catch (UnsupportedFlavorException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
