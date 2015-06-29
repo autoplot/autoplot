@@ -26,8 +26,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.das2.util.LoggerManager;
 
@@ -78,7 +76,9 @@ public class DataMashUp extends javax.swing.JPanel {
         if ( m.isLeaf(n) ) {
             return n.toString();
         } else {
-            StringBuilder t= new StringBuilder( n.toString() + "(" );
+            String sn= n.toString();
+            int iparen= sn.indexOf("(");
+            StringBuilder t= new StringBuilder( sn.substring(0,iparen) + "(" );
             int nchild= m.getChildCount(n);
             for ( int i=0; i<nchild; i++ ) {
                 if ( i>0 ) t.append(",");
@@ -91,7 +91,7 @@ public class DataMashUp extends javax.swing.JPanel {
     
     public String getAsJythonInline() {
         StringBuilder b= new StringBuilder();
-        b.append( namedURIListTool1.getAsJython() );
+        b.append( namedURIListTool1.getAsJythonInline() );
         
         DefaultTreeModel m= (DefaultTreeModel) jTree1.getModel();
         
