@@ -35,7 +35,9 @@ public class Util {
     /**
      * load and maintain recent entries in the context name.  This will also add
      * a listener to save recent entries.
-     * @param name
+     * @param nodeName the context
+     * @param sel the recent entries are added to this selector.
+     * @param deft the deft to use with the first invocation.
      */
     public static void loadRecent( final String nodeName, final DataSetSelector sel, List<Bookmark> deft ) {
 
@@ -79,6 +81,7 @@ public class Util {
         }
 
         sel.addPropertyChangeListener( DataSetSelector.PROP_RECENT, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 PrintStream fout= null;
                 try {
@@ -95,6 +98,7 @@ public class Util {
         });
         
         sel.addActionListener( new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 PrintStream fout= null;
                 try {
@@ -113,12 +117,16 @@ public class Util {
 
     }
 
-
+    /**
+     * return the recent entries.
+     * @param sel the selector containing the recent entries.
+     * @return the list.
+     */
     public static List<Bookmark> getRecent( DataSetSelector sel ) {
         List<String> ls= sel.getRecent();
         List<Bookmark> result= new ArrayList();
-        for ( int i=0; i<ls.size(); i++ ) {
-            result.add( new Bookmark.Item(ls.get(i)) );
+        for ( String l : ls ) {
+            result.add(new Bookmark.Item(l));
         }
         return result;
     }
