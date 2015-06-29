@@ -208,7 +208,7 @@ public class InlineDataSource extends AbstractDataSource {
             int i2= i1+ss[i].length();
             ss[i]= s.substring(i1,i2);
             i1= i2+1;
-        }
+        } 
         return ss;
     }
     
