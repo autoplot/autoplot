@@ -25,7 +25,7 @@ public class TestDashup {
     
     public static void test2() {
         DataMashUp dmu= new DataMashUp();
-        dmu.setIds( Arrays.asList( "data1", "data2" ) );
+        dmu.setIds( Arrays.asList( "x", "y" ) );
         dmu.setUris( Arrays.asList("http://autoplot.org/data/autoplot.cdf?Magnitude","http://autoplot.org/data/autoplot.cdf?BGSEc&slice1=2") );
         JDialog dia= new JDialog();
         dia.setResizable(true);
