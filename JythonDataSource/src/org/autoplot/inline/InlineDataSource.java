@@ -191,14 +191,30 @@ public class InlineDataSource extends AbstractDataSource {
         }
     }
 
-    private String[] wowSplit( String s, char delim, char exclude ) {    
+    /**
+     * only split on the delimiter when we are not within the exclude delimiters.  For example,
+     * <code>
+     * x=getDataSet("http://autoplot.org/data/autoplot.cdf?Magnitude&noDep=T")&y=getDataSet('http://autoplot.org/data/autoplot.cdf?BGSEc&slice1=2')&sqrt(x)
+     * </code>
+     * @param s the string to split.
+     * @param delim the delimiter to split on, for example the ampersand (&).
+     * @param exclude1 for example the single quote (')
+     * @param exclude2 for example the double quote (")  Note URIs don't support these anyway.
+     * @return the split.
+     */
+    protected static String[] guardedSplit( String s, char delim, char exclude1, char exclude2 ) {    
         if ( delim=='_') throw new IllegalArgumentException("_ not allowed for delim");
         StringBuilder scopyb= new StringBuilder(s.length());
-        boolean inExclude= false;
+        char inExclude= (char)0;
+        
         for ( int i=0; i<s.length(); i++ ) {
             char c= s.charAt(i);
-            if ( c==exclude ) inExclude= !inExclude;
-            if ( inExclude ) c='_';
+            if ( inExclude==0 ) {
+                if ( c==exclude1 || c==exclude2 ) inExclude= c;
+            } else {
+                if ( c==inExclude ) inExclude= 0;
+            }
+            if ( inExclude>(char)0 ) c='_';
             scopyb.append(c);            
         }
         String[] ss= scopyb.toString().split(""+delim);
@@ -252,7 +268,7 @@ public class InlineDataSource extends AbstractDataSource {
             
         }
         
-        String[] ss= wowSplit( noFile, '&', '\'' );
+        String[] ss= guardedSplit( noFile, '&', '\'', '\"' );
         
 
         MutablePropertyDataSet ds= null;
