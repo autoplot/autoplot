@@ -27,6 +27,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.das2.util.LoggerManager;
 
@@ -198,19 +199,17 @@ public class DataMashUp extends javax.swing.JPanel {
             public void drop(DropTargetDropEvent dtde) {
                 try {
                     String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
-                    System.err.println("drop "+data);
+                    
+                    DefaultTreeModel model= (DefaultTreeModel) jTree1.getModel();
+                    
                     final TreePath tp= jTree1.getClosestPathForLocation( dtde.getLocation().x, dtde.getLocation().y );
                     MutableTreeNode mtn= (MutableTreeNode)tp.getLastPathComponent();
+                    MutableTreeNode parent= (MutableTreeNode)mtn.getParent();
+                    
                     mtn.setUserObject(data);
                     for ( int i=mtn.getChildCount()-1; i>=0; i-- ) {
                         mtn.remove(i);
                     }
-                    jTree1.collapsePath(tp);
-                    SwingUtilities.invokeLater( new Runnable() {
-                        public void run() {
-                            jTree1.expandPath(tp);
-                        }
-                    });
                    
                     if ( !data.startsWith("vap+") && data.endsWith(")") ) { //TODO: cheesy vap+ to detect URIs.
                         int i= data.indexOf("(");
@@ -221,6 +220,22 @@ public class DataMashUp extends javax.swing.JPanel {
                             mtn.insert( new DefaultMutableTreeNode(ss[k]), k );
                         }
                     }
+
+                    if ( parent==null ) {
+                        model.setRoot( mtn );
+                    } else { 
+                        int index= model.getIndexOfChild( parent, mtn );
+                        model.removeNodeFromParent(mtn);
+                        model.insertNodeInto( mtn, parent, index );
+                    }
+                    
+                    
+                    jTree1.collapsePath(tp);
+                    SwingUtilities.invokeLater( new Runnable() {
+                        public void run() {
+                            jTree1.expandPath(tp);
+                        }
+                    });
                     
                 } catch (UnsupportedFlavorException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
