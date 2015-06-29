@@ -10,7 +10,9 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -218,9 +220,21 @@ public class NamedURIListTool extends JPanel {
     String getAsJython() {
         StringBuilder b= new StringBuilder();
         for ( int i=0; i<this.uris.size(); i++ ) {
-            b.append( this.ids.get(i) ).append( " = " ).append( "getDataSet(\"").append( this.uris.get(i) ).append("\")\n");
+            b.append( this.ids.get(i) ).append( "=" ).append( "getDataSet('").append( this.uris.get(i) ).append("')\n");
         }
         return b.toString();
     }
 
+    /**
+     * return the jython code that gets these, to prefix vap+inline:...
+     * @return 
+     */
+    String getAsJythonInline() {
+        StringBuilder b= new StringBuilder();
+        for ( int i=0; i<this.uris.size(); i++ ) {
+            b.append( this.ids.get(i) ).append( "=" ).append( "getDataSet('").append( this.uris.get(i) ).append("')&");
+        }
+        return b.toString();
+    }
+    
 }
