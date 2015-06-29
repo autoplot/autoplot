@@ -191,6 +191,27 @@ public class InlineDataSource extends AbstractDataSource {
         }
     }
 
+    private String[] wowSplit( String s, char delim, char exclude ) {    
+        if ( delim=='_') throw new IllegalArgumentException("_ not allowed for delim");
+        StringBuilder scopyb= new StringBuilder(s.length());
+        boolean inExclude= false;
+        for ( int i=0; i<s.length(); i++ ) {
+            char c= s.charAt(i);
+            if ( c==exclude ) inExclude= !inExclude;
+            if ( inExclude ) c='_';
+            scopyb.append(c);            
+        }
+        String[] ss= scopyb.toString().split(""+delim);
+        
+        int i1= 0;
+        for ( int i=0; i<ss.length; i++ ) {
+            int i2= i1+ss[i].length();
+            ss[i]= s.substring(i1,i2);
+            i1= i2+1;
+        }
+        return ss;
+    }
+    
     // http://autoplot.org/developer.inlineData
     //vap+inline:3,4;3,6;5,6
     //vap+inline:2000-001T00:00,23.5;2000-002T00:00,23.5;2000-003T00:00,23.5
@@ -217,12 +238,22 @@ public class InlineDataSource extends AbstractDataSource {
         s= s.replaceAll("%20"," ");
         //s= s.replaceAll("\\+"," ");
 
-        // this is because URISplit treats it like a file.
-        URISplit split= URISplit.parse(s);
-        String noFile;
-        noFile= split.params==null ? split.file : split.params; //kludge...
+        String noFile= null;
+        if ( s.startsWith("vap+inline:file:///") ) {
+            noFile= s.substring(19);
+        } else if ( s.startsWith("vap+inline:file:/") ) { // this is an old bug where file was inserted.
+            noFile= s.substring(17);
+        } else if ( s.startsWith("vap+inline:") ) {
+            noFile= s.substring(11);
+        } else { // do what we did before    
+            // this is because URISplit treats it like a file.
+            URISplit split= URISplit.parse(s);
+            noFile= split.params==null ? split.file : split.params; //kludge...
+            
+        }
         
-        String[] ss= noFile.split("&");
+        String[] ss= wowSplit( noFile, '&', '\'' );
+        
 
         MutablePropertyDataSet ds= null;
         MutablePropertyDataSet bundle1= null;
