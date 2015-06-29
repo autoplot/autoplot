@@ -519,7 +519,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 this.tm= toTableModel(lit, 1);
             }
         } else {
-            String[] ss= uri.split("&");
+            String[] ss= InlineDataSource.guardedSplit( uri, '&', '\'', '\"' );
+            //String[] ss= uri.split("&");
             StringBuilder t= new StringBuilder();
             for ( int i=0; i<ss.length; i++ ) {
                 if ( i>0 ) t.append("\n");
