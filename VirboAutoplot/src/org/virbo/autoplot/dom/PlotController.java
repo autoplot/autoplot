@@ -1068,6 +1068,12 @@ public class PlotController extends DomNodeController {
 
 
     void bindPEToColorbar( PlotElement pe ) {
+        if ( this.plot==null ) {
+            throw new NullPointerException("plotController.plot is null"); // bug 1419: I think I see this on the server
+        }
+        if ( pe.style==null ) {
+            throw new NullPointerException("Style pe.style is null"); // bug 1419: I think I see this on the server
+        }
         this.dom.controller.bind( pe.style, PlotElementStyle.PROP_COLORTABLE, this.plot, Plot.PROP_COLORTABLE );
     }
 
@@ -1077,6 +1083,9 @@ public class PlotController extends DomNodeController {
      * @param reset
      */
     synchronized void addPlotElement(PlotElement p,boolean reset) {
+        
+        if ( p==null ) throw new NullPointerException("PlotElement p is null"); // bug 1419: I think I see this on the server
+        
         Renderer rr= p.controller.getRenderer();
 
         if ( rr instanceof SpectrogramRenderer ) {
