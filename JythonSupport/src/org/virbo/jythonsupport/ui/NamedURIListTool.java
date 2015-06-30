@@ -6,8 +6,11 @@
 package org.virbo.jythonsupport.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
@@ -19,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -175,21 +180,34 @@ public class NamedURIListTool extends JPanel {
         String currentName= ids.get(fi);
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
+        JLabel c= new JLabel( "Parameter name:" );
+        
+        c.setAlignmentX( Component.LEFT_ALIGNMENT );
+        p.add(  c );
         JTextField tf= new JTextField(currentName);
+        tf.setAlignmentX( Component.LEFT_ALIGNMENT );
         p.add( tf );
+        p.add( Box.createVerticalStrut( p.getFont().getSize() ) );
         DataSourceEditorPanel edit=null;
         try {
             edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel( DataSetURI.getURIValid( uris.get(fi) ) );
+            String uri= uris.get(fi);
             try {
-                edit.prepare( uris.get(fi), null, new NullProgressMonitor() );
-                p.add( edit.getPanel() );
+                if ( !edit.reject( uri ) ) {
+                    edit.prepare( uri, null, new NullProgressMonitor() );
+                    edit.setURI( uri );
+                    JPanel editPanel= edit.getPanel();
+                    editPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
+                    p.add( editPanel );
+                }
             } catch ( Exception ex ) {
                 ex.printStackTrace(); //TODO
             }
+            
         } catch (URISyntaxException ex) {
-            Logger.getLogger(NamedURIListTool.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
-        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( scrollPane, p ) ) {
+        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( scrollPane, p, "Rename parameter and dataset editor", JOptionPane.OK_CANCEL_OPTION ) ) {
             ids.set( fi,tf.getText() );
             if ( edit!=null ) {
                 uris.set( fi, edit.getURI() );
