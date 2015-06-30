@@ -1,7 +1,5 @@
 package org.virbo.datasource;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -23,6 +21,7 @@ import org.das2.util.LoggerManager;
  * routines for working with URIs.
  *
  * We need a working definition of well-formed and colloquial URIs:
+ *<blockquote><pre>
  * = well-formed URIs =
  *   <vapScheme>:<fileResource>?<params>
  *   <vapScheme>:[<identifier>?]<params>
@@ -37,6 +36,8 @@ import org.das2.util.LoggerManager;
  *   * spaces in parameter lists are converted into pluses.
  *   * pluses in parameter lists are converted into %2B.
  *   * note that if there are pluses but the URI is valid, then pluses may be left alone. 
+ * </pre></blockquote>
+ * 
  * This routine knows nothing about the data source that will interpret the
  * URI, so this needs to be established.
  * 
@@ -528,24 +529,26 @@ public class URISplit {
     }
 
     /**
-     * split the url string into components, keeping track of the caret position
+     * split the UI string into components, keeping track of the caret position
      * when characters are inserted.  This does not try to identify
      * the vap scheme, since that might require interaction with the server to
      * get mime type.  This inserts the scheme "file://" when the scheme is 
      * absent.
-     * The string http://www.example.com/data/myfile.nc?myVariable is split into:
-     *   vapScheme, vap+nc
-     *   scheme, http
-     *   authority, http://www.example.com
-     *   path, the directory with http://www.example.com/data/
-     *   file, the file, http://www.example.com/data/myfile.nc
-     *   ext, the extenion, .nc
-     *   params, myVariable or null
+     * For example, the string http://www.example.com/data/myfile.nc?myVariable is split into:<ul>
+     *   <li>vapScheme, vap+nc
+     *   <li>scheme, http
+     *   <li>authority, http://www.example.com
+     *   <li>path, the directory with http://www.example.com/data/
+     *   <li>file, the file, http://www.example.com/data/myfile.nc
+     *   <li>ext, the extension, .nc or null.
+     *   <li>params, myVariable or null.
+     * </ul>
      * @param surl  the string to parse
-     * @param resourceUriCarotPos the position of the caret, the relative position will be preserved through normalization in formatCaretPos
+     * @param caretPos the position of the caret, the relative position will be preserved through normalization in formatCaretPos
      * @param normalize normalize the surl by adding implicit "vap", etc.
+     * @return the decomposed uri.
      */
-    public static URISplit parse( String surl, int caretPos , boolean normalize) {
+    public static URISplit parse( String surl, int caretPos, boolean normalize) {
 
         logger.log( Level.FINE, "URISplit.parse(\"{0}\",{1},{2})", new Object[]{ surl, caretPos, normalize });
 
@@ -679,6 +682,8 @@ public class URISplit {
             result.authority = rsurl.substring(0, iauth);
         }
 
+        if ( ext!=null && ext.length()==0 ) ext=null;
+        
         if (file != null) {
             i = rsurl.lastIndexOf("/", iquery);
             if (i == -1) {
