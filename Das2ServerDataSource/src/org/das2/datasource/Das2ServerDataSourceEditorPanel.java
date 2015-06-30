@@ -1043,11 +1043,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             if (obj instanceof DasServer.DataSrcListItem) {
                 DasServer.DataSrcListItem li = (DasServer.DataSrcListItem) obj;
 
+
                 if (li.description() == null) {
-                    setText(String.format("<html>%s", li.name()));
+                    setText(String.format("<html><b>%s</b>", li.name()));
                 } else {
-                    setText(String.format("<html>%s &nbsp;<i>%s</i>", li.name(), li.description()));
-                }
+                    setText(String.format("<html><b>%s</b> &nbsp;<i>%s</i>", li.name(), li.description()));
+                }                 
             }
 
             return this;
