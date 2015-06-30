@@ -64,6 +64,9 @@ public class DataMashUp extends javax.swing.JPanel {
         dragSource.createDefaultDragGestureRecognizer( jList1, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
         dragSource.createDefaultDragGestureRecognizer( namedURIListTool1, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
 
+        String data = "plus(x,y)";
+        TreePath tp= new TreePath( ( (DefaultMutableTreeNode) jTree1.getModel().getRoot() ).getPath() );
+        doDrop(data,tp);
     }
 
     /**
@@ -99,6 +102,45 @@ public class DataMashUp extends javax.swing.JPanel {
         
         return b.toString();
         
+    }
+    
+    private void doDrop( String data, final TreePath tp ) {
+
+        DefaultTreeModel model= (DefaultTreeModel) jTree1.getModel();
+
+        MutableTreeNode mtn= (MutableTreeNode)tp.getLastPathComponent();
+        MutableTreeNode parent= (MutableTreeNode)mtn.getParent();
+
+        mtn.setUserObject(data);
+        for ( int i=mtn.getChildCount()-1; i>=0; i-- ) {
+            mtn.remove(i);
+        }
+
+        if ( !data.startsWith("vap+") && data.endsWith(")") ) { //TODO: cheesy vap+ to detect URIs.
+            int i= data.indexOf("(");
+            int j= data.length()-1;
+            String[] ss= data.substring(i+1,j).split(",",-2);
+            int n= ss.length;
+            for ( int k=0; k<n; k++ ) {
+                mtn.insert( new DefaultMutableTreeNode(ss[k]), k );
+            }
+        }
+
+        if ( parent==null ) {
+            model.setRoot( mtn );
+        } else { 
+            int index= model.getIndexOfChild( parent, mtn );
+            model.removeNodeFromParent(mtn);
+            model.insertNodeInto( mtn, parent, index );
+        }
+
+
+        jTree1.collapsePath(tp);
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                jTree1.expandPath(tp);
+            }
+        });        
     }
     
     /**
@@ -199,43 +241,10 @@ public class DataMashUp extends javax.swing.JPanel {
             public void drop(DropTargetDropEvent dtde) {
                 try {
                     String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
-                    
-                    DefaultTreeModel model= (DefaultTreeModel) jTree1.getModel();
-                    
-                    final TreePath tp= jTree1.getClosestPathForLocation( dtde.getLocation().x, dtde.getLocation().y );
-                    MutableTreeNode mtn= (MutableTreeNode)tp.getLastPathComponent();
-                    MutableTreeNode parent= (MutableTreeNode)mtn.getParent();
-                    
-                    mtn.setUserObject(data);
-                    for ( int i=mtn.getChildCount()-1; i>=0; i-- ) {
-                        mtn.remove(i);
-                    }
-                   
-                    if ( !data.startsWith("vap+") && data.endsWith(")") ) { //TODO: cheesy vap+ to detect URIs.
-                        int i= data.indexOf("(");
-                        int j= data.length()-1;
-                        String[] ss= data.substring(i+1,j).split(",",-2);
-                        int n= ss.length;
-                        for ( int k=0; k<n; k++ ) {
-                            mtn.insert( new DefaultMutableTreeNode(ss[k]), k );
-                        }
-                    }
 
-                    if ( parent==null ) {
-                        model.setRoot( mtn );
-                    } else { 
-                        int index= model.getIndexOfChild( parent, mtn );
-                        model.removeNodeFromParent(mtn);
-                        model.insertNodeInto( mtn, parent, index );
-                    }
-                    
-                    
-                    jTree1.collapsePath(tp);
-                    SwingUtilities.invokeLater( new Runnable() {
-                        public void run() {
-                            jTree1.expandPath(tp);
-                        }
-                    });
+                    TreePath tp= jTree1.getClosestPathForLocation( dtde.getLocation().x, dtde.getLocation().y );
+
+                    doDrop(data,tp);
                     
                 } catch (UnsupportedFlavorException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
