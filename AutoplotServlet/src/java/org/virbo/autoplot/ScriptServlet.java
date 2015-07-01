@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.autoplot;
 
@@ -34,10 +30,12 @@ import org.virbo.autoplot.scriptconsole.LoggingOutputStream;
 public class ScriptServlet extends HttpServlet {
    
     /** 
-    * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-    * @param request servlet request
-    * @param response servlet response
-    */
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+     * @param request servlet request
+     * @param response servlet response
+     * @throws javax.servlet.ServletException
+     * @throws java.io.IOException
+     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         try {
@@ -59,10 +57,10 @@ public class ScriptServlet extends HttpServlet {
             // do minimal taint checking.
             String[] ss= script.split("\n");
              
-            for ( int i=0; i<ss.length; i++ ) {
-                if ( ss[i].contains("import") ) throw new IllegalArgumentException("imports not allowed for security");
-                if ( ss[i].contains("eval") ) throw new IllegalArgumentException("eval not allowed for security");
-                if ( ss[i].contains("formatDataSet") ) throw new IllegalArgumentException("formatDataSet not allowed for security");
+            for (String s : ss) {
+                if (s.contains("import")) throw new IllegalArgumentException("imports not allowed for security");
+                if (s.contains("eval")) throw new IllegalArgumentException("eval not allowed for security");
+                if (s.contains("formatDataSet")) throw new IllegalArgumentException("formatDataSet not allowed for security");
             }
 
             String ts= new TimeDatumFormatter("%Y%m%dT%H%M%S.%{milli}").format( TimeUtil.now() );
@@ -73,7 +71,7 @@ public class ScriptServlet extends HttpServlet {
             String home= System.getProperty( "AUTOPLOT_SERVLET_HOME" );
             if ( home==null ) home= "/tmp/autoplotservlet/";
 
-            home= new File(home).getCanonicalPath().toString();
+            home= new File(home).getCanonicalPath();
 
             home= home + File.separator; 
 
@@ -130,7 +128,8 @@ public class ScriptServlet extends HttpServlet {
             interp.set("getFile",null);
             interp.set("downloadResourceAsTempFile",null);
 
-            interp.setOut( new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO ) );
+            LoggingOutputStream los1= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO );
+            interp.setOut( los1 );
             
             interp.set( "response", response );
 
@@ -138,9 +137,13 @@ public class ScriptServlet extends HttpServlet {
             response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
             
             //TODO: this limits to one user!
-            ScriptContext._setOutputStream( new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO ) ); 
+            LoggingOutputStream los2= new LoggingOutputStream( Logger.getLogger("autoplot.servlet.scriptservlet"), Level.INFO ); 
+            ScriptContext._setOutputStream( los2 ); 
             
             interp.exec(script);
+            
+            try { los1.close(); } catch ( IOException ex ) {}
+            try { los2.close(); } catch ( IOException ex ) {}
             
         } catch ( Exception ex ) {
             response.sendError(403, ex.toString() );
