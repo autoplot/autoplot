@@ -146,11 +146,11 @@ public class ServletUtil {
                 if ( whiteList==null || freshNow-whiteListFresh>5000 ) { 
                     List<String> local= new ArrayList<String>(100);
                     try {
-                        logger.log(Level.INFO, "Reading whitelist from {0} ===", ff);
+                        logger.log(Level.FINE, "Reading whitelist from {0} ===", ff);
                         BufferedReader r= new BufferedReader( new FileReader( ff ) );
                         String s= r.readLine();
                         while ( s!=null ) {
-                            logger.log(Level.INFO, "{0}", s);
+                            logger.log(Level.FINE, "{0}", s);
                             int i= s.indexOf("#");
                             if ( i>-1 ) s= s.substring(0,i);
                             s= s.trim();
@@ -164,7 +164,7 @@ public class ServletUtil {
                             }
                             s= r.readLine();
                         }
-                        logger.log(Level.INFO, "Done reading whitelist from {0} ===", ff);
+                        logger.log(Level.FINE, "Done reading whitelist from {0} ===", ff);
                     } catch ( IOException ex ) {
                         throw ex; 
                     }
@@ -202,14 +202,17 @@ public class ServletUtil {
     }
     
     /**
-     * dump the whitelist to the logger.
+     * dump the whitelist to the logger at the given level.
+     * @param level the level to log at.
      */
-    public static void dumpWhitelistToLogger() {
-        logger.log(Level.INFO, "=== the whitelist ===" );
-        for ( String s: whiteList ) {
-            logger.log(Level.INFO, s );
+    public static void dumpWhitelistToLogger( Level level ) {
+        if ( logger.isLoggable(level) ) {
+            logger.log( level, "=== the whitelist ===" );
+            for ( String s: whiteList ) {
+                logger.log( level, s );
+            }
+            logger.log( level, "===" );
         }
-        logger.log(Level.INFO, "===" );
     }
     
     public static File getServletHome() {
