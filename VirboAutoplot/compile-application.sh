@@ -264,6 +264,7 @@ if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStab
 # this can be removed soon:
 if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/dataset/SparseDataSetBuilder.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/dataset/SparseDataSet.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC -target 1.6 -source 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/jythonsupport/ui/DataMashUp.java; then echo "****"; hasErrors=1; fi
 
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do

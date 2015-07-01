@@ -200,6 +200,7 @@ if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotS
 if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/datum/RationalNumber.java; then echo "****"; hasErrors=1; fi  
 if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/datum/SIUnits.java; then echo "****"; hasErrors=1; fi  
 if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/dataset/RepeatIndexDataSet.java; then echo "****"; hasErrors=1; fi
+if ! ${JAVA_HOME}bin/javac -target 1.6 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/jythonsupport/ui/DataMashUp.java; then echo "****"; hasErrors=1; fi
 
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
