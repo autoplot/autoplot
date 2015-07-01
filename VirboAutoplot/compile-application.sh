@@ -19,9 +19,6 @@
 if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.7.0_80/
 fi
-if [ "" = "$JAVA6_HOME" ]; then
-    JAVA6_HOME=$JAVA_HOME
-fi
 
 if [ "" = "$TAG" ]; then
     if [ "" = "$AP_VERSION" ]; then
@@ -32,8 +29,8 @@ if [ "" = "$TAG" ]; then
 fi
 echo "TAG=${TAG}"
 
-JAVAC=$JAVA6_HOME/bin/javac
-JAR=$JAVA6_HOME/bin/jar
+JAVAC=$JAVA_HOME/bin/javac
+JAR=$JAVA_HOME/bin/jar
 
 # we rsync over stable jars to compile against.  Setting AP_KEEP_STABLE=T means keep the Jar files.
 if [ "" = "$AP_KEEP_STABLE" ]; then
@@ -319,7 +316,7 @@ cd temp-volatile-classes
 echo " ==manifest=="
 cat ../temp-volatile-src/MANIFEST.MF
 echo " ==manifest=="
-${JAVA6_HOME}bin/jar cmf ../temp-volatile-src/MANIFEST.MF ../dist/AutoplotVolatile.jar *
+${JAVA_HOME}bin/jar cmf ../temp-volatile-src/MANIFEST.MF ../dist/AutoplotVolatile.jar *
 cd ..
 
 echo "done make jumbo jar files..."
@@ -328,35 +325,35 @@ echo "done make jumbo jar files..."
 # See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373 "Error verifying signatures of pack200 files in some cases"
 # See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6351684 "pack200 doesn't work on/corrupts obfuscated files"
 echo "=== normalize jar file before signing..."
-${JAVA6_HOME}bin/pack200 --repack dist/AutoplotVolatile1.jar dist/AutoplotVolatile.jar
-${JAVA6_HOME}bin/pack200 --repack dist/AutoplotVolatile2.jar dist/AutoplotVolatile1.jar # http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373  Note this doesn't appear to have an effect.
+${JAVA_HOME}bin/pack200 --repack dist/AutoplotVolatile1.jar dist/AutoplotVolatile.jar
+${JAVA_HOME}bin/pack200 --repack dist/AutoplotVolatile2.jar dist/AutoplotVolatile1.jar # http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6575373  Note this doesn't appear to have an effect.
 mv dist/AutoplotVolatile2.jar dist/AutoplotVolatile.jar
 rm dist/AutoplotVolatile1.jar
 
 echo "=== sign and pack the jar file..."
 echo "  use set +x to hide private info"
-#echo  ${JAVA6_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"
+#echo  ${JAVA_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"
 set +x
-if ! ${JAVA6_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"; then
+if ! ${JAVA_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotVolatile.jar "$ALIAS"; then
    echo "Fail to sign resources!"
    exit 1
 fi
 set -x
 
 echo "=== verify the jar file..."
-${JAVA6_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10
+${JAVA_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10
 
 echo "=== sign and pack the jar file..."
-${JAVA6_HOME}bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
-${JAVA6_HOME}bin/unpack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile_pack_gz.jar
+${JAVA_HOME}bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
+${JAVA_HOME}bin/unpack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile_pack_gz.jar
 
-if ! ${JAVA6_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10; then
+if ! ${JAVA_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -10; then
    echo "jarsigner verify failed on file dist/AutoplotVolatile.jar!"
    exit 1
 fi
 
 echo "=== verify signed and unpacked jar file..."
-if ! ${JAVA6_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -10; then
+if ! ${JAVA_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -10; then
    echo "jarsigner verify  failed on pack_gz file dist/AutoplotVolatile_pack_gz.jar!"
    exit 1
 fi
@@ -374,8 +371,8 @@ echo "=== modify jar files for this particular release"
 cd temp-volatile-src
 $JAVAC  -target 1.7 -source 1.7 -d ../temp-volatile-classes external/FileSearchReplace.java
 cd ..
-${JAVA6_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
-${JAVA6_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
+${JAVA_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
+${JAVA_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
 
 # if these are needed.
 # These are needed for the single-jar build.

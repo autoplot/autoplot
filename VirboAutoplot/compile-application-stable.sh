@@ -11,9 +11,6 @@
 if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.7.0_80/
 fi
-if [ "" = "$JAVA6_HOME" ]; then
-    JAVA6_HOME=/usr/local/jdk1.7.0_80/
-fi
 
 if [ "" = "$KEYPASS" ]; then
     echo "KEYPASS NEEDED!"

@@ -14,13 +14,9 @@
 #
 # Used by: ???
 #
-# set JAVA_HOME and JAVA6_HOME
+# set JAVA_HOME 
 if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.7.0_80/
-fi
-
-if [ "" = "$JAVA6_HOME" ]; then
-    JAVA6_HOME=/usr/local/jdk1.7.0_80/
 fi
 
 if [ "" = "$TAG" ]; then
