@@ -8,6 +8,7 @@ package org.virbo.datasource;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -119,6 +120,11 @@ public final class AutoplotSettings {
     }
 
     /**
+     * cache the resolved autoplotData property.
+     */
+    private String resolvedAutoplotData= null;
+    
+    /**
      * resolve the property, resolving references.  For example, ${HOME} 
      * is replaced with System.getProperty("user.home").
      * @param name the name to resolve, such as PROP_AUTOPLOTDATA or PROP_FSCACHE
@@ -126,12 +132,20 @@ public final class AutoplotSettings {
      */
     public String resolveProperty( String name ) {
         if ( name.equals("autoplotData") ) {
-            return getAutoplotData().replace("${HOME}", System.getProperty("user.home") );
+            String l= resolvedAutoplotData;
+            if ( l!=null ) return l;
+            String s=  getAutoplotData().replace("${HOME}", System.getProperty("user.home") );
+            File f= new File(s);
+            f= f.getAbsoluteFile();
+            resolvedAutoplotData= f.toString();
+            return f.toString();
         } else if ( name.equals("fscache" ) ) {
             String result= getFscache();
             result= result.replace("${autoplotData}", getAutoplotData() );
             result= result.replace("${HOME}", System.getProperty("user.home") );
-            return result;
+            File f= new File(result);
+            f= f.getAbsoluteFile();
+            return f.toString();
         } else {
             throw new IllegalArgumentException("unable to resolve property: "+ name );
         }
