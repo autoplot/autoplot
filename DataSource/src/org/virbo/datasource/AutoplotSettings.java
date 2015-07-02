@@ -141,11 +141,9 @@ public final class AutoplotSettings {
             return f.toString();
         } else if ( name.equals("fscache" ) ) {
             String result= getFscache();
-            result= result.replace("${autoplotData}", getAutoplotData() );
+            result= result.replace("${autoplotData}", resolveProperty("autoplotData") );
             result= result.replace("${HOME}", System.getProperty("user.home") );
-            File f= new File(result);
-            f= f.getAbsoluteFile();
-            return f.toString();
+            return result;
         } else {
             throw new IllegalArgumentException("unable to resolve property: "+ name );
         }
