@@ -42,7 +42,7 @@
         <p>The <a href="CdawebVapServlet.jsp">"CdawebVapServlet"</a> creates v1.08 vap files.
         </p>
 
-        <p>The <a href="ServletInfo">"ServletInfo"</a> shows information about the servlet for debugging. 
+        <p><a href="ServletInfo">"ServletInfo"</a> shows information about the servlet for debugging. 
         </p>
 
         <p><a href="thin/zoom/demo.html">"Thin"<a> shows how Autoplot is used to implement a thin-client that is usable on phones.  
