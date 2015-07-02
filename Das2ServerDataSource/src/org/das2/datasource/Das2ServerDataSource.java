@@ -531,21 +531,22 @@ class Das2ServerDataSource extends AbstractDataSource {
 
             @Override
             public String getURI() {
+                Map<String,String> c= new HashMap(params);
                 String stime= timeRange.min().toString().replace(" ", "+");
                 String etime= timeRange.max().toString().replace(" ", "+");
-                String sparams= "dataset="+params.get( "dataset" )
-                        + "&start_time=" + stime
-                        + "&end_time=" + etime;
+                c.put("start_time",stime);
+                c.put("end_time",etime);
                 if ( resolution!=null ) {
                     double resSec= resolution.doubleValue(Units.seconds);
                     resSec= Math.round( resSec * 1000 ) / 1000.;
-                    sparams+= "&resolution=" + resSec;
+                    c.put( "resolution", String.valueOf(resSec) );
                 } else {
                     logger.fine("no resolution specified");
                 }
                 if ( params.containsKey("interval") ) {
-                    sparams+= "&interval="+params.get("interval");
+                    c.put( "interval", params.get("interval") );
                 }
+                String sparams= URISplit.formatParams(c);
                 if ( dsParams!=null && dsParams.trim().length()>0 )  sparams+= "&" + dsParams; //TODO: Double-load was caused by extra & at the end.  It's silly to have it so sensitive.
                 return "vap+das2Server:" + resourceURI + "?" + sparams;
             }
