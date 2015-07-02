@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The Scratch cat messes with the last Autoplot screenshot.  Have a great summer kids!
+        <p><small>Have a nice 4th of July weekend, Americans!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -21,8 +21,10 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-06-29 r17030):</p>
+        <p>Bugfixes (2015-07-02 r17061):</p>
         <ul>
+            <li>CollapseFilterEditor panel would loose the selected index when resetting the dimension names.</li>
+            <li>das2server GUIs would drop intrinsic and item keywords.</li>
             <li>add missing sqrt and pow filters to FilterChain GUI.</li>
             <li>vap+inline: supports more complex URIs that contain getDataSet calls with ampersands within.</li>
             <li>ds1 + '5nT' will preserve the DEPEND_0 of ds1.</li>
@@ -142,6 +144,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>intrinsic checkbox in das2server editor panel.  Bold font used to improve readability.</li>
             <li>compile in new Dashup GUI for testing.</li>
             <li>in Jython, add datumRange method for coercing various object types into DatumRange.</li>
             <li>allow vap+jyds:http://... when the whitelist contains just http://...</li>
