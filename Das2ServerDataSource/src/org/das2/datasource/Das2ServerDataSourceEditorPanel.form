@@ -19,10 +19,6 @@
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
-                      <Component id="jScrollPane2" max="32767" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="das2ServerComboBox" alignment="0" pref="630" max="32767" attributes="0"/>
@@ -69,14 +65,21 @@
                       </Group>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                      <Component id="jScrollPane2" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
+                      <Component id="intrinsicCb" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
                       <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="tcaTextField" min="-2" pref="70" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="44" max="-2" attributes="0"/>
                       <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="tcaItem" min="-2" pref="42" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -126,6 +129,7 @@
                   <Component id="tcaTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="tcaItem" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="intrinsicCb" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -211,8 +215,8 @@
     </Container>
     <Component class="javax.swing.JLabel" name="jLabel5">
       <Properties>
-        <Property name="text" type="java.lang.String" value="TCA Interval (sec):"/>
-        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Interval (in seconds) to use for TCA (ephemeris) data.&lt;br&gt;&#xa;Leave blank for most datasets.  For TCA data, specify a cadence based on the rate of change of the data.&lt;br&gt;&#xa;&lt;/html&gt;&#xa;"/>
+        <Property name="text" type="java.lang.String" value="Sampling Interval (sec):"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt; Interval (in seconds) to use for arbitrary resolution data.&lt;br&gt;Typically used for spacecraft positions, leave blank for most datasets.&lt;br&gt; &lt;/html&gt; "/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="tcaTextField">
@@ -292,6 +296,14 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="timeRangeToolActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="intrinsicCb">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Force Intrinsic Resolution"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="intrinsicCbActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
