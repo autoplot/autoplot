@@ -3,18 +3,10 @@
 # this copies all the sources into the temp directory, then compiles a few key sources, so
 # that unreferenced routines are not used.
 
-echo "compile-applet-all v.20140908"
-
-# set JAVA5_HOME and JAVA6_HOME
-if [ "" = "$JAVA5_HOME" ]; then
-    JAVA5_HOME=/usr/local/jdk1.5.0_15__32/
-fi
-if [ "" = "$JAVA6_HOME" ]; then
-    JAVA6_HOME=/usr/local/jdk1.6.0_16__32/
-fi
+echo "compile-applet-all v.20150702"
 
 if [ "" = "$JAVA_HOME" ]; then
-    JAVA_HOME=$JAVA6_HOME
+    JAVA_HOME=/usr/local/jdk1.8/
 fi
 
 rm -r -f temp-src/
@@ -62,14 +54,14 @@ rm -rf org/das2/dasml/*
 echo "compile sources..."
 pwd
 hasErrors=0
-if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotApplet.java; then hasErrors=1; fi
-if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/endtoend/TestApplet*.java; then hasErrors=1; fi
-if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/tsds/datasource/TsdsDataSourceFactory.java; then hasErrors=1; fi
-if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/das2Stream/Das2StreamDataSourceFactory.java; then hasErrors=1; fi
-if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/binarydatasource/BinaryDataSourceFactory.java; then hasErrors=1; fi
-if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/csv/CsvDataSourceFactory.java; then hasErrors=1; fi
-if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/components/propertyeditor/PropertyEditor.java; then hasErrors=1; fi
-if ! $JAVA_HOME/bin/javac -target 1.6 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.7 -source 1.7  -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotApplet.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.7 -source 1.7  -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/endtoend/TestApplet*.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.7 -source 1.7  -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/tsds/datasource/TsdsDataSourceFactory.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.7 -source 1.7  -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/das2Stream/Das2StreamDataSourceFactory.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.7 -source 1.7  -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/binarydatasource/BinaryDataSourceFactory.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.7 -source 1.7  -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/csv/CsvDataSourceFactory.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.7 -source 1.7  -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/components/propertyeditor/PropertyEditor.java; then hasErrors=1; fi
+if ! $JAVA_HOME/bin/javac -target 1.7 -source 1.7  -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
 
 echo "done compile sources."
 
@@ -127,10 +119,10 @@ rm org/das2/util/JCrypt.class
 #rm org/das2/graph/XAxisDataLoader.class
 
 mkdir -p ../dist/
-$JAVA5_HOME/bin/jar cf ../dist/AutoplotAppletAll.jar *
+$JAVA_HOME/bin/jar cf ../dist/AutoplotAppletAll.jar *
 cd ..
 
-$JAVA5_HOME/bin/pack200 dist/AutoplotAppletAll.jar.pack.gz dist/AutoplotAppletAll.jar
+$JAVA_HOME/bin/pack200 dist/AutoplotAppletAll.jar.pack.gz dist/AutoplotAppletAll.jar
 
 echo "copy example html."
 cp src/AutoplotApplet.html dist/
@@ -138,8 +130,8 @@ cp src/AutoplotAppletAurora.html dist/
 
 if [ "" != "$EXAMPLE_URI" ]; then
    cd temp-src
-   echo $JAVA5_HOME/bin/javac -target 1.5 -d ../temp-classes external/FileSearchReplace.java
-   $JAVA5_HOME/bin/javac -target 1.5 -d ../temp-classes external/FileSearchReplace.java
+   echo $JAVA5_HOME/bin/javac -target 1.7 -source 1.7  -d ../temp-classes external/FileSearchReplace.java
+   $JAVA5_HOME/bin/javac -target 1.7 -source 1.7  -d ../temp-classes external/FileSearchReplace.java
    cd ..
    echo $JAVA5_HOME/bin/java -cp temp-classes external.FileSearchReplace dist/AutoplotApplet.html 'http://www.sarahandjeremy.net/jeremy/data/0B000800408DD710.$Y$m$d.d2s?timerange=2009-03-14' $EXAMPLE_URI
    $JAVA5_HOME/bin/java -cp temp-classes external.FileSearchReplace dist/AutoplotApplet.html 'http://www.sarahandjeremy.net/jeremy/data/0B000800408DD710.$Y$m$d.d2s?timerange=2009-03-14' $EXAMPLE_URI
