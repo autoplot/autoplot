@@ -42,11 +42,14 @@
         <p>The <a href="CdawebVapServlet.jsp">"CdawebVapServlet"</a> creates v1.08 vap files.
         </p>
 
+        <p>The <a href="ServletInfo">"ServletInfo"</a> shows information about the servlet for debugging. 
+        </p>
+
         <p><a href="thin/zoom/demo.html">"Thin"<a> shows how Autoplot is used to implement a thin-client that is usable on phones.  
                     <b>The current version of this at <a href="http://autoplot.org/git/web/thin/zoom/demo.html">github</a></b>
         </p>
         
-        <p>The source for all of these is found at <a href="http://sourceforge.net/p/autoplot/code/12695/tree/autoplot/trunk/AutoplotServlet/">SourceForge</a>.</p>
+        <p>The source for all of these is found at <a href="https://sourceforge.net/p/autoplot/code/HEAD/tree/autoplot/trunk/AutoplotServlet/">SourceForge</a>.</p>
         
         
         <p><b>Note: These are provided as examples and there is no guarantee of security.  Data providers interested in using this software on their servers must do so at their own risk.</b></p>
