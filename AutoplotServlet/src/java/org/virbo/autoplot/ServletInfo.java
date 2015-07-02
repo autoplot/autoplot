@@ -5,6 +5,7 @@
  */
 package org.virbo.autoplot;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -55,6 +56,7 @@ public class ServletInfo extends HttpServlet {
                 out.println("<li>"+s1+"\n");
             }
             out.println("</ul>");
+            out.println("PWD: "+ ( new File(".").getAbsolutePath() ) );
             out.println("Servlet Home: "+ServletUtil.getServletHome() + "\n"); // TODO: security concerns
             
             out.println("</body>");
