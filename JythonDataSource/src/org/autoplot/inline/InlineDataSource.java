@@ -278,60 +278,70 @@ public class InlineDataSource extends AbstractDataSource {
 
         Map<String,String> p= new LinkedHashMap<String,String>();
 
-        Pattern depPat= Pattern.compile("DEPEND_(\\d+)(\\.([A-Z]+))?");
-        Matcher m;
-        for ( int i=0; i<ss.length; i++ ) {
-            String arg= ss[i];
-            if ( arg.length()==0 ) continue;
-            if ( arg.charAt(0)>='A' && arg.charAt(0)<='Z' ) { // it's a directive
-                String[] sss= arg.split("=");
-                if ( sss.length>1 ) {
-                    String propName= sss[0];
-                    String propValue= sss[1];
-                    if ( (m=depPat.matcher(propName)).matches() ) {
-                        int idep= Integer.parseInt( m.group(1) );
-                        if ( m.group(3)!=null ) {
-                            Map map= deppropn[idep];
-                            if ( map==null ) {
-                                map= new HashMap();
-                                deppropn[idep]= map;
+        mon.setTaskSize(ss.length);
+        mon.started();
+        
+        try {
+            Pattern depPat= Pattern.compile("DEPEND_(\\d+)(\\.([A-Z]+))?");
+            Matcher m;
+            for ( int i=0; i<ss.length; i++ ) {
+                mon.setTaskProgress(i);
+                mon.setProgressMessage(ss[i]);
+                String arg= ss[i];
+                if ( arg.length()==0 ) continue;
+                if ( arg.charAt(0)>='A' && arg.charAt(0)<='Z' ) { // it's a directive
+                    String[] sss= arg.split("=");
+                    if ( sss.length>1 ) {
+                        String propName= sss[0];
+                        String propValue= sss[1];
+                        if ( (m=depPat.matcher(propName)).matches() ) {
+                            int idep= Integer.parseInt( m.group(1) );
+                            if ( m.group(3)!=null ) {
+                                Map map= deppropn[idep];
+                                if ( map==null ) {
+                                    map= new HashMap();
+                                    deppropn[idep]= map;
+                                }
+                                map.put( m.group(3), propValue );
+                            } else {
+                                depn[idep]= parseInlineDs(propValue);
                             }
-                            map.put( m.group(3), propValue );
+                        } else if ( propName.startsWith("BUNDLE_1") ) {
+                            if ( propValue.equals("") || propValue.equals("None") || propValue.equals("null") ) {
+                                p.put(propName,propValue);
+                            } else {
+                                bundle1= parseInlineDs(propValue);
+                            }
                         } else {
-                            depn[idep]= parseInlineDs(propValue);
-                        }
-                    } else if ( propName.startsWith("BUNDLE_1") ) {
-                        if ( propValue.equals("") || propValue.equals("None") || propValue.equals("null") ) {
-                            p.put(propName,propValue);
-                        } else {
-                            bundle1= parseInlineDs(propValue);
+                            if ( DataSetUtil.isDimensionProperty(propName) || propName.equals(QDataSet.RENDER_TYPE) || propName.equals(QDataSet.DELTA_PLUS) || propName.equals(QDataSet.DELTA_MINUS) ) {
+                                p.put(propName,propValue);
+                                continue;
+                            } else {
+                                try {
+                                    interp.exec(arg);
+                                } catch ( Exception ex ) {
+                                    throw ex; // https://sourceforge.net/p/autoplot/bugs/1376/
+                                }
+                            }
                         }
                     } else {
-                        if ( DataSetUtil.isDimensionProperty(propName) || propName.equals(QDataSet.RENDER_TYPE) || propName.equals(QDataSet.DELTA_PLUS) || propName.equals(QDataSet.DELTA_MINUS) ) {
-                            p.put(propName,propValue);
-                            continue;
-                        } else {
-                            try {
-                                interp.exec(arg);
-                            } catch ( Exception ex ) {
-                                throw ex; // https://sourceforge.net/p/autoplot/bugs/1376/
-                            }
-                        }
+                        throw new ParseException("expected = for non-number",0);
                     }
-                } else {
-                    throw new ParseException("expected = for non-number",0);
+                } else if ( isAssignment(arg) ) {
+                    logger.log( Level.FINER, "assignment {0}", arg);
+
+                    interp.exec(arg);
+
+                } else { 
+                    ds= parseInlineDs(arg);
+
                 }
-            } else if ( isAssignment(arg) ) {
-                logger.log( Level.FINER, "assignment {0}", arg);
-
-                interp.exec(arg);
-                
-            } else { 
-                ds= parseInlineDs(arg);
-                
             }
-        }
 
+        } finally {
+            mon.finished();
+        }
+    
         if ( ds==null ) {
             throw new IllegalArgumentException("URI don't contain anything to plot");
         }
