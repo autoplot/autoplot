@@ -868,6 +868,7 @@ public class PlotElementController extends DomNodeController {
                             setResetPlotElement(false);
                         } catch ( RuntimeException ex ) {
                             setStatus("warning: Exception in process: " + ex );
+                            getRenderer().setDataSet(null);
                             getRenderer().setException(getRootCause(ex));
                             renderException= ex;
                         }
@@ -878,6 +879,7 @@ public class PlotElementController extends DomNodeController {
                             setResetPlotElement(false);
                         } catch ( RuntimeException ex ) {
                             setStatus("warning: Exception in process: " + ex );
+                            getRenderer().setDataSet(null);
                             getRenderer().setException(getRootCause(ex));
                             renderException= ex;
                         }
