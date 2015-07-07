@@ -15,15 +15,16 @@
         </p>
 
         <p>This is the Autoplot2015a branch.  This is an update to the production version containing bugfixes and minor new features.
-            Java 6 is now required.  Java 7 will be required in May!  Java 8 will be required
-            sometime soon.
+            Java 7 is now required.  Java 8 will be required sometime soon.
         </p>
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-07-02 r17061):</p>
+        <p>Bugfixes (2015-07-07 r17079):</p>
         <ul>
+            <li>old code for managing the tick formatter assumed that milliseconds would be sufficient.</li>
             <li>CollapseFilterEditor panel would loose the selected index when resetting the dimension names.</li>
+            <li>add progress monitor to InlineDataSource</li>
             <li>das2server GUIs would drop intrinsic and item keywords.</li>
             <li>add missing sqrt and pow filters to FilterChain GUI.</li>
             <li>vap+inline: supports more complex URIs that contain getDataSet calls with ampersands within.</li>
@@ -50,6 +51,9 @@
             <li>rte_1765707187: export to file when filename is relative is allowed now.  Thanks Ananya!</li>
             <li>rte_0874741227: nullPointerException with Jython scripts, thanks Bill and Dan!</li>
             <li>setDepend0Cadence supports rank 3 joins</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>SpectrogramRenderer used code that ignored CADENCE property to judge the distance between measurements</li>
             <li>1403: properly support brackets in filenames (rte1830227625) </li>
             <li>1310: fix accidental java import with "import java.lang.Thread as _Thread instead of "import java.lang.Thread"</li>
@@ -122,28 +126,9 @@
             <li>1350: Corrections to QStreams containing bundles.</li>
             <li>rte 2071287514: cancel dialog by closing window caused RTE.  Check for other places where it is assumed at least one element is returned.  Thanks Bob!</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>divp implementation fixed</li>
-            <li>modp correctly supports seconds-since units to provide easy method for getting hours since midnight.</li>
-            <li>don't show number of Epoch records when variable record count doesn't match</li>
-            <li>Improve feedback when NetCDF file is mistaken for CDF file</li>
-            <li>RGBRenderer checks for log/linear match and prints a warning when they don't match</li>
-            <li>within function would incorrectly perform where command, when result should have been zeros and non-zeros.  This will affect scripts that use this command.</li>
-            <li>clean up javadoc for ArrayDataSet.  Make ArrayDataSet implementations consistent with one another.</li>
-            <li>introduce org.virbo.dataset.examples.Schemes.java, so that javadoc can refer to it.</li>
-            <li>PWD was not available when --script was used.</li>
-            <li>1341: CDF subsample was terribly slow, because subsampling/5M record file.  Now just read in all the data, then subsample.  Thanks Kristoff!</li>
-            <li>pngwalk generation would fail when years were 2008-2014, because it was counting off in 365-day, not yearly increments.</li>
-            <li>add Ops.datum after seeing that dataset('2011-06-08T01:54') would parse but datum('2011-06-08T01:54') would not.</li>
-            <li>1339:  LANL rank 4 cdf file shows that DataSetWrapper rank 4 was never implemented.  Thanks Brian!</li>
-            <li>createPngWalk code used to assume vap argument was local reference, which needn't be the case.  This may cause problems on Windows.</li>
-            <li>set the initial timerange to avoid extraneous load.  Thanks Reiner!</li>
-            <li>initially set it to slices0(:) GUI correctly.</li>
-            <li>1334: first image of pngwalk would be loaded at the full resolution.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>add fft and magnitude to the filters.</li>
             <li>intrinsic checkbox in das2server editor panel.  Bold font used to improve readability.</li>
             <li>compile in new Dashup GUI for testing.</li>
             <li>in Jython, add datumRange method for coercing various object types into DatumRange.</li>
@@ -151,6 +136,9 @@
             <li>system property AUTOPLOT_DATA can be used to specify autoplot_data folder location.</li>
             <li>GUI title indicates if problemmatic 32bit Java is used.</li>
             <li>layout tab has add plots and delete plots button.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>           
             <li>Chris added support for macros (substitutions) in das2streams.</li>
             <li>format to HTML supports rank 1 data.</li>
             <li>Add Tools->Filters... so new users needn't understand the data tab</li>
@@ -178,26 +166,6 @@
             <li>get rid of extraneous InterruptedExceptions which were thrown from the bowels, and needn't be propagated to the more abstract waitUntilIdle</li>
             <li>renderer style panels for Contour, PitchAngleDistribution, and EventsBar styles.</li>
             <li>more dasCore code cleanup</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>           
-            <li>Ascii Table data URIs now support arg_0 to match CDF, which automatically gets the ISO8601 column 0 dependence.</li>
-            <li>putBundleProperty and putIndexedProperty added to make it easier to build bundles.</li>
-            <li>random sequences used for randn can now be reset.</li>
-            <li>support rank 2 bundle in export to IDLSAV</li>
-            <li>CDF reader detects HDF and NetCDF files with .cdf extension</li>
-            <li>add origin and clockwise controls to pitch angle distribution renderer</li>
-            <li>406: CDF files support some LaTeX for MMS labels</li>
-            <li>format to idlsav supports bundles</li>
-            <li>javadoc improvements throughout dasCore and QDataSet packages</li>
-            <li>DataSetBuilder add nextRecord( Object ... values ) to provide efficient way to define bundles in scripts</li>
-            <li>415: plotx(xpos='50%,100%-5em',ypos='20%,50%') allows direct specification of layout.</li>
-            <li>ticks can be set manually from scripts.</li>
-            <li>console GUI can export records as XML or flat ascii file now</li>
-            <li>Autoplot servlet supports backgroundColor=none for transparent backgrounds</li>
-            <li>pngwalk create speed is reported in images per minute instead of .1/sec</li>
-            <li>add fftPower that matches the filter call.</li>
-            <li>javadoc improvements to DasCore</li>
         </ul>
 
         <p>Known issues:</p>
