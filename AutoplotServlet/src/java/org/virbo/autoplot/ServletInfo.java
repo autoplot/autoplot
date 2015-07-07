@@ -58,6 +58,7 @@ public class ServletInfo extends HttpServlet {
             out.println("</ul>");
             out.println("<p>PWD: "+ ( new File(".").getAbsolutePath() ) );
             out.println("<br>Servlet Home: "+ServletUtil.getServletHome() + "</p>\n"); // TODO: security concerns
+            out.println("<br>user.name: "+ System.getProperty("user.name") + "</p>\n"); // TODO: security concerns
             
             out.println("</body>");
             out.println("</html>");
