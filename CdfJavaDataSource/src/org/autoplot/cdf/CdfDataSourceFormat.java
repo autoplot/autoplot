@@ -25,6 +25,8 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
+import org.das2.util.DeflaterChannel;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.SemanticOps;
 
@@ -524,6 +526,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 type= CDFDataType.FLOAT;
             }
         }
+        
+        boolean compressed= "T".equals( params.get("compressed") );
 
         UnitsConverter uc = UnitsConverter.IDENTITY;
 
@@ -549,23 +553,37 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         }
         
             
-        if ( ds.rank()==1 ) {
-            cdf.defineVariable( name, type, new int[0] );
-            //cdf.createVariable( name, type, new int[0] );
-            cdf.addData( name, dataSetToNioArray( ds, uc, type, mon ) );
-
-        } else if ( ds.rank()==2 ) {
-            cdf.defineVariable( name, type, new int[] { ds.length(0) } );
-            cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
-
-        } else if ( ds.rank()==3 ) {
-            cdf.defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
-            cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
-
-        } else if ( ds.rank()==4 ) {
-            cdf.defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
-            cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
-
+        if ( compressed ) {
+            if ( ds.rank()==1 ) {
+                cdf.defineCompressedVariable( name, type, new int[0] );
+                cdf.addData( name, dataSetToNioArray( ds, uc, type, mon ) ); //TODO: I think I need to compress the channel.
+            } else { 
+                if ( ds.rank()==2 ) {
+                    cdf.defineCompressedVariable( name, type, new int[] { ds.length(0) } );
+                } else if ( ds.rank()==3 ) {
+                    cdf.defineCompressedVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
+                } else if ( ds.rank()==4 ) {
+                    cdf.defineCompressedVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
+                }
+                cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
+            }
+            
+        } else {
+            if ( ds.rank()==1 ) {
+                cdf.defineVariable( name, type, new int[0] );
+                cdf.addData( name, dataSetToNioArray( ds, uc, type, mon ) );
+            } else { 
+                if ( ds.rank()==2 ) {
+                    cdf.defineVariable( name, type, new int[] { ds.length(0) } );
+                } else if ( ds.rank()==3 ) {
+                    cdf.defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
+                } else if ( ds.rank()==4 ) {
+                    cdf.defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
+                }
+                cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
+            }
+            
+            
         }
 
         copyMetadata( units, name, isSupport, ds );
