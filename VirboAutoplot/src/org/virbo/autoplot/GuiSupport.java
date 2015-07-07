@@ -493,7 +493,7 @@ public class GuiSupport {
             logger.log(Level.FINE, " ..caused exception: {0} using format {1}", new Object[]{uriOut, format});
             logger.log(Level.SEVERE,  "exception "+uriOut, ex );
         }
-        if ( mon!=null ) mon.finished();
+        if ( mon!=null && !mon.isFinished() ) mon.finished(); // in case they forgot the tidy up.
     }
 
     /**
