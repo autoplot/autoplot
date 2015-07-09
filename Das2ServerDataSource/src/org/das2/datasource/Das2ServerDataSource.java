@@ -547,7 +547,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                     c.put( "interval", params.get("interval") );
                 }
                 String sparams= URISplit.formatParams(c);
-                if ( dsParams!=null && dsParams.trim().length()>0 )  sparams+= "&" + dsParams; //TODO: Double-load was caused by extra & at the end.  It's silly to have it so sensitive.
+                //if ( dsParams!=null && dsParams.trim().length()>0 )  sparams+= "&" + dsParams; //TODO: Double-load was caused by extra & at the end.  It's silly to have it so sensitive.
                 return "vap+das2Server:" + resourceURI + "?" + sparams;
             }
 
