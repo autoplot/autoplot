@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Have a nice 4th of July weekend, Americans!  
+        <p><small>Funky polar spectrogram screenshot.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,8 +20,11 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-07-07 r17079):</p>
+        <p>Bugfixes (2015-07-09 r17091):</p>
         <ul>
+            <li>check to see that the bookmarks are loaded before assuming they had been, to support running scripts within 10 seconds of launch.</li>
+            <li>total of total showed a bug where the weights were not properly accounted for.</li>
+            <li>1422: filters GUI will run filters on the event thread, hanging app for slow filters.</li>
             <li>old code for managing the tick formatter assumed that milliseconds would be sufficient.</li>
             <li>CollapseFilterEditor panel would loose the selected index when resetting the dimension names.</li>
             <li>add progress monitor to InlineDataSource</li>
@@ -128,6 +131,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add rank 4 ones and replicate functions.</li>
+            <li>1421: filters can now be cancelled.</li>
             <li>add fft and magnitude to the filters.</li>
             <li>intrinsic checkbox in das2server editor panel.  Bold font used to improve readability.</li>
             <li>compile in new Dashup GUI for testing.</li>
