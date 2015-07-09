@@ -5125,7 +5125,7 @@ APSplash.checkTime("init 240");
             File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
                         
             boolean isTool= split.path.contains(tools.toString()); // here is the trust...
-            Bookmark trust= BookmarksManager.findBookmarkByUri( toolsManager.getModel().getList(), script, 1 );
+            Bookmark trust= toolsManager==null ? null : BookmarksManager.findBookmarkByUri( toolsManager.getModel().getList(), script, 1 );
             isTool = isTool || trust!=null;
             
             final boolean fisTool= isTool;
