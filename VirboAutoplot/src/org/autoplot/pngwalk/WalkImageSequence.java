@@ -67,6 +67,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
     private QualityControlSequence qualitySeq;
 
     private boolean haveThumbs400=true;
+    
+    private boolean limitWarning= false;
 
     /** Create an image sequence based on a URI template.
      *
@@ -233,6 +235,9 @@ public class WalkImageSequence implements PropertyChangeListener  {
             } else {
                 displayRange = possibleRanges;
             }
+            
+            limitWarning = possibleRanges.size()==20000;
+            
             displayImages.clear();
 
             for (DatumRange dr : displayRange) {
@@ -261,6 +266,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
         pcs.firePropertyChange(PROP_SEQUENCE_CHANGED, false, true);
     }
 
+    protected boolean isLimitWarning() {
+        return this.limitWarning;
+    }
+    
     /**
      * initialize the quality control sequence.
      * @param qcFolder URI with the password resolved.
@@ -624,7 +633,11 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
         //long mem= ( Runtime.getRuntime().freeMemory() ) / (1024 * 1024);
         if ( loadingCount==0 && thumbLoadingCount==0) {
-            setStatus(""+loadedCount+" of "+totalCount + " images loaded." );
+            if ( limitWarning ) {
+                setStatus("<html>"+loadedCount+" of "+totalCount + " images loaded.  Limitations of the PNG Walk Tool prevent use of the entire series." );
+            } else {
+                setStatus(""+loadedCount+" of "+totalCount + " images loaded." );
+            }
         } else {
             setStatus("busy: "+loadedCount+" of "+totalCount + " images loaded, " 
                     + loadingCount + " are loading and "+ thumbLoadingCount + " thumbs are loading.");
