@@ -8,7 +8,6 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,6 +47,7 @@ import org.das2.graph.SpectrogramRenderer;
 import org.das2.graph.TickCurveRenderer;
 import org.das2.graph.VectorPlotRenderer;
 import org.das2.system.RequestProcessor;
+import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
@@ -62,7 +62,6 @@ import org.virbo.autoplot.util.RunLaterListener;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.DataSetWrapper;
 import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -649,6 +648,12 @@ public class PlotElementController extends DomNodeController {
                 throw ex;
             }
             return;
+        } catch ( CancelledOperationException ex ) {
+            getRenderer().setDataSet(null);
+            getRenderer().setException(getRootCause(ex));
+            setDataSetInternal(null);
+            return;
+            
         } catch ( Exception ex ) {
             getRenderer().setDataSet(null);
             getRenderer().setException(getRootCause(ex));
@@ -866,6 +871,11 @@ public class PlotElementController extends DomNodeController {
                             plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
                             resetPlotElement(fillDs2, renderType, s.substring(i+1) );
                             setResetPlotElement(false);
+                        } catch ( CancelledOperationException ex ) {
+                            setStatus("warning: Filters were cancelled: " + ex );
+                            getRenderer().setDataSet(null);
+                            getRenderer().setException(ex);
+                            renderException= ex;
                         } catch ( RuntimeException ex ) {
                             setStatus("warning: Exception in process: " + ex );
                             getRenderer().setDataSet(null);
