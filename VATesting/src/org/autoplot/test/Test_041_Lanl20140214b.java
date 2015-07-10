@@ -4,10 +4,12 @@
  */
 package org.autoplot.test;
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.das2.graph.SpectrogramRenderer;
+import org.das2.util.filesystem.FileSystem;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
@@ -33,13 +35,24 @@ public class Test_041_Lanl20140214b implements Scenario {
             AutoplotUI app= (AutoplotUI) getViewWindow();
 
             //wait "Reloaded" footer
+            
             waitUntilIdle();
 
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("http://www.rbsp-ect.lanl.gov/data_pub/rbspa/rept/level3/rbspa_$x_ect-rept-sci-L3_$Y$m$d_v$(v,sep).cdf?FEDU&timerange=20130915");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
-            Thread.sleep(3000); // TODO: have a look at the waitUntilIdle and convince self that it shouldn't be considered when blocking.
+            Thread.sleep(6000); // TODO: have a look at the waitUntilIdle and convince self that it shouldn't be considered when blocking.
             waitUntilIdle();
+
+            // There's a strange bug where waitUntilIdle doesn't wait.  I can demo that the TSB code blocks properly, but this should be investigated more.
+            int i=200;
+            File f= new File( FileSystem.settings().getLocalCacheDir(), "/http/www.rbsp-ect.lanl.gov/data_pub/rbspa/rept/level3/rbspa_rel03_ect-rept-sci-L3_20130915_v5.0.0.cdf" );
+            while ( i>0 && !f.exists() ) {
+                System.err.println("sleeping while file is downloading, because waitUntilIdle function failed. "+i);
+                Thread.sleep(1000);
+                i=i-1;
+                waitUntilIdle();
+            }
             
             writeToPng( "Test_4pt1_Lanl20140214b.001.png");
 
