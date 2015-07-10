@@ -5,6 +5,7 @@
 
 package org.autoplot.test;
 
+import java.io.File;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
@@ -50,6 +51,9 @@ public class Test_100_Demo1423 {
         
         writeToPng("Test_100_Demo1423.png"); // Leave artifacts for testing.
 
+        // The script writes this file, so delete it.  It's redundant.
+        new File( "test037_demo1423.png" ).delete();
+        
         mainFrame.close();
 
         System.err.println("Done!");
