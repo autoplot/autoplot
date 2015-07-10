@@ -44,7 +44,7 @@ public class Test_041_Lanl20140214b implements Scenario {
             Thread.sleep(6000); // TODO: have a look at the waitUntilIdle and convince self that it shouldn't be considered when blocking.
             waitUntilIdle();
 
-            // There's a strange bug where waitUntilIdle doesn't wait.  I can demo that the TSB code blocks properly, but this should be investigated more.
+            // TODO: There's a strange bug where waitUntilIdle doesn't wait.  I can demo that the TSB code blocks properly, but this should be investigated more.
             int i=200;
             File f= new File( FileSystem.settings().getLocalCacheDir(), "/http/www.rbsp-ect.lanl.gov/data_pub/rbspa/rept/level3/rbspa_rel03_ect-rept-sci-L3_20130915_v5.0.0.cdf" );
             while ( i>0 && !f.exists() ) {
