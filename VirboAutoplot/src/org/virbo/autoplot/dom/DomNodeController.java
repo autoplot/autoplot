@@ -128,7 +128,7 @@ public class DomNodeController {
                     //        System.err.println("Wei's problem!");
                     //    }
                     //}
-                    //useful for debugging, see https://sourceforge.net/tracker/index.php?func=detail&aid=3410461&group_id=199733&atid=970682
+                    //useful for debugging, see https://sourceforge.net/p/autoplot/bugs/756/
                     //for ( Object o:  k.changesSupport.changesPending.keySet() ) {
                     //    System.err.println( "pending change "+o );
                     //}
