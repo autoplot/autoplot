@@ -113,6 +113,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
     private double validMax = Double.POSITIVE_INFINITY;
 
     /**
+     * name of the event list column.
+     */
+    String eventListColumn= null;
+    
+    /**
      * column for colors, if available.
      */
     int eventListColorColumn= -1;
@@ -179,7 +184,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         QDataSet bundleDescriptor= (QDataSet) ds.property(QDataSet.BUNDLE_1);
 
-        String eventListColumn= getParam( "eventListColumn", null );
         if ( eventListColumn!=null ) {
             dep0= ArrayDataSet.maybeCopy( DataSetOps.leafTrim( ds, 0, 2) );
             Units u0= parser.getUnits(0);
@@ -188,7 +192,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 if ( UnitsUtil.isTimeLocation(u0) && UnitsUtil.isTimeLocation(u1) ) {
                     throw new IllegalArgumentException("somehow the parser was misconfigured to have two different time units.");
                 }
-                if ( !u1.isConvertableTo(u0.getOffsetUnits()) ) { // allow "s" to go with UTC
+                if ( !u1.isConvertibleTo(u0.getOffsetUnits()) ) { // allow "s" to go with UTC
                     throw new IllegalArgumentException("first two columns should have the same units, or second column should be offset (e.g. seconds) from first");
                 }
             }
@@ -749,15 +753,21 @@ public class AsciiTableDataSource extends AbstractDataSource {
             depend1Values = parseRangeStr(o, columnCount);
         }
 
+        eventListColumn= params.get("eventListColumn");
+        
+        // rfe https://sourceforge.net/p/autoplot/bugs/1425/: create events list automatically.
+        if ( parser.getFieldLabels().length>=2 && parser.getFieldLabels().length <= 4 && UnitsUtil.isTimeLocation(parser.getUnits(0)) && UnitsUtil.isTimeLocation(parser.getUnits(1)) ) {
+            eventListColumn= "field"+(parser.getFieldLabels().length-1);
+        }
+        
         // rfe3489706: add support for HDMC's simple event list format, where the first two columns are start and stop times.
-        o= params.get("eventListColumn");
-        if ( o!=null ) {
+        if ( eventListColumn!=null ) {
             parser.setUnits( 0, Units.us2000 );
             parser.setUnits( 1, Units.us2000 );
             //if ( UnitsUtil.isTimeLocation( parser.getUnits(1) ) ) parser.setUnits(1,Units.us2000); // enough of a guess that this will find a good record.
             parser.setFieldParser(0, parser.UNITS_PARSER);
             parser.setFieldParser(1, parser.UNITS_PARSER);
-            int icol = parser.getFieldIndex(o);
+            int icol = parser.getFieldIndex(eventListColumn);
             EnumerationUnits eu= EnumerationUnits.create("events");
             parser.setUnits(icol,eu);
             parser.setFieldParser(icol,parser.ENUMERATION_PARSER);
