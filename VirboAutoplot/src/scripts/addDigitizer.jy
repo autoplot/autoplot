@@ -14,7 +14,7 @@ from org.das2.event import BoxSelectorMouseModule
 
 mm= BoxSelectorMouseModule.create( plot, 'digitizer' )
 
-from java.lang import Runtime
+import java.util.HashMap
 
 def boxSelected(event):
     x= event.getXRange().min()
