@@ -60,6 +60,8 @@ public class Test_034_TimeSeriesBrowse implements Scenario {
                 }
             });
             
+            Thread.sleep(500);
+            
             ScriptContext.waitUntilIdle();
 
             SwingUtilities.invokeAndWait( new Runnable() {
@@ -80,7 +82,15 @@ public class Test_034_TimeSeriesBrowse implements Scenario {
             new JButtonOperator( diaFrame, "Plot Below" ).clickMouse();
 
             System.err.println("Boo, sleep because testing server isn't stopping properly."); //TODO: fix this!
-            Thread.sleep(500);
+            Thread.sleep(1000);
+            ScriptContext.waitUntilIdle();
+            
+            int tries=0;
+            while ( tries<10 && dom.getPlotElements(1).getController().getDataSet()==null ) {
+                tries++;
+                System.err.println("* data not here yet");
+                Thread.sleep(330);
+            }
             
             System.err.println( "5: "+xaxis.getDatumRange() );
             System.err.println("current directory: "+new File(".").getAbsoluteFile().toString());
