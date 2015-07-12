@@ -123,6 +123,9 @@ public class Test140 {
 
                 plot( ds );
                 setCanvasSize( 450, 300 );
+                ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setLeft("5.0em");
+                ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100.00%-3.0em");
+                
                 int i= uri.lastIndexOf("/");
 
                 getApplicationModel().waitUntilIdle();
@@ -318,6 +321,8 @@ public class Test140 {
         Map<String,Exception> exceptions= new LinkedHashMap();
         Map<String,Integer> exceptionNumbers= new LinkedHashMap();
         
+        ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
+
         for ( int i=1; i<args.length; i++ ) {
             String uri= args[i];
             System.err.println("\n== from "+uri+" ==");
