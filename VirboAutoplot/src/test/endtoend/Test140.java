@@ -124,7 +124,7 @@ public class Test140 {
                 plot( ds );
                 setCanvasSize( 450, 300 );
                 ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setLeft("5.0em");
-                ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100.00%-3.0em");
+                ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100.00%-10.0em");
                 
                 int i= uri.lastIndexOf("/");
 
