@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.das2.datum.EnumerationUnits;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
@@ -219,6 +220,13 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                             return false;
                         }
                     }
+                    if ( cc.size()>0 && cc.size()<6 ) {  // kludge where the last completion will be for eventListColumn when this could be done automatically.
+                        CompletionContext lastCC= cc.get(cc.size()-1);
+                        if ( lastCC.context==CompletionContext.CONTEXT_PARAMETER_NAME 
+                                && lastCC.completable.equals("eventListColumn") ) {
+                            return false;
+                        }
+                    }
                     return true;
                 }
             }
@@ -271,6 +279,14 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     s,
                     label, null ) ) ;
         }
+        
+        if ( parser.getFieldCount()>2 && UnitsUtil.isTimeLocation(parser.getUnits(0)) && UnitsUtil.isTimeLocation(parser.getUnits(1) ) ) {
+            result.add(new CompletionContext(
+                    CompletionContext.CONTEXT_PARAMETER_NAME,
+                    "eventListColumn",
+                    "eventListColumn", null ) ) ;
+        }
+        
         return result;
 
     }
