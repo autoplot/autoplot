@@ -583,7 +583,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="filtersMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Filters..."/>
+                <Property name="text" type="java.lang.String" value="Additional Operations..."/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filtersMenuItemActionPerformed"/>

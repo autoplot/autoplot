@@ -2820,7 +2820,7 @@ APSplash.checkTime("init 52.9");
         });
         toolsMenu.add(replaceFileMenuItem);
 
-        filtersMenuItem.setText("Filters...");
+        filtersMenuItem.setText("Additional Operations...");
         filtersMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filtersMenuItemActionPerformed(evt);
@@ -3603,7 +3603,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         String filter= dom.getController().getPlotElement().getComponent();
         if ( filter.length()==0 ) {
             AddFilterDialog dia= new AddFilterDialog();
-            if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, dia, "Add Filter", JOptionPane.OK_CANCEL_OPTION ) ) {
+            if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, dia, "Add Operation", JOptionPane.OK_CANCEL_OPTION ) ) {
                 filter= dia.getValue();
             } else {
                 return;
@@ -3616,7 +3616,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
             fcp.setInput(dsf.getController().getFillDataSet());
             fcp.setFilter(filter);
         }
-        if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, fcp, "Edit Filters", JOptionPane.OK_CANCEL_OPTION ) ) {
+        if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, fcp, "Edit Operations", JOptionPane.OK_CANCEL_OPTION ) ) {
             dom.getController().getPlotElement().setComponent(fcp.getFilter());
         }
     }//GEN-LAST:event_filtersMenuItemActionPerformed
