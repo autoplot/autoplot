@@ -21,9 +21,9 @@ public class FiltersTreePicker {
     public static void pickFilter(JFrameOperator mainFrame, String[] path  ) {
         try {
             // Implement reducex() filter
-            new JMenuBarOperator( mainFrame ).pushMenuNoBlock("Tools|Filters...");
+            new JMenuBarOperator( mainFrame ).pushMenuNoBlock("Tools|Additional Operations...");
 
-            DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser("Add Filter" ) );
+            DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser("Add Operation" ) );
 
             JTreeOperator tree= new JTreeOperator( addFilterFrame );
             tree.clickMouse();
