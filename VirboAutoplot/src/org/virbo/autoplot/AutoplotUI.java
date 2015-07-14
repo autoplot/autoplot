@@ -5142,7 +5142,8 @@ APSplash.checkTime("init 240");
                                     scriptPanel.loadFile(ff);
                                 }
                             }
-                            dom.getController().getApplicationModel().addRecent(script);
+                            split.params= URISplit.formatParams(params);
+                            dom.getController().getApplicationModel().addRecent(URISplit.format(split));
                             //TODO: bug 1408: can we not somehow set the address bar URI here?
                         }
                         //askRunScript( pp, split.resourceUri, ff );
