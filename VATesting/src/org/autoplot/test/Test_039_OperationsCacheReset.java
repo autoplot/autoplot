@@ -59,7 +59,7 @@ public class Test_039_OperationsCacheReset implements Scenario {
             
                 Thread.sleep(500);
             
-                DialogOperator reduceFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
+                DialogOperator reduceFrame = new DialogOperator( new RegexComponentChooser( "Edit Operations") );
                 new JTextFieldOperator(reduceFrame, "1").setText("360"); 
                 new JComboBoxOperator(reduceFrame).selectItem("s", true, true);
                 Thread.sleep(250);
@@ -86,7 +86,7 @@ public class Test_039_OperationsCacheReset implements Scenario {
                
                 Thread.sleep(500);
 
-                DialogOperator reduceFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
+                DialogOperator reduceFrame = new DialogOperator( new RegexComponentChooser( "Edit Operations") );
                 new JTextFieldOperator(reduceFrame, "1").setText("360");
                 new JComboBoxOperator(reduceFrame).selectItem("s", true, true);
                 Thread.sleep(250);
