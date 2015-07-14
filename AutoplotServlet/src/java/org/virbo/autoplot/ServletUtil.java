@@ -112,6 +112,7 @@ public class ServletUtil {
     
     private static List<String> whiteList=null;
     private static long whiteListFresh= 0;
+    private static long whiteListLastModified= 0;
     
     /**
      * return the whitelist, checking no more than once per 5 seconds, and
@@ -127,27 +128,30 @@ public class ServletUtil {
         File sd= getServletHome();
         File ff= new File( sd, "whitelist.txt" );
         if ( !ff.exists() ) {
+            BufferedWriter w=null;
             try {
-                BufferedWriter w= new BufferedWriter( new FileWriter( ff ) );
+                w= new BufferedWriter( new FileWriter( ff ) );
                 w.write("# list of whitelisted URIs regular expressions.  See http://autoplot.org/servlet_guide.\n");
                 w.write("# http://autoplot.org/data.*  # uncomment to allow scripts from autoplot.org\n");                
                 w.write("http://localhost(:\\d+)?/.*\n");
-                w.close();
             } catch ( IOException ex ) {
                 throw ex;
+            } finally {
+                if ( w!=null ) w.close();
             }
-            whiteListFresh= currentTimeMillis;
-            whiteList= Collections.emptyList();
-            return whiteList;
         }
+        
+        // the goal here is to avoid disk access which would slow down the server.  
+        // whiteListFresh is the last time we checked the whitelist.
         long freshNow= ff.lastModified();
-        if ( whiteList==null || freshNow-whiteListFresh>5000 ) {
-            synchronized ( ServletUtil.class ) {
-                if ( whiteList==null || freshNow-whiteListFresh>5000 ) { 
-                    List<String> local= new ArrayList<String>(100);
+        if ( whiteList==null || freshNow!=whiteListLastModified  ) {
+            synchronized ( ServletUtil.class ) { // Avoid synchronized block if the file is fresh
+                if ( whiteList==null || freshNow!=whiteListLastModified  ) { 
+                    List<String> local= new ArrayList(100);
+                    BufferedReader r=null;
                     try {
                         logger.log(Level.FINE, "Reading whitelist from {0} ===", ff);
-                        BufferedReader r= new BufferedReader( new FileReader( ff ) );
+                        r= new BufferedReader( new FileReader( ff ) );
                         String s= r.readLine();
                         while ( s!=null ) {
                             logger.log(Level.FINE, "{0}", s);
@@ -167,11 +171,18 @@ public class ServletUtil {
                         logger.log(Level.FINE, "Done reading whitelist from {0} ===", ff);
                     } catch ( IOException ex ) {
                         throw ex; 
+                    } finally {
+                        if ( r!=null ) r.close();
                     }
                     whiteList= local;
-                    whiteListFresh= currentTimeMillis;
+                    whiteListFresh= freshNow;
+                    whiteListLastModified= freshNow;
+                } else {
+                    logger.log(Level.FINE,"No need to read the whitelist, it hasn't been updated (synchronized block).");
                 }
             }
+        } else {
+            logger.log(Level.FINE,"No need to read the whitelist, it hasn't been updated.");
         }
         return whiteList;
     }    
