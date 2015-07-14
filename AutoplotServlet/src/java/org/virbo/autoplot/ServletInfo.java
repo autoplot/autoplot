@@ -8,12 +8,14 @@ package org.virbo.autoplot;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.das2.util.AboutUtil;
+import static org.virbo.autoplot.ServletUtil.getServletHome;
 import static org.virbo.autoplot.SimpleServlet.version;
 
 /**
@@ -47,19 +49,31 @@ public class ServletInfo extends HttpServlet {
             
             String s = AboutUtil.getAboutHtml();
             s = s.substring(0, s.length() - 7);
-            s = s + "<br><br>servlet version="+version+"<br></html>";
             out.println(s);
                     
-            out.println("<h2>whitelist</h2>\n<ul>");
+            File sd= ServletUtil.getServletHome();
+            File ff= new File( sd, "whitelist.txt" );
+            out.println("<h2>Whitelist File</h2>\n");
+            out.println("Whitelist File: "+ff+"<br>");
+            out.println("<ul>");
             List<String> ss= ServletUtil.getWhiteList();
             for ( String s1: ss ) {
                 out.println("<li>"+s1+"\n");
             }
+            if ( ss.isEmpty() ) {
+                out.println("<li>(whitelist is empty)\n");
+            }
             out.println("</ul>");
+            out.println("<h2>Other Info</h2>\n");
+            InetAddress localhost = java.net.InetAddress.getLocalHost();
+            String hostName = localhost.getHostName();
+            out.println("hostname: "+hostName);
             out.println("<br>user.name: "+ System.getProperty("user.name") + "\n"); // TODO: security concerns
-            out.println("<br>java.version: "+ System.getProperty("java.home") + "\n"); // TODO: security concerns
+            out.println("<br>java.home: "+ System.getProperty("java.home") + "\n"); // TODO: security concerns
             out.println("<p>PWD: "+ ( new File(".").getAbsolutePath() ) +"\n" );
             out.println("<br>Servlet Home: "+ServletUtil.getServletHome() + "\n"); // TODO: security concerns
+            out.println("<br>servlet version="+version+"<br>");
+            
             out.println("</p></body>");
             out.println("</html>");
         } finally {
