@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.das2.util.AboutUtil;
-import static org.virbo.autoplot.ServletUtil.getServletHome;
 import static org.virbo.autoplot.SimpleServlet.version;
 
 /**
