@@ -492,9 +492,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                     parameter= parameterDescriptions.entrySet().iterator().next().getKey();
                     subsetComboBox.setSelectedItem("");
                     param= parameter;
+                    paramInfo.setText("");
                 } else {
                     param= "";
-                    paramInfo.setText("(no plottable parameters)");
+                    if ( this.parameterTree.getRowCount()==0 && numSupport>0 && numData==0 && !this.showAllVarTypeCB.isSelected() ) {
+                        paramInfo.setText("(all parameters are marked as support data, select \"show all\" above)");
+                    } else {
+                        paramInfo.setText("(no plottable parameters)");
+                    }
                 }                
             }
             parameter= param.replaceAll("%3D", "=");
