@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -472,7 +473,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             String slice1= params.remove("slice1");
 
             fillTree( this.parameterTree, parameterDescriptions, cdf, param, slice1 );
-
+            
             logger.finest("close cdf");
 
             DefaultComboBoxModel cbmodel= new DefaultComboBoxModel();
@@ -588,6 +589,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
         DefaultMutableTreeNode root= new DefaultMutableTreeNode("");
 
+        List<TreePath> expand=new ArrayList(mm.size());
+        
         TreePath selection=null;
         for ( Entry<String,String> e: mm.entrySet() ) {
 
@@ -631,6 +634,10 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                             }
                         }
                         root.add( node );
+                        if ( rec.length<4 ) {
+                            expand.add( new TreePath( new Object[] { root, node } ) );
+                        }
+                        
                     } catch (Exception ex ) {
                         logger.log(Level.WARNING,"parameter name found: "+s+" referred to by " +e.getKey(),ex);
                         root.add( node );
@@ -654,7 +661,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         parameterTree.setRootVisible(false);
         parameterTree.setModel(tm);
 
-        if ( selection!=null ) parameterTree.setSelectionPath(selection);
+        if ( selection!=null ) {
+            parameterTree.setSelectionPath(selection);
+            parameterTree.scrollPathToVisible(selection);
+        }
+        
+        for ( TreePath tp: expand ) {
+            parameterTree.expandPath(tp);
+        }
 
     }
 
