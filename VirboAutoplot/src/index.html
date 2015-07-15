@@ -20,13 +20,14 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-07-15 r17120):</p>
+        <p>Bugfixes (2015-07-15 r17124):</p>
         <ul>
+            <li>minor tweaks to property editor</li>
             <li>update RBSP orbits to 2827</li>
             <li>hide the "filters" name which is meaningless to the scientists, and use "operations" (which is just as meaningless, but there's one fewer name).</li>
             <li>check to see that the bookmarks are loaded before assuming they had been, to support running scripts within 10 seconds of launch.</li>
             <li>total of total showed a bug where the weights were not properly accounted for.</li>
-            <li>1422: filters GUI will run filters on the event thread, hanging app for slow filters.</li>
+            <li>1422: filters GUI would run filters on the event thread, hanging app for slow filters.</li>
             <li>old code for managing the tick formatter assumed that milliseconds would be sufficient.</li>
             <li>CollapseFilterEditor panel would loose the selected index when resetting the dimension names.</li>
             <li>add progress monitor to InlineDataSource</li>
@@ -133,7 +134,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>improvements to feedback in CDF parameter editor panel.  Thanks, Rich!</li>
+            <li>improvements to feedback in CDF parameter editor panel.</li>
             <li>1425: implicit events file format allows any text file with ISO8601, ISO8601 for the first two columns to be implicitly treated as an events file.</li>
             <li>add rank 4 ones and replicate functions.</li>
             <li>1421: filters can now be cancelled.</li>
@@ -143,7 +144,7 @@
             <li>in Jython, add datumRange method for coercing various object types into DatumRange.</li>
             <li>allow vap+jyds:http://... when the whitelist contains just http://...</li>
             <li>system property AUTOPLOT_DATA can be used to specify autoplot_data folder location.</li>
-            <li>GUI title indicates if problemmatic 32bit Java is used.</li>
+            <li>GUI title indicates if problematic 32bit Java is used.</li>
             <li>layout tab has add plots and delete plots button.</li>
        </ul>
         <p>Less recent features:</p>
