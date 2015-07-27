@@ -64,6 +64,7 @@ public class PlotElementStyle extends DomNode {
     }
 
     public void setColor(Color color) {
+        if ( color==null ) throw new IllegalArgumentException("color is null");
         Color oldColor = this.color;
         this.color = color;
         propertyChangeSupport.firePropertyChange(PROP_COLOR, oldColor, color);
@@ -77,6 +78,7 @@ public class PlotElementStyle extends DomNode {
     }
 
     public void setFillColor(Color fillColor) {
+        if ( fillColor==null ) throw new IllegalArgumentException("color is null");
         Color oldFillColor = this.fillColor;
         this.fillColor = fillColor;
         propertyChangeSupport.firePropertyChange(PROP_FILLCOLOR, oldFillColor, fillColor);
@@ -120,6 +122,7 @@ public class PlotElementStyle extends DomNode {
     }
     
     public void setSymbolConnector(PsymConnector symbolConnector) {
+        if ( symbolConnector==null ) throw new NullPointerException("symbolConnector is null");
         Object oldVal= this.symbolConnector;
         this.symbolConnector = symbolConnector;
         propertyChangeSupport.firePropertyChange(PROP_SYMBOL_CONNECTOR, oldVal, symbolConnector );

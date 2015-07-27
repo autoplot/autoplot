@@ -323,17 +323,17 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
 
             if ( bundle!=null ) {
-                QDataSet labels = Ops.labels(parser.getFieldLabels());
+                QDataSet labels = Ops.labelsDataset(parser.getFieldLabels());
                 labels = labels.trim( bundle[0], bundle[1]);
                 mds.putProperty(QDataSet.DEPEND_1, labels);
             }
 
             if ( depend1Label!=null ) {
-                mds.putProperty(QDataSet.DEPEND_1, Ops.labels(depend1Label) );
+                mds.putProperty(QDataSet.DEPEND_1, Ops.labelsDataset(depend1Label) );
             }
 
             if (depend1Labels != null) {
-                QDataSet labels = Ops.labels(parser.getFieldLabels());
+                QDataSet labels = Ops.labelsDataset(parser.getFieldLabels());
                 labels = labels.trim( depend1Labels[0], depend1Labels[1] );
                 mds.putProperty(QDataSet.DEPEND_1, labels);
             }

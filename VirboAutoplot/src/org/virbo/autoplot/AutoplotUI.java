@@ -4586,8 +4586,12 @@ APSplash.checkTime("init 240");
                             statusLabel.setIcon(BUSY_ICON);
                         }
                     }
-                    statusTextField.setText(fmyMess);
-                    statusTextField.setToolTipText(fmessage);
+                    try {
+                        statusTextField.setText(fmyMess);
+                        statusTextField.setToolTipText(fmessage);
+                    } catch ( ArrayIndexOutOfBoundsException e ) {
+                        logger.log( Level.SEVERE, e.getMessage(), e ); // rte_0759798375_20121111_205149_*.xml
+                    }
                 } catch ( Exception e ) {
                     logger.log( Level.SEVERE, e.getMessage(), e ); // rte_0759798375_20121111_205149_*.xml
                 }

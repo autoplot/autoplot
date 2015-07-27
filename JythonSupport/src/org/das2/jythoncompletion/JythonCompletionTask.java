@@ -99,6 +99,8 @@ public class JythonCompletionTask implements CompletionTask {
                 logger.fine("no completion context");
             } else {
                 doQuery( cc, arg0);
+                // TODO: how to make it so the plotx reference documentation waits?  I guess we add multiple completions.
+                //( arg0.addItem(new MessageCompletionItem("please wait")) );
             }
         } catch ( BadLocationException ex ) {
             logger.log( Level.WARNING, null, ex );
@@ -128,6 +130,8 @@ public class JythonCompletionTask implements CompletionTask {
                 c= queryMethods(cc, arg0);
             } else if (cc.contextType.equals(CompletionContext.STRING_LITERAL_ARGUMENT)) {
                 c= queryStringLiteralArgument(cc, arg0);
+            } else if (cc.contextType.equals(CompletionContext.COMMAND_ARGUMENT)) {
+                c= queryCommandArgument(cc, arg0);
             }
         } catch ( BadLocationException ex ) {
             logger.log( Level.WARNING, null, ex );
@@ -758,6 +762,37 @@ public class JythonCompletionTask implements CompletionTask {
         return 0;
     }
 
+    private int queryCommandArgument(CompletionContext cc, CompletionResultSet result ) throws BadLocationException {
+        String method = cc.contextString;
+        int [] pos= new int[2];
+        
+        PythonInterpreter interp = getInterpreter();
+
+        String eval;
+        eval= editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
+        
+        if ( JythonCompletionProvider.getInstance().settings().isSafeCompletions() ) {
+            eval= sanitizeLeaveImports( eval );
+        } 
+        
+        try {
+            interp.exec(eval);
+        } catch ( PyException ex ) {
+            result.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
+            return 0;
+        }
+        
+        PyObject po= interp.eval(method);
+        PyObject doc= interp.eval(method+".__doc__");
+        String signature= makeInlineSignature( po, doc );
+
+        String link = signature;
+
+        result.addItem( new DefaultCompletionItem( method, cc.completable.length(), method, method, link) );
+                    
+        return 1;
+    }
+
     /**
      * return an interpreter to match the one the user's code lives in.
      * @return
@@ -882,6 +917,33 @@ public class JythonCompletionTask implements CompletionTask {
         
     }
     
+    /**
+     * get __doc__ from the function.
+     * @param po
+     * @param doc
+     * @return 
+     */
+    private static String makeInlineSignature( PyObject po, PyObject doc ) {
+        String sig= ( po instanceof PyFunction ) ? getPyFunctionSignature((PyFunction)po) : "";
+        String signature= doc instanceof PyNone ? "(No documentation)" : doc.toString();
+
+                String[] ss2= signature.split("\n");
+        if ( ss2.length>1 ) {
+            for ( int jj= 0; jj< ss2.length; jj++ ){
+                ss2[jj]= escapeHtml(ss2[jj]);
+            }
+            if ( !signature.startsWith("<html>" ) ) {
+                signature= "<html><b>"+sig+ "</b><br><br>"+join( ss2, "<br>" )+"</html>";
+            } else {
+                signature= "<html><b>"+sig+ "</b><br><br>" + signature.substring(6)+"</html>";
+            }
+        } else {
+            signature= "<html><b>"+sig+ "</b><br><br>" + signature+"</html>";
+        }
+        signature= "inline:" + signature;
+        return signature;
+    }
+    
     public static List<DefaultCompletionItem> getLocalsCompletions(PythonInterpreter interp, CompletionContext cc) {
         
         List<DefaultCompletionItem> result= new ArrayList();
@@ -921,22 +983,7 @@ public class JythonCompletionTask implements CompletionTask {
                 } else if (po.isCallable()) {
                     label = ss + "() ";
                     PyObject doc= interp.eval(ss+".__doc__");
-                    String sig= ( po instanceof PyFunction ) ? getPyFunctionSignature((PyFunction)po) : "";
-                    signature= doc instanceof PyNone ? "(No documentation)" : doc.toString();
-                    String[] ss2= signature.split("\n");
-                    if ( ss2.length>1 ) {
-                        for ( int jj= 0; jj< ss2.length; jj++ ){
-                            ss2[jj]= escapeHtml(ss2[jj]);
-                        }
-                        if ( !signature.startsWith("<html>" ) ) {
-                            signature= "<html><b>"+sig+ "</b><br><br>"+join( ss2, "<br>" )+"</html>";
-                        } else {
-                            signature= "<html><b>"+sig+ "</b><br><br>" + signature.substring(6)+"</html>";
-                        }
-                    } else {
-                        signature= "<html><b>"+sig+ "</b><br><br>" + signature+"</html>";
-                    }
-                    signature= "inline:" + signature;
+                    signature= makeInlineSignature( po, doc );
                     
                 } else if (po.isNumberType()) {
                     if ( po.getType().getFullName().equals("javaclass")  ) {

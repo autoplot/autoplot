@@ -241,11 +241,21 @@ public class CompletionSupport {
                 } else {
                     return null;
                 }
-            } else if ( tokens.get(0).kind==PythonGrammarConstants.NAME ) {
-                if ( tokens.size()==3 ) {
-                    return new CompletionContext( CompletionContext.DEFAULT_NAME, null, "" );
-                } else {
-                    return new CompletionContext( CompletionContext.DEFAULT_NAME, null, completable );
+            } else {
+                for ( int i= myTokenIndex; i>0; i--) { // look for function call, because we want the completions for the function.
+                    if ( tokens.get(i).kind==PythonGrammarConstants.LPAREN && tokens.get(i-1).kind==PythonGrammarConstants.NAME ) {
+                        String contextString= tokens.get(i-1).image;
+                        return new CompletionContext( CompletionContext.COMMAND_ARGUMENT, contextString, tokens.get(myTokenIndex).image );
+                    } else if ( tokens.get(i-1).kind==PythonGrammarConstants.EQUAL ) {
+                        return new CompletionContext( CompletionContext.DEFAULT_NAME, null, tokens.get(myTokenIndex).image );
+                    }
+                }
+                if ( tokens.get(0).kind==PythonGrammarConstants.NAME ) { // why this?
+                    if ( tokens.size()==3 ) {
+                        return new CompletionContext( CompletionContext.DEFAULT_NAME, null, "" );
+                    } else {
+                        return new CompletionContext( CompletionContext.DEFAULT_NAME, null, completable );
+                    }                
                 }
             }
         }

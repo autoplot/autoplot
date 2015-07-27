@@ -204,7 +204,7 @@ public class PyQDataSet extends PyJavaInstance {
         return Py.newLong((int)rods.value());
     }
 
-
+    
     private final static Map<String,PyReflectedFunction> binaryInfixMethods;
     static {
         binaryInfixMethods= new HashMap<String, PyReflectedFunction>(); //TODO: what is this?

@@ -17,12 +17,15 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PlotSymbol;
+import org.das2.graph.PsymConnector;
+import org.das2.util.ClassMap;
 import org.python.core.Py;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyString;
+import org.python.core.PyTuple;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
@@ -33,6 +36,7 @@ import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Row;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.PyQDataSet;
 
@@ -50,9 +54,9 @@ public class PlotCommand extends PyObject {
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
     
     public static PyString __doc__ =
-        new PyString("<html>plotx is an experimental extension of the plot command that uses Python features like keywords.\n"
-            + "<br>plotx([pos],x,y,z,[keywords])\n"
-            + "<br>keywords:\n"
+        new PyString("<html><H2>plot([pos],x,y,z,[named parameters])</H2>"
+            + "plot (or plotx) plots the data or URI for data on the canvas.\n"
+            + "<br><b>named parameters:</b>\n"
             + "<table>"
             + "<tr><td>xlog ylog zlog </td><td>explicitly set this axis to log (or linear when set equal to 0.).</td></tr>\n"
             + " <tr><td> xtitle ytitle ztitle  </td><td>set the label for the axis.</td></tr>\n"
@@ -60,14 +64,15 @@ public class PlotCommand extends PyObject {
             + " <tr><td> renderType  </td><td> explcitly set the render type, to scatter, series, nnSpectrogram, digital, etc\n</td></tr>"
             + " <tr><td> color      </td><td> the line colors.\n</td></tr>"
             + " <tr><td> fillColor   </td><td>the color when filling volumes.\n</td></tr>"
-            + "  <tr><td>symsize     </td><td>set the point (pixel) size\n</td></tr>"
+            + " <tr><td> symsize     </td><td>set the point (pixel) size\n</td></tr>"
             + " <tr><td> linewidth   </td><td>the line thickness in points (pixels)\n</td></tr>"
             + " <tr><td> symbol      </td><td>the symbol, e.g. dots triangles cross\n</td></tr>"
             + " <tr><td> isotropic   </td><td>constrain the ratio between the x and y axes.\n</td></tr>"
+            + " <tr><td> legendLabel </td><td>add label to the legend</td></tr>"
             + " <tr><td> title   </td><td>title for the plot\n</td></tr>"
             + " <tr><td> xpos    </td><td>override horizontal position of plot, eg. '50%+1em,100%-2em'\n</td>"
             + " <tr><td> ypos    </td><td>override vertical position of plot, eg. '0%+1em,25%-2em', 0 is top\n</td>"
-            + "</table>");
+            + "</table></html>");
 
     private static QDataSet coerceIt( PyObject arg0 ) {
         Object o = arg0.__tojava__(QDataSet.class);
@@ -85,47 +90,46 @@ public class PlotCommand extends PyObject {
     }
 
     /**
-     * return the object or null for this string  "RED" -&gt; Color.RED
-     * @param c the class defining the target type
-     * @param ele the string representation to be interpreted for this type.
-     * @return the instance of the type.
+     * get the color from the python object, for example:
+     * <ul>
+     * <li>Color.RED
+     * <li>16711680   (int for red)
+     * <li>16711680.  (float from QDataSet)
+     * <li>(255,0,0)
+     * <li>(1.0,0,0)
+     * </ul>
+     * @param val
+     * @return 
      */
-    private Object getEnumElement( Class c, String ele ) {
-        int PUBLIC_STATIC_FINAL = Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL;
-        List lvals;
-        if (c.isEnum()) {
-            Object[] vals = c.getEnumConstants();
-            for (Object o : vals) {
-                Enum e = (Enum) o;
-                if ( e.toString().equalsIgnoreCase(ele) ) return e;
+    public static Color getColor( PyObject val ) {
+        Color c=null;
+        if (val.__tojava__(Color.class) != Py.NoConversion) {
+            c = (Color) val.__tojava__(Color.class);
+        } else if (val instanceof PyFloat) {
+            c = new Color((int) ((PyFloat) val).getValue());
+        } else if (val instanceof PyInteger) {
+            c = new Color(((PyInteger) val).getValue());
+        } else if (val instanceof PyQDataSet) {
+            c = new Color((int) ((PyQDataSet) val).getQDataSet().value());
+        } else if (val instanceof PyTuple) {
+            String sval= val.toString();
+            sval= sval.substring(1,sval.length()-1);
+            if (sval != null) {
+                c = Ops.colorFromString(sval);
+            } else {
+                throw new IllegalArgumentException("can't identify color");
             }
-            lvals= Arrays.asList(vals);
         } else {
-            Field[] fields = c.getDeclaredFields();
-            lvals= new ArrayList();
-            for ( Field f: fields ) {
-                try {
-                    String name = f.getName();
-                    if ( ( ( f.getModifiers() & PUBLIC_STATIC_FINAL) == PUBLIC_STATIC_FINAL ) ) {
-                        Object value = f.get(null);
-                        if ( value!=null && c.isInstance(value) ) {
-                            lvals.add(value);
-                            if ( name.equalsIgnoreCase(ele) || value.toString().equalsIgnoreCase(ele) ) {
-                               return value;
-                            }
-                        }
-                    }
-                } catch (IllegalAccessException iae) {
-                    IllegalAccessError err = new IllegalAccessError(iae.getMessage());
-                    err.initCause(iae);
-                    throw err;
-                }
+            String sval = (String) val.__str__().__tojava__(String.class);
+            if (sval != null) {
+                c = Ops.colorFromString(sval);
+            } else {
+                throw new IllegalArgumentException("can't identify color");
             }
         }
-        logger.log( Level.INFO, "looking for {0}, found {1}\n", new Object[]{ele, lvals.toString()});
-        return null;
+        return c;
     }
-
+    
     /**
      * implement the python call.
      * @param args the "rightmost" elements are the keyword values.
@@ -146,7 +150,8 @@ public class PlotCommand extends PyObject {
             "title",
             "renderType",
             "color", "fillColor",
-            "symsize","linewidth",
+            "symsize","linewidth","linestyle",
+            "legendLabel",
             "symbol",
             "isotropic", "xpos", "ypos"
         },
@@ -158,7 +163,8 @@ public class PlotCommand extends PyObject {
             Py.None,
             Py.None,
             Py.None,Py.None,
-            Py.None,Py.None,
+            Py.None,Py.None,Py.None,
+            Py.None,
             Py.None,
             Py.None, Py.None, Py.None
         } );
@@ -317,46 +323,13 @@ public class PlotCommand extends PyObject {
                 } else if ( kw.equals("zlog") ) {
                     plot.getZaxis().setLog( "1".equals(sval) );
                 } else if ( kw.equals("color" ) ) {
-                    if ( val.__tojava__(Color.class)!=Py.NoConversion ) {
-                        Color c= (Color) val.__tojava__(Color.class);
-                        elements.get(0).getStyle().setColor( c );
-                    } else if ( val instanceof PyFloat ) {
-                        Color c= new Color( (int)((PyFloat)val).getValue() );
-                        elements.get(0).getStyle().setColor( c );
-                    } else if ( val instanceof PyInteger ) {
-                        Color c= new Color( ((PyInteger)val).getValue() );
-                        elements.get(0).getStyle().setColor( c );
-                    } else if ( val instanceof PyQDataSet ) {
-                        Color c= new Color( (int)((PyQDataSet)val).getQDataSet().value() );
-                        elements.get(0).getStyle().setColor( c );
-                    } else {
-                        if ( sval!=null ) {
-                           Color c;
-                           try {
-                               c= Color.decode( sval );
-                           } catch ( NumberFormatException ex ) {
-                               c= (Color)getEnumElement( Color.class, sval );
-                           }
-                           if ( c!=null ) {
-                               elements.get(0).getStyle().setColor( c );
-                           } else {
-                               throw new IllegalArgumentException("unable to identify color: "+sval);
-                           }
-                        }
-                    }
+                    Color c= getColor(val);
+                    elements.get(0).getStyle().setColor( c );
                 } else if ( kw.equals("fillColor" ) ) { // because you can specify renderType=stairSteps, we need fillColor.
                     if ( sval!=null ) {
                        Color c;
-                       try {
-                           c= Color.decode( sval );
-                       } catch ( NumberFormatException ex ) {
-                           c= (Color)getEnumElement( Color.class, sval );
-                       }
-                       if ( c!=null ) {
-                           elements.get(0).getStyle().setFillColor( c );
-                       } else {
-                           throw new IllegalArgumentException("unable to identify color: "+sval);
-                       }
+                       c= Ops.colorFromString( sval );
+                       elements.get(0).getStyle().setFillColor( c );
                     }
                 } else if ( kw.equals("title") ) {
                     plot.setTitle(sval);
@@ -364,8 +337,11 @@ public class PlotCommand extends PyObject {
                     elements.get(0).getStyle().setSymbolSize( Double.valueOf(sval) );
                 } else if ( kw.equals("linewidth") ) {
                     elements.get(0).getStyle().setLineWidth( Double.valueOf(sval) );
+                } else if ( kw.equals("linestyle") ) {
+                    PsymConnector p= (PsymConnector) ClassMap.getEnumElement( PsymConnector.class, sval );
+                    elements.get(0).getStyle().setSymbolConnector( p );
                 } else if ( kw.equals("symbol") ) {
-                    PlotSymbol p= (PlotSymbol) getEnumElement( DefaultPlotSymbol.class, sval );
+                    PlotSymbol p= (PlotSymbol) ClassMap.getEnumElement( DefaultPlotSymbol.class, sval );
                     if ( p!=null ) {
                         elements.get(0).getStyle().setPlotSymbol( p );
                     } else {
@@ -385,6 +361,11 @@ public class PlotCommand extends PyObject {
                         RenderType rt= RenderType.valueOf(srenderType);
                         elements.get(0).setRenderType(rt);
                         elements.get(0).setRenderControl(renderControl);
+                    }
+                } else if ( kw.equals("legendLabel" ) ) {
+                    if ( !sval.equals("") ) {
+                        elements.get(0).setLegendLabel(sval);
+                        elements.get(0).setDisplayLegend(true);
                     }
                 } else if ( kw.equals("isotropic" ) ) {
                     plot.setIsotropic(true);

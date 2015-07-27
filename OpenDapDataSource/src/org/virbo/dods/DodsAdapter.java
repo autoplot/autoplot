@@ -378,7 +378,7 @@ public class DodsAdapter {
                             rresult.putValue( i, j, ds.value(i) );
                         }
                     }
-                    rresult.putProperty(QDataSet.DEPEND_1, DataSetOps.trim( Ops.labels(labels), 1, cols-1 ) );
+                    rresult.putProperty(QDataSet.DEPEND_1, DataSetOps.trim( Ops.labelsDataset(labels), 1, cols-1 ) );
                     rresult.putProperty(QDataSet.DEPEND_0, dss[0] );
                     zresult= rresult;
                 }

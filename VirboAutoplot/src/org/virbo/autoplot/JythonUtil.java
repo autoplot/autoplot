@@ -79,6 +79,7 @@ public class JythonUtil {
         }
         interp.set( "monitor", new NullProgressMonitor() );
         interp.set( "plotx", new PlotCommand() );
+        interp.set( "plot", new PlotCommand() );
         return interp;
     }
 
@@ -96,7 +97,6 @@ public class JythonUtil {
         InteractiveInterpreter interp= createInterpreter(appContext, sandbox);
         if ( dom!=null ) interp.set("dom", dom );
         if ( mon!=null ) interp.set("monitor", mon ); else interp.set( "monitor", new NullProgressMonitor() );
-        interp.set( "plotx", new PlotCommand() );
         return interp;
     }
 
