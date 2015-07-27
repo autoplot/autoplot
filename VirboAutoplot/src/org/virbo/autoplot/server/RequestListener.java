@@ -46,6 +46,7 @@ public class RequestListener {
         this.readData = newreadData;
         propertyChangeSupport.firePropertyChange(PROP_READDATA, oldreadData, newreadData);
     }
+
     private Runnable run = new Runnable() {
 
         public void run() {
@@ -53,6 +54,9 @@ public class RequestListener {
             while (listening) {
                 try {
                     ServerSocket listen = new ServerSocket(port, 1000);
+                    setPort( listen.getLocalPort() );
+                    
+                    System.out.println("autoplot is listening on port "+port+".");
 
                     // wait for connections forever
                     while (listening) {
@@ -102,14 +106,28 @@ public class RequestListener {
         this.socket = newsocket;
         propertyChangeSupport.firePropertyChange(PROP_SOCKET, oldsocket, newsocket);
     }
+    
+    public static final String PROP_PORT = "port";
     private int port = 1234;
 
+    /**
+     * return the port being used.  Note if the port was zero, this
+     * will be assigned the port that was used.
+     * @return the port being used.
+     */
     public int getPort() {
         return this.port;
     }
 
+    /**
+     * this may be zero to request that a port be chosen, or non-zero
+     * for the port number.
+     * @param newport 
+     */
     public void setPort(int newport) {
+        int old= this.port;
         this.port = newport;
+        propertyChangeSupport.firePropertyChange( PROP_PORT, old, port );
     }
 
     public OutputStream getOutputStream() {

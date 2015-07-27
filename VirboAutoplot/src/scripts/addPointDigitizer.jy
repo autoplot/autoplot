@@ -9,6 +9,7 @@ from org.das2.components import DataPointRecorderNew
 from org.virbo.dataset import SemanticOps
 from org.das2.dataset import DataSetUpdateListener
 from org.das2.graph import SpectrogramRenderer
+import java.util.HashMap
 
 setLayoutOverplot(3)
 
@@ -19,6 +20,7 @@ addTab( 'digitizer', dpr )
 class MyUpdateListener( DataSetUpdateListener ):
     def dataSetUpdated( self, e ):
         ds= dpr.getDataSet()
+        print ds
         if ( ds!=None ):
             plot( 2, ds[:,0], ds[:,1]  )
         else:
@@ -36,13 +38,15 @@ dpr.addSelectedDataSetUpdateListener( MySelectionListener() )
             
 pp= dom.plots[0].controller.dasPlot
 
-from org.das2.event import BoxSelectorMouseModule
+from org.das2.event import DataPointSelectorMouseModule
+from org.das2.event import CrossHairRenderer
 
-mm= BoxSelectorMouseModule.create( pp, 'digitizer' )
+dprr= CrossHairRenderer( pp,None,pp.getXAxis(),pp.getYAxis() )
+mm= DataPointSelectorMouseModule( pp, None, dprr, 'digitizer' )
 
-def boxSelected(event):
-    x= event.getXRange().min()
-    y= event.getYRange().max()
+def dataPointSelected(event):
+    x= event.getX()
+    y= event.getY()
     pes= dom.controller.getPlotElementsFor(dom.plots[0])
     if ( len(pes)==0 ): 
         setStatus('no data found for plot')
@@ -51,20 +55,9 @@ def boxSelected(event):
     if ( ds==None ):
         setStatus('nothing plotted')
         return 
-    if ( SemanticOps.isSimpleTableDataSet( ds  ) ):
-       try:
-          z= slice0( ds, dataset(x) )
-          z= slice0( z, dataset(y) )
-          map= java.util.HashMap()
-          map.put( 'z', z )
-       except:
-          setStatus('out of bounds')
-          return
-    else:
-       map= None
-    dpr.addDataPoint( x, y, map )
+    dpr.addDataPoint( x, y )
     
-mm.BoxSelected=boxSelected
+mm.dataPointSelected=dataPointSelected
 
 pp.dasMouseInputAdapter.primaryModule= mm
 
@@ -75,6 +68,6 @@ plot(0, 'vap+cdaweb:ds=PO_H0_CAM&id=H_PLUS&timerange=2000-03-16' )
 #plot(0, 'http://www.rbsp-ect.lanl.gov/data_pub/rbspa/hope/level3/PA/rbspa_rel02_ect-hope-PA-L3_20121023_v5.0.0.cdf?FEDO' )
 
 import javax
-javax.swing.JOptionPane.showMessageDialog( getViewWindow(),'Draw a box, and it will be recorded on the digitizer tab')
+javax.swing.JOptionPane.showMessageDialog( getViewWindow(),'Click on the plot, and it will be recorded on the digitizer tab')
 
 dom.plots[0].yaxis.autoRange= False

@@ -48,7 +48,7 @@ public class Test_050_FftFilter implements Scenario {
             
             FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Filtering|FFT Power Spectrum with sliding window".split("\\|") );
             
-            DialogOperator fftFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
+            DialogOperator fftFrame = new DialogOperator( new RegexComponentChooser( "Edit Operations") );
             
             Thread.sleep(100);
             
@@ -63,7 +63,7 @@ public class Test_050_FftFilter implements Scenario {
             JComboBoxOperator slide = new JComboBoxOperator(fftFrame, 1);
             slide.selectItem(2);
                     
-            new JButtonOperator( fftFrame, "Ok" ).clickMouse();
+            new JButtonOperator( fftFrame, "OK" ).clickMouse();
             
             Thread.sleep(1000); // This is because of a bug in the locking, otherwise it will grab the current image.
             new JTabbedPaneOperator( app.getTabs() ).selectPage("data");

@@ -11,6 +11,8 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
@@ -25,8 +27,10 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -255,4 +259,40 @@ public class NamedURIListTool extends JPanel {
         return b.toString();
     }
     
+    /**
+     * return null if nothing is selected, the URI otherwise.
+     * @return null if nothing is selected, the URI otherwise.
+     */
+    public String selectDataId( String id ) {
+        JPanel dsSelector= new JPanel();
+        dsSelector.setLayout( new BoxLayout(dsSelector,BoxLayout.Y_AXIS ) );
+        ButtonGroup bg= new ButtonGroup();
+        JCheckBox[] butts= new JCheckBox[this.uris.size()];
+        GridBagLayout layout= new GridBagLayout();
+        dsSelector.setLayout(layout);
+        GridBagConstraints c= new GridBagConstraints();
+        for ( int i=0; i<this.uris.size(); i++ ) {
+            JCheckBox cb= new JCheckBox( this.ids.get(i) );
+            if ( this.ids.get(i).equals(id) ) cb.setSelected(true);
+            butts[i]= cb;
+            c.gridx= 1;
+            c.gridy= i;
+            dsSelector.add( cb, c );
+            c.gridx= 2;
+            c.anchor= GridBagConstraints.WEST;
+            dsSelector.add( new JLabel( this.uris.get(i) ), c );
+            bg.add(cb);
+        }
+        if ( JOptionPane.showConfirmDialog( this, dsSelector, "Select Variable", JOptionPane.OK_CANCEL_OPTION ) ==JOptionPane.OK_OPTION ) {
+            for ( int i=0; i<this.uris.size(); i++ ) {
+                if ( butts[i].isSelected() ) {
+                    return this.ids.get(i);
+                }
+            }
+            return null;
+        } else {
+            return null;
+        }
+        
+    }
 }

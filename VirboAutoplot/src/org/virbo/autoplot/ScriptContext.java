@@ -44,6 +44,7 @@ import org.virbo.dataset.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.util.awt.SvgGraphicsOutput;
+import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.Plot;
@@ -400,12 +401,17 @@ public class ScriptContext extends PyJavaInstance {
      * @param label the label for the dependent parameter
      * @param x QDataSet for the independent parameter for the X values
      * @param y QDataSet for the independent parameter for the Y values
-     * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
+     * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter, or null.
      * @param renderType hint at the render type to use, such as "nnSpectrogram" or "digital", 
      */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z, String renderType ) {
         maybeInitModel();
-        if ( z.rank()==1 ) {
+        if ( z==null ) {
+            ArrayDataSet yds= ArrayDataSet.copy(y);
+            yds.putProperty( QDataSet.RENDER_TYPE, renderType );
+            yds.putProperty( QDataSet.DEPEND_0, x );
+            model.setDataSet(chNum, label, yds);
+        } else if ( z.rank()==1 ) {
             ArrayDataSet yds= ArrayDataSet.copy(y);
             yds.putProperty( QDataSet.RENDER_TYPE, renderType );
             yds.putProperty( QDataSet.DEPEND_0, x );
@@ -869,6 +875,39 @@ public class ScriptContext extends PyJavaInstance {
         format.formatData( file, ds, new NullProgressMonitor());
 
     }
+    
+    /**
+     * Export the data into a format implied by the filename extension.  
+     * See the export data dialog for additional parameters available for formatting.
+     *
+     * For example:
+     *<blockquote><pre><small>{@code
+     * ds= getDataSet('http://autoplot.org/data/somedata.cdf?BGSEc')
+     * formatDataSet( ds, 'vap+dat:file:/home/jbf/temp/foo.dat?tformat=minutes&format=6.2f')
+     *}</small></pre></blockquote>
+     * 
+     * @param ds
+     * @param file local file name that is the target
+     * @throws java.lang.Exception
+     */
+    public static void formatDataSet(QDataSet ds, String file, ProgressMonitor monitor ) throws Exception {
+        
+        file= getLocalFilename(file);
+
+        URISplit split= URISplit.parse(file);
+        
+        URI uri = split.resourceUri; 
+        
+        DataSourceFormat format = DataSetURI.getDataSourceFormat(uri);
+        
+        if (format == null) {
+            throw new IllegalArgumentException("no format for extension: " + file);
+        }
+
+        format.formatData( file, ds, monitor );
+
+    }
+    
     
     /**
      * set the title of the plot.

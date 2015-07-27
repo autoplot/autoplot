@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BoxLayout;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -171,6 +174,7 @@ public class DataMashUp extends javax.swing.JPanel {
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
+        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane3.setViewportView(jList1);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -188,6 +192,11 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jSplitPane2.setLeftComponent(jTabbedPane1);
 
+        jTree1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTree1MouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(jTree1);
 
         jSplitPane2.setRightComponent(jScrollPane2);
@@ -212,6 +221,18 @@ public class DataMashUp extends javax.swing.JPanel {
             .addComponent(jSplitPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
+        if ( evt.getClickCount()==2 ) {
+            TreePath tp= jTree1.getClosestPathForLocation( evt.getX(), evt.getY() );
+            jTree1.setSelectionPath(tp);
+            String currentId= tp.getLastPathComponent().toString();
+            String s= namedURIListTool1.selectDataId(currentId);
+            if ( s!=null ) {
+                doDrop(s,tp);
+            }
+        }
+    }//GEN-LAST:event_jTree1MouseClicked
 
     final DropTargetListener createDropTargetListener() {
         return new DropTargetListener() {

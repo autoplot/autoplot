@@ -30,7 +30,7 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
         java.util.Map<String, String> params= URISplit.parseParams(split.params);
 
         boolean binary= "binary".equals( params.get( "type" ) );
-        if (split.ext.equals(".qds")) {
+         if (split.ext.equals(".qds")) {
             FileOutputStream fo=null;
             try {
                 fo= new FileOutputStream( new File( split.resourceUri ) );

@@ -12,7 +12,7 @@ hubConnector.setAutoconnect(3);
 meta = Metadata()
 meta.setName("Autoplot");
 meta.setDescriptionText("Autoplot");
-meta.setIconUrl("http://autoplot.org:8080/hudson/job/autoplot-release/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/logo16x16.png");
+meta.setIconUrl("http://autoplot.org/hudson/job/autoplot-release/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/logo16x16.gif");
 meta.setDocumentationUrl("http://autoplot.org");
 
 hubConnector.declareMetadata(meta);

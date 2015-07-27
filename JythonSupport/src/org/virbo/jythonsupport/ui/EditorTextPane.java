@@ -232,7 +232,12 @@ public class EditorTextPane extends JEditorPane {
                     MutablePropertyDataSet mpds= ArrayDataSet.copy(pds.getQDataSet());
                     String oldTitle= (String) mpds.property(QDataSet.TITLE);
                     mpds.putProperty(QDataSet.TITLE, oldTitle==null ? doThis : ( doThis+": "+oldTitle ) );
-                    new org.virbo.qstream.SimpleStreamFormatter().format(mpds, new FileOutputStream(tmpfile), true );
+                    FileOutputStream fout= new FileOutputStream(tmpfile);
+                    try {
+                        new org.virbo.qstream.SimpleStreamFormatter().format(mpds, fout, true );
+                    } finally {
+                        fout.close();
+                    }
                     Socket s= new Socket("localhost",12345);
                     OutputStream out= s.getOutputStream();
                     try {

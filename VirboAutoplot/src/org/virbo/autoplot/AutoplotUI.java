@@ -59,6 +59,7 @@ import java.io.StringReader;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
@@ -4385,7 +4386,9 @@ APSplash.checkTime("init 240");
     private Runnable updateIconRunnable= new Runnable() {
         public void run() {
             statusLabel.setToolTipText(currentIconTooltip);
-            statusLabel.setIcon(currentIcon);
+            if ( statusLabel.getIcon()!=WARNING_ICON ) {
+                statusLabel.setIcon(currentIcon);
+            }
         }
     };
     
@@ -4535,6 +4538,12 @@ APSplash.checkTime("init 240");
                 }
             }
         });
+        rlistener.addPropertyChangeListener(RequestListener.PROP_PORT, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateFrameTitle();
+            }
+        } );
         rlistener.startListening();
         serverCheckBoxMenuItem.setSelected(true);
         serverCheckBoxMenuItem.setToolTipText("server listening on port "+port);

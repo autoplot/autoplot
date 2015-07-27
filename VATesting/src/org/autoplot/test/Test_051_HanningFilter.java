@@ -52,7 +52,7 @@ public class Test_051_HanningFilter implements Scenario {
             
             FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Filtering|Hanning".split("\\|") );
         
-            DialogOperator hanningFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
+            DialogOperator hanningFrame = new DialogOperator( new RegexComponentChooser( "Edit Operations") );
         
             new JTextComponentOperator(hanningFrame).setText("100");
         

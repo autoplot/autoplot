@@ -591,9 +591,9 @@ public class PyQDataSet extends PyJavaInstance {
             QubeDataSetIterator.DimensionIteratorFactory fit;
             if (a instanceof PySlice) {
                 PySlice slice = (PySlice) a;
-                Integer start = ( slice.start==Py.None ) ? null : ( (Number) slice.start.__tojava__(Number.class) ).intValue();
-                Integer stop = ( slice.stop==Py.None ) ? null : ( (Number) slice.stop.__tojava__(Number.class) ).intValue();
-                Integer step = ( slice.step==Py.None ) ? null : ( (Number) slice.step.__tojava__(Number.class) ).intValue();
+                Integer start = ( slice.start==Py.None ) ? null : getInteger( slice.start );
+                Integer stop = ( slice.stop==Py.None ) ? null : getInteger( slice.stop );
+                Integer step = ( slice.step==Py.None ) ? null : getInteger( slice.step );
                 fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
 
             } else if (a.isNumberType()) {
@@ -667,7 +667,7 @@ public class PyQDataSet extends PyJavaInstance {
                 PyObject a = slices.__getitem__(i);
                 QubeDataSetIterator.DimensionIteratorFactory fit;
                 if (a instanceof PySlice) {
-                    PySlice slice = (PySlice) a;
+                    PySlice slice = (PySlice) a; // TODO: why not the same as 75 lines prior?
                     Integer start = (Integer) slice.start.__tojava__(Integer.class);
                     Integer stop = (Integer) slice.stop.__tojava__(Integer.class);
                     Integer step = (Integer) slice.step.__tojava__(Integer.class);
@@ -707,6 +707,24 @@ public class PyQDataSet extends PyJavaInstance {
                 iter.next();
                 iter.putValue(ds, d);
             }
+        }
+    }
+    
+    /**
+     * encapsulate the logic where we can interpret a int, float or rank 0 dataset as an int.
+     * @param o rank 0 dataset, int or float.
+     * @return integer interpretation of the value.
+     */
+    private static int getInteger( PyObject obj ) {
+        if ( obj instanceof PyQDataSet ) {
+            PyQDataSet pds= (PyQDataSet)obj;
+            if ( pds.rods.rank()!=0 ) {
+                throw new IllegalArgumentException("QDataSet cannot be interpreted as integer, because its rank is greater than 0");
+            } else {
+                return (int)pds.rods.value();
+            }
+        } else {
+            return ( (Number) obj.__tojava__(Number.class) ).intValue();
         }
     }
 

@@ -55,7 +55,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     /** the maximum number of DEPEND_1 channels where we should show option for depend_1. */
     private static final int MAX_SLICE1_OFFER = 32;
 
-    private final static Logger logger= Logger.getLogger( "apdss.cdfj" );
+    private final static Logger logger= Logger.getLogger( "apdss.cdf" );
 
     private boolean isValidCDF= false;
 
@@ -618,12 +618,17 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                     DefaultMutableTreeNode node= new DefaultMutableTreeNode( e.getKey() );
                     try {
                         Object o = cdf.get(s);
-                        Object oo= Array.get(o,0);
-                        if ( !oo.getClass().isArray() || !( String.class.isAssignableFrom( oo.getClass().getComponentType() ) ) ) {
-                           logger.log(Level.FINE, "Expected string array in element: {0}", s);
-                           continue;
+                        String[] rec;
+                        if ( o.getClass().isArray() && String.class.isAssignableFrom( o.getClass().getComponentType() ) ) {
+                            rec= (String[])o;
+                        } else {
+                            Object oo= Array.get(o,0);
+                            if ( !oo.getClass().isArray() || !( String.class.isAssignableFrom( oo.getClass().getComponentType() ) ) ) {
+                               logger.log(Level.FINE, "Expected string array in element: {0}", s);
+                               continue;
+                            }
+                            rec= (String[])Array.get(o,0);
                         }
-                        String[] rec= (String[])Array.get(o,0);
                         for ( int i=0; i<rec.length; i++ ) {
                             String snode=  String.format("%d: %s", i, rec[i] ) ;
                             DefaultMutableTreeNode child= new DefaultMutableTreeNode( snode );

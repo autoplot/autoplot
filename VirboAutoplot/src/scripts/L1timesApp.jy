@@ -1,4 +1,9 @@
-fp=  open( '/home/jbf/L1times.2.dat', 'r' )
+# demonstrates one method for parsing files.
+# here we read in a file 
+
+ff= downloadResourceAsTempFile( URL('http://www-pw.physics.uiowa.edu/~jbf/autoplot/data/txt/L1times.2.dat'), monitor )
+
+fp= open( ff.toString(), 'r' )
 import org
 
 dom= getDocumentModel()
@@ -40,7 +45,5 @@ timetags.putProperty( QDataSet.DEPEND_0, filetime.getDataSet() )
 timetags.putProperty( QDataSet.PLANE_0, filename.getDataSet() )
 
 result= timetags.getDataSet()
-diff= result - result.property( QDataSet.DEPEND_0 )
-diff.putProperty( QDataSet.DEPEND_0, result )
 
 plot( result )

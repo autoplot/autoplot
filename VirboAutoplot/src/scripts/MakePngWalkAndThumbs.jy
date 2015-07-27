@@ -1,6 +1,7 @@
 #Sample script to make a set of summary plots
-
+from org.autoplot.pngwalk import DemoPngWalk
 import math
+import java.io
 
 dom= getDocumentModel()
 
@@ -15,7 +16,7 @@ def myWriteToPng( filename, appmodel, ldom, width, height ):
   out.close();
 
 def doBatch( times, dom, outputFolder, product, timeFormat, mon ):
-
+   
    java.io.File(outputFolder).mkdirs()
    java.io.File(outputFolder+'thumbs400/').mkdirs()
 
@@ -103,7 +104,7 @@ timeFormatTf= JTextField( '%Y%m%d' )
 p.add( timeFormatTf )
 
 p.add( JLabel( 'Time Range:' ) )
-timeRangeTf= JTextField( '2009' )
+timeRangeTf= JTextField( '2015-May' )
 p.add( timeRangeTf )
 
 outputFolder=0
@@ -132,8 +133,7 @@ if ( proceed ):
    doBatch( times, dom, outputFolder, fln_root, timeFormat, mon )
 
    if ( not mon.cancelled ):
-
-     from org.autoplot.pngwalk import DemoPngWalk
+       
      if ( outputFolder[1]==':' ):
        url= 'file:/'+outputFolder
      else:

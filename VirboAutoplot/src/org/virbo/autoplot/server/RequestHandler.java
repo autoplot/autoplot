@@ -5,7 +5,6 @@
 package org.virbo.autoplot.server;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -74,11 +73,7 @@ public class RequestHandler {
             while ( s!=null ) {
                 try {
                     echo = !s.trim().endsWith(";");
-                    if ( s.contains("import") ) {
-                        if ( echo ) out.write("# rejecting command with import.\n".getBytes());
-                    } else {
-                        interp.exec(s);
-                    }
+                    interp.exec(s);
                 } catch ( RuntimeException ex ) {
                     ex.printStackTrace( new PrintStream( out ) );
                     ex.printStackTrace();

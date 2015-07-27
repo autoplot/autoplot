@@ -16,7 +16,7 @@ import org.virbo.dataset.QDataSet;
  */
 public abstract class TrArrayDataSet extends AbstractDataSet {
 
-    protected static final Logger logger= Logger.getLogger("apdss");
+    protected static final Logger logger= Logger.getLogger("apdss.cdfj");
     float fill= Float.NaN;
     double dfill= Double.NaN;
 

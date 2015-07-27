@@ -49,7 +49,7 @@ import org.virbo.dsops.Ops;
  */
 public class CdfUtil {
 
-    private final static Logger logger= LoggerManager.getLogger("apdss.cdfjava");
+    private final static Logger logger= LoggerManager.getLogger("apdss.cdf");
 
     /**
      * return the Java type used to store the CDF data type.
@@ -974,10 +974,10 @@ public class CdfUtil {
                 }
             }
         }
-        if ( skipCount==v.length ) {
-            logger.fine( "turning off dataOnly because it rejects everything");
-            dataOnly= false;
-        }
+        //if ( skipCount==v.length ) {
+        //    logger.fine( "turning off dataOnly because it rejects everything");
+        //    dataOnly= false;
+        //}
 
         for (String v1 : v) {
             String svar=null;

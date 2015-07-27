@@ -1,10 +1,9 @@
-from org.das2.graph import ContoursRenderer, SpectrogramRenderer;
-from javax.beans.binding import *;
-from org.das2.event import AnnotatorMouseModule;
-createGui()
+# demonstrates how a feature can be added to Autoplot
 
-model = getApplicationModel()
-
-model.autoOverview= False
-model.plot.addMouseModule( AnnotatorMouseModule(model.plot) )
+# we need a reference to the das plot object, not the Autoplot plot object.
+dasPlot= dom.plots[0].controller.dasPlot
+anno= AnnotatorMouseModule( dasPlot )
+dasPlot.getDasMouseInputAdapter().addMouseModule( anno )
+dasPlot.getDasMouseInputAdapter().setPrimaryModule( anno )
+plot( 'vap+inline:ripples(100,100)+rand(100,100)+outerProduct(ones(100),linspace(0,10,100) )' )
 

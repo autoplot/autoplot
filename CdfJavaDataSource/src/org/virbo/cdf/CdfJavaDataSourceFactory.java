@@ -34,7 +34,7 @@ import org.virbo.datasource.URISplit;
  */
 public class CdfJavaDataSourceFactory implements DataSourceFactory {
     
-    private static final Logger logger = Logger.getLogger("apdss.cdfjava");
+    private static final Logger logger = Logger.getLogger("apdss.cdf");
     
     /** Creates a new instance of CdfFileDataSourceFactory */
     public CdfJavaDataSourceFactory() {

@@ -91,6 +91,7 @@
                                 <StringItem index="3" value="link(x,y,z)"/>
                               </StringArray>
                             </Property>
+                            <Property name="selectionMode" type="int" value="0"/>
                           </Properties>
                         </Component>
                       </SubComponents>
@@ -112,6 +113,9 @@
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
                 <Component class="javax.swing.JTree" name="jTree1">
+                  <Events>
+                    <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jTree1MouseClicked"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>

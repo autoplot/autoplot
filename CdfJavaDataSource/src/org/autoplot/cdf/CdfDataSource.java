@@ -72,7 +72,7 @@ public class CdfDataSource extends AbstractDataSource {
     protected static final String PARAM_ID = "id";
     protected static final String PARAM_SLICE1 = "slice1";
     
-    private static final Logger logger= LoggerManager.getLogger("apdss.cdfjava");
+    private static final Logger logger= LoggerManager.getLogger("apdss.cdf");
     Map<String, Object> attributes;
 
     public CdfDataSource( URI uri ) {

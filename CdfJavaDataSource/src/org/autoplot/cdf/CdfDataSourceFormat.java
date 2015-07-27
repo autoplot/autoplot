@@ -45,7 +45,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     Map<QDataSet,String> names;
     Map<String,QDataSet> seman;
 
-    private static final Logger logger= LoggerManager.getLogger("apdss.cdfj");
+    private static final Logger logger= LoggerManager.getLogger("apdss.cdf");
     
     public CdfDataSourceFormat() {
         names= new HashMap<QDataSet,String>();

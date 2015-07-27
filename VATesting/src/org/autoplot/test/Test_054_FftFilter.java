@@ -41,7 +41,7 @@ public class Test_054_FftFilter implements Scenario {
         
         FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Filtering|FFT with sliding window".split("\\|") );
         
-        DialogOperator fftFrame = new DialogOperator( new RegexComponentChooser( "Edit Filters") );
+        DialogOperator fftFrame = new DialogOperator( new RegexComponentChooser( "Edit Operations") );
         
         JTextComponentOperator size = new JTextComponentOperator(fftFrame);
         size.setText("100");
