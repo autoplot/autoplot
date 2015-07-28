@@ -383,12 +383,19 @@ public class EditorAnnotationsSupport {
         return new ExpressionLookup() {
             @Override
             public PyObject lookup(String expr) {
+                if ( expr==null ) {
+                    return new PyString("<html>highlite an expression");
+                }
                 try {
                     PyObject po= interp.eval(expr);
                     return po;
                 } catch ( Exception e ) {
                     String msg= e.getMessage();
-                    if ( msg==null ) msg="";
+                    if ( msg==null ) {
+                        msg=e.toString();
+                        int i= msg.lastIndexOf("?\n");
+                        msg= msg.substring(i+2).trim();
+                    }
                     return new PyString("<html>highlite an expression<br>"+msg);
                 }
             }
