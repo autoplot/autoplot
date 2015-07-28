@@ -50,6 +50,7 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
     public static QDataSet adaptList( PyList p ) {
         double[] j= new double[ p.size() ];
         QDataSet d1;
+        JoinDataSet jds= null; // support list of lists.
         Units u= null;
         for ( int i=0; i<p.size(); i++ ) {
             Object n= p.get(i);
@@ -64,12 +65,25 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
             }
             if ( u==null )  u= SemanticOps.getUnits(d1);
           
-            j[i]= d1.value();
-            
+            if ( d1.rank()==0 ) {
+                j[i]= d1.value();
+            } else {
+                if ( jds==null ) {
+                    jds= new JoinDataSet(d1);
+                } else {
+                    jds.join(d1);
+                }
+            }
         }
-        DDataSet q= DDataSet.wrap( j );
-        q.putProperty( QDataSet.UNITS, u );
-        return q;
+        
+        if ( jds==null ) {
+            DDataSet q= DDataSet.wrap( j );
+            q.putProperty( QDataSet.UNITS, u );
+            return q;
+        } else {
+            jds.putProperty( QDataSet.UNITS, u );
+            return jds;
+        }
     }
 
     protected static QDataSet adaptArray(PyArray pyArray) {
