@@ -20,8 +20,27 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-07-15 r17124):</p>
+        <p>Bugfixes (2015-07-28 r17132):</p>
         <ul>
+            <li> allow waveform cadence to change in fftPower.</li>
+            <li> Ops.labels renamed to Ops.labelsDataset, to avoid name clashes.</li>
+            <li> completions within command, like plotx(&lt;C&gt;) where we need to look up the documentation for plotx.</li>
+            <li> more support for color argument in plotx</li>
+            <li> plot and plotx command are finally one and the same.</li>
+            <li> check for null in setSymbolConnector, setColor, setFillColor.</li>
+            <li>cdfn and cdfj loggers combined to "cdf" since there's just one cdf source.</li>
+            <li>bug where cdf editor had no visible variables because of bugs with CDF editor (Thanks Mark and Matt).</li>
+            <li>bug where labels were array [N] instead of [1,N] corrected.<li>
+            <li>ds[rank0ds] handled in Jython<li>
+            <li>flattenRank2 handles rank 1 DEPEND_1.<li>
+            <li>correction where FFT window was applied twice corrected.<li>
+            <li>qds supports BIN_PLUS and BIN_MINUS properties, WEIGHTS.<li>
+            <li>verify the qstream packet length is less than 1000000, to aid in debugging.<li>
+            <li>warning icon persists, where it was cleared mistakenly before.<li>
+            <li>scriptContext formatDataSet allows progress monitor.<li>
+            <li>imports are allowed with server port again.</li>
+            <li>updates to many of the example scripts. </li>
+            <li>bugfixes in block from 2015-07-15 to 2015-07-26</li>
             <li>FFTPower would apply the window twice, affecting the data.  Thanks, Chris!</li>
             <li>minor tweaks to property editor</li>
             <li>update RBSP orbits to 2827</li>
@@ -134,7 +153,10 @@
             <li>rte 2071287514: cancel dialog by closing window caused RTE.  Check for other places where it is assumed at least one element is returned.  Thanks Bob!</li>
         </ul>
         <p>Features:</p>
-        <ul>
+        <ul><li> plotx command legendLabel named parameter added.</li>
+            <li> plotx linestyle added.</li>
+            <li>improvements to DashupTool.</li>
+            <li>update the port reported when the server is on, to support automatic selection of port with --server=0.</li>
             <li>support Units.RGBColor for the units of the colorBy dataset.</li>
             <li>improvements to feedback in CDF parameter editor panel.</li>
             <li>1425: implicit events file format allows any text file with ISO8601, ISO8601 for the first two columns to be implicitly treated as an events file.</li>
