@@ -394,7 +394,7 @@ public class EditorAnnotationsSupport {
                     if ( msg==null ) {
                         msg=e.toString();
                         int i= msg.lastIndexOf("?\n");
-                        msg= msg.substring(i+2).trim();
+                        if ( i>-1 ) msg= msg.substring(i+2).trim();
                     }
                     return new PyString("<html>highlite an expression<br>"+msg);
                 }
