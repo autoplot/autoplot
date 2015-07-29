@@ -66,6 +66,7 @@ public class PlotCommand extends PyObject {
             + " <tr><td> fillColor   </td><td>the color when filling volumes.\n</td></tr>"
             + " <tr><td> symsize     </td><td>set the point (pixel) size\n</td></tr>"
             + " <tr><td> linewidth   </td><td>the line thickness in points (pixels)\n</td></tr>"
+            + " <tr><td> linestyle   </td><td>the line style, one of solid,none,dotfine,dashfine</td></tr>"
             + " <tr><td> symbol      </td><td>the symbol, e.g. dots triangles cross\n</td></tr>"
             + " <tr><td> isotropic   </td><td>constrain the ratio between the x and y axes.\n</td></tr>"
             + " <tr><td> legendLabel </td><td>add label to the legend</td></tr>"
