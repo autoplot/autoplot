@@ -7,7 +7,8 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>South America's border used to show where line plots of large data sets is pathologically slow.  
+        <p><small>A round of new features is coming with v2015b.  Here rgbColorDataset is used to form the data for the colorScatter mode, and plot now accepts named parameters.
+                <a href='http://autoplot.org/data/script/screenshots/rgbColorScatter.jy'>script</a>
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -22,7 +23,10 @@
 
         <p>Bugfixes (2015-07-28 r17132):</p>
         <ul>
-            <li> allow waveform cadence to change in fftPower.</li>
+            <li>1434: metadata propagation through operators is inconsistent, inconvenient </li>
+            <li>1433: allow waveform cadence to change in fftPower.</li>
+            <li>1432: list of list to declare double arrays (and rank 2 datasets) in Jython.</li>
+            <li>1431: "Cannot create PyString from null" popup in editor. </li>
             <li> Ops.labels renamed to Ops.labelsDataset, to avoid name clashes.</li>
             <li> completions within command, like plotx(&lt;C&gt;) where we need to look up the documentation for plotx.</li>
             <li> more support for color argument in plotx</li>
@@ -153,7 +157,9 @@
             <li>rte 2071287514: cancel dialog by closing window caused RTE.  Check for other places where it is assumed at least one element is returned.  Thanks Bob!</li>
         </ul>
         <p>Features:</p>
-        <ul><li> plotx command legendLabel named parameter added.</li>
+        <ul>
+            <li>within parameter added to CDF</li>
+            <li> plotx command legendLabel named parameter added.</li>
             <li> plotx linestyle added.</li>
             <li>improvements to DashupTool.</li>
             <li>update the port reported when the server is on, to support automatic selection of port with --server=0.</li>
