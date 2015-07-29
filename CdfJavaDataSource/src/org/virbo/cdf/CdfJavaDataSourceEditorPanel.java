@@ -155,7 +155,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereParamList, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        whereOp.setModel(new javax.swing.DefaultComboBoxModel(new String[] { ".eq", ".gt", ".lt", ".ne" }));
+        whereOp.setModel(new javax.swing.DefaultComboBoxModel(new String[] { ".eq", ".gt", ".lt", ".ne", ".within" }));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereOp, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -170,13 +170,13 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel3Layout.createSequentialGroup()
-                .add(12, 12, 12)
-                .add(whereParamList, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(whereParamList, 0, 112, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(whereOp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(whereOp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 84, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(whereTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 65, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(whereTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 53, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(jPanel3Layout.createSequentialGroup()
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jLabel4)
@@ -214,7 +214,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                     .add(noDep))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(showAllVarTypeCB)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jSplitPane1.setRightComponent(jPanel3);
@@ -519,8 +519,10 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 int i= where.indexOf(".");
                 if ( i>-1 ) {
                     whereParamList.setSelectedItem(where.substring(0,i)); 
-                    whereOp.setSelectedItem(where.substring(i,i+3) ); // DANGER assumes 2 chars
-                    whereTF.setText(where.substring(i+4,where.length()-1));
+                    int i0= where.indexOf("(");
+                    int i1= where.indexOf(")",i0);
+                    whereOp.setSelectedItem(where.substring(i,i0));
+                    whereTF.setText( where.substring(i0+1,i1).replaceAll("\\+"," "));
                 }
             } else {
                 whereCB.setSelected(false);
@@ -575,7 +577,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             }
 
             if ( whereCB.isSelected() ) {
-                params.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText() ) );
+                params.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText().replaceAll(" ","+") ) );
             } else {
                 params.remove("where");
             }
