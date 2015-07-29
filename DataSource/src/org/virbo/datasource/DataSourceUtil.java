@@ -461,6 +461,9 @@ public class DataSourceUtil {
         List<String> search= new ArrayList( Arrays.asList( yyyymmdd_HHMM, yyyymmdd_HH, yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm_dd, yyyy ) );
         List<String> replac= new ArrayList( Arrays.asList( "\\$Y\\$m\\$d$3\\$H\\$M", "\\$Y\\$m\\$d$3\\$H", "\\$Y$2\\$j", "\\$Y\\$m\\$d","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d","/\\$Y/" ) );
         List<Integer> resol= new ArrayList( Arrays.asList( minute, hour, day, day, day, month, day, year ) );
+        
+        // it looks like to have $Y$m01 resolution, we would need to have a flag to only accept the aggregation if the more general one is not needed for other files.
+        
         String s= replaceLast( split.file, 
                 search,
                 replac,
