@@ -2024,8 +2024,12 @@ public class DataSetURI {
                         paramsCopy.put(cc1.completable, null);
                     }
 
-                    String ss= ( split.vapScheme==null ? "" : (split.vapScheme + ":" ) ) + split.file + "?" + URISplit.formatParams(paramsCopy);
-
+                    String ss= ( split.vapScheme==null ? "" : (split.vapScheme + ":" ) );
+                    if ( split.file!=null ) {
+                        ss= ss+ "?" + URISplit.formatParams(paramsCopy) + "?";
+                    }
+                    ss+= URISplit.formatParams(paramsCopy);
+                            
                     if (dontYetHave == false) {
                         continue;  // skip it
                     }
