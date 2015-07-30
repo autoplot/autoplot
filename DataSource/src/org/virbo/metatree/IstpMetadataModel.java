@@ -273,9 +273,10 @@ public class IstpMetadataModel extends MetadataModel {
 
         if (attrs.containsKey("DISPLAY_TYPE")) {
             String type = (String) attrs.get("DISPLAY_TYPE");
-            if ( type.equals("spectrogram") ) {
+            if ( !type.equals(type.toLowerCase() ) ) logger.log(Level.WARNING, "DISPLAY_TYPE should be lower case ({0})", type);
+            if ( type.equalsIgnoreCase("spectrogram") ) {
                 type= "spectrogram";
-            } else if ( type.equals( "time_series" ) || type.equals("stack_plot") ) {
+            } else if ( type.equalsIgnoreCase("time_series" ) || type.equalsIgnoreCase("stack_plot") ) {
                 type= "time_series"; // TODO: this will be "series" after reduction is put in.
             }
             properties.put(QDataSet.RENDER_TYPE, type);
