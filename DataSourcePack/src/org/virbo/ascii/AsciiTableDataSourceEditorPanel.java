@@ -1388,7 +1388,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             }
             model.setRecParser(p);
             columns = getColumnNames();
-            ParseException richHeaderWarn = null;
+            Exception richHeaderWarn = null;
             boolean isRichHeader = AsciiParser.isRichHeader(p.header);
             if (isRichHeader) {
                 try {
@@ -1396,6 +1396,9 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                     for ( int i=0; i<columns1.length; i++ )  columns1[i]="";
                     AsciiHeadersParser.parseMetadata(p.header,columns1,columns1);
                 } catch (ParseException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                    richHeaderWarn = ex;
+                } catch ( IllegalArgumentException ex ) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                     richHeaderWarn = ex;
                 }
