@@ -54,6 +54,24 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
             for ( DefaultCompletionItem item: r ) {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, item.getComplete(), this, "arg_0" ) );
             }   
+        } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
+            PythonInterpreter interp = JythonUtil.createInterpreter(false);
+            URL imports = JythonOps.class.getResource("imports.py");
+            interp.execfile(imports.openStream(),"imports.py");
+            String frag= cc.completable;
+            org.das2.jythoncompletion.CompletionContext cc1= CompletionSupport.getCompletionContext( "x="+frag, cc.completablepos+2, 0, 0, 0 );        
+            List<DefaultCompletionItem> r=  JythonCompletionTask.getLocalsCompletions( interp, cc1 );
+
+            Collections.sort(r,new Comparator<DefaultCompletionItem>() {
+                @Override
+                public int compare(DefaultCompletionItem o1, DefaultCompletionItem o2) {
+                    return o1.getComplete().compareTo(o2.getComplete());
+                }
+            });
+            
+            for ( DefaultCompletionItem item: r ) {
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, item.getComplete(), this, item.getComplete() ) );
+            }   
         }
         
         return result;
