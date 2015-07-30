@@ -946,8 +946,13 @@ public class DataSetSelector extends javax.swing.JPanel {
         
         boolean shortFsCompletion= carotpos<6 && ( surl.startsWith("/") || ( surl.length()>1 && Character.isLetter(surl.charAt(0)) && surl.charAt(1)==':' ) );
         
-        boolean haveSource= DataSourceRegistry.getInstance().hasSourceByExt(DataSetURI.getExt(surl));
-        if ( ( split.file==null || split.resourceUriCarotPos > split.file.length() ) && haveSource ) {
+        String ext= DataSetURI.getExt(surl);
+        
+        boolean haveSource= DataSourceRegistry.getInstance().hasSourceByExt(ext);
+        
+        boolean sourceNeedsNoFile= ext!=null && ( ext.equals("inline") || ext.equals("cdaweb") || ext.equals("pdsppi") );
+        
+        if ( ( split.file==null || split.resourceUriCarotPos > split.file.length() ) && haveSource || sourceNeedsNoFile ) {
             showFactoryCompletions( surl, carotpos );
 
         } else if ( carotpos==0 || (
