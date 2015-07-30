@@ -334,13 +334,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         if (dep0 != null) {
             String l = (String) Ops.guessName(dep0);
             if ( l==null ) {
-                if ( Units.t2000.isConvertableTo( SemanticOps.getUnits(dep0) ) ) {
+                if ( Units.t2000.isConvertibleTo( SemanticOps.getUnits(dep0) ) ) {
                     l= "time(UTC)";
                 } else {
                     l= "dep0";
                 }
             } else {
-                if ( Units.t2000.isConvertableTo( SemanticOps.getUnits(dep0) ) ) {
+                if ( Units.t2000.isConvertibleTo( SemanticOps.getUnits(dep0) ) ) {
                     l= l+" (UTC)";
                 }
             }
@@ -370,7 +370,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                         startStopTime= true;
                     }
                 }
-                if ( u1!=null && Units.t2000.isConvertableTo( u1 ) ) {
+                if ( u1!=null && Units.t2000.isConvertibleTo( u1 ) ) {
                     if ( startStopTime ) {
                         l1= "time"+i;                            
                     } else {
@@ -486,7 +486,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             if (dep0 != null) {
                 String l = (String) dep0.property(QDataSet.LABEL);
                 if ( l==null ) {
-                    if ( Units.t2000.isConvertableTo( SemanticOps.getUnits(dep0) ) ) {
+                    if ( Units.t2000.isConvertibleTo( SemanticOps.getUnits(dep0) ) ) {
                         l= "time(UTC)";
                     } else {
                         l= "dep0";
