@@ -20,6 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.das2.datum.DatumRange;
@@ -79,23 +80,14 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         return ads;
     }
-
+    
     /**
      * return the index of the agg part of the uri.  
      * @param surl the URI as a string.
      * @return the index, which will be the location of a slash.
      */
     protected static int splitIndex(String surl) { // See also org/autoplot/pngwalk/WalkUtil.java splitIndex...
-        int i0 = surl.indexOf("%Y");  //TODO: /tmp/data_$(m,Y=2011).dat
-        if ( i0==-1 ) i0 = surl.indexOf("$Y");
-        int i1;
-        i1 = surl.indexOf("%y");
-        if ( i1==-1 ) i1 = surl.indexOf("$y");
-        if ( i0==-1 ) i0= Integer.MAX_VALUE;
-        if ( i1==-1 ) i1= Integer.MAX_VALUE;
-        int i= Math.min(i0,i1);
-        i = surl.lastIndexOf('/', i);
-        return i;
+        return FileStorageModel.splitIndex(surl);
     }
 
     /**
