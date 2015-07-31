@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import javax.swing.Action;
 import javax.swing.JFrame;
@@ -41,6 +42,22 @@ public class AppManager {
         if ( app instanceof JFrame ) {
             ((JFrame)app).setDefaultCloseOperation( JFrame.DO_NOTHING_ON_CLOSE );
         }
+    }
+    
+    /**
+     * return true if the application is registered.  This was introduced
+     * so that ScriptContext could check that it hasn't been closed.  (This 
+     * listens to window closing events.)
+     * @param app
+     * @return true if the app is still registered.
+     */
+    public boolean isRunningApplication( Object app ) {
+        for ( Object o: apps ) {
+            if ( o==app ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void closeApplication( Object app ) {
