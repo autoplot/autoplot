@@ -41,6 +41,7 @@ import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.JythonUtil;
+import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
@@ -457,6 +458,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         }
         System.err.println("== Executing Script ==");
+        ScriptContext.setApplication(model);
         support.executeScript( evt.getModifiers() );
     }//GEN-LAST:event_executeButtonActionPerformed
 
