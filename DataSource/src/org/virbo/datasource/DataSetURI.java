@@ -1944,7 +1944,9 @@ public class DataSetURI {
                 cc.completable = surl1.substring(amppos + 1, carotPos);
                 cc.completablepos = carotPos - (amppos + 1);
                 if (surl1.length() > carotPos && surl1.charAt(carotPos) != '&') {  // insert implicit "&"  //TODO: bug 1088: where would this be appropriate???
-                    surl1 = surl1.substring(0, carotPos) + '&' + surl1.substring(carotPos);
+                    int aftaCarotPos= surl1.indexOf("&",carotPos);
+                    if ( aftaCarotPos==-1 ) aftaCarotPos= surl1.length();
+                    surl1 = surl1.substring(0, carotPos) + '&' + surl1.substring(aftaCarotPos);
                     split = URISplit.parse(surl1);
                 }
 
