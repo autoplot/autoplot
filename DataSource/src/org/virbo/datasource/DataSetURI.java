@@ -2026,7 +2026,7 @@ public class DataSetURI {
 
                     String ss= ( split.vapScheme==null ? "" : (split.vapScheme + ":" ) );
                     if ( split.file!=null ) {
-                        ss= ss+ "?";
+                        ss+= split.file + "?";
                     }
                     ss+= URISplit.formatParams(paramsCopy);
                             
