@@ -328,6 +328,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         if ( !ScriptContext.isModelInitialized() ) {
             ScriptContext.setApplicationModel(model);
             ScriptContext.setView(this);
+            ScriptContext.defaultApp= this;
         }
 
         model.setResizeRequestListener( new ApplicationModel.ResizeRequestListener() {
@@ -549,8 +550,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     if ( JOptionPane.YES_OPTION==
                             JOptionPane.showConfirmDialog( AutoplotUI.this, "Scripts can only be run from the main window.  Make this the main window?", 
                                     "Reset Main Window", JOptionPane.YES_NO_OPTION ) ) {
-                        ScriptContext.setApplicationModel(AutoplotUI.this.applicationModel);
-                        ScriptContext.setView(AutoplotUI.this);
+                        ScriptContext.setApplication(AutoplotUI.this);
                     }
                     runScript( dataSetSelector.getValue() );
                 }
