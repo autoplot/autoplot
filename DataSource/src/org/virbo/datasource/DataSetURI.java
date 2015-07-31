@@ -1946,7 +1946,8 @@ public class DataSetURI {
                 if (surl1.length() > carotPos && surl1.charAt(carotPos) != '&') {  // insert implicit "&"  //TODO: bug 1088: where would this be appropriate???
                     int aftaCarotPos= surl1.indexOf("&",carotPos);
                     if ( aftaCarotPos==-1 ) aftaCarotPos= surl1.length();
-                    surl1 = surl1.substring(0, carotPos) + '&' + surl1.substring(aftaCarotPos);
+                    surl1 = surl1.substring(0, carotPos);
+                    if ( aftaCarotPos<surl1.length() ) surl1= '&' + surl1.substring(aftaCarotPos);
                     split = URISplit.parse(surl1);
                 }
 
