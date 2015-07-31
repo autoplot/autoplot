@@ -51,7 +51,7 @@ public class AppManager {
      * @param app
      * @return true if the app is still registered.
      */
-    public boolean isRunningApplication( Object app ) {
+    public synchronized boolean isRunningApplication( Object app ) {
         for ( Object o: apps ) {
             if ( o==app ) {
                 return true;
