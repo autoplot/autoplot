@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +115,73 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
+     * set the current application for commands.  For example, to
+     * have two windows plotting data, you would:
+     * <pre>
+     * plot([1,2,3])
+     * set
+     * </pre>
+     * @param app the application
+     */
+    public static synchronized void setApplication( AutoplotUI app ) {
+        setApplicationModel(app.applicationModel);
+        setView(app);        
+    }
+    
+    public static synchronized void setDefaultApplication() {
+        setApplication(defaultApp);
+    }
+    
+    public static synchronized void setApplication( ApplicationModel appm ) {
+        AutoplotUI app= appLookup.get(appm);
+        if (app==null ) {
+            setDefaultApplication();
+        }
+        setApplicationModel(appm);      
+    }    
+
+    /**
+     * return the focus application.
+     * @return the focus application.
+     */
+    public static synchronized AutoplotUI getApplication() {
+        return view;
+    }
+    
+    private static Map<String,AutoplotUI> apps= new HashMap();
+    
+    private static Map<ApplicationModel,AutoplotUI> appLookup= new HashMap();
+    
+    /**
+     * get or create the application identified by the name.  For example:
+     *<blockquote><pre>
+     *ds= ripples(20,20)
+     *plot( 0, ds )
+     *sliceWindow= newApplication('slice')
+     *setApplication(sliceWindow)
+     *plot( slice0(ds,0) ) 
+     * </pre></blockquote>
+     * @param id an identifier
+     * @return the AutoplotUI.
+     */
+    public static synchronized AutoplotUI newApplication( String id ) {
+        AutoplotUI result= apps.get(id);
+        if ( result!=null ) {
+            if ( !AppManager.getInstance().isRunningApplication(result) ) {
+                AutoplotUI app= apps.remove(id); //TODO: just listen for window events!
+                appLookup.remove(app.applicationModel);
+                result= null;
+            }
+        }
+        if ( result==null ) {
+            result= view.newApplication();
+            apps.put(id,result);
+            appLookup.put(result.applicationModel,result);
+        }
+        return result;
+    }
+    
+    /**
      * set the focus for scripts.
      * @param m the application model.
      */
@@ -123,6 +191,8 @@ public class ScriptContext extends PyJavaInstance {
     }
     
     private static AutoplotUI view = null;
+    
+    public static AutoplotUI defaultApp= null; // kludge to get the first.
 
     private static synchronized void maybeInitView() {
         maybeInitModel();
@@ -132,6 +202,7 @@ public class ScriptContext extends PyJavaInstance {
                 public void run() {
                     view = new AutoplotUI(model);
                     view.setVisible(true);
+                    defaultApp= view;
                 }
             };
             if ( SwingUtilities.isEventDispatchThread() ) {
