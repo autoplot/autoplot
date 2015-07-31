@@ -156,6 +156,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
     private void formatBundleDesc(PrintWriter out, QDataSet bds, QDataSet bundleDesc ) throws JSONException {
         
         assert bds!=null;
+        assert bundleDesc.length()==bds.length(1);
         
         QDataSet dep0;
         dep0= (QDataSet) bds.property(QDataSet.DEPEND_0);
@@ -164,11 +165,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         JSONObject jo1= new JSONObject();
         
         int startColumn= dep0==null ? 0 : 1;  // first column of the vector
-        int dep0inc= 0; // amount to inc because of rank 1 dataset
-        
-        if ( bds.rank()==1 ) {
-            dep0inc= 1;
-        }
+        int dep0inc; // 0 or 1, the amount to inc because of dep0 column.
 
         String name;
         String dep1Name= null;
@@ -188,7 +185,14 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 jsonProp( jo1, dep0, QDataSet.UNITS, -1 );
             }
             jo1.put( "START_COLUMN", 0 );
-            jo.put( name, jo1 );
+            if ( bds.rank()>1 ) {
+                jo.put( name, jo1 );
+                dep0inc=1;
+            } else {
+                dep0inc=0;
+            }
+        } else {
+            dep0inc=0;
         }
 
         String[] elementNames= new String[bundleDesc.length()];
@@ -200,7 +204,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             }
             elementLabels= null;
         } else {
-            for ( int i=dep0inc; i<bundleDesc.length(); i++ ) {
+            for ( int i=0; i<bundleDesc.length(); i++ ) {
                 name= (String) bundleDesc.property( QDataSet.NAME,i );
                 if ( name==null ) {
                     logger.info("unnamed dataset!");
@@ -216,8 +220,10 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 jsonProp( jo1, bundleDesc, QDataSet.FILL_VALUE, i );
                 jsonProp( jo1, bundleDesc, QDataSet.DEPEND_0, i );
                 jsonProp( jo1, bundleDesc, QDataSet.START_INDEX, i );
-                jo1.put("START_COLUMN", i );
-                //jo.put( name, jo1 ); // only output the bundle for now.
+                jo1.put("START_COLUMN", i+dep0inc );
+                if ( bds.rank()==1 ) {
+                    jo.put( name, jo1 ); // only output the bundle for now.
+                }
                 elementNames[i]= name;
                 elementLabels[i]= (String)bundleDesc.property(QDataSet.LABEL,i);
             }
@@ -243,12 +249,8 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 jo1.put("DEPEND_1", dep1Name );
                 jo1.put("RENDER_TYPE", "spectrogram" );
             }
+            jo.put( Ops.guessName(bds,"data"), jo1 );    
         }
-
-        jsonProp( jo1, bds, QDataSet.VALID_MIN, -1 );
-        jsonProp( jo1, bds, QDataSet.VALID_MAX, -1 );
-        jsonProp( jo1, bds, QDataSet.FILL_VALUE, -1 );
-        jo.put( Ops.guessName(bds), jo1 );        
         
         String json= jo.toString( 3 );
 
@@ -543,13 +545,36 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         mon.finished();
     }
 
+    /**
+     * use the label if it's compact
+     * @param ds
+     * @param deft
+     * @return 
+     */
     private String dataSetLabel( QDataSet ds, String deft ) {
-        String name = (String) ds.property(QDataSet.NAME);
+        String head= getParam( "header", "" ); // could be "rich"
+        String name;
+        if ( "rich".equals(head) ) {
+            name = (String) ds.property(QDataSet.NAME);
+        } else {
+            name = (String) ds.property(QDataSet.LABEL);
+            if ( name!=null && name.contains("(") ) {
+                int i= name.indexOf("("); // Y (Hz)
+                name= name.substring(0,i).trim();
+            }
+        }
+        if ( name==null || !Ops.safeName(name).equals(name) ) {
+            name = (String) ds.property(QDataSet.NAME);
+        }
         if ( name==null || name.equals("") ) name= deft;
         String label= name;
         Units units= (Units)ds.property(QDataSet.UNITS);
         if ( units!=null && units!=Units.dimensionless ) {
-            label= label+" ("+units+")";
+            if ( UnitsUtil.isTimeLocation(units) ) {
+                label= label + "(UTC)";
+            } else {
+                label= label+"("+units+")";
+            }
         }
         return label;
     }
@@ -567,14 +592,6 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         String head= getParam( "header", "" ); // could be "rich"
         if ( "rich".equals( head ) ) {
             try {
-                DDataSet ds= DDataSet.createRank1(1);
-                ds.putProperty( QDataSet.TITLE, data.property(QDataSet.TITLE) );
-                ds.putProperty( QDataSet.LABEL, data.property(QDataSet.LABEL) );
-                ds.putProperty( QDataSet.NAME, data.property(QDataSet.NAME) );
-                ds.putProperty( QDataSet.UNITS, data.property(QDataSet.UNITS) );
-                ds.putProperty( QDataSet.VALID_MAX, data.property(QDataSet.VALID_MAX) );
-                ds.putProperty( QDataSet.VALID_MIN, data.property(QDataSet.VALID_MIN) );
-                ds.putProperty( QDataSet.FILL_VALUE, data.property(QDataSet.FILL_VALUE) );
                 DDataSet ids= DDataSet.createRank1(1);
                 ids.putProperty( QDataSet.TITLE, dep0.property(QDataSet.TITLE) );
                 ids.putProperty( QDataSet.LABEL, dep0.property(QDataSet.LABEL) );
@@ -583,6 +600,16 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 ids.putProperty( QDataSet.VALID_MAX, dep0.property(QDataSet.VALID_MAX) );
                 ids.putProperty( QDataSet.VALID_MIN, dep0.property(QDataSet.VALID_MIN) );
                 ids.putProperty( QDataSet.FILL_VALUE, dep0.property(QDataSet.FILL_VALUE) );
+                DDataSet ds= DDataSet.createRank1(1);
+                ds.putProperty( QDataSet.TITLE, data.property(QDataSet.TITLE) );
+                ds.putProperty( QDataSet.LABEL, data.property(QDataSet.LABEL) );
+                String name=  (String)data.property(QDataSet.NAME);
+                if ( name==null ) name= "data";
+                ds.putProperty( QDataSet.NAME, name );
+                ds.putProperty( QDataSet.UNITS, data.property(QDataSet.UNITS) );
+                ds.putProperty( QDataSet.VALID_MAX, data.property(QDataSet.VALID_MAX) );
+                ds.putProperty( QDataSet.VALID_MIN, data.property(QDataSet.VALID_MIN) );
+                ds.putProperty( QDataSet.FILL_VALUE, data.property(QDataSet.FILL_VALUE) );
                 QDataSet bds= Ops.join( ids, ds );
                 formatBundleDesc( out,data,bds );
             } catch ( JSONException ex ) {
@@ -620,6 +647,8 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 if ( planeUnits.get(i)==null ) planeUnits.add(i, Units.dimensionless );
                 l= dataSetLabel( plane, "data"+i );
                 buf.append(", ").append( l);
+            } else {
+                break;
             }
         }
 
