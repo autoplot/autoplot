@@ -153,13 +153,21 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         return jo1;
     }
     
-    private void formatBundleDesc(PrintWriter out, QDataSet bds, QDataSet bundleDesc ) throws JSONException {
+    /**
+     * format the data, using column descriptions in bundleDesc.  Note
+     * that when data is Data[Dep0], that bundleDesc will have two columns.
+     * @param out
+     * @param data
+     * @param bundleDesc
+     * @throws JSONException 
+     */
+    private void formatBundleDesc(PrintWriter out, QDataSet data, QDataSet bundleDesc ) throws JSONException {
         
-        assert bds!=null;
-        assert bundleDesc.length()==bds.length(1);
+        assert data!=null;
+        assert bundleDesc.length()==data.length(1);
         
         QDataSet dep0;
-        dep0= (QDataSet) bds.property(QDataSet.DEPEND_0);
+        dep0= (QDataSet) data.property(QDataSet.DEPEND_0);
 
         JSONObject jo= new JSONObject();
         JSONObject jo1= new JSONObject();
@@ -170,8 +178,8 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         String name;
         String dep1Name= null;
         
-        QDataSet dep= (QDataSet) bds.property(QDataSet.DEPEND_1);
-        if ( dep!=null && UnitsUtil.isRatioMeasurement( SemanticOps.getUnits(dep) ) && bds.property(QDataSet.BUNDLE_1)==null ) {
+        QDataSet dep= (QDataSet) data.property(QDataSet.DEPEND_1);
+        if ( dep!=null && UnitsUtil.isRatioMeasurement( SemanticOps.getUnits(dep) ) && data.property(QDataSet.BUNDLE_1)==null ) {
             dep1Name= (String) Ops.guessName(dep);
             jo.put( dep1Name, formatDataSetInline( dep ) );
         }
@@ -185,7 +193,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 jsonProp( jo1, dep0, QDataSet.UNITS, -1 );
             }
             jo1.put( "START_COLUMN", 0 );
-            if ( bds.rank()>1 ) {
+            if ( data.rank()>1 ) {
                 jo.put( name, jo1 );
                 dep0inc=1;
             } else {
@@ -213,7 +221,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 jo1= new JSONObject();
                 jsonProp( jo1, bundleDesc, QDataSet.LABEL, i );
                 if ( !jsonProp( jo1, bundleDesc, QDataSet.UNITS, i ) ) {
-                    jsonProp( jo1, bds, QDataSet.UNITS, -1 );
+                    jsonProp( jo1, data, QDataSet.UNITS, -1 );
                 }
                 jsonProp( jo1, bundleDesc, QDataSet.VALID_MIN, i );
                 jsonProp( jo1, bundleDesc, QDataSet.VALID_MAX, i );
@@ -221,7 +229,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 jsonProp( jo1, bundleDesc, QDataSet.DEPEND_0, i );
                 jsonProp( jo1, bundleDesc, QDataSet.START_INDEX, i );
                 jo1.put("START_COLUMN", i+dep0inc );
-                if ( bds.rank()==1 ) {
+                if ( data.rank()==1 ) {
                     jo.put( name, jo1 ); // only output the bundle for now.
                 }
                 elementNames[i]= name;
@@ -235,7 +243,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         
         jo1= new JSONObject();
         jo1.put( "START_COLUMN", startColumn  );
-        if ( bds.rank()>1 ) {
+        if ( data.rank()>1 ) {
             if ( bundleDesc.length()==1 ) { // bundle of 1 rank 2
                 jo1.put( "DIMENSION", new int[] { (int)bundleDesc.value(0,0)} );            
             } else {                        // bundle of N rank 1
@@ -249,7 +257,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 jo1.put("DEPEND_1", dep1Name );
                 jo1.put("RENDER_TYPE", "spectrogram" );
             }
-            jo.put( Ops.guessName(bds,"data"), jo1 );    
+            jo.put( Ops.guessName(data,"data"), jo1 );    
         }
         
         String json= jo.toString( 3 );
