@@ -339,7 +339,7 @@ public class Test140 {
             iid= ( ( iid+1 ) / 100 + 1 ) * 100;
         }
         
-        System.err.println("\n\n== Exceptions encountered ====");
+        System.err.println("\n\n=== Exceptions encountered ==============");
         
         for ( Entry<String,Exception> e: exceptions.entrySet() ) {
             System.err.println( String.format( "== %4d: %s ==", exceptionNumbers.get(e.getKey()), e.getKey() ) );
@@ -353,6 +353,8 @@ public class Test140 {
             System.err.println("("+exceptions.size()+" exceptions)\n\n");
             System.exit(1);
         }
+        
+        System.err.println("\n\n==============");
         
     }
 }
