@@ -36,8 +36,10 @@ public class Test005 {
             setCanvasSize(800, 600);
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
-
-
+            getDocumentModel().getCanvases(0).getMarginColumn().setLeft("+6em");
+            getDocumentModel().getCanvases(0).getMarginRow().setTop("2em");
+            getDocumentModel().getCanvases(0).getMarginRow().setBottom("100%-1em");
+            
             xxx("init");
 
             //plot("http://cdaweb.gsfc.nasa.gov/opendap/hyrax/genesis/gim/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density");
