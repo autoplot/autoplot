@@ -38,7 +38,7 @@ public class Test005 {
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             getDocumentModel().getCanvases(0).getMarginColumn().setLeft("+6em");
             getDocumentModel().getCanvases(0).getMarginRow().setTop("2em");
-            getDocumentModel().getCanvases(0).getMarginRow().setBottom("100%-1em");
+            getDocumentModel().getCanvases(0).getMarginRow().setBottom("100%-3em");
             
             xxx("init");
 
