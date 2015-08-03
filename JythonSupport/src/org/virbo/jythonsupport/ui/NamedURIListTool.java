@@ -157,7 +157,11 @@ public class NamedURIListTool extends JPanel {
             final DataSetSelector dss= new DataSetSelector();
             dss.setPlotItButtonVisible(false);
             dss.setValue( uris.get(fi) );
-            dss.setRecent( DataSetSelector.getDefaultRecent() );
+            try{
+                dss.setRecent( DataSetSelector.getDefaultRecent() );
+            } catch ( IllegalArgumentException ex ) {
+                
+            }
             dss.addActionListener( new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
