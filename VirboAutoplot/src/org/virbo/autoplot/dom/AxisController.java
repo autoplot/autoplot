@@ -11,6 +11,8 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasAxis.Lock;
+import org.das2.graph.DasPlot;
+import org.jdesktop.beansbinding.Converter;
 
 /**
  *
@@ -118,6 +120,38 @@ public class AxisController extends DomNodeController {
         axis.setAutoLabel(true);
     }
 
+    private Converter getOppositeConverter( Axis axis, final DasAxis dasAxis ) {
+        return new Converter() {
+            @Override
+            public Object convertForward(Object s) {
+                int orientation;
+                if ( dasAxis.isHorizontal() ) {
+                    if ( s.equals(Boolean.TRUE) ) {
+                        orientation= DasAxis.TOP;
+                    } else {
+                        orientation=DasAxis.BOTTOM;
+                    }
+                } else {
+                    if ( s.equals(Boolean.TRUE) ) {
+                        orientation= DasAxis.RIGHT;
+                    } else {
+                        orientation= DasAxis.LEFT;
+                    }
+                }
+                return orientation;
+            }
+            @Override
+            public Object convertReverse(Object t) {
+                int orientation= (Integer)t;
+                if ( orientation==DasAxis.TOP || orientation==DasAxis.RIGHT ) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+    }
+            
     public final synchronized void bindTo(DasAxis p) {
         ApplicationController ac = dom.controller;
         ac.bind(axis, "range", p, "datumRange");
@@ -126,6 +160,7 @@ public class AxisController extends DomNodeController {
         ac.bind(axis, "drawTickLabels", p, "tickLabelsVisible");
         ac.bind(axis, "flipped", p, "flipped");
         ac.bind(axis, "visible", p, "visible" );
+        ac.bind(axis, "opposite", p, "orientation", getOppositeConverter(axis,dasAxis) );
     }
 
     public DasAxis getDasAxis() {
@@ -142,6 +177,7 @@ public class AxisController extends DomNodeController {
         Axis that = (Axis) n;
         if ( !exclude.contains( Axis.PROP_LOG ) ) axis.setLog(that.isLog());
         if ( !exclude.contains( Axis.PROP_FLIPPED ) ) axis.setFlipped(that.isFlipped());
+        if ( !exclude.contains( Axis.PROP_OPPOSITE ) ) axis.setOpposite(that.isOpposite());
         if ( !exclude.contains( Axis.PROP_RANGE ) ) axis.setRange(that.getRange());
         if ( !exclude.contains( Axis.PROP_LABEL ) ) axis.setLabel(that.getLabel());
         if ( !exclude.contains( Axis.PROP_AUTORANGE ) ) axis.setAutoRange(that.isAutoRange());

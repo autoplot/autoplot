@@ -103,6 +103,24 @@ public class Axis extends DomNode {
     }
 
     /**
+     * draw the axis on the opposite side usually used.  This is on the
+     * right side or top.
+     */
+    private boolean opposite = false;
+
+    public static final String PROP_OPPOSITE = "opposite";
+
+    public boolean isOpposite() {
+        return opposite;
+    }
+
+    public void setOpposite(boolean opposite) {
+        boolean oldOpposite = this.opposite;
+        this.opposite = opposite;
+        propertyChangeSupport.firePropertyChange(PROP_OPPOSITE, oldOpposite, opposite);
+    }
+
+    /**
      * false indicates the component will not be drawn.  Note the x and y axes
      * are only drawn if the plot is drawn, and the colorbar may be drawn
      * if the plot is not drawn.
@@ -197,6 +215,7 @@ public class Axis extends DomNode {
             Axis that = (Axis) n;
             if ( !exclude.contains( PROP_LOG ) ) this.setLog(that.isLog());
             if ( !exclude.contains( PROP_FLIPPED ) ) this.setFlipped(that.isFlipped());
+            if ( !exclude.contains( PROP_OPPOSITE ) ) this.setFlipped(that.isOpposite());
             if ( !exclude.contains( PROP_RANGE ) ) this.setRange(that.getRange());
             if ( !exclude.contains( PROP_LABEL ) ) this.setLabel(that.getLabel());
             if ( !exclude.contains( PROP_AUTORANGE ) ) this.setAutoRange(that.isAutoRange());
@@ -225,6 +244,8 @@ public class Axis extends DomNode {
         if ( !b ) result.add( new PropertyChangeDiff( PROP_LOG , that.log, this.log) );
         b= that.flipped==this.flipped;
         if ( !b ) result.add( new PropertyChangeDiff( PROP_FLIPPED , that.flipped, this.flipped) );
+        b=  that.opposite==this.opposite;
+        if ( !b ) result.add( new PropertyChangeDiff( PROP_OPPOSITE, that.opposite, this.opposite) );
         b=  that.range.equals(this.range) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_RANGE, that.range , this.range ) );
         b=  that.label.equals(this.label) ;
