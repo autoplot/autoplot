@@ -25,6 +25,7 @@ public class AxisController extends DomNodeController {
     Plot plot;
     Axis axis;
     private final static Object PENDING_RANGE_TWEAK="pendingRangeTweak";
+    private boolean defaultOppositeRight= false;
 
     public AxisController(Application dom, Plot plot, Axis axis, DasAxis dasAxis) {
         super( axis );
@@ -33,6 +34,9 @@ public class AxisController extends DomNodeController {
         this.plot= plot;
         this.axis = axis;
         axis.controller = this;
+        if ( plot.zaxis==axis ) {
+            defaultOppositeRight= true;
+        }
         bindTo(dasAxis);
         axis.addPropertyChangeListener(rangeChangeListener);
     }
@@ -131,6 +135,12 @@ public class AxisController extends DomNodeController {
                     } else {
                         orientation=DasAxis.BOTTOM;
                     }
+                } else if ( AxisController.this.defaultOppositeRight ) {
+                    if ( s.equals(Boolean.TRUE) ) {
+                        orientation= DasAxis.LEFT;
+                    } else {
+                        orientation= DasAxis.RIGHT;
+                    }                    
                 } else {
                     if ( s.equals(Boolean.TRUE) ) {
                         orientation= DasAxis.RIGHT;
