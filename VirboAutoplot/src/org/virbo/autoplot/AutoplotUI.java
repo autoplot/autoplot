@@ -200,6 +200,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
     // if non-null, then load this set of initial bookmarks.
     private String initialBookmarksUrl= null;
     
+    String applicationName= "";
+    void setApplicationName(String id) {
+        this.applicationName= id;
+    }
+    
     transient PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
         @Override
         public Element serialize(Document document, ProgressMonitor monitor) {
@@ -3722,21 +3727,24 @@ private void updateFrameTitle() {
     final String s32bit= is32bit ? " (32bit)" : "";
     
     final String theTitle;
+    
+    String apname= this.applicationName.length()==0 ? "" : this.applicationName + " - ";
+    
     if ( suri==null ) {
-        theTitle=  title0 + isoffline + server + s32bit;
+        theTitle= apname + title0 + isoffline + server + s32bit;
     } else {
         URISplit split= URISplit.parse(suri);
 
         boolean dirty= undoRedoSupport.getDepth()>1;
         if ( split.path!=null && split.file!=null ) {
             String titleStr= split.file.substring( split.path.length() ) + ( dirty ? "*" : "" );
-            theTitle= titleStr + " - " + title0 + isoffline + server;
+            theTitle= apname + titleStr + " - " + title0 + isoffline + server;
         } else {
             //I was seeing null pointer exceptions here--see rte_1590234331_20110328_153705_wsk.xml.  I suspect this is Windows.
             logger.log(Level.WARNING, "Unable to get path from: {0}", suri);
-            theTitle= "???" + " - " + title0 + isoffline + server;
+            theTitle= apname + "???" + " - " + title0 + isoffline + server;
         }
-    }
+    }    
     Runnable run= new Runnable() {
         @Override
         public void run() {
