@@ -409,7 +409,7 @@ public class EditorContextMenu {
             jumpToMenuPosition= actionsMenu.getItemCount();
             actionsMenu.add(jumpToMenu);
             
-            JMenuItem mi= new JMenuItem( new AbstractAction("plot") {
+            JMenuItem mi= new JMenuItem( new AbstractAction("Plot") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
@@ -420,7 +420,7 @@ public class EditorContextMenu {
             } );
             mi.setToolTipText("Plot dataset reference in a second Autoplot with its server port open");
             actionsMenu.add( mi );
-            mi= new JMenuItem( new AbstractAction("indent block") {
+            mi= new JMenuItem( new AbstractAction("Indent Block") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
@@ -439,7 +439,7 @@ public class EditorContextMenu {
             } );
             mi.setToolTipText("indent the selected block of lines");
             actionsMenu.add( mi );
-            mi= new JMenuItem( new AbstractAction("dedent block") {
+            mi= new JMenuItem( new AbstractAction("Unindent Block") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
@@ -458,7 +458,7 @@ public class EditorContextMenu {
             } );
             mi.setToolTipText("indent the selected block of lines");
             actionsMenu.add( mi );
-            mi= new JMenuItem( new AbstractAction("comment block") {
+            mi= new JMenuItem( new AbstractAction("Comment Block") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
@@ -478,7 +478,7 @@ public class EditorContextMenu {
             mi.setToolTipText("comment the selected block of lines");
             actionsMenu.add( mi );
             
-            mi= new JMenuItem( new AbstractAction("uncomment block") {
+            mi= new JMenuItem( new AbstractAction("Uncomment Block") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
@@ -500,7 +500,7 @@ public class EditorContextMenu {
 
             menu.add( actionsMenu );
 
-            mi= new JMenuItem( new AbstractAction("show usages") {
+            mi= new JMenuItem( new AbstractAction("Show Usages") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);  
@@ -550,7 +550,7 @@ public class EditorContextMenu {
             mi.setToolTipText("Pick Font for editor");
             settingsMenu.add( mi );
 
-            mi = new JMenuItem(new AbstractAction("Keyboard shortcuts...") {
+            mi = new JMenuItem(new AbstractAction("Keyboard Shortcuts...") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);
