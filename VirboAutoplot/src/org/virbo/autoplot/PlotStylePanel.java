@@ -529,6 +529,8 @@ public class PlotStylePanel extends javax.swing.JPanel {
 
         plotPanelLayout.linkSize(new java.awt.Component[] {backgroundColorButton, foregroundColorButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
+        plotPanelLayout.linkSize(new java.awt.Component[] {heightTextField, widthTextField}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         plotPanelLayout.setVerticalGroup(
             plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(plotPanelLayout.createSequentialGroup()
