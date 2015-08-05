@@ -12,7 +12,8 @@
 package org.virbo.autoplot;
 
 /**
- *
+ * Dialog for adjusting the canvas size.  Note this control also appears on
+ * the style tab.
  * @author jbf
  */
 public class CanvasSizePanel extends javax.swing.JPanel {
@@ -22,8 +23,20 @@ public class CanvasSizePanel extends javax.swing.JPanel {
         initComponents();
         heightTextField.setValue( 100 );
         widthTextField.setValue( 100 );
+        updateSizeEnabled();
     }
 
+    /**
+     * jbf: I don't why I'm having to call this from outside...
+     */
+    protected void updateSizeEnabled() { 
+        boolean s = fixedRadioButton.isSelected();
+        widthTextField.setEnabled(s);
+        heightTextField.setEnabled(s);
+        widthLabel.setEnabled(s);
+        heightLabel.setEnabled(s);        
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -37,33 +50,78 @@ public class CanvasSizePanel extends javax.swing.JPanel {
         buttonGroup1 = new javax.swing.ButtonGroup();
         resizeRadioButton = new javax.swing.JRadioButton();
         fixedRadioButton = new javax.swing.JRadioButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        widthLabel = new javax.swing.JLabel();
         widthTextField = new javax.swing.JFormattedTextField();
         heightTextField = new javax.swing.JFormattedTextField();
+        heightLabel = new javax.swing.JLabel();
 
         buttonGroup1.add(resizeRadioButton);
-        resizeRadioButton.setText("Resize to Fit");
+        resizeRadioButton.setSelected(true);
+        resizeRadioButton.setText("Adjust to Fit into Application");
+        resizeRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resizeRadioButtonActionPerformed(evt);
+            }
+        });
 
         buttonGroup1.add(fixedRadioButton);
-        fixedRadioButton.setSelected(true);
         fixedRadioButton.setText("Fixed Size");
+        fixedRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fixedRadioButtonActionPerformed(evt);
+            }
+        });
 
-        jLabel1.setText("Width:");
-
-        jLabel2.setText("Height:");
+        widthLabel.setText("Width (px):");
+        widthLabel.setEnabled(false);
 
         widthTextField.setText("100");
+        widthTextField.setEnabled(false);
         widthTextField.setFocusLostBehavior(javax.swing.JFormattedTextField.COMMIT);
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, fixedRadioButton, org.jdesktop.beansbinding.ELProperty.create("${selected}"), widthTextField, org.jdesktop.beansbinding.BeanProperty.create("editable"));
         bindingGroup.addBinding(binding);
 
         heightTextField.setText("100");
+        heightTextField.setEnabled(false);
         heightTextField.setFocusLostBehavior(javax.swing.JFormattedTextField.COMMIT);
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, fixedRadioButton, org.jdesktop.beansbinding.ELProperty.create("${selected}"), heightTextField, org.jdesktop.beansbinding.BeanProperty.create("editable"));
         bindingGroup.addBinding(binding);
+
+        heightLabel.setText("Height (px):");
+        heightLabel.setEnabled(false);
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(widthLabel)
+                    .add(heightLabel))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(widthTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 63, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(heightTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 63, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel1Layout.linkSize(new java.awt.Component[] {heightTextField, widthTextField}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(widthLabel)
+                    .add(widthTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(heightLabel)
+                    .add(heightTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+        );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -72,26 +130,13 @@ public class CanvasSizePanel extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                        .add(fixedRadioButton)
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                            .add(24, 24, 24)
-                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                .add(jLabel1)
-                                .add(jLabel2))
-                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                                .add(layout.createSequentialGroup()
-                                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                    .add(heightTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE))
-                                .add(layout.createSequentialGroup()
-                                    .add(12, 12, 12)
-                                    .add(widthTextField)))))
+                    .add(layout.createSequentialGroup()
+                        .add(12, 12, 12)
+                        .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(fixedRadioButton)
                     .add(resizeRadioButton))
-                .addContainerGap(243, Short.MAX_VALUE))
+                .addContainerGap(107, Short.MAX_VALUE))
         );
-
-        layout.linkSize(new java.awt.Component[] {heightTextField, widthTextField}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
@@ -100,27 +145,30 @@ public class CanvasSizePanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(fixedRadioButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
-                    .add(widthTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel2)
-                    .add(heightTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(50, Short.MAX_VALUE))
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(52, 52, 52))
         );
 
         bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void fixedRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fixedRadioButtonActionPerformed
+        updateSizeEnabled();
+    }//GEN-LAST:event_fixedRadioButtonActionPerformed
+
+    private void resizeRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resizeRadioButtonActionPerformed
+        updateSizeEnabled();
+    }//GEN-LAST:event_resizeRadioButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton fixedRadioButton;
+    private javax.swing.JLabel heightLabel;
     private javax.swing.JFormattedTextField heightTextField;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JRadioButton resizeRadioButton;
+    private javax.swing.JLabel widthLabel;
     private javax.swing.JFormattedTextField widthTextField;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
