@@ -1,6 +1,7 @@
 
 package org.virbo.autoplot;
 
+import java.awt.Dimension;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.dataset.DataSet;
@@ -161,6 +162,7 @@ public class ScriptContext extends PyJavaInstance {
      *setApplication(sliceWindow)
      *plot( slice0(ds,0) ) 
      * </pre></blockquote>
+     * Windows with this name will be reused.
      * @param id an identifier
      * @return the AutoplotUI.
      */
@@ -175,6 +177,7 @@ public class ScriptContext extends PyJavaInstance {
         }
         if ( result==null ) {
             result= view.newApplication();
+            result.setApplicationName(id);
             apps.put(id,result);
             appLookup.put(result.applicationModel,result);
         }
@@ -255,11 +258,27 @@ public class ScriptContext extends PyJavaInstance {
      * @param width the width of the canvas
      * @param height the height of the canvas
      */
-    public static void setCanvasSize(int width, int height) {
+    public static void setCanvasSize( final int width, final int height) {
         maybeInitModel();
-        model.canvas.setSize(width, height);
-        model.getDocumentModel().getCanvases(0).setSize(width,height);
-        model.waitUntilIdle(); 
+        Runnable run= new Runnable() {
+            public void run() {
+                if ( view!=null ) view.resizeForCanvasSize(width,height);
+                //model.waitUntilIdle();
+                model.canvas.setSize(new Dimension(width, height));
+                model.getDocumentModel().getCanvases(0).setSize(width,height);
+            }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }                
     }
 
     /**
