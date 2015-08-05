@@ -5,6 +5,7 @@
 
 package org.virbo.autoplot.dom;
 
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,6 +71,9 @@ public class Canvas extends DomNode {
     public void setSize( int width, int height ) {
         int oldWidth= this.width;
         int oldHeight= this.height;
+        if ( this.controller!=null ) {
+            this.controller.dasCanvas.setSize( new Dimension(width,height) );
+        }
         if ( width!=oldWidth ) {
             this.width= width;
         }
