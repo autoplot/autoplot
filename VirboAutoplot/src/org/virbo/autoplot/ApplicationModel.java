@@ -412,11 +412,11 @@ public class ApplicationModel {
                             params.put("timeRange", params.remove("timerange") );
                         }
                         params.put("PWD",split.path);
-                        doOpen(openable, params);
+                        doOpenVap(openable, params);
                     } else {
                         LinkedHashMap<String, String> params = new LinkedHashMap();
                         params.put("PWD",split.path);
-                        doOpen(openable, params);
+                        doOpenVap(openable, params);
                     }
                     mon.setProgressMessage("done loading vap file");
                     mon.finished();
@@ -1156,7 +1156,17 @@ public class ApplicationModel {
         }
     }
 
-    public void doOpen( File f, LinkedHashMap<String, String> deltas) throws IOException {
+    /**
+     * Load the vap file at f, apply additional modifications to the DOM, then
+     * sync the application to this.  Deltas with names in all caps (e.g. PWD or FILE) 
+     * will be applied to the vap, looking for %{PWD} or %{FILE}:
+     * <li>PWD will be set to the current working directory of the vap file.
+     * @param f a .vap file.
+     * @param deltas list property name, property value pairs to apply to the
+     *   vap DOM after it's loaded.  
+     * @throws java.io.IOException
+     */
+    public void doOpenVap( File f, LinkedHashMap<String, String> deltas) throws IOException {
         if ( !f.exists() ) throw new IllegalArgumentException("no such file: "+f);
         if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
 
@@ -1164,7 +1174,7 @@ public class ApplicationModel {
         try {
             in= new FileInputStream(f);
 
-            doOpen( in,deltas );
+            doOpenVap( in,deltas );
 
             setVapFile( f.toString() );
             
@@ -1197,7 +1207,7 @@ public class ApplicationModel {
      *   vap DOM after it's loaded.  
      * @throws java.io.IOException
      */
-    public void doOpen( InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
+    public void doOpenVap( InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
 
         Application state = (Application) StatePersistence.restoreState(in);
         makeValid( state );
@@ -1291,7 +1301,7 @@ public class ApplicationModel {
     }
 
     void doOpen(File f) throws IOException {
-        doOpen(f,null);
+        doOpenVap(f,null);
     }
 
     protected String vapFile = null;
