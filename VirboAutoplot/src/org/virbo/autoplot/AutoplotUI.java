@@ -3446,6 +3446,8 @@ private void canvasSizeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     org.das2.util.LoggerManager.logGuiEvent(evt);
     CanvasSizePanel p= new CanvasSizePanel();
     p.getResizeRadioButton().setSelected( dom.getCanvases(0).isFitted() );
+    p.getFixedRadioButton().setSelected( !dom.getCanvases(0).isFitted() ); // ???
+    p.updateSizeEnabled(); // ???
     p.getHeightTextField().setValue( dom.getCanvases(0).getHeight() );
     p.getWidthTextField().setValue( dom.getCanvases(0).getWidth() );
     if ( JOptionPane.showConfirmDialog( this,p,"Set Canvas Size",JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
