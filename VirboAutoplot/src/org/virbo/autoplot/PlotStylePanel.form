@@ -76,7 +76,7 @@
                               <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Component id="fontLabel" min="-2" pref="191" max="-2" attributes="0"/>
-                              <EmptySpace pref="31" max="32767" attributes="1"/>
+                              <EmptySpace pref="21" max="32767" attributes="1"/>
                               <Component id="pickFontButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
@@ -122,19 +122,14 @@
                                   <Component id="widthLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="heightLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="heightTextField" linkSize="4" pref="63" max="32767" attributes="1"/>
-                                  </Group>
-                                  <Group type="102" alignment="0" attributes="1">
-                                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
-                                      <Component id="widthTextField" linkSize="4" max="32767" attributes="1"/>
-                                  </Group>
+                                  <Component id="heightTextField" linkSize="4" alignment="0" pref="63" max="32767" attributes="1"/>
+                                  <Component id="widthTextField" linkSize="4" alignment="0" max="32767" attributes="1"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
                                       <Component id="unitsCB" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                                   </Group>
@@ -189,7 +184,7 @@
                           <Component id="heightTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="unitsCB" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="46" max="32767" attributes="0"/>
+                      <EmptySpace pref="30" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
