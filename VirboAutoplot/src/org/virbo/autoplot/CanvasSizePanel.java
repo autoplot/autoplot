@@ -16,7 +16,7 @@ package org.virbo.autoplot;
  * the style tab.
  * @author jbf
  */
-public class CanvasSizePanel extends javax.swing.JPanel {
+public final class CanvasSizePanel extends javax.swing.JPanel {
 
     /** Creates new form CanvasSizePanel */
     public CanvasSizePanel( ) {
