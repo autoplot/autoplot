@@ -658,7 +658,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                         } else {
                             in = DataSetURI.getInputStream( DataSetURI.toUri( vapfile ), new NullProgressMonitor() );
                         }
-                        applicationModel.doOpen( in, null );
+                        applicationModel.doOpenVap( in, null );
                     } catch ( IOException ex ) {
                         JOptionPane.showMessageDialog( AutoplotUI.this, "Unable to load: \n"+vapfile+"\n"+ex );
                     } finally {
@@ -1937,8 +1937,10 @@ APSplash.checkTime("init 52.9");
         Dimension dout= parentToAdjust.getSize();
         Dimension din= this.applicationModel.getCanvas().getSize();
 
-        dout.width= dout.width + (  w - din.width );
-        dout.height= dout.height + ( h - din.height );
+        if ( this.applicationModel.dom.getCanvases(0).isFitted() ) {
+            dout.width= dout.width + (  w - din.width );
+            dout.height= dout.height + ( h - din.height );
+        }
 
         //GraphicsConfiguration gc= getGraphicsConfiguration();
         //Dimension screenSize = gc.getBounds().getSize();
@@ -1946,16 +1948,18 @@ APSplash.checkTime("init 52.9");
 
         double scale= 1.0;
 
+        boolean oldFitted= this.applicationModel.dom.getCanvases(0).isFitted();
+
         if ( w<640 || h<480 ) {
             this.applicationModel.dom.getCanvases(0).setFitted(false);
-            setStatus("warning: canvas is no longer fitted, see options->plot style->canvas size");
             this.applicationModel.dom.getCanvases(0).setHeight(h);
             this.applicationModel.dom.getCanvases(0).setWidth(w);
             
         } else if ( dout.width>screenSize.getWidth() || dout.height>screenSize.getHeight() ) {
 
             String[] options= new String[] { "Scale to fit display", "Use scrollbars" };
-            int i= JOptionPane.showOptionDialog( this, "Canvas size doesn't fit well on this display.", "Incompatible Canvas Size", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE, ERROR_ICON,
+            int i= JOptionPane.showOptionDialog( this, "Canvas size doesn't fit well on this display.", "Incompatible Canvas Size", 
+                    JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE, ERROR_ICON,
                     options, options[1] );
             if ( i!= JOptionPane.CLOSED_OPTION ) {
                 if ( i==0 ) {
@@ -1974,9 +1978,8 @@ APSplash.checkTime("init 52.9");
                     //this.applicationModel.dom.getCanvases(0).setFont(newFont.toString());
                     parentToAdjust.setSize( nw + (  w - din.width ) , nh + ( h - din.height ) );
 
-                } else if ( i==1 ) {
+                } else if ( i==1 ) { // scrollbars option.
                     this.applicationModel.dom.getCanvases(0).setFitted(false);
-                    setStatus("warning: canvas is no longer fitted, see options->plot style->canvas size");
                     this.applicationModel.dom.getCanvases(0).setHeight(h);
                     this.applicationModel.dom.getCanvases(0).setWidth(w);
                 }
@@ -1987,10 +1990,14 @@ APSplash.checkTime("init 52.9");
             if ( parentToAdjust.getSize().getWidth()!=dout.width ) {
                 this.applicationModel.dom.getCanvases(0).setFitted(false);
                 setStatus("warning: unable to resize to requested size, using scrollbars.");
-                this.applicationModel.dom.getCanvases(0).setHeight(h);
-                this.applicationModel.dom.getCanvases(0).setWidth(w);
             }
+            this.applicationModel.dom.getCanvases(0).setHeight(h);
+            this.applicationModel.dom.getCanvases(0).setWidth(w);
         }
+        if ( oldFitted==true && this.applicationModel.dom.getCanvases(0).isFitted()==false ) {
+            setStatus("warning: canvas is no longer fitted, see options->plot style->canvas size");
+        }
+
         return scale;
     }
 
