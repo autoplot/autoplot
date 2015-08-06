@@ -80,4 +80,22 @@ public class Util
            tf.setOpaque(false);
            tf.setBorder(null );
        }
+       
+    /**
+     * enable or disable all the components in a container.  
+     * Thanks to http://stackoverflow.com/questions/10985734/java-swing-enabling-disabling-all-components-in-jpanel
+     * @param container the container
+     * @param enabled true to enable, false to disable
+     * @param exclude null, or a component to exclude.
+     */
+    public static void enableComponents( Container container, boolean enabled, Component exclude ) {
+       Component[] components = container.getComponents();
+       for (Component component : components) {
+           if ( component==exclude ) continue;
+           component.setEnabled(enabled);
+           if (component instanceof Container) {
+               enableComponents((Container)component, enabled,exclude);
+           }
+       }
+    }
 }
