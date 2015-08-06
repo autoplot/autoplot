@@ -45,6 +45,7 @@ import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.datum.InconvertibleUnitsException;
+import org.das2.util.AboutUtil;
 import org.das2.util.awt.SvgGraphicsOutput;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
@@ -250,7 +251,7 @@ public class ScriptContext extends PyJavaInstance {
     public static void _setOutputStream(OutputStream out) {
         ScriptContext.out = out;
     }
-
+    
     /**
      * set the size of the canvas.  This is only used when the GUI is not used, and in
      * headless mode, otherwise the GUI controls the size of the canvas.
@@ -640,6 +641,8 @@ public class ScriptContext extends PyJavaInstance {
      *  the container.  Use writeToPng( filename, width, height ) instead for now.
      *  See writeToPdf(String filename), which appears to have a fix for this that
      *  would affect how this is resolved.
+     * Note for relative references, this will use the Java process present working directory (PWD) instead
+     * of the PWD variable found in scripts
      * @param filename The name of a local file
      * @throws java.io.IOException
      */
@@ -676,6 +679,8 @@ public class ScriptContext extends PyJavaInstance {
      *  the container.  User writeToPng( filename, width, height ) instead for now.
      *  See writeToPdf(String filename), which appears to have a fix for this that
      *  would affect how this is resolved.
+     * Note for relative references, this will use the Java process present working directory (PWD) instead
+     * of the PWD variable found in scripts
      * @param filename The name of a local file
      * @param width the width in pixels of the png
      * @param height the height in pixels of the png
@@ -710,7 +715,7 @@ public class ScriptContext extends PyJavaInstance {
         waitUntilIdle();
         
         maybeMakeParent(filename);
-
+        
         final FileOutputStream out1 = new FileOutputStream(filename);
 
         DasPNGEncoder encoder = new DasPNGEncoder();
@@ -758,6 +763,8 @@ public class ScriptContext extends PyJavaInstance {
     
     /**
      * write out the current canvas to a svg file.
+     * Note for relative references, this will use the Java process present working directory (PWD) instead
+     * of the PWD variable found in scripts
      * @param filename the local file to write the file.
      * @throws java.io.IOException
      */    
@@ -801,6 +808,8 @@ public class ScriptContext extends PyJavaInstance {
      * write out the current canvas to a pdf file.
      * TODO: this has issues with the size.  See writeToPng(filename).  It looks
      *   like this might be handled here
+     * Note for relative references, this will use the Java process present working directory (PWD) instead
+     * of the PWD variable found in scripts
      * @param filename the local file to write the file.
      * @throws java.io.IOException
      */
