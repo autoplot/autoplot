@@ -21,8 +21,18 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-07-29 r17143):</p>
+        <p>Bugfixes (2015-08-06 r17202):</p>
         <ul>
+            <li>1439: add "delete selected items" to edit menu of DataPointRecorder<li>
+            <li>bugfix: Kristoff demonstrated that embed data doesn't work when the file came via http.</li>
+            <li>1442-6: camelCase for the plotx command.</li>
+            <li>1442-7 symbolSize instead of symSize</li>
+            <li>1442-10:  height and width boxes on mac</li>
+            <li>resizeForCanvasSize didn't consider that the canvas may already be disconnected from the application</li>
+            <li>1433: Kristoff pointed out that when records contain fill or are not long enough for the interval, then the ytags would be left with a different length.</li>
+            <li>bugfixes with rich ascii.</li>
+            <li>1088: clip off the extra stuff when we do completions in the middle of a parameter.</li>
+            <li>tolerate mixed case DISPLAY_TYPE metadata in CDF files.</li>
             <li>1434: metadata propagation through operators is inconsistent, inconvenient </li>
             <li>1433: allow waveform cadence to change in fftPower.</li>
             <li>1432: list of list to declare double arrays (and rank 2 datasets) in Jython.</li>
@@ -158,6 +168,12 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>embed data found in data sources that does not have a URI ("vap+internal:")</li>
+            <li>opposite property for axes.</li>
+            <li>support $x/$Y_$m for file storage models </li>
+            <li>rfe 439: Need standard method for getting a second Autoplot app in a script.</li>
+            <li>avoid filesystem completions with  inline, cdaweb, or pdsppi.</li>
+            <li>completions are working somewhat with vap+inline.</li>
             <li>within parameter added to CDF</li>
             <li> plotx command legendLabel named parameter added.</li>
             <li> plotx linestyle added.</li>
