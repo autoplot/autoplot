@@ -64,9 +64,9 @@ public class PlotCommand extends PyObject {
             + " <tr><td> renderType  </td><td> explcitly set the render type, to scatter, series, nnSpectrogram, digital, etc\n</td></tr>"
             + " <tr><td> color      </td><td> the line colors.\n</td></tr>"
             + " <tr><td> fillColor   </td><td>the color when filling volumes.\n</td></tr>"
-            + " <tr><td> symsize     </td><td>set the point (pixel) size\n</td></tr>"
-            + " <tr><td> linewidth   </td><td>the line thickness in points (pixels)\n</td></tr>"
-            + " <tr><td> linestyle   </td><td>the line style, one of solid,none,dotfine,dashfine</td></tr>"
+            + " <tr><td> symbolSize     </td><td>set the point (pixel) size\n</td></tr>"
+            + " <tr><td> lineWidth   </td><td>the line thickness in points (pixels)\n</td></tr>"
+            + " <tr><td> lineStyle   </td><td>the line style, one of solid,none,dotfine,dashfine</td></tr>"
             + " <tr><td> symbol      </td><td>the symbol, e.g. dots triangles cross\n</td></tr>"
             + " <tr><td> isotropic   </td><td>constrain the ratio between the x and y axes.\n</td></tr>"
             + " <tr><td> legendLabel </td><td>add label to the legend</td></tr>"
@@ -152,6 +152,7 @@ public class PlotCommand extends PyObject {
             "renderType",
             "color", "fillColor",
             "symbolSize","lineWidth","lineStyle",
+            "symsize","linewidth","linestyle",
             "legendLabel",
             "symbol",
             "isotropic", "xpos", "ypos"
@@ -164,6 +165,7 @@ public class PlotCommand extends PyObject {
             Py.None,
             Py.None,
             Py.None,Py.None,
+            Py.None,Py.None,Py.None,
             Py.None,Py.None,Py.None,
             Py.None,
             Py.None,
