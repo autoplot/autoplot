@@ -227,20 +227,27 @@ public class EmbedDataExperiment {
                 } else if ( uri.equals("vap+internal:") ) {
                     QDataSet ds= datasets[dsfCount];
                     logger.log(Level.FINE, "automatically embedding internal data as qds: {0}", ds);
+                    File tmpFile= File.createTempFile("autoplot", ".qds");
                     String fname= "internal/data"+nameGenCount+".qds";
                     SimpleStreamFormatter ff= new SimpleStreamFormatter();
-                    PipedOutputStream pout= new PipedOutputStream();
-                    PipedInputStream pin= new PipedInputStream(pout);
+                    //PipedOutputStream pout= new PipedOutputStream();
+                    //PipedInputStream pin= new PipedInputStream(pout);
+                    OutputStream pout= new FileOutputStream(tmpFile);
+                    InputStream pin=null;
                     try {
                         ff.format( ds, pout, true);
                         pout.close();
+                        pin= new FileInputStream(tmpFile);
                         writeToZip( out, fname, pin );
+                        if ( !tmpFile.delete() ) {
+                            logger.warning("unable to delete temp file: "+tmpFile);
+                        }
                         dsf.setUri( "%{PWD}/"+fname);
                     } catch ( StreamException ex ) {
                         logger.log( Level.WARNING, null, ex );
                     } finally {
                         pout.close();
-                        pin.close();
+                        if ( pin!=null ) pin.close();
                     }
                     nameGenCount++;
                 }
