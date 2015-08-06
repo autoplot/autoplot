@@ -142,7 +142,7 @@ public class PlotCommand extends PyObject {
 
         PyObject False= Py.newBoolean(false);
 
-        FunctionSupport fs= new FunctionSupport( "plotx", 
+        FunctionSupport fs= new FunctionSupport( "plot", 
             new String[] { "x", "y", "z",
             "xtitle", "xrange",
             "ytitle", "yrange",
@@ -151,7 +151,7 @@ public class PlotCommand extends PyObject {
             "title",
             "renderType",
             "color", "fillColor",
-            "symsize","linewidth","linestyle",
+            "symbolSize","lineWidth","lineStyle",
             "legendLabel",
             "symbol",
             "isotropic", "xpos", "ypos"
@@ -334,11 +334,11 @@ public class PlotCommand extends PyObject {
                     }
                 } else if ( kw.equals("title") ) {
                     plot.setTitle(sval);
-                } else if ( kw.equals("symsize") ) {
+                } else if ( kw.equals("symsize") || kw.equals("symbolSize") ) {
                     elements.get(0).getStyle().setSymbolSize( Double.valueOf(sval) );
-                } else if ( kw.equals("linewidth") ) {
+                } else if ( kw.equals("linewidth" ) || kw.equals("lineWidth") ) {
                     elements.get(0).getStyle().setLineWidth( Double.valueOf(sval) );
-                } else if ( kw.equals("linestyle") ) {
+                } else if ( kw.equals("linestyle") || kw.equals("lineStyle") ) {
                     PsymConnector p= (PsymConnector) ClassMap.getEnumElement( PsymConnector.class, sval );
                     elements.get(0).getStyle().setSymbolConnector( p );
                 } else if ( kw.equals("symbol") ) {
