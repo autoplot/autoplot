@@ -235,7 +235,7 @@ public class EmbedDataExperiment {
                     OutputStream pout= new FileOutputStream(tmpFile);
                     InputStream pin=null;
                     try {
-                        ff.format( ds, pout, true);
+                        ff.format( ds, pout, false );
                         pout.close();
                         pin= new FileInputStream(tmpFile);
                         writeToZip( out, fname, pin );
