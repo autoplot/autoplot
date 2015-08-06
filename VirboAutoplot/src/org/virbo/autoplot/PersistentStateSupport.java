@@ -292,6 +292,10 @@ public class PersistentStateSupport {
             public void run() {
                 try {
                     File f= file;
+                    if ( component instanceof AutoplotUI ) {
+                        ((AutoplotUI)component).setStatus("busy: writing to "+file);
+                    }
+                    
                     if ( embedData ) {
                         if ( !f.getName().endsWith("zip") ) f= new File( f.getPath()+"zip" );                        
                     } else {
@@ -325,6 +329,9 @@ public class PersistentStateSupport {
                     prefs.put( DataSetSelectorSupport.PREF_LAST_OPEN_VAP_FOLDER, new File( getCurrentFile() ).getParent() );
                     setSaving( false );
                     setDirty( false );
+                    if ( component instanceof AutoplotUI ) {
+                        ((AutoplotUI)component).setStatus("wrote "+file);
+                    }
                     update();
                 } catch ( IOException ex ) {
                     String mess;
