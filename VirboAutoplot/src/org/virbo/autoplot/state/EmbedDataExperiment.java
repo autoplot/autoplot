@@ -135,6 +135,7 @@ public class EmbedDataExperiment {
     
     /**
      * return a list of all the resources used in the DOM.
+     * TODO: this might run a script to resolve the resources it loads.
      * @param dom
      * @return 
      */
@@ -171,6 +172,24 @@ public class EmbedDataExperiment {
     }
     
     /**
+     * make a relative name from the resource URI.  This should not contain
+     * the "vap+cdf:" part!
+     * @param uri the resource location, like "http://autoplot.org/data/autoplot.cdf"
+     * @return the name, like "http/autoplot.org/data/autoplot.cdf"
+     */
+    private static String makeRelativeName( URI uri ) {
+        String name;
+        if ( uri.getScheme().equals("file")) {
+           name= uri.toString().replaceAll(":///","/");
+           name= name.replaceAll(":/", "/" );
+        } else {
+           name= uri.toString().replaceAll("://","/");     
+        }   
+        name= name.replaceAll("//","/");
+        return name;
+    }
+    
+    /**
      * save the application, but embed data file resources within the 
      * zip, along with the .vap.  The vap is saved with the name default.vap.
      * When the data source contains a dataset that was created internally (with
@@ -197,14 +216,7 @@ public class EmbedDataExperiment {
         try {
             out= new ZipOutputStream( fout );
             for ( URI uri: getResources(dom) ) {
-                String name;
-                if ( uri.getScheme().equals("file")) {
-                   name= uri.toString().replaceAll(":///","/");
-                   name= name.replaceAll(":/", "/" );
-                } else {
-                   name= uri.toString().replaceAll("://","/");     
-                }
-                name= name.replaceAll("//","/");
+                String name= makeRelativeName(uri);
                 File file1= DataSetURI.getFile(uri,new NullProgressMonitor());
                 writeToZip( out, name, file1 );
             }
@@ -213,15 +225,8 @@ public class EmbedDataExperiment {
             for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
                 String uri = dsf.getUri();
                 URISplit split= URISplit.parse(uri);
-                if ( split.resourceUri!=null && !split.vapScheme.equals("vap+jyds") ) {
-                    String name;
-                    if ( split.resourceUri.getScheme().equals("file")) {
-                        name= split.resourceUri.toString().replaceAll(":///","/");
-                        name= name.replaceAll(":/", "/" );
-                    } else {
-                        name= uri.replaceAll("://","/");  
-                    }
-                    name= name.replaceAll("//","/");
+                if ( split.resourceUri!=null ) {
+                    String name= makeRelativeName(split.resourceUri);
                     split.file= "%{PWD}/"+name;
                     dsf.setUri( URISplit.format(split) );
                 } else if ( uri.equals("vap+internal:") ) {
@@ -240,7 +245,7 @@ public class EmbedDataExperiment {
                         pin= new FileInputStream(tmpFile);
                         writeToZip( out, fname, pin );
                         if ( !tmpFile.delete() ) {
-                            logger.warning("unable to delete temp file: "+tmpFile);
+                            logger.log(Level.WARNING, "unable to delete temp file: {0}", tmpFile);
                         }
                         dsf.setUri( "%{PWD}/"+fname);
                     } catch ( StreamException ex ) {
