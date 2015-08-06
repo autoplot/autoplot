@@ -242,6 +242,7 @@ public class EmbedDataExperiment {
                         pout.close();
                         pin.close();
                     }
+                    nameGenCount++;
                 }
                 dsfCount++;
             }
