@@ -289,7 +289,7 @@
                   <Connection code="createToolAction( &quot;guessTimeFormat&quot;, Tool.GUESSTIMEFORMAT )" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Guess"/>
-                <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Scan the selected columns and try to identify field types.&lt;br&gt; This uses the number of digits in each field to identify the type&lt;br&gt; (e.g. 3 digits implies day of year), so select the cells accordingly.&lt;/html&gt;"/>
+                <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;This will scan the selected columns and try to identify field types.&lt;br&gt; This uses the number of digits in each field to identify the type&lt;br&gt; (e.g. 3 digits implies day of year), so select the cells accordingly.&lt;/html&gt;"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="guessTimeFormatToggleButtonActionPerformed"/>

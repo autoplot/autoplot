@@ -5,6 +5,8 @@
  */
 package org.virbo.ascii;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.event.MouseEvent;
 import java.net.URISyntaxException;
 import org.virbo.datasource.ui.TableRowHeader;
@@ -49,6 +51,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.ui.Util;
 import org.virbo.dsutil.AsciiHeadersParser;
 import org.virbo.dsutil.AsciiParser;
 import org.virbo.dsutil.AutoHistogram;
@@ -82,14 +85,21 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
     JToggleButton currentToolButton;
 
     Action createToolAction(final String label, final Tool t) {
+        assert ( t!=Tool.NONE );
         return new AbstractAction(label) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if ( e.getSource() instanceof JToggleButton ) {
+                    if ( currentTool!=Tool.NONE ) {
+                        clearTool();
+                        return;
+                    }
                     if ( jTable1.getSelectionModel().isSelectionEmpty() ) {
                         jTable1.getSelectionModel().clearSelection();
                         jTable1.getColumnModel().getSelectionModel().clearSelection();
                         currentToolButton= ( JToggleButton ) e.getSource();
+                        Util.enableComponents( (Container)jTabbedPane1.getSelectedComponent(), false, (Component)e.getSource() );
+                        jTabbedPane1.setEnabled(false);
                         currentTool = t;
                     } else {
                         currentToolButton= ( JToggleButton ) e.getSource();
@@ -281,6 +291,10 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     private void clearTool() {
         if ( currentTool!=Tool.NONE ) {
+            if ( !jTabbedPane1.isEnabled() ) {
+                jTabbedPane1.setEnabled(true);
+                Util.enableComponents( (Container)jTabbedPane1.getSelectedComponent(), true, null );
+            }
             currentTool = Tool.NONE;
             currentToolButton.setSelected(false);
             currentToolButton = null;
@@ -445,7 +459,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         guessTimeFormatToggleButton.setAction(createToolAction( "guessTimeFormat", Tool.GUESSTIMEFORMAT ));
         guessTimeFormatToggleButton.setText("Guess");
-        guessTimeFormatToggleButton.setToolTipText("<html>Scan the selected columns and try to identify field types.<br> This uses the number of digits in each field to identify the type<br> (e.g. 3 digits implies day of year), so select the cells accordingly.</html>");
+        guessTimeFormatToggleButton.setToolTipText("<html>This will scan the selected columns and try to identify field types.<br> This uses the number of digits in each field to identify the type<br> (e.g. 3 digits implies day of year), so select the cells accordingly.</html>");
         guessTimeFormatToggleButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 guessTimeFormatToggleButtonActionPerformed(evt);
