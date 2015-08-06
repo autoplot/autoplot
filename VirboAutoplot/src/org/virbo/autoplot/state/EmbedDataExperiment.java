@@ -9,12 +9,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -26,8 +31,12 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.URISplit;
+import org.virbo.qstream.SimpleStreamFormatter;
+import org.virbo.qstream.StreamException;
+import org.virbo.qstream.StreamTool;
 
 /**
  * Embed data and vap in a zip file.  Now that we have PWD, this will
@@ -43,6 +52,26 @@ public class EmbedDataExperiment {
         FileChannel ic=null;
         try {
             ic = new FileInputStream(f).getChannel();
+            out.putNextEntry(e);
+
+            byte[] bbuf= new byte[2048];
+            ByteBuffer buf= ByteBuffer.wrap(bbuf);
+            int c;
+            while ( (c=ic.read(buf))>0 ) {
+                out.write( bbuf, 0, c);
+                buf.flip();
+            }
+            out.closeEntry();
+        } finally {
+            if ( ic!=null ) ic.close();
+        }
+    }
+    
+    private static void writeToZip( ZipOutputStream out, String name, InputStream in ) throws FileNotFoundException, IOException {
+        ZipEntry e= new ZipEntry( name ) ;
+        ReadableByteChannel ic=null;
+        try {
+            ic = Channels.newChannel(in);
             out.putNextEntry(e);
 
             byte[] bbuf= new byte[2048];
@@ -144,6 +173,9 @@ public class EmbedDataExperiment {
     /**
      * save the application, but embed data file resources within the 
      * zip, along with the .vap.  The vap is saved with the name default.vap.
+     * When the data source contains a dataset that was created internally (with
+     * the plot command for example), it will be formatted as a qds and 
+     * embedded within the vap.
      * 
      * @param dom3 the state to save.
      * @param f the zip file output name.
@@ -153,6 +185,12 @@ public class EmbedDataExperiment {
     public static void save( Application dom3, File f ) throws FileNotFoundException, IOException {
         // too bad I have to do this...  but it doesn't work otherwise...
         Application dom = dom3.getController().getApplicationModel().createState(false);
+        QDataSet[] datasets= new QDataSet[dom.getDataSourceFilters().length];
+        for ( int i=0; i<datasets.length; i++ ) {
+            if ( dom3.getDataSourceFilters(i).getUri().equals("vap+internal:") ) {
+                datasets[i]= dom3.getDataSourceFilters(i).getController().getDataSet();
+            }
+        }
 
         FileOutputStream fout= new FileOutputStream(f);
         ZipOutputStream out=null;
@@ -170,10 +208,12 @@ public class EmbedDataExperiment {
                 File file1= DataSetURI.getFile(uri,new NullProgressMonitor());
                 writeToZip( out, name, file1 );
             }
+            int nameGenCount= 0; // for automatically named data files.
+            int dsfCount= 0;
             for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
                 String uri = dsf.getUri();
                 URISplit split= URISplit.parse(uri);
-                if ( split.resourceUri!=null ) {
+                if ( split.resourceUri!=null && !split.vapScheme.equals("vap+jyds") ) {
                     String name;
                     if ( split.resourceUri.getScheme().equals("file")) {
                         name= split.resourceUri.toString().replaceAll(":///","/");
@@ -184,7 +224,26 @@ public class EmbedDataExperiment {
                     name= name.replaceAll("//","/");
                     split.file= "%{PWD}/"+name;
                     dsf.setUri( URISplit.format(split) );
+                } else if ( uri.equals("vap+internal:") ) {
+                    QDataSet ds= datasets[dsfCount];
+                    logger.log(Level.FINE, "automatically embedding internal data as qds: {0}", ds);
+                    String fname= "internal/data"+nameGenCount+".qds";
+                    SimpleStreamFormatter ff= new SimpleStreamFormatter();
+                    PipedOutputStream pout= new PipedOutputStream();
+                    PipedInputStream pin= new PipedInputStream(pout);
+                    try {
+                        ff.format( ds, pout, true);
+                        pout.close();
+                        writeToZip( out, fname, pin );
+                        dsf.setUri( "%{PWD}/"+fname);
+                    } catch ( StreamException ex ) {
+                        logger.log( Level.WARNING, null, ex );
+                    } finally {
+                        pout.close();
+                        pin.close();
+                    }
                 }
+                dsfCount++;
             }
             ZipEntry e= new ZipEntry("default.vap");
             out.putNextEntry(e);
