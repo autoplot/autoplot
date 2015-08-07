@@ -12,8 +12,11 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.LocalFileSystem;
@@ -25,7 +28,7 @@ import org.virbo.datasource.capability.Updating;
  */
 public class FilePollUpdating implements Updating {
 
-    private static final Logger logger= Logger.getLogger(LogNames.APDSS_UPDATING);
+    private static final Logger logger= LoggerManager.getLogger("apdss.updating"); 
     URI pollURI;
     FileSystem fs; // remote source of the file
     FileObject fo; // remote FileObject.
@@ -37,6 +40,8 @@ public class FilePollUpdating implements Updating {
     private final static int LIMIT_SHORT_REMOTE_CYCLE_PERIOD_SECONDS= 10; 
     boolean dirty= false; //true indicates the hash has changed and we need to clean.
     //boolean polling= false; //true indicates we are polling.    
+    
+    private static Map<Thread,URI> myThreads= new HashMap();
     
     public FilePollUpdating( URI uri, long pollCyclePeriodSeconds ) throws FileSystem.FileSystemOfflineException, UnknownHostException, FileNotFoundException {
         this.pollURI= uri;
@@ -94,7 +99,7 @@ public class FilePollUpdating implements Updating {
                     while ( dirHash!=0 ) {
                         logger.log(Level.FINEST, "polling..." );
                         try {
-                            Thread.sleep( pollCyclePeriodSeconds*1000 );
+                            Thread.sleep( pollCyclePeriodSeconds*1000 );  // there's a bug here, that we can't kill the thread for so many seconds.
                         } catch (InterruptedException ex) {
                             logger.log(Level.SEVERE, ex.getMessage(), ex);
                         }
@@ -108,9 +113,18 @@ public class FilePollUpdating implements Updating {
                             dirty= false;
                         }
                     }
+                    myThreads.remove( Thread.currentThread() );
                 }
             };
-            new Thread( run, "FillPollUpdating" ).start();
+            
+            if ( myThreads.size()<1000 ) {
+                Thread t= new Thread( run, "FilePollUpdating" );
+            
+                myThreads.put( t,pollURI );
+                t.start();
+            } else {
+                logger.warning("thread limit reached, FillPollUpdating fails.");
+            }
                 
     }
     
