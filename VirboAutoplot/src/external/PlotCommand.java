@@ -44,12 +44,13 @@ public class PlotCommand extends PyObject {
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
     
     public static PyString __doc__ =
-        new PyString("<html><H2>plot([pos],x,y,z,[named parameters])</H2>"
+        new PyString("<html><H2>plot([index],x,y,z,[named parameters])</H2>"
             + "plot (or plotx) plots the data or URI for data on the canvas.\n"
             + "<br><b>named parameters:</b>\n"
             + "<table>"
             + "<tr><td>xlog ylog zlog </td><td>explicitly set this axis to log (or linear when set equal to 0.).</td></tr>\n"
             + " <tr><td> xtitle ytitle ztitle  </td><td>set the label for the axis.</td></tr>\n"
+            + " <tr><td> index       </td><td>plot index\n</td></tr>"
             + " <tr><td> title       </td><td>title for the plot\n</td></tr>"
             + " <tr><td> renderType  </td><td> explcitly set the render type, to scatter, series, nnSpectrogram, digital, etc\n</td></tr>"
             + " <tr><td> color      </td><td> the line colors.\n</td></tr>"
@@ -104,7 +105,8 @@ public class PlotCommand extends PyObject {
             "symsize","linewidth","linestyle",
             "legendLabel",
             "symbol",
-            "isotropic", "xpos", "ypos"
+            "isotropic", "xpos", "ypos",
+            "index"
         },
         new PyObject[] { Py.None, Py.None,
             Py.None, Py.None,
@@ -118,7 +120,8 @@ public class PlotCommand extends PyObject {
             Py.None,Py.None,Py.None,
             Py.None,
             Py.None,
-            Py.None, Py.None, Py.None
+            Py.None, Py.None, Py.None,
+            Py.None
         } );
         
         fs.args( args, keywords );
@@ -135,6 +138,7 @@ public class PlotCommand extends PyObject {
 
         // If the first (zeroth) argument is an int, than this is the data source where the value should be inserted.  Additional
         // data sources and plots will be added until there are enough.
+        // this is an alias for the index argument.
         PyObject po0= args[0];
         if ( po0 instanceof PyInteger ) {
             iplot= ((PyInteger)po0).getValue();
@@ -164,8 +168,12 @@ public class PlotCommand extends PyObject {
                 String spec= args[i+nparm].toString();
                 row= dom.getCanvases(0).getController().maybeAddRow( spec );
                 if ( column==null ) column=dom.getCanvases(0).getMarginColumn();
+            } else if ( keywords[i].equals("index") ) {
+                int sindex= Integer.parseInt( args[i+nparm].toString() );
+                iplot= sindex;
             }
         }
+        
         if ( row!=null ) {
             assert column!=null;
             Plot p= null;
