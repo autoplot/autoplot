@@ -89,47 +89,6 @@ public class PlotCommand extends PyObject {
             }
         }
     }
-
-    /**
-     * get the color from the python object, for example:
-     * <ul>
-     * <li>Color.RED
-     * <li>16711680   (int for red)
-     * <li>16711680.  (float from QDataSet)
-     * <li>(255,0,0)
-     * <li>(1.0,0,0)
-     * </ul>
-     * @param val
-     * @return 
-     */
-    public static Color getColor( PyObject val ) {
-        Color c=null;
-        if (val.__tojava__(Color.class) != Py.NoConversion) {
-            c = (Color) val.__tojava__(Color.class);
-        } else if (val instanceof PyFloat) {
-            c = new Color((int) ((PyFloat) val).getValue());
-        } else if (val instanceof PyInteger) {
-            c = new Color(((PyInteger) val).getValue());
-        } else if (val instanceof PyQDataSet) {
-            c = new Color((int) ((PyQDataSet) val).getQDataSet().value());
-        } else if (val instanceof PyTuple) {
-            String sval= val.toString();
-            sval= sval.substring(1,sval.length()-1);
-            if (sval != null) {
-                c = Ops.colorFromString(sval);
-            } else {
-                throw new IllegalArgumentException("can't identify color");
-            }
-        } else {
-            String sval = (String) val.__str__().__tojava__(String.class);
-            if (sval != null) {
-                c = Ops.colorFromString(sval);
-            } else {
-                throw new IllegalArgumentException("can't identify color");
-            }
-        }
-        return c;
-    }
     
     /**
      * implement the python call.
@@ -289,51 +248,40 @@ public class PlotCommand extends PyObject {
                 if ( kw.equals("ytitle") ) {
                     plot.getYaxis().setLabel( sval);
                 } else if ( kw.equals("yrange") ) {
-                    DatumRange dr= plot.getYaxis().getRange();
-                    Units u= dr.getUnits();
-                    PyList plval= (PyList)val;
-                    if ( ((Number)plval.get(0)).doubleValue()<=0 ) {
+                    DatumRange newRange= JythonOps.datumRange(val);
+                    if ( plot.getYaxis().isLog() && newRange.min().doubleValue(newRange.getUnits())<0 ) {
                         plot.getYaxis().setLog(false);
                     }
-                    plot.getYaxis().setRange( DatumRange.newDatumRange( ((Number)plval.get(0)).doubleValue(),
-                           ((Number)plval.get(1)).doubleValue(), u ) );
+                    plot.getYaxis().setRange( newRange );
                 } else if ( kw.equals("ylog") ) {
                     plot.getYaxis().setLog( "1".equals(sval) );
                 } else if ( kw.equals("xtitle") ) {
                     plot.getXaxis().setLabel( sval);
                 } else if ( kw.equals("xrange") ) {
-                    DatumRange dr= plot.getXaxis().getRange();
-                    Units u= dr.getUnits();
-                    PyList plval= (PyList)val;
-                    if ( ((Number)plval.get(0)).doubleValue()<=0 ) {
+                    DatumRange newRange= JythonOps.datumRange(val);
+                    if ( plot.getXaxis().isLog() && newRange.min().doubleValue(newRange.getUnits())<0 ) {
                         plot.getXaxis().setLog(false);
                     }
-                    plot.getXaxis().setRange( DatumRange.newDatumRange( ((Number)plval.get(0)).doubleValue(),
-                           ((Number)plval.get(1)).doubleValue(), u ) );
+                    plot.getXaxis().setRange( newRange );
                 } else if ( kw.equals("xlog") ) {
                     plot.getXaxis().setLog( "1".equals(sval) );
                 } else if ( kw.equals("ztitle") ) {
                     plot.getZaxis().setLabel( sval);
                 } else if ( kw.equals("zrange") ) {
-                    DatumRange dr= plot.getZaxis().getRange();
-                    Units u= dr.getUnits();
-                    PyList plval= (PyList)val;
-                    if ( ((Number)plval.get(0)).doubleValue()<=0 ) {
+                    DatumRange newRange= JythonOps.datumRange(val);
+                    if ( plot.getZaxis().isLog() && newRange.min().doubleValue(newRange.getUnits())<0 ) {
                         plot.getZaxis().setLog(false);
                     }
-                    plot.getZaxis().setRange( DatumRange.newDatumRange( ((Number)plval.get(0)).doubleValue(),
-                           ((Number)plval.get(1)).doubleValue(), u ) );
+                    plot.getZaxis().setRange( newRange );
                 } else if ( kw.equals("zlog") ) {
                     plot.getZaxis().setLog( "1".equals(sval) );
                 } else if ( kw.equals("color" ) ) {
-                    Color c= getColor(val);
+                    Color c= JythonOps.color(val);
                     elements.get(0).getStyle().setColor( c );
                 } else if ( kw.equals("fillColor" ) ) { // because you can specify renderType=stairSteps, we need fillColor.
-                    if ( sval!=null ) {
-                       Color c;
-                       c= Ops.colorFromString( sval );
-                       elements.get(0).getStyle().setFillColor( c );
-                    }
+                    Color c;
+                    c= JythonOps.color(val);
+                    elements.get(0).getStyle().setFillColor( c );
                 } else if ( kw.equals("title") ) {
                     plot.setTitle(sval);
                 } else if ( kw.equals("symsize") || kw.equals("symbolSize") ) {
