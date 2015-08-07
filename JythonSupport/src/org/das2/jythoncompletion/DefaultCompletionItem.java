@@ -49,6 +49,9 @@ public class DefaultCompletionItem implements CompletionItem  {
      * @param sortPriority 1 is default.
      */
     public DefaultCompletionItem( String text, int offset, String complete, String label, String link, int sortPriority ) {
+        if ( complete.length()<offset ) {
+            throw new IllegalArgumentException("completion offset is less than length");
+        }
         this.text= text;
         this.offset= offset;
         this.complete= complete;
