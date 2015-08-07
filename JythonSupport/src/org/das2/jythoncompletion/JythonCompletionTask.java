@@ -132,6 +132,7 @@ public class JythonCompletionTask implements CompletionTask {
                 c= queryStringLiteralArgument(cc, arg0);
             } else if (cc.contextType.equals(CompletionContext.COMMAND_ARGUMENT)) {
                 c= queryCommandArgument(cc, arg0);
+                c+= queryNames(cc, arg0);
             }
         } catch ( BadLocationException ex ) {
             logger.log( Level.WARNING, null, ex );
@@ -154,6 +155,7 @@ public class JythonCompletionTask implements CompletionTask {
     }
 
     private int queryMethods(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
+        logger.fine("queryMethods");
         PythonInterpreter interp;
 
         interp = getInterpreter();
@@ -376,6 +378,7 @@ public class JythonCompletionTask implements CompletionTask {
      * @return the count
      */
     private int queryModules(CompletionContext cc, CompletionResultSet rs) {
+        logger.fine("queryModules");
         PythonInterpreter interp = getInterpreter();
 
         String eval = "targetComponents = '" + cc.contextString + "'.split('.')\n" +
@@ -417,6 +420,7 @@ public class JythonCompletionTask implements CompletionTask {
      * @return the count
      */
     private int queryPackages(CompletionContext cc, CompletionResultSet rs) {
+        logger.fine("queryPackages");
         PythonInterpreter interp = getInterpreter();
 
         HashSet<String> results= new HashSet();       
@@ -646,6 +650,7 @@ public class JythonCompletionTask implements CompletionTask {
     }
     
     private int queryNames(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
+        logger.fine("queryNames");
         int count=0;
         String[] keywords = new String[]{"assert", "def", "elif", "except", "from", "for", "finally", "import", "while", "print", "raise"}; //TODO: not complete
         for (String kw : keywords) {
@@ -762,9 +767,16 @@ public class JythonCompletionTask implements CompletionTask {
         return 0;
     }
 
+    /**
+     * show the documentation found for the command.
+     * @param cc
+     * @param result
+     * @return
+     * @throws BadLocationException 
+     */
     private int queryCommandArgument(CompletionContext cc, CompletionResultSet result ) throws BadLocationException {
+        logger.fine("queryCommandArgument");
         String method = cc.contextString;
-        int [] pos= new int[2];
         
         PythonInterpreter interp = getInterpreter();
 
@@ -781,14 +793,15 @@ public class JythonCompletionTask implements CompletionTask {
             result.addItem(new MessageCompletionItem("Eval error in code before current position", ex.toString()));
             return 0;
         }
-        
+
         PyObject po= interp.eval(method);
         PyObject doc= interp.eval(method+".__doc__");
+        if ( po instanceof PyFunction ) {
+            method= getPyFunctionSignature((PyFunction)po);
+        }
         String signature= makeInlineSignature( po, doc );
 
-        String link = signature;
-
-        result.addItem( new DefaultCompletionItem( method, cc.completable.length(), method, method, link) );
+        result.addItem( new MessageCompletionItem( method, signature ) );
                     
         return 1;
     }
@@ -919,26 +932,29 @@ public class JythonCompletionTask implements CompletionTask {
     
     /**
      * get __doc__ from the function.
-     * @param po
-     * @param doc
-     * @return 
+     * @param po PyFunction, typically.
+     * @param doc the documentation for the function.
+     * @return "inline:..."
      */
     private static String makeInlineSignature( PyObject po, PyObject doc ) {
         String sig= ( po instanceof PyFunction ) ? getPyFunctionSignature((PyFunction)po) : "";
         String signature= doc instanceof PyNone ? "(No documentation)" : doc.toString();
 
-                String[] ss2= signature.split("\n");
+        if ( sig.length()>0 ) {
+            sig= "<b>"+sig+ "</b><br><br>";
+        }
+        String[] ss2= signature.split("\n");
         if ( ss2.length>1 ) {
             for ( int jj= 0; jj< ss2.length; jj++ ){
                 ss2[jj]= escapeHtml(ss2[jj]);
             }
             if ( !signature.startsWith("<html>" ) ) {
-                signature= "<html><b>"+sig+ "</b><br><br>"+join( ss2, "<br>" )+"</html>";
+                signature= "<html>"+sig+join( ss2, "<br>" )+"</html>";
             } else {
-                signature= "<html><b>"+sig+ "</b><br><br>" + signature.substring(6)+"</html>";
+                signature= "<html>"+sig+ signature.substring(6)+"</html>";
             }
         } else {
-            signature= "<html><b>"+sig+ "</b><br><br>" + signature+"</html>";
+            signature= "<html>"+sig+ signature+"</html>";
         }
         signature= "inline:" + signature;
         return signature;
@@ -982,6 +998,9 @@ public class JythonCompletionTask implements CompletionTask {
                     }                    
                 } else if (po.isCallable()) {
                     label = ss + "() ";
+                    if ( po instanceof PyFunction ) {
+                        label= getPyFunctionSignature((PyFunction)po);
+                    }
                     PyObject doc= interp.eval(ss+".__doc__");
                     signature= makeInlineSignature( po, doc );
                     
