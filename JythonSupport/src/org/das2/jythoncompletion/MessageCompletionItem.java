@@ -15,7 +15,7 @@ import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
 
 /**
- *
+ * Completion that just shows a message.
  * @author jbf
  */
 public class MessageCompletionItem implements CompletionItem {
@@ -29,59 +29,75 @@ public class MessageCompletionItem implements CompletionItem {
 
     public MessageCompletionItem( String message, String documentation ) {
         this.message= message;
+        if( documentation.startsWith("inline:") ) {
+            documentation= documentation.substring(7);
+        }
         this.documentation= documentation;
     }
 
+    @Override
     public void defaultAction(JTextComponent component) {
 
     }
 
+    @Override
     public void processKeyEvent(KeyEvent evt) {
 
     }
 
+    @Override
     public int getPreferredWidth(Graphics g, Font defaultFont) {
         return g.getFontMetrics(defaultFont).stringWidth(message);
     }
 
+    @Override
     public void render(Graphics graphics, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height, boolean selected) {
         graphics.drawString( message, 0, graphics.getFontMetrics().getHeight() );
     }
 
+    @Override
     public CompletionTask createDocumentationTask() {
         if ( documentation==null ) {
             return null;
         } else {
             return new CompletionTask( ) {
+                @Override
                 public void query(CompletionResultSet resultSet) {
                     resultSet.setDocumentation( new DefaultDocumentationItem(null,documentation) );
                     resultSet.finish();
                 }
+                @Override
                 public void refresh(CompletionResultSet resultSet) {
                     query(resultSet);
                 }
+                @Override
                 public void cancel() {
                 }
             };
         }
     }
 
+    @Override
     public CompletionTask createToolTipTask() {
         return null;
     }
 
+    @Override
     public boolean instantSubstitution(JTextComponent component) {
         return false;
     }
 
+    @Override
     public int getSortPriority() {
         return 0;
     }
 
+    @Override
     public CharSequence getSortText() {
         return "a";
     }
 
+    @Override
     public CharSequence getInsertPrefix() {
         return "";
     }
