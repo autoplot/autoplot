@@ -25,7 +25,7 @@ import org.das2.jythoncompletion.support.CompletionUtilities;
 import org.das2.jythoncompletion.ui.CompletionImpl;
 
 /**
- *
+ * Completion item which will insert text when accepted.
  * @author jbf
  */
 public class DefaultCompletionItem implements CompletionItem  {
@@ -77,6 +77,7 @@ public class DefaultCompletionItem implements CompletionItem  {
         return new DefaultCompletionItem( message, 0, "", message, null );
     }
     
+    @Override
     public void defaultAction( JTextComponent jTextComponent ) {
         try {
             int pos= jTextComponent.getCaretPosition();
@@ -116,6 +117,7 @@ public class DefaultCompletionItem implements CompletionItem  {
     }
 
     
+    @Override
     public void processKeyEvent(KeyEvent keyEvent) {
             //JTextComponent component = (JTextComponent) keyEvent.getSource();
             //int caretOffset = component.getSelectionEnd();
@@ -126,6 +128,7 @@ public class DefaultCompletionItem implements CompletionItem  {
 
     }
     
+    @Override
     public int getPreferredWidth(Graphics graphics, Font font) {
         String left= label;
         String right= null;
@@ -137,6 +140,7 @@ public class DefaultCompletionItem implements CompletionItem  {
         return CompletionUtilities.getPreferredWidth( left, right, graphics, font );
     }
     
+    @Override
     public void render(Graphics graphics, Font font, Color color, Color color0, int i, int i0, boolean b) {
         String left= label;
         String right= null;
@@ -148,57 +152,68 @@ public class DefaultCompletionItem implements CompletionItem  {
         CompletionUtilities.renderHtml(null,left,right,graphics,font, color,i,i0,b);
     }
     
+    @Override
     public CompletionTask createDocumentationTask() {
         if ( link==null ) {
             return null;
         } else if ( link.startsWith("inline:") ) {
             final String flink= link;
             return new CompletionTask() {
+                @Override
                 public void query(CompletionResultSet resultSet) {
                     resultSet.setDocumentation( new DefaultDocumentationItem(null,flink.substring(7)) );
                     resultSet.finish();
                 }
+                @Override
                 public void refresh(CompletionResultSet resultSet) {
                     query(resultSet);
                 }
+                @Override
                 public void cancel() {
                 }  
             };
         } else {
             return new CompletionTask( ) {
+                @Override
                 public void query(CompletionResultSet resultSet) {
                     resultSet.setDocumentation( new DefaultDocumentationItem(link) );
                     resultSet.finish();
                 }
+                @Override
                 public void refresh(CompletionResultSet resultSet) {
                     query(resultSet);
                 }
+                @Override
                 public void cancel() {
                 }  
             };
         }
     }
     
+    @Override
     public CompletionTask createToolTipTask() {
         return null;
     }
     
+    @Override
     public boolean instantSubstitution(JTextComponent jTextComponent) {
         defaultAction(jTextComponent);
         return true;
     }
     
+    @Override
     public int getSortPriority() {
         return sortPriority;
     }
     
+    @Override
     public CharSequence getSortText() {
         return text;
     }
     
+    @Override
     public CharSequence getInsertPrefix() {
         return text.substring(0,offset);
     }
-
     
 }
