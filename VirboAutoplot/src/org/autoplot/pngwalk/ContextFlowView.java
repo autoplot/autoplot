@@ -45,8 +45,9 @@ public class ContextFlowView extends PngWalkView {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if ( imageBounds==null ) return;
+                List<Rectangle> limageBounds= new ArrayList(imageBounds);
                 for ( int i=firstIndexPainted; i<lastIndexPainted; i++ ) {
-                    if ( imageBounds.get(i).contains(e.getPoint()) ) {
+                    if ( limageBounds.get(i).contains(e.getPoint()) ) {
                         seq.setIndex(i);
                         break;
                     }
@@ -71,12 +72,14 @@ public class ContextFlowView extends PngWalkView {
 
     @Override
     protected final void sequenceChanged() {
+        List<Rectangle> limageBounds;
         if ( seq==null ) {
-            imageBounds= null;
+            limageBounds= null;
         } else {
-            imageBounds= new ArrayList<Rectangle>(seq.size());
-            for ( int i=0; i<seq.size(); i++ ) imageBounds.add(i,null);
+            limageBounds= new ArrayList<Rectangle>(seq.size());
+            for ( int i=0; i<seq.size(); i++ ) limageBounds.add(i,null);
         }
+        this.imageBounds= limageBounds;
         repaint();
     }
 
