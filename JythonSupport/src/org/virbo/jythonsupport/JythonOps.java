@@ -5,6 +5,7 @@
 
 package org.virbo.jythonsupport;
 
+import java.awt.Color;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -213,6 +214,47 @@ public class JythonOps {
             throw Py.TypeError("unable to coerce "+arg0+" to DatumRange");
         }
         
+    }
+    
+    /**
+     * get the color from the python object, for example:
+     * <ul>
+     * <li>Color.RED
+     * <li>16711680   (int for red)
+     * <li>16711680.  (float from QDataSet)
+     * <li>(255,0,0)
+     * <li>(1.0,0,0)
+     * </ul>
+     * @param val the value
+     * @return java.awt.Color
+     */
+    public static Color color( PyObject val ) {
+        Color c=null;
+        if (val.__tojava__(Color.class) != Py.NoConversion) {
+            c = (Color) val.__tojava__(Color.class);
+        } else if (val instanceof PyFloat) {
+            c = new Color((int) ((PyFloat) val).getValue());
+        } else if (val instanceof PyInteger) {
+            c = new Color(((PyInteger) val).getValue());
+        } else if (val instanceof PyQDataSet) {
+            c = new Color((int) ((PyQDataSet) val).getQDataSet().value());
+        } else if (val instanceof PyTuple) {
+            String sval= val.toString();
+            sval= sval.substring(1,sval.length()-1);
+            if (sval != null) {
+                c = Ops.colorFromString(sval);
+            } else {
+                throw new IllegalArgumentException("can't identify color");
+            }
+        } else {
+            String sval = (String) val.__str__().__tojava__(String.class);
+            if (sval != null) {
+                c = Ops.colorFromString(sval);
+            } else {
+                throw new IllegalArgumentException("can't identify color");
+            }
+        }
+        return c;
     }
     
     /**
