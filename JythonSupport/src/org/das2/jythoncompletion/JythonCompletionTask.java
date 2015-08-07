@@ -91,6 +91,7 @@ public class JythonCompletionTask implements CompletionTask {
         }
     }
 
+    @Override
     public void query(CompletionResultSet arg0) throws PyException {
         try {
             JythonCompletionProvider.getInstance().setMessage("busy: getting completions");
@@ -833,10 +834,12 @@ public class JythonCompletionTask implements CompletionTask {
         }
     }
 
+    @Override
     public void refresh(CompletionResultSet arg0) {
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void cancel() {
         //throw new UnsupportedOperationException("Not supported yet.");
     }
