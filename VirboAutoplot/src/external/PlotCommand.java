@@ -6,26 +6,17 @@
 package external;
 
 import java.awt.Color;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
-import org.das2.datum.Units;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PlotSymbol;
 import org.das2.graph.PsymConnector;
 import org.das2.util.ClassMap;
 import org.python.core.Py;
-import org.python.core.PyFloat;
 import org.python.core.PyInteger;
-import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PyString;
-import org.python.core.PyTuple;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
@@ -36,16 +27,15 @@ import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Row;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.JythonOps;
-import org.virbo.jythonsupport.PyQDataSet;
 
 /**
  * new implementation of the plot command allows for keywords in the
  * Jython environment.
  *<blockquote><pre><small>{@code
- * plotx( 0, ripples(20) )
- * plotx( 1, ripples(20), renderType='color:blue' )
+ * plot( 0, ripples(20) )
+ * plot( 1, ripples(20), color=Color.BLUE )
+ * plot( 2, ripples(20), renderType='series>color=blue' )
  *}</small></pre></blockquote>
  * @author jbf
  */
