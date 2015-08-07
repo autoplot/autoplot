@@ -7,8 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A round of new features is coming with v2015b.  Here rgbColorDataset is used to form the data for the colorScatter mode, and plot now accepts named parameters.
-                <a href='http://autoplot.org/data/script/screenshots/rgbColorScatter.jy'>script</a>
+        <p><small>A recent study of the series renderer showed that its performance scaled as expected.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -23,6 +22,9 @@
 
         <p>Bugfixes (2015-08-06 r17202):</p>
         <ul>
+            <li>rte 2091983907: thread safety in pngwalk.  Thanks usuario!</li>
+            <li>rte_1604359977: limit the total number of filePollUpdates threads that can be started to 10000.  Thanks, Bob!</li>
+            <li>completions within a function call are corrected.  plot( ripples&lt;C&gt; ) corrected. </li>
             <li>1439: add "delete selected items" to edit menu of DataPointRecorder<li>
             <li>bugfix: Kristoff demonstrated that embed data doesn't work when the file came via http.</li>
             <li>1442-6: camelCase for the plotx command.</li>
@@ -168,6 +170,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>plot named parameters have consistent capitalization and index named parameter introduced.</li>
             <li>embed data found in data sources that does not have a URI ("vap+internal:")</li>
             <li>opposite property for axes.</li>
             <li>support $x/$Y_$m for file storage models </li>
