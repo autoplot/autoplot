@@ -330,10 +330,13 @@ public final class AutoplotUI extends javax.swing.JFrame {
             model.setExceptionHandler( new GuiExceptionHandler() );
         }
 
+        applicationModel = model;
+        this.dom= model.getDocumentModel();
+        
         if ( !ScriptContext.isModelInitialized() ) {
             ScriptContext.setApplicationModel(model);
             ScriptContext.setView(this);
-            ScriptContext.defaultApp= this;
+            ScriptContext._setDefaultApp(this);
         }
 
         model.setResizeRequestListener( new ApplicationModel.ResizeRequestListener() {
@@ -344,8 +347,6 @@ public final class AutoplotUI extends javax.swing.JFrame {
         });
 
         APSplash.checkTime("init 10");
-
-        this.dom= model.getDocumentModel();
         
         support = new GuiSupport(this);
 
