@@ -11,6 +11,8 @@ import org.das2.graph.DasCanvas;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import java.awt.Window;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -28,6 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -121,7 +124,9 @@ public class ScriptContext extends PyJavaInstance {
      * have two windows plotting data, you would:
      * <pre>
      * plot([1,2,3])
-     * set
+     * popup=newWindow('popup')
+     * setWindow(popup)
+     * plot([3,2,1])
      * </pre>
      * @param app the application
      */
@@ -134,14 +139,21 @@ public class ScriptContext extends PyJavaInstance {
         setApplication(defaultApp);
     }
     
-    public static synchronized void setApplication( ApplicationModel appm ) {
+    /**
+     * Set the application model.  This is the simplest Autoplot implementation
+     * existing, where there are no buttons, etc.
+     * @param appm 
+     */
+    public static synchronized void setWindow( ApplicationModel appm ) {
         AutoplotUI app= appLookup.get(appm);
         if (app==null ) {
-            setDefaultApplication();
+            view= null;
+        } else {
+            view= app;
         }
-        setApplicationModel(appm);      
-    }    
-
+        setApplicationModel(appm);              
+    }
+    
     /**
      * return the focus application.
      * @return the focus application.
@@ -150,8 +162,16 @@ public class ScriptContext extends PyJavaInstance {
         return view;
     }
     
-    private static Map<String,AutoplotUI> apps= new HashMap();
+    /**
+     * return the internal handle for the application.
+     * @return the internal handle for the application.
+     */
+    public static synchronized ApplicationModel getWindow() {
+        return model;
+    }
     
+    private static Map<String,AutoplotUI> apps= new HashMap();
+    private static Map<String,ApplicationModel> applets= new HashMap();
     private static Map<ApplicationModel,AutoplotUI> appLookup= new HashMap();
     
     /**
@@ -186,8 +206,62 @@ public class ScriptContext extends PyJavaInstance {
     }
     
     /**
+     * create a new window.
+     * @param id
+     * @return 
+     */
+    public static synchronized ApplicationModel newWindow( final String id ) {
+        ApplicationModel result= applets.get(id);
+        if ( result==null ) {
+            result= new ApplicationModel();
+            result.addDasPeersToApp();
+            result.setName(id);
+            applets.put(id,result);
+            if ( !DasApplication.getDefaultApplication().isHeadless() ) {
+                JFrame j= new JFrame(id);
+                j.getContentPane().add(result.canvas);
+                j.pack();
+                j.setVisible(true);
+                j.addWindowListener(new WindowListener() {
+                    @Override
+                    public void windowOpened(WindowEvent e) {
+                    }
+
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        applets.remove(id);
+                    }
+
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        applets.remove(id);
+                    }
+
+                    @Override
+                    public void windowIconified(WindowEvent e) {
+                    }
+
+                    @Override
+                    public void windowDeiconified(WindowEvent e) {
+                    }
+
+                    @Override
+                    public void windowActivated(WindowEvent e) {
+                    }
+
+                    @Override
+                    public void windowDeactivated(WindowEvent e) {
+                    }
+                });
+            }
+        }
+        return result;
+    }
+            
+    /**
      * set the focus for scripts.
      * @param m the application model.
+     * @see setWindow, which should be used instead.
      */
     public static void setApplicationModel(ApplicationModel m) {
         model = m;
@@ -198,6 +272,11 @@ public class ScriptContext extends PyJavaInstance {
     
     public static AutoplotUI defaultApp= null; // kludge to get the first.
 
+    protected static void _setDefaultApp( AutoplotUI app ) {
+        defaultApp= app;
+        appLookup.put( app.applicationModel, app);
+    }
+    
     private static synchronized void maybeInitView() {
         maybeInitModel();
         if (view == null) {
@@ -263,9 +342,20 @@ public class ScriptContext extends PyJavaInstance {
         maybeInitModel();
         Runnable run= new Runnable() {
             public void run() {
-                if ( view!=null ) view.resizeForCanvasSize(width,height);
+                if ( view!=null ) {
+                    view.resizeForCanvasSize(width,height);
+                } else {
+                    if ( !DasApplication.getDefaultApplication().isHeadless() ) {
+                        Window w=SwingUtilities.getWindowAncestor( model.canvas );
+                        // assume it is fitted for now.  This is a gross over simplification, not considering scroll panes, etc.
+                        Dimension windowDimension= w.getSize();
+                        Dimension canvasDimension= model.canvas.getSize();
+                        w.setSize( width + ( windowDimension.width - canvasDimension.width ), height +  ( windowDimension.height - canvasDimension.height ) ); 
+                    }
+                }
                 //model.waitUntilIdle();
                 model.canvas.setSize(new Dimension(width, height));
+                
                 model.getDocumentModel().getCanvases(0).setSize(width,height);
             }
         };
