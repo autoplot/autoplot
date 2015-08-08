@@ -378,7 +378,7 @@ public class AutoplotApplet extends JApplet {
 
                 logger.log(Level.FINE, "open vap stream {0} @ {1} msec", new Object[]{url, System.currentTimeMillis() - t0});
 
-                appmodel.doOpen(in, null);
+                appmodel.doOpenVap(in, null);
                 logger.log(Level.FINE, "done open vap @ {0} msec", (System.currentTimeMillis() - t0));
                 
                 appmodel.waitUntilIdle();
