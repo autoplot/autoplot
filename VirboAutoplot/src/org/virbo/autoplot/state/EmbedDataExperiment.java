@@ -143,6 +143,7 @@ public class EmbedDataExperiment {
         Set<URI> result= new HashSet();
         for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
             String suri = dsf.getUri();
+            if ( suri.trim().length()==0 ) continue;
             URISplit split= URISplit.parse(suri);
             if ( split.resourceUri!=null ) {
                 URI uri= makeCanonical( split.resourceUri );
