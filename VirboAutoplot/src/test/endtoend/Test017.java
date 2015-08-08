@@ -101,10 +101,10 @@ public class Test017 {
         // Note test140 could be used to test off the wiki page again, automatically.
         
         //TEST DATA SOURCE TYPE: 1 Tsds
-        "001 vap+tsds:http://timeseries.org/get.cgi?StartDate=19890101&EndDate=19890101&ext=bin&out=tsml&ppd=1440&param1=SourceAcronym_Subset3-1-v0",
-        "002 vap+tsds:http://timeseries.org/get.cgi?StartDate=19950101&EndDate=19950104&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-22-v0",
+        //"001 vap+tsds:http://timeseries.org/get.cgi?StartDate=19890101&EndDate=19890101&ext=bin&out=tsml&ppd=1440&param1=SourceAcronym_Subset3-1-v0",
+        //"002 vap+tsds:http://timeseries.org/get.cgi?StartDate=19950101&EndDate=19950104&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-22-v0",
         //old TSDS URLs that didn't work removed.
-        "004 vap+tsds:http://timeseries.org/get.cgi?StartDate=19950101&EndDate=19950104&ext=bin&out=tsml&ppd=144&param1=OMNI_OMNIHR-22-v0",
+        ///"004 vap+tsds:http://timeseries.org/get.cgi?StartDate=19950101&EndDate=19950104&ext=bin&out=tsml&ppd=144&param1=OMNI_OMNIHR-22-v0",
         //old TSDS URLs that didn't work removed.
         //TEST DATA SOURCE TYPE: 2 Das2Server
 
