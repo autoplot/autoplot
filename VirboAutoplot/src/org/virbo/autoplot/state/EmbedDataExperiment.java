@@ -194,7 +194,7 @@ public class EmbedDataExperiment {
      * save the application, but embed data file resources within the 
      * zip, along with the .vap.  The vap is saved with the name default.vap.
      * When the data source contains a dataset that was created internally (with
-     * the plot command for example), it will be formatted as a qds and 
+     * the Jython plot command, for example), it will be formatted as a QStream and 
      * embedded within the vap.
      * 
      * @param dom3 the state to save.
@@ -226,7 +226,7 @@ public class EmbedDataExperiment {
             for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
                 String uri = dsf.getUri();
                 URISplit split= URISplit.parse(uri);
-                if ( split.resourceUri!=null ) {
+                if ( uri.trim().length()>0 && split.resourceUri!=null ) {
                     String name= makeRelativeName(split.resourceUri);
                     split.file= "%{PWD}/"+name;
                     dsf.setUri( URISplit.format(split) );
