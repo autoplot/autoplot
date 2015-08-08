@@ -92,6 +92,9 @@ public class Test027 {
 
             //this would get confused because it would use the .net as the start of the extension.
             doTest( 16, "file:///home/jbf/autoplot_data/fscache/temp/http/sarahandjeremy.net/albumServer/PhotoServer__imageeq20080201_misc_geothermaldivIMG_2414cropptJPG_sizeeq600_widtheq500_rotateeq0?channel=hue");
+
+            // this parses to file:///, and it should probably be left alone.
+            doTest( 17, "" );
             
             doTestComp( 100, "vap+cdaweb:ds=ac_k0_epm&H_lo&timerange=2010-01" );
             doTestComp( 101, "Enter Data Set" );
