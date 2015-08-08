@@ -206,9 +206,38 @@ public class ScriptContext extends PyJavaInstance {
     }
     
     /**
+     * create a new window with the given location and size.
+     * @param id identifier for the window
+     * @param width the canvas size
+     * @param height the canvas size
+     * @param x the window location, if possible
+     * @param y the window location, if possible
+     * @return a handle (do not use this object, code will break) for the window.
+     */
+    public static synchronized ApplicationModel newWindow( final String id, int width, int height, int x, int y ) {
+        ApplicationModel result= newWindow(id);
+        Window window= SwingUtilities.getWindowAncestor(result.canvas);
+        if ( window!=null ) {
+        // assume it is fitted for now.  This is a gross over simplification, not considering scroll panes, etc.
+            Dimension windowDimension= window.getSize();
+            Dimension canvasDimension= model.canvas.getSize();
+            if ( Math.abs( windowDimension.width - canvasDimension.width )>100 
+                    || Math.abs( windowDimension.height - canvasDimension.height )>100 ) { 
+                window.setSize( width + 2, height + 29 ); // safety.  Based on arbitrary window system (Gnome).
+            } else {
+                window.setSize( width + ( windowDimension.width - canvasDimension.width ), height +  ( windowDimension.height - canvasDimension.height ) ); 
+            }
+            window.setLocation( x, y );
+        } else {
+            model.canvas.setSize(width,height);
+        }
+        return result;
+    }
+    
+    /**
      * create a new window.
-     * @param id
-     * @return 
+     * @param id identifier for the window
+     * @return a handle (do not use this object, code will break) for the window.
      */
     public static synchronized ApplicationModel newWindow( final String id ) {
         ApplicationModel result= applets.get(id);
