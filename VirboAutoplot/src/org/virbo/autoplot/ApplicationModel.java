@@ -108,6 +108,8 @@ import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.Version;
 /**
  * Internal model of the application to separate model from view.
+ * Note this is the legacy model that still remains from the first implementation
+ * of Autoplot, and represents the most simple application.
  * @author jbf
  */
 public class ApplicationModel {
@@ -204,6 +206,20 @@ public class ApplicationModel {
             logger.fine("history.txt is not being recorded in headless mode");
             dontRecordHistory= true;
         }
+    }
+
+    private String name = "";
+
+    public static final String PROP_NAME = "name";
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        String oldName = this.name;
+        this.name = name;
+        propertyChangeSupport.firePropertyChange(PROP_NAME, oldName, name);
     }
 
     /**
