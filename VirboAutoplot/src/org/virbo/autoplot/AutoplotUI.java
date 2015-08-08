@@ -1391,6 +1391,7 @@ APSplash.checkTime("init 270");
      */
     private void addToDiscoveryUseSoon( final String uri ) {
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 // always tack on the URI to history.dat file
                 File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );    
@@ -1401,9 +1402,9 @@ APSplash.checkTime("init 270");
                     TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
                     Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
                     out3.append( tp.format( now, null) + "\t" + uri + "\n" );
-                    out3.close();
                 } catch ( IOException ex ) {
                     logger.log(Level.SEVERE,ex.getMessage(),ex);
+                } finally {
                     if ( out3!=null ) try {
                         out3.close();
                     } catch (IOException ex1) {
@@ -1418,30 +1419,41 @@ APSplash.checkTime("init 270");
     private void fillAddDataFromMenuImmediately(final List<String> exts) {
         addDataFromMenu.removeAll();
         for ( String ext: exts ) {
-            if ( ext.startsWith(".") ) ext= ext.substring(1);
-            final String fext= ext;
-            Action a= new AbstractAction( ext+"..." ) {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    org.das2.util.LoggerManager.logGuiEvent(e);                                
-                    try {
-                        String uri = "vap+" + fext + ":";
-                        String refuri= (String) dataSetSelector.getEditor().getText();
-                        if ( refuri.startsWith(uri) ) {
-                            addToDiscoveryUseSoon(refuri);
-                            dataSetSelector.browseSourceType();
-                        } else {
-                            addToDiscoveryUseSoon(uri);
-                            dataSetSelector.setValue(uri);
-                            dataSetSelector.maybePlot( true );
-                        }
-                    } catch (Exception ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
+            if ( ext.equals("file:") ) {
+                Action a= new AbstractAction( "Local File...") {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        addToDiscoveryUseSoon("file:");
+                        dataSetSelector.getOpenLocalAction().actionPerformed(e);
                     }
-                }
-            };
-            JMenuItem item= new JMenuItem( a );
-            addDataFromMenu.add(item);
+                };
+                addDataFromMenu.add( new JMenuItem( a ) );
+            } else {
+                if ( ext.startsWith(".") ) ext= ext.substring(1);
+                final String fext= ext;
+                Action a= new AbstractAction( ext+"..." ) {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        org.das2.util.LoggerManager.logGuiEvent(e);                                
+                        try {
+                            String uri = "vap+" + fext + ":";
+                            String refuri= (String) dataSetSelector.getEditor().getText();
+                            if ( refuri.startsWith(uri) ) {
+                                addToDiscoveryUseSoon(refuri);
+                                dataSetSelector.browseSourceType();
+                            } else {
+                                addToDiscoveryUseSoon(uri);
+                                dataSetSelector.setValue(uri);
+                                dataSetSelector.maybePlot( true );
+                            }
+                        } catch (Exception ex) {
+                            logger.log(Level.SEVERE, ex.getMessage(), ex);
+                        }
+                    }
+                };                
+                JMenuItem item= new JMenuItem( a );
+                addDataFromMenu.add(item);
+            }
         }
     }
     
@@ -1451,7 +1463,7 @@ APSplash.checkTime("init 270");
      */
     private void fillAddDataFromMenu() {
         final List<String> exts= DataSetURI.getDiscoverableExtensions();
-        
+        exts.add("file:"); // special marker for local files.
         File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) + "/bookmarks/discovery.txt" );
         if ( f.exists()&& f.canRead()) {
             BufferedReader reader=null;
@@ -1459,12 +1471,21 @@ APSplash.checkTime("init 270");
                 reader= new BufferedReader( new FileReader(f) );
                 String s= reader.readLine();
                 while ( s!=null ) {
-                    if ( s.length()>29 && s.substring(25,29).equals("vap+") ) {
-                        int i= s.indexOf(":",29);
-                        String ex1= "."+s.substring(29,i);
-                        if ( exts.contains(ex1) ) {
-                            exts.remove(ex1);
-                            exts.add(0,ex1);
+                    if ( s.length()>29 ) {
+                        String ss= s.substring(25,29);
+                        if ( ss.equals("file") ) {
+                            String ex1= "file:";
+                            if ( exts.contains(ex1) ) {
+                                exts.remove(ex1);
+                                exts.add(0,ex1);
+                            }
+                        } else if ( ss.equals("vap+") ) {
+                            int i= s.indexOf(":",29);
+                            String ex1= "."+s.substring(29,i);
+                            if ( exts.contains(ex1) ) {
+                                exts.remove(ex1);
+                                exts.add(0,ex1);
+                            }
                         }
                     }
                     s= reader.readLine();
@@ -1559,10 +1580,10 @@ mi.setIcon( new ImageIcon( getClass().getResource("/resources/history.png") ) );
 APSplash.checkTime("init 52.5");
         fileMenu.add( mi );
 
-        mi= new JMenuItem(dataSetSelector.getOpenLocalAction() );
-        mi.setToolTipText("Open local data file");
-        expertItems.add(mi);
-        fileMenu.add(mi);
+        //mi= new JMenuItem(dataSetSelector.getOpenLocalAction() );
+        //mi.setToolTipText("Open local data file");
+        //expertItems.add(mi);
+        //fileMenu.add(mi);
 APSplash.checkTime("init 52.7");
         fileMenu.add( new JSeparator() );
 
