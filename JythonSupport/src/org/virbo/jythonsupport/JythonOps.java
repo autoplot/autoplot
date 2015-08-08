@@ -185,7 +185,7 @@ public class JythonOps {
      *   <li>Strings like ("5 to 15 s" or "2014-01-01")
      *   <li>2-element arrays and lists
      * </ul>
-     * @param arg0 None, PyQDataSet, String, array or List.
+     * @param arg0 PyQDataSet, String, array or List.
      * @throws IllegalArgumentException if the argument cannot be parsed or converted.
      * @return DatumRange
      */    
@@ -214,6 +214,20 @@ public class JythonOps {
             throw Py.TypeError("unable to coerce "+arg0+" to DatumRange");
         }
         
+    }
+    
+    /**
+     * coerce python objects to DatumRange, when the units are known.
+     * @param arg0 PyQDataSet, String, array or List.
+     * @param context the units.
+     * @return 
+     */
+    public static DatumRange datumRange( PyObject arg0, Units context ) {
+        DatumRange newRange= JythonOps.datumRange(arg0);
+        if ( context.isConvertibleTo(newRange.getUnits()) ) {
+            newRange= DatumRange.newDatumRange( newRange.min().value(), newRange.max().value(), context );
+        }        
+        return newRange;
     }
     
     /**
