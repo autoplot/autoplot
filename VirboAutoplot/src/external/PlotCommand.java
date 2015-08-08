@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.util.List;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
+import org.das2.datum.Units;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PlotSymbol;
 import org.das2.graph.PsymConnector;
@@ -246,7 +247,7 @@ public class PlotCommand extends PyObject {
                 if ( kw.equals("ytitle") ) {
                     plot.getYaxis().setLabel( sval);
                 } else if ( kw.equals("yrange") ) {
-                    DatumRange newRange= JythonOps.datumRange(val);
+                    DatumRange newRange= JythonOps.datumRange(val,plot.getYaxis().getRange().getUnits());
                     if ( plot.getYaxis().isLog() && newRange.min().doubleValue(newRange.getUnits())<0 ) {
                         plot.getYaxis().setLog(false);
                     }
@@ -256,7 +257,7 @@ public class PlotCommand extends PyObject {
                 } else if ( kw.equals("xtitle") ) {
                     plot.getXaxis().setLabel( sval);
                 } else if ( kw.equals("xrange") ) {
-                    DatumRange newRange= JythonOps.datumRange(val);
+                    DatumRange newRange= JythonOps.datumRange( val,plot.getXaxis().getRange().getUnits() );
                     if ( plot.getXaxis().isLog() && newRange.min().doubleValue(newRange.getUnits())<0 ) {
                         plot.getXaxis().setLog(false);
                     }
@@ -266,7 +267,7 @@ public class PlotCommand extends PyObject {
                 } else if ( kw.equals("ztitle") ) {
                     plot.getZaxis().setLabel( sval);
                 } else if ( kw.equals("zrange") ) {
-                    DatumRange newRange= JythonOps.datumRange(val);
+                    DatumRange newRange= JythonOps.datumRange(val,plot.getZaxis().getRange().getUnits());
                     if ( plot.getZaxis().isLog() && newRange.min().doubleValue(newRange.getUnits())<0 ) {
                         plot.getZaxis().setLog(false);
                     }
