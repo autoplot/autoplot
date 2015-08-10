@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.das2.jythoncompletion;
 
 import java.awt.Color;
@@ -18,7 +15,7 @@ import org.das2.jythoncompletion.support.CompletionTask;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 
 /**
- * adapts CompletionResult to Netbeans model.
+ * Completions for the URI when (for example) getDataSet('http:&lt;C&gt;') is entered.
  *
  * @author jbf
  */
@@ -31,6 +28,7 @@ public class DataSetUrlCompletionItem implements CompletionItem {
         this.rs = rs;
     }
 
+    @Override
     public CompletionTask createDocumentationTask() {
         return null;
         /* if ( rs.doc!=null ) return new DocCompletionTask() {
@@ -46,10 +44,12 @@ public class DataSetUrlCompletionItem implements CompletionItem {
          };*/
     }
 
+    @Override
     public CompletionTask createToolTipTask() {
         return null;
     }
 
+    @Override
     public void defaultAction(JTextComponent jTextComponent) {
         try {
             logger.fine("defaultAction of DataSetUrlCompletionItem");
@@ -60,7 +60,7 @@ public class DataSetUrlCompletionItem implements CompletionItem {
                 int ii = txt.indexOf("'");
                 int jj = txt.indexOf("\n");
                 if (ii > -1 && ii < jj) {
-                    logger.fine("ii=" + ii);
+                    logger.log(Level.FINE, "ii={0}", ii);
                     d.remove(pos, ii);
                 }
                 d.insertString(pos, rs.completion.substring(rs.completable.length()), null);
@@ -72,10 +72,12 @@ public class DataSetUrlCompletionItem implements CompletionItem {
         }
     }
 
+    @Override
     public CharSequence getInsertPrefix() {
         return rs.completion;
     }
 
+    @Override
     public int getPreferredWidth(Graphics graphics, Font font) {
         int n = rs.label.length();
         String label;
@@ -87,22 +89,27 @@ public class DataSetUrlCompletionItem implements CompletionItem {
         return graphics.getFontMetrics(font).stringWidth(label);
     }
 
+    @Override
     public int getSortPriority() {
         return 0;
     }
 
+    @Override
     public CharSequence getSortText() {
         return rs.completion;
     }
 
+    @Override
     public boolean instantSubstitution(JTextComponent jTextComponent) {
         defaultAction(jTextComponent);
         return true;
     }
 
+    @Override
     public void processKeyEvent(KeyEvent keyEvent) {
     }
 
+    @Override
     public void render(Graphics graphics, Font font, Color color, Color color0, int i, int i0, boolean b) {
         int n = rs.label.length();
         String label;
