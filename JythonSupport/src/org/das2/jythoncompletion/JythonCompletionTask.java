@@ -818,6 +818,9 @@ public class JythonCompletionTask implements CompletionTask {
                 result.addItem( item );
                 //result.addItem( new MessageCompletionItem( method + labels.get(jj), signatures.get(jj) ) );
             }
+        } else {
+            String signature= makeInlineSignature( po, doc );
+            result.addItem( new MessageCompletionItem( method, signature ) );
         }
         //logger.fine( "DefaultCompletionItem("+ss+","+cc.completable.length()+",\n" + ss + argss.get(jj)+",\n"+label+",\n"+link+")");
                                             
