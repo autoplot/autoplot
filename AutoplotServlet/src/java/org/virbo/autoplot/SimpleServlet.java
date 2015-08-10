@@ -418,14 +418,14 @@ public class SimpleServlet extends HttpServlet {
                         }
                         params= params1;
                     }
-                    appmodel.doOpen(openable, params);
+                    appmodel.doOpenVap(openable, params);
                 } else {
                     LinkedHashMap<String, String> params = new LinkedHashMap();
                     if ( isLocalVap ) params.put("PWD",split.path);
                     if ( stimeRange.trim().length()>0 ) {
                         params.put( "timeRange", stimeRange );
                     }                   
-                    appmodel.doOpen(openable, params);
+                    appmodel.doOpenVap(openable, params);
                 }
                 logit("opened vap", t0, uniq, debug);
                 width = appmodel.dom.getCanvases(0).getWidth();
