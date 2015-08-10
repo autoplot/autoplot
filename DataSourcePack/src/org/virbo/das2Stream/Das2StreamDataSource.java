@@ -8,6 +8,7 @@
  */
 package org.virbo.das2Stream;
 
+import java.io.File;
 import org.das2.client.DataSetStreamHandler;
 import org.das2.stream.StreamException;
 import org.das2.util.monitor.ProgressMonitor;
@@ -22,6 +23,8 @@ import java.util.HashMap;
 import org.virbo.dataset.QDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.dataset.NoDataInIntervalException;
+import org.das2.util.FileUtil;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
@@ -94,7 +97,16 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
                 DataSetStreamHandler handler = new DataSetStreamHandler(props, mon);
 
-                StreamTool.readStream(channel, handler);
+                System.err.println("Reading URI: "+uri);
+                try {
+                    StreamTool.readStream(channel, handler);
+                } catch ( NullPointerException ex ) {
+                    File ff= new File("/tmp/badd2s.d2s");
+                    File infile= DataSetURI.getFile(uri,new NullProgressMonitor());
+                    FileUtil.fileCopy(infile,ff);
+                    logger.warning("bad stream written to /tmp/badd2s.d2s.  Note the data source was reading the stream directly.");
+                    throw ex;
+                }
 
                 in.close();
 
