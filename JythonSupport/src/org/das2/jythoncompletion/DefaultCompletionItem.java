@@ -36,6 +36,7 @@ public class DefaultCompletionItem implements CompletionItem  {
     String label;
     String link;
     int sortPriority;
+    boolean referenceOnly= false;
     
     final static Logger logger= Logger.getLogger( "jython.editor" );
     
@@ -61,6 +62,10 @@ public class DefaultCompletionItem implements CompletionItem  {
         this.sortPriority= sortPriority;
     }
 
+    public void setReferenceOnly( boolean ref ) {
+        this.referenceOnly= ref;
+    }
+    
     /**
      * 
      * @param text  used for sort and insert prefix.  Typically same as complete.
@@ -70,6 +75,7 @@ public class DefaultCompletionItem implements CompletionItem  {
      * @param link  handed over to DefaultDocumentationItem, if non null.  May be "inline:&lt;html&gt;..."
      */
     public DefaultCompletionItem( String text, int offset, String complete, String label, String link ) {
+        //http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/org/virbo/jythonsupport/Util.html#getCompletions(java.lang.String)
         this(text, offset, complete, label, link, 1);
     }
     
@@ -79,6 +85,7 @@ public class DefaultCompletionItem implements CompletionItem  {
     
     @Override
     public void defaultAction( JTextComponent jTextComponent ) {
+        if ( referenceOnly ) return;
         try {
             int pos= jTextComponent.getCaretPosition();
             Document d= jTextComponent.getDocument();
@@ -201,6 +208,7 @@ public class DefaultCompletionItem implements CompletionItem  {
     
     @Override
     public boolean instantSubstitution(JTextComponent jTextComponent) {
+        if ( referenceOnly ) return false;
         defaultAction(jTextComponent);
         return true;
     }
