@@ -381,9 +381,11 @@ public class ScriptContext extends PyJavaInstance {
                     if ( !DasApplication.getDefaultApplication().isHeadless() ) {
                         Window w=SwingUtilities.getWindowAncestor( model.canvas );
                         // assume it is fitted for now.  This is a gross over simplification, not considering scroll panes, etc.
-                        Dimension windowDimension= w.getSize();
-                        Dimension canvasDimension= model.canvas.getSize();
-                        w.setSize( width + ( windowDimension.width - canvasDimension.width ), height +  ( windowDimension.height - canvasDimension.height ) ); 
+                        if ( w!=null ) {
+                            Dimension windowDimension= w.getSize();
+                            Dimension canvasDimension= model.canvas.getSize();
+                            w.setSize( width + ( windowDimension.width - canvasDimension.width ), height +  ( windowDimension.height - canvasDimension.height ) ); 
+                        }
                     }
                 }
                 //model.waitUntilIdle();
