@@ -82,11 +82,15 @@ public class DefaultCompletionItem implements CompletionItem  {
         try {
             int pos= jTextComponent.getCaretPosition();
             Document d= jTextComponent.getDocument();
-            d.insertString( pos, complete.substring(offset), null );
+            int lineEnd= Utilities.getRowEnd( jTextComponent, pos );
+            String restOfLine= d.getText(pos,lineEnd-pos);
+            if ( !restOfLine.startsWith( complete.substring(offset) ) ) { // in case they triggered completion just for reference
+                d.insertString( pos, complete.substring(offset), null );
+            }
         } catch ( BadLocationException ex ) {
             throw new RuntimeException(ex);
         }
-        CompletionImpl.get().hideCompletion();
+        CompletionImpl.get().hideCompletion(false);
     }
     
     public String getComplete() {
