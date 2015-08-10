@@ -10,6 +10,7 @@ package org.virbo.autoplot;
 
 import java.awt.AWTEvent;
 import java.awt.Component;
+import java.awt.Dimension;
 import org.virbo.datasource.AutoplotSettings;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
@@ -24,6 +25,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
@@ -1209,10 +1211,38 @@ public class ApplicationModel {
 
     ResizeRequestListener resizeRequestListener=null;
 
-    public void setResizeRequestListener( ResizeRequestListener list ) {
-        this.resizeRequestListener= list;
+    /**
+     * set the code which will handle resize requests, for example if
+     * a .vap is loaded.
+     * @param listener the listener.
+     */
+    public void setResizeRequestListener( ResizeRequestListener listener ) {
+        this.resizeRequestListener= listener;
     }
 
+    /**
+     * set the canvas size, to the extent that this is possible.
+     * @param width
+     * @param height 
+     */
+    public void setCanvasSize( int width, int height ) {
+        if ( this.resizeRequestListener!=null ) {
+            resizeRequestListener.resize(width, height );
+        } else {
+            if ( !DasApplication.getDefaultApplication().isHeadless() ) {
+                Window w=SwingUtilities.getWindowAncestor( this.canvas );
+                // assume it is fitted for now.  This is a gross over simplification, not considering scroll panes, etc.
+                if ( w!=null ) {
+                    Dimension windowDimension= w.getSize();
+                    Dimension canvasDimension= this.canvas.getSize();
+                    w.setSize( width + ( windowDimension.width - canvasDimension.width ), height +  ( windowDimension.height - canvasDimension.height ) ); 
+                }
+            }
+        
+            canvas.setSize(new Dimension(width, height));
+        }
+    }
+    
     /**
      * open the serialized DOM, apply additional modifications to the DOM, then
      * sync the application to this.  Deltas with names in all caps (e.g. PWD or FILE) 
