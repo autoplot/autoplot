@@ -2140,7 +2140,15 @@ public class AutoplotUtil {
 
     }
 
+    /**
+     * return 64x64 pixel Autoplot Icon.
+     * @return 
+     */
     public static Image getAutoplotIcon() {
+        return new ImageIcon(AutoplotUtil.class.getResource("/logo64x64.png")).getImage();
+    }
+    
+    public static Image getNoIcon() {
         return new ImageIcon(AutoplotUtil.class.getResource("/logo64x64.png")).getImage();
     }
 
@@ -2255,7 +2263,7 @@ public class AutoplotUtil {
             });        
         }
         
-        return JOptionPane.showConfirmDialog( parentComponent, message, title, optionType );
+        return JOptionPane.showConfirmDialog( parentComponent, message, title, optionType, JOptionPane.PLAIN_MESSAGE );
         
     }
     
