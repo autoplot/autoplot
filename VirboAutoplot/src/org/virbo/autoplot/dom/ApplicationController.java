@@ -747,8 +747,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             ArrayList<PlotElement> elements =
                     new ArrayList<PlotElement>(Arrays.asList(application.getPlotElements()));
             elements.remove(pelement);
+            PlotElement selected= getPlotElement();
             if ( elements.size()>0 ) {
-                if (!elements.contains(getPlotElement())) {  // reset the focus element Id
+                if ( selected!=null && !elements.contains(selected)) {  // reset the focus element Id
                     if (elements.isEmpty()) {
                         setPlotElement(null);
                     } else {
@@ -1609,10 +1610,19 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         try {
             
+            // set the focus to the last one remaining.
+            application.controller.setPlot(application.getPlots(0));
+            List<PlotElement> peles= application.controller.getPlotElementsFor(plot);
+            if ( peles.size()>0 ) {
+                application.controller.setPlotElement(peles.get(0));
+            } else {
+                application.controller.setPlotElement(application.getPlotElements(0));
+            }
+            
             for ( int i=application.getPlots().length-1; i>0; i-- ) {
                 deletePlot( application.getPlots(i) );
             }
-            
+
             Plot p0= application.getPlots(0);
             p0.getXaxis().getController().getDasAxis().setTcaFunction(null);
 
@@ -1629,6 +1639,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             application.getPlots(0).setId("plot_0");//TODO: this should also reset the listening plotElement
             application.getPlotElements(0).setPlotId("plot_0");
 
+            application.controller.setPlotElement(application.getPlotElements(0));
+            application.controller.setPlot(application.getPlots(0));            
+                        
             for ( int i=application.getDataSourceFilters().length-1; i>0; i-- ) {
                 deleteDataSourceFilter( application.getDataSourceFilters(i) );
             }
