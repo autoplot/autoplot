@@ -143,6 +143,8 @@ public class ScriptContext extends PyJavaInstance {
      * Set the application model.  This is the simplest Autoplot implementation
      * existing, where there are no buttons, etc.
      * @param appm 
+     * @see #newWindow(java.lang.String) 
+     * @see #getWindow() which returns the current window.
      */
     public static synchronized void setWindow( ApplicationModel appm ) {
         AutoplotUI app= appLookup.get(appm);
@@ -163,7 +165,7 @@ public class ScriptContext extends PyJavaInstance {
     }
     
     /**
-     * return the internal handle for the application.
+     * return the internal handle for the window and dom within.
      * @return the internal handle for the application.
      */
     public static synchronized ApplicationModel getWindow() {
@@ -213,6 +215,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param x the window location, if possible
      * @param y the window location, if possible
      * @return a handle (do not use this object, code will break) for the window.
+     * @see #setWindow(org.virbo.autoplot.ApplicationModel) 
      */
     public static synchronized ApplicationModel newWindow( final String id, int width, int height, int x, int y ) {
         ApplicationModel result= newWindow(id);
@@ -238,6 +241,7 @@ public class ScriptContext extends PyJavaInstance {
      * create a new window.
      * @param id identifier for the window
      * @return a handle (do not use this object, code will break) for the window.
+     * @see #setWindow(org.virbo.autoplot.ApplicationModel) 
      */
     public static synchronized ApplicationModel newWindow( final String id ) {
         ApplicationModel result= applets.get(id);
