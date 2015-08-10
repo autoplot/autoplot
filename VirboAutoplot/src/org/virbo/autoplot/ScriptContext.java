@@ -52,6 +52,7 @@ import org.das2.util.AboutUtil;
 import org.das2.util.awt.SvgGraphicsOutput;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
+import org.virbo.autoplot.ApplicationModel.ResizeRequestListener;
 import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
@@ -250,8 +251,10 @@ public class ScriptContext extends PyJavaInstance {
             result.addDasPeersToApp();
             result.setName(id);
             applets.put(id,result);
+            final JFrame j;
             if ( !DasApplication.getDefaultApplication().isHeadless() ) {
-                JFrame j= new JFrame(id);
+                j= new JFrame(id);
+                j.setIconImage( AutoplotUtil.getAutoplotIcon() );
                 j.getContentPane().add(result.canvas);
                 j.pack();
                 j.setVisible(true);
@@ -286,7 +289,21 @@ public class ScriptContext extends PyJavaInstance {
                     public void windowDeactivated(WindowEvent e) {
                     }
                 });
+            } else {
+                j= null;
             }
+            result.setResizeRequestListener( new ResizeRequestListener() {
+                @Override
+                public double resize(int width, int height) {
+                    if ( j!=null ) {
+                        Dimension windowDimension= j.getSize();
+                        Dimension canvasDimension= model.canvas.getSize();        
+                        j.setSize( width + ( windowDimension.width - canvasDimension.width ), height +  ( windowDimension.height - canvasDimension.height ) ); 
+                    }
+                    model.canvas.setSize(width,height);
+                    return 1.;
+                }                
+            } );
         }
         return result;
     }
@@ -375,22 +392,7 @@ public class ScriptContext extends PyJavaInstance {
         maybeInitModel();
         Runnable run= new Runnable() {
             public void run() {
-                if ( view!=null ) {
-                    view.resizeForCanvasSize(width,height);
-                } else {
-                    if ( !DasApplication.getDefaultApplication().isHeadless() ) {
-                        Window w=SwingUtilities.getWindowAncestor( model.canvas );
-                        // assume it is fitted for now.  This is a gross over simplification, not considering scroll panes, etc.
-                        if ( w!=null ) {
-                            Dimension windowDimension= w.getSize();
-                            Dimension canvasDimension= model.canvas.getSize();
-                            w.setSize( width + ( windowDimension.width - canvasDimension.width ), height +  ( windowDimension.height - canvasDimension.height ) ); 
-                        }
-                    }
-                }
-                //model.waitUntilIdle();
-                model.canvas.setSize(new Dimension(width, height));
-                
+                model.setCanvasSize(width, height);                
                 model.getDocumentModel().getCanvases(0).setSize(width,height);
             }
         };
