@@ -799,11 +799,28 @@ public class JythonCompletionTask implements CompletionTask {
         PyObject doc= interp.eval(method+".__doc__");
         if ( po instanceof PyFunction ) {
             method= getPyFunctionSignature((PyFunction)po);
+            String signature= makeInlineSignature( po, doc );
+            result.addItem( new MessageCompletionItem( method, signature ) );
+        } else if ( po instanceof PyReflectedFunction ) {
+            PyReflectedFunction prf = (PyReflectedFunction) po;
+            List<String> labels= new ArrayList();
+            List<String> signatures= new ArrayList();
+            List<String> argss= new ArrayList();
+            doPyReflectedFunction(eval, prf, labels, signatures, argss );    
+            for ( int jj=0; jj<labels.size(); jj++ ) {
+                String signature= signatures.get(jj);
+                String link = null;
+                if (signature != null) {
+                    link= getLinkForJavaSignature(signature);
+                }
+                DefaultCompletionItem item = new DefaultCompletionItem( method, 0, signature, labels.get(jj), link );
+                item.setReferenceOnly(true);
+                result.addItem( item );
+                //result.addItem( new MessageCompletionItem( method + labels.get(jj), signatures.get(jj) ) );
+            }
         }
-        String signature= makeInlineSignature( po, doc );
-
-        result.addItem( new MessageCompletionItem( method, signature ) );
-                    
+        //logger.fine( "DefaultCompletionItem("+ss+","+cc.completable.length()+",\n" + ss + argss.get(jj)+",\n"+label+",\n"+link+")");
+                                            
         return 1;
     }
 
@@ -963,6 +980,25 @@ public class JythonCompletionTask implements CompletionTask {
         return signature;
     }
     
+    private static void doPyReflectedFunction( String ss, PyReflectedFunction prf, List<String> labels, List<String> signatures, List<String> argss ) {
+        PyReflectedFunctionPeeker peek = new PyReflectedFunctionPeeker(prf);
+        for ( int jj=0; jj<peek.getArgsCount(); jj++ ) {
+            String signature = methodSignature(peek.getMethod(jj));
+            String args = methodArgs(peek.getMethod(jj));
+            int j= signature.indexOf("#");
+            String label= ss + "() JAVA";
+            if ( j>-1 ) {
+                label= signature.substring(j+1);
+                label= hideJavaPaths( label );
+                Class ret= peek.getMethod(0).getReturnType();
+                label= label + "->" + hideJavaPaths( ret.getCanonicalName() );
+            }
+            signatures.add(signature);
+            labels.add(label);
+            argss.add(args);
+        }                    
+    }
+    
     public static List<DefaultCompletionItem> getLocalsCompletions(PythonInterpreter interp, CompletionContext cc) {
         
         List<DefaultCompletionItem> result= new ArrayList();
@@ -982,23 +1018,8 @@ public class JythonCompletionTask implements CompletionTask {
                 List<String> labels= new ArrayList();
                 String args = "";
                 if (po instanceof PyReflectedFunction) {
-                    label = ss + "() JAVA";
                     PyReflectedFunction prf = (PyReflectedFunction) po;
-                    PyReflectedFunctionPeeker peek = new PyReflectedFunctionPeeker(prf);
-                    for ( int jj=0; jj<peek.getArgsCount(); jj++ ) {
-                        signature = methodSignature(peek.getMethod(jj));
-                        args = methodArgs(peek.getMethod(jj));
-                        int j= signature.indexOf("#");
-                        if ( j>-1 ) {
-                            label= signature.substring(j+1);
-                            label= hideJavaPaths( label );
-                            Class ret= peek.getMethod(0).getReturnType();
-                            label= label + "->" + hideJavaPaths( ret.getCanonicalName() );
-                        }
-                        signatures.add(signature);
-                        labels.add(label);
-                        argss.add(args);
-                    }                    
+                    doPyReflectedFunction( ss, prf, labels, signatures, argss );
                 } else if (po.isCallable()) {
                     label = ss + "() ";
                     if ( po instanceof PyFunction ) {
@@ -1041,6 +1062,7 @@ public class JythonCompletionTask implements CompletionTask {
                         if ( ss.equals("dom") ) {
                             link= "http://autoplot.org/developer.scripting#DOM";
                         }
+                        logger.fine( "DefaultCompletionItem("+ss+","+cc.completable.length()+",\n" + ss + argss.get(jj)+",\n"+label+",\n"+link+")");
                         result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + argss.get(jj), label, link) );
                     }
                 } else {
