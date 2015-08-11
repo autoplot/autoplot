@@ -263,45 +263,61 @@ public class Test017 {
 
     };
 
-    private static Runnable getRunnable( final String uri, final String id ) {
-        Runnable run= new Runnable() {
-            public void run()  {
-                try {
-                    QDataSet ds;
-                    ds = Util.getDataSet(uri);
-                    MutablePropertyDataSet hist = (MutablePropertyDataSet) Ops.autoHistogram(ds);
-                    hist.putProperty(QDataSet.TITLE, uri);
-                    hist.putProperty(QDataSet.LABEL, id);
-                    formatDataSet(hist, id + ".qds");
-                    QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
-                    if (dep0 != null) {
-                        MutablePropertyDataSet hist2 = (MutablePropertyDataSet) Ops.autoHistogram(dep0);
-                        formatDataSet(hist2, id + ".dep0.qds");
-                    } else {
-                        PrintWriter pw = new PrintWriter(id + ".dep0.qds");
-                        pw.println("no dep0");
-                        pw.close();
-                    }
-                    plot(ds);
-                    setCanvasSize(750, 300);
-                    int i = uri.lastIndexOf("/");
-                    setTitle(uri.substring(i + 1));
-                    writeToPng(id + ".png");
+    private static class ResultRunnable implements Runnable {
 
-                } catch (Exception ex) {
-                    TestSupport.logger.log(Level.SEVERE, ex.getMessage(), ex);
+        String uri;
+        String id;
+        String resultMessage;
+        
+        ResultRunnable( String uri, String id ) {
+            this.uri= uri;
+            this.id= id;
+            this.resultMessage= "";
+        }
+        
+        @Override
+        public void run() {
+            try {
+                QDataSet ds;
+                ds = Util.getDataSet(uri);
+                MutablePropertyDataSet hist = (MutablePropertyDataSet) Ops.autoHistogram(ds);
+                hist.putProperty(QDataSet.TITLE, uri);
+                hist.putProperty(QDataSet.LABEL, id);
+                formatDataSet(hist, id + ".qds");
+                QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
+                if (dep0 != null) {
+                    MutablePropertyDataSet hist2 = (MutablePropertyDataSet) Ops.autoHistogram(dep0);
+                    formatDataSet(hist2, id + ".dep0.qds");
+                } else {
+                    PrintWriter pw = new PrintWriter(id + ".dep0.qds");
+                    pw.println("no dep0");
+                    pw.close();
                 }
+                plot(ds);
+                setCanvasSize(750, 300);
+                int i = uri.lastIndexOf("/");
+                setTitle(uri.substring(i + 1));
+                writeToPng(id + ".png");
+                resultMessage= "okay!";
+
+            } catch (Exception ex) {
+                TestSupport.logger.log(Level.SEVERE, ex.getMessage(), ex);
+                resultMessage= "exception occurred.";
             }
-        };
-        return run;
+        }
+        
+        public String getResultMessage() {
+            return resultMessage;
+        }
     }
+    
 
     private static void doTest( final String uri, final String id, ThreadPoolExecutor exec ) throws IOException, InterruptedException, Exception {
 
         System.err.printf( "== %s ==\n", id );
         System.err.printf( "uri: %s\n", uri );
         
-        Runnable run= getRunnable( uri, id );
+        ResultRunnable run= new ResultRunnable( uri, id );
         int timeoutSeconds= 180;
 
         Future f=null;
@@ -318,7 +334,7 @@ public class Test017 {
         }
 
         if ( f!=null && "Success!".equals(f.get(  timeoutSeconds, TimeUnit.SECONDS ) ) ) { //findbugs wrong
-            System.err.println("okay!");
+            System.err.println( run.getResultMessage() );
         } else {
             PrintWriter pw = new PrintWriter(id + ".error");
             pw.println(uri);
