@@ -97,14 +97,15 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
                 DataSetStreamHandler handler = new DataSetStreamHandler(props, mon);
 
-                System.err.println("Reading URI: "+uri);
                 try {
                     StreamTool.readStream(channel, handler);
                 } catch ( NullPointerException ex ) {
-                    File ff= new File("/tmp/badd2s.d2s");
-                    File infile= DataSetURI.getFile(uri,new NullProgressMonitor());
-                    FileUtil.fileCopy(infile,ff);
-                    logger.warning("bad stream written to /tmp/badd2s.d2s.  Note the data source was reading the stream directly.");
+                    if ( "Linux".equals(System.getProperty("os.name")) ) {                        
+                        File ff= new File("/tmp/badd2s.d2s");
+                        File infile= DataSetURI.getFile(uri,new NullProgressMonitor());
+                        FileUtil.fileCopy(infile,ff);
+                        logger.warning("bad stream written to /tmp/badd2s.d2s.  Note the data source was reading the stream directly.");
+                    }
                     throw ex;
                 }
 
