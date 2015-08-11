@@ -29,7 +29,7 @@ public class MessageCompletionItem implements CompletionItem {
 
     public MessageCompletionItem( String message, String documentation ) {
         this.message= message;
-        if( documentation.startsWith("inline:") ) {
+        if( documentation!=null && documentation.startsWith("inline:") ) {
             documentation= documentation.substring(7);
         }
         this.documentation= documentation;
