@@ -226,27 +226,31 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         Color c = JColorChooser.showDialog(this, "background color", backgroundColorButton.getBackground());
-        jComboBox1.setSelectedIndex(fores.length);
-        backgroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
-        app.getCanvas().setBackground(c);
-        app.getDocumentModel().getOptions().setBackground(c);
+        if ( c!=null ) {
+            jComboBox1.setSelectedIndex(fores.length);
+            backgroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
+            app.getCanvas().setBackground(c);
+            app.getDocumentModel().getOptions().setBackground(c);
+        }
         
     }//GEN-LAST:event_backgroundColorButtonActionPerformed
 
     private void foregroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foregroundColorButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         Color c = JColorChooser.showDialog(this, "foreground color", foregroundColorButton.getBackground());
-        jComboBox1.setSelectedIndex(fores.length);
-        List<PlotElement> pe= Arrays.asList( app.dom.getPlotElements() );
-        for ( PlotElement p: pe ) {
-            if ( p.getStyle().getColor().equals(app.getCanvas().getForeground())) {
-                p.getStyle().setColor(c);
+        if ( c!=null ) {
+            jComboBox1.setSelectedIndex(fores.length);
+            List<PlotElement> pe= Arrays.asList( app.dom.getPlotElements() );
+            for ( PlotElement p: pe ) {
+                if ( p.getStyle().getColor().equals(app.getCanvas().getForeground())) {
+                    p.getStyle().setColor(c);
+                }
             }
+            foregroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
+            app.getCanvas().setForeground(c);
+            app.getDocumentModel().getOptions().setForeground(c);
+            app.getDocumentModel().getOptions().setColor(c);
         }
-        foregroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
-        app.getCanvas().setForeground(c);
-        app.getDocumentModel().getOptions().setForeground(c);
-        app.getDocumentModel().getOptions().setColor(c);
     }//GEN-LAST:event_foregroundColorButtonActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
