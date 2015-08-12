@@ -80,6 +80,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         if ( o==null ) return deft; else return o;
     }
 
+    @Override
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
 
         setUri(uri);
@@ -173,10 +174,12 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
 //        new HDF5DataSourceFormat().formatData("file:///home/jbf/foo.nc", out, new NullProgressMonitor() );
 //    }
 
+    @Override
     public boolean canFormat(QDataSet ds) {
         return true;
     }
 
+    @Override
     public String getDescription() {
         return "HDF5";
     }
