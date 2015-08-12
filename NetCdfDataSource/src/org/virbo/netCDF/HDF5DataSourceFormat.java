@@ -114,27 +114,34 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         }
 
         List<Dimension> dims= new ArrayList();  //TODO: rank2 DEPEND_1.
+        Map<String,Dimension[]> dimss= new HashMap<String, Dimension[]>();
         for ( int i=0; i<data.rank(); i++ ) {
             String namei= "dim"+i;
             QDataSet depi= (QDataSet) data.property("DEPEND_"+i);
             if ( depi!=null ) {
-                namei= nameFor(depi);
-            }
+                namei= nameFor(depi); // allocate the name
+            } 
             Dimension d= ncfile.addDimension( namei, qube[i] );
             dims.add( d );
+            if ( depi!=null ) {
+                if ( depi.rank()==2 ) {
+                    dimss.put( namei, new Dimension[] { dims.get(0), d } );
+                } else {
+                    dimss.put( namei, new Dimension[] { d } );
+                }
+            }
         }
         
         for ( int i=0; i<data.rank(); i++ ) {
-            
+            String namei;
             QDataSet depi= (QDataSet) data.property("DEPEND_"+i);
             if ( depi!=null ) {
-                nameFor(depi); // allocate the name
+                namei= nameFor(depi);
+                Units u= SemanticOps.getUnits(depi);
+                String typeSuggest1= UnitsUtil.isTimeLocation(u) ? "double" : typeSuggest;
+            
+                defineVariableOne( ncfile, depi, typeSuggest1, dimss.get(namei) );
             }
-            Units u= SemanticOps.getUnits(depi);
-            String typeSuggest1= UnitsUtil.isTimeLocation(u) ? "double" : typeSuggest;
-            
-            defineVariableOne( ncfile, depi, typeSuggest1, new Dimension[] { dims.get(i) } );
-            
         }
         
         defineVariableOne( ncfile, data, typeSuggest, dims.toArray(new Dimension[dims.size()]) );      
