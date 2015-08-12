@@ -70,9 +70,6 @@
         <Property name="text" type="java.lang.String" value="Use ISTP Metadata Conventions"/>
         <Property name="toolTipText" type="java.lang.String" value="Use ISTP metadata conventions for the data, like LABLAXIS, UNITS and VALIDMIN"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="istpMetadataActionPerformed"/>
-      </Events>
     </Component>
   </SubComponents>
 </Form>

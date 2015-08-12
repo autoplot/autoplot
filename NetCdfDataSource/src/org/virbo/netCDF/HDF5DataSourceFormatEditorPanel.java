@@ -1,12 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * BinaryDataSourceFormatEditorPanel.java
+ * HDF5DataSourceFormatEditorPanel.java
  *
- * Created on Jul 18, 2011, 4:43:42 PM
  */
 package org.virbo.netCDF;
 
@@ -17,7 +11,7 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 
 /**
- *
+ * Options for formatting to HDF5.
  * @author jbf
  */
 public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implements DataSourceFormatEditorPanel {
@@ -48,11 +42,6 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
 
         istpMetadata.setText("Use ISTP Metadata Conventions");
         istpMetadata.setToolTipText("Use ISTP metadata conventions for the data, like LABLAXIS, UNITS and VALIDMIN");
-        istpMetadata.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                istpMetadataActionPerformed(evt);
-            }
-        });
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -83,10 +72,6 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void istpMetadataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_istpMetadataActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_istpMetadataActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox istpMetadata;
@@ -94,6 +79,7 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
     private javax.swing.JComboBox typeComboBox;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
@@ -106,6 +92,7 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
             return s;
         }
     }
+    @Override
     public void setURI(String uri) {
         URISplit split= URISplit.parse(uri);
         Map<String,String> args= URISplit.parseParams(split.params);
@@ -114,9 +101,13 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
         s= getParam( args,"type","double");
         typeComboBox.setSelectedItem(s);
 
+        s= getParam( args,"metadata","");
+        istpMetadata.setSelected(s.equals("istp"));
+
         file= split.file;
     }
 
+    @Override
     public String getURI() {
         String result= file;
         Map<String,String> args= new HashMap();
@@ -124,6 +115,7 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
         String s;
         s= (String) typeComboBox.getSelectedItem();
         if ( !s.equals("double") ) args.put( "type", s );
+        if ( istpMetadata.isSelected() ) args.put( "metadata", "istp" );
 
         String params= URISplit.formatParams(args);
         if ( result==null ) result= "file:///";
