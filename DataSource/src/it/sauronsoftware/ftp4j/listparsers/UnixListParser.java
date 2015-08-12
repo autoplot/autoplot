@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 public class UnixListParser implements FTPListParser {
 
 	private static final Pattern PATTERN = Pattern
-			.compile("^([dl\\-])[r\\-][w\\-][xSs\\-][r\\-][w\\-][xSs\\-][r\\-][w\\-][xTt\\-]\\s+"
+			.compile("^([dl\\-])[r\\-][w\\-][xSs\\-][r\\-][w\\-][xSs\\-][r\\-][w\\-][xTt\\-]\\+?\\s+"
 					+ "(?:\\d+\\s+)?\\S+\\s*\\S+\\s+(\\d+)\\s+(?:(\\w{3})\\s+(\\d{1,2}))\\s+"
 					+ "(?:(\\d{4})|(?:(\\d{1,2}):(\\d{1,2})))\\s+"
 					+ "([^\\\\*?\"<>|]+)(?: -> ([^\\\\*?\"<>|]+))?$");
