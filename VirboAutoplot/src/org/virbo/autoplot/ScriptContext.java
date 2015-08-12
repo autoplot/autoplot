@@ -1437,9 +1437,10 @@ public class ScriptContext extends PyJavaInstance {
     
     /**
      * make a stack plot.
-     * @param nrows 
+     * @param nrows number of rows (plots)
      */
     public static void setLayout( int nrows ) {
+        if ( nrows<1 ) throw new IllegalArgumentException("must be one or more rows");
         setLayout( nrows, 1 );
     }
     
@@ -1448,10 +1449,12 @@ public class ScriptContext extends PyJavaInstance {
      * similar to the subplot command in Matlab and !p.multi in IDL.  Once 
      * additional plots are added, use the plot command with the index argument.
      * 
-     * @param ncolumns 
-     * @param nrows
+     * @param nrows number of rows
+     * @param ncolumns number of columns
      */
     public static void setLayout( int nrows, int ncolumns ) {
+        if ( nrows<1 ) throw new IllegalArgumentException("must be one or more rows");
+        if ( ncolumns<1 ) throw new IllegalArgumentException("must be one or more columns");        
         reset();
         DasCanvas c= dom.getCanvases(0).getController().getDasCanvas();
         Lock canvasLock= c.mutatorLock();
@@ -1478,6 +1481,8 @@ public class ScriptContext extends PyJavaInstance {
      * @return the new plots.
      */
     public static List<Plot> addPlots( int nrows, int ncolumns, String dir ) {
+        if ( nrows<1 ) throw new IllegalArgumentException("must be one or more rows");
+        if ( ncolumns<1 ) throw new IllegalArgumentException("must be one or more columns");
         Plot d= null;
         if ( dir==null ) {
             d= dom.getController().getPlot();
@@ -1495,6 +1500,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param nplotElement the number of plotElements on the one plot.
      */
     public static void setLayoutOverplot( int nplotElement ) {
+        if ( nplotElement<1 ) throw new IllegalArgumentException("must be one or more plots");
         reset();
         DasCanvas c= dom.getCanvases(0).getController().getDasCanvas();
         Lock canvasLock= c.mutatorLock();
