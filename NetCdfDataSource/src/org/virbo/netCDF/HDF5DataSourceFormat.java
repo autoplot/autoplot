@@ -6,6 +6,7 @@
 package org.virbo.netCDF;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSourceFormat;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
+import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFileWriteable;
@@ -90,6 +92,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         File file= new File( getResourceURI().toURL().getFile() );
         NetcdfFileWriteable ncfile;
         
+        // append is here as a placeholder and is not implemented!
         boolean append= "T".equals( getParam("append","F") ) ;
         
         if ( ! append ) {
@@ -100,19 +103,17 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             ncfile= NetcdfFileWriteable.createNew( file.toString(), true );
 
         } else {
-            throw new IllegalArgumentException("append is not supported"); // this is more complex than I was hoping.
+            throw new IllegalArgumentException("append is not supported"); // this is more complex than expected.
             //ncfile= NetcdfFileWriteable.openExisting( file.toString(), true );
             
         }
-
-        String varName= nameFor(data);
 
         int[] qube= DataSetUtil.qubeDims(data);
         if ( qube==null ) {
             throw new IllegalArgumentException("data is not a qube");
         }
 
-        List<Dimension> dims= new ArrayList();
+        List<Dimension> dims= new ArrayList();  //TODO: rank2 DEPEND_1.
         for ( int i=0; i<data.rank(); i++ ) {
             String namei= "dim"+i;
             QDataSet depi= (QDataSet) data.property("DEPEND_"+i);
@@ -121,9 +122,54 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             }
             Dimension d= ncfile.addDimension( namei, qube[i] );
             dims.add( d );
+        }
+        
+        for ( int i=0; i<data.rank(); i++ ) {
+            
+            QDataSet depi= (QDataSet) data.property("DEPEND_"+i);
+            if ( depi!=null ) {
+                nameFor(depi); // allocate the name
+            }
+            Units u= SemanticOps.getUnits(depi);
+            String typeSuggest1= UnitsUtil.isTimeLocation(u) ? "double" : typeSuggest;
+            
+            defineVariableOne( ncfile, depi, typeSuggest1, new Dimension[] { dims.get(i) } );
             
         }
+        
+        defineVariableOne( ncfile, data, typeSuggest, dims.toArray(new Dimension[dims.size()]) );      
+        
+        
+        if ( append ) {
+            // I wonder how this would be done
+        } else {
+            ncfile.create();
+        }        
+        
+        for ( int i=0; i<data.rank(); i++ ) {
+            
+            QDataSet depi= (QDataSet) data.property("DEPEND_"+i);
+            if ( depi!=null ) {
+                nameFor(depi); // allocate the name
+            }
+            Units u= SemanticOps.getUnits(depi);
+            String typeSuggest1= UnitsUtil.isTimeLocation(u) ? "double" : typeSuggest;
+            
+            formatDataOne(ncfile, depi, typeSuggest1 );
+            
+        }
+        
+        formatDataOne(ncfile, data, typeSuggest );
 
+        ncfile.finish();
+
+        ncfile.close();
+        
+    }
+
+    private void defineVariableOne( NetcdfFileWriteable ncfile, QDataSet data, String typeSuggest, Dimension[] dims ) {
+        String varName= nameFor(data);
+        
         Variable var= ncfile.addVariable( varName, typeFor(data,typeSuggest), dims );
 
         double fill;
@@ -136,19 +182,40 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         
         String meta= getParam( "metadata", "" );
         if ( meta.equals("istp") ) {
+            var.addAttribute( new Attribute("FIELDNAM", varName ) );
             var.addAttribute( new Attribute("UNITS", SemanticOps.getUnits(data).toString() ) );
             var.addAttribute( new Attribute("VAR_TYPE", "data" ) );
+            var.addAttribute( new Attribute("FILLVAL",  fill ) );
             var.addAttribute( new Attribute("VALIDMIN", (Double) getProperty( data, QDataSet.VALID_MIN, -1e38 ) ) );
             var.addAttribute( new Attribute("VALIDMAX", (Double) getProperty( data, QDataSet.VALID_MAX, 1e38 ) ) );
-            var.addAttribute( new Attribute("FILLVAL",  fill ) );
+            if ( data.property(QDataSet.TYPICAL_MIN)!=null ) {
+                var.addAttribute( new Attribute("SCALEMIN", (Double) getProperty( data, QDataSet.TYPICAL_MIN, -1e38 ) ) ); // -1e38 will not be used
+            }
+            if ( data.property(QDataSet.TYPICAL_MAX)!=null ) {
+                var.addAttribute( new Attribute("SCALEMAX", (Double) getProperty( data, QDataSet.TYPICAL_MAX, 1e38 ) ) ); // -1e38 will not be used
+            }
+            if ( data.property(QDataSet.SCALE_TYPE)!=null ) {
+                var.addAttribute( new Attribute("SCALETYP", (String) getProperty( data, QDataSet.SCALE_TYPE, "linear" ) ) );
+            }
+            if ( data.property(QDataSet.TITLE)!=null ) {
+                var.addAttribute( new Attribute("CATDESC", (String) getProperty( data, QDataSet.TITLE, "" ) ) );
+            }
+            if ( data.property(QDataSet.LABEL)!=null ) {
+                var.addAttribute( new Attribute("LABLAXIS", (String) getProperty( data, QDataSet.LABEL, "" ) ) );
+            }
         } else {
             var.addAttribute( new Attribute("_FillValue", fill ) );
         }
+        
+    }
+    
+    private void formatDataOne( NetcdfFileWriteable ncfile, QDataSet data, String typeSuggest) throws IllegalArgumentException, InvalidRangeException, IOException {
 
-        if ( append ) {
-            // I wonder how this would be done
-        } else {
-            ncfile.create();
+        String varName= nameFor(data);
+        
+        int[] qube= DataSetUtil.qubeDims(data);
+        if ( qube==null ) {
+            throw new IllegalArgumentException("data is not a qube");
         }
 
         ArrayDataSet ads= ArrayDataSet.copy(data);
@@ -162,11 +229,6 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             i++;
         }
         ncfile.write( varName, ddata );
-
-        ncfile.finish();
-
-        ncfile.close();
-        
     }
 
 //    public static void main( String[] args ) throws Exception {
@@ -176,7 +238,8 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
 
     @Override
     public boolean canFormat(QDataSet ds) {
-        return true;
+        int[] qube= DataSetUtil.qubeDims(ds);
+        return qube!=null;
     }
 
     @Override
