@@ -34,6 +34,7 @@ import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
 import static org.virbo.netCDF.NetCDFDataSourceFactory.checkMatlab;
 import ucar.ma2.DataType;
+import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
@@ -66,13 +67,15 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         parameterTree = new javax.swing.JTree();
+        jLabel1 = new javax.swing.JLabel();
         parameterInfoLabel = new javax.swing.JLabel();
 
         selectVariableLabel.setText("Select paramater:");
 
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        jSplitPane2.setResizeWeight(0.5);
 
-        jSplitPane1.setDividerLocation(220);
+        jSplitPane1.setResizeWeight(0.5);
 
         parameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
@@ -82,6 +85,10 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jScrollPane1.setViewportView(parameterTree);
 
         jSplitPane1.setLeftComponent(jScrollPane1);
+
+        jLabel1.setText("More to come...");
+        jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        jSplitPane1.setRightComponent(jLabel1);
 
         jSplitPane2.setTopComponent(jSplitPane1);
 
@@ -95,26 +102,27 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             .addGroup(layout.createSequentialGroup()
                 .addComponent(selectVariableLabel)
                 .addGap(0, 0, Short.MAX_VALUE))
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(selectVariableLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE))
+                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void parameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTreeValueChanged
         TreePath tp= evt.getPath();
         parameter= String.valueOf(tp.getPathComponent(1));
-        String longName= params.get(parameter);
+        String longName= parameters.get(parameter);
         parameterInfoLabel.setText( longName );
     }//GEN-LAST:event_parameterTreeValueChanged
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
@@ -129,10 +137,15 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
     URISplit split;
     
     /**
-     * parameter name to short descriptions of the parameter.
+     * URI parameters, like arg_0.
      */
     Map<String,String> params;
 
+    /**
+     * parameter name to short descriptions of the parameter.
+     */
+    Map<String,String> parameters= new LinkedHashMap();
+    
     /**
      * the parameter within the HDF5 file to be plotted.
      */
@@ -223,8 +236,6 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             
             List<Variable> vars= (List<Variable>)dataset.getVariables();
             dataset.close();
-
-            Map<String,String> params= new LinkedHashMap();
             
             for ( int j=0; j<vars.size();j++ ) {
                 Variable v= vars.get(j);
@@ -232,12 +243,22 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 if ( v.getDimensions().isEmpty() ) continue;
                 boolean isFormattedTime= v.getDataType()==DataType.CHAR && v.getRank()==2 && v.getShape(1)>=14 && v.getShape(1)<=30;
                 if ( !isFormattedTime && !v.getDataType().isNumeric() ) continue;
+                StringBuilder description= new StringBuilder( "<html><b>"+v.getName()+"[" );
+                for ( int k=0; k<v.getDimensions().size(); k++ ) {
+                    Dimension d= v.getDimension(k);
+                    if ( k>0 ) description.append(",");
+                    if ( !d.getName().equals(v.getName()) ) {
+                        description.append(d.getName()).append("=");
+                    }
+                    description.append(d.getLength());
+                }
+                description.append("]");
                 
-                params.put( v.getName(), v.getDescription() );
+                parameters.put( v.getName(), description.toString() );
 
             }
 
-            String label= "Select NetCDF Variable (%d data):";
+            String label= "Select HDF5 Variable (%d parameters):";
             
             int numData= vars.size();
 
@@ -255,9 +276,9 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             
             String slice1= params.remove("slice1");
 
-            fillTree( this.parameterTree, params, param, slice1 );
+            fillTree( this.parameterTree, parameters, param, slice1 );
             
-            logger.finest("close cdf");
+            logger.finest("close hdf");
 
             DefaultComboBoxModel cbmodel= new DefaultComboBoxModel();
             for ( String p: params.keySet() ) {
@@ -291,12 +312,12 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
     @Override
     public void markProblems(List<String> problems) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.err.println(problems);
     }
 
     @Override
     public JPanel getPanel() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this;
     }
 
     @Override
