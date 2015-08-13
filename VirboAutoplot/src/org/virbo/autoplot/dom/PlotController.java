@@ -285,7 +285,7 @@ public class PlotController extends DomNodeController {
         DatumRange dr= dr0;
         int count; // limits the number of steps we can take.
         int STEP_LIMIT=10000;
-        if ( ds!=null &&  ds.rank()>0 ) {
+        if ( ds!=null &&  ds.rank()>0 && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(ds) ) ) {
             try {
                 QDataSet bounds= SemanticOps.bounds(ds).slice(0);
                 if ( !validBounds(bounds) || !SemanticOps.getUnits(bounds).isConvertibleTo(dr.getUnits() ) || !DataSetUtil.asDatumRange(bounds).contains(dr) ) {
@@ -939,7 +939,12 @@ public class PlotController extends DomNodeController {
             dasPlot.setTitle( (String)titleConverter.convertForward( plot.getTitle() ) );
             QDataSet pds= plotElement.getController().getDataSet();
             logger.log( Level.FINE, "{0} dataSetListener", plot);
-            updateNextPrevious( plot.getXaxis().getRange(), pds );
+            if ( pds!=null && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(pds)) ) {
+                updateNextPrevious( plot.getXaxis().getRange(), pds );
+            } else {
+                scanPrevRange= null;
+                scanNextRange= null;
+            }
         }
     };
 
