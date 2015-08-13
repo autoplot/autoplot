@@ -45,8 +45,11 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
     private synchronized String nameFor(QDataSet dep0) {
         String name= names.get(dep0);
 
-        if ( name==null ) name = (String) dep0.property(QDataSet.NAME);
-
+        if ( name!=null ) {
+            return name;
+        }
+        
+        name = (String) dep0.property(QDataSet.NAME);
         Units units = (Units) dep0.property(QDataSet.UNITS);
         if (name == null) {
             if ( units!=null && UnitsUtil.isTimeLocation(units)) {
@@ -56,6 +59,10 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             }
         }
 
+        if ( names.containsValue(name) ) {
+            name= name+"_"+names.size(); // safety.  We should really never get here for other reasons.
+        }
+        
         names.put(dep0, name);
 
         return name;
@@ -135,7 +142,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         for ( int i=0; i<data.rank(); i++ ) {
             String namei;
             QDataSet depi= (QDataSet) data.property("DEPEND_"+i);
-            if ( depi!=null ) {
+            if ( depi!=null && depi!=data ) {
                 namei= nameFor(depi);
                 Units u= SemanticOps.getUnits(depi);
                 String typeSuggest1= UnitsUtil.isTimeLocation(u) ? "double" : typeSuggest;
