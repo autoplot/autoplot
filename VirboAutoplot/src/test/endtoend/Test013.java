@@ -84,6 +84,8 @@ public class Test013 {
             QDataSet qds = handler.getDataSet();
             //System.err.println( "" + qds + " "+ ( Ops.equivalent( ds, qds)  ) );
             System.err.println( "" + qds );
+            ScriptContext.plot(qds);
+            ScriptContext.writeToPng( file+".png" );
         } finally {
             if ( in!=null ) in.close();
         }
@@ -439,6 +441,8 @@ public class Test013 {
     
     public static void main(String[] args)  {
         try {
+            test2();
+            xxx("test2");
 
             testException();
             
@@ -465,9 +469,6 @@ public class Test013 {
 
             test1_5();
             xxx("test1_5");
-
-            test2();
-            xxx("test2");
 
             test3();
             xxx("test3");
