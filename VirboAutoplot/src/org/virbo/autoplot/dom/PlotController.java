@@ -941,9 +941,6 @@ public class PlotController extends DomNodeController {
             logger.log( Level.FINE, "{0} dataSetListener", plot);
             if ( pds!=null && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(pds)) ) {
                 updateNextPrevious( plot.getXaxis().getRange(), pds );
-            } else {
-                scanPrevRange= null;
-                scanNextRange= null;
             }
         }
     };
