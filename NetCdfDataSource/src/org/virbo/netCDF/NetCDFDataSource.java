@@ -185,17 +185,19 @@ public class NetCDFDataSource extends AbstractDataSource {
 
             if ( svariable==null ) {
                 for (Variable v : variables) {
-                    if ( !v.getDimension(0).getName().equals(v.getName()) ) {
+                    if ( !v.getDimension(0).getName().equals(v.getName()) ) { // search for dependent variable
                         variable= v;
                         break;
                     }
                 }
+                if ( variable==null ) throw new IllegalArgumentException("Unable to identify dependent variable");
             } else {
                 for (Variable v : variables) {
                     if ( v.getName().replaceAll(" ", "+").equals( svariable ) ) { //TODO: verify this, it's probably going to cause problems now.
                         variable= v;
                     }
                 }
+                if ( variable==null ) throw new IllegalArgumentException("No such variable: "+svariable);
             }
         } finally {
             mon.finished();
