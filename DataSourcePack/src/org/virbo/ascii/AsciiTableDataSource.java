@@ -756,7 +756,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         eventListColumn= params.get("eventListColumn");
         
         // rfe https://sourceforge.net/p/autoplot/bugs/1425/: create events list automatically.
-        if ( parser.getFieldLabels().length>=2 && parser.getFieldLabels().length <= 4 && UnitsUtil.isTimeLocation(parser.getUnits(0)) && UnitsUtil.isTimeLocation(parser.getUnits(1)) ) {
+        if ( parser.getFieldLabels().length>=2 && parser.getFieldLabels().length <= 5 && UnitsUtil.isTimeLocation(parser.getUnits(0)) && UnitsUtil.isTimeLocation(parser.getUnits(1)) ) {
             eventListColumn= "field"+(parser.getFieldLabels().length-1);
         }
         
