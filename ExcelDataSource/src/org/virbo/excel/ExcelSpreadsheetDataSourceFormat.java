@@ -243,7 +243,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
 
     HSSFCellStyle dateCellStyle;
     
-    Calendar c= Calendar.getInstance( TimeZone.getTimeZone("GMT") );
+    Calendar c= Calendar.getInstance( TimeZone.getTimeZone("GMT") ); // This doesn't seem to affect the result, which is still in the local timezone.
     
     private void setCellValue( HSSFCell cell, Datum datum ) {
         Units u= datum.getUnits();
