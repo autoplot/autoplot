@@ -1866,14 +1866,18 @@ public class AutoplotUtil {
                         spec= RenderType.colorScatter;
                     } else if ( bundle1.length()==3 && fillds.property(QDataSet.DEPEND_0)==null && bundle1.property(QDataSet.CONTEXT_0,2)!=null ) {  // this is more consistent with PlotElementController code.
                         spec= RenderType.colorScatter;
-                    } else if ( bundle1.length()==3 || bundle1.length()==4 ) {
+                    } else if ( bundle1.length()==3 || bundle1.length()==4 || bundle1.length()==5 ) {
                         Units u0= (Units) bundle1.property(QDataSet.UNITS,0);
                         if ( u0==null ) u0= Units.dimensionless;
                         Units u1= (Units) bundle1.property(QDataSet.UNITS,1);
                         if ( u1==null ) u1= Units.dimensionless;
                         Units u3= (Units) bundle1.property(QDataSet.UNITS,bundle1.length()-1);
-                        if ( u3!=null && UnitsUtil.isOrdinalMeasurement(u3) && u0.getOffsetUnits().isConvertibleTo(u1) ) {
-                            spec= RenderType.eventsBar;
+                        if ( u3!=null && UnitsUtil.isOrdinalMeasurement(u3) ) {
+                            if ( u0.getOffsetUnits().isConvertibleTo(u1) ) {
+                                spec= RenderType.eventsBar;
+                            } else if ( UnitsUtil.isTimeLocation(u0) && UnitsUtil.isTimeLocation(u1) ) {
+                                spec= RenderType.eventsBar;
+                            }
                         }
                     } else {
                         Units u3= (Units) bundle1.property(QDataSet.UNITS,bundle1.length()-1);
