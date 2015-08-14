@@ -24,6 +24,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSourceFormat;
+import org.virbo.dsops.Ops;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
@@ -219,6 +220,13 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             }
         } else {
             var.addAttribute( new Attribute("_FillValue", fill ) );
+            if ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(data) ) ) {
+                //data= Ops.putProperty( Ops.convertUnitsTo( data, Units.cdfTT2000 ), QDataSet.UNITS, null );
+                //data= Ops.divide( data, 1e9 );
+                Units u= SemanticOps.getUnits(data);
+                String unitsStr= u.getOffsetUnits().toString() + " " + u.getBasis().getDescription();
+                var.addAttribute( new Attribute("units",unitsStr));
+            }
         }
         
     }
