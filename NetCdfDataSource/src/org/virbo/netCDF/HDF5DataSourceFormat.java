@@ -221,7 +221,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         } else {
             var.addAttribute( new Attribute("_FillValue", fill ) );
             if ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(data) ) ) {
-                //data= Ops.putProperty( Ops.convertUnitsTo( data, Units.cdfTT2000 ), QDataSet.UNITS, null );
+                //data= Ops.putProperty( Ops.convertUnitsTo( data, Units.cdfTT2000 ), QDataSet.UNITS, null ); // data should really be converted to account for leap seconds.
                 //data= Ops.divide( data, 1e9 );
                 Units u= SemanticOps.getUnits(data);
                 String unitsStr= u.getOffsetUnits().toString() + " " + u.getBasis().getDescription();
