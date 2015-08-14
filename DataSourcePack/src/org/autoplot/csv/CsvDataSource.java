@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.TimeLocationUnits;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
@@ -24,6 +25,8 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.dataset.SparseDataSet;
+import org.virbo.dataset.SparseDataSetBuilder;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
@@ -110,7 +113,7 @@ public class CsvDataSource extends AbstractDataSource {
         String column= getParam( "column", null );
         int icolumn;
         if ( column==null ) {
-            icolumn= ncol==-1 ? -1 : ncol-1;
+            icolumn= -1;
         } else {
             icolumn= TableOps.columnIndex( column, headers );
             if ( icolumn==-1 ) {
@@ -144,11 +147,12 @@ public class CsvDataSource extends AbstractDataSource {
 
         Units dep0u= Units.dimensionless;
         Units u= Units.dimensionless;
+        Units[] columnUnits= null;
 
         int hline=2; // allow top two lines to be header lines.
 
         double tb=0, cb=0;  // temporary holders for data
-        double[] bundleb=null;
+        double[] bundleb=null; // temporary holders for each column.
         if ( cols!=null ) {
             bundleb= new double[ cols[1]-cols[0] ];
         }
@@ -172,10 +176,17 @@ public class CsvDataSource extends AbstractDataSource {
             mon.setProgressMessage("read line "+line);
             if ( hline>0 ) {
                 if ( icolumn==-1 ) {
-                    icolumn= reader.getColumnCount()-1;
-                    headers= new String[reader.getColumnCount()];
-                    for ( int i=0; i<reader.getColumnCount(); i++ ) {
-                        headers[i]= "column_"+i;
+                    if ( TimeUtil.isValidTime(reader.get(0)) && TimeUtil.isValidTime(reader.get(1) ) && reader.getColumnCount()>=2 && reader.getColumnCount()<=5 ) {
+                        builder= new DataSetBuilder( 2, 100, reader.getColumnCount() );
+                        columnUnits= new Units[reader.getColumnCount()];
+                        for ( int j=0; j<reader.getColumnCount(); j++ ) {
+                            columnUnits[j]= guessUnits(reader.get(j));
+                        }
+                        u= Units.cdfTT2000;
+                        bundleb= new double[reader.getColumnCount()];
+                        icolumn= 0;
+                    } else {
+                        icolumn= reader.getColumnCount()-1;
                     }
                 }
                 if ( idep0column==-1 && reader.getColumnCount()==2 ) {
@@ -217,11 +228,12 @@ public class CsvDataSource extends AbstractDataSource {
                 }
                 if ( bundleb!=null ) {
                     for ( int j=0; j<bundleb.length; j++ ) {
-                        if ( u instanceof EnumerationUnits ) {
-                            bundleb[j]= ((EnumerationUnits)u).createDatum( reader.get(icolumn+j) ).doubleValue(u);
+                        Units u1= columnUnits[j];
+                        if ( u1 instanceof EnumerationUnits ) {
+                            bundleb[j]= ((EnumerationUnits)u1).createDatum( reader.get(icolumn+j) ).doubleValue(u1);
                         } else {
                             try {
-                                bundleb[j]= u.parse(reader.get(icolumn+j)).doubleValue(u);
+                                bundleb[j]= u1.parse(reader.get(icolumn+j)).doubleValue(u1);
                             } catch ( ParseException ex ) {
                                 fill= -1e38;
                                 bundleb[j]= fill;
@@ -270,11 +282,21 @@ public class CsvDataSource extends AbstractDataSource {
             tds.putProperty(QDataSet.LABEL,dep0ds.property(QDataSet.LABEL));
             ds.putProperty(QDataSet.DEPEND_0, tds);
         }
-        ds.putProperty(QDataSet.UNITS,u);
-        ds.putProperty(QDataSet.NAME,icolumnDs.property(QDataSet.NAME));
-        ds.putProperty(QDataSet.LABEL,icolumnDs.property(QDataSet.LABEL));
-        if ( fill==-1e38 ) {
-            ds.putProperty( QDataSet.FILL_VALUE, fill );
+        if ( bundleb!=null ) {
+            SparseDataSet bds= SparseDataSet.createRankLen( 2, bundleb.length );
+            for ( int j=0; j<bundleb.length; j++ ) {
+                bds.putProperty(QDataSet.UNITS, j, columnUnits[j]);
+                bds.putProperty(QDataSet.LABEL, j, headers[j] );
+                bds.putProperty(QDataSet.NAME, j, Ops.safeName(headers[j]) );
+            }
+            ds.putProperty( QDataSet.BUNDLE_1, bds );
+        } else {
+            ds.putProperty(QDataSet.UNITS,u);
+            ds.putProperty(QDataSet.NAME,icolumnDs.property(QDataSet.NAME));
+            ds.putProperty(QDataSet.LABEL,icolumnDs.property(QDataSet.LABEL));
+            if ( fill==-1e38 ) {
+                ds.putProperty( QDataSet.FILL_VALUE, fill );
+            }
         }
 
         return ds;
