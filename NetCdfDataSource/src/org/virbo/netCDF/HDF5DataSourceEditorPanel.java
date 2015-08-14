@@ -295,7 +295,9 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 }                
             }
             
-            parameter= parameter.replaceAll("%3D", "=");
+            if ( parameter!=null ) {
+                parameter= parameter.replaceAll("%3D", "=");
+            }
             
         } catch (IOException ex) {
             DasExceptionHandler.handle( ex );
