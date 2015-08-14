@@ -25,7 +25,6 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.IstpMetadataModel;
 import ucar.ma2.InvalidRangeException;
@@ -79,7 +78,9 @@ public class NetCdfVarDataSet extends AbstractDataSet {
      * 
      * See CdfJavaDataSource, which is where this was copied from.
      * @param constraint, such as "[0:100:2]" for even records between 0 and 100, non-inclusive.
+     * @param recCount the number of records for when negative indeces are used.
      * @return [ start, stop, stride ] or [ start, -1, -1 ] for slice.
+     * @throws java.text.ParseException
      */
      public static long[] parseConstraint(String constraint, long recCount) throws ParseException {
         long[] result = new long[]{0, recCount, 1};
@@ -335,7 +336,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         
     }
     
-    
+    @Override
     public int rank() {
         return shape.length;
     }
