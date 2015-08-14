@@ -58,6 +58,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
     Map<String, String> params;
     URISplit split;
 
+    @Override
     public boolean reject( String url ) throws IOException, URISyntaxException {
         split = URISplit.parse(url);
         FileSystem fs = FileSystem.create( DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI() );
@@ -67,6 +68,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
         return false;
     }
     
+    @Override
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
         split = URISplit.parse(uri);
         params = URISplit.parseParams(split.params);
@@ -76,6 +78,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
         return true;
     }
 
+    @Override
     public void markProblems(List<String> problems) {
 
     }
@@ -91,7 +94,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
         jTable1.setCellSelectionEnabled(true);
 
         jTable1.getColumnModel().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) {
                     return;
@@ -206,7 +209,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
 
     Action createToolAction(final String label, final Tool t) {
         return new AbstractAction(label) {
-
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if ( e.getSource() instanceof JToggleButton ) {
                     if ( jTable1.getSelectionModel().isSelectionEmpty() ) {
@@ -493,7 +496,7 @@ private void firstRowTextFieldActionPerformed(java.awt.event.ActionEvent evt) {/
 }//GEN-LAST:event_firstRowTextFieldActionPerformed
 
 private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_firstRowTextFieldFocusLost
-    if (((Integer) firstRowTextField.getValue()).intValue() > 1) {
+    if (((Integer) firstRowTextField.getValue()) > 1) {
         params.put(PROP_FIRST_ROW, String.valueOf(firstRowTextField.getValue()));
     }
     resetFirstRow();
@@ -542,6 +545,7 @@ private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FI
     public static final String PROP_COLUMN = "column";
     public static final String PROP_DEP0 = "depend0";
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
@@ -554,6 +558,7 @@ private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FI
         }
     }
 
+    @Override
     public void setURI(String url) {
         try {
             split = URISplit.parse(url);
@@ -578,6 +583,7 @@ private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FI
 
     }
 
+    @Override
     public String getURI() {
 
         if ( params.containsKey(PROP_COLUMN) ) {
