@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,9 +58,10 @@ import org.virbo.dsops.Ops;
 public class CreatePngWalk {
 
     /**
-     * Get the list of times, which can be one of:
-     *   * rank 2 bins datasets  T[index;min,max]
-     *   * dataset with rank 2 bins datasets   Event[ T[index;min,max] ]
+     * Get the list of times, which can be one of:<ul>
+     *   <li> rank 2 bins datasets  T[index;min,max]
+     *   <li> dataset with rank 2 bins datasets   Event[ T[index;min,max] ]
+     * </ul>
      * This uses params.batchUri to get the URI that is resolved to control the times.  These
      * times then need to be formatted to filenames, 
      * 
@@ -67,14 +70,11 @@ public class CreatePngWalk {
      * @throws IllegalArgumentException
      * @throws ParseException 
      */
-    private static String[] getListOfTimes( Params params ) throws IllegalArgumentException, ParseException {
+    private static String[] getListOfTimes( Params params, List<String> warnings ) throws IllegalArgumentException, ParseException {
         String[] times;
         if ( params.useBatchUri ) {
             try {
                 String uri= params.batchUri;
-                if ( uri.endsWith(".dat") || uri.endsWith(".txt")) {
-                    uri += "?eventListColumn=field1";
-                }
                 QDataSet timesds= org.virbo.jythonsupport.Util.getDataSet( uri );
                 if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(timesds) ) ) {
                     if ( (QDataSet) timesds.property(QDataSet.DEPEND_0)!=null ) {
@@ -82,7 +82,7 @@ public class CreatePngWalk {
                     } else if ( SemanticOps.isBundle(timesds) ) { // See EventsRenderer.makeCanonical
                         timesds= Ops.bundle( DataSetOps.unbundle(timesds,0), DataSetOps.unbundle(timesds,1) ); 
                     } else {
-                        throw new IllegalArgumentException("expected [UTC,UTC] or [UTC,UTC,:]");
+                        throw new IllegalArgumentException("expected events list URI");
                     }
                 }
                 if ( timesds.rank()!=2 ) {
@@ -103,7 +103,8 @@ public class CreatePngWalk {
                         Datum w1= tp.parse(times[i]).getTimeRange().width();
                         if ( w1.multiply(2).lt(w0) ) {
                             if ( i==0 ) {
-                                logger.fine("timeformat poorly represents the time, flipping into jeggy mode...");
+                                logger.log(Level.WARNING, "timeformat ({0}) is not sufficient to uniquely identify each time.", params.timeFormat);
+                                warnings.add("timeformat ("+params.timeFormat+") is not sufficient to uniquely identify each time.");
                                 jeggyMode= true;
                                 times[i]= tp.format( DataSetUtil.asDatumRange( timesds.slice(i) ) ) + ": "+DataSetUtil.asDatumRange( timesds.slice(i) ).toString();
                             } else {
@@ -557,7 +558,7 @@ public class CreatePngWalk {
                     return -1;
                 }
 
-                String[] times = getListOfTimes( params );
+                String[] times = getListOfTimes( params, new ArrayList() );
 
                 status= doBatch( times, dom, params, mon );
 
@@ -589,7 +590,7 @@ public class CreatePngWalk {
 
         } else {
             
-            String[] times = getListOfTimes( params );
+            String[] times = getListOfTimes( params, new ArrayList() );
             
             ProgressMonitor mon;
             if (ScriptContext.getViewWindow() == null) {
