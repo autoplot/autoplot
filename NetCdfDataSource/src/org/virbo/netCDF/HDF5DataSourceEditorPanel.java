@@ -329,7 +329,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
             }
 
-            String label= "Select HDF5 Variable (%d parameters):";
+            String label= "Select Parameter (%d parameters):";
             
             int numData= vars.size();
 
