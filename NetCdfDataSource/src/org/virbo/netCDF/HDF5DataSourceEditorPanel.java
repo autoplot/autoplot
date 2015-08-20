@@ -65,9 +65,15 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         selectVariableLabel = new javax.swing.JLabel();
         jSplitPane2 = new javax.swing.JSplitPane();
         jSplitPane1 = new javax.swing.JSplitPane();
+        advancedPanel = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        subsetComboBox = new javax.swing.JComboBox();
+        whereCB1 = new javax.swing.JCheckBox();
+        whereParamList = new javax.swing.JComboBox();
+        whereOp = new javax.swing.JComboBox();
+        whereTF = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         parameterTree = new javax.swing.JTree();
-        jLabel1 = new javax.swing.JLabel();
         parameterInfoLabel = new javax.swing.JLabel();
 
         selectVariableLabel.setText("Select paramater:");
@@ -77,6 +83,68 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         jSplitPane1.setResizeWeight(0.5);
 
+        advancedPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Advanced"));
+        advancedPanel.setMaximumSize(new java.awt.Dimension(285, 32767));
+
+        jLabel5.setText("Load subset of the data:");
+        jLabel5.setToolTipText("<html>Load a subset of the data records, for example:<br>[0:100]  first 100 records<br> [-100:] last 100 records<br> [::10] every tenth record<br> </html>");
+
+        subsetComboBox.setEditable(true);
+        subsetComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "::10", "0:100", "-100:", "0:10000:5" }));
+        subsetComboBox.setToolTipText("<html>Load a subset of the data records, for example:<br>[0:100]  first 100 records<br> [-100:] last 100 records<br> [::10] every tenth record<br> </html>");
+
+        whereCB1.setText("Only load data where:");
+        whereCB1.setToolTipText("return only the records where the condition is true");
+        whereCB1.setEnabled(false);
+
+        whereParamList.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        whereParamList.setEnabled(false);
+
+        whereOp.setModel(new javax.swing.DefaultComboBoxModel(new String[] { ".eq", ".gt", ".lt", ".ne", ".within" }));
+        whereOp.setEnabled(false);
+
+        whereTF.setText("0");
+        whereTF.setToolTipText("enter the value, or \"mode\" for the most frequently occuring value.");
+        whereTF.setEnabled(false);
+
+        javax.swing.GroupLayout advancedPanelLayout = new javax.swing.GroupLayout(advancedPanel);
+        advancedPanel.setLayout(advancedPanelLayout);
+        advancedPanelLayout.setHorizontalGroup(
+            advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(advancedPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(whereParamList, 0, 340, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(whereOp, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(whereTF, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(advancedPanelLayout.createSequentialGroup()
+                .addGroup(advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5)
+                    .addComponent(whereCB1)
+                    .addGroup(advancedPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(subsetComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 314, Short.MAX_VALUE))
+        );
+        advancedPanelLayout.setVerticalGroup(
+            advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(advancedPanelLayout.createSequentialGroup()
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(subsetComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(whereCB1)
+                .addGap(8, 8, 8)
+                .addGroup(advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(whereParamList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(whereOp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(whereTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(330, 330, 330))
+        );
+
+        jSplitPane1.setRightComponent(advancedPanel);
+
         parameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 parameterTreeValueChanged(evt);
@@ -85,10 +153,6 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jScrollPane1.setViewportView(parameterTree);
 
         jSplitPane1.setLeftComponent(jScrollPane1);
-
-        jLabel1.setText("More to come...");
-        jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        jSplitPane1.setRightComponent(jLabel1);
 
         jSplitPane2.setTopComponent(jSplitPane1);
 
@@ -122,7 +186,8 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel advancedPanel;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
@@ -130,6 +195,11 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private javax.swing.JLabel parameterInfoLabel;
     private javax.swing.JTree parameterTree;
     private javax.swing.JLabel selectVariableLabel;
+    private javax.swing.JComboBox subsetComboBox;
+    private javax.swing.JCheckBox whereCB1;
+    private javax.swing.JComboBox whereOp;
+    private javax.swing.JComboBox whereParamList;
+    private javax.swing.JTextField whereTF;
     // End of variables declaration//GEN-END:variables
 
     private static final Logger logger= LoggerManager.getLogger("apdss.hdf5");
@@ -295,6 +365,14 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 }                
             }
             
+            if ( param!=null ) {
+                if ( subset!=null ) {
+                    subsetComboBox.setSelectedItem( subset );
+                } else {
+                    subsetComboBox.setSelectedItem("");
+                }
+            } 
+            
             if ( parameter!=null ) {
                 parameter= parameter.replaceAll("%3D", "=");
             }
@@ -324,7 +402,16 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
     @Override
     public String getURI() {
-        params.put( "arg_0", parameter );
+        String slice= subsetComboBox.getSelectedItem().toString().trim();
+        if ( slice.length()>0 && slice.charAt(0)!='[' ) {
+            slice= "["+slice+"]";
+        }
+        
+        String p= parameter;
+        if ( slice.length()>0 ) {
+            p= p+slice;
+        }
+        params.put( "arg_0", p );
         split.params= URISplit.formatParams(params);
         return URISplit.format(split);
     }
