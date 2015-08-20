@@ -350,7 +350,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
     public double value( int i, int j ) {
         int index= j + shape[1] * i;
         if ( index>=data.length) {
-            throw new IllegalArgumentException("how");
+            throw new IllegalArgumentException("index out of bounds");
         }
         return data[ index ];
     }
@@ -360,7 +360,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         //int index= i + shape[0] * j + shape[0] * shape[1] * k;
         int index= k + shape[2] * j + shape[2] * shape[1] * i;
         if ( index>=data.length) {
-            throw new IllegalArgumentException("how");
+            throw new IllegalArgumentException("index out of bounds");
         }
         return data[index];
     }
@@ -369,7 +369,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
     public double value( int i, int j, int k, int l ) {
         int index= l + shape[3] * k  + shape[3] * shape[2] * j + shape[3] * shape[2] * shape[1] * i;
         if ( index>=data.length) {
-            throw new IllegalArgumentException("how");
+            throw new IllegalArgumentException("index out of bounds");
         }
         return data[index];
     }
