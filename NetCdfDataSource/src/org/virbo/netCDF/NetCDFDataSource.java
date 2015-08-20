@@ -12,14 +12,17 @@ package org.virbo.netCDF;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
+import org.das2.dataset.NoDataInIntervalException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.das2.datum.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
@@ -41,9 +44,19 @@ public class NetCDFDataSource extends AbstractDataSource {
     
     private static final Logger logger= LoggerManager.getLogger("apdss.netcdf");
     
+    protected static final String PARAM_WHERE = "where";
+        
     Variable variable;
+    
+    /**
+     * if non-null, the variable to use for the where filter.
+     */
+    Variable whereVariable;  
+    
     String sMyUrl;
     String svariable;
+    String swhereVariable;
+    
     NetcdfDataset ncfile;
     String constraint; // null, or string like [:,:,4,5]
 
@@ -84,7 +97,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             
         } else {
             // get the variable            
-            Map p= getParams();
+            Map<String,String> p= getParams();
             if ( p.containsKey( "id" ) ) {
                 svariable= (String) p.get( "id" );
             } else {
@@ -100,19 +113,28 @@ public class NetCDFDataSource extends AbstractDataSource {
                     constraint= null;
                 }
             }
+            
+            swhereVariable= p.get( PARAM_WHERE );  // may be null, typically is null.
+
         }
     }
     
     @Override
-    public QDataSet getDataSet( ProgressMonitor mon) throws IOException {
+    public QDataSet getDataSet( ProgressMonitor mon) throws IOException, NoDataInIntervalException, ParseException {
         logger.finer("getDataSet");
         mon.started();
         mon.setTaskSize(20);
         try { 
             readData( mon.getSubtaskMonitor(0,15,"read data") );
-            NetCdfVarDataSet result= NetCdfVarDataSet.create( getVariable(), constraint, ncfile, mon.getSubtaskMonitor(15,20,"copy over ") );
+            QDataSet result= NetCdfVarDataSet.create( getVariable(), constraint, ncfile, mon.getSubtaskMonitor(15,20,"copy over ") );
+            String w= (String)getParam(PARAM_WHERE,"" );
+            if ( w!=null && w.length()>0 ) {
+                NetCdfVarDataSet whereParm= NetCdfVarDataSet.create( whereVariable, constraint, ncfile, new NullProgressMonitor() );
+                result = doWhereFilter( w, whereParm, DataSetOps.makePropertiesMutable(result) );
+            }
+
             QDataSet qresult= checkLatLon(result);
-            
+               
             ncfile.close();
             ncfile= null;
             return qresult;
@@ -127,7 +149,7 @@ public class NetCDFDataSource extends AbstractDataSource {
      * check for lat and lon tags, transpose if lat come before lon.
      * @param v
      */
-    private QDataSet checkLatLon( NetCdfVarDataSet v ) {
+    private QDataSet checkLatLon( QDataSet v ) {
         int lat=-1;
         int lon=-1;
         for ( int i=0; i<v.rank();i++ ) {
@@ -150,7 +172,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             return v;
         }
     }
-
+    
     /**
      * this is sloppy in that it opens the file and then relies on someone else to close it.
      * @param mon
@@ -198,6 +220,17 @@ public class NetCDFDataSource extends AbstractDataSource {
                     }
                 }
                 if ( variable==null ) throw new IllegalArgumentException("No such variable: "+svariable);
+            }
+            
+            if ( swhereVariable!=null ) {
+                int i= swhereVariable.indexOf(".");
+                String swv= swhereVariable.substring(0,i);
+                for (Variable v : variables) {
+                    if ( v.getName().replaceAll(" ", "+").equals( swv ) ) { //TODO: verify this, it's probably going to cause problems now.
+                        whereVariable= v;
+                    }
+                }
+                if ( whereVariable==null ) throw new IllegalArgumentException("No such variable: "+swv );
             }
         } finally {
             mon.finished();
