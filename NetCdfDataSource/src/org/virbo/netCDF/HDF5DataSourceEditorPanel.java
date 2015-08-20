@@ -113,7 +113,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(advancedPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(whereParamList, 0, 340, Short.MAX_VALUE)
+                .addComponent(whereParamList, 0, 257, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(whereOp, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -125,7 +125,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     .addGroup(advancedPanelLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(subsetComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 314, Short.MAX_VALUE))
+                .addGap(0, 231, Short.MAX_VALUE))
         );
         advancedPanelLayout.setVerticalGroup(
             advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -140,7 +140,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     .addComponent(whereParamList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(whereOp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(whereTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(330, 330, 330))
+                .addContainerGap(102, Short.MAX_VALUE))
         );
 
         jSplitPane1.setRightComponent(advancedPanel);
@@ -157,6 +157,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jSplitPane2.setTopComponent(jSplitPane1);
 
         parameterInfoLabel.setText("jLabel1");
+        parameterInfoLabel.setMinimumSize(new java.awt.Dimension(49, 100));
         jSplitPane2.setRightComponent(parameterInfoLabel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -166,14 +167,14 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             .addGroup(layout.createSequentialGroup()
                 .addComponent(selectVariableLabel)
                 .addGap(0, 0, Short.MAX_VALUE))
-            .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
+            .addComponent(jSplitPane2)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(selectVariableLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE))
+                .addComponent(jSplitPane2))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -367,6 +368,8 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             
             if ( param!=null ) {
                 if ( subset!=null ) {
+                    if ( subset.startsWith("[") ) subset= subset.substring(1); // note I think they always will.
+                    if ( subset.endsWith("]") ) subset= subset.substring(0,subset.length()-1);                    
                     subsetComboBox.setSelectedItem( subset );
                 } else {
                     subsetComboBox.setSelectedItem("");
@@ -402,14 +405,14 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
     @Override
     public String getURI() {
-        String slice= subsetComboBox.getSelectedItem().toString().trim();
-        if ( slice.length()>0 && slice.charAt(0)!='[' ) {
-            slice= "["+slice+"]";
+        String subset= subsetComboBox.getSelectedItem().toString().trim();
+        if ( subset.length()>0 && subset.charAt(0)!='[' ) {
+            subset= "["+subset+"]";
         }
         
         String p= parameter;
-        if ( slice.length()>0 ) {
-            p= p+slice;
+        if ( subset.length()>0 ) {
+            p= p+subset;
         }
         params.put( "arg_0", p );
         split.params= URISplit.formatParams(params);
