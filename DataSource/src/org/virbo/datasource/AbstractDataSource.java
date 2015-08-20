@@ -15,14 +15,28 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.autoplot.bufferdataset.BufferDataSet;
+import org.das2.dataset.NoDataInIntervalException;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
+import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.capability.Updating;
+import org.virbo.dsops.CoerceUtil;
+import org.virbo.dsops.Ops;
 
 /**
  * Base class for file-based DataSources that keeps track of the uri, makes
@@ -198,7 +212,7 @@ public abstract class AbstractDataSource implements DataSource {
      * return the parameters from the URL.
      * @return the parameters from the URL.
      */
-    protected Map getParams() {
+    protected Map<String,String> getParams() {
         return new LinkedHashMap(params);
     }
 
@@ -268,6 +282,151 @@ public abstract class AbstractDataSource implements DataSource {
             return Collections.singletonMap("Exception", (Object) e);
         }
     }
+    
+    /**
+     * 
+     * @param result the dataset
+     * @param parm the param used to filter.
+     * @param op one of gt,lt,eq,ne,within
+     * @param d rank 0 value or rank 1 range for the "within" operator.
+     * @return the dataset with the filter applied.  (Note this may or may not be the same object.)
+     */
+    private MutablePropertyDataSet applyFilter( MutablePropertyDataSet result, QDataSet parm, String op, QDataSet d ) throws NoDataInIntervalException {
+        QDataSet r;
+        if ( parm.rank()<result.rank() ) {
+                    QDataSet[] operands= new QDataSet[2];
+                    CoerceUtil.coerce( result, parm, false, operands );
+                    parm= operands[1];
+                }
+                if ( parm.rank()>1 ) {
+                    if ( op.equals("gt" ) ){
+                        r= Ops.where( Ops.le( parm,d ) );
+                    } else if ( op.equals("lt") ) {
+                        r= Ops.where( Ops.ge( parm,d ) );
+                    } else if ( op.equals("eq") ) {
+                        r= Ops.where( Ops.ne( parm,d ) );
+                    } else if ( op.equals("ne") ) {
+                        r= Ops.where( Ops.eq( parm,d ) );
+                    } else if ( op.equals("within") ) {
+                        r= Ops.where( Ops.without( parm,d ) );
+                    } else {
+                        throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");                        
+                    }
+                    double fill= Double.NaN;
+                    result= BufferDataSet.maybeCopy(result);
+                    if ( parm.rank()==2 && result.rank()==2 ) {
+                        for ( int jj=0; jj<r.length(); jj++ ) {
+                            ((BufferDataSet)result).putValue((int)r.value(jj,0),(int)r.value(jj,1),fill);
+                        }
+                    } else if ( parm.rank()==3 && result.rank()==3 ) {
+                        for ( int jj=0; jj<r.length(); jj++ ) {
+                            ((BufferDataSet)result).putValue((int)r.value(jj,0),(int)r.value(jj,1),(int)r.value(jj,2),fill);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("where can only apply filter and dataset have same dimensions");  
+                    }
+                } else if ( parm.rank()<2 ) {
+                    if ( op.equals("gt" ) ){
+                        r= Ops.where( Ops.gt( parm,d ) );
+                    } else if ( op.equals("lt") ) {
+                        r= Ops.where( Ops.lt( parm,d ) );
+                    } else if ( op.equals("eq") ) {
+                        r= Ops.where( Ops.eq( parm,d ) );
+                    } else if ( op.equals("ne") ) {
+                        r= Ops.where( Ops.ne( parm,d ) );
+                    } else if ( op.equals("within") ) {
+                        r= Ops.where( Ops.within( parm,d ) );
+                    } else {
+                            throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
+                    }
+                    if ( r.length()==0 ) {
+                        throw new NoDataInIntervalException("'where' argument removes all data");
+                    } else {
+                        result= DataSetOps.applyIndex( result, 0, r, true );
+                        // check to see if rank 2 depend can now be rank 1.  This might be the reason we used where...
+                        for ( int ii=1; ii<result.rank(); ii++ ) {
+                            String sdep= "DEPEND_"+ii;
+                            QDataSet dep= (QDataSet) result.property(sdep);
+                            if ( dep!=null && dep.rank()==2 && DataSetUtil.isConstant(dep) ) {
+                                result.putProperty(sdep,dep.slice(0) );
+                            }
+                        }
+                    }
+                }
+        return result;
+    }
+    
+    
+    /**
+     * implement where constraint.  This was extracted from the CdfDataSource to support HDF5 files as well, and soon txt files.
+     * 
+     * @param w
+     * @param parm
+     * @param result
+     * @return
+     * @throws NoDataInIntervalException, ParseException 
+     */
+    protected MutablePropertyDataSet doWhereFilter( String w, QDataSet parm, MutablePropertyDataSet result) throws NoDataInIntervalException, ParseException {
+        Pattern p= Pattern.compile("\\.([elgn][qte])\\(");
+        Matcher m= p.matcher(w);
+        int ieq;
+        if ( !m.find() ) {
+            Pattern p2= Pattern.compile("\\.within\\(");
+            Matcher m2= p2.matcher(w);
+            if ( !m2.find() ) {
+                throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, .lt, .within");
+            } else {
+                ieq= w.indexOf(".within(");
+                String sval= w.substring(ieq+8).replaceAll("\\+"," ");
+                if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
+                Units du= SemanticOps.getUnits(parm);
+                DatumRange dr= DatumRangeUtil.parseDatumRange(sval,du);
+                result= applyFilter( result, parm, "within", DataSetUtil.asDataSet(dr) );
+                
+            }
+            
+        } else {
+            ieq= m.start();
+            String op= m.group(1);
+            String sval= w.substring(ieq+4);
+            if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
+            parm= Ops.reform(parm); // TODO: Nasty kludge why did we see it in the first place vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN&where=range__C4_CP_FGM_SPIN.eq(3)
+            QDataSet d;
+            if ( parm.rank()==2 ) {
+                if ( sval.equals("mode") && ( op.equals("eq") || op.equals("ne") ) ) {
+                    QDataSet hash= Ops.hashcodes(parm);
+                    QDataSet mode= Ops.mode(hash);
+                    d= mode;
+                    parm= hash;
+                } else {
+                    Units du= SemanticOps.getUnits(parm);
+                    d= DataSetUtil.asDataSet( du.parse(sval) );
+                }
+            } else if ( parm.rank()==1 ) {
+                if ( sval.equals("mode") ) {
+                    QDataSet mode= Ops.mode(parm);
+                    d= mode;
+                } else if ( sval.equals("median") ) {
+                    QDataSet median= Ops.median(parm);
+                    d= median;
+                } else if ( sval.equals("mean") ) {
+                    QDataSet mean= Ops.mean(parm);
+                    d= mean;
+                } else {
+                    Units du= SemanticOps.getUnits(parm);
+                    d= DataSetUtil.asDataSet(du.parse(sval));
+                }
+            } else {
+                throw new IllegalArgumentException("param is rank>2");
+            }
+            
+            result= applyFilter(result, parm, op, d );
+            
+        }
+        return result;
+    }
+    
+    
 
     private HashMap<Class, Object> capabilities = new HashMap<Class, Object>();
 
