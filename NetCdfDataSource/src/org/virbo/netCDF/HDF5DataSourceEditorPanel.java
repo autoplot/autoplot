@@ -1,14 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.netCDF;
 
 import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,8 +22,6 @@ import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
@@ -140,7 +133,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     .addComponent(whereParamList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(whereOp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(whereTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(102, Short.MAX_VALUE))
+                .addContainerGap(161, Short.MAX_VALUE))
         );
 
         jSplitPane1.setRightComponent(advancedPanel);
@@ -157,6 +150,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jSplitPane2.setTopComponent(jSplitPane1);
 
         parameterInfoLabel.setText("jLabel1");
+        parameterInfoLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         parameterInfoLabel.setMinimumSize(new java.awt.Dimension(49, 100));
         jSplitPane2.setRightComponent(parameterInfoLabel);
 
@@ -308,9 +302,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             List<Variable> vars= (List<Variable>)dataset.getVariables();
             dataset.close();
             
-            for ( int j=0; j<vars.size();j++ ) {
-                Variable v= vars.get(j);
-
+            for (Variable v : vars) {
                 if ( v.getDimensions().isEmpty() ) continue;
                 boolean isFormattedTime= v.getDataType()==DataType.CHAR && v.getRank()==2 && v.getShape(1)>=14 && v.getShape(1)<=30;
                 if ( !isFormattedTime && !v.getDataType().isNumeric() ) continue;
@@ -326,7 +318,6 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 description.append("]");
                 
                 parameters.put( v.getName(), description.toString() );
-
             }
 
             String label= "Select Parameter (%d parameters):";

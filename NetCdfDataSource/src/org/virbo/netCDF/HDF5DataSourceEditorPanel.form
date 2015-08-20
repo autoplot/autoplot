@@ -214,6 +214,7 @@
         <Component class="javax.swing.JLabel" name="parameterInfoLabel">
           <Properties>
             <Property name="text" type="java.lang.String" value="jLabel1"/>
+            <Property name="verticalAlignment" type="int" value="1"/>
             <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[49, 100]"/>
             </Property>
