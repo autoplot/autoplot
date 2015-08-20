@@ -53,6 +53,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jScrollPane2 = new javax.swing.JScrollPane();
         selectVariableLabel = new javax.swing.JLabel();
@@ -61,7 +62,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         advancedPanel = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         subsetComboBox = new javax.swing.JComboBox();
-        whereCB1 = new javax.swing.JCheckBox();
+        whereCB = new javax.swing.JCheckBox();
         whereParamList = new javax.swing.JComboBox();
         whereOp = new javax.swing.JComboBox();
         whereTF = new javax.swing.JTextField();
@@ -86,19 +87,24 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         subsetComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "::10", "0:100", "-100:", "0:10000:5" }));
         subsetComboBox.setToolTipText("<html>Load a subset of the data records, for example:<br>[0:100]  first 100 records<br> [-100:] last 100 records<br> [::10] every tenth record<br> </html>");
 
-        whereCB1.setText("Only load data where:");
-        whereCB1.setToolTipText("return only the records where the condition is true");
-        whereCB1.setEnabled(false);
+        whereCB.setText("Only load data where:");
+        whereCB.setToolTipText("return only the records where the condition is true");
 
         whereParamList.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        whereParamList.setEnabled(false);
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereParamList, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
 
         whereOp.setModel(new javax.swing.DefaultComboBoxModel(new String[] { ".eq", ".gt", ".lt", ".ne", ".within" }));
-        whereOp.setEnabled(false);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereOp, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
 
         whereTF.setText("0");
         whereTF.setToolTipText("enter the value, or \"mode\" for the most frequently occuring value.");
-        whereTF.setEnabled(false);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, whereCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), whereTF, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
 
         javax.swing.GroupLayout advancedPanelLayout = new javax.swing.GroupLayout(advancedPanel);
         advancedPanel.setLayout(advancedPanelLayout);
@@ -114,7 +120,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             .addGroup(advancedPanelLayout.createSequentialGroup()
                 .addGroup(advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel5)
-                    .addComponent(whereCB1)
+                    .addComponent(whereCB)
                     .addGroup(advancedPanelLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(subsetComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -127,7 +133,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(subsetComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(whereCB1)
+                .addComponent(whereCB)
                 .addGap(8, 8, 8)
                 .addGroup(advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(whereParamList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -170,6 +176,8 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSplitPane2))
         );
+
+        bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
     private void parameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTreeValueChanged
@@ -191,10 +199,11 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private javax.swing.JTree parameterTree;
     private javax.swing.JLabel selectVariableLabel;
     private javax.swing.JComboBox subsetComboBox;
-    private javax.swing.JCheckBox whereCB1;
+    private javax.swing.JCheckBox whereCB;
     private javax.swing.JComboBox whereOp;
     private javax.swing.JComboBox whereParamList;
     private javax.swing.JTextField whereTF;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
     private static final Logger logger= LoggerManager.getLogger("apdss.hdf5");
@@ -310,10 +319,15 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 for ( int k=0; k<v.getDimensions().size(); k++ ) {
                     Dimension d= v.getDimension(k);
                     if ( k>0 ) description.append(",");
-                    if ( !d.getName().equals(v.getName()) ) {
-                        description.append(d.getName()).append("=");
+                    try {
+                        String n= d.getName();
+                        if ( n!=null && !n.equals(v.getName()) ) {
+                            description.append(d.getName()).append("=");
+                        }
+                        description.append(d.getLength());
+                    } catch ( NullPointerException ex ) {
+                        throw ex;
                     }
-                    description.append(d.getLength());
                 }
                 description.append("]");
                 
@@ -369,6 +383,26 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 parameter= parameter.replaceAll("%3D", "=");
             }
             
+            List<String> varnames= new ArrayList<String>();
+            for ( Variable v: vars ) {
+                varnames.add(v.getName());
+            }
+            whereParamList.setModel( new DefaultComboBoxModel( varnames.toArray() ) );
+            String where= params.get("where");
+            if ( where!=null && where.length()>0 ) {
+                whereCB.setSelected(true);
+                int i= where.indexOf(".");
+                if ( i>-1 ) {
+                    whereParamList.setSelectedItem(where.substring(0,i)); 
+                    int i0= where.indexOf("(");
+                    int i1= where.indexOf(")",i0);
+                    whereOp.setSelectedItem(where.substring(i,i0));
+                    whereTF.setText( where.substring(i0+1,i1).replaceAll("\\+"," "));
+                }
+            } else {
+                whereCB.setSelected(false);
+            }
+            
         } catch (IOException ex) {
             DasExceptionHandler.handle( ex );
             logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -404,6 +438,13 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             p= p+subset;
         }
         params.put( "arg_0", p );
+        
+        if ( whereCB.isSelected() ) {
+            params.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText().replaceAll(" ","+") ) );
+        } else {
+            params.remove("where");
+        }
+        
         split.params= URISplit.formatParams(params);
         return URISplit.format(split);
     }
