@@ -247,7 +247,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         return true;
     }
     
-    private void fillTree( JTree parameterTree, Map<String,String> mm, String param, String slice1 ) {
+    private void fillTree( JTree parameterTree, Map<String,String> mm, String param ) {
 
         DefaultMutableTreeNode root= new DefaultMutableTreeNode("");
 
@@ -345,9 +345,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 }
             }
             
-            String slice1= params.remove("slice1");
-
-            fillTree( this.parameterTree, parameters, param, slice1 );
+            fillTree( this.parameterTree, parameters, param );
             
             logger.finest("close hdf");
 
