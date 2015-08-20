@@ -483,6 +483,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
             if ( param!=null ) {
                 if ( subset!=null ) {
+                    if ( subset.startsWith("[") ) subset= subset.substring(1);
+                    if ( subset.endsWith("]") ) subset= subset.substring(0,subset.length()-1);
                     subsetComboBox.setSelectedItem( subset );
                 } else {
                     subsetComboBox.setSelectedItem("");
@@ -543,9 +545,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
     @Override
     public String getURI() {
-        String slice= subsetComboBox.getSelectedItem().toString().trim();
-        if ( slice.length()>0 && slice.charAt(0)!='[' ) {
-            slice= "["+slice+"]";
+        String subset= subsetComboBox.getSelectedItem().toString().trim();
+        if ( subset.length()>0 && subset.charAt(0)!='[' ) {
+            subset= "["+subset+"]";
         }
 
         if ( isValidCDF ) {
@@ -555,14 +557,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             } else if ( treePath.getPathCount()==3 ) {
                 String p= String.valueOf( treePath.getPathComponent(1) );
                 p= p.replaceAll("=", "%3D");
-                params.put( "arg_0", p + ( slice==null ? "" : slice ) );
+                params.put( "arg_0", p + ( subset==null ? "" : subset ) );
                 String val=  String.valueOf( treePath.getPathComponent(2) );
                 int idx= val.indexOf(":");
                 params.put( "slice1", val.substring(0,idx).trim() );
             } else {
                 String p= String.valueOf( treePath.getPathComponent(1) );
                 p= p.replaceAll("=", "%3D");
-                params.put( "arg_0", p + ( slice==null ? "" : slice ) );
+                params.put( "arg_0", p + ( subset==null ? "" : subset ) );
             }
 
             if ( noDep.isSelected() ) {
