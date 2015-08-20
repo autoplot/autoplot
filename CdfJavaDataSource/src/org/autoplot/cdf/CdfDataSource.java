@@ -415,67 +415,10 @@ public class CdfDataSource extends AbstractDataSource {
 
         String w= (String)map.get( PARAM_WHERE );
         if ( w!=null && w.length()>0 ) {
-            Pattern p= Pattern.compile("\\.([elgn][qte])\\(");
-            Matcher m= p.matcher(w);
-            int ieq;
-            if ( !m.find() ) {
-                Pattern p2= Pattern.compile("\\.within\\(");
-                Matcher m2= p2.matcher(w);
-                if ( !m2.find() ) {
-                    throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, .lt, .within");
-                } else {
-                    ieq= w.indexOf(".within(");
-                    String sval= w.substring(ieq+8).replaceAll("\\+"," ");
-                    if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
-                    String sparm= w.substring(0,ieq);
-                    QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, null );
-                    Units du= SemanticOps.getUnits(parm);
-                    DatumRange dr= DatumRangeUtil.parseDatumRange(sval,du);
-                    result= applyFilter( result, parm, "within", DataSetUtil.asDataSet(dr) );
-                    
-                }
-                
-            } else {
-                ieq= m.start();
-                String op= m.group(1);
-                String sval= w.substring(ieq+4);
-                if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
-                String sparm= w.substring(0,ieq);
-                QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, null );
-                parm= Ops.reform(parm); // TODO: Nasty kludge why did we see it in the first place vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN&where=range__C4_CP_FGM_SPIN.eq(3)
-                QDataSet r;
-                QDataSet d;
-                if ( parm.rank()==2 ) {
-                    if ( sval.equals("mode") && ( op.equals("eq") || op.equals("ne") ) ) {
-                        QDataSet hash= Ops.hashcodes(parm);
-                        QDataSet mode= Ops.mode(hash);
-                        d= mode;
-                        parm= hash;
-                    } else { 
-                        Units du= SemanticOps.getUnits(parm);
-                        d= DataSetUtil.asDataSet( du.parse(sval) );
-                    }
-                } else if ( parm.rank()==1 ) {
-                    if ( sval.equals("mode") ) {
-                        QDataSet mode= Ops.mode(parm);
-                        d= mode;
-                    } else if ( sval.equals("median") ) {
-                        QDataSet median= Ops.median(parm);
-                        d= median;
-                    } else if ( sval.equals("mean") ) {
-                        QDataSet mean= Ops.mean(parm);
-                        d= mean;
-                    } else {
-                        Units du= SemanticOps.getUnits(parm);
-                        d= DataSetUtil.asDataSet(du.parse(sval));
-                    }
-                } else {
-                    throw new IllegalArgumentException("param is rank>2");
-                }
-                
-                result= applyFilter(result, parm, op, d );
-                
-            }
+            int ieq= w.indexOf(".");
+            String sparm= w.substring(0,ieq);
+            QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, null );
+            result = doWhereFilter( w, parm, result );
         }
 
         if ( !doDep ) {
@@ -590,6 +533,66 @@ public class CdfDataSource extends AbstractDataSource {
 
         return result;
 
+    }
+
+    private MutablePropertyDataSet doWhereFilter( String w, QDataSet parm, MutablePropertyDataSet result) throws Exception {
+        Pattern p= Pattern.compile("\\.([elgn][qte])\\(");
+        Matcher m= p.matcher(w);
+        int ieq;
+        if ( !m.find() ) {
+            Pattern p2= Pattern.compile("\\.within\\(");
+            Matcher m2= p2.matcher(w);
+            if ( !m2.find() ) {
+                throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, .lt, .within");
+            } else {
+                ieq= w.indexOf(".within(");
+                String sval= w.substring(ieq+8).replaceAll("\\+"," ");
+                if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
+                Units du= SemanticOps.getUnits(parm);
+                DatumRange dr= DatumRangeUtil.parseDatumRange(sval,du);
+                result= applyFilter( result, parm, "within", DataSetUtil.asDataSet(dr) );
+                
+            }
+            
+        } else {
+            ieq= m.start();
+            String op= m.group(1);
+            String sval= w.substring(ieq+4);
+            if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
+            parm= Ops.reform(parm); // TODO: Nasty kludge why did we see it in the first place vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN&where=range__C4_CP_FGM_SPIN.eq(3)
+            QDataSet d;
+            if ( parm.rank()==2 ) {
+                if ( sval.equals("mode") && ( op.equals("eq") || op.equals("ne") ) ) {
+                    QDataSet hash= Ops.hashcodes(parm);
+                    QDataSet mode= Ops.mode(hash);
+                    d= mode;
+                    parm= hash;
+                } else {
+                    Units du= SemanticOps.getUnits(parm);
+                    d= DataSetUtil.asDataSet( du.parse(sval) );
+                }
+            } else if ( parm.rank()==1 ) {
+                if ( sval.equals("mode") ) {
+                    QDataSet mode= Ops.mode(parm);
+                    d= mode;
+                } else if ( sval.equals("median") ) {
+                    QDataSet median= Ops.median(parm);
+                    d= median;
+                } else if ( sval.equals("mean") ) {
+                    QDataSet mean= Ops.mean(parm);
+                    d= mean;
+                } else {
+                    Units du= SemanticOps.getUnits(parm);
+                    d= DataSetUtil.asDataSet(du.parse(sval));
+                }
+            } else {
+                throw new IllegalArgumentException("param is rank>2");
+            }
+            
+            result= applyFilter(result, parm, op, d );
+            
+        }
+        return result;
     }
     
     /**
