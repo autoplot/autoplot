@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
@@ -185,6 +186,20 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         parameter= String.valueOf(tp.getPathComponent(1));
         String longName= parameters.get(parameter);
         parameterInfoLabel.setText( longName );
+
+        String dims= longName.substring(parameter.length());
+        
+        List<String> varnames= new ArrayList<String>();
+        for ( Entry<String,String> ps : parameters.entrySet() ) {
+            String v= ps.getValue();
+            int i= v.indexOf("[");
+            if ( dims.startsWith( v.substring(i,v.length()-1) ) ) {
+                varnames.add(ps.getKey());
+            }
+        }
+        
+        whereParamList.setModel( new DefaultComboBoxModel( varnames.toArray() ) );            
+        
     }//GEN-LAST:event_parameterTreeValueChanged
 
 
@@ -224,6 +239,11 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
      * the parameter within the HDF5 file to be plotted.
      */
     String parameter;
+    
+    /**
+     * the variables in the HDF5 file.
+     */
+    List<Variable> vars;
 
     @Override
     public boolean reject(String uri) throws Exception {
@@ -308,14 +328,14 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             NetcdfFile f= NetcdfFile.open( resource );
             NetcdfDataset dataset= new NetcdfDataset( f );
             
-            List<Variable> vars= (List<Variable>)dataset.getVariables();
+            vars= (List<Variable>)dataset.getVariables();
             dataset.close();
             
             for (Variable v : vars) {
                 if ( v.getDimensions().isEmpty() ) continue;
                 boolean isFormattedTime= v.getDataType()==DataType.CHAR && v.getRank()==2 && v.getShape(1)>=14 && v.getShape(1)<=30;
                 if ( !isFormattedTime && !v.getDataType().isNumeric() ) continue;
-                StringBuilder description= new StringBuilder( "<html><b>"+v.getName()+"[" );
+                StringBuilder description= new StringBuilder( v.getName()+"[" );
                 for ( int k=0; k<v.getDimensions().size(); k++ ) {
                     Dimension d= v.getDimension(k);
                     if ( k>0 ) description.append(",");
