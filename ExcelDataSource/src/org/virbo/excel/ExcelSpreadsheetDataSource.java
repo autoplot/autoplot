@@ -144,15 +144,16 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
     }
 
     /**
-     * parse spec into [icstart,icend,jrstart,jrend]
-     * AC11:AC23
-     * A1:10
-     * A
+     * parse spec into [icstart,icend,jrstart,jrend]<ul>
+     * <li>AC11:AC23
+     * <li>A1:10
+     * <li>A
+     * </ul>
      * Returns [ columnNumber, lastColumnNumber, first, last ].  lastColumnNumber=-1 means just one column (rank 1).
      * @param spec
      * @param firstRow
      * @param lastRow exclusive last row index, or -1.
-     * @return [ columnNumber, lastColumnNumber, first, last ].  lastColumnNumber=-1 means just one column (rank 1).
+     * @return [ columnNumber, lastColumnNumber, first, lastRowExclusive ].  lastColumnNumber=-1 means just one column (rank 1).
      */
     private int[] parseDataSetSpec( String spec, int firstRow, int lastRow ) {
 
@@ -188,15 +189,18 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                         lastRow = sheet.getLastRowNum()+1;
                     }
                 } else {
-                    lastRow = Integer.parseInt(m.group(5));
+                    lastRow = Integer.parseInt(m.group(5))+1;
                 }
             }
             if ( m.group(4)!=null ) {
-                columnNumber1= getColumnNumber(m.group(4), firstRow);
+                String c= m.group(4);
+                if ( c.length()==0 ) c= m.group(1); // easy mistake to make.
+                columnNumber1= getColumnNumber( c, firstRow);
             } else {
                 columnNumber1= -1;
             }
             columnNumber = getColumnNumber(col, firstRow);
+            if ( columnNumber1>-1 && columnNumber1==columnNumber1 ) columnNumber1=-1;
             return new int[]{columnNumber, columnNumber1, firstRow, lastRow};
         }
     }
