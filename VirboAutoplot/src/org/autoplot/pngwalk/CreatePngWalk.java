@@ -41,6 +41,7 @@ import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.OptionsPrefsController;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.DataSetOps;
@@ -305,6 +306,9 @@ public class CreatePngWalk {
         dom2.getController().waitUntilIdle();
         dom2.syncTo( dom, java.util.Arrays.asList("id") ); // work around bug where someone resets the margin column http://jfaden.net:8080/hudson/job/autoplot-test033/5786/artifact/
 
+        OptionsPrefsController opc= new OptionsPrefsController( dom2.getOptions() );
+        opc.loadPreferencesWithEvents();
+        
         mon.setProgressMessage("write " + params.product + ".vap");
         logger.log(Level.FINE, "write {0}.vap", params.product);
 
