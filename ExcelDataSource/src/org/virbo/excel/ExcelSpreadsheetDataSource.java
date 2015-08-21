@@ -1,11 +1,4 @@
-/*
- * ExcelSpreadsheetDataSource.java
- *
- * Created on April 1, 2007, 6:55 AM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
+
 package org.virbo.excel;
 
 import java.util.logging.Level;
@@ -17,9 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,9 +25,12 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 
 /**
- * http://www.autoplot.org/data/swe-np.xls?column=data&depend0=dep0
- * file:/home/jbf/ct/hudson/data.backup/xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency
- * http://www.icip.iastate.edu/sites/default/files/uploads/tables/agriculture/ag-land-hist.xls?column=C14:BM14
+ * Creates QDataSets from an Excel spreadsheet using Apache POI library.<ul>
+ * <li>http://www.autoplot.org/data/swe-np.xls?column=data&depend0=dep0
+ * <li>http://sarahandjeremy.net/~jbf/autoplot/data/hudson_data/xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency
+ * <li>http://www.icip.iastate.edu/sites/default/files/uploads/tables/agriculture/ag-land-hist.xls?column=C14:BM14
+ * <li>file:///home/jbf/ct/hudson/data/xls/c2-70landvalues.xls?sheet=County&column=BM&depend0=A
+ * </ul>
  * @author jbf
  */
 public class ExcelSpreadsheetDataSource extends AbstractDataSource {
@@ -54,11 +47,14 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
      *     column=id  the column ID for the data
      *     depend0=id the column ID for the x tags
      * file://C:/iowaCitySales2004-2006.latlong.xls?column=M[2:]&depend0=B[2:]&plane0=C[2:]
+     * @param uri
+     * @throws java.io.IOException
      */
     public ExcelSpreadsheetDataSource(URI uri) throws IOException {
         super(uri);
     }
 
+    @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws IOException {
         File file = getFile(mon);
         InputStream in = new FileInputStream(file);
@@ -216,8 +212,6 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         return ExcelUtil.getColumnNumber( sheet, id, firstRow);
     }
     
-
-
     protected static int findFirstRow( HSSFSheet sheet, int firstRow ) {
         int ilastRow= sheet.getPhysicalNumberOfRows();
         int inextRow = firstRow;
@@ -244,7 +238,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         return inextRow;
     }
 
-    class ExcelSpreadsheetDataSet extends AbstractDataSet {
+    private class ExcelSpreadsheetDataSet extends AbstractDataSet {
 
         short columnNumber;
         int firstRow;
@@ -340,6 +334,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             return firstRow;
         }
         
+        @Override
         public int rank() {
             return rank;
         }
