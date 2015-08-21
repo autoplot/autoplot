@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +44,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
 
     POIFSFileSystem fs;
     HSSFSheet sheet;
+    boolean isUsing1904DateWindowing;
     ExcelSpreadsheetDataSet data;
     static Logger logger= Logger.getLogger("org.autoplot.ExcelSpreadsheetDataSource");
 
@@ -134,7 +137,9 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             }
         }
 
-
+        //isUsing1904DateWindowing= wb.isUsing1904DateWindowing(); // TODO: upgrade to 3.6.
+        isUsing1904DateWindowing= false;
+        
         return data;
     }
 
@@ -305,8 +310,13 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             if ( cell.getCellType()!=HSSFCell.CELL_TYPE_STRING ) {
                 isDate = HSSFDateUtil.isCellDateFormatted(cell);
                 if (isDate) {
-                    properties.put(QDataSet.UNITS, Units.t1970);
-                    units= Units.t1970;
+                    if ( isUsing1904DateWindowing ) {
+                        //throw new IllegalArgumentException("isUsing1904DateWindowing is not implemented");
+                        units= Units.lookupUnits("days since 1903-12-31T00:00Z"); // this is a guess and is untested, because my old version of apache poi doesn't have the check.
+                    } else {
+                        units= Units.lookupUnits("days since 1899-12-30T00:00Z"); // "Excel thinks 2/29/1900 is a valid date, which it isn't" // see org.apache.poi.ss.usermodel.DateUtil source
+                    }
+                    properties.put(QDataSet.UNITS, units);
                 }
             } else if ( cell.getCellType()==HSSFCell.CELL_TYPE_STRING ) {
                 String s= cell.getStringCellValue();
@@ -330,8 +340,8 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
 
         @Override
         public double value(int i) {
-            HSSFRow row = null;
-            HSSFCell cell = null;
+            HSSFRow row;
+            HSSFCell cell;
             try {
                 if ( transpose ) {
                     row = sheet.getRow(firstRow);
@@ -341,8 +351,8 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                     cell = row.getCell(columnNumber);
                 }
                 if (isDate) {
-                    Date d = cell.getDateCellValue();
-                    return d.getTime() / 1000.;
+                    double d= cell.getNumericCellValue();
+                    return d;
                 } else {
                     if ( cell==null ) {
                         return Double.NaN;
@@ -367,8 +377,8 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
 
         @Override
         public double value(int i,int j) {
-            HSSFRow row = null;
-            HSSFCell cell = null;
+            HSSFRow row;
+            HSSFCell cell;
             try {
                 if ( transpose ) {
                     row = sheet.getRow( j + firstRow );
@@ -378,8 +388,8 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                     cell = row.getCell( j + columnNumber );
                 }
                 if (isDate) {
-                    Date d = cell.getDateCellValue();
-                    return d.getTime() / 1000.;
+                    double d= cell.getNumericCellValue();
+                    return d;
                 } else {
                     if ( cell==null ) {
                         return Double.NaN;
