@@ -313,8 +313,10 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                     if ( isUsing1904DateWindowing ) {
                         //throw new IllegalArgumentException("isUsing1904DateWindowing is not implemented");
                         units= Units.lookupUnits("days since 1903-12-31T00:00Z"); // this is a guess and is untested, because my old version of apache poi doesn't have the check.
+                        properties.put(QDataSet.VALID_MIN,0);
                     } else {
                         units= Units.lookupUnits("days since 1899-12-30T00:00Z"); // "Excel thinks 2/29/1900 is a valid date, which it isn't" // see org.apache.poi.ss.usermodel.DateUtil source
+                        properties.put(QDataSet.VALID_MIN,61); // get past the leap day to avoid fancy code that would handle this.
                     }
                     properties.put(QDataSet.UNITS, units);
                 }
