@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A recent study of the series renderer showed that its performance scaled as expected.
+        <p><small>Bugs in the contour plot are corrected.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,8 +20,15 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-08-09 r17233):</p>
+        <p>Bugfixes (2015-08-21 r17320l):</p>
         <ul>
+            <li>More zaxis properties are loaded in das2streams.</li>
+            <li>1165: create pngwalk uses user prefs for grid and other options.</li>
+            <li>xls files would drop the last record.</li>
+            <li>xls files would have times shifted by local time zone.</li>
+            <li>bugfix: null pointer when no color was selected in pick colors dialog on Linux.
+            <li>rank 3 data in QStream wasn't properly read in.</li>
+            <li>Autoplot dialogs like the "additional operators" don't have goofy default question mark icons.</li>
             <li>output of contour hard to use, breaks in non-monotonic data. Thanks Sebastian!</li>
             <li>rte 2091983907: thread safety in pngwalk.  Thanks usuario!</li>
             <li>rte_1604359977: limit the total number of filePollUpdates threads that can be started to 10000.  Thanks, Bob!</li>
@@ -173,6 +180,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>where keyword support in HDF5</li>
+            <li>HDF5 now has an editor panel.</li>
+            <li>improvements to completions in Jython editor panel.</li>
             <li>plot named parameters have consistent capitalization and index named parameter introduced.</li>
             <li>embed data found in data sources that does not have a URI ("vap+internal:")</li>
             <li>opposite property for axes.</li>
