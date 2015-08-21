@@ -151,7 +151,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
      * Returns [ columnNumber, lastColumnNumber, first, last ].  lastColumnNumber=-1 means just one column (rank 1).
      * @param spec
      * @param firstRow
-     * @param lastRow
+     * @param lastRow exclusive last row index, or -1.
      * @return [ columnNumber, lastColumnNumber, first, last ].  lastColumnNumber=-1 means just one column (rank 1).
      */
     private int[] parseDataSetSpec( String spec, int firstRow, int lastRow ) {
@@ -163,7 +163,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         Matcher m= pc.matcher(spec);
         if ( m.matches() ) { // kludge for http://www.autoplot.org/data/swe-np.xls?column=data&depend0=dep0
             columnNumber= getColumnNumber(m.group(1), firstRow);
-            return new int[] { columnNumber, -1, Math.max(0,firstRow), sheet.getLastRowNum() };
+            return new int[] { columnNumber, -1, Math.max(0,firstRow), sheet.getLastRowNum()+1 };
         }
 
         Pattern p = Pattern.compile("([a-zA-Z_]*)((\\d+):([a-zA-Z_]*)?(\\d+)?)?");
@@ -179,13 +179,13 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                     firstRow = 0;
                 }
                 if (lastRow == -1) {
-                    lastRow = sheet.getLastRowNum();
+                    lastRow = sheet.getLastRowNum()+1;
                 }
             } else {
                 firstRow = Integer.parseInt(m.group(3));
                 if (m.group(5) == null) {
                     if (lastRow == -1) {
-                        lastRow = sheet.getLastRowNum();
+                        lastRow = sheet.getLastRowNum()+1;
                     }
                 } else {
                     lastRow = Integer.parseInt(m.group(5));
