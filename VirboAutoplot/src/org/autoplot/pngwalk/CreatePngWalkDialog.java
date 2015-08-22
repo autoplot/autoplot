@@ -68,6 +68,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         
         boolean useEventsFile= prefs.getBoolean( "useEventsFile", eventsFileRadioButton.isSelected() );
         eventsFileRadioButton.setSelected(useEventsFile);
+        batchUriNameCB.setSelected(prefs.get( "batchUriName", "" ).equals("$o"));
         
         String eventsFile= prefs.get( "eventsFile", eventsFileSelector.getValue() );
         eventsFileSelector.setValue(eventsFile);
@@ -98,6 +99,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         prefs.putBoolean( "useTimeRange", timeRangeRadioButton.isSelected() );
         prefs.putBoolean( "useEventsFile", eventsFileRadioButton.isSelected() );
         prefs.put( "eventsFile", eventsFileSelector.getValue() );
+        prefs.put( "batchUriName", batchUriNameCB.isSelected() ? "$o" : "" );
         
         prefs.put( "outputFormat", pngFormatCB.isSelected() ? "png" : "pdf" );
         
@@ -139,6 +141,11 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         }
         
         params.useBatchUri= eventsFileRadioButton.isSelected();
+        if ( batchUriNameCB.isSelected() ) {
+            params.batchUriName="$o";
+        } else {
+            params.batchUriName="";
+        }
         
         params.outputFormat= pngFormatCB.isSelected() ? "png" : "pdf";
                 
@@ -214,6 +221,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
         pngFormatCB = new javax.swing.JRadioButton();
         pdfFormatCB = new javax.swing.JRadioButton();
         jLabel4 = new javax.swing.JLabel();
+        batchUriNameCB = new javax.swing.JCheckBox();
 
         jLabel1.setText("Filename Root:");
         jLabel1.setToolTipText("Stem to identify result within folder.");
@@ -317,6 +325,12 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
 
         jLabel4.setText("Output Format:");
 
+        batchUriNameCB.setText("events file specifies product names");
+        batchUriNameCB.setToolTipText("<html>The events file contains the file name, so for example instead of product_$Y$m$d,\n<br>just use the last column when generating the filename.\n<br><tt>2000-01-09T06:50:41.155Z\t2000-01-09T13:46:34.224Z\ta/o1\t</tt>\n");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, eventsFileRadioButton, org.jdesktop.beansbinding.ELProperty.create("${selected}"), batchUriNameCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -353,24 +367,27 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                             .add(layout.createSequentialGroup()
                                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(layout.createSequentialGroup()
+                                        .add(createThumbsCb)
+                                        .add(35, 35, 35)
+                                        .add(jLabel4)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(pngFormatCB)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(pdfFormatCB))
+                                    .add(eventsFileRadioButton)
+                                    .add(timeRangeRadioButton)
+                                    .add(layout.createSequentialGroup()
                                         .add(12, 12, 12)
-                                        .add(eventsFileSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                        .add(layout.createSequentialGroup()
-                                            .add(createThumbsCb)
-                                            .add(35, 35, 35)
-                                            .add(jLabel4)
-                                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                            .add(pngFormatCB)
-                                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                            .add(pdfFormatCB))
-                                        .add(eventsFileRadioButton)
-                                        .add(timeRangeRadioButton)
-                                        .add(layout.createSequentialGroup()
-                                            .add(12, 12, 12)
-                                            .add(timeRangeTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 306, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                            .add(timeRangeToolButton))))
+                                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(eventsFileSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .add(layout.createSequentialGroup()
+                                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                                    .add(batchUriNameCB)
+                                                    .add(layout.createSequentialGroup()
+                                                        .add(timeRangeTf, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 306, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                        .add(timeRangeToolButton)))
+                                                .add(0, 0, Short.MAX_VALUE)))))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)))
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(autorangeCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -428,14 +445,16 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
                         .add(eventsFileRadioButton)
                         .add(1, 1, 1)
                         .add(eventsFileSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(18, 18, 18)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(createThumbsCb)
+                        .add(3, 3, 3)
+                        .add(batchUriNameCB)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                                 .add(pngFormatCB)
                                 .add(pdfFormatCB)
-                                .add(jLabel4)))))
-                .addContainerGap(68, Short.MAX_VALUE))
+                                .add(jLabel4))
+                            .add(createThumbsCb))))
+                .addContainerGap(53, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -475,6 +494,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox autorangeCB;
+    private javax.swing.JCheckBox batchUriNameCB;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JCheckBox createThumbsCb;

@@ -64,7 +64,8 @@ public class CreatePngWalk {
      *   <li> dataset with rank 2 bins datasets   Event[ T[index;min,max] ]
      * </ul>
      * This uses params.batchUri to get the URI that is resolved to control the times.  These
-     * times then need to be formatted to filenames, 
+     * times then need to be formatted to filenames, or if params.batchUriName is "$o" then
+     * the output filename is explicitly specified in the last column.
      * 
      * @param params
      * @return
@@ -77,41 +78,35 @@ public class CreatePngWalk {
             try {
                 String uri= params.batchUri;
                 QDataSet timesds= org.virbo.jythonsupport.Util.getDataSet( uri );
-                if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(timesds) ) ) {
-                    if ( (QDataSet) timesds.property(QDataSet.DEPEND_0)!=null ) {
-                        timesds= (QDataSet) timesds.property(QDataSet.DEPEND_0);
-                    } else if ( SemanticOps.isBundle(timesds) ) { // See EventsRenderer.makeCanonical
-                        timesds= Ops.bundle( DataSetOps.unbundle(timesds,0), DataSetOps.unbundle(timesds,1) ); 
-                    } else {
-                        throw new IllegalArgumentException("expected events list URI");
-                    }
-                }
-                if ( timesds.rank()!=2 ) {
-                    timesds= Ops.createEvents( timesds );
-                }
-                if ( timesds.rank()!=2 ) {
-                    throw new IllegalArgumentException("expected bins dataset for times");
-                }
                 times= new String[timesds.length()];
-                TimeParser tp= TimeParser.create(params.timeFormat);
-                boolean jeggyMode=false;
-                for ( int i=0; i<times.length; i++ ) {
-                    if ( jeggyMode ) {
-                        times[i]= tp.format( DataSetUtil.asDatumRange( timesds.slice(i) ) ) + ": "+DataSetUtil.asDatumRange( timesds.slice(i) ).toString();
-                    } else {
-                        times[i]= tp.format( DataSetUtil.asDatumRange( timesds.slice(i) ) );
-                        Datum w0= DataSetUtil.asDatumRange( timesds.slice(i) ).width();
-                        Datum w1= tp.parse(times[i]).getTimeRange().width();
-                        if ( w1.multiply(2).lt(w0) ) {
-                            if ( i==0 ) {
-                                logger.log(Level.WARNING, "timeformat ({0}) is not sufficient to uniquely identify each time.", params.timeFormat);
-                                warnings.add("timeformat ("+params.timeFormat+") is not sufficient to uniquely identify each time.");
-                                jeggyMode= true;
-                                times[i]= tp.format( DataSetUtil.asDatumRange( timesds.slice(i) ) ) + ": "+DataSetUtil.asDatumRange( timesds.slice(i) ).toString();
-                            } else {
-                                throw new IllegalArgumentException("timeformat poorly represents the time.");
-                            }
+                
+                if ( params.batchUriName.equals("") ) {
+                    if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(timesds) ) ) {
+                        if ( (QDataSet) timesds.property(QDataSet.DEPEND_0)!=null ) {
+                            timesds= (QDataSet) timesds.property(QDataSet.DEPEND_0);
+                        } else if ( SemanticOps.isBundle(timesds) ) { // See EventsRenderer.makeCanonical
+                            timesds= Ops.bundle( DataSetOps.unbundle(timesds,0), DataSetOps.unbundle(timesds,1) ); 
+                        } else {
+                            throw new IllegalArgumentException("expected events list URI");
                         }
+                    }
+                    if ( timesds.rank()!=2 ) {
+                        timesds= Ops.createEvents( timesds );
+                    }
+                    if ( timesds.rank()!=2 ) {
+                        throw new IllegalArgumentException("expected bins dataset for times");
+                    }
+                
+                    TimeParser tp= TimeParser.create(params.timeFormat);
+                    for ( int i=0; i<times.length; i++ ) {
+                        times[i]= tp.format( DataSetUtil.asDatumRange( timesds.slice(i) ) ) + ": "+DataSetUtil.asDatumRange( timesds.slice(i) ).toString();
+                    }
+                } else {
+                    timesds= Ops.createEvents(timesds);                    
+                    Units tu= ((Units)((QDataSet)timesds.property(QDataSet.BUNDLE_1)).property( QDataSet.UNITS, 0 ));
+                    Units eu= ((Units)((QDataSet)timesds.property(QDataSet.BUNDLE_1)).property( QDataSet.UNITS, 3 ));
+                    for ( int i=0; i<times.length; i++ ) {
+                        times[i]= eu.createDatum( timesds.slice(i).value(3) ).toString() + ": " + DatumRange.newDatumRange( timesds.slice(i).value(0), timesds.slice(i).value(1), tu ); // TODO: this should be easier to code
                     }
                 }
             } catch (Exception ex) {
@@ -178,6 +173,16 @@ public class CreatePngWalk {
          * if true, use the URI to source the list of events.
          */
         public boolean useBatchUri= false;
+        
+        /**
+         * if non-null, use the name in the event list column instead of the 
+         * product and timeFormat.  For example,
+         * the batch file contains lines like:
+         * 2015-03-05T02:10 2015-03-05T02:14 marsex/event1
+         * so this png will have the name outputFolder + "marsex/event1" + ".png"
+         * This must be either empty "" or "$o" for now.
+         */
+        public String batchUriName= "";
         
         /*
          * if true, the also create thumbs.
@@ -282,8 +287,22 @@ public class CreatePngWalk {
         TimeParser tp = TimeParser.create(params.timeFormat);
         Application dom= (Application) readOnlyDom.copy();
         try {
-            DatumRange tr1= tp.parse(times[0]).getTimeRange(); // set the initial timerange to avoid an extraneous load.
-            dom.setTimeRange(tr1);
+            String atime= times[0];
+            int ic= atime.indexOf(": ");
+            String exactTime; 
+            if ( ic>-1 ) { // rfe batchfile time.
+                exactTime= atime.substring(ic+2);
+            } else {
+                exactTime= atime;
+            }
+            // set the initial timerange to avoid an extraneous load.
+            if ( params.useBatchUri ) {
+                DatumRange tr1= DatumRangeUtil.parseTimeRange(exactTime);
+                dom.setTimeRange(tr1);        
+            } else {
+                DatumRange tr1= tp.parse(exactTime).getTimeRange(); 
+                dom.setTimeRange(tr1);        
+            }
         } catch ( ParseException ex ) {
             throw new RuntimeException(ex);
         }
@@ -382,8 +401,6 @@ public class CreatePngWalk {
         long t0 = java.lang.System.currentTimeMillis();
         int count = 0;
 
-        String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version.trim();
-
         appmodel.setExceptionHandler( new ExceptionHandler() {
             @Override
             public void handle(Throwable t) {
@@ -408,7 +425,7 @@ public class CreatePngWalk {
                 atime= atime.substring(0,ic);
             }
             
-            String filename= String.format("%s%s_%s%s.%s", params.outputFolder, params.product, atime, vers, params.outputFormat );
+            String filename = getFilename( params, "", atime );
 
             count = count + 1;
             if (mon.isCancelled()) {
@@ -477,7 +494,7 @@ public class CreatePngWalk {
             
             if ( params.createThumbs && params.outputFormat.equals("png") ) {
                 BufferedImage thumb400 = ImageResize.getScaledInstance(image, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                File outf= new java.io.File(String.format("%sthumbs400/%s_%s%s.png", params.outputFolder, params.product, atime, vers ) );
+                File outf= new java.io.File( getFilename(params, "thumbs400", atime ) );
                 File parentf= outf.getParentFile();
                 if ( parentf!=null && !parentf.exists() ) {
                     if ( !parentf.mkdirs() ) {
@@ -488,7 +505,7 @@ public class CreatePngWalk {
                     throw new IllegalArgumentException("no appropriate writer is found");
                 }
                 BufferedImage thumb100 = ImageResize.getScaledInstance(thumb400, thumbW/4, thumbH/4, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                outf= new java.io.File(String.format("%sthumbs100/%s_%s%s.png", params.outputFolder, params.product, atime, vers ) );
+                outf= new java.io.File( getFilename( params, "thumbs100", atime ) );
                 parentf= outf.getParentFile();
                 if ( parentf!=null && !parentf.exists() ) {
                     if ( !parentf.mkdirs() ) {
@@ -517,6 +534,38 @@ public class CreatePngWalk {
         mon.finished();
         
         return returnCodeAll;
+    }
+
+    /**
+     * create the filename for the time.
+     * @param params the parameters
+     * @param thumbdir "" or "thumbs100" or "thumbs400"
+     * @param atime the time "20150822"
+     * @return
+     * @throws IllegalArgumentException 
+     */
+    private static String getFilename(Params params, String thumbdir, String atime) throws IllegalArgumentException {
+        String filename;
+        if ( thumbdir.length()>0 ) {
+            thumbdir= thumbdir + "/";
+        }
+        if ( params.useBatchUri && params.batchUriName.equals("$o") ) {
+            String name= atime; // really?
+            if ( name.endsWith(params.outputFormat) ) {
+                name= name.substring(0,name.length()-(params.outputFormat.length()+1));
+            }
+            if ( params.product.equals("") ) {
+                filename= String.format("%s%s%s.%s", params.outputFolder, thumbdir, name, params.outputFormat );
+            } else {
+                filename= String.format("%s%s%s_%s.%s", params.outputFolder, thumbdir, params.product, name, params.outputFormat );
+            }
+        } else if ( params.useBatchUri && !params.batchUriName.equals("") ) {
+            throw new IllegalArgumentException("batchUriName must be \"\" or \"$o\"");
+        } else {
+            String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version.trim();
+            filename= String.format("%s%s%s_%s%s.%s", params.outputFolder, thumbdir, params.product, atime, vers, params.outputFormat );
+        }
+        return filename;
     }
 
     /**
@@ -629,6 +678,7 @@ public class CreatePngWalk {
         alm.addOptionalSwitchArgument( "timeRange", "r", "timeRange", "", "time range to cover, e.g. 2011 through 2012" );
         alm.requireOneOf( new String[] { "timeRange","batchUri" } );
         alm.addOptionalSwitchArgument( "batchUri", "b", "batchUri", "", "optionally provide list of timeranges" );
+        alm.addOptionalSwitchArgument( "batchUriName", null, "batchUriName", "", "use $o to use the filename in the batch file" );
         alm.addOptionalSwitchArgument( "createThumbs", "t", "createThumbs", "y", "create thumbnails, y (default) or n" );
         alm.addOptionalSwitchArgument( "product", "n", "product", "product", "product name in each filename (default=product)");
         alm.addOptionalSwitchArgument( "outputFolder", "o", "outputFolder", "pngwalk", "location of root of pngwalk");
@@ -660,7 +710,10 @@ public class CreatePngWalk {
         params.autorange= alm.getBooleanValue("autorange");
         params.update= alm.getBooleanValue("update");
         params.batchUri= alm.getValue("batchUri");
-        if ( params.batchUri!=null && params.batchUri.length()>0 ) params.useBatchUri= true;
+        if ( params.batchUri!=null && params.batchUri.length()>0 ) {
+            params.useBatchUri= true;
+            params.batchUriName= alm.getValue("batchUriName");
+        }
         params.outputFormat= alm.getValue("outputFormat");
         String vap= alm.getValue("vap");
         if ( ( vap.length()>2 && vap.charAt(1)==':' ) ) {

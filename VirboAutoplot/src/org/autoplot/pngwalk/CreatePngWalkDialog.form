@@ -64,26 +64,31 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
-                                      <Component id="eventsFileSelector" max="32767" attributes="0"/>
+                                      <Component id="createThumbsCb" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
+                                      <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="pngFormatCB" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="pdfFormatCB" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Component id="createThumbsCb" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
-                                          <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="pngFormatCB" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="pdfFormatCB" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <Component id="eventsFileRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="timeRangeRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
-                                          <Component id="timeRangeTf" min="-2" pref="306" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="timeRangeToolButton" min="-2" max="-2" attributes="0"/>
+                                  <Component id="eventsFileRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="timeRangeRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="eventsFileSelector" alignment="0" max="32767" attributes="0"/>
+                                          <Group type="102" attributes="0">
+                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                  <Component id="batchUriNameCB" min="-2" max="-2" attributes="0"/>
+                                                  <Group type="102" alignment="0" attributes="0">
+                                                      <Component id="timeRangeTf" min="-2" pref="306" max="-2" attributes="0"/>
+                                                      <EmptySpace max="-2" attributes="0"/>
+                                                      <Component id="timeRangeToolButton" min="-2" max="-2" attributes="0"/>
+                                                  </Group>
+                                              </Group>
+                                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                          </Group>
                                       </Group>
                                   </Group>
                               </Group>
@@ -161,18 +166,20 @@
                       <Component id="eventsFileRadioButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                       <Component id="eventsFileSelector" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="createThumbsCb" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Group type="103" alignment="3" groupAlignment="3" attributes="0">
+                      <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
+                      <Component id="batchUriNameCB" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                               <Component id="pngFormatCB" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="pdfFormatCB" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="createThumbsCb" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
-              <EmptySpace pref="68" max="32767" attributes="0"/>
+              <EmptySpace pref="53" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -364,6 +371,15 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Output Format:"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="batchUriNameCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="events file specifies product names"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;The events file contains the file name, so for example instead of product_$Y$m$d,&#xa;&lt;br&gt;just use the last column when generating the filename.&#xa;&lt;br&gt;&lt;tt&gt;2000-01-09T06:50:41.155Z&#x9;2000-01-09T13:46:34.224Z&#x9;a/o1&#x9;&lt;/tt&gt;&#xa;"/>
+      </Properties>
+      <BindingProperties>
+        <BindingProperty name="enabled" source="eventsFileRadioButton" sourcePath="${selected}" target="batchUriNameCB" targetPath="enabled" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
     </Component>
   </SubComponents>
 </Form>
