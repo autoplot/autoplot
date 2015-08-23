@@ -554,11 +554,40 @@ public class Options extends DomNode {
     }
 
 
+    
+    /**
+     * synchronizes any property having to do with the appearance of the
+     * plot.  This includes user preferences like the axis grid, and also performance
+     * switches which may have a minor effect on appearance such as overrendering.
+     * This was introduced to support createPngWalk, which should have an appearance
+     * as close as possible to the vap.
+     * @param n the node
+     * @param exclude the properties to exclude.
+     */
+    public void syncToAll( DomNode n,List<String> exclude ) {
+        this.syncTo(n,exclude);
+        Options that = (Options) n;
+        if ( !exclude.contains(PROP_DRAWGRID) ) this.setDrawGrid( that.isDrawGrid() );
+        if ( !exclude.contains(PROP_DRAWMINORGRID) ) this.setDrawMinorGrid( that.isDrawMinorGrid() );
+        if ( !exclude.contains(PROP_MULTILINETEXTALIGNMENT) ) this.setMultiLineTextAlignment( that.getMultiLineTextAlignment() );
+        if ( !exclude.contains(PROP_OVERRENDERING) ) this.setOverRendering( that.isOverRendering() );
+        if ( !exclude.contains(PROP_TEXTANTIALIAS) ) this.setTextAntiAlias( that.isTextAntiAlias() );
+    }
 
     // Note these are weird: I'm not sure if I've just forgotten items or this was intentional.
     // I suspect that it is intentional that a subset of the options are treated this way.  Seems like
     // there was an issue with colors if I didn't do this.  Anyway, we sync useTimeRangeEditor because
     // of the use case where a product is turned over to a person who doesn't want to see URIs.
+    
+    /**
+     * synchronizes to another node, except unlike other nodes where this is
+     * thorough by default, this is the minimal set of properties that 
+     * will provide a usable display.  These include the colors and the fonts,
+     * and the timeRange editor mode, flip colorbar label, the ticklen, and last
+     * scanEnabled.  
+     * @param n the node
+     * @param exclude the properties to exclude.
+     */
     @Override
     public void syncTo( DomNode n,List<String> exclude ) {
         super.syncTo(n,exclude);
