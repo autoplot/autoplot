@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -324,10 +325,8 @@ public class CreatePngWalk {
         dom2.syncTo( dom, java.util.Arrays.asList("id") );
         dom2.getController().waitUntilIdle();
         dom2.syncTo( dom, java.util.Arrays.asList("id") ); // work around bug where someone resets the margin column http://jfaden.net:8080/hudson/job/autoplot-test033/5786/artifact/
+        dom2.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList() ); // 1165 grid overlay
 
-        OptionsPrefsController opc= new OptionsPrefsController( dom2.getOptions() );
-        opc.loadPreferencesWithEvents();
-        
         mon.setProgressMessage("write " + params.product + ".vap");
         logger.log(Level.FINE, "write {0}.vap", params.product);
 
