@@ -79,8 +79,10 @@ import org.das2.datum.format.TimeDatumFormatter;
 import org.das2.event.DataPointSelectionEvent;
 import org.das2.event.DataPointSelectionListener;
 import org.das2.util.ArgumentList;
+import org.das2.util.ImageUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
+import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -302,15 +304,27 @@ public final class PngWalkTool extends javax.swing.JPanel {
             public boolean isActionEnabled(String filename) {
                 String s = filename;
                 String template = tool.getTemplate();
-                int i0 = template.indexOf("_$Y");
-                if ( i0==-1 ) i0= template.indexOf("_%Y");
-                if ( i0==-1 ) i0= template.indexOf("_%o"); 
-                if ( i0==-1 ) i0= template.indexOf("_%{o,");
+                int i0 = -1;
+                if ( i0==-1 ) i0= template.indexOf("_$Y");
                 if ( i0==-1 ) i0= template.indexOf("_$o");
                 if ( i0==-1 ) i0= template.indexOf("_$(o,");
                 int i1 = s.indexOf(".png");
+                
+                if ( i0==-1 ) {
+                    try {
+                        File file = DataSetURI.getFile( filename, new AlertNullProgressMonitor("get image file") ); // assume it's local.
+                        String json= ImageUtil.getJSONMetadata( file );
+                        if ( json!=null ) {
+                            if ( i0==-1 ) i0= template.indexOf("_*"); 
+                            if ( i0==-1 ) i0= template.indexOf("_$x");
+                        }
+                    } catch ( IOException ex ) {
+                        logger.log( Level.WARNING, null, ex );
+                    }
+                }
+
                 if ( i1==-1 || i0==-1 ) return false;
-                //String timeRange = s.substring(i0 + 1, i1);
+                
                 String productFile = template.substring(0, i0) + ".vap";
                 try {
                     return WalkUtil.fileExists(productFile);
@@ -338,6 +352,17 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     if ( s.startsWith("file:/") && !s.startsWith("file:///") && template.startsWith("file:///") ) {
                         s= "file:///"+s.substring(6);
                     }
+                    
+                    DatumRange jsonTimeRange=null;
+                    
+                    try {
+                        File file = DataSetURI.getFile( s, new AlertNullProgressMonitor("get image file") ); // assume it's local.
+                        String json= ImageUtil.getJSONMetadata( file );
+                        jsonTimeRange= RichPngUtil.getXRange(json);
+                    } catch ( IOException ex ) {
+                        logger.log( Level.WARNING, null, ex );
+                    }
+                    
                     int i= template.indexOf("$");
                     if ( i!=-1 ) { // do a little testing
                         int i2= i+1;
@@ -349,36 +374,48 @@ public final class PngWalkTool extends javax.swing.JPanel {
                             i2++;
                             c= template.charAt(i2);
                         }
-                        if ( i2==template.length() || !( c=='Y' || c=='y' || c=='o' ) ) {
+                        if ( i2==template.length() || !( c=='Y' || c=='y' || c=='o' || c=='x' ) ) {
                             throw new IllegalArgumentException("template must start with $Y, $y or $(o,...)");
-                        }
+                        }   
                     }
+                    
                     int i0 = template.indexOf("_$Y");
-                    if ( i0==-1 ) i0= template.indexOf("_%Y"); // I don't think this should happen now.
                     if ( i0==-1 ) i0= template.indexOf("_$y");
                     if ( i0==-1 ) i0= template.indexOf("_$o");
                     if ( i0==-1 ) i0= template.indexOf("_$(o,");
+                        
+                    if ( i0==-1 && jsonTimeRange!=null ) {
+                        if ( i0==-1 ) i0= template.indexOf("_*"); 
+                        if ( i0==-1 ) i0= template.indexOf("_$x");
+                    }
+                        
                     //Note, _$(m,Y=2000) is not supported.
-                    
+
                     //int i1 = template.indexOf(".png");
                     //if ( i1==-1 ) return;
                     //TimeParser tp= TimeParser.create( template.substring(i0 + 1, i1) );
                     //String timeRange = s.substring(i0 + 1, i1);
-                    
+
                     //kludge: LANL showed a bug where "user" was inserted into the URL.  Check for this.
 
                     if ( s.contains("//user@") && !template.contains("//user@") ) {
                         s= s.replace("//user@", "//" );
                     }
 
-                    TimeParser tp= TimeParser.create( template );
-                    String timeRange = s;
-                    try {
-                        DatumRange dr= tp.parse(timeRange).getTimeRange();
-                        timeRange= dr.toString().replaceAll(" ", "+");
-                    } catch ( ParseException ex ) {
-                        throw new RuntimeException(ex);
+                    String timeRange;
+                    if ( jsonTimeRange==null ) {
+                        TimeParser tp= TimeParser.create( template );
+                        timeRange = s;
+                        try {
+                            DatumRange dr= tp.parse(timeRange).getTimeRange();
+                            timeRange= dr.toString().replaceAll(" ", "+");
+                        } catch ( ParseException ex ) {
+                            throw new RuntimeException(ex);
+                        }
+                    } else {
+                        timeRange= jsonTimeRange.toString().replaceAll("\\s", "+");
                     }
+                    
                     String productFile=null;
                     productFile = template.substring(0, i0) + ".vap";
                     suri = productFile + "?timeRange=" + timeRange;
