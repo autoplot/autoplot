@@ -374,7 +374,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="batchUriNameCB">
       <Properties>
-        <Property name="text" type="java.lang.String" value="events file specifies product names"/>
+        <Property name="text" type="java.lang.String" value="Events file specifies product names"/>
         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;The events file contains the file name, so for example instead of product_$Y$m$d,&#xa;&lt;br&gt;just use the last column when generating the filename.&#xa;&lt;br&gt;&lt;tt&gt;2000-01-09T06:50:41.155Z&#x9;2000-01-09T13:46:34.224Z&#x9;a/o1&#x9;&lt;/tt&gt;&#xa;"/>
       </Properties>
       <BindingProperties>

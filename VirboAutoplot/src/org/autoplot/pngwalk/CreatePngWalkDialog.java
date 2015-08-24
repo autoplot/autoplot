@@ -325,7 +325,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
 
         jLabel4.setText("Output Format:");
 
-        batchUriNameCB.setText("events file specifies product names");
+        batchUriNameCB.setText("Events file specifies product names");
         batchUriNameCB.setToolTipText("<html>The events file contains the file name, so for example instead of product_$Y$m$d,\n<br>just use the last column when generating the filename.\n<br><tt>2000-01-09T06:50:41.155Z\t2000-01-09T13:46:34.224Z\ta/o1\t</tt>\n");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, eventsFileRadioButton, org.jdesktop.beansbinding.ELProperty.create("${selected}"), batchUriNameCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
