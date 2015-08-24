@@ -67,12 +67,18 @@ public class RichPngUtil {
      */
     public static DatumRange getRange( JSONObject  axis ) throws JSONException, ParseException {
         DatumRange range;
-        if ( "UTC".equals( axis.getString("units") ) ) {
+
+        String sunits;
+        if ( axis.has("units") ) {
+            sunits= axis.getString("units"); 
+        } else {
+            sunits= "";
+        }
+        
+        if ( "UTC".equals( sunits ) ) {
             range= DatumRangeUtil.parseISO8601Range( axis.getString("min")+"/"+axis.getString("max") );
 
         } else {
-            String sunits= "";
-            sunits= axis.getString("units"); 
             Units units= Units.lookupUnits(sunits);
             range= new DatumRange(units.parse(axis.getString("min")),
                   units.parse(axis.getString("max")) );
