@@ -25,6 +25,7 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.jythonsupport.ui.DataMashUp;
 
 /**
  * Editor panel for inline URIs.  This supports events lists and short 
@@ -62,6 +63,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         jTextPane1 = new javax.swing.JTextPane();
         jLabel1 = new javax.swing.JLabel();
         examplesButton = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        dataMashUp1 = new org.virbo.jythonsupport.ui.DataMashUp();
 
         jTabbedPane1.setToolTipText("jython tab allows short scripts to be constructed");
         jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -119,7 +122,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(directionsLabel)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(deleteSelectedButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -145,7 +148,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                         .addComponent(addButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(deleteSelectedButton)
-                        .addGap(0, 180, Short.MAX_VALUE)))
+                        .addGap(0, 188, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -174,7 +177,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(examplesButton, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE))
+                        .addComponent(examplesButton, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE))
                     .addComponent(jScrollPane2))
                 .addContainerGap())
         );
@@ -186,11 +189,28 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(examplesButton)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jTabbedPane1.addTab("jython", jPanel2);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(dataMashUp1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(dataMashUp1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 12, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("dashup", jPanel3);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -373,6 +393,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
+    private org.virbo.jythonsupport.ui.DataMashUp dataMashUp1;
     private javax.swing.JButton deleteSelectedButton;
     private javax.swing.JLabel directionsLabel;
     private javax.swing.JButton examplesButton;
@@ -380,6 +401,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -509,7 +531,9 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         if ( uri.startsWith("vap+inline:") ) {
             uri= uri.substring(11);
         }
-        if ( uri.length()==0 || Character.isDigit( uri.charAt(0) ) ) {
+        if ( DataMashUp.isDataMashupJythonInline( uri ) ) {
+            dataMashUp1.setAsJythonInline( uri );
+        } else if ( uri.length()==0 || Character.isDigit( uri.charAt(0) ) ) {
             int amp= uri.indexOf("&");
             if ( amp==-1 ) amp= uri.length();
             String lit= uri.substring(0,amp);
@@ -540,6 +564,9 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     public JPanel getPanel() {
         TableModel ltm= tm;
         initComponents();
+
+        jTabbedPane1.remove(2); // remove dashup tab
+
         if ( text!=null ) jTextPane1.setText(text);
         if ( ltm!=null ) {
             if ( tm.getColumnCount()==2 ) {
@@ -582,7 +609,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 s.append("&RENDER_TYPE=eventsBar");
             }
             return s.toString();
-        } else {
+        } else if ( jTabbedPane1.getSelectedIndex()==1 ) {
             StringBuilder s= new StringBuilder( "vap+inline:" );
             String t= jTextPane1.getText();
             String[] ss= t.split("\n");
@@ -591,6 +618,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 s.append(ss[i]);
             }
             return s.toString();
+        } else {
+            return dataMashUp1.getAsJythonInline();
         }
     }
     
