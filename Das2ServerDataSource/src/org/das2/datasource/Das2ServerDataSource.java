@@ -203,7 +203,20 @@ class Das2ServerDataSource extends AbstractDataSource {
 
         if ( interval!=null ) { // TCAs use interval parameter
             logger.finer("dataset is a TCA, so do not use resolution");
-            params2.put("interval",URLEncoder.encode(interval, "US-ASCII"));
+            // this is dicey.  interval is now replaced with a value based on the
+            // resolution.
+            
+            double dsec;
+            if ( resolution==null ) {
+                dsec= Double.parseDouble(interval);
+            } else {
+                dsec= resolution.doubleValue(Units.seconds);
+            }
+            
+            int iinterval= (int)dsec;
+            if ( iinterval<1 ) iinterval= 1;
+            
+            params2.put("interval",URLEncoder.encode(String.valueOf( iinterval ), "US-ASCII"));
             params2.remove("resolution");
         } else {
             logger.finer("dataset is not a TCA");
