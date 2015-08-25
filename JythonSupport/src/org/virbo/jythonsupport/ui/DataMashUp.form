@@ -85,7 +85,7 @@
                           <Properties>
                             <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
                               <StringArray count="4">
-                                <StringItem index="0" value="plus(x,y)"/>
+                                <StringItem index="0" value="add(x,y)"/>
                                 <StringItem index="1" value="sin(a)"/>
                                 <StringItem index="2" value="atan2(x,y)"/>
                                 <StringItem index="3" value="link(x,y,z)"/>
