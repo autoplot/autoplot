@@ -163,16 +163,25 @@ public class UriTcaSource extends AbstractQFunction {
                 return new BundleDataSet( error );
             }
         }
+                
+        QDataSet tt= Ops.unbundle(parms, 0 );
+        QDataSet dtt= Ops.diff( tt );
+        QDataSet gcd= DataSetUtil.gcd( dtt, Ops.divide( dtt.slice(0),100 ) );
+            
         Datum d;
         DatumRange dr= null; // calculate the bounding DatumRange for all params.
         for ( int i=0; i<parms.length(); i++ ) {
             d= DataSetUtil.asDatum( parms.slice(i).slice(0) );
             dr= DatumRangeUtil.union( dr, d );
         }
+        Datum neededResolution= DataSetUtil.asDatum( gcd ).divide(24); // something arbitrarily close.
+            
         if ( tsb!=null ) {
             DatumRange timeRange= tsb.getTimeRange();
+            Datum resolution= tsb.getTimeResolution();
             tsb.setTimeRange(dr);
-            if ( timeRange==null || !timeRange.contains(dr) ) {
+            if ( timeRange==null || !timeRange.contains(dr) || ( resolution!=null && neededResolution.lt(resolution) ) ) {
+                tsb.setTimeResolution( neededResolution );
                 needToRead= true;
             }
         }
