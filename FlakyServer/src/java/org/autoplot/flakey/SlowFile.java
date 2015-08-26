@@ -89,9 +89,9 @@ public class SlowFile extends HttpServlet {
                     long di= i - i0;
                     while ( dt==0 || ( ( di * 8 / 1000. ) / ( dt / 1000. ) > govern ) ) {  // something is wrong with my units here...
                         Thread.sleep(100);
-                        t0= ( System.currentTimeMillis()-t0 );
-                        i0= i;
                     }
+                    t0= ( System.currentTimeMillis()-t0 );
+                    i0= i;
                 }
             }
         } catch (InterruptedException ex) {
