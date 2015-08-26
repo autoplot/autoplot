@@ -367,6 +367,10 @@ public class CreatePngWalk {
                 ff.println( "batchUri=" + params.batchUri );
                 build.append("--batchUri=").append(params.batchUri).append( " ");
             }
+            if ( params.batchUriName!=null && !params.batchUriName.equals("") ) {
+                ff.println( "batchUriName=" + params.batchUri );
+                build.append("--batchUriName=").append(params.batchUri).append( " ");
+            }
             if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
                 ff.println( "rescalex="+ params.rescalex );
                 build.append("--rescalex=").append(params.rescalex).append( " ");
@@ -545,18 +549,21 @@ public class CreatePngWalk {
      */
     private static String getFilename(Params params, String thumbdir, String atime) throws IllegalArgumentException {
         String filename;
-        if ( thumbdir.length()>0 ) {
+        if ( thumbdir.length()>0 && !thumbdir.endsWith("/") ) {
             thumbdir= thumbdir + "/";
         }
         if ( params.useBatchUri && params.batchUriName.equals("$o") ) {
             String name= atime; // really?
-            if ( name.endsWith(params.outputFormat) ) {
+            // sometimes we want capitalized extention.
+            String outputFormat= params.outputFormat;
+            if ( name.toLowerCase().endsWith(params.outputFormat) ) {
+                outputFormat= name.substring(name.length()-outputFormat.length());
                 name= name.substring(0,name.length()-(params.outputFormat.length()+1));
             }
             if ( params.product.equals("") ) {
-                filename= String.format("%s%s%s.%s", params.outputFolder, thumbdir, name, params.outputFormat );
+                filename= String.format("%s%s%s.%s", params.outputFolder, thumbdir, name, outputFormat );
             } else {
-                filename= String.format("%s%s%s_%s.%s", params.outputFolder, thumbdir, params.product, name, params.outputFormat );
+                filename= String.format("%s%s%s_%s.%s", params.outputFolder, thumbdir, params.product, name, outputFormat );
             }
         } else if ( params.useBatchUri && !params.batchUriName.equals("") ) {
             throw new IllegalArgumentException("batchUriName must be \"\" or \"$o\"");
