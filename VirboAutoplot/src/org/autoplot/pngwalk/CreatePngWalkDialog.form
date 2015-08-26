@@ -304,6 +304,7 @@
             <StringItem index="9" value="$(o,id=http://das2.org/wiki/index.php/Orbits/crres)"/>
           </StringArray>
         </Property>
+        <Property name="enabled" type="boolean" value="true"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="timeRangeToolButton">
@@ -377,9 +378,9 @@
         <Property name="text" type="java.lang.String" value="Events file specifies product names"/>
         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;The events file contains the file name, so for example instead of product_$Y$m$d,&#xa;&lt;br&gt;just use the last column when generating the filename.&#xa;&lt;br&gt;&lt;tt&gt;2000-01-09T06:50:41.155Z&#x9;2000-01-09T13:46:34.224Z&#x9;a/o1&#x9;&lt;/tt&gt;&#xa;"/>
       </Properties>
-      <BindingProperties>
-        <BindingProperty name="enabled" source="eventsFileRadioButton" sourcePath="${selected}" target="batchUriNameCB" targetPath="enabled" updateStrategy="0" immediately="false"/>
-      </BindingProperties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="batchUriNameCBActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
