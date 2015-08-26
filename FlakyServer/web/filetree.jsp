@@ -12,7 +12,14 @@
         <title>File Tree</title>
     </head>
     <body>
-        <h1>This file tree contains data.</h1>
-        <a href='SlowFile?id=0B000800408DD710.20090310.d2s'>0B000800408DD710.20090310.d2s</a>
+        <h1>Simulation of Slow Filesystem</h1>
+        <p>Often we see a filesystem served by Apache or whatever which 
+        has strange delays caused by slow NFS mounts, filewalls, or excessive traffic 
+        on the server.  These files will be transmitted with 10 second pauses at 
+        2000 and 24000 bytes into the file transfer.</p>
+        <a href='slowdata/0B000800408DD710.20090310.d2s'>0B000800408DD710.20090310.d2s</a><br>
+        <a href='slowdata/0B000800408DD710.20090311.d2s'>0B000800408DD710.20090311.d2s</a><br>
+        <a href='slowdata/0B000800408DD710.20090312.d2s'>0B000800408DD710.20090312.d2s</a><br>
+        <a href='slowdata/0B000800408DD710.20090313.d2s'>0B000800408DD710.20090313.d2s</a><br>
     </body>
 </html>
