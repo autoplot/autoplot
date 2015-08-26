@@ -6,6 +6,7 @@
 package org.autoplot.flakey;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -43,6 +44,8 @@ public class SlowFile extends HttpServlet {
         if ( id==null ) {
             id= request.getPathInfo();
         }
+
+        doHead( request, response );
         
         if ( id.endsWith("/") ) {
             id= "index.jsp";
@@ -77,7 +80,7 @@ public class SlowFile extends HttpServlet {
             while ( c>-1 ) {
                 out.write(c);
                 i++;
-                if ( ( i==2000 || i==50000 ) ) {
+                if ( ( i==2000 || i==10000 || i==50000 ) ) {
                     System.err.println("artificial 10 second hang at byte offset "+i);
                     Thread.sleep(2000); // simulate hang
                     t0= System.currentTimeMillis();
@@ -89,13 +92,14 @@ public class SlowFile extends HttpServlet {
                     long di= i - i0;
                     while ( dt==0 || ( ( di * 8 / 1000. ) / ( dt / 1000. ) > govern ) ) {  // something is wrong with my units here...
                         Thread.sleep(100);
+                        dt= ( System.currentTimeMillis()-t0 );
                     }
-                    t0= ( System.currentTimeMillis()-t0 );
-                    i0= i;
                 }
             }
         } catch (InterruptedException ex) {
             Logger.getLogger(SlowFile.class.getName()).log(Level.SEVERE, null, ex);
+        } catch ( FileNotFoundException ex ) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
         
         long dt= ( System.currentTimeMillis()-t0 );
