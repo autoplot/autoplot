@@ -21,5 +21,8 @@
         <a href='slowdata/0B000800408DD710.20090311.d2s'>0B000800408DD710.20090311.d2s</a><br>
         <a href='slowdata/0B000800408DD710.20090312.d2s'>0B000800408DD710.20090312.d2s</a><br>
         <a href='slowdata/0B000800408DD710.20090313.d2s'>0B000800408DD710.20090313.d2s</a><br>
+        <a href='slowdata/rbspa_rel02_ect-hope-sci-L2SA_20130302_v4.0.0.cdf'>rbspa_rel02_ect-hope-sci-L2SA_20130302_v4.0.0.cdf</a><br>
+        <a href='slowdata/rbspa_rel02_ect-hope-sci-L2SA_20130303_v4.0.0.cdf'>rbspa_rel02_ect-hope-sci-L2SA_20130303_v4.0.0.cdf</a><br>
+        <a href='slowdata/rbspa_rel02_ect-hope-sci-L2SA_20130304_v4.0.0.cdf'>rbspa_rel02_ect-hope-sci-L2SA_20130304_v4.0.0.cdf</a><br>
     </body>
 </html>

@@ -36,6 +36,8 @@ public class SlowFile extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        System.err.println("code version 2015-08-26T11:17" );
+        
         String id= request.getParameter("id");
         
         if ( id==null ) {
@@ -45,7 +47,13 @@ public class SlowFile extends HttpServlet {
         if ( id.endsWith("/") ) {
             id= "index.jsp";
         } else {
-            response.setContentType("application/x-das2stream");
+            if ( id.endsWith(".d2s") ) {
+                response.setContentType("application/x-das2stream");
+            } else if ( id.endsWith(".cdf") ) {
+                response.setContentType("application/x-cdf-file");
+            } else {
+                response.setContentType("application/octet-stream");
+            }
         }
         
         
@@ -58,23 +66,42 @@ public class SlowFile extends HttpServlet {
             url= new URL( surl + "data/"+id);
         }
         
+        long t0= System.currentTimeMillis();
+        long i0= 0;
+        
+        long govern= 1000; //bits per second 
+        
         int i=0;
         try ( InputStream in= url.openStream(); OutputStream out=response.getOutputStream() ) {
             int c= in.read();
             while ( c>-1 ) {
                 out.write(c);
                 i++;
-                if ( i==2000 || i==24000 ) {
-                    try {
-                        System.err.println("artificial 10 second hang at byte offset "+i);
-                        Thread.sleep(10000); // simulate hang
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(SlowFile.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                if ( ( i==2000 || i==50000 ) ) {
+                    System.err.println("artificial 10 second hang at byte offset "+i);
+                    Thread.sleep(2000); // simulate hang
+                    t0= System.currentTimeMillis();
+                    i0= i;
                 }
                 c= in.read();
+                if ( i % 1000 == 0 ) { // limit to 600kbps
+                    long dt= ( System.currentTimeMillis()-t0 );
+                    long di= i - i0;
+                    while ( dt==0 || ( ( di * 8 / 1000. ) / ( dt / 1000. ) > govern ) ) {  // something is wrong with my units here...
+                        Thread.sleep(100);
+                        t0= ( System.currentTimeMillis()-t0 );
+                        i0= i;
+                    }
+                }
             }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SlowFile.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        long dt= ( System.currentTimeMillis()-t0 );
+        System.err.println("request satisfied in (ms): "+ ( dt ) );
+        System.err.println("request bits per second (bps): "+ ( i * 8 / 1000. ) / ( dt / 1000. ) );
+        System.err.println("request governed to (bps): "+ govern );
     }
 
     @Override
