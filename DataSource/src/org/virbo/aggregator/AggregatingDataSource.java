@@ -768,7 +768,15 @@ public final class AggregatingDataSource extends AbstractDataSource {
             mon.setTaskSize(10);
             mon.started();
             try {
-                String scompUrl = getFsm().getFileSystem().getRootURI().toString() + getFsm().getRepresentativeFile(mon.getSubtaskMonitor(0,5,"get representative file"));
+                
+                // bug 1453: arbitrary file is picked from the file storage model, which could be a downloaded file but isn't.
+                String scompUrl;
+                DatumRange vr= getViewRange();
+                if ( vr!=null ) {
+                    scompUrl = getFsm().getFileSystem().getRootURI().toString() + getFsm().getRepresentativeFile(mon.getSubtaskMonitor(0,5,"get representative file"),null,vr);
+                } else {
+                    scompUrl = getFsm().getFileSystem().getRootURI().toString() + getFsm().getRepresentativeFile(mon.getSubtaskMonitor(0,5,"get representative file"));
+                }
                 if (!sparams.equals("")) {
                     scompUrl += "?" + sparams;
                 }
