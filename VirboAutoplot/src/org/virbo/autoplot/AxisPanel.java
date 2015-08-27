@@ -146,8 +146,8 @@ public class AxisPanel extends javax.swing.JPanel {
         BindingGroup bc = new BindingGroup();
         Binding b;
         Plot p = applicationController.getPlot();
-
-        if (plotBindingGroup != null) plotBindingGroup.unbind();
+        
+        if (plotBindingGroup != null) plotBindingGroup.unbind(); // consider synchronized block, or require that this always be called from the event thread, or check that the plot has changed.
         //http://www.infoq.com/news/2007/09/beans-binding
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.label"), xTitleTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p,BeanProperty.create( "xaxis.range"), xredit, BeanProperty.create("value")));
