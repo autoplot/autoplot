@@ -102,6 +102,7 @@ public class AxisPanel extends javax.swing.JPanel {
    APSplash.checkTime("in axispanel 30");
 
         xredit.addPropertyChangeListener( new PropertyChangeListener() {
+           @Override
            public void propertyChange(PropertyChangeEvent ev ) {
                DatumRange dr= (DatumRange)xredit.getValue();
                xLog.setEnabled( UnitsUtil.isRatioMeasurement(dr.getUnits() ) );
@@ -109,6 +110,7 @@ public class AxisPanel extends javax.swing.JPanel {
            }
         });
         yredit.addPropertyChangeListener( new PropertyChangeListener() {
+           @Override
            public void propertyChange(PropertyChangeEvent ev ) {
                DatumRange dr= (DatumRange)yredit.getValue();
                yLog.setEnabled( UnitsUtil.isRatioMeasurement(dr.getUnits() ) );
@@ -116,6 +118,7 @@ public class AxisPanel extends javax.swing.JPanel {
            }
         });
         zredit.addPropertyChangeListener( new PropertyChangeListener() {
+           @Override
            public void propertyChange(PropertyChangeEvent ev ) {
                DatumRange dr= (DatumRange)zredit.getValue();
                zLog.setEnabled( UnitsUtil.isRatioMeasurement(dr.getUnits() ) );
@@ -621,6 +624,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
     private JMenuItem createMenuItem( final JTextField componentTextField, final String insert, String doc ) {
         JMenuItem result= new JMenuItem( new AbstractAction( insert ) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 String v= componentTextField.getText();
@@ -634,6 +638,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
     private JMenuItem createMenuItem( final JTextField componentTextField, final String insert, final String label, String doc ) {
         JMenuItem result= new JMenuItem( new AbstractAction( label ) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 String v= componentTextField.getText();
