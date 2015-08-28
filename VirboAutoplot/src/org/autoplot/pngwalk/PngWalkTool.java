@@ -39,7 +39,9 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -147,6 +149,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
     transient DatumRange pendingGoto= null;  // after password is entered, then go to this range.
 
+    private String product; // the product
+    private String baseurl; // the base url
+    
     public static void main(String[] args) {
 
         DataSetURI.init();  // for FtpFileSystem implementation
@@ -194,9 +199,20 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
     }
 
-    private static String readPngwalkFile( String template ) {
+    /**
+     * returns a map containing data from the .pngwalk file.
+     * <ul>
+     * <li>product
+     * <li>template
+     * </ul>
+     * @param template
+     * @return the map
+     */
+    private static Map readPngwalkFile( String template ) {
         URISplit split= URISplit.parse(template);
         InputStream in=null;
+        String product= "";
+        String baseurl= "";
         try {
             Properties p= new Properties();
             if ( split.file==null ) {
@@ -207,15 +223,22 @@ public final class PngWalkTool extends javax.swing.JPanel {
             p.load( in );
             String vers= p.getProperty("version");
             if ( vers==null || vers.trim().length()==0 ) vers=""; else vers="_"+vers;
-            String baseurl= p.getProperty("baseurl","."); // baseurl is needed so that pngwalks can be used out-of-context, for example when a browser downloads the file and hands it off to Autoplot.
+            baseurl= p.getProperty("baseurl","."); // baseurl is needed so that pngwalks can be used out-of-context, for example when a browser downloads the file and hands it off to Autoplot.
             if ( !baseurl.equals(".") ) {
                 if ( !baseurl.endsWith("/") ) {
                     baseurl= baseurl + "/";
                 }
                 split.path=baseurl;
             }
-            String t= split.path + p.getProperty("product") + "_" + p.getProperty("timeFormat") +vers + ".png";
+            String t;
+            if ( !p.getProperty("filePattern","").equals("") ) {
+                // names were specified in the batch file.
+                t= split.path + p.getProperty("filePattern","");
+            } else {
+                t= split.path + p.getProperty("product") + "_" + p.getProperty("timeFormat") +vers + ".png";
+            }
             template= t;
+            product= p.getProperty("product");
         } catch (FileSystemOfflineException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (URISyntaxException ex) {
@@ -232,7 +255,11 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 logger.log( Level.WARNING, ex.getMessage(), ex );
             }
         }
-        return template;
+        Map<String,String> result= new HashMap();
+        result.put( "template", template );
+        result.put( "product", product );
+        result.put( "baseurl", baseurl );
+        return result;
 
     }
 
@@ -254,10 +281,19 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         if ( template!=null ) {
             if ( template.endsWith(".pngwalk") ) {
-                template= readPngwalkFile(template);
+                Map<String,String> map= readPngwalkFile(template);
+                template= map.get("template");
+                tool.product= map.get("product");
+                tool.baseurl= map.get("baseurl");
+            } else {
+                tool.product= "";
+                tool.baseurl= "";
             }
             tool.setTemplate(template);
-        } 
+        } else {
+            tool.product= "";
+            tool.baseurl= "";
+        }
 
         String sdeft= "<?xml version=\"1.0\" encoding=\"UTF-8\"?><bookmark-list version=\"1.1\">    <bookmark-folder remoteUrl=\"http://virbo.org/meta/viewDataFile.jsp?docname=418DBD06-4CA9-4D8E-44EB-F548AE6DBB9C&amp;filetype=data\">" +
         "<title>Demos</title>" +
@@ -310,22 +346,29 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 if ( i0==-1 ) i0= template.indexOf("_$(o,");
                 int i1 = s.indexOf(".png");
                 
+                String productFile=null;
+                
                 if ( i0==-1 ) {
                     try {
                         File file = DataSetURI.getFile( filename, new AlertNullProgressMonitor("get image file") ); // assume it's local.
                         String json= ImageUtil.getJSONMetadata( file );
                         if ( json!=null ) {
-                            if ( i0==-1 ) i0= template.indexOf("_*"); 
-                            if ( i0==-1 ) i0= template.indexOf("_$x");
+                            if ( i0==-1 ) i0= template.indexOf("*"); 
+                            if ( i0==-1 ) i0= template.indexOf("$x");
                         }
+                        productFile= tool.baseurl + tool.product + ".vap";
+                        
                     } catch ( IOException ex ) {
                         logger.log( Level.WARNING, null, ex );
                     }
                 }
 
-                if ( i1==-1 || i0==-1 ) return false;
+                if ( i0==-1 ) return false;
                 
-                String productFile = template.substring(0, i0) + ".vap";
+                if ( productFile==null ) {
+                    productFile = template.substring(0, i0) + ".vap";
+                }
+                
                 try {
                     return WalkUtil.fileExists(productFile);
                 } catch (FileSystemOfflineException ex) {
@@ -416,8 +459,13 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         timeRange= jsonTimeRange.toString().replaceAll("\\s", "+");
                     }
                     
-                    String productFile=null;
-                    productFile = template.substring(0, i0) + ".vap";
+                    String productFile;
+                    
+                    if ( tool.product!=null && tool.product.length()>0 && tool.baseurl.length()>1 ) {
+                        productFile = tool.baseurl + tool.product + ".vap";  //HERE IT IS
+                    } else {
+                        productFile = template.substring(0, i0) + ".vap";  
+                    }
                     suri = productFile + "?timeRange=" + timeRange;
                 }
 
@@ -849,7 +897,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
             public void actionPerformed( ActionEvent ev ) {
                 String template= dataSetSelector1.getValue();
                 if ( template.endsWith(".pngwalk") ) {
-                   template= readPngwalkFile(template);
+                    Map<String,String> m= readPngwalkFile(template);
+                    template= m.get("template");
+                    product= m.get("product");
+                    baseurl= m.get("baseurl");
                 }
                 setTemplate(template);
             }
@@ -1715,8 +1766,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
     private void dataSetSelector1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelector1ActionPerformed
         LoggerManager.logGuiEvent(evt);
         String t= dataSetSelector1.getValue();
+        
         if ( t.endsWith(".pngwalk") ) {
-            t= readPngwalkFile(t);
+            Map<String,String> m= readPngwalkFile(t);
+            t= m.get("template");
         }
         setTemplate( t );
         nextButton.requestFocus();
