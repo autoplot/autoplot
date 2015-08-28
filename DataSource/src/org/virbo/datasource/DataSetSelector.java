@@ -12,6 +12,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
@@ -32,6 +33,7 @@ import java.awt.event.MouseAdapter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -72,8 +74,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -1464,16 +1469,27 @@ public class DataSetSelector extends javax.swing.JPanel {
                 if (arg.equals("plugins")) {
                     ABOUT_PLUGINS_ACTION.actionPerformed(e);
                 } else if ( arg.equals("classpath") ) {
-                    org.das2.util.LoggerManager.logGuiEvent(e);            
-                    StringBuilder result= new StringBuilder("<html>");
-                    ClassLoader cl = ClassLoader.getSystemClassLoader();
-                    if ( cl instanceof URLClassLoader ) {
-                        URL[] urls = ((URLClassLoader)cl).getURLs();
-                        for(URL url: urls){
-                            result.append(url.toString()).append("<br>");
+                    try {
+                        org.das2.util.LoggerManager.logGuiEvent(e);
+                        StringBuilder result= new StringBuilder("<html>");
+                        ClassLoader cl = ClassLoader.getSystemClassLoader();
+                        if ( cl instanceof URLClassLoader ) {
+                            URL[] urls = ((URLClassLoader)cl).getURLs();
+                            for(URL url: urls){
+                                result.append(url.toString()).append("<br>");
+                            }
                         }
+                        JTextPane jtp= new JTextPane();
+                        jtp.setContentType("text/html");
+                        jtp.read( new StringReader(result.toString()), null);
+                        jtp.setEditable(false);
+                        JScrollPane pane= new JScrollPane(jtp);
+                        pane.setPreferredSize( new Dimension(640,480) );
+                        pane.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS );
+                        JOptionPane.showMessageDialog(DataSetSelector.this, pane );
+                    } catch (IOException ex) {
+                        Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    JOptionPane.showMessageDialog(DataSetSelector.this, result.toString() );
                 }
             }
         });
