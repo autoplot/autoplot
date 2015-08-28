@@ -622,6 +622,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     }
     
     private void write( String name ) throws IOException {
+        logger.log(Level.FINE, "call cdf.write({0})", new Object[] { logName(name) } );
         cdf.write( name );
     }
     
