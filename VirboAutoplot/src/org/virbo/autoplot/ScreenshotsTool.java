@@ -77,6 +77,7 @@ public class ScreenshotsTool extends EventQueue {
     
     /**
      * start should be called from the event thread.
+     * @param parent the device
      */
     public static void start( Window parent ) {
 
@@ -96,6 +97,7 @@ public class ScreenshotsTool extends EventQueue {
         folderPanel.add( tf );
 
         folderPanel.add( new JButton( new AbstractAction( "Pick", new ImageIcon( ScreenshotsTool.class.getResource("/org/virbo/autoplot/file.png") ) ) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser ch= new JFileChooser();
                 ch.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
@@ -153,6 +155,7 @@ public class ScreenshotsTool extends EventQueue {
         bounds= null;
 
         tickleTimer= new TickleTimer( 300, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 AWTEvent update= peekEvent(1200);
                 if ( update==null ) {
@@ -324,6 +327,7 @@ public class ScreenshotsTool extends EventQueue {
     /**
      * return the common bounding rectangle to all png images in the directory.  
      * @param root folder containing png images.
+     * @param monitor progress monitor for the task
      * @return the rectangle common to all images.
      * @throws IOException
      * @see #getTrim(java.awt.image.BufferedImage) 
@@ -357,6 +361,8 @@ public class ScreenshotsTool extends EventQueue {
      * return the rectangle containing the image.  The background is determined by looking at the upper-left 
      * pixel, and the rectangle bounding the non-background pixels is returned.
      * Thanks to http://stackoverflow.com/questions/10678015/how-to-auto-crop-an-image-white-border-in-java
+     * @param source the image, containing a base color in the upper right corner.
+     * @return the rectangle tightly containing the windows.
      */
     public static Rectangle getTrim( BufferedImage source ) {
         int baseColor = source.getRGB(0, 0);
@@ -394,8 +400,9 @@ public class ScreenshotsTool extends EventQueue {
 
     /**
      * trim off the excess white to make a smaller image
-     * @param image
-     * @return
+     * @param image the image
+     * @param r the rectangle
+     * @return the smaller image
      */
     public static BufferedImage trim( BufferedImage image, Rectangle r ) {
         return image.getSubimage( r.x, r.y, r.width, r.height );
@@ -412,8 +419,9 @@ public class ScreenshotsTool extends EventQueue {
 
     /**
      * find the common trim bounding box and trim all the images in the directory.
-     * @param dir
+     * @param dir folder containing the images.
      * @param r the bounding rectangle, or null if getTrim should be used.
+     * @param monitor
      * @throws IOException
      */
     public static void trimAll( File dir, Rectangle r, ProgressMonitor monitor ) throws IOException {
@@ -478,6 +486,7 @@ public class ScreenshotsTool extends EventQueue {
      * or wheel events should be indicated.
      * @param active the display number.  See getActiveDisplay(window);
      * @param buttons one of: MouseEvent.BUTTON1_DOWN_MASK, MouseEvent.BUTTON2_DOWN_MASK, MouseEvent.BUTTON3_DOWN_MASK, MOUSE_WHEEL_UP, MOUSE_WHEEL_DOWN
+     * @param includePointer include the pointer (enlarged and indicates button presses)
      * @return image of the screen.
      */
     public static BufferedImage getScreenShot( int active, int buttons, boolean includePointer ) {
@@ -668,6 +677,7 @@ public class ScreenshotsTool extends EventQueue {
                     pop();
 
                     Runnable run= new Runnable() {
+                        @Override
                         public void run() {
                             finishUp();
                         }
@@ -709,7 +719,7 @@ public class ScreenshotsTool extends EventQueue {
                 }
             }
             PngWalkTool tool= PngWalkTool.start( "file:"+outLocationFolder+ "/*.png", null );
-            if ( !tool.isQualityControlEnabled() ) {
+            if ( !PngWalkTool.isQualityControlEnabled() ) {
                 tool.startQC();
             }
         } else {
