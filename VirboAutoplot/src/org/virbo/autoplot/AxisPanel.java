@@ -18,7 +18,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
@@ -26,7 +25,6 @@ import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
-import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.Application;
@@ -36,7 +34,7 @@ import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
 
 /**
- *
+ * Panel for controlling the axes of the current focus plot.
  * @author  jbf
  */
 public class AxisPanel extends javax.swing.JPanel {
@@ -52,7 +50,10 @@ public class AxisPanel extends javax.swing.JPanel {
     
     private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui");
 
-    /** Creates new form PlotStylePanel */
+    /** 
+     * Creates new form PlotStylePanel
+     * @param applicationModel
+     */
     public AxisPanel(final ApplicationModel applicationModel) {
    APSplash.checkTime("in axispanel 10");
         this.applicationModel = applicationModel;
@@ -60,6 +61,7 @@ public class AxisPanel extends javax.swing.JPanel {
         this.applicationController= this.dom.getController();
         
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 doPlotBindings();
             }
@@ -67,6 +69,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
    APSplash.checkTime("in axispanel 15");
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 doPlotElementBindings();
             }
@@ -131,8 +134,10 @@ public class AxisPanel extends javax.swing.JPanel {
 
     private FocusListener createDatumRangeEditorListener( final DatumRangeEditor edit ) {
         return new FocusListener() {
+            @Override
             public void focusGained(FocusEvent e) {
             }
+            @Override
             public void focusLost(FocusEvent e) {
                 edit.setValue( edit.getValue() );
             }
@@ -144,7 +149,7 @@ public class AxisPanel extends javax.swing.JPanel {
     private BindingGroup doPlotBindings() {
 
         BindingGroup bc = new BindingGroup();
-        Binding b;
+
         Plot p = applicationController.getPlot();
         
         if (plotBindingGroup != null) plotBindingGroup.unbind(); // consider synchronized block, or require that this always be called from the event thread, or check that the plot has changed.
