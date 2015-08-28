@@ -1,0 +1,92 @@
+# title: Add Events Digitizer
+# label: Events Digitizer
+# Drag events are registered on the tab "digitizer," recording the horizontal range selected.
+# This also provides feedback showing the digitized data and the data points 
+# selected in the digitizer tab using decorators.
+
+from org.das2.components import DataPointRecorderNew
+from org.virbo.dataset import SemanticOps
+from org.das2.dataset import DataSetUpdateListener
+from org.das2.graph import SpectrogramRenderer
+from org.das2.graph import Painter
+
+import java.util.LinkedHashMap
+
+dpr= DataPointRecorderNew()
+
+addTab( 'digitizer', dpr )
+
+pp= dom.plots[0].controller.dasPlot
+
+dom.canvases[0].controller.dasCanvas.removeTopDecorators()
+dom.canvases[0].controller.dasCanvas.removeBottomDecorators()
+
+class UpdatesPainter( Painter ):
+    def __init__(self,color,width):
+        self.color= color
+        self.width= width
+        self.ds= None
+    def setDs(self,ds):
+        self.ds= ds
+    def paint(self,g):
+        g.setColor(self.color)
+        if ( self.ds!=None ):
+            for ds1 in self.ds:
+                x1= pp.getXAxis().transform(datum(ds1.slice(0)))
+                x2= pp.getXAxis().transform(datum(ds1.slice(1)))
+                y= pp.getYAxis().transform(datum(ds1.slice(2)))
+                g.fillRect( int(x1), int(y)-self.width/2, int(x2-x1), self.width )
+                
+selectionPainter= UpdatesPainter( Color.YELLOW, 5 )
+class MySelectionListener(DataSetUpdateListener):
+   def dataSetUpdated(self,event):
+        global selectionPainter
+        ds= dpr.getSelectedDataSet()
+        selectionPainter.setDs(ds)
+        dom.canvases[0].controller.dasCanvas.repaint()        
+dpr.addSelectedDataSetUpdateListener( MySelectionListener() )
+dom.canvases[0].controller.dasCanvas.addTopDecorator(selectionPainter)
+                
+updatesPainter= UpdatesPainter( Color.GRAY, 1 )
+class MyUpdateListener( DataSetUpdateListener ):
+    def dataSetUpdated( self, e ):
+        global updatesPainter
+        updatesPainter.setDs(dpr.getDataSet())
+        dom.canvases[0].controller.dasCanvas.repaint()
+dpr.addDataSetUpdateListener( MyUpdateListener() )
+dom.canvases[0].controller.dasCanvas.addTopDecorator(updatesPainter)
+
+from org.das2.event import BoxSelectorMouseModule
+from org.das2.event import HorizontalDragRangeRenderer
+
+#mm= BoxSelectorMouseModule( pp, pp.getXAxis(), pp.getYAxis(), None, HorizontalDragRangeRenderer(pp), 'events digitizer' )
+mm= BoxSelectorMouseModule.create( pp, 'events digitizer' )
+
+from org.virbo.dataset import DataSetUtil
+
+def boxSelected(event):
+    xr= event.getXRange()
+    y= event.getStartY()
+    pes= dom.controller.getPlotElementsFor(dom.plots[0])
+    if ( len(pes)==0 ): 
+        setStatus('no data found for plot')
+        return
+    ds= pes[0].controller.getDataSet()
+    if ( ds==None ):
+        setStatus('nothing plotted')
+        return 
+    
+    mp= java.util.LinkedHashMap()
+    mp.put( "y", y )
+    dpr.addDataPoint( xr.min(), xr.max(), mp )
+    
+mm.BoxSelected=boxSelected
+
+pp.dasMouseInputAdapter.primaryModule= mm
+
+# make sure the focus is on the 0th plot element.  The 2nd will be the selected points and above that is the digitized.
+dom.controller.plotElement= dom.plotElements[0]
+
+import javax
+javax.swing.JOptionPane.showMessageDialog( getViewWindow(),'Click on drag on the plot, and it will be recorded on the digitizer tab')
+
