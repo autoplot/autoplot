@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -1461,6 +1463,17 @@ public class DataSetSelector extends javax.swing.JPanel {
                 String arg = m.group(1);
                 if (arg.equals("plugins")) {
                     ABOUT_PLUGINS_ACTION.actionPerformed(e);
+                } else if ( arg.equals("classpath") ) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);            
+                    StringBuilder result= new StringBuilder("<html>");
+                    ClassLoader cl = ClassLoader.getSystemClassLoader();
+                    if ( cl instanceof URLClassLoader ) {
+                        URL[] urls = ((URLClassLoader)cl).getURLs();
+                        for(URL url: urls){
+                            result.append(url.toString()).append("<br>");
+                        }
+                    }
+                    JOptionPane.showMessageDialog(DataSetSelector.this, result.toString() );
                 }
             }
         });
