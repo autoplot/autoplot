@@ -84,9 +84,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 throw new IllegalArgumentException("Unable to delete file"+file);
             }
             logger.log(Level.FINE, "create CDF file {0}", file);
+            logger.log(Level.FINE, "call cdf= new CDFWriter( false )");
             cdf = new CDFWriter( false );
 
         } else {
+            logger.log(Level.FINE, "call cdf= new CDFWriter( URL({0}) )", file.toURI().toURL() );
             cdf = new CDFWriter( file.toURI().toURL() );
             
         }
