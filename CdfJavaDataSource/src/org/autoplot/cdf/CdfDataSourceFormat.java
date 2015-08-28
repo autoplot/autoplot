@@ -5,7 +5,6 @@
 package org.autoplot.cdf;
 
 import gov.nasa.gsfc.spdf.cdfj.CDFDataType;
-import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import gov.nasa.gsfc.spdf.cdfj.CDFWriter;
 import java.lang.reflect.Array;
 import org.virbo.datasource.DataSourceUtil;
@@ -13,6 +12,7 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
@@ -25,8 +25,6 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.GZIPInputStream;
-import org.das2.util.DeflaterChannel;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.SemanticOps;
 
@@ -166,7 +164,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             logger.log( Level.WARNING, ex.getMessage() , ex );
         }
             
-        cdf.write( file.toString() );
+        write( file.toString() );
         
     }
 
@@ -556,31 +554,33 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if ( compressed ) {
             if ( ds.rank()==1 ) {
                 cdf.defineCompressedVariable( name, type, new int[0] );
-                cdf.addData( name, dataSetToNioArray( ds, uc, type, mon ) ); //TODO: I think I need to compress the channel.
+                addData( name, dataSetToNioArray( ds, uc, type, mon ) ); //TODO: I think I need to compress the channel.
             } else { 
                 if ( ds.rank()==2 ) {
-                    cdf.defineCompressedVariable( name, type, new int[] { ds.length(0) } );
+                    defineCompressedVariable( name, type, new int[] { ds.length(0) } );
                 } else if ( ds.rank()==3 ) {
-                    cdf.defineCompressedVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
+                    defineCompressedVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
                 } else if ( ds.rank()==4 ) {
-                    cdf.defineCompressedVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
+                    defineCompressedVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
                 }
-                cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
+                Object o= dataSetToArray( ds, uc, type, mon );
+                logger.log(Level.FINE, "call cdf.addData(name,{0})", o);
+                addData( name, o );
             }
             
         } else {
             if ( ds.rank()==1 ) {
-                cdf.defineVariable( name, type, new int[0] );
-                cdf.addData( name, dataSetToNioArray( ds, uc, type, mon ) );
+                defineVariable( name, type, new int[0] );
+                addData( name, dataSetToNioArray( ds, uc, type, mon ) );
             } else { 
                 if ( ds.rank()==2 ) {
-                    cdf.defineVariable( name, type, new int[] { ds.length(0) } );
+                    defineVariable( name, type, new int[] { ds.length(0) } );
                 } else if ( ds.rank()==3 ) {
-                    cdf.defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
+                    defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
                 } else if ( ds.rank()==4 ) {
-                    cdf.defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
+                    defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
                 }
-                cdf.addData( name, dataSetToArray( ds, uc, type, mon ) );
+                addData( name, dataSetToArray( ds, uc, type, mon ) );
             }
             
             
@@ -588,6 +588,54 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
         copyMetadata( units, name, isSupport, ds );
         
+    }
+    
+    /**
+     * return expressions so example testing codes can be written
+     * @param o
+     * @return 
+     */
+    private String logName( Object o ) {
+        if ( o.getClass().isArray() ) {
+            StringBuilder s= new StringBuilder("[");
+            s.append( Array.getLength(o));
+            o= Array.get(o,0);
+            while ( o.getClass().isArray() ) {
+                s.append(",").append(Array.getLength(o));
+                o= Array.get(o,0);
+            }
+            s.append("]");
+            String n= o.getClass().toString();
+            if ( n.startsWith("class java.lang.") ) {
+                n= n.substring(16);
+            }
+            return n + s.toString();
+        } else if ( o instanceof String ) {
+            return "\"" + o + "\"";
+        } else if ( o instanceof CDFDataType ) {
+            return "CDFDataType." + ((CDFDataType)o).getValue();
+        } else {
+            return o.toString();
+        }
+    }
+    
+    private void write( String name ) throws IOException {
+        cdf.write( name );
+    }
+    
+    private void defineCompressedVariable( String name, CDFDataType type, int[] dims )  throws Exception{
+        logger.log(Level.FINE, "call cdf.defineCompressedVariable({0},{1},{2})", new Object[] { logName(name), logName(type), logName(dims) } );
+        cdf.defineCompressedVariable( name, type, dims );
+    }
+    
+    private void defineVariable( String name, CDFDataType type, int[] dims )  throws Exception{
+        logger.log(Level.FINE, "call cdf.defineVariable({0},{1},{2})", new Object[] { logName(name), logName(type), logName(dims) } );
+        cdf.defineVariable( name, type, dims );
+    }
+    
+    private void addData( String name, Object d ) throws Exception {
+        logger.log(Level.FINE, "call cdf.addData({0},{1})", new Object[] { logName(name), logName(d) } );
+        cdf.addData( name, d );
     }
 
     /**
