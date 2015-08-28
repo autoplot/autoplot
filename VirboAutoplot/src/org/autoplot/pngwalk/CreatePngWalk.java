@@ -363,6 +363,9 @@ public class CreatePngWalk {
             build.append("--timeFormat='").append(params.timeFormat).append( "' ");
             ff.println( "timeRange=" + params.timeRangeStr );
             build.append("--timeRange='").append(params.timeRangeStr).append( "' ");
+            if ( params.batchUriName.equals("$o") ) {
+                ff.println( "filePattern=*.png  # this may need editing");
+            }
             if ( params.batchUri!=null && !params.batchUri.equals("") ) {
                 ff.println( "batchUri=" + params.batchUri );
                 build.append("--batchUri=").append(params.batchUri).append( " ");
@@ -560,11 +563,7 @@ public class CreatePngWalk {
                 outputFormat= name.substring(name.length()-outputFormat.length());
                 name= name.substring(0,name.length()-(params.outputFormat.length()+1));
             }
-            if ( params.product.equals("") ) {
-                filename= String.format("%s%s%s.%s", params.outputFolder, thumbdir, name, outputFormat );
-            } else {
-                filename= String.format("%s%s%s_%s.%s", params.outputFolder, thumbdir, params.product, name, outputFormat );
-            }
+            filename= String.format("%s%s%s.%s", params.outputFolder, thumbdir, name, outputFormat );
         } else if ( params.useBatchUri && !params.batchUriName.equals("") ) {
             throw new IllegalArgumentException("batchUriName must be \"\" or \"$o\"");
         } else {
@@ -611,10 +610,12 @@ public class CreatePngWalk {
                     mon = DasProgressPanel.createFramed(ScriptContext.getViewWindow(), "running batch");
                 }
 
-                TimeParser tp= TimeParser.create(params.timeFormat);
-                if ( !tp.isNested() ) {
-                    JOptionPane.showMessageDialog( ScriptContext.getViewWindow(), "<html>Time spec must have fields nested: $Y,$m,$d, etc,<br>not "+params.timeFormat + " ." );
-                    return -1;
+                if ( params.timeFormat.length()>0 ) {
+                    TimeParser tp= TimeParser.create(params.timeFormat);
+                    if ( !tp.isNested() ) {
+                        JOptionPane.showMessageDialog( ScriptContext.getViewWindow(), "<html>Time spec must have fields nested: $Y,$m,$d, etc,<br>not "+params.timeFormat + " ." );
+                        return -1;
+                    }
                 }
 
                 String[] times = getListOfTimes( params, new ArrayList() );
@@ -632,7 +633,13 @@ public class CreatePngWalk {
                     if ( ScriptContext.getViewWindow() != null && params.outputFormat.equals("png" ) ) {
                         logger.log(Level.FINE, "version=\"{0}\"", String.valueOf(params.version));
                         String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version.trim();
-                        final String st= url + params.product + "_" + params.timeFormat + vers + ".png";
+                        String st1;
+                        if ( params.batchUriName.length()==0 ) {
+                            st1= url + params.product + "_" + params.timeFormat + vers + ".png";
+                        } else {
+                            st1= url + "*.png";
+                        }
+                        final String st=st1;
                         SwingUtilities.invokeLater( new Runnable() {
                             @Override
                             public void run() {
