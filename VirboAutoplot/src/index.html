@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Bugs in the contour plot are corrected.
+        <p><small>Random NC4 used to verify new HDF5 dialog.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,8 +20,14 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-08-21 r17320l):</p>
+        <p>Bugfixes (2015-08-27 r17320l):</p>
         <ul>
+            <li>screenshots tool includes Windows as well as Frames when masking for privacy.</li>
+            <li>1453: AggregatingDataSource now uses the time constraint when identifying the delegate file for retrieving metadata, avoiding extraneous load.</li>
+            <li>1448: allow capitalized extentions like ".PNG" when explicit filenames are used.</li>
+            <li>1433: double check on timetags was too restrictive and throwing out too much data from RBSP waveform data, George pointed out.</li>
+            <li>Ephemeris ticks now use resolution when tick labels are sourced from TimeSeriesBrowse.</li>
+            <li>PNGWalk "View in Autoplot" button will look at PNG metadata to extract the timerange.</li>
             <li>More zaxis properties are loaded in das2streams.</li>
             <li>1165: create pngwalk uses user prefs for grid and other options.</li>
             <li>xls files would drop the last record.</li>
@@ -68,6 +74,9 @@
             <li>updates to many of the example scripts. </li>
             <li>bugfixes in block from 2015-07-15 to 2015-07-26</li>
             <li>FFTPower would apply the window twice, affecting the data.  Thanks, Chris!</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>minor tweaks to property editor</li>
             <li>update RBSP orbits to 2827</li>
             <li>hide the "filters" name which is meaningless to the scientists, and use "operations" (which is just as meaningless, but there's one fewer name).</li>
@@ -104,82 +113,11 @@
             <li>rte_0874741227: nullPointerException with Jython scripts, thanks Bill and Dan!</li>
             <li>setDepend0Cadence supports rank 3 joins</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>SpectrogramRenderer used code that ignored CADENCE property to judge the distance between measurements</li>
-            <li>1403: properly support brackets in filenames (rte1830227625) </li>
-            <li>1310: fix accidental java import with "import java.lang.Thread as _Thread instead of "import java.lang.Thread"</li>
-            <li>1404: fix occasional Jython GUI error caused by review GUI being created off of the event thread.</li>
-            <li>1393: WebStart caching has a bug where updates aren't seen, urlc.setUseCaches(false) fixes.</li>
-            <li>1310: keep track of scripts that have been approved by the operator, reducing tedium and enhancing security</li>
-            <li>1402: recent change in ascii URIs breaks editor when DEPEND_0 is not the zeroth column.</li>
-            <li>append will preserve BufferDataSets when they are the same type.</li>
-            <li>CDF editor only allows one item to be selected.</li>
-            <li>1349: 32-bit machines will use heap memory instead of accessing native memory.</li>
-            <li>1390: createEvent with the arguments createEvent( ds, DatumRange, color, label ) </li>
-            <li>1390: eventds.slice(0).slice(0) now has correct units.</li>
-            <li>1399: minor das2server bugs such as +20 fixed.  This may introduce new bugs...</li>
-            <li>1398: join of tables containing length 1 dataset would fail to limit interpolation length.</li>
-            <li>1398: xTagWidth property wouldn't be converted into QDataSet for MultiTableDataSet</li>
-            <li>478: list subset preserves DEPEND variable.</li>
-            <li>1395: out-of-native memory error when lots of data is loaded rapidly because of Java GC doesn't clear references.</li>
-            <li>1394: remove excessive traffic with the HTTP server, where GETs were done on the remote folder every ten seconds during aggregation</li>
-            <li>1394: expensiveOpCache for getting HTTP freshness didn't authenticate</li>
-            <li>Empty Tools submenu will have "filters" added.</li>
-            <li>TickCurveRenderer code that detected breaks initializes properly now.</li>
-            <li>reset() method clears top and bottom decorators as well.</li>
-            <li>top and bottom decorator access is thread-safe</li>
-            <li>1392: reducex GUI resets with "60s"</li>
-            <li>Slice filter GUI now supports slice at time or Datum.</li>
-            <li>1383: double slash in history on Windows</li>
-            <li>1387: vertical slicer should keep labels</li>
-            <li>context overview doesn't mess up the menus like it has done since 2008.</li>
-            <li>1385: VOTables contained lower case tr tags, where the parser assumed they would be upper case.</li>
-            <li>1381: rebin propagates the labels and units.</li>
-            <li>1380: correct the number of bins reported when DEPEND_2 is rank 2</li>
-            <li>bugfix: correct place where blurTsbURI can return null.</li>
-            <li>1377: corrections and clarifications with inline editor panel and URIs.</li>
-            <li>1376: RTE caused by inline URI very hard to diagnose in script.</li>
-            <li>QStreams with just one rank 2 dataset would flatten the QDataSet to rank 1 mistakenly.</li>
-            <li>bugfix: screenshots tool would always grab from the first display.</li>
-            <li>slice filter editor panel shouldn't use commas in the index.</li>
-            <li>1375: operations GUIs are incorrectly set as focus is switched. </li>
-            <li>remove long operations from the droplist of recent operations.  They mess up the layout of the GUI, and are probably difficult to interpret anyway.</li>
-            <li>add round(n,1) to match Python round function.</li>
-            <li>add more keyboard shortcuts and cheatsheet in Jython editor.</li>
-            <li>allow single-letter variable name lookups in Jython editor.</li>
-            <li>OpenDAP support would collapse rank 3 and rank 4 data, because early version of Autoplot only supported rank 2 data.</li>
-            <li>switch to latest version of Java CDF library</li>
-            <li>Autoplot server only accepts connections from localhost, and doesn't allow imports.</li>
-            <li>correct branch where names were used instead of labels for x,y,z plots from das2server.</li>
-            <li>kludge in update to force repaint when valid range and fill value fields are changed.</li>
-            <li>rte_1630095413: clean up transition by clearing input and filter.  Before the wrong dataset was sent to the filter.</li>
-            <li>1366 DasProgressPanel constructor should be protected.  Jython scripts would sometimes not have a showing progress bar</li>
-            <li>aggregation of two QStreams would fail because of change to when join datasets are flattened.</li>
-            <li>1362: memory leaks shown by Kenzie's FFT process.</li>
-            <li>1359: scan buttons get into funky state demonstration</li>
-            <li>clarify smax&lt;smin message in eventsRenderer</li>
-            <li>bugfix when very small times were used and seconds was 0. with parse and format times.</li>
-            <li>correct where $(subseconds,places=6) was ignoring the fractional part of the seconds field, and was just using the micros.</li>
-            <li>1359: trim() supports waveform dataset, which was causing scan to next to fail.</li>
-            <li>unsigned bytes, shorts and ints in HDF5 files are corrected.</li>
-            <li>minor performance enhancements for huge scatter renderer</li>
-            <li>1357: avoid nasty messages about immutable datasets, where CDAWeb plugin was modifying data that will soon be immutable.</li>
-            <li>1356: clean up code where the listener would add another listener.</li>
-            <li>1355: old renderer would paint new dataset, which could hang the event thread</li>
-            <li>1353: corrections to huge scatter where large waveform packets were preventing it from painting individual points.</li>
-            <li>1354: edit style properties now brings up custom editor.</li>
-            <li>bugfix: single-tag dataset for ephemeris would result in RTE.</li>
-            <li>HtmlTableDataSource name changes, improved support for dates.</li>
-            <li>huge scatter properly implements flipped</li>
-            <li>magic number check on CDF files would fail with old CDF files</li>
-            <li>IndexGenDataSet is now final, more operations try to preserve internal types to save memory.</li>
-            <li>CDF file units can now contain LaTeX code as well.</li>
-            <li>1350: Corrections to QStreams containing bundles.</li>
-            <li>rte 2071287514: cancel dialog by closing window caused RTE.  Check for other places where it is assumed at least one element is returned.  Thanks Bob!</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>441: allow $v and $x to trigger the split index.</li>
+            <li>Introduce "flaky server" code to model slow servers so Autoplot can deal with them more effectively.</li>
+            <li>1448: explicit control of output filenames in pngwalk.</li>
             <li>where keyword support in HDF5</li>
             <li>HDF5 now has an editor panel.</li>
             <li>improvements to completions in Jython editor panel.</li>
@@ -196,6 +134,9 @@
             <li>improvements to DashupTool.</li>
             <li>update the port reported when the server is on, to support automatic selection of port with --server=0.</li>
             <li>support Units.RGBColor for the units of the colorBy dataset.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>           
             <li>improvements to feedback in CDF parameter editor panel.</li>
             <li>1425: implicit events file format allows any text file with ISO8601, ISO8601 for the first two columns to be implicitly treated as an events file.</li>
             <li>add rank 4 ones and replicate functions.</li>
@@ -208,36 +149,6 @@
             <li>system property AUTOPLOT_DATA can be used to specify autoplot_data folder location.</li>
             <li>GUI title indicates if problematic 32bit Java is used.</li>
             <li>layout tab has add plots and delete plots button.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>           
-            <li>Chris added support for macros (substitutions) in das2streams.</li>
-            <li>format to HTML supports rank 1 data.</li>
-            <li>Add Tools->Filters... so new users needn't understand the data tab</li>
-            <li>add grid to match flatten to filters GUI.</li>
-            <li>macros support %{PROPERTIES.UNITS} %{PROPERTIES.CACHE_TAG}</li>
-            <li>add separate logger das2.url that logs all external connections.</li>
-            <li>add (µs) as a unit.</li>
-            <li>UTC is allowed where units are found, so that times can be explicitly parsed as such.</li>
-            <li>plotx color keyword parameter can now be a float, int, rank 0 dataset, or Color.</li>
-            <li>426: extract macro converter logic, and make plot title and plotElement label macros consistent.</li>
-            <li>426: support macros for METADATA and USER_PROPERTIES, like %{METADATA.GlobalAttributes.Mission_group}</li>
-            <li>putProperty( ds, QDataSet.USER_PROPERTIES, PyDict )</li>
-            <li>stairSteps mode doesn't show dot plot symbols, to better support histograms.</li>
-            <li>add more shortcuts to jython editor, and screen showing shortcuts.</li>
-            <li>applot.py matured and improves support for SciPy.</li>
-            <li>Autoplot Server port only listens to localhost, and does not allow imports.</li>
-            <li>update RBSP orbits to 2015-05-01</li>
-            <li>finish off applot.py support for Autoplot in native SciPy applications, using Autoplot server.</li>
-            <li>export to CDF supports UINT1, UINT2, and UINT4 data types.</li>
-            <li>add more examples to InlineDataSource editor panel, to add colored events bar.</li>
-            <li>add PutPropertyFilterEditorPanel, which allows valid ranges and missing metadata to be specified</li>
-            <li>introduce DatumRangeUtil.parseDatumRange(String) which detects ISO8601 times or units equal to UTC.</li>
-            <li>automatic hang detection writes RTE to autoplot_data/log/ when app hangs for 10 seconds.</li>
-            <li>added BindingSupport.printStatus() to help find memory leaks caused by bindings</li>
-            <li>get rid of extraneous InterruptedExceptions which were thrown from the bowels, and needn't be propagated to the more abstract waitUntilIdle</li>
-            <li>renderer style panels for Contour, PitchAngleDistribution, and EventsBar styles.</li>
-            <li>more dasCore code cleanup</li>
         </ul>
 
         <p>Known issues:</p>
