@@ -283,7 +283,7 @@ public class ScreenshotsTool extends EventQueue {
 
     /**
      *  mask out parts of the desktop that are not Autoplot, for the user's privacy.
-     *  @param g 
+     *  @param g the graphics to paint on.
      *  @param b the rectangle showing the display translation.
      */
     static void filterBackground( Graphics2D g, Rectangle b ) {
@@ -306,16 +306,16 @@ public class ScreenshotsTool extends EventQueue {
             }
         }
 
-//        Window[] windows= Window.getWindows();
-//        for ( Window window: windows ) {
-//            if ( window.isVisible() ) {
-//                if ( window.isShowing() ) {
-//                    Rectangle rect= window.getBounds();
-//                    rect.translate( -b.x, -b.y );
-//                    s.subtract( new Area( rect ) );
-//                }
-//            }
-//        }
+        Window[] windows= Window.getWindows();
+        for ( Window window: windows ) {
+            if ( window.isVisible() ) {
+                if ( window.isShowing() ) {
+                    Rectangle rect= window.getBounds();
+                    rect.translate( -b.x, -b.y );
+                    s.subtract( new Area( rect ) );
+                }
+            }
+        }
 
         g.fill(s);
         
