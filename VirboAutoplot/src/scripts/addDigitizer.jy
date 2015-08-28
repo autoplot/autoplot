@@ -8,11 +8,11 @@ addTab( 'digitizer', dpr )
 
 ## add the box selector #########################
 dom= getDocumentModel()
-plot= dom.plots[0].controller.dasPlot
+dasPlot= dom.plots[0].controller.dasPlot
 
 from org.das2.event import BoxSelectorMouseModule
 
-mm= BoxSelectorMouseModule.create( plot, 'digitizer' )
+mm= BoxSelectorMouseModule.create( dasPlot, 'digitizer' )
 
 import java.util.HashMap
 
@@ -26,7 +26,7 @@ def boxSelected(event):
     
 mm.BoxSelected=boxSelected
 
-plot.dasMouseInputAdapter.primaryModule= mm
+dasPlot.dasMouseInputAdapter.primaryModule= mm
 
 import javax
 javax.swing.JOptionPane.showMessageDialog( getViewWindow(),'Draw a box, and it will be recorded on the digitizer tab')
