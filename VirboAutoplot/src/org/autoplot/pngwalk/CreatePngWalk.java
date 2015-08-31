@@ -14,7 +14,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -364,7 +363,8 @@ public class CreatePngWalk {
             ff.println( "timeRange=" + params.timeRangeStr );
             build.append("--timeRange='").append(params.timeRangeStr).append( "' ");
             if ( params.batchUriName.equals("$o") ) {
-                ff.println( "filePattern=*.png  # this may need editing");
+                ff.println( "# the filePattern may need editing, depending on extension and subdirectories.");
+                ff.println( "filePattern=*.png");
             }
             if ( params.batchUri!=null && !params.batchUri.equals("") ) {
                 ff.println( "batchUri=" + params.batchUri );
