@@ -293,66 +293,66 @@ public abstract class AbstractDataSource implements DataSource {
      */
     private MutablePropertyDataSet applyFilter( MutablePropertyDataSet result, QDataSet parm, String op, QDataSet d ) throws NoDataInIntervalException {
         QDataSet r;
-        if ( parm.rank()<result.rank() ) {
-                    QDataSet[] operands= new QDataSet[2];
-                    CoerceUtil.coerce( result, parm, false, operands );
-                    parm= operands[1];
+        if ( parm.rank()>1 && parm.rank()<result.rank() ) {
+            QDataSet[] operands= new QDataSet[2];
+            CoerceUtil.coerce( result, parm, false, operands );
+            parm= operands[1];
+        }
+        if ( parm.rank()>1 ) {
+            if ( op.equals("gt" ) ){
+                r= Ops.where( Ops.le( parm,d ) );
+            } else if ( op.equals("lt") ) {
+                r= Ops.where( Ops.ge( parm,d ) );
+            } else if ( op.equals("eq") ) {
+                r= Ops.where( Ops.ne( parm,d ) );
+            } else if ( op.equals("ne") ) {
+                r= Ops.where( Ops.eq( parm,d ) );
+            } else if ( op.equals("within") ) {
+                r= Ops.where( Ops.without( parm,d ) );
+            } else {
+                throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");                        
+            }
+            double fill= Double.NaN;
+            result= BufferDataSet.maybeCopy(result);
+            if ( parm.rank()==2 && result.rank()==2 ) {
+                for ( int jj=0; jj<r.length(); jj++ ) {
+                    ((BufferDataSet)result).putValue((int)r.value(jj,0),(int)r.value(jj,1),fill);
                 }
-                if ( parm.rank()>1 ) {
-                    if ( op.equals("gt" ) ){
-                        r= Ops.where( Ops.le( parm,d ) );
-                    } else if ( op.equals("lt") ) {
-                        r= Ops.where( Ops.ge( parm,d ) );
-                    } else if ( op.equals("eq") ) {
-                        r= Ops.where( Ops.ne( parm,d ) );
-                    } else if ( op.equals("ne") ) {
-                        r= Ops.where( Ops.eq( parm,d ) );
-                    } else if ( op.equals("within") ) {
-                        r= Ops.where( Ops.without( parm,d ) );
-                    } else {
-                        throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");                        
-                    }
-                    double fill= Double.NaN;
-                    result= BufferDataSet.maybeCopy(result);
-                    if ( parm.rank()==2 && result.rank()==2 ) {
-                        for ( int jj=0; jj<r.length(); jj++ ) {
-                            ((BufferDataSet)result).putValue((int)r.value(jj,0),(int)r.value(jj,1),fill);
-                        }
-                    } else if ( parm.rank()==3 && result.rank()==3 ) {
-                        for ( int jj=0; jj<r.length(); jj++ ) {
-                            ((BufferDataSet)result).putValue((int)r.value(jj,0),(int)r.value(jj,1),(int)r.value(jj,2),fill);
-                        }
-                    } else {
-                        throw new IllegalArgumentException("where can only apply filter and dataset have same dimensions");  
-                    }
-                } else if ( parm.rank()<2 ) {
-                    if ( op.equals("gt" ) ){
-                        r= Ops.where( Ops.gt( parm,d ) );
-                    } else if ( op.equals("lt") ) {
-                        r= Ops.where( Ops.lt( parm,d ) );
-                    } else if ( op.equals("eq") ) {
-                        r= Ops.where( Ops.eq( parm,d ) );
-                    } else if ( op.equals("ne") ) {
-                        r= Ops.where( Ops.ne( parm,d ) );
-                    } else if ( op.equals("within") ) {
-                        r= Ops.where( Ops.within( parm,d ) );
-                    } else {
-                            throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
-                    }
-                    if ( r.length()==0 ) {
-                        throw new NoDataInIntervalException("'where' argument removes all data");
-                    } else {
-                        result= DataSetOps.applyIndex( result, 0, r, true );
-                        // check to see if rank 2 depend can now be rank 1.  This might be the reason we used where...
-                        for ( int ii=1; ii<result.rank(); ii++ ) {
-                            String sdep= "DEPEND_"+ii;
-                            QDataSet dep= (QDataSet) result.property(sdep);
-                            if ( dep!=null && dep.rank()==2 && DataSetUtil.isConstant(dep) ) {
-                                result.putProperty(sdep,dep.slice(0) );
-                            }
-                        }
+            } else if ( parm.rank()==3 && result.rank()==3 ) {
+                for ( int jj=0; jj<r.length(); jj++ ) {
+                    ((BufferDataSet)result).putValue((int)r.value(jj,0),(int)r.value(jj,1),(int)r.value(jj,2),fill);
+                }
+            } else {
+                throw new IllegalArgumentException("where can only apply filter and dataset have same dimensions");  
+            }
+        } else if ( parm.rank()<2 ) {
+            if ( op.equals("gt" ) ){
+                r= Ops.where( Ops.gt( parm,d ) );
+            } else if ( op.equals("lt") ) {
+                r= Ops.where( Ops.lt( parm,d ) );
+            } else if ( op.equals("eq") ) {
+                r= Ops.where( Ops.eq( parm,d ) );
+            } else if ( op.equals("ne") ) {
+                r= Ops.where( Ops.ne( parm,d ) );
+            } else if ( op.equals("within") ) {
+                r= Ops.where( Ops.within( parm,d ) );
+            } else {
+                throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
+            }
+            if ( r.length()==0 ) {
+                throw new NoDataInIntervalException("'where' argument removes all data");
+            } else {
+                result= DataSetOps.applyIndex( result, 0, r, true );
+                // check to see if rank 2 depend can now be rank 1.  This might be the reason we used where...
+                for ( int ii=1; ii<result.rank(); ii++ ) {
+                    String sdep= "DEPEND_"+ii;
+                    QDataSet dep= (QDataSet) result.property(sdep);
+                    if ( dep!=null && dep.rank()==2 && DataSetUtil.isConstant(dep) ) {
+                        result.putProperty(sdep,dep.slice(0) );
                     }
                 }
+            }
+        }
         return result;
     }
     
