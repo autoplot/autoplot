@@ -274,6 +274,27 @@ public final class PngWalkTool extends javax.swing.JPanel {
         SwingUtilities.invokeLater(run);
     }
     
+    private static String checkRelativeBaseurl( String baseurl, String template, String product ) {
+        if ( baseurl.equals(".") ) {
+            URISplit split= URISplit.parse(template);
+            String f= split.path;
+            int i= f.indexOf( "/"+product );
+            if ( i==-1 ) {
+                i= f.indexOf("*");
+                if ( i>-1 ) i= f.lastIndexOf("/",i);
+            }
+            if ( i==-1 ) {
+                if ( f.endsWith("/") ) {
+                    baseurl= f;
+                }
+            }
+            if ( i>-1 ) {
+                baseurl= f.substring(0,i+1);
+            }
+        }
+        return baseurl;
+    }
+    
     public static PngWalkTool start( String template, final Window parent ) {
 
         final PngWalkTool tool = new PngWalkTool();
@@ -282,9 +303,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
         if ( template!=null ) {
             if ( template.endsWith(".pngwalk") ) {
                 Map<String,String> map= readPngwalkFile(template);
-                template= map.get("template");
                 tool.product= map.get("product");
                 tool.baseurl= map.get("baseurl");
+                tool.baseurl= checkRelativeBaseurl(tool.baseurl, template, tool.product );
+                template= map.get("template");
             } else {
                 tool.product= "";
                 tool.baseurl= "";
@@ -901,6 +923,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     template= m.get("template");
                     product= m.get("product");
                     baseurl= m.get("baseurl");
+                    baseurl= checkRelativeBaseurl(baseurl, template, product );
                 }
                 setTemplate(template);
             }
@@ -1770,6 +1793,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         if ( t.endsWith(".pngwalk") ) {
             Map<String,String> m= readPngwalkFile(t);
             t= m.get("template");
+            baseurl= checkRelativeBaseurl(baseurl, t, m.get("product") );
         }
         setTemplate( t );
         nextButton.requestFocus();
