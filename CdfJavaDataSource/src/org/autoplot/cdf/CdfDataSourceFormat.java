@@ -88,8 +88,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             cdf = new CDFWriter( false );
 
         } else {
-            logger.log(Level.FINE, "call cdf= new CDFWriter( URL({0}) )", file.toURI().toURL() );
-            cdf = new CDFWriter( file.toURI().toURL() );
+            logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", file.toString() );
+            cdf = new CDFWriter( file.toString(), false );
             
         }
         
