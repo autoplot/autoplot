@@ -21,7 +21,8 @@
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
         <p>Bugfixes (2015-08-27 r17320l):</p>
-        <ul>
+        <ul>    
+            <li>refactor ascii parser to make it more consistent.</li>
             <li>screenshots tool includes Windows as well as Frames when masking for privacy.</li>
             <li>1453: AggregatingDataSource now uses the time constraint when identifying the delegate file for retrieving metadata, avoiding extraneous load.</li>
             <li>1448: allow capitalized extentions like ".PNG" when explicit filenames are used.</li>
@@ -115,6 +116,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>442: special support for MMS data website, which has uses login and cookies </li>
+            <li>http://autoplot.org//developer.datasetToString clean up</li>
+            <li>.pngwalk file has filepattern to support more pngwalks and subdirectories</li>
+            <li>URI about:classpath added for debugging</li>
             <li>441: allow $v and $x to trigger the split index.</li>
             <li>Introduce "flaky server" code to model slow servers so Autoplot can deal with them more effectively.</li>
             <li>1448: explicit control of output filenames in pngwalk.</li>
