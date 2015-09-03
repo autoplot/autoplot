@@ -58,6 +58,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -3154,14 +3155,37 @@ APSplash.checkTime("init 52.9");
             String mem = nf.format(Runtime.getRuntime().maxMemory()   / 1000000 );
             String tmem= nf.format(Runtime.getRuntime().totalMemory() / 1000000 );
             String fmem= nf.format(Runtime.getRuntime().freeMemory()  / 1000000 );
+            String nmem= "???";
+            try {
+                // taken from https://svn.apache.org/repos/asf/flume/trunk/flume-ng-core/src/main/java/org/apache/flume/tools/DirectMemoryUtils.java
+                Class<?> VM = Class.forName("sun.misc.VM");
+                Method maxDirectMemory = VM.getDeclaredMethod("maxDirectMemory", new Class[0] );
+                Object result = maxDirectMemory.invoke(null, (Object[])null);
+                if (result != null && result instanceof Long) {
+                    nmem= nf.format( ((Long)result) / 1000000 );
+                }       
+            } catch ( ClassNotFoundException ex ) {
+                // do nothing, show ??? for native.
+            } catch (NoSuchMethodException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SecurityException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
             String pwd= new File("foo.txt").getAbsoluteFile().getParent();
             String pid= getProcessId("???");
             String host= InetAddress.getLocalHost().getHostName();
             String aboutContent = "<ul>" +
                 "<li>Java version: " + javaVersion +
-                "<li>max memory (Mb): " + mem + " (memory available to process)" +
-                "<li>total memory (Mb): " + tmem + " (amount allocated to the process)" +
-                "<li>free memory (Mb): " + fmem + " (amount available before more must be allocated)" + 
+                "<li>max memory (MB): " + mem + " (memory available to process)" +
+                "<li>total memory (MB): " + tmem + " (amount allocated to the process)" +
+                "<li>free memory (MB): " + fmem + " (amount available before more must be allocated)" + 
+                "<li>native memory limit (MB): " + nmem + " (amount of native memory available to the process)" +
                 "<li>arch: " + arch +
                 "<li>hostname: "+ host +
                 "<li>pid: " + pid +
