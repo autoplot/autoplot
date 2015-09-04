@@ -819,9 +819,19 @@ public class AutoplotUtil {
                 Units.dimensionless);
     }
 
+    /**
+     * this is a copy of the other autorange, lacking some of its hacks.  TODO: why?
+     * @param hist
+     * @param ds
+     * @param properties
+     * @return 
+     */
     public static AutoRangeDescriptor autoRange(QDataSet hist, QDataSet ds, Map properties) {
 
-        logger.log(Level.FINE, "enter autoRange {0}", ds);
+        Logger logger1= LoggerManager.getLogger("qdataset.ops.autorange");
+                
+        logger1.log(Level.FINE, "enter autoRange {0}", ds);
+        logger1.entering("org.virbo.autoplot.AutoplotUtil", "autoRange" );
 
         Units u = (Units) ds.property(QDataSet.UNITS);
         if (u == null) {
@@ -969,6 +979,7 @@ public class AutoplotUtil {
                     result.range = range;
                     // just use the metadata settings.
 
+                    logger1.exiting("org.virbo.autoplot.AutoplotUtil", "autoRange" );
                     return result; // DANGER--EXIT POINT
 
                 }
@@ -993,9 +1004,8 @@ public class AutoplotUtil {
         } else {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
         }
-
-        logger.fine("exit autoRange");
-
+        
+        logger1.exiting("org.virbo.autoplot.AutoplotUtil", "autoRange" );
         return result;
     }
 
@@ -1124,13 +1134,13 @@ public class AutoplotUtil {
      * @param ds The dataset, a non-bundle, to be autoranged.
      * @param properties Additional constraints for properties, such as SCALE_TYPE
      * @param ignoreDsProps Don't check ds for TYPICAL_MIN and SCALE_TYPE.  MONOTONIC is never ignored.
-     * @return
+     * @return the range.
      */
     public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties, boolean ignoreDsProps) {
 
-        Logger logger1= LoggerManager.getLogger("autoplot.autorange");
+        Logger logger1= LoggerManager.getLogger("qdataset.ops.autorange");
         
-        logger1.log(Level.FINE, "enter autoRange {0}", ds);
+        logger1.entering( "org.virbo.autoplot.AutoplotUtil", "autoRange", ds );
 
         Units u = (Units) ds.property(QDataSet.UNITS);
         if (u == null) {
@@ -1151,6 +1161,7 @@ public class AutoplotUtil {
             result.range= DataSetUtil.asDatumRange(ext,true);
             result.robustMin= result.range.min().doubleValue(u);
             result.robustMax= result.range.max().doubleValue(u);
+            logger1.exiting("org.virbo.autoplot.AutoplotUtil", "autoRange", ds );
             return result;
         }
 
@@ -1205,6 +1216,7 @@ public class AutoplotUtil {
             }
             result.robustMin= result.range.min().doubleValue(result.range.getUnits());
             result.robustMax= result.range.max().doubleValue(result.range.getUnits());
+            logger1.exiting("org.virbo.autoplot.AutoplotUtil", "autoRange", ds );
             return result;
         }
 
@@ -1488,6 +1500,7 @@ public class AutoplotUtil {
                         result.range = range;
                         // just use the metadata settings.
                         logger1.fine("using TYPICAL_MIN, TYPICAL_MAX from metadata");
+                        logger1.exiting("org.virbo.autoplot.AutoplotUtil", "autoRange", ds );
                         return result; // DANGER--EXIT POINT
                     } else {
                         logger1.log(Level.FINE, "TYPICAL_MIN={0} and TYPICAL_MAX={1} from metadata rejected because it clipped or squished the data {2}", new Object[]{tmin.toString(), tmax.toString(), result.range});
@@ -1541,7 +1554,7 @@ public class AutoplotUtil {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
         }
 
-        logger1.fine("exit autoRange");
+        logger1.exiting("org.virbo.autoplot.AutoplotUtil", "autoRange", ds );
 
         if ( typical!=null ) {
             if ( result.log && typical.log ) {
@@ -1561,7 +1574,7 @@ public class AutoplotUtil {
                     }
                 }
             }
-        }
+        }        
         return result;
     }
 
