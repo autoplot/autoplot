@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Random NC4 used to verify new HDF5 dialog.
+        <p><small>67,000,000 points are plotted somewhat interactively.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,13 +20,17 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-09-02 r17369):</p>
-        <ul>    
+        <p>Bugfixes (2015-09-04 r17380):</p>
+        <ul> 
+            <li>support for huge (&gt;2GB) CDF files</li>
+            <li>improvements to Huge Scatter mode allow 67 million points to be plotted interactively (somewhat).</li>
+            <li>sloppy code in spinner progress bar be left behind when loading ephemeris.</li>
             <li>refactor ascii parser to make it more consistent.</li>
             <li>screenshots tool includes Windows as well as Frames when masking for privacy.</li>
             <li>1453: AggregatingDataSource now uses the time constraint when identifying the delegate file for retrieving metadata, avoiding extraneous load.</li>
             <li>1448: allow capitalized extentions like ".PNG" when explicit filenames are used.</li>
             <li>1433: double check on timetags was too restrictive and throwing out too much data from RBSP waveform data, George pointed out.</li>
+            <li>2015 leap second was applied 64 seconds too early.</li>
             <li>Ephemeris ticks now use resolution when tick labels are sourced from TimeSeriesBrowse.</li>
             <li>PNGWalk "View in Autoplot" button will look at PNG metadata to extract the timerange.</li>
             <li>More zaxis properties are loaded in das2streams.</li>
@@ -116,8 +120,8 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>Add native memory available to the "About Autoplot" dialog.</li>
             <li>442: special support for MMS data website, which has uses login and cookies </li>
+            <li>Add native memory available to the "About Autoplot" dialog.</li>
             <li>http://autoplot.org//developer.datasetToString clean up</li>
             <li>.pngwalk file has filepattern to support more pngwalks and subdirectories</li>
             <li>URI about:classpath added for debugging</li>
