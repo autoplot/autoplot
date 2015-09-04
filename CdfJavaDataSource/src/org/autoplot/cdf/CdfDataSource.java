@@ -158,7 +158,10 @@ public class CdfDataSource extends AbstractDataSource {
             }
         }
     });
-
+ 
+    /**
+     * -1 means check; 0 means no; 1 means yes, do allocate outside of the JVM memory.
+     */
     private static int allocateDirect= -1;
     
     /**
@@ -187,17 +190,20 @@ public class CdfDataSource extends AbstractDataSource {
                     File cdfFile= new File(fileName);
                     if ( !cdfFile.exists() ) throw new IllegalArgumentException("CDF file does not exist: "+fileName);
                     if ( cdfFile.length()==0 ) throw new IllegalArgumentException("CDF file length is zero: "+fileName);
-                    
-                    if ( allocateDirect==0 ) {
-                        try {
-                            cdf= ReaderFactory.getReader(fileName);
-                        } catch ( Exception e ) {
-                            throw e;
-                        } catch ( Throwable t ) {
-                            throw new CDFException(t.getMessage());
+                    if ( cdfFile.length()<Integer.MAX_VALUE ) {
+                        if ( allocateDirect==0 ) {
+                            try {
+                                cdf= ReaderFactory.getReader(fileName);
+                            } catch ( Exception e ) {
+                                throw e;
+                            } catch ( Throwable t ) {
+                                throw new CDFException(t.getMessage());
+                            }
+                        } else {
+                            cdf= new CDFReader(fileName);
                         }
                     } else {
-                        cdf= new CDFReader(fileName);
+                        cdf= ReaderFactory.getReader(fileName);
                     }
                     
                     //cdf = CDFFactory.getCDF(fileName);
