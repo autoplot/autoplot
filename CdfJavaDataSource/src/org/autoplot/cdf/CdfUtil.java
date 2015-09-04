@@ -359,7 +359,7 @@ public class CdfUtil {
      * @return the size the data atom in bytes 
      * TODO: this needs to be verified.  Unsigned numbers may come back as next larger size.
      */
-    private static int sizeOf( long itype ) {
+    protected static int sizeOf( long itype ) {
         int sizeBytes;
         if ( itype==CDFConstants.CDF_EPOCH16 ) {
             sizeBytes= 16;
@@ -540,6 +540,21 @@ public class CdfUtil {
             recStart= 0;
         }
 
+        // check for length limit
+        int bytesPerRecord= DataSetUtil.product(dimSizes) * sizeOf(varType);
+        int limit= (int)( Integer.MAX_VALUE / bytesPerRecord );
+        
+        if ( limit<(recCount/recInterval) ) {
+            int newRecCount= (int)( limit * recInterval );
+            String suggest;
+            if ( recInterval>1 ) {
+                suggest= "[0:"+newRecCount+":"+recInterval+"]";
+            } else {
+                suggest= "[0:"+newRecCount+"]";
+            }
+            throw new IllegalArgumentException("data read would result in more than 2GB read, which is not yet supported.  Use "+svariable+suggest+" to read every other record.");
+        }
+        
         ByteBuffer[] buf;
 
         long rc= recCount;
