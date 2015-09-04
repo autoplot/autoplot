@@ -496,6 +496,10 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         if ( fire==null ) {
             return;
         }
+        if ( UnitsUtil.isNominalMeasurement( fire.getUnits() ) ) {
+            // Dave saw this. rte_1250873233_20150902_170348_ddm.xml
+            return;
+        }
         if ( fire.width().value()==0 ) {
             logger.fine("zero width.");
             Units tu;
