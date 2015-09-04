@@ -29,6 +29,7 @@ import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -404,6 +405,8 @@ public class LogConsole extends javax.swing.JPanel {
         }
     }
 
+    Map<String,Long> entryTimes= new HashMap<String, Long>();    
+    
     private String getRecMsg( long baseTime, LogRecord rec ) {
         
         long t= baseTime;
@@ -418,6 +421,14 @@ public class LogConsole extends javax.swing.JPanel {
             recMsg = msg;
         } else {
             recMsg = MessageFormat.format( msg, parms );
+        }
+        if ( recMsg.startsWith("ENTRY ") ) {
+            entryTimes.put(recMsg.substring(6),rec.getMillis());
+        } else if ( recMsg.startsWith("RETURN ") ) {
+            Long t1= entryTimes.remove( recMsg.substring(7) );
+            if ( t1!=null ) {
+                recMsg= recMsg+" ("+(rec.getMillis()-t1)+"ms)";
+            }
         }
         String prefix = "";
         if ( rec.getMessage()==null ) {
@@ -472,6 +483,8 @@ public class LogConsole extends javax.swing.JPanel {
             StyleConstants.setBackground(highlistAttr, Color.ORANGE);
             
             long t = n == 0 ? 0 : lrecords.get(n-1).getMillis();
+            
+            entryTimes= new HashMap<String, Long>();    
             
             for (LogRecord rec : lrecords) {
                 if (rec.getLevel().intValue() >= level) {
