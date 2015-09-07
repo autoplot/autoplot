@@ -20,6 +20,10 @@ if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.7.0_80/
 fi
 
+if [[ $JAVA_HOME != */ ]]; then
+    JAVA_HOME=${JAVA_HOME}/
+fi
+
 if [ "" = "$TAG" ]; then
     if [ "" = "$AP_VERSION" ]; then
        TAG=untagged
@@ -29,8 +33,8 @@ if [ "" = "$TAG" ]; then
 fi
 echo "TAG=${TAG}"
 
-JAVAC=$JAVA_HOME/bin/javac
-JAR=$JAVA_HOME/bin/jar
+JAVAC=${JAVA_HOME}bin/javac
+JAR=${JAVA_HOME}bin/jar
 
 # we rsync over stable jars to compile against.  Setting AP_KEEP_STABLE=T means keep the Jar files.
 if [ "" = "$AP_KEEP_STABLE" ]; then
