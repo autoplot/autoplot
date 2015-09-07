@@ -232,9 +232,11 @@ hasErrors=0
 echo "=== compile sources..."
 cd temp-volatile-src
 echo "pwd=" `pwd`
-$JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java
-$JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then echo "****"; hasErrors=1; fi
+if [ $hasErrors -eq 1 ]; then
+  echo "Error somewhere in compile, see above"
+  exit 1 
+fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then echo "****"; hasErrors=1; fi
