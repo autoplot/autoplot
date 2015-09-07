@@ -219,8 +219,8 @@ for i in \
   $plugins \
   VirboAutoplot; do
     if [ -d ../${i}/javahelp/ ]; then
-        echo ${RSYNC} -av --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
-        ${RSYNC} -av --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
+        echo ${RSYNC} --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
+        ${RSYNC} --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
     fi
 done
 
@@ -232,11 +232,13 @@ hasErrors=0
 echo "=== compile sources..."
 cd temp-volatile-src
 echo "pwd=" `pwd`
+echo $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then echo "****"; hasErrors=1; fi
 if [ $hasErrors -eq 1 ]; then
   echo "Error somewhere in compile, see above"
   exit 1 
 fi
+echo "only the first compile is echoed."
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then echo "****"; hasErrors=1; fi
