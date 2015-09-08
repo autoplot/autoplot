@@ -41,6 +41,7 @@ public class JavadocLookup {
      * @return null or the link, like http://docs.oracle.com/javase/6/docs/api/javax/swing/JCheckBox#paramString()
      */
     public String getLinkForJavaSignature(String signature) {
+        if ( signature==null ) return null;
         String lookfor= signature.replaceAll("\\.","/");
         Set<String> keys= lookups.keySet();
         for ( String key : keys ) {
