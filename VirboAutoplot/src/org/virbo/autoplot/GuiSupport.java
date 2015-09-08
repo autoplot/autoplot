@@ -51,11 +51,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BoxLayout;
 import javax.swing.ComponentInputMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -80,6 +82,7 @@ import org.autoplot.renderer.PitchAngleDistributionStylePanel;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.DatumRange;
+import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
@@ -1461,7 +1464,46 @@ public class GuiSupport {
             expertMenuItems.add(item);
 
         }
+        
+        item= new JMenuItem( new AbstractAction("Reset axis units to..." ) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
+                Units u= dasAxis.getUnits();
+                Units[] uu= u.getConvertableUnits();
 
+                Component p= (JFrame)SwingUtilities.getWindowAncestor( controller.getDasCanvas().getParent());
+                
+                if ( uu.length<1 ) {
+                    JOptionPane.showMessageDialog( p, "No conversions found from \""+u+"\"");
+                } else {
+                    JPanel p1= new JPanel();
+                    p1.setLayout( new BoxLayout(p1,BoxLayout.Y_AXIS) );
+                    p1.setAlignmentY(0.f);
+                    p1.setAlignmentX(0.f);
+                    JLabel l= new JLabel("Axis units are \""+u+"\"");
+                    l.setAlignmentX(0.f);
+                    p1.add(l);
+                    l= new JLabel("Reset axis units to:");
+                    l.setAlignmentX(0.f);
+                    p1.add(l);
+                    JComboBox cb= new JComboBox(uu);
+                    cb.setAlignmentX(0.f);
+                    p1.add(cb);
+                    if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( p,
+                                p1,
+                                "Reset axis units", JOptionPane.OK_CANCEL_OPTION ) ) {
+                        Units nu= (Units)cb.getSelectedItem();
+                        DatumRange oldRange= dasAxis.getDatumRange();
+                        DatumRange newRange= DatumRange.newDatumRange( oldRange.min().doubleValue(nu), oldRange.max().doubleValue(nu), nu );
+                        dasAxis.resetRange(newRange);
+                    }
+                }
+            }            
+        } );
+        mouseAdapter.addMenuItem(item);
+        expertMenuItems.add(item);
+            
         List<JMenuItem> expertMenuItemsList= new ArrayList( Arrays.asList( plotController.getExpertMenuItems() ) );
         expertMenuItemsList.addAll(expertMenuItems);
 
