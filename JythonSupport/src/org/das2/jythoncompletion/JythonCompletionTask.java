@@ -1065,7 +1065,7 @@ public class JythonCompletionTask implements CompletionTask {
                         if ( ss.equals("dom") ) {
                             link= "http://autoplot.org/developer.scripting#DOM";
                         }
-                        logger.fine( "DefaultCompletionItem("+ss+","+cc.completable.length()+",\n" + ss + argss.get(jj)+",\n"+label+",\n"+link+")");
+                        logger.log(Level.FINE, "DefaultCompletionItem({0},{1},\n{2}{3},\n{4},\n{5})", new Object[]{ss, cc.completable.length(), ss, argss.get(jj), label, link});
                         result.add( new DefaultCompletionItem(ss, cc.completable.length(), ss + argss.get(jj), label, link) );
                     }
                 } else {
