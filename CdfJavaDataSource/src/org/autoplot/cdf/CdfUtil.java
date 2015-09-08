@@ -16,9 +16,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import java.lang.reflect.Array;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -453,26 +451,6 @@ public class CdfUtil {
         return wrapCdfData(cdf, svariable, recStart, recCount, recInterval, slice1, false, mon);
     }
     
-    private static synchronized MutablePropertyDataSet maybeGetCached( CDFReader cdf, String svariable, 
-            long recStart, long recCount, long recInterval ) throws Exception {
-        String cdfFile;
-        synchronized ( CdfDataSource.lock ) {
-            cdfFile= CdfDataSource.openFilesRev.get(cdf);
-        }
-
-        if ( false && cdfFile!=null ) { //TODO: explore why enabling the cache causes problems with test autoplot-test034.
-            String uri= cdfFile + "?" + svariable;
-            if ( recStart!=0 || recCount!=cdf.getNumberOfValues(svariable) || recInterval>1 ) {
-                uri= uri + "["+recStart+":"+(recStart+recCount)+":"+recInterval+"]";
-            }
-            synchronized ( CdfDataSource.dslock ) {
-                MutablePropertyDataSet result= CdfDataSource.dsCache.get( uri );
-                if ( result!=null ) return result;
-            }
-        }
-        return null;
-    }
-    
     /**
      * Return the named variable as a QDataSet.  This does not look at the
      * metadata for DEPEND_0, etc, and only adds metadata to represent time units
@@ -574,7 +552,8 @@ public class CdfUtil {
         
         if ( recInterval==1 ) {
             try {
-                buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, true );
+                boolean preserve= true;
+                buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, preserve  );
             } catch ( CDFException ex ) {
                 buff2= myGetBuffer( cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
             }
@@ -1154,7 +1133,7 @@ public class CdfUtil {
                 try { 
                     //assert svar is valid.
                     itype= cdf.getType(svar);
-                } catch ( CDFException ex ) {} ;
+                } catch ( CDFException ex ) {}
                 
                 String recDesc= ""+ CdfUtil.getStringDataType( itype );
                 if ( dims!=null ) {
