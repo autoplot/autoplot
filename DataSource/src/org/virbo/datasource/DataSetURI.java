@@ -220,6 +220,8 @@ public class DataSetURI {
         if (ipercy == -1) ipercy = surl.lastIndexOf("%{o");
         if (ipercy == -1) ipercy = surl.lastIndexOf("$(periodic");
         if (ipercy == -1) ipercy = surl.lastIndexOf("%{periodic");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$v");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$(v");
         
         return ipercy != -1;
     }
