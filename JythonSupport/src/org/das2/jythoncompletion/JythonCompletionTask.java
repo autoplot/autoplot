@@ -1093,7 +1093,6 @@ public class JythonCompletionTask implements CompletionTask {
      * @return the link, like http://docs.oracle.com/javase/7/docs/api/javax/swing/JCheckBox#paramString()
      */
     private static String getLinkForJavaSignature(String signature) {
-        http://voyager.gsfc.nasa.gov/cdfj-current/docs/gov/nasa/gsfc/spdf/cdfj/GenericReader.html#getBuffer(java.lang.String)
         return JavadocLookup.getInstance().getLinkForJavaSignature(signature);
     }
 }
