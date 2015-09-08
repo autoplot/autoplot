@@ -1090,22 +1090,10 @@ public class JythonCompletionTask implements CompletionTask {
      * things, this goes to Oracle's website.  For other things, this goes
      * to the Autoplot/Das2 javadocs.
      * @param signature signature like javax.swing.JCheckBox#paramString()
-     * @return the link, like http://docs.oracle.com/javase/6/docs/api/javax/swing/JCheckBox#paramString()
+     * @return the link, like http://docs.oracle.com/javase/7/docs/api/javax/swing/JCheckBox#paramString()
      */
     private static String getLinkForJavaSignature(String signature) {
-        String link = null;
-        if ( signature != null) {
-            if ( signature.startsWith("javax") || signature.startsWith("java") || signature.startsWith("org.w3c.dom") || signature.startsWith("org.xml.sax") ) {
-                link= "http://docs.oracle.com/javase/6/docs/api/" + signature.replaceAll(",", ", ");
-            } else if ( signature.startsWith("org/")) {
-                link= JythonCompletionProvider.getInstance().settings.getDocHome() + signature.replaceAll(",", ", ");
-            } else {
-                //String docHome= JythonCompletionProvider.getInstance().settings().getDocHome();
-                //docHome= docHome.replaceAll("AUTOPLOT_HOME", FileSystem.settings().getLocalCacheDir().toString() );
-                //link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
-                link= null;
-            }
-        }
-        return link;
+        http://voyager.gsfc.nasa.gov/cdfj-current/docs/gov/nasa/gsfc/spdf/cdfj/GenericReader.html#getBuffer(java.lang.String)
+        return JavadocLookup.getInstance().getLinkForJavaSignature(signature);
     }
 }
