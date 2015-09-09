@@ -76,6 +76,7 @@ public class Axis extends DomNode {
 
     /**
      * concise label for the axis.
+     * @return the label
      */
     public String getLabel() {
         return label;
@@ -83,6 +84,7 @@ public class Axis extends DomNode {
 
     /**
      * concise label for the axis.
+     * @param label the label
      */
     public void setLabel(String label) {
         String oldLabel = this.label;
@@ -155,6 +157,33 @@ public class Axis extends DomNode {
         boolean oldAutorange = this.autoRange;
         this.autoRange = autorange;
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGE, oldAutorange, autorange);
+    }
+
+    /**
+     * when the dimension is autoranged, consider these hints.  These
+     * could include:
+     * <li>includeZero
+     * <li>log or linear
+     * <li>center=DATUM
+     * <li>width=DATUM, note percent increase can be used with log.
+     * <li>reluctant=true
+     * <li>units=UNITS, explicitly set the units.
+     * These are formed by combining them with ampersands, so for example:
+     * <code>linear&width=40</code>
+     * would have the two hints.
+     */
+    private String autoRangeHints = "";
+
+    public static final String PROP_AUTORANGEHINTS = "autoRangeHints";
+
+    public String getAutoRangeHints() {
+        return autoRangeHints;
+    }
+
+    public void setAutoRangeHints(String autoRangeHints) {
+        String oldAutoRangeHints = this.autoRangeHints;
+        this.autoRangeHints = autoRangeHints;
+        propertyChangeSupport.firePropertyChange(PROP_AUTORANGEHINTS, oldAutoRangeHints, autoRangeHints);
     }
 
     /**
