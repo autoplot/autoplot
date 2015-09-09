@@ -28,6 +28,7 @@ public interface DataSourceEditorPanel {
      * Leaving the editor should never result in a URI that would reject.
      * @param uri
      * @return true if the URI is not usable.
+     * @throws java.lang.Exception
      */
     public boolean reject( String uri ) throws Exception;
 
@@ -35,6 +36,8 @@ public interface DataSourceEditorPanel {
      * load any needed resources.  Return false if cancel, true to proceed into the gui.
      * Throw a FileNotFoundException if needed resources is not found.
      * @param uri partially-completed URI
+     * @param parent the parent GUI.
+     * @param mon monitor to indicate slow process.
      * @return true to proceed, false if to cancel.
      */
     public boolean prepare( String uri, java.awt.Window parent, ProgressMonitor mon) throws Exception;
@@ -44,7 +47,7 @@ public interface DataSourceEditorPanel {
      * should make it valid so getUri is valid.  Note also that the URI will be
      * be the same as in prepare.  If exceptions occur here, they must be re-thrown as
      * runtime exceptions, and they should be checked for in prepare().
-     * @param url
+     * @param uri
      */
     public void setURI( String uri );
 
@@ -64,7 +67,7 @@ public interface DataSourceEditorPanel {
 
     /**
      * return the URI configured by the editor.  This should be the fully-qualified
-     * URI, with the "vap+<ext>:" scheme.
+     * URI, with the "vap+&lt;ext&gt;:" scheme.
      *
      * @return
      */
