@@ -346,6 +346,9 @@ public class Options extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGING, oldautoranging, newautoranging);
     }
 
+    /**
+     * "" or "reluctant"
+     */
     private String autorangeType = "";
     
     public static final String PROP_AUTORANGETYPE = "autorangeType";
