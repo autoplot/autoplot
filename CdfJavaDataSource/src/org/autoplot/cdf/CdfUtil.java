@@ -553,7 +553,11 @@ public class CdfUtil {
         if ( recInterval==1 ) {
             try {
                 boolean preserve= true;
-                buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, preserve  );
+                if ( stype.equals("string") ) {
+                    buff2= null;
+                } else {
+                    buff2= cdf.getBuffer( svariable, stype, new int[] { (int)recStart,(int)(recStart+recInterval*(rc-1)) }, preserve  );
+                }
             } catch ( CDFException ex ) {
                 buff2= myGetBuffer( cdf, svariable, (int)recStart, (int)(recStart+rc*recInterval), (int)recInterval  );
             }
@@ -577,6 +581,11 @@ public class CdfUtil {
             qube[0]= 1;
         } else {
             qube[0]= (int)recCount;
+        }
+        
+        if ( stype.equals("string") ) {
+            result = readStringData(svariable, recInterval, cdf, recCount, qube );
+            return result;
         }
 
         if ( buf.length>1 ) {
@@ -650,41 +659,7 @@ public class CdfUtil {
 //        }
 
         if ( varType == CDFConstants.CDF_CHAR || varType==CDFConstants.CDF_UCHAR ) {
-            EnumerationUnits units = EnumerationUnits.create(svariable);
-            Object o;
-
-            if ( recInterval>1 ) throw new IllegalArgumentException("recInterval>1 not supported here");
-            o = cdf.get(svariable);
-
-            Object o0= Array.get(o,0);
-            String[] sdata;
-            if ( o0.getClass().isArray() ) {
-                sdata= new String[ Array.getLength(o0) ];
-                for ( int j=0; j<Array.getLength(o0); j++ ) {
-                    sdata[j]= (String) Array.get(o0, j);
-                }
-            } else if ( o0.getClass()==String.class ) {
-                //sdata= new String[ 1 ]; //vap+cdaweb:ds=ALOUETTE2_AV_LIM&id=freq_mark&timerange=1967-01-15+12:59:00+to+12:59:01
-                //sdata[0]= String.valueOf( o0 );
-                sdata= ((String[])o);
-            } else {
-                throw new IllegalArgumentException("not handled single array where expected double array");
-            }
-
-            int[] back = new int[sdata.length];
-            for (int i = 0; i < sdata.length; i++) {
-                back[i] = (int)( units.createDatum(sdata[i]).doubleValue(units) );
-            }
-            boolean[] varies= cdf.getVarys(svariable);
-            boolean canSlice= recCount==-1;
-            if ( canSlice ) {
-                for ( int i=1; i<varies.length; i++ ) canSlice= canSlice && !varies[i];
-            }
-            if ( canSlice ) {
-                qube= new int[] { qube[1] };
-            }
-            result= ArrayDataSet.wrap( back, qube, false );
-            result.putProperty(QDataSet.UNITS, units);
+            throw new IllegalArgumentException("We shouldn't get here because stype=string");
 
         } else if ( varType == CDFConstants.CDF_EPOCH ) {
             result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
@@ -730,8 +705,45 @@ public class CdfUtil {
         return result;
         
     }
-    
 
+    private static MutablePropertyDataSet readStringData(String svariable, long recInterval, CDFReader cdf, long recCount, int[] qube ) throws ArrayIndexOutOfBoundsException, IllegalArgumentException, CDFException.ReaderError {
+        EnumerationUnits units = EnumerationUnits.create(svariable);
+        Object o;
+        if ( recInterval>1 ) throw new IllegalArgumentException("recInterval>1 not supported here");
+        o = cdf.get(svariable);
+        Object o0= Array.get(o,0);
+        String[] sdata;
+        if ( o0.getClass().isArray() ) {
+            sdata= new String[ Array.getLength(o0) ];
+            for ( int j=0; j<Array.getLength(o0); j++ ) {
+                sdata[j]= (String) Array.get(o0, j);
+            }
+        } else if ( o0.getClass()==String.class ) {
+            //sdata= new String[ 1 ]; //vap+cdaweb:ds=ALOUETTE2_AV_LIM&id=freq_mark&timerange=1967-01-15+12:59:00+to+12:59:01
+            //sdata[0]= String.valueOf( o0 );
+            sdata= ((String[])o);
+        } else {
+            throw new IllegalArgumentException("not handled single array where expected double array");
+        }
+        int[] back = new int[sdata.length];
+        for (int i = 0; i < sdata.length; i++) {
+            back[i] = (int)( units.createDatum(sdata[i]).doubleValue(units) );
+        }
+        boolean[] varies= cdf.getVarys(svariable);
+        boolean canSlice= recCount==-1;
+        if ( canSlice ) {
+            for ( int i=1; i<varies.length; i++ ) canSlice= canSlice && !varies[i];
+        }
+        if ( canSlice ) {
+            qube= new int[] { qube[1] };
+        }
+        MutablePropertyDataSet result;
+        result= ArrayDataSet.wrap( back, qube, false );
+        result.putProperty(QDataSet.UNITS, units);
+        return result;
+    }
+    
+    
     /**
      * returns the amount of JVM memory in bytes occupied by the dataset. This is an approximation,
      * calculated by taking the element type size (e.g. float=4 bytes) times the number of elements for
