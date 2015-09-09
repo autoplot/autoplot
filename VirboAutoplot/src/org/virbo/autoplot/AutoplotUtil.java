@@ -821,10 +821,12 @@ public class AutoplotUtil {
 
     /**
      * this is a copy of the other autorange, lacking some of its hacks.  TODO: why?
+     * This is not used.
      * @param hist
      * @param ds
      * @param properties
      * @return 
+     * @see #autoRange(org.virbo.dataset.QDataSet, java.util.Map, boolean) 
      */
     public static AutoRangeDescriptor autoRange(QDataSet hist, QDataSet ds, Map properties) {
 
@@ -1115,6 +1117,13 @@ public class AutoplotUtil {
         return result;
     }
 
+    /**
+     * Autorange using the dataset properties
+     * @param ds the dataset, a non-bundle, to be autoranged.
+     * @param properties Additional constraints for properties, such as SCALE_TYPE
+     * @return  the range.
+     * @see #autoRange(org.virbo.dataset.QDataSet, java.util.Map, boolean) 
+     */
     public static AutoRangeDescriptor autoRange( QDataSet ds, Map properties ) {
         return autoRange( ds, properties, false );
     }
