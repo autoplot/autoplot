@@ -246,6 +246,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                     s = reader.readLine();
                 }
                 reader.close();
+                if ( !haveResult ) problems.add("there must be a line that starts with \"data\" or \"result\"");
                 return !haveResult;
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
