@@ -211,10 +211,10 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * create a new window with the given location and size.
      * @param id identifier for the window
-     * @param width the canvas size
-     * @param height the canvas size
-     * @param x the window location, if possible
-     * @param y the window location, if possible
+     * @param width the canvas width
+     * @param height the canvas height
+     * @param x the window upper-left location, if possible
+     * @param y the window upper-left location, if possible
      * @return a handle (do not use this object, code will break) for the window.
      * @see #setWindow(org.virbo.autoplot.ApplicationModel) 
      */
@@ -236,6 +236,20 @@ public class ScriptContext extends PyJavaInstance {
             model.canvas.setSize(width,height);
         }
         return result;
+    }
+    
+    /**
+     * set the window location
+     * @param x the window upper-left location, if possible
+     * @param y the window upper-left location, if possible
+     */
+    public static synchronized void setWindowLocation( int x, int y ) {
+        Window window= SwingUtilities.getWindowAncestor( getWindow().getCanvas() );
+        if ( window!=null ) {
+        // assume it is fitted for now.  This is a gross over simplification, not considering scroll panes, etc.
+            window.setLocation( x, y );
+        } else {
+        }
     }
     
     /**
