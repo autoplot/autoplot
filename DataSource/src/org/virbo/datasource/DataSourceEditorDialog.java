@@ -9,6 +9,8 @@ package org.virbo.datasource;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 
 /**
  * Dialog that contains DataSourceEditorPanels, and actions like:
@@ -25,6 +27,7 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
         initComponents();
         this.jPanel1.add(message,BorderLayout.CENTER);
         setLocationRelativeTo(parent);
+        problemsList.setVisible(false);
         this.validate();
     }
 
@@ -34,6 +37,20 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
         this.jPanel1.add(message,BorderLayout.CENTER);
         setLocationRelativeTo(parent);
         this.validate();
+    }
+    
+    public void setProblems( List<String> problems ) {
+        if ( problems==null || problems.isEmpty() ) {
+            problemsList.setVisible(false);
+        } else {
+            String[] prob= new String[problems.size()+1];
+            prob[0]= "Problems indicated...";
+            for ( int i=0; i<problems.size(); i++ ) {
+                prob[i+1]= "<html><em>&bull;&nbsp;"+problems.get(i);
+            }
+            problemsList.setModel( new DefaultComboBoxModel(prob));
+            problemsList.setVisible(true);
+        }
     }
 
     protected boolean cancelled = true;
@@ -80,6 +97,7 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
         cancelButton = new javax.swing.JButton();
         plotBelowButton = new javax.swing.JButton();
         overplotButton = new javax.swing.JButton();
+        problemsList = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -141,12 +159,16 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
                 .add(overplotButton))
         );
 
+        problemsList.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(425, Short.MAX_VALUE)
+                .addContainerGap()
+                .add(problemsList, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(18, 18, 18)
                 .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 850, Short.MAX_VALUE)
         );
@@ -155,7 +177,9 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(problemsList, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
 
         pack();
@@ -196,6 +220,7 @@ private void overplotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GE
     private javax.swing.JButton okayButton;
     private javax.swing.JButton overplotButton;
     private javax.swing.JButton plotBelowButton;
+    private javax.swing.JComboBox problemsList;
     // End of variables declaration//GEN-END:variables
 
     /**

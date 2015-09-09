@@ -816,7 +816,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     
                     final String fsurl= surl;
 
-                    Runnable run= getURIReviewDialog( fsurl, fedit );
+                    Runnable run= getURIReviewDialog( fsurl, fedit, problems );
                     
                     SwingUtilities.invokeLater(run);
 
@@ -845,7 +845,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
     }
 
-    private Runnable getURIReviewDialog( final String fsurl, final DataSourceEditorPanel fedit ) {
+    private Runnable getURIReviewDialog( final String fsurl, final DataSourceEditorPanel fedit, final List<String> problems ) {
         Runnable run= new Runnable() {
             @Override
             public void run() {
@@ -860,6 +860,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     throw new RuntimeException("parent windowAncestor type is not supported.");
                 }
                 dialog.setTitle(title);
+                dialog.setProblems(problems);
 
                 if ( actionListenerList==null || actionListenerList.isEmpty() ) {
                     dialog.setPlayButton(false); // nothing is going to happen, so don't show play button.
