@@ -1243,6 +1243,18 @@ public class ApplicationModel {
         }
     }
     
+    
+    /**
+     * set the location of the application container.  This will generally
+     * have some small offset from the canvas.
+     * @param x the upper-left corner location.
+     * @param y the upper-left corner location.
+     */
+    public void setLocation( int x, int y ) {
+        Window w=SwingUtilities.getWindowAncestor( this.canvas );
+        w.setLocation( x, y );
+    }
+    
     /**
      * open the serialized DOM, apply additional modifications to the DOM, then
      * sync the application to this.  Deltas with names in all caps (e.g. PWD or FILE) 
