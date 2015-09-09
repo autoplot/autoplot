@@ -8,10 +8,12 @@ import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,17 +40,16 @@ import org.das2.graph.DasRow;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
-import org.das2.system.RequestProcessor;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.MouseModuleType;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
-import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
 
 /**
@@ -792,6 +793,112 @@ public class PlotController extends DomNodeController {
     }
     
     /**
+     * implement hints like width=40.  
+     * <blockquote><pre>
+     * includeZero   T or F     make sure that zero is within the result.
+     * width         30nT       use this width.  This is a formatted datum which 
+     *                            is parsed with the units of the axis, or with ratiometric units for log.
+     * (not yet) log           T or F     force log or linear axis
+     * widths        30nT,300nT,3000nT   use one of these widths
+     * center        0          constrain the center to be this location
+     * (not yet) reluctant     T or F     use the old range if it is acceptable.
+     * </pre></blockquote>
+
+     * @param axis
+     * @param hintsString 
+     */
+    private void doHints( Axis axis, String hintsString ) {
+        Map<String,String> hints= URISplit.parseParams(hintsString);
+        DatumRange range=axis.getRange();
+
+        boolean includeZero= "T".equals(hints.get("includeZero"));
+        String width= hints.get("width");
+        String widths= hints.get("widths");
+        String center= hints.get("center");
+
+        if ( width!=null ) {
+            Units u= range.getUnits().getOffsetUnits();
+            try {
+                if ( axis.log ) {
+                    Datum w= Units.log10Ratio.parse(width);
+                    w= w.divide(2);
+                    Datum currentCenter= DatumRangeUtil.rescaleLog( range, 0.5, 0.5 ).min();
+                    range= new DatumRange( currentCenter.divide( Math.pow(10,w.value()) ), currentCenter.multiply( Math.pow(10,w.value()) ) );
+                } else {
+                    Datum w= u.parse(width);
+                    w= w.divide(2);
+                    Datum currentCenter= DatumRangeUtil.rescale( range, 0.5, 0.5 ).min();
+                    range= new DatumRange( currentCenter.subtract(w), currentCenter.add(w) );
+                }
+            } catch (ParseException ex) {
+                Logger.getLogger(PlotController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if ( widths!=null ) {
+            String[] wss= widths.split("\\,");
+            Datum limit= axis.log ? Units.log10Ratio.createDatum( Math.log10( range.max().divide(range.min()).value() ) ) : range.width();
+            Units u= range.getUnits().getOffsetUnits();
+            for ( String ws: wss ) {
+                try {
+                    if ( axis.log ) {
+                        Datum w= Units.log10Ratio.parse(ws);
+                        if ( w.gt(limit) || ws.equals(wss[wss.length-1])) {
+                            w= w.divide(2);
+                            Datum currentCenter= DatumRangeUtil.rescaleLog( range, 0.5, 0.5 ).min();
+                            range= new DatumRange( currentCenter.divide( Math.pow(10,w.value()) ), currentCenter.multiply( Math.pow(10,w.value()) ) );
+                            break;
+                        }
+                    } else {
+                        Datum w= u.parse(ws);
+                        if ( w.gt(limit) || ws.equals(wss[wss.length-1])) { 
+                            w= w.divide(2);
+                            Datum currentCenter= DatumRangeUtil.rescale( range, 0.5, 0.5 ).min();
+                            range= new DatumRange( currentCenter.subtract(w), currentCenter.add(w) );
+                            break;
+                        }
+                    }
+                } catch ( ParseException ex ) {
+                    logger.log( Level.WARNING, null, ex );
+                }
+            }
+        }
+        if ( includeZero && UnitsUtil.isNominalMeasurement(range.getUnits() ) ) {
+            Datum z= range.getUnits().createDatum(0);
+            if ( widths==null && width==null ) {
+                range= DatumRangeUtil.union( range, z ); //TODO: consider extra 10%
+            } else {
+                if ( range.min().value()>0 ) {
+                    double n= DatumRangeUtil.normalize( range, z );
+                    range= DatumRangeUtil.rescale( range, -n, -n+1 );
+                } else if ( range.max().value()<0. ) {
+                    double n= DatumRangeUtil.normalize( range, z );
+                    range= DatumRangeUtil.rescale( range, -n-1, -n );                    
+                }
+            }
+        }
+        if ( center!=null ) {
+            Units u= range.getUnits();
+            try {
+                if ( axis.log ) {
+                    Datum w= range.max().divide(range.min() );
+                    w= w.divide(2);
+                    Datum currentCenter;
+                    currentCenter = u.parse(center);
+                    range= new DatumRange( currentCenter.divide( Math.pow(10,w.value()) ), currentCenter.multiply( Math.pow(10,w.value()) ) );
+                } else {
+                    Datum w= range.width();
+                    w= w.divide(2);
+                    Datum currentCenter= u.parse(center);
+                    range= new DatumRange( currentCenter.subtract(w), currentCenter.add(w) );
+                }
+            } catch (ParseException ex) {
+                Logger.getLogger(PlotController.class.getName()).log(Level.SEVERE, null, ex);
+            }              
+        }
+        axis.setRange( range );
+    }
+    
+    /**
      * set the zoom so that all of the plotElements' data is visible.  This means finding
      * the "union" of the plotElements' plotDefault ranges.  If any plotElement's default log
      * is false, then the new setting will be false.
@@ -861,6 +968,9 @@ public class PlotController extends DomNodeController {
         if ( x ) {
             logCheck(newSettings.getXaxis());
             Axis newAxis= newSettings.getXaxis();
+            if ( plot.getXaxis().getAutoRangeHints().length()>0 ) {
+                doHints( newAxis, plot.getXaxis().getAutoRangeHints() );
+            }
             if ( dom.options.getAutorangeType().equals( Options.VALUE_AUTORANGE_TYPE_RELUCTANT) ) {
                 newAxis= reluctantRanging( plot.getXaxis(), newAxis );
             }
@@ -879,6 +989,9 @@ public class PlotController extends DomNodeController {
         if ( y ) {
             logCheck(newSettings.getYaxis());
             Axis newAxis= newSettings.getYaxis();
+            if ( plot.getYaxis().getAutoRangeHints().length()>0 ) {
+                doHints( newAxis, plot.getYaxis().getAutoRangeHints() );
+            }
             if ( dom.options.getAutorangeType().equals( Options.VALUE_AUTORANGE_TYPE_RELUCTANT) ) {
                 newAxis= reluctantRanging( plot.getYaxis(), newAxis );
             }
@@ -891,6 +1004,9 @@ public class PlotController extends DomNodeController {
         if ( z ) {
             logCheck(newSettings.getZaxis());
             Axis newAxis= newSettings.getZaxis();
+            if ( plot.getZaxis().getAutoRangeHints().length()>0 ) {
+                doHints( newAxis, plot.getZaxis().getAutoRangeHints() );
+            }
             if ( dom.options.getAutorangeType().equals( Options.VALUE_AUTORANGE_TYPE_RELUCTANT) ) {
                 newAxis= reluctantRanging( plot.getZaxis(), newAxis );
             }
