@@ -20,9 +20,10 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-09-04 r17380):</p>
-        <ul> 
-            <li>support for huge (&gt;2GB) CDF files</li>
+        <p>Bugfixes (2015-09-10 r17432):</p>
+        <ul>
+            <li>properly format the leap second with 23:59:60</li>
+            <li>support for huge (&gt;2GB) CDF files, switch to 20150828 CDF library version</li>
             <li>improvements to Huge Scatter mode allow 67 million points to be plotted interactively (somewhat).</li>
             <li>sloppy code in spinner progress bar be left behind when loading ephemeris.</li>
             <li>refactor ascii parser to make it more consistent.</li>
@@ -120,6 +121,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>setWindowLocation command.  commands for multiple windows in scripts.</li>
+            <li>441: allow non-time aggregations like data_$x.dat</li>
+            <li>444: data source editors may have list of reasons why the URI was rejected</li>
+            <li>443: autoRangingHints property allows more control over autoranging (https://sourceforge.net/p/autoplot/feature-requests/443/)</li>
+            <li>axes have dialog supporting units change to convertible units</li>
             <li>442: special support for MMS data website, which has uses login and cookies </li>
             <li>Add native memory available to the "About Autoplot" dialog.</li>
             <li>http://autoplot.org//developer.datasetToString clean up</li>
