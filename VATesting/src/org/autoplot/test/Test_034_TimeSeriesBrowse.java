@@ -95,7 +95,7 @@ public class Test_034_TimeSeriesBrowse implements Scenario {
             System.err.println( "5: "+xaxis.getDatumRange() );
             System.err.println("current directory: "+new File(".").getAbsoluteFile().toString());
             
-            ScriptContext.writeToPng( "Test_3pt4_TimeSeriesBrowse.001.png");
+            ScriptContext.writeToPng( "Test_034_TimeSeriesBrowse.001.png");
         
             System.err.println("--- bindings ---");
             BindingModel[] bms= ScriptContext.getDocumentModel().getBindings();

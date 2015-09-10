@@ -61,7 +61,7 @@ public class Test_022_ContextOverview implements Scenario {
                 System.err.println("after wait, data loaded. "+range0);
             }
 
-            save( "Test_2pt2_ContextOverview.000.vap" );
+            save( "Test_022_ContextOverview.000.vap" );
 
             waitUntilIdle();
              
@@ -78,7 +78,7 @@ public class Test_022_ContextOverview implements Scenario {
 
             Thread.sleep(1000); // get to work on hudson--not sure why
 
-            writeToPng( "Test_2pt2_ContextOverview.001.png");
+            writeToPng( "Test_022_ContextOverview.001.png");
 
 
             // small cheat, because we don't make the menu popup.
@@ -91,7 +91,7 @@ public class Test_022_ContextOverview implements Scenario {
 
             Thread.sleep(5000); // get to work on hudson--not sure why 
 
-            writeToPng( "Test_2pt2_ContextOverview.002.png");
+            writeToPng( "Test_022_ContextOverview.002.png");
 
             boolean tbindings= dom.getBindings().length==13; // colorbar //TODO: WHY????
             boolean trange= range0.equals( dom.getPlots(1).getXaxis().getRange() );

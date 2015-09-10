@@ -63,8 +63,8 @@ public class Test_051_HanningFilter implements Scenario {
             tabs.selectPage("data");
             System.err.println("Done!");
 
-            writeToPng("Test_5pt1_HanningFilter.png"); // Leave artifacts for testing.
-            save("Test_5pt1_HanningFilter.vap");
+            writeToPng("Test_051_HanningFilter.png"); // Leave artifacts for testing.
+            save("Test_051_HanningFilter.vap");
             
             return(0);
         } catch (InterruptedException ex) {

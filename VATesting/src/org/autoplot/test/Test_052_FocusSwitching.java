@@ -87,13 +87,13 @@ public class Test_052_FocusSwitching implements Scenario {
             BufferedImage image= ScreenshotsTool.getScreenShotNoPointer();
             //BufferedImage image= ScreenshotsTool.getScreenShot();
             
-            ImageIO.write( image, "png", new File( "Test_5pt2_FocusSwitching_Screen.png" ) );
+            ImageIO.write( image, "png", new File( "Test_052_FocusSwitching_Screen.png" ) );
             
             System.err.println( "filter: " + app.getDataPanel().getFiltersChainPanel().getFilter() );
             System.err.println("Done!");
             
-            writeToPng("Test_5pt2_FocusSwitching.png"); // Leave artifacts for testing.
-            save("Test_5pt2_FocusSwitching.vap");
+            writeToPng("Test_052_FocusSwitching.png"); // Leave artifacts for testing.
+            save("Test_052_FocusSwitching.vap");
             
             return(0);
             

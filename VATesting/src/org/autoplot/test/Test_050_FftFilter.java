@@ -69,8 +69,8 @@ public class Test_050_FftFilter implements Scenario {
             new JTabbedPaneOperator( app.getTabs() ).selectPage("data");
             System.err.println("Done!");
             
-            writeToPng("Test_5pt0_FftFilter.png"); // Leave artifacts for testing.
-            save("Test_5pt0_FftFilter.vap");
+            writeToPng("Test_050_FftFilter.png"); // Leave artifacts for testing.
+            save("Test_050_FftFilter.vap");
             
             return(0);
         } catch (InterruptedException ex) {

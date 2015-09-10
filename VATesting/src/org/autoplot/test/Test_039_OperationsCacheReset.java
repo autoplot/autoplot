@@ -103,8 +103,8 @@ public class Test_039_OperationsCacheReset implements Scenario {
 
             System.err.println("Done!");
             
-            writeToPng("Test_3pt9_OperationsCacheReset.png"); // Leave artifacts for testing.
-            save("Test_3pt9_OperationsCacheReset.vap");
+            writeToPng("Test_039_OperationsCacheReset.png"); // Leave artifacts for testing.
+            save("Test_039_OperationsCacheReset.vap");
             
             
         return(0);

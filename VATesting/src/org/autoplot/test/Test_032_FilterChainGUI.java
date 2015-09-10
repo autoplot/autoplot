@@ -27,7 +27,7 @@ import static org.virbo.autoplot.ScriptContext.writeToPng;
 import util.RegexComponentChooser;
 
 /**
- * Test 3pt12
+ * Test 032
  * @author kenziemclouth
  */
 public class Test_032_FilterChainGUI implements Scenario {
@@ -99,8 +99,8 @@ public class Test_032_FilterChainGUI implements Scenario {
             
             System.err.println("Done!");
             
-            writeToPng("Test_3pt12_FilterChainGUI.png"); // Leave artifacts for testing.
-            save("Test_3pt12_FilterChainGUI.vap");
+            writeToPng("Test_032_FilterChainGUI.png"); // Leave artifacts for testing.
+            save("Test_032_FilterChainGUI.vap");
             
             
             return(0);

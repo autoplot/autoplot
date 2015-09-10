@@ -68,8 +68,8 @@ public class Test_035_3533882_timerange_reset implements Scenario {
             Util.pushContextMenu( dom.getPlots(1).getController().getDasPlot(),
                     new String[] { "Edit Plot Element", "Delete Plot Element" } );
 
-            writeToPng("Test_3pt5_3533882_timerange_reset.png");
-            save("Test_3pt5_3533882_timerange_reset.vap");
+            writeToPng("Test_035_3533882_timerange_reset.png");
+            save("Test_035_3533882_timerange_reset.vap");
 
             if ( true ) {
                 return 0;

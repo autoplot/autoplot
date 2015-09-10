@@ -188,8 +188,8 @@ public class Test_031_MultiPanelPlot implements Scenario {
 //            
 //            System.err.println("Done!");
 //            
-            writeToPng("Test_3pt1_MultiPanelPlot.png"); // Leave artifacts for testing.
-            save("Test_3pt1_MultiPanelPlot.vap");
+            writeToPng("Test_031_MultiPanelPlot.png"); // Leave artifacts for testing.
+            save("Test_031_MultiPanelPlot.vap");
             
             return(0);
         } catch (InterruptedException ex) {

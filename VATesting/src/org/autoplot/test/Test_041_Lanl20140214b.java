@@ -54,7 +54,7 @@ public class Test_041_Lanl20140214b implements Scenario {
                 waitUntilIdle();
             }
             
-            writeToPng( "Test_4pt1_Lanl20140214b.001.png");
+            writeToPng( "Test_041_Lanl20140214b.001.png");
 
             Util.switchToTab(app,"style");
             // how to push droplist?
@@ -62,7 +62,7 @@ public class Test_041_Lanl20140214b implements Scenario {
             
             dom.getPlotElements(0).getStyle().setRebinMethod( SpectrogramRenderer.RebinnerEnum.lanlNearestNeighbor );
             
-            writeToPng( "Test_4pt1_Lanl20140214b.001a.png");
+            writeToPng( "Test_041_Lanl20140214b.001a.png");
             
             waitUntilIdle();
 
@@ -71,7 +71,7 @@ public class Test_041_Lanl20140214b implements Scenario {
             
             waitUntilIdle();
             
-            writeToPng( "Test_4pt1_Lanl20140214b.002.png");
+            writeToPng( "Test_041_Lanl20140214b.002.png");
             
             Util.pushContextMenu( dom.getPlots(0).getController().getDasPlot(),
                     new String[] { "Plot Style", "Series" } );

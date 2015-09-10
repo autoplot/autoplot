@@ -50,8 +50,8 @@ public class Test_038_CopyPlotElementsDown implements Scenario  {
 
             Thread.sleep(1000);
 
-            writeToPng("Test_3pt8_CopyPlotElementsDown.png");
-            save("Test_3pt8_CopyPlotElementsDown.vap");
+            writeToPng("Test_038_CopyPlotElementsDown.png");
+            save("Test_038_CopyPlotElementsDown.vap");
 
             return 0;
         } catch (IOException ex) {

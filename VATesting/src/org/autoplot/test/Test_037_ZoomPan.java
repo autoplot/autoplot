@@ -53,18 +53,18 @@ public class Test_037_ZoomPan implements Scenario {
             MouseWheelEvent e;
             e = new MouseWheelEvent(p, 0, System.currentTimeMillis(), 0, 300, 300, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, 1);
             p.getDasMouseInputAdapter().getSecondaryModule().mouseWheelMoved(e);
-            writeToPng("Test_3pt7_ZoomPan.001.png");
+            writeToPng("Test_037_ZoomPan.001.png");
             dr0= p.getXAxis().getDatumRange();
 
             e = new MouseWheelEvent(p, 0, System.currentTimeMillis(), 0, 300, 300, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, -1);
             p.getDasMouseInputAdapter().getSecondaryModule().mouseWheelMoved(e);
-            writeToPng("Test_3pt7_ZoomPan.002.png");
+            writeToPng("Test_037_ZoomPan.002.png");
             dr1= p.getXAxis().getDatumRange();
 
             dom.getController().getPlot().setIsotropic(true);
             e = new MouseWheelEvent(p, 0, System.currentTimeMillis(), 0, 300, 300, 0, false, MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, 1);
             p.getXAxis().getDasMouseInputAdapter().getSecondaryModule().mouseWheelMoved(e);
-            writeToPng("Test_3pt7_ZoomPan.003.png");
+            writeToPng("Test_037_ZoomPan.003.png");
             dr2= p.getXAxis().getDatumRange();
 
             if ( dr0.width().value()==125.0
