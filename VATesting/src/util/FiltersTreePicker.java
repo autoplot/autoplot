@@ -6,6 +6,7 @@ import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JTreeOperator;
+import org.virbo.filters.AddFilterDialog;
 
 /**
  *
@@ -24,7 +25,9 @@ public class FiltersTreePicker {
             new JMenuBarOperator( mainFrame ).pushMenuNoBlock("Tools|Additional Operations...");
 
             DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser("Add Operation" ) );
-
+            
+            // NOTE this hangs when the tree view "By Category" is not set.
+            
             JTreeOperator tree= new JTreeOperator( addFilterFrame );
             tree.clickMouse();
             tree.selectPath(tree.findPath( path ) );
