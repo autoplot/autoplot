@@ -239,6 +239,7 @@ if [ $hasErrors -eq 1 ]; then
   exit 1 
 fi
 echo "only the first compile is echoed."
+if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/scriptconsole/DumpRteExceptionHandler.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then echo "****"; hasErrors=1; fi

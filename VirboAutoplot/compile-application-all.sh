@@ -179,7 +179,13 @@ hasErrors=0
 # compile key java classes.
 echo "compile sources..."
 cd temp-src
+echo $JAVAC -target 1.7 -source 1.7 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then echo "****"; hasErrors=1; fi
+if [ $hasErrors -eq 1 ]; then
+  echo "Error somewhere in compile, see above"
+  exit 1 
+fi
+if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/scriptconsole/DumpRteExceptionHandler.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then echo "****"; hasErrors=1; fi
