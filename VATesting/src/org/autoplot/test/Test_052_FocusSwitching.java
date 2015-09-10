@@ -44,12 +44,6 @@ public class Test_052_FocusSwitching implements Scenario {
         try {
             
             ScriptContext.getApplicationModel().setExceptionHandler( new DumpRteExceptionHandler() );
-            
-            Runnable run= new Runnable() {
-                public void run() {
-                    throw new RuntimeException("Wow Man!");
-                }
-            };
 
             SwingUtilities.invokeLater(run);
             
