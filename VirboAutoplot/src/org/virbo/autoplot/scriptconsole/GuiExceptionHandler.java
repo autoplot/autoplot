@@ -374,7 +374,13 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         return rteHash;
     }
     
-    private static int hashCode( Throwable t ) {
+    /**
+     * create a hashCode identifying the stack trace location found
+     * within the throwable.
+     * @param t the throwable
+     * @return the hash
+     */
+    public static int hashCode( Throwable t ) {
 //        if ( t.getCause()!=null ) {
 //            t= t.getCause();
 //        }
