@@ -17,6 +17,7 @@ import org.virbo.autoplot.dom.Application;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.virbo.autoplot.AutoplotUI;
 import static org.virbo.autoplot.ScriptContext.*;
+import org.virbo.autoplot.scriptconsole.DumpRteExceptionHandler;
 
 /**
  * verify the zoom pan functions of the mousewheel.
@@ -37,6 +38,9 @@ public class Test_037_ZoomPan implements Scenario {
         DatumRange dr2;
 
         try {
+            
+            getApplicationModel().setExceptionHandler( new DumpRteExceptionHandler() );
+            
             createGui();
             AutoplotUI app = (AutoplotUI) getViewWindow();
             Application dom = getDocumentModel();
