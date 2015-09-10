@@ -3042,7 +3042,10 @@ APSplash.checkTime("init 52.9");
         final String uri= (String) dataSetSelector.getValue();
         final int modifiers= evt.getModifiers();
         org.das2.util.LoggerManager.getLogger("gui").log(Level.FINE, "plot URI \"{0}\"", uri);
-        ((GuiExceptionHandler)applicationModel.getExceptionHandler()).setFocusURI(uri);
+        ExceptionHandler eh= applicationModel.getExceptionHandler();
+        if ( eh instanceof GuiExceptionHandler ) {
+            ((GuiExceptionHandler)eh).setFocusURI(uri);
+        }
         Runnable run= new Runnable() {
             @Override
             public void run() {
