@@ -48,7 +48,7 @@ public class DumpRteExceptionHandler implements ExceptionHandler {
         } catch (IOException ex) {
             Logger.getLogger(DumpRteExceptionHandler.class.getName()).log(Level.SEVERE, null, ex);
         } 
-        System.err.println("** Exception written to "+file);
+        System.err.println("##### Exception written to "+file);
     }
 
     @Override
