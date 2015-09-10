@@ -99,6 +99,9 @@ public class PlotController extends DomNodeController {
         this.plot.addPropertyChangeListener( Plot.PROP_TITLE, labelListener );
         this.plot.addPropertyChangeListener( Plot.PROP_TICKS_URI, ticksURIListener );
         this.plot.addPropertyChangeListener( Plot.PROP_ID, idListener );
+        this.plot.getXaxis().addPropertyChangeListener( autorangeListener );
+        this.plot.getYaxis().addPropertyChangeListener( autorangeListener );
+        this.plot.getZaxis().addPropertyChangeListener( autorangeListener );
         dom.options.addPropertyChangeListener( Options.PROP_DAY_OF_YEAR, dayOfYearListener );
         dom.options.addPropertyChangeListener( Options.PROP_MOUSEMODULE, mouseModuleListener );
         plot.controller= this;
@@ -252,6 +255,25 @@ public class PlotController extends DomNodeController {
             } else {
                 logger.log( Level.WARNING, "logger note recognized: {0}", mm);
             }
+        }
+    };
+    
+    /**
+     * listen to changes in the autoRange property of the axes, and to the autoRangeHints.
+     */
+    private PropertyChangeListener autorangeListener= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ( evt.getPropertyName().equals("autoRange") && evt.getNewValue().equals(Boolean.TRUE) ) {
+                resetZoom( getPlot().getXaxis().isAutoRange(),
+                        getPlot().getYaxis().isAutoRange(),
+                        getPlot().getZaxis().isAutoRange() );
+            } else if ( evt.getPropertyName().equals("autoRangeHints") ) {
+                resetZoom( getPlot().getXaxis().isAutoRange(),
+                        getPlot().getYaxis().isAutoRange(),
+                        getPlot().getZaxis().isAutoRange() );
+            }
+            
         }
     };
     
