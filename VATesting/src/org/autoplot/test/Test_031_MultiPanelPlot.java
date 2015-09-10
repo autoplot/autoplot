@@ -127,7 +127,7 @@ public class Test_031_MultiPanelPlot implements Scenario {
             domTable.selectCell(domTable.findCellRow("plotElements[0]"), 0);
             domTable.selectCell(domTable.findCellRow("component", true, true),1);
             JTextFieldOperator component = new JTextFieldOperator(domTable);
-            component.setText("slice0(0)");
+            component.setText("|slice0(0)");
             Thread.sleep(400);
             domTable.selectCell(domTable.findCellRow("plotElements[0]"),0);
             Thread.sleep(400);
@@ -141,7 +141,7 @@ public class Test_031_MultiPanelPlot implements Scenario {
                 domTable.selectCell(domTable.findCellRow("component", true, true),1);
                 domTable.selectCell(domTable.findCellRow("component", true, true),1);
                 component = new JTextFieldOperator(domTable);
-                component.setText("slice0(" + i + ")");
+                component.setText("|slice0(" + i + ")");
                 domTable.selectCell(domTable.findCellRow("plotElements[" + i + "]"), 0);
                 Thread.sleep(200);
 
