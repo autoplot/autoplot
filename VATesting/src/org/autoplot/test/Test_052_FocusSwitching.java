@@ -44,9 +44,8 @@ public class Test_052_FocusSwitching implements Scenario {
         try {
             
             ScriptContext.getApplicationModel().setExceptionHandler( new DumpRteExceptionHandler() );
+            org.das2.DasApplication.getDefaultApplication().setExceptionHandler( new DumpRteExceptionHandler() );
 
-            SwingUtilities.invokeLater(run);
-            
             ScriptContext.createGui();
             
             ScriptContext.waitUntilIdle();
