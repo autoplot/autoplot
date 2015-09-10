@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.SwingUtilities;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
@@ -43,6 +44,14 @@ public class Test_052_FocusSwitching implements Scenario {
         try {
             
             ScriptContext.getApplicationModel().setExceptionHandler( new DumpRteExceptionHandler() );
+            
+            Runnable run= new Runnable() {
+                public void run() {
+                    throw new RuntimeException("Wow Man!");
+                }
+            };
+
+            SwingUtilities.invokeLater(run);
             
             ScriptContext.createGui();
             
