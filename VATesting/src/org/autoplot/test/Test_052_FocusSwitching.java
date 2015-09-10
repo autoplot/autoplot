@@ -26,6 +26,7 @@ import static org.virbo.autoplot.ScriptContext.getDocumentModel;
 import static org.virbo.autoplot.ScriptContext.save;
 import static org.virbo.autoplot.ScriptContext.writeToPng;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.scriptconsole.DumpRteExceptionHandler;
 import util.NameComponentChooser;
 import util.RegexComponentChooser;
 
@@ -40,6 +41,9 @@ public class Test_052_FocusSwitching implements Scenario {
     public int runIt(Object o) {
 
         try {
+            
+            ScriptContext.getApplicationModel().setExceptionHandler( new DumpRteExceptionHandler() );
+            
             ScriptContext.createGui();
             
             ScriptContext.waitUntilIdle();
