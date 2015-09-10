@@ -15,10 +15,10 @@ import org.netbeans.jemmy.Scenario;
 import static org.virbo.autoplot.ScriptContext.*;
 
 /**
- * Test_032
+ * Test_033
  * @author jbf
  */
-public class Test_032_OperationsCacheDoesNotProperlyUpdate implements Scenario  {
+public class Test_033_OperationsCacheDoesNotProperlyUpdate implements Scenario  {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
@@ -41,8 +41,8 @@ public class Test_032_OperationsCacheDoesNotProperlyUpdate implements Scenario  
             dom.getPlots(0).getXaxis().getController().getDasAxis().scanPrevious();
             waitUntilIdle();
 
-            writeToPng("Test_032_OperationsCacheDoesNotProperlyUpdate.png");
-            save("Test_032_OperationsCacheDoesNotProperlyUpdate.vap");
+            writeToPng("Test_033_OperationsCacheDoesNotProperlyUpdate.png");
+            save("Test_033_OperationsCacheDoesNotProperlyUpdate.vap");
 
             return 0;
         } catch (IOException ex) {
@@ -53,7 +53,7 @@ public class Test_032_OperationsCacheDoesNotProperlyUpdate implements Scenario  
 
 
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_032_OperationsCacheDoesNotProperlyUpdate"};
+	String[] params = {"org.autoplot.test.Test_033_OperationsCacheDoesNotProperlyUpdate"};
 	org.netbeans.jemmy.Test.main(params);
     }
 
