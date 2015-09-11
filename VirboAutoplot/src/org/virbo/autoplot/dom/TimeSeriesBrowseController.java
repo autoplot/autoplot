@@ -326,7 +326,13 @@ public class TimeSeriesBrowseController {
                 if ( xAxis.getDLength()>2 ) {
                     newResolution = visibleRange.width().divide(xAxis.getDLength());
                 } else {
-                    logger.warning("WARNING: xaxis isn't sized, loading data at full resolution!"); //TODO: check into this
+                    Canvas c= this.dataSourceController.getApplication().getCanvases(0);
+                    xAxis.getCanvas().setSize(c.width,c.height);
+                    if ( xAxis.getDLength()<=2 ) {
+                        logger.warning("WARNING: xaxis isn't sized, loading data at full resolution!"); //TODO: check into this
+                    } else {
+                        newResolution = visibleRange.width().divide(xAxis.getDLength());
+                    }
                 }
                 // don't waste time by chasing after 1.0% of a dataset.
                 DatumRange newRange = visibleRange;
