@@ -65,6 +65,8 @@ public class PlotCommand extends PyObject {
             + " <tr><td> title   </td><td>title for the plot\n</td></tr>"
             + " <tr><td> xpos    </td><td>override horizontal position of plot, eg. '50%+1em,100%-2em'\n</td>"
             + " <tr><td> ypos    </td><td>override vertical position of plot, eg. '0%+1em,25%-2em', 0 is top\n</td>"
+            + " <tr><td> xdrawTickLabels</td><td>False turns off the x tick labels for the plot\n</td>"
+            + " <tr><td> ydrawTickLabels</td><td>False turns off the y tick labels for the plot\n</td>"
             + "</table></html>");
 
     private static QDataSet coerceIt( PyObject arg0 ) {
@@ -107,6 +109,7 @@ public class PlotCommand extends PyObject {
             "legendLabel",
             "symbol",
             "isotropic", "xpos", "ypos",
+            "xdrawTickLabels", "ydrawTickLabels",
             "index"
         },
         new PyObject[] { Py.None, Py.None,
@@ -119,6 +122,7 @@ public class PlotCommand extends PyObject {
             Py.None,Py.None,
             Py.None,Py.None,Py.None,
             Py.None,Py.None,Py.None,
+            Py.None,Py.None,
             Py.None,
             Py.None,
             Py.None, Py.None, Py.None,
@@ -319,6 +323,10 @@ public class PlotCommand extends PyObject {
                     }
                 } else if ( kw.equals("isotropic" ) ) {
                     plot.setIsotropic(true);
+                } else if ( kw.equals("xdrawTickLabels") ) {
+                    plot.getXaxis().setDrawTickLabels( "1".equals(sval) );
+                } else if ( kw.equals("ydrawTickLabels") ) {
+                    plot.getYaxis().setDrawTickLabels( "1".equals(sval) );
                 }
             }
 
