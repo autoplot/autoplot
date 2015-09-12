@@ -1612,8 +1612,121 @@ public class AutoplotUtil {
     }
 
     /**
+     * This is introduced to study effect of 
+     * https://sourceforge.net/p/autoplot/feature-requests/445/
+     * Do not use this in scripts!!!
+     * This is very interesting:
+     *
+     * Ops.extent: 53ms
+     * simpleRange: 77ms
+     * study445FastRange: 4ms
+     * 
+     * Ops.extent: 76ms 
+     * simpleRange: 114ms 
+     * study445FastRange: 12ms
+     * 
+     * This is likely showing that DataSetIterator is slow...
+     * 
+     * @param ds
+     * @return 
+     */
+    private static QDataSet study445FastRange( QDataSet ds ) {
+        QDataSet max= ds;
+        QDataSet min= ds;
+        
+        Double dvalidMax= (Double) ds.property(QDataSet.VALID_MAX);
+        Double dvalidMin= (Double) ds.property(QDataSet.VALID_MIN);
+        Double dfill= (Double) ds.property(QDataSet.FILL_VALUE);
+        double validMin=  ( dvalidMin!=null ) ? dvalidMin : -1 * Double.MAX_VALUE;
+        double validMax=  ( dvalidMax!=null ) ? dvalidMax : Double.MAX_VALUE;
+        double fill= ( dfill!=null ) ? dfill : 1e38;
+        double fillup= fill < 0 ? fill / 1.0001 : fill * 1.0001;
+        double filldn= fill < 0 ? fill * 1.0001 : fill / 1.0001;
+        int count=0;
+        
+        double[] result = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
+        if ( ds.rank()==1 ) {
+            int n= ds.length();
+            for ( int i=0; i<n; i++ ) {
+                double d= ds.value(i);
+                if ( validMax>d && validMin<=d && ( d<filldn || d>=fillup ) ) { 
+                    double min1= min.value(i); // Math.min requires we do extra redundent checks, and we leave this routine, but appearently this is no faster...
+                    result[0]= result[0] < min1 ? result[0] : min1;
+                    double max1= max.value(i);
+                    result[1]= result[1] > max1 ? result[1] : max1;
+                    count++;
+                }
+            }
+        } else if ( ds.rank()==2 ) {
+            int n0= ds.length();
+            for ( int i0=0; i0<n0; i0++ ) {
+                int n1= ds.length(i0);
+                for ( int i1=0; i1<n1; i1++ ) {
+                    double d= ds.value(i0,i1);
+                    if ( validMax>d && validMin<=d  && ( d<filldn || d>=fillup ) ) {
+                        result[0]= Math.min( result[0], min.value(i0,i1) );
+                        result[1]= Math.max( result[1], max.value(i0,i1) );
+                        count++;
+                    }
+                }
+            }
+        } else if ( ds.rank()==3 ) {
+            int n0= ds.length();
+            for ( int i0=0; i0<n0; i0++ ) {
+                int n1= ds.length(i0);
+                for ( int i1=0; i1<n1; i1++ ) {
+                    int n2= ds.length(i0,i1);
+                    for ( int i2=0; i2<n2; i2++ ) {
+                        double d= ds.value(i0,i1,i2);
+                        if ( validMax>d && validMin<=d  && ( d<filldn || d>=fillup ) ) {
+                            result[0]= Math.min( result[0], min.value(i0,i1,i2) );
+                            result[1]= Math.max( result[1], max.value(i0,i1,i2) );
+                            count++;
+                        }
+                    }
+                }
+            }
+        } else if ( ds.rank()==4 ) {
+            int n0= ds.length();
+            for ( int i0=0; i0<n0; i0++ ) {
+                int n1= ds.length(i0);
+                for ( int i1=0; i1<n1; i1++ ) {
+                    int n2= ds.length(i0,i1);
+                    for ( int i2=0; i2<n2; i2++ ) {
+                        int n3= ds.length(i0,i1,i2);
+                        for ( int i3=0; i3<n3; i3++ ) {
+                            double d= ds.value(i0,i1,i2,i3);
+                            if ( validMax>d && validMin<=d  && ( d<filldn || d>=fillup ) ) {
+                                result[0]= Math.min( result[0], min.value(i0,i1,i2,i3) );
+                                result[1]= Math.max( result[1], max.value(i0,i1,i2,i3) );
+                                count++;
+                            }
+                        }
+                    }
+                }
+            }
+        } else if ( ds.rank()==0 ) {
+            result[0]= ds.value();
+            result[1]= ds.value();
+            count++;
+        }
+
+        DDataSet qresult= DDataSet.wrap(result);
+        qresult.putProperty( QDataSet.SCALE_TYPE, ds.property(QDataSet.SCALE_TYPE) );
+        qresult.putProperty( QDataSet.USER_PROPERTIES, Collections.singletonMap( "count", count ) );
+        qresult.putProperty( QDataSet.BINS_0, "min,maxInclusive" );
+        qresult.putProperty( QDataSet.UNITS, ds.property(QDataSet.UNITS ) );
+        if ( result[0]==fill ) qresult.putProperty( QDataSet.FILL_VALUE, fill);
+        
+        return qresult;
+    }
+    
+    /**
      * return simple extent by only including points consistent with adjacent points.
      * also considers delta_plus, delta_minus properties.
+     * TODO: /home/jbf/ct/autoplot/script/study/rfe445_speed/verifyExtentSimpleRange.jy showed that this was 25% slower than extent.
+     * TODO: this is almost 800% slower than study445FastRange (above), which shows DataSetIterator is slow.
+     * 
      * @param ds rank N dataset
      * @return double[min,max].
      */
