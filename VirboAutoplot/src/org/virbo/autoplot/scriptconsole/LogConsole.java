@@ -40,6 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.KeyStroke;
@@ -204,7 +205,11 @@ public class LogConsole extends javax.swing.JPanel {
         String oldSearchText = this.searchText;
         this.searchText = searchText;
         if ( searchText != null && searchText.length()>0 ) {
-            searchTextPattern = Pattern.compile(searchText);
+            try {
+                searchTextPattern = Pattern.compile(Pattern.quote(searchText));
+            } catch ( PatternSyntaxException ex ) {
+                //searchTextPattern = Pattern.compile(Pattern.quote(searchText));
+            }
         } else {
             searchTextPattern = null;
         }
@@ -497,7 +502,7 @@ public class LogConsole extends javax.swing.JPanel {
                     String recMsg= getRecMsg(t,rec);
                     
                     AttributeSet attr = null;
-                    if (st != null && p.matcher(recMsg).find()) {
+                    if (st != null && p!=null && p.matcher(recMsg).find()) {
                         attr = highlistAttr;
                     }
                     try {
