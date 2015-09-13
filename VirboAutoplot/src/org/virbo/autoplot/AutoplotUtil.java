@@ -1274,6 +1274,8 @@ public class AutoplotUtil {
                 }
             } else if ( ds.length()==1 ) {
                 dd = simpleRange(ds);
+                //QDataSet ddds= study445FastRange(ds);
+                //dd = new double[] { ddds.value(0), ddds.value(1) };
                 if (UnitsUtil.isTimeLocation(u)) {
                     dd = new double[]{ dd[0], dd[0]+Units.days.createDatum(1).doubleValue(u.getOffsetUnits()) };
                 } else {
@@ -1291,6 +1293,8 @@ public class AutoplotUtil {
             // find min and max of three-point medians
             try {
                 dd = simpleRange(ds);
+                //QDataSet ddds= study445FastRange(ds);
+                //dd = new double[] { ddds.value(0), ddds.value(1) };
                 logger1.log(Level.FINEST, "simpleRange(ds)= {0} - {1}", new Object[]{dd[0], dd[1]});
                 if ( Units.dimensionless.isFill(dd[0]) ) dd[0]= dd[0] / 100; // kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FEDO
                 if ( Units.dimensionless.isFill(dd[1]) ) dd[1]= dd[1] / 100; // work around 2009 bug where DatumRanges cannot contain -1e31.
