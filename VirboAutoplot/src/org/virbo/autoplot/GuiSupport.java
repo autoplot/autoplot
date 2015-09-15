@@ -688,7 +688,7 @@ public class GuiSupport {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 if ( parent.stateSupport.isDirty() ) {
                     String msg= "The application has been modified.  Do you want to save your changes?";
-                    int result= JOptionPane.showConfirmDialog(parent,msg );
+                    int result= JOptionPane.showConfirmDialog( parent, msg, "Application Modified", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE );
                     if ( result==JOptionPane.OK_OPTION ) {
                         result= parent.stateSupport.saveAs();
                         if ( result==JFileChooser.CANCEL_OPTION ) {
