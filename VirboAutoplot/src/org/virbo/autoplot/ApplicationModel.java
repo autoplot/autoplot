@@ -64,6 +64,7 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.beans.BeansUtil;
 import org.das2.components.DasProgressPanel;
@@ -925,7 +926,8 @@ public class ApplicationModel {
     
     void resetFontSize() {
         Font f = Font.decode( this.dom.getOptions().getCanvasFont() );
-        int size= 12;
+        Font defaultFont = UIManager.getDefaults().getFont("TextPane.font");
+        int size= defaultFont.getSize();
         f = f.deriveFont((float)size);
         this.dom.getOptions().setCanvasFont(DomUtil.encodeFont(f));
     }
