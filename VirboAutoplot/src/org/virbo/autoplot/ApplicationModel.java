@@ -922,6 +922,13 @@ public class ApplicationModel {
         f = f.deriveFont((float)size-step);
         this.dom.getOptions().setCanvasFont(DomUtil.encodeFont(f));
     }
+    
+    void resetFontSize() {
+        Font f = Font.decode( this.dom.getOptions().getCanvasFont() );
+        int size= 12;
+        f = f.deriveFont((float)size);
+        this.dom.getOptions().setCanvasFont(DomUtil.encodeFont(f));
+    }
 
     /**
      * creates an ApplicationState object representing the current state.
