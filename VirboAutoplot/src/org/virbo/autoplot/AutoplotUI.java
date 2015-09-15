@@ -2262,6 +2262,7 @@ APSplash.checkTime("init 52.9");
         textSizeMenu = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
+        resetFontMI = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
         resetZoomMenu = new javax.swing.JMenu();
         resetZoomMenuItem = new javax.swing.JMenuItem();
@@ -2510,6 +2511,16 @@ APSplash.checkTime("init 52.9");
             }
         });
         textSizeMenu.add(jMenuItem2);
+
+        resetFontMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
+        resetFontMI.setText("Reset to 100%");
+        resetFontMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetFontMIActionPerformed(evt);
+            }
+        });
+        textSizeMenu.add(resetFontMI);
 
         viewMenu.add(textSizeMenu);
         viewMenu.add(jSeparator4);
@@ -3688,6 +3699,11 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         }
     }//GEN-LAST:event_filtersMenuItemActionPerformed
 
+    private void resetFontMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetFontMIActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+        applicationModel.resetFontSize();
+    }//GEN-LAST:event_resetFontMIActionPerformed
+
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     @Override
     public void propertyChange( PropertyChangeEvent ev ) {
@@ -4742,6 +4758,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenuItem reloadAllMenuItem;
     private javax.swing.JMenu renderingOptionsMenu;
     private javax.swing.JMenuItem replaceFileMenuItem;
+    private javax.swing.JMenuItem resetFontMI;
     private javax.swing.JMenuItem resetMemoryCachesMI;
     private javax.swing.JMenuItem resetXMenuItem;
     private javax.swing.JMenuItem resetYMenuItem;
