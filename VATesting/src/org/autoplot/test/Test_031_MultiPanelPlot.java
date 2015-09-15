@@ -95,12 +95,12 @@ public class Test_031_MultiPanelPlot implements Scenario {
             //mainFrame.clickMouse(clickPoint.x+50, clickPoint.y-130); 
             //mainFrame.clickMouse(clickPoint.x+150, clickPoint.y-110); 
             
-            System.err.println( "***** clickPoint= x:"+ (clickPoint.x+50) + " y:"+ (clickPoint.y-130)  );
+            //System.err.println( "***** clickPoint= x:"+ (clickPoint.x+50) + " y:"+ (clickPoint.y-130)  );
             
             //for pc
-            mainFrame.clickMouse(clickPoint.x+50, clickPoint.y-130, 2);
-            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-130);
-            mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-130);
+            //mainFrame.clickMouse(clickPoint.x+50, clickPoint.y-130, 2);
+            //mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-130);
+            //mainFrame.clickForPopup(clickPoint.x+50, clickPoint.y-130);
             
             //JPopupMenuOperator popup1 = new JPopupMenuOperator();
             //popup1.pushMenuNoBlock("Plot|Delete", "|");
