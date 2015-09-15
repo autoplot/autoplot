@@ -61,13 +61,23 @@ public class Test_052_FocusSwitching implements Scenario {
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
-            ScriptContext.waitUntilIdle();
+            Thread.sleep(1000);
+            ScriptContext.waitUntilIdle(); // clickMouse doesn't block, never has...
             
             Component data= new JTabbedPaneOperator( app.getTabs() ).selectPage("data");
             //Ask Kenzie how to add filter via buttons.
             
             Application dom = getDocumentModel();
+            
+            // why must I do this?  I would think that waitUntilIdle would catch this.
+            while ( dom.getPlotElements(0).getController().getDataSet()==null ) {
+                Thread.sleep(100);
+            }
+                    
             dom.getPlotElements(0).setComponent("|slice1(10)");
+            Thread.sleep(1000);
+            
+            ScriptContext.waitUntilIdle(); 
             
             new JButtonOperator( mainFrame, new NameComponentChooser("browse") ).clickMouse();
 
@@ -75,10 +85,13 @@ public class Test_052_FocusSwitching implements Scenario {
 
             new JButtonOperator( diaFrame, "Plot Below" ).clickMouse();
             
-            Thread.sleep(100);
-            ScriptContext.waitUntilIdle();
+            Thread.sleep(1000);
+            ScriptContext.waitUntilIdle(); // clickMouse doesn't block, never has...
             
             dom.getPlotElements(1).setComponent("|slice0(8)");
+            Thread.sleep(1000);
+            
+            ScriptContext.waitUntilIdle();
             
             dom.getController().setPlotElement( dom.getPlotElements(0) );
             
