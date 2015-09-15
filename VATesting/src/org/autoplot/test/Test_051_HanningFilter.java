@@ -54,7 +54,7 @@ public class Test_051_HanningFilter implements Scenario {
         
             DialogOperator hanningFrame = new DialogOperator( new RegexComponentChooser( "Edit Operations") );
         
-            new JTextComponentOperator(hanningFrame).setText("100");
+            new JTextComponentOperator(hanningFrame).setText("128");
         
             new JButtonOperator( hanningFrame, "Ok" ).clickMouse();      
 
