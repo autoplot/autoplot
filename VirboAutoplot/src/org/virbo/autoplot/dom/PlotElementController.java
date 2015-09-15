@@ -2564,7 +2564,8 @@ public class PlotElementController extends DomNodeController {
      * another type.
      * postconditions: The correct renderer is installed in the plot.
      */
-    protected synchronized void maybeCreateDasPeer(){
+    protected void maybeCreateDasPeer(){
+        
         final Renderer oldRenderer = getRenderer();
 
         //logger.fine( "oldRenderer= "+oldRenderer + "  plotElementController="+ this + " ("+this.hashCode()+")" + " " + Thread.currentThread().getName() );
