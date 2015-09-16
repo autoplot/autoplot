@@ -164,9 +164,15 @@ public class UriTcaSource extends AbstractQFunction {
             }
         }
                 
-        QDataSet tt= Ops.unbundle(parms, 0 );
+        QDataSet tt= Ops.copy( Ops.unbundle(parms, 0 ) );
         QDataSet dtt= Ops.diff( tt );
-        QDataSet gcd= DataSetUtil.gcd( dtt, Ops.divide( dtt.slice(0),100 ) );
+        QDataSet gcd;
+        try {
+            gcd= DataSetUtil.gcd( dtt, Ops.divide( dtt.slice(0),100 ) );
+        } catch ( IllegalArgumentException ex ) {
+            ex.printStackTrace();
+            gcd= Ops.reduceMin( dtt, 0 );
+        }
             
         Datum d;
         DatumRange dr= null; // calculate the bounding DatumRange for all params.
