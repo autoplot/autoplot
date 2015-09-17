@@ -687,6 +687,11 @@ public class PlotElementController extends DomNodeController {
         return dataSet;
     }
 
+    /**
+     * finish off the components and data post processing, and set the 
+     * dataset.  This does not set the renderer dataset.
+     * @param dataSet 
+     */
     private void setDataSetInternal(QDataSet dataSet) {
         QDataSet oldDataSet = this.dataSet;
         this.dataSet = dataSet; //TODO: we should probably synchronize dataSet access.
