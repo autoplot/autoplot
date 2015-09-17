@@ -166,11 +166,11 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             QDataSet depi= (QDataSet) data.property("DEPEND_"+i);
             if ( depi!=null ) {
                 nameFor(depi); // allocate the name
-            }
-            Units u= SemanticOps.getUnits(depi);
-            String typeSuggest1= UnitsUtil.isTimeLocation(u) ? "double" : typeSuggest;
+                Units u= SemanticOps.getUnits(depi);
+                String typeSuggest1= UnitsUtil.isTimeLocation(u) ? "double" : typeSuggest;
             
-            formatDataOne(ncfile, depi, typeSuggest1 );
+                formatDataOne(ncfile, depi, typeSuggest1 );
+            }
             
         }
         
