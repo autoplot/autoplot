@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.netCDF;
 
@@ -18,18 +14,19 @@ import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.ArrayDataSet;
+import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSourceFormat;
-import org.virbo.dsops.Ops;
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
+import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Variable;
 
@@ -41,7 +38,7 @@ import ucar.nc2.Variable;
 public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
 
     Map<QDataSet,String> names= new HashMap();
-    private static final Logger logger= LoggerManager.getLogger("apdss.cdfj");
+    private static final Logger logger= LoggerManager.getLogger("apdss.netcdf");
     
     private synchronized String nameFor(QDataSet dep0) {
         String name= names.get(dep0);
@@ -78,6 +75,10 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
                 return DataType.DOUBLE;
             } else if ( suggest.equals("float") ) {
                 return DataType.FLOAT;
+            } else if ( suggest.equals("long") ) {
+                return DataType.LONG;
+            } else if ( suggest.equals("int") ) {
+                return DataType.INT;
             } else {
                 return DataType.DOUBLE;
             }
@@ -90,6 +91,34 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         if ( o==null ) return deft; else return o;
     }
 
+    private void copy( NetcdfFile in, NetcdfFileWriteable out ) {
+        
+        for ( Dimension d : in.getDimensions() ) {
+            out.addDimension( out.getRootGroup(), d );
+        }
+        
+        for ( Variable v : in.getVariables() ) {
+            out.addVariable( out.getRootGroup(), v );
+            names.put( DDataSet.create( new int[0] ), v.getName() );
+        }
+        
+    }
+    
+    private Dimension getDimension( NetcdfFile ncfile, String name ) {
+                
+        try {
+            for ( Dimension d: ncfile.getDimensions() ) {
+                if ( d.getName().equals(name) ) {
+                    return d;
+                }
+            }
+        } catch ( NullPointerException ex ) {
+            
+        }
+        return null;
+    }
+            
+            
     @Override
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
 
@@ -99,20 +128,44 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         
         File file= new File( getResourceURI().toURL().getFile() );
         NetcdfFileWriteable ncfile;
+        NetcdfFile oldfile;
+        
+        List<Dimension> dims= new ArrayList();  //TODO: rank2 DEPEND_1.
+        Map<String,Dimension[]> dimss= new HashMap<String, Dimension[]>();
+        
+        String name1= getParam( "arg_0", null );
+
+        if ( name1!=null ) {
+            names.put(data,name1);
+        }
         
         // append is here as a placeholder and is not implemented!
         boolean append= "T".equals( getParam("append","F") ) ;
+        
+        String tempFileName= file.toString() + ".temp";
         
         if ( ! append ) {
             if ( file.exists() && !file.delete() ) {
                 throw new IllegalArgumentException("Unable to delete file"+file);
             }
             logger.log(Level.FINE, "create HDF5 file {0}", file);
-            ncfile= NetcdfFileWriteable.createNew( file.toString(), true );
-
+            logger.log(Level.FINER, "NetcdfFileWriteable.createNew( {0}, true )", tempFileName);
+            ncfile= NetcdfFileWriteable.createNew( tempFileName, true );
+            oldfile= null;
+            
         } else {
-            throw new IllegalArgumentException("append is not supported"); // this is more complex than expected.
+            //throw new IllegalArgumentException("append is not supported"); // this is more complex than expected.
             //ncfile= NetcdfFileWriteable.openExisting( file.toString(), true );
+            logger.log(Level.FINER, "oldfile= NetcdfFile.open( {0} );", file.toString());
+            
+            oldfile= NetcdfFile.open( file.toString() );
+            //oldfile= NetcdfFileWriteable.openExisting( file.toString(),true );
+            
+            logger.log(Level.FINER, "ncfile=NetcdfFileWriteable.createNew( {0}, true )", tempFileName);
+            ncfile= NetcdfFileWriteable.createNew( tempFileName, true );
+            
+            copy( oldfile, ncfile );
+            dims.addAll( oldfile.getDimensions() );
             
         }
 
@@ -121,22 +174,28 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             throw new IllegalArgumentException("data is not a qube");
         }
 
-        List<Dimension> dims= new ArrayList();  //TODO: rank2 DEPEND_1.
-        Map<String,Dimension[]> dimss= new HashMap<String, Dimension[]>();
         for ( int i=0; i<data.rank(); i++ ) {
             String namei= "dim"+i;
             QDataSet depi= (QDataSet) data.property("DEPEND_"+i);
             if ( depi!=null ) {
                 namei= nameFor(depi); // allocate the name
             } 
-            Dimension d= ncfile.addDimension( namei, qube[i] );
-            dims.add( d );
-            if ( depi!=null ) {
-                if ( depi.rank()==2 ) {
-                    dimss.put( namei, new Dimension[] { dims.get(0), d } );
-                } else {
-                    dimss.put( namei, new Dimension[] { d } );
+            
+            if ( !append ) {
+                Dimension d= getDimension( ncfile, namei );
+                if ( d==null ) {
+                    d= ncfile.addDimension( namei, qube[i] );
                 }
+                dims.add( d );
+                if ( depi!=null ) {
+                    if ( depi.rank()==2 ) {
+                        dimss.put( namei, new Dimension[] { dims.get(0), d } );
+                    } else {
+                        dimss.put( namei, new Dimension[] { d } );
+                    }
+                }
+            } else {
+  
             }
         }
         
@@ -156,7 +215,17 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         
         
         if ( append ) {
-            // I wonder how this would be done
+            ncfile.create();
+            for ( Variable v : oldfile.getVariables() ) {
+                logger.log(Level.FINER, "ncfile.findVariable({0})", v.getName());
+                Variable newVariable= ncfile.findVariable(v.getName());
+                logger.log(Level.FINER, "v.getShape()" );
+                v.getShape();
+                logger.log(Level.FINER, "v.read()" );
+                Array a= v.read();
+                ncfile.write( v.getName(), a );
+            }
+            
         } else {
             ncfile.create();
         }        
@@ -176,9 +245,15 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         
         formatDataOne(ncfile, data, typeSuggest );
 
+        logger.log(Level.FINER, "ncfile.finish()" );
         ncfile.finish();
 
+        logger.log(Level.FINER, "ncfile.close()" );
         ncfile.close();
+        
+        if ( ! new File( tempFileName ).renameTo( file ) ) {
+            throw new IOException("unable to rename file "+tempFileName );
+        }
         
     }
 
@@ -242,7 +317,9 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
 
         ArrayDataSet ads= ArrayDataSet.copy(data);
 
-        Array ddata= Array.factory( typeFor(data,typeSuggest), qube );
+        DataType dataType= typeFor(data,typeSuggest);
+        logger.log(Level.FINER, "ddata= Array.factory( {0}, qube );", dataType );
+        Array ddata= Array.factory( dataType, qube );
         DataSetIterator it= new QubeDataSetIterator(ads);
         int i=0;
         while ( it.hasNext() ) {
@@ -250,6 +327,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             ddata.setDouble( i, it.getValue(ads) );
             i++;
         }
+        logger.log(Level.FINER, "ncfile.write({0},data)", varName);
         ncfile.write( varName, ddata );
     }
 
