@@ -601,10 +601,12 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if ( o.getClass().isArray() ) {
             StringBuilder s= new StringBuilder("[");
             s.append( Array.getLength(o));
-            o= Array.get(o,0);
-            while ( o.getClass().isArray() ) {
-                s.append(",").append(Array.getLength(o));
+            if ( Array.getLength(o)>0 ) {
                 o= Array.get(o,0);
+                while ( o.getClass().isArray() ) {
+                    s.append(",").append(Array.getLength(o));
+                    o= Array.get(o,0);
+                }
             }
             s.append("]");
             String n= o.getClass().toString();
