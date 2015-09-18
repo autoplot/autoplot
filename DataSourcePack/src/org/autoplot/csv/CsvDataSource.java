@@ -26,7 +26,6 @@ import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.SparseDataSet;
-import org.virbo.dataset.SparseDataSetBuilder;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
@@ -77,8 +76,8 @@ public class CsvDataSource extends AbstractDataSource {
         } catch ( Exception ex ) {
         }
         try {
-            Units.us2000.parse(sval);
-            return Units.us2000;
+            Units.cdfTT2000.parse(sval);
+            return Units.cdfTT2000;
         } catch ( Exception ex ) {
         }
         return EnumerationUnits.create("enum");
