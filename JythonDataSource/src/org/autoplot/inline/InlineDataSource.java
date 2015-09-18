@@ -318,6 +318,7 @@ public class InlineDataSource extends AbstractDataSource {
                                 continue;
                             } else {
                                 try {
+                                    interp.set( "monitor", mon.getSubtaskMonitor(arg));
                                     interp.exec(arg);
                                 } catch ( Exception ex ) {
                                     throw ex; // https://sourceforge.net/p/autoplot/bugs/1376/
@@ -329,7 +330,8 @@ public class InlineDataSource extends AbstractDataSource {
                     }
                 } else if ( isAssignment(arg) ) {
                     logger.log( Level.FINER, "assignment {0}", arg);
-
+                    interp.set( "monitor", mon.getSubtaskMonitor(arg));
+                    arg= URISplit.uriDecode(arg);
                     interp.exec(arg);
 
                 } else { 
