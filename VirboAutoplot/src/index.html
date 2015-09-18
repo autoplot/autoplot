@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>67,000,000 points are plotted somewhat interactively.
+        <p><small>axis popup menu allows the units to be reset.  Here we switch to a unit that supports the leap second.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,8 +20,17 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-09-10 r17434):</p>
-        <ul>
+        <p>Bugfixes (2015-09-18 r17488):</p>
+        <ul> 
+            <li>HugeScatter wouldn't to paint the exception if that's why it didn't have a dataset</li>
+            <li>vap+inline each line needs to be URL-decoded.  Add monitor so downloadResourceAsTempFile can be used.</li>
+            <li>if the first filter was an implicit unbundle, then it Filters GUI wouldn't update properly</li>
+            <li>FFTPower GUI supports slide of 8 (7/8 overlap)</li>
+            <li>use case where GCD didn't work to calculate the needed cadence for ephemeris ticks, fall back to difference</li>
+            <li>CACHE_TAG was getting through the subset operator, causing strange caching problems.</li>
+            <li>copyTo needs to reset the limit of the new buffer, I believe because of append.</li>
+            <li>handle case where there is a CONTEXT_0 with Units.us2000 and DEPEND_0 with Units.seconds in fftFilter.</li>
+            <li>1458: valid function would return result with fill_value of its input for reference, but this could be zero, which is incorrect. SUGGEST_FILL property added.</li>
             <li>properly size the x-axis when running headless jobs with TimeSeriesBrowse-capable datasets.</li>
             <li>properly format the leap second with 23:59:60</li>
             <li>support for huge (&gt;2GB) CDF files, switch to 20150828 CDF library version</li>
@@ -122,6 +131,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add ctrl+0 to reset the font.</li>
+            <li>446: add binsWithin function, motivated by Ivar's script.</li>
+            <li>ds[rand()*100]= 1 now works.</li>
+            <li>plot command [xy]drawTickLabels=False added</li>
+            <li>445: speed enhancements for lanlNNRebinner, experiments with extent</li>
             <li>setWindowLocation command.  commands for multiple windows in scripts.</li>
             <li>441: allow non-time aggregations like data_$x.dat</li>
             <li>444: data source editors may have list of reasons why the URI was rejected</li>
