@@ -197,12 +197,14 @@ public class NetCDFDataSource extends AbstractDataSource {
                 dataset= NcMLReader.readNcML( location, null );
             } else {
                 NetCDFDataSourceFactory.checkMatlab(location);
+                logger.log(Level.FINER, "NetcdfFile.open( {0} )", location);
                 NetcdfFile f= NetcdfFile.open( location );
                 dataset= new NetcdfDataset( f );
             }
 
             ncfile= dataset;
 
+            logger.log(Level.FINER, "dataset.getVariables()" );
             List<Variable> variables= (List<Variable>)dataset.getVariables();
 
             if ( svariable==null ) {
@@ -252,9 +254,14 @@ public class NetCDFDataSource extends AbstractDataSource {
             mon.setProgressMessage("reading metadata");
             readData( mon.getSubtaskMonitor("readData") );
             List attr;
+            
+            logger.finer("variable.getAttributes()");
             attr= getVariable().getAttributes();
 
-            if ( attr==null ) return null; // transient state
+            if ( attr==null ) {
+                logger.finer("attr was null");
+                return null;
+            } // transient state
 
             Map<String,Object> result= new LinkedHashMap<String, Object>();
             for( int i=0; i<attr.size(); i++ ) {
@@ -264,6 +271,7 @@ public class NetCDFDataSource extends AbstractDataSource {
 
             try {
                 if ( ncfile!=null ) {
+                    logger.finer("ncfile.close()");
                     ncfile.close();
                     ncfile= null;
                 }
@@ -293,6 +301,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             }
             MetadataModel result= MetadataModel.createNullModel();
 
+            logger.finer("getVariable().getAttributes()");
             List attr= getVariable().getAttributes();
             if ( attr==null ) return null; // transient state
             for( int i=0; i<attr.size(); i++ ) {
@@ -303,11 +312,12 @@ public class NetCDFDataSource extends AbstractDataSource {
             }
             try {
                 if ( ncfile!=null ) {
+                    logger.finer("ncfile.close()");
                     ncfile.close();
                     ncfile= null;
                 }
             } catch ( IOException ex ) {
-                ex.printStackTrace();
+                logger.log(Level.WARNING,null,ex);
             }
             return result;
         }

@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.das2.datum.LoggerManager;
 import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -143,6 +144,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         if ( !mon.isStarted() ) mon.started(); //das2 bug: monitor blinks if we call started again here
         mon.setProgressMessage( "reading "+v.getNameAndDimensions() );
 
+        logger.finer("v.getShape()");
         shape= v.getShape();
         boolean[] slice= new boolean[shape.length];
 
@@ -167,6 +169,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                     }
                 }
                 
+                logger.finer("v.read()");
                 a= v.read(ranges);
 
             } catch ( ParseException ex ) {
@@ -175,7 +178,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 throw new RuntimeException(ex);
             }
         } else {
-
+            logger.finer("v.read()");
             a= v.read();
 
         }
@@ -207,8 +210,10 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         
         for ( int ir=0; ir<a.getRank(); ir++ ) {
             if ( !slice[ir] ) {
+                logger.log(Level.FINER, "v.getDimension({0})", ir);
                 ucar.nc2.Dimension d= v.getDimension(ir);
 
+                logger.log(Level.FINER, "ncfile.findVariable({0})", d.getName());
                 Variable cv = ncfile.findVariable(d.getName());
                 if ((cv != null) && cv.isCoordinateVariable()) {
                     Variable dv= cv;
@@ -227,6 +232,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
 
         mon.setProgressMessage("reading attributes");
 
+        logger.finer("v.getAttributes()");
         List attrs= v.getAttributes();
         for ( Iterator i= attrs.iterator(); i.hasNext(); ) {
             Attribute attr= (Attribute) i.next();
@@ -305,6 +311,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             for ( int ir=0; ir<a.getRank(); ir++ ) {
                 String s= (String) attributes.get("DEPEND_"+ir);
                 if ( s!=null ) {
+                    logger.log(Level.FINER, "ncfile.findVariable({0})" , s );
                     Variable dv= ncfile.findVariable(s);
                     if ( dv!=null && dv!=variable ) {
                         QDataSet dependi= create( dv,  sliceConstraints(constraints,ir), ncfile, new NullProgressMonitor() ); // TODO: slice constaint
