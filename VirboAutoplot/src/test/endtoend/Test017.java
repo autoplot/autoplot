@@ -181,6 +181,8 @@ public class Test017 {
         //"027 http://vho.nasa.gov/mission/soho/celias_pm_30sec/2003.txt",
         //High resolution OMNI data:
 
+        
+        "028 vap+dat:ftp://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/monthly_1min/omni_min200101.asc?time=field0&column=field14&timeFormat=$Y+$j+$H+$M&validMax=9999",
        // "028 vap+dat:ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/high_res_omni/monthly_1min/omni_min200101.asc?time=field0&column=field14&timeFormat=$Y+$j+$H+$M&validMax=9999",
         //Comment parameter used:
 
