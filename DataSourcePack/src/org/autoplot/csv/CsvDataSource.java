@@ -29,6 +29,7 @@ import org.virbo.dataset.SparseDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.dsops.Ops;
+import org.virbo.dsutil.AsciiParser;
 import org.virbo.dsutil.DataSetBuilder;
 
 /**
@@ -76,8 +77,8 @@ public class CsvDataSource extends AbstractDataSource {
         } catch ( Exception ex ) {
         }
         try {
-            Units.cdfTT2000.parse(sval);
-            return Units.cdfTT2000;
+            AsciiParser.UNIT_UTC.parse(sval);
+            return AsciiParser.UNIT_UTC;
         } catch ( Exception ex ) {
         }
         return EnumerationUnits.create("enum");
@@ -181,7 +182,7 @@ public class CsvDataSource extends AbstractDataSource {
                         for ( int j=0; j<reader.getColumnCount(); j++ ) {
                             columnUnits[j]= guessUnits(reader.get(j));
                         }
-                        u= Units.cdfTT2000;
+                        u= AsciiParser.UNIT_UTC;
                         bundleb= new double[reader.getColumnCount()];
                         icolumn= 0;
                     } else {
