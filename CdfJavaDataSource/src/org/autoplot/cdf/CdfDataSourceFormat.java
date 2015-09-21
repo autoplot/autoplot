@@ -76,20 +76,23 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         URISplit split= URISplit.parse( uri );
         java.util.Map<String, String> params= URISplit.parseParams( split.params );
 
-        File file= new File( split.resourceUri );
+        File ffile= new File( split.resourceUri.getPath() );
+        File file= new File( split.resourceUri.getPath()+".temp" ); 
+        
         boolean append= "T".equals( params.get("append") ) ;
+
+        if ( file.exists() && !file.delete() ) {
+            throw new IllegalArgumentException("Unable to delete file"+file);
+        }
         
         if ( ! append ) {
-            if ( file.exists() && !file.delete() ) {
-                throw new IllegalArgumentException("Unable to delete file"+file);
-            }
             logger.log(Level.FINE, "create CDF file {0}", file);
             logger.log(Level.FINE, "call cdf= new CDFWriter( false )");
             cdf = new CDFWriter( false );
 
         } else {
             logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", file.toString() );
-            cdf = new CDFWriter( file.toString(), false );
+            cdf = new CDFWriter( ffile.toString(), false ); // read in the old file first
             
         }
         
@@ -167,6 +170,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         }
             
         write( file.toString() );
+        
+        file.renameTo(ffile);
         
     }
 
