@@ -171,7 +171,9 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             
         write( file.toString() );
         
-        file.renameTo(ffile);
+        if ( !file.renameTo(ffile) ) {
+            throw new IllegalArgumentException("unable to move temporary file to final name: "+file);
+        }
         
     }
 
