@@ -23,7 +23,7 @@ import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.URISplit;
 
 /**
- *
+ * Editor Panel for formatting data.
  * @author jbf
  */
 public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel implements DataSourceFormatEditorPanel {
@@ -53,6 +53,10 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
         numberFormatSpecifierTF = new javax.swing.JTextField();
         timesFormatTF = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
+        noHeadersCB = new javax.swing.JCheckBox();
+        justDataCB = new javax.swing.JCheckBox();
+        timeUnitsDropList = new javax.swing.JComboBox();
+        timeUnitsCB = new javax.swing.JCheckBox();
 
         useFormatSpecCB.setText("Explicit Format Specifiers");
         useFormatSpecCB.setToolTipText("Specify the format to for numbers and times.");
@@ -101,7 +105,7 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
                 .add(explicitFormatSpecPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(numberFormatSpecifierTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(timesFormatTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(144, Short.MAX_VALUE))
         );
         explicitFormatSpecPanelLayout.setVerticalGroup(
             explicitFormatSpecPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -113,8 +117,31 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
                 .add(explicitFormatSpecPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
                     .add(timesFormatTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        noHeadersCB.setText("No Headers");
+        noHeadersCB.setToolTipText("Don't use any headers, making import into IDL and Matlab easier.");
+        noHeadersCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                noHeadersCBActionPerformed(evt);
+            }
+        });
+
+        justDataCB.setText("Just Data, don't format timetags and other dependencies");
+        justDataCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                justDataCBActionPerformed(evt);
+            }
+        });
+
+        timeUnitsDropList.setEditable(true);
+        timeUnitsDropList.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "hours since 2015-01-01T00:00", "seconds since 2015-09-22T00:00" }));
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, timeUnitsCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), timeUnitsDropList, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        timeUnitsCB.setText("Time Units:");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -125,20 +152,37 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(useFormatSpecCB)
                     .add(layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(explicitFormatSpecPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(richHeadersCB))
-                .addContainerGap(112, Short.MAX_VALUE))
+                        .add(richHeadersCB)
+                        .add(18, 18, 18)
+                        .add(noHeadersCB))
+                    .add(justDataCB)
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                            .add(timeUnitsCB)
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                            .add(timeUnitsDropList, 0, 353, Short.MAX_VALUE))
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                            .add(12, 12, 12)
+                            .add(explicitFormatSpecPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                .add(18, 18, 18))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(richHeadersCB)
-                .add(8, 8, 8)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(richHeadersCB)
+                    .add(noHeadersCB))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(justDataCB)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(useFormatSpecCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(explicitFormatSpecPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(timeUnitsDropList, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(timeUnitsCB))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -146,25 +190,43 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
     }// </editor-fold>//GEN-END:initComponents
 
     private void richHeadersCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_richHeadersCBActionPerformed
-        // TODO add your handling code here:
+        if ( richHeadersCB.isSelected() ) {
+            noHeadersCB.setSelected(false);
+        }
     }//GEN-LAST:event_richHeadersCBActionPerformed
+
+    private void noHeadersCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_noHeadersCBActionPerformed
+        if ( noHeadersCB.isSelected() ) {
+            richHeadersCB.setSelected(false);
+        }
+    }//GEN-LAST:event_noHeadersCBActionPerformed
+
+    private void justDataCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_justDataCBActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_justDataCBActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel explicitFormatSpecPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JCheckBox justDataCB;
+    private javax.swing.JCheckBox noHeadersCB;
     private javax.swing.JTextField numberFormatSpecifierTF;
     private javax.swing.JCheckBox richHeadersCB;
+    private javax.swing.JCheckBox timeUnitsCB;
+    private javax.swing.JComboBox timeUnitsDropList;
     private javax.swing.JComboBox timesFormatTF;
     private javax.swing.JCheckBox useFormatSpecCB;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
 
+    @Override
     public void setURI(String uri) {
         URISplit split= URISplit.parse(uri);
         file= split.file;
@@ -185,8 +247,18 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
         if ( "rich".equals(s) ) {
             richHeadersCB.setSelected(true);
         }
+        s= args.get("depend0Units");
+        if ( s!=null ) {
+            timeUnitsDropList.setSelectedItem(s);
+            timeUnitsCB.setSelected(true);
+        }
+        s= args.get("doDep");
+        if ( s!=null && s.length()>0 && 'F'==s.substring(0,1).toUpperCase().charAt(0) ) {
+            justDataCB.setSelected(true);
+        }
     }
 
+    @Override
     public String getURI() {
         String result= file;
         Map<String,String> args= new HashMap();
@@ -204,11 +276,20 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
 //                args.put( "tformat", ts + "NoZ" );
 //            }
         }
+        if ( timeUnitsCB.isSelected() ) {
+            args.put( "depend0Units",timeUnitsDropList.getSelectedItem().toString() );
+        }
 
         if ( richHeadersCB.isSelected() ) {
             args.put( "header", "rich" );
+        } else if ( noHeadersCB.isSelected() ) {
+            args.put( "header", "none" );
         }
 
+        if ( justDataCB.isSelected() ) {
+            args.put( "doDep", "F" );
+        }
+        
         String params= URISplit.formatParams(args);
         if ( result==null ) result= "file:///";
         URISplit ss= URISplit.parse(result);
