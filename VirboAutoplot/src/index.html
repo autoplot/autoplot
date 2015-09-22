@@ -20,8 +20,9 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-09-18 r17488):</p>
+        <p>Bugfixes (2015-09-22 r17488):</p>
         <ul> 
+            <li>Export to CDF didn't properly support append keyword.</li>
             <li>HugeScatter wouldn't to paint the exception if that's why it didn't have a dataset</li>
             <li>vap+inline each line needs to be URL-decoded.  Add monitor so downloadResourceAsTempFile can be used.</li>
             <li>if the first filter was an implicit unbundle, then it Filters GUI wouldn't update properly</li>
@@ -48,7 +49,7 @@
             <li>1165: create pngwalk uses user prefs for grid and other options.</li>
             <li>xls files would drop the last record.</li>
             <li>xls files would have times shifted by local time zone.</li>
-            <li>bugfix: null pointer when no color was selected in pick colors dialog on Linux.
+            <li>null pointer when no color was selected in pick colors dialog on Linux.
             <li>rank 3 data in QStream wasn't properly read in.</li>
             <li>Autoplot dialogs like the "additional operators" don't have goofy default question mark icons.</li>
             <li>output of contour hard to use, breaks in non-monotonic data. Thanks Sebastian!</li>
@@ -56,9 +57,9 @@
             <li>rte_1604359977: limit the total number of filePollUpdates threads that can be started to 10000.  Thanks, Bob!</li>
             <li>completions within a function call are corrected.  plot( ripples&lt;C&gt; ) corrected. </li>
             <li>1439: add "delete selected items" to edit menu of DataPointRecorder</li>
-            <li>bugfix: Sebastian demonstrated that QStream with DEPEND_0 having DEPEND_0 would cause failure.
-            <li>bugfix: Sebastian demonstrated that embed data failed when the URI was ''.
-            <li>bugfix: Kristoff demonstrated that embed data doesn't work when the file came via http.</li>
+            <li>Sebastian demonstrated that QStream with DEPEND_0 having DEPEND_0 would cause failure.
+            <li>Sebastian demonstrated that embed data failed when the URI was ''.
+            <li>Kristoff demonstrated that embed data doesn't work when the file came via http.</li>
             <li>1442-6: camelCase for the plotx command.</li>
             <li>1442-7 symbolSize instead of symSize</li>
             <li>1442-10:  height and width boxes on mac</li>
@@ -71,11 +72,11 @@
             <li>1433: allow waveform cadence to change in fftPower.</li>
             <li>1432: list of list to declare double arrays (and rank 2 datasets) in Jython.</li>
             <li>1431: "Cannot create PyString from null" popup in editor. </li>
-            <li> Ops.labels renamed to Ops.labelsDataset, to avoid name clashes.</li>
-            <li> completions within command, like plotx(&lt;C&gt;) where we need to look up the documentation for plotx.</li>
-            <li> more support for color argument in plotx</li>
-            <li> plot and plotx command are finally one and the same.</li>
-            <li> check for null in setSymbolConnector, setColor, setFillColor.</li>
+            <li>Ops.labels renamed to Ops.labelsDataset, to avoid name clashes.</li>
+            <li>completions within command, like plotx(&lt;C&gt;) where we need to look up the documentation for plotx.</li>
+            <li>more support for color argument in plotx</li>
+            <li>plot and plotx command are finally one and the same.</li>
+            <li>check for null in setSymbolConnector, setColor, setFillColor.</li>
             <li>cdfn and cdfj loggers combined to "cdf" since there's just one cdf source.</li>
             <li>bug where cdf editor had no visible variables because of bugs with CDF editor (Thanks Mark and Matt).</li>
             <li>bug where labels were array [N] instead of [1,N] corrected.</li>
@@ -160,8 +161,8 @@
             <li>avoid filesystem completions with  inline, cdaweb, or pdsppi.</li>
             <li>completions are working somewhat with vap+inline.</li>
             <li>within parameter added to CDF</li>
-            <li> plotx command legendLabel named parameter added.</li>
-            <li> plotx linestyle added.</li>
+            <li>plotx command legendLabel named parameter added.</li>
+            <li>plotx linestyle added.</li>
             <li>improvements to DashupTool.</li>
             <li>update the port reported when the server is on, to support automatic selection of port with --server=0.</li>
             <li>support Units.RGBColor for the units of the colorBy dataset.</li>
