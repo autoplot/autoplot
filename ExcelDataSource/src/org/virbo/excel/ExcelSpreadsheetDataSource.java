@@ -196,7 +196,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                 columnNumber1= -1;
             }
             columnNumber = getColumnNumber(col, firstRow);
-            if ( columnNumber1>-1 && columnNumber1==columnNumber1 ) columnNumber1=-1;
+            if ( columnNumber1>-1 && columnNumber1==columnNumber ) columnNumber1=-1;
             return new int[]{columnNumber, columnNumber1, firstRow, lastRow};
         }
     }
