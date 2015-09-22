@@ -30,6 +30,18 @@ public class Test_022_ContextOverview implements Scenario {
 
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
+    private void waitUntilBusy() {
+        logger.fine("waiting for some pending changes");
+        Application dom= getDocumentModel();
+        while ( !dom.getController().isPendingChanges() ) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Test_022_ContextOverview.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
     @Override
     public int runIt(Object o) {
 
@@ -50,13 +62,20 @@ public class Test_022_ContextOverview implements Scenario {
                     new ComponentChooser[] { new RegexComponentChooser("Bookmarks"),
                     new RegexComponentChooser("Demos"), new RegexComponentChooser("Demo 5: .*") } );
 
-            Thread.sleep(1000);
+            waitUntilBusy();
             waitUntilIdle();
 
             DatumRange range0= dom.getPlots(0).getXaxis().getRange();
             
             if ( range0.getUnits().isConvertibleTo(Units.dimensionless) ) {
+                waitUntilIdle();  // why???
+                ((AutoplotUI)getViewWindow()).getDataSetSelector().isPendingChanges();
+                range0= dom.getPlots(0).getXaxis().getRange();
+            }
+            
+            if ( range0.getUnits().isConvertibleTo(Units.dimensionless) ) {
                 System.err.println("** xaxis is not a time axis");
+                return 1;
             } else {
                 System.err.println("after wait, data loaded. "+range0);
             }
