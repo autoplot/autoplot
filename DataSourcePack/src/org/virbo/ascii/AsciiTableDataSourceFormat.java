@@ -14,9 +14,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.das2.datum.Datum;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DatumFormatter;
+import org.das2.datum.format.DefaultDatumFormatter;
 import org.das2.datum.format.EnumerationDatumFormatter;
 import org.das2.datum.format.TimeDatumFormatter;
 import org.das2.datum.format.TimeDatumFormatterFactory;
@@ -29,34 +31,76 @@ import org.virbo.datasource.AbstractDataSourceFormat;
 import org.das2.datum.format.FormatStringFormatter;
 import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dsops.Ops;
 
 /**
  * Format the QDataSet into Ascii tables.  
+ * <ul>
+ * <li>header=rich include "rich ascii" metadata.
+ * <li>header=none don't include any headers.
+ * <li>tformat=iso8601 use ISO8601 times (like 2015-01-01T00:00Z)
+ * <li>tformat=hours+since+2015-01-01T00:00 use offsets. (timeformat and tformat are aliases)
+ * <li>tformat=day
+ * <li>format=%f5.2 use this formatter for data.
+ * </ul>
  * @author jbf
  */
 public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
     private static final Logger logger= Logger.getLogger("apdss.ascii");
 
-    private DatumFormatter getTimeFormatter( String ft ) {
-        DatumFormatter tformat;
-        String ft0= ft;
-        ft= ft.toLowerCase();
-        if (ft.equals("iso8601")) {
-            tformat = TimeDatumFormatterFactory.getInstance().defaultFormatter();
-        } else if ( ft0.startsWith("%")
+    private DatumFormatter getTimeFormatter( ) {
+        DatumFormatter timeFormatter;
+        String tformat= getParam( "tformat", "ISO8601" );
+        String ft= tformat.toLowerCase();
+        String depend0Units= getParam( "depend0Units", "" );
+        Units dep0units= null;
+        
+        if ( depend0Units.length()>0 ) {
+            try {
+                dep0units= Units.lookupTimeUnits(depend0Units);
+            } catch (ParseException ex) {
+                Logger.getLogger(AsciiTableDataSourceFormat.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            final Units tu= dep0units;
+            if ( ft.equals("iso8601") ) ft=null;
+            final String sformat= ft;
+            timeFormatter= new DefaultDatumFormatter() {
+                @Override
+                public String format(Datum datum) {
+                    return format(datum, tu);
+                }
+                @Override
+                public String format(Datum datum, Units units) {
+                    if ( datum.isFill() ) {
+                        return "fill";
+                    } else {
+                        if ( sformat!=null && sformat.startsWith("%") ) {
+                            return String.format( sformat, datum.doubleValue(tu) );
+                        } else {
+                            return String.valueOf( datum.doubleValue(tu) );
+                        }
+                    }
+                }
+            };
+        } else if (ft.equals("iso8601")) {
+            timeFormatter = TimeDatumFormatterFactory.getInstance().defaultFormatter();
+            
+        } else if ( tformat.startsWith("%")
                 || ft.startsWith("$") ) {
-            if ( ft0.startsWith("$") ) { // provide convenient URI-friendly spec
-                ft0= ft0.replaceAll("\\$", "%");
+            if ( tformat.startsWith("$") ) { // provide convenient URI-friendly spec
+                tformat= tformat.replaceAll("\\$", "%");
             }
             try {
-                tformat = new TimeDatumFormatter(ft0);
+                timeFormatter = new TimeDatumFormatter(tformat);
             } catch (ParseException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
                 try {
-                    tformat = new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S");
+                    timeFormatter = new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S");
                 } catch (ParseException ex1) {
                     throw new RuntimeException(ex1);
                 }
@@ -64,29 +108,29 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         } else {
             try {
                 if (ft.equals("day")) {
-                    tformat = new TimeDatumFormatter("%Y-%m-%d");
+                    timeFormatter = new TimeDatumFormatter("%Y-%m-%d");
                 } else if (ft.equals("hour")) {
-                    tformat = new TimeDatumFormatter("%Y-%m-%dT%H:%MZ");
+                    timeFormatter = new TimeDatumFormatter("%Y-%m-%dT%H:%MZ");
                 } else if (ft.startsWith("min")) {
-                    tformat =  new TimeDatumFormatter("%Y-%m-%dT%H:%MZ");
+                    timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%MZ");
                 } else if (ft.startsWith("sec")) {
-                    tformat =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%SZ");
+                    timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%SZ");
                 } else if (ft.startsWith("millisec")) {
-                    tformat =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}Z");
+                    timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}Z");
                 } else if (ft.startsWith("microsec")) {
-                    tformat =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}%{micro}Z");
+                    timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}%{micro}Z");
                 } else {
                     logger.log(Level.FINE, "not implemented: {0}", ft);
-                    tformat = new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S");
+                    timeFormatter = new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S");
                 }
 
             } catch (ParseException ex) {
                 ex.printStackTrace();
-                tformat = TimeDatumFormatterFactory.getInstance().defaultFormatter();
+                timeFormatter = TimeDatumFormatterFactory.getInstance().defaultFormatter();
                 
             }
         }
-        return tformat;
+        return timeFormatter;
 
     }
 
@@ -101,7 +145,15 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         }
     }
 
+    /**
+     * output the dataset property if it exists.  The form will be
+     * name: value.  If header=none, simply return.
+     * @param out the output stream that is writing the file.
+     * @param data the dataset.
+     * @param property the property name.
+     */
     private void maybeOutputProperty(PrintWriter out, QDataSet data, String property) {
+        if ( getParam("header","").equals("none") ) return;
         Object v = data.property(property);
         if (v != null) {
             out.println("# " + property + ": " + v);
@@ -132,6 +184,12 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 jo1.put( prop, o.toString() );
             } else if ( o instanceof Number ) {
                 jo1.put( prop, (Number)o );
+            } else if ( o instanceof Units ) {
+                if ( UnitsUtil.isTimeLocation((Units)o) ) {
+                    jo1.put( prop, "UTC" );
+                } else {
+                    jo1.put( prop, String.valueOf(o) );
+                }
             } else {
                 jo1.put( prop, String.valueOf(o) );
             }
@@ -141,6 +199,12 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         }
     }
 
+    /**
+     * format the depend dataset within the rich header.
+     * @param ds
+     * @return
+     * @throws JSONException 
+     */
     private JSONObject formatDataSetInline( QDataSet ds ) throws JSONException {
         JSONObject jo1= new JSONObject();
         jsonProp( jo1, ds, QDataSet.LABEL, -1 );
@@ -161,7 +225,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
      * @param bundleDesc
      * @throws JSONException 
      */
-    private void formatBundleDesc(PrintWriter out, QDataSet data, QDataSet bundleDesc ) throws JSONException {
+    private void formatBundleDescRichAscii(PrintWriter out, QDataSet data, QDataSet bundleDesc ) throws JSONException {
         
         assert data!=null;
         assert bundleDesc.length()==data.length(1);
@@ -188,7 +252,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             name= (String) Ops.guessName(dep0);
             jsonProp( jo1, dep0, QDataSet.LABEL, -1 );
             if ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(dep0) ) ) {
-                jo1.put("UNITS", "UTC" );
+                jo1.put("UNITS", getTimeUnitLabel() );
             } else {
                 jsonProp( jo1, dep0, QDataSet.UNITS, -1 );
             }
@@ -265,21 +329,35 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         String[] lines= json.split("\n");
         StringBuilder sb= new StringBuilder();
 
-        for ( int i=0; i<lines.length; i++ ) {
-            sb.append("# ").append(lines[i]).append( "\n");
+        for ( String line : lines ) {
+            sb.append("# ").append(line).append("\n");
         }
 
         out.print( sb.toString() );
 
     }
 
+    private String getTimeUnitLabel( ) {
+        String depend0Units= getParam("depend0Units","");
+        if ( depend0Units.equals("") ) {
+            return "UTC";
+        } else {
+            try {
+                Units u= Units.lookupTimeUnits(depend0Units);
+                return u.toString();
+            } catch (ParseException ex) {
+                throw new IllegalArgumentException(ex);
+            }
+        }
+    }
+    
     /**
      * format the rank 2 bundle of data.
      * @param out
      * @param data
      * @param mon
      */
-    private void formatBundle(PrintWriter out, QDataSet data, ProgressMonitor mon) {
+    private void formatRank2Bundle(PrintWriter out, QDataSet data, ProgressMonitor mon) {
 
         QDataSet bundleDesc= (QDataSet) data.property(QDataSet.BUNDLE_1);
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
@@ -289,7 +367,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         boolean haveRich= false;
         if ( bundleDesc!=null && "rich".equals( head ) ) {
             try {
-                formatBundleDesc( out, data, bundleDesc );
+                formatBundleDescRichAscii( out, data, bundleDesc );
                 haveRich= true;
             } catch ( JSONException ex ) {
                 ex.printStackTrace();
@@ -298,7 +376,9 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             maybeOutputProperty(out, data, QDataSet.TITLE);
         }
 
-        DatumFormatter tf= getTimeFormatter( getParam( "timeformat", "ISO8601" ) );
+        DatumFormatter tf= getTimeFormatter( );
+        
+        
         String df= getParam( "format", "" );
 
         DatumFormatter[] formats= new DatumFormatter[data.length(0)];
@@ -345,16 +425,16 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             String l = (String) Ops.guessName(dep0);
             if ( l==null ) {
                 if ( Units.t2000.isConvertibleTo( SemanticOps.getUnits(dep0) ) ) {
-                    l= "time(UTC)";
+                    l= "time("+getTimeUnitLabel()+")";
                 } else {
                     l= "dep0";
                 }
             } else {
                 if ( Units.t2000.isConvertibleTo( SemanticOps.getUnits(dep0) ) ) {
-                    l= l+" (UTC)";
+                    l= l+" ("+getTimeUnitLabel()+")";
                 }
             }
-            out.print(" " + l + ", ");
+            if ( !"none".equals(head) ) out.print(" " + l + ", ");
         }
 
         int i;
@@ -393,7 +473,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             if ( uu[i]!=null && uu[i]!=Units.dimensionless ) {
                 if ( uu[i] instanceof EnumerationUnits ) {
                 } else if ( UnitsUtil.isTimeLocation(uu[i] ) ) {
-                    l1+= "(UTC)";
+                    l1+= "("+getTimeUnitLabel()+")";
                 } else {
                     l1+="("+uu[i]+")";
                 }
@@ -402,12 +482,14 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             for ( int k=0; k<bundleDesc.length(i); k++ ) {
                 nelements*= bundleDesc.value(i,k);
             }
-            for ( int k=0; k<nelements; k++ ) {
-                out.print( l1  );
-                if ( i==bundleDesc.length()-1 && k==nelements-1 ) {
-                    out.print( "\n" );
-                } else {
-                    out.print( ", " );
+            if ( !"none".equals(head) ) {
+                for ( int k=0; k<nelements; k++ ) {
+                    out.print( l1  );
+                    if ( i==bundleDesc.length()-1 && k==nelements-1 ) {
+                        out.print( "\n" );
+                    } else {
+                        out.print( ", " );
+                    }
                 }
             }
         }
@@ -478,7 +560,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 ds.putProperty( QDataSet.FILL_VALUE, 0, data.property(QDataSet.FILL_VALUE) );
                 ds.putValue( 0, data.length(0) );
                 bds.bundle( ds );
-                formatBundleDesc( out, data, bds );
+                formatBundleDescRichAscii( out, data, bds );
             } catch ( JSONException ex ) {
                 ex.printStackTrace();
             }
@@ -491,13 +573,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
         if ( u!=Units.dimensionless && !"rich".equals( head )  ) maybeOutputProperty( out, data, QDataSet.UNITS );
         
-        if (dep1 != null) {
+        if (dep1 != null && !"none".equals(head) ) {
             out.print("#");
             if (dep0 != null) {
                 String l = (String) dep0.property(QDataSet.LABEL);
                 if ( l==null ) {
                     if ( Units.t2000.isConvertibleTo( SemanticOps.getUnits(dep0) ) ) {
-                        l= "time(UTC)";
+                        l= "time("+getTimeUnitLabel()+")";
                     } else {
                         l= "dep0";
                     }
@@ -528,8 +610,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         mon.setTaskSize(data.length());
         mon.started();
 
-        String ft= getParam( "tformat", "ISO8601" );
-        DatumFormatter tf= ft.equals("") ? Units.us2000.getDatumFormatterFactory().defaultFormatter() : getTimeFormatter(ft);
+        DatumFormatter tf= getTimeFormatter();
 
         String dfs= getParam( "format", "" );
         DatumFormatter df= dfs.equals("") ? u.getDatumFormatterFactory().defaultFormatter() : getDataFormatter( dfs, u );
@@ -541,6 +622,9 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             mon.setTaskProgress(i);
             if ( mon.isCancelled() ) break;
             if (dep0 != null) {
+                assert dep0!=null;
+                assert cf0!=null;
+                assert u0!=null;
                 out.print("" + cf0.format( u0.createDatum(dep0.value(i)),u0 ) + ", ");
             }
 
@@ -579,7 +663,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         Units units= (Units)ds.property(QDataSet.UNITS);
         if ( units!=null && units!=Units.dimensionless ) {
             if ( UnitsUtil.isTimeLocation(units) ) {
-                label= label + "(UTC)";
+                label= label + "("+getTimeUnitLabel()+")";
             } else {
                 label= label+"("+units+")";
             }
@@ -619,7 +703,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 ds.putProperty( QDataSet.VALID_MIN, data.property(QDataSet.VALID_MIN) );
                 ds.putProperty( QDataSet.FILL_VALUE, data.property(QDataSet.FILL_VALUE) );
                 QDataSet bds= Ops.join( ids, ds );
-                formatBundleDesc( out,data,bds );
+                formatBundleDescRichAscii( out,data,bds );
             } catch ( JSONException ex ) {
                 ex.printStackTrace();
             }
@@ -660,7 +744,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             }
         }
 
-        out.println( buf.substring(2) );
+        if ( !"none".equals(head) ) out.println( buf.substring(2) );
         
         mon.setTaskSize(data.length());
         mon.started();
@@ -672,11 +756,21 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 //            }
 //        }
 
-        String ft= getParam( "tformat", "ISO8601" );
-        DatumFormatter tf= ft.equals("") ? Units.us2000.getDatumFormatterFactory().defaultFormatter() : getTimeFormatter(ft);
+        DatumFormatter tf= getTimeFormatter();
 
-        String dfs= getParam( "format", "" );
-        DatumFormatter df= dfs.equals("") ? u.getDatumFormatterFactory().defaultFormatter() : getDataFormatter( dfs, u );
+        Units dep0units= u0; // target output units.
+        String depend0Units= getParam( "depend0Units", "" );
+        if ( depend0Units.length()>0 ) {
+            tf= Units.dimensionless.getDatumFormatterFactory().defaultFormatter();
+            try {
+                dep0units= Units.lookupTimeUnits(depend0Units);
+            } catch (ParseException ex) {
+                throw new IllegalArgumentException("unable to parse depend0Units");
+            }
+        }
+        
+        String format= getParam( "format", "" );
+        DatumFormatter df= format.equals("") ? u.getDatumFormatterFactory().defaultFormatter() : getDataFormatter(format, u );
 
         DatumFormatter cf0= dep0==null ? null : ( UnitsUtil.isTimeLocation(u0) ? tf : df );
         DatumFormatter cf1= UnitsUtil.isTimeLocation(u) ? tf : df;
@@ -685,7 +779,9 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             if ( mon.isCancelled() ) break;
 
             if (dep0 != null) {
-                out.print("" + cf0.format( u0.createDatum(dep0.value(i)),u0 ) + ", ");
+                assert cf0!=null;
+                assert u0!=null;
+                out.print("" + cf0.format( u0.createDatum(dep0.value(i)),dep0units ) + ", ");
             }
 
             out.print( cf1.format(u.createDatum(data.value(i)), u) );
@@ -707,9 +803,19 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
      * @param mon
      * @throws IOException
      */
+    @Override
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
 
         setUri(uri);
+        
+        String doDep= getParam("doDep", "");
+        if ( doDep.length()>0 && doDep.toUpperCase().charAt(0)=='F' ) {
+            MutablePropertyDataSet mpds= DataSetOps.makePropertiesMutable(data);
+            mpds.putProperty( QDataSet.DEPEND_0, null );
+            mpds.putProperty( QDataSet.DEPEND_1, null );
+            mpds.putProperty( QDataSet.BUNDLE_1, null );
+            data= mpds;
+        }
 
         File f= new File( getResourceURI() );
 //        if ( !f.createNewFile() ) {
@@ -721,14 +827,14 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 //        }
         PrintWriter out = new PrintWriter( f ); //TODO: it would be nice to support a preview, this assumes file.
 
-        String head= getParam( "header", "" ); // could be "rich"
-        if ( !"rich".equals( head ) ) {
+        String head= getParam( "header", "" ); // could be "rich" or "none"
+        if ( !"rich".equals( head ) && !"none".equals(head)) {
             out.println("# Generated by Autoplot on " + new Date());
         }
 
         if (data.rank() == 2) {
             if ( SemanticOps.isBundle(data) ) {
-                formatBundle( out, data, mon ); // data should have property BUNDLE_1 because of isBundle==true
+                formatRank2Bundle( out, data, mon ); // data should have property BUNDLE_1 because of isBundle==true
             } else {
                 formatRank2(out, data, mon);
             }
