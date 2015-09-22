@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>axis popup menu allows the units to be reset.  Here we switch to a unit that supports the leap second.
+        <p><small>axis popup menu allows the units to be changed.  Here we switch from a unit that supports the leap second (cdfTT2000).
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,7 +20,7 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-09-22 r17488):</p>
+        <p>Bugfixes (2015-09-22 r17510):</p>
         <ul> 
             <li>Export to CDF didn't properly support append keyword.</li>
             <li>HugeScatter wouldn't to paint the exception if that's why it didn't have a dataset</li>
@@ -132,6 +132,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>ascii formatter now allows header=none and doDep=F, depend0Units=seconds+since+1970-01-01 to support import to Matlab and IDL.</li>
+            <li>ascii parser depend0Units=seconds+since+1970-01-01</li>
             <li>add ctrl+0 to reset the font.</li>
             <li>446: add binsWithin function, motivated by Ivar's script.</li>
             <li>ds[rand()*100]= 1 now works.</li>
