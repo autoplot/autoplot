@@ -280,7 +280,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
             String dep0Units= getParam( "depend0Units", null );
             if ( dep0Units!=null ) {
-                dep0.putProperty( QDataSet.UNITS, SemanticOps.lookupUnits(dep0Units) );
+                dep0Units= dep0Units.replaceAll("\\+"," ");
+                dep0.putProperty( QDataSet.UNITS, Units.lookupUnits(dep0Units) );
             }
         }
 
@@ -616,8 +617,22 @@ public class AsciiTableDataSource extends AbstractDataSource {
             timeFormat = timeFormat.replaceAll("\\%", "\\$");
             timeFormat = timeFormat.replaceAll("\\{", "(");
             timeFormat = timeFormat.replaceAll("\\}", ")");
-            String timeColumnName = params.get("time");
-            timeColumn = timeColumnName == null ? 0 : parser.getFieldIndex(timeColumnName);
+            String timeColumnName = params.get("time");   
+            if ( timeColumnName==null ) {
+                timeColumn= 0;
+            } else {
+                // future-proof against field0-field4, coming soon.
+                int i= timeColumnName.indexOf("-");
+                if ( i>-1 ) {
+                    timeColumnName= timeColumnName.substring(0,i);
+                } else {
+                    i= timeColumnName.indexOf(":");
+                    if ( i>-1 ) {
+                        timeColumnName= timeColumnName.substring(0,i);
+                    }
+                }
+                timeColumn= parser.getFieldIndex(timeColumnName);
+            }
 
             String timeFormatDelim= delim;
             if ( delim==null ) timeFormatDelim= " ";
