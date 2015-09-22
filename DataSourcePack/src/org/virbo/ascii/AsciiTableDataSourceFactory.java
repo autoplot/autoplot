@@ -155,6 +155,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             } else if (paramName.equals("depend0Units")) {
                 List<CompletionContext> result = new ArrayList<CompletionContext>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ms", "units for the x tags"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "hours+since+2015-01-01T00:00", "units for the x tags"));
                 return result;
             } else if (paramName.equals("timeFormat")) {
                 List<CompletionContext> result = new ArrayList<CompletionContext>();
