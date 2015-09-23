@@ -786,4 +786,16 @@ public class DataSourceRegistry {
         }
     }
 
+    /**
+     * returns true if the vap scheme requires a resource URL.  For example,
+     * vap+cdf: needs a resource URI (the file) but vap+inline doesn't.
+     * @param vapScheme
+     * @return true if the vapScheme needs a URL.
+     */
+    public boolean hasResourceUri(String vapScheme) {
+        if (vapScheme.endsWith(":") ) vapScheme= vapScheme.substring(0,vapScheme.length()-1);
+        boolean noUri= vapScheme.endsWith("cdaweb") || vapScheme.endsWith("inline" ) || vapScheme.endsWith("pdsppi");
+        return !noUri;
+    }
+
 }
