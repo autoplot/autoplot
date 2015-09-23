@@ -1924,12 +1924,11 @@ public class DataSetURI {
         cc.surl = surl1;
         cc.surlpos = carotPos; //resourceUriCarotPos
 
+        boolean hasResourceUri= DataSourceRegistry.getInstance().hasResourceUri(split.vapScheme);
+            
         List<CompletionResult> result = new ArrayList<CompletionResult>();
 
-        if (qpos != -1 && qpos < carotPos) { // in query section
-            if (qpos == -1) {
-                qpos = surl1.length();
-            }
+        if ( ( qpos==-1 && !hasResourceUri ) || ( qpos != -1 && qpos < carotPos) ) { // in query section
 
             int eqpos = surl1.lastIndexOf('=', carotPos - 1);
             int amppos = surl1.lastIndexOf('&', carotPos - 1);
@@ -1973,9 +1972,19 @@ public class DataSetURI {
                 throw new IllegalArgumentException("unable to find data source factory");
             }
 
-            String suri= CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
-            if ( suri==null ) {
-                suri= cc.surl;
+            String suri;
+            if ( hasResourceUri ) {
+                suri= CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
+                if ( suri==null ) {
+                    suri= cc.surl;
+                }
+            } else {
+                suri= surl1;
+                int i= cc.completable.indexOf(":");
+                if ( i>0 ) {
+                    cc.completable= cc.completable.substring(i+1);
+                    cc.completablepos= cc.completablepos-(i+1);
+                }
             }
             URI uri = DataSetURI.getURIValid(suri);
 
@@ -2030,7 +2039,7 @@ public class DataSetURI {
                     }
 
                     String ss= ( split.vapScheme==null ? "" : (split.vapScheme + ":" ) );
-                    if ( split.file!=null ) {
+                    if ( split.file!=null && hasResourceUri ) {
                         ss+= split.file + "?";
                     }
                     ss+= URISplit.formatParams(paramsCopy);
