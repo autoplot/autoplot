@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.nio.channels.Channels;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -337,7 +338,13 @@ public class DataSetURI {
             if (tsb==null ) return null;
             tsb.setURI(value);
             return tsb.blurURI();
-        } catch (Exception ex) {
+        } catch (URISyntaxException ex) {
+            return null;
+        } catch (IOException ex) {
+            return null;
+        } catch (IllegalArgumentException ex) {
+            return null;
+        } catch (ParseException ex) {
             return null;
         }
         
@@ -356,7 +363,13 @@ public class DataSetURI {
             tsb.setURI(value);
             tsb.setTimeResolution(null);
             return tsb.getURI();
-        } catch (Exception ex) {
+        } catch (URISyntaxException ex) {
+            return null;
+        } catch (IOException ex) {
+            return null;
+        } catch (IllegalArgumentException ex) {
+            return null;
+        } catch (ParseException ex) {
             return null;
         }
         
@@ -1364,10 +1377,9 @@ public class DataSetURI {
                 String[] types= new String[] { "ftp://", "http://", "https://", "file:/", "sftp://" };
                 List<CompletionResult> result= new ArrayList<CompletionResult>();
                 String completable= surl.substring(0, carotpos);
-                for ( int i=0; i<types.length; i++ ) {
-                    if ( types[i].length()>= carotpos &&
-                            types[i].startsWith( completable ) ) {
-                        result.add( new CompletionResult(types[i],null,types[i],completable,false) );
+                for (String type : types) {
+                    if (type.length() >= carotpos && type.startsWith(completable)) {
+                        result.add(new CompletionResult(type, null, type, completable, false));
                     }    
                 }
                 return result;
