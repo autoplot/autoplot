@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Units;
@@ -238,22 +240,36 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         
         defineVariableOne( ncfile, data, typeSuggest, dims.toArray(new Dimension[dims.size()]) );      
         
+        // unfortunately it looks like I can't have both files open at once.  
+        Map<String,Array> dataStore= new LinkedHashMap<String, Array>();
         
         if ( append ) {
-            ncfile.create();
+            assert oldfile!=null;
+            //ncfile.create();
+            logger.log(Level.FINER,"oldFile.getVariables()");
             for ( Variable v : oldfile.getVariables() ) {
-                logger.log(Level.FINER, "ncfile.findVariable({0})", v.getName());
-                Variable newVariable= ncfile.findVariable(v.getName());
+                //logger.log(Level.FINER, "ncfile.findVariable({0})", v.getName());
+                //Variable newVariable= ncfile.findVariable(v.getName());
                 logger.log(Level.FINER, "v.getShape()" );
                 v.getShape();
                 logger.log(Level.FINER, "v.read()" );
                 Array a= v.read();
-                ncfile.write( v.getName(), a );
+                System.err.println(a);
+                dataStore.put( v.getName(), a );
+                //logger.log(Level.FINER, "ncfile.write({0},a)", v.getName());
+                //ncfile.write( v.getName(), a );
+            }
+            
+            oldfile.close();
+            
+            ncfile.create();
+            for ( Entry<String,Array> var: dataStore.entrySet() ) {
+                ncfile.write( var.getKey(), var.getValue() );
             }
             
         } else {
             ncfile.create();
-        }        
+        }
         
         for ( int i=0; i<data.rank(); i++ ) {
             
