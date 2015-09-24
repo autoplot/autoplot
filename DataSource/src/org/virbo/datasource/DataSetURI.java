@@ -1936,7 +1936,7 @@ public class DataSetURI {
         cc.surl = surl1;
         cc.surlpos = carotPos; //resourceUriCarotPos
 
-        boolean hasResourceUri= DataSourceRegistry.getInstance().hasResourceUri(split.vapScheme);
+        boolean hasResourceUri= split.vapScheme==null || DataSourceRegistry.getInstance().hasResourceUri(split.vapScheme);
             
         List<CompletionResult> result = new ArrayList<CompletionResult>();
 
