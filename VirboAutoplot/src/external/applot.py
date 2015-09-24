@@ -1,3 +1,5 @@
+# send data over to Autoplot via its server port.  This is a port of the applot for IDL that supports NumPy.
+#
 # Write from python to d2s.  This will not work on Windows because of linefeeds.  (Ask Chris
 # how to write out 0x10 and doubles.)
 
@@ -351,6 +353,7 @@ def qstream( dataStruct, filename, ytags=None, ascii=True, xunits='', delta_plus
 #end
 
 def tryPortConnect( host, port ):
+   print 'tryPortConnect'
    import socket
    s = socket.socket()
    s.connect(('localhost',port))
