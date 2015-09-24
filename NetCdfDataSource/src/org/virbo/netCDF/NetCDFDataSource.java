@@ -121,7 +121,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     
     @Override
     public QDataSet getDataSet( ProgressMonitor mon) throws IOException, NoDataInIntervalException, ParseException {
-        logger.finer("getDataSet");
+        logger.entering("org.virbo.netCDF.NetCDFDataSource", "getDataSet");
         mon.started();
         mon.setTaskSize(20);
         try { 
@@ -135,11 +135,15 @@ public class NetCDFDataSource extends AbstractDataSource {
 
             QDataSet qresult= checkLatLon(result);
                
+            logger.finer("ncfile.close()");
             ncfile.close();
+            
             ncfile= null;
             return qresult;
+            
         } finally {
             mon.finished();
+            logger.exiting("org.virbo.netCDF.NetCDFDataSource", "getDataSet");
         }
         
     }
@@ -249,6 +253,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     
     @Override
     public Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception {
+        logger.entering("org.virbo.netCDF.NetCDFDataSource", "getMetadata");
         mon.started();
         try {
             mon.setProgressMessage("reading metadata");
@@ -264,8 +269,8 @@ public class NetCDFDataSource extends AbstractDataSource {
             } // transient state
 
             Map<String,Object> result= new LinkedHashMap<String, Object>();
-            for( int i=0; i<attr.size(); i++ ) {
-                Attribute at= (Attribute) attr.get(i);
+            for (Object attr1 : attr) {
+                Attribute at = (Attribute) attr1;
                 result.put( at.getName(), at.getStringValue() );
             }
 
@@ -281,6 +286,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             return result;
         } finally {
             mon.finished();
+            logger.exiting("org.virbo.netCDF.NetCDFDataSource", "getMetadata");
         }
         
         
@@ -304,8 +310,8 @@ public class NetCDFDataSource extends AbstractDataSource {
             logger.finer("getVariable().getAttributes()");
             List attr= getVariable().getAttributes();
             if ( attr==null ) return null; // transient state
-            for( int i=0; i<attr.size(); i++ ) {
-                Attribute at= (Attribute) attr.get(i);
+            for (Object attr1 : attr) {
+                Attribute at = (Attribute) attr1;
                 if ( at.getName().equals("VAR_TYPE") ) {
                     result= new IstpMetadataModel();
                 }

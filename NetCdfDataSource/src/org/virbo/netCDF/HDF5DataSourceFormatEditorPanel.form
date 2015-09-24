@@ -26,10 +26,15 @@
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="istpMetadata" pref="364" max="32767" attributes="0"/>
+                      <Component id="istpMetadata" max="32767" attributes="0"/>
                       <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
                   </Group>
               </Group>
+          </Group>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace max="32767" attributes="0"/>
+              <Component id="justDataCB" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -43,7 +48,9 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="istpMetadata" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="233" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="justDataCB" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="203" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -69,6 +76,11 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Use ISTP Metadata Conventions"/>
         <Property name="toolTipText" type="java.lang.String" value="Use ISTP metadata conventions for the data, like LABLAXIS, UNITS and VALIDMIN"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="justDataCB">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Just Data, don&apos;t format timetags and other dependencies"/>
       </Properties>
     </Component>
   </SubComponents>

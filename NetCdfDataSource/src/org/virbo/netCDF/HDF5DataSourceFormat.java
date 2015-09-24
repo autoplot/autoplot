@@ -4,6 +4,7 @@ package org.virbo.netCDF;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,9 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetIterator;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.SemanticOps;
@@ -26,6 +29,7 @@ import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
+import ucar.nc2.Group;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFileWriteable;
 import ucar.nc2.Variable;
@@ -94,12 +98,14 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
     private void copy( NetcdfFile in, NetcdfFileWriteable out ) {
         
         for ( Dimension d : in.getDimensions() ) {
+            logger.log(Level.FINER, "out.addDimension({0})", d.getName());
             out.addDimension( out.getRootGroup(), d );
         }
         
         for ( Variable v : in.getVariables() ) {
+            logger.log(Level.FINER, "out.addVariable({0})", v.getShortName());
             out.addVariable( out.getRootGroup(), v );
-            names.put( DDataSet.create( new int[0] ), v.getName() );
+            names.put( DDataSet.create( new int[0] ), v.getShortName() );
         }
         
     }
@@ -107,6 +113,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
     private Dimension getDimension( NetcdfFile ncfile, String name ) {
                 
         try {
+            logger.log(Level.FINER, "ncfile.getDimensions() (looking for {0})", name);
             for ( Dimension d: ncfile.getDimensions() ) {
                 if ( d.getName().equals(name) ) {
                     return d;
@@ -126,17 +133,29 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
 
         String typeSuggest= getParam( "type", "double" );
         
-        File file= new File( getResourceURI().toURL().getFile() );
+        File file= new File( getResourceURI().toURL().getFile() );        
         NetcdfFileWriteable ncfile;
         NetcdfFile oldfile;
         
         List<Dimension> dims= new ArrayList();  //TODO: rank2 DEPEND_1.
+        Map<String,Dimension> dim= new HashMap<String, Dimension>();
         Map<String,Dimension[]> dimss= new HashMap<String, Dimension[]>();
         
         String name1= getParam( "arg_0", null );
 
         if ( name1!=null ) {
             names.put(data,name1);
+        }
+        
+        String doDep= getParam("doDep", "");
+        if ( doDep.length()>0 && doDep.toUpperCase().charAt(0)=='F' ) {
+            MutablePropertyDataSet mpds= DataSetOps.makePropertiesMutable(data);
+            mpds.putProperty( QDataSet.DEPEND_0, null );
+            mpds.putProperty( QDataSet.DEPEND_1, null );
+            mpds.putProperty( QDataSet.DEPEND_2, null );
+            mpds.putProperty( QDataSet.DEPEND_3, null );
+            mpds.putProperty( QDataSet.BUNDLE_1, null );
+            data= mpds;
         }
         
         // append is here as a placeholder and is not implemented!
@@ -165,6 +184,10 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             ncfile= NetcdfFileWriteable.createNew( tempFileName, true );
             
             copy( oldfile, ncfile );
+            
+            for ( Dimension d: oldfile.getDimensions() ) {
+                dim.put( d.getName(), d );
+            }
             dims.addAll( oldfile.getDimensions() );
             
         }
@@ -182,10 +205,12 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             } 
             
             if ( !append ) {
-                Dimension d= getDimension( ncfile, namei );
+                Dimension d= dim.get(namei);
                 if ( d==null ) {
+                    logger.log(Level.FINER, "ncfile.addDimension({0},{1})", new Object[]{namei, DataSetUtil.toString(qube)});
                     d= ncfile.addDimension( namei, qube[i] );
                 }
+                dim.put( d.getName(), d );
                 dims.add( d );
                 if ( depi!=null ) {
                     if ( depi.rank()==2 ) {
@@ -237,17 +262,17 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
                 nameFor(depi); // allocate the name
                 Units u= SemanticOps.getUnits(depi);
                 String typeSuggest1= UnitsUtil.isTimeLocation(u) ? "double" : typeSuggest;
-            
+                
                 formatDataOne(ncfile, depi, typeSuggest1 );
             }
             
         }
         
         formatDataOne(ncfile, data, typeSuggest );
-
+                        
         logger.log(Level.FINER, "ncfile.finish()" );
         ncfile.finish();
-
+        
         logger.log(Level.FINER, "ncfile.close()" );
         ncfile.close();
         
@@ -260,7 +285,9 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
     private void defineVariableOne( NetcdfFileWriteable ncfile, QDataSet data, String typeSuggest, Dimension[] dims ) {
         String varName= nameFor(data);
         
-        Variable var= ncfile.addVariable( varName, typeFor(data,typeSuggest), dims );
+        DataType t= typeFor(data,typeSuggest);
+        logger.log(Level.FINER, "ncfile.addVariable({0},{1},<dims>)", new Object[]{varName, t});
+        Variable var= ncfile.addVariable( varName, t, dims );
 
         double fill;
         Number nfill= (Number)data.property(QDataSet.FILL_VALUE);
@@ -272,6 +299,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
         
         String meta= getParam( "metadata", "" );
         if ( meta.equals("istp") ) {
+            logger.finer("adding ISTP metadata");
             var.addAttribute( new Attribute("FIELDNAM", varName ) );
             var.addAttribute( new Attribute("UNITS", SemanticOps.getUnits(data).toString() ) );
             var.addAttribute( new Attribute("VAR_TYPE", "data" ) );
@@ -327,7 +355,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
             ddata.setDouble( i, it.getValue(ads) );
             i++;
         }
-        logger.log(Level.FINER, "ncfile.write({0},data)", varName);
+        logger.log(Level.FINER, "ncfile.write({0},ddata)", varName);
         ncfile.write( varName, ddata );
     }
 

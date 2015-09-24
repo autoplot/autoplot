@@ -7,14 +7,14 @@ package org.virbo.netCDF;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JPanel;
+import org.virbo.datasource.AbstractDataSourceFormatEditorPanel;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.DataSourceFormatEditorPanel;
 
 /**
  * Options for formatting to HDF5.
  * @author jbf
  */
-public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implements DataSourceFormatEditorPanel {
+public class HDF5DataSourceFormatEditorPanel extends AbstractDataSourceFormatEditorPanel {
 
     /** Creates new form BinaryDataSourceFormatEditorPanel */
     public HDF5DataSourceFormatEditorPanel() {
@@ -35,6 +35,7 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
         jLabel1 = new javax.swing.JLabel();
         typeComboBox = new javax.swing.JComboBox();
         istpMetadata = new javax.swing.JCheckBox();
+        justDataCB = new javax.swing.JCheckBox();
 
         jLabel1.setText("Type:");
 
@@ -42,6 +43,8 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
 
         istpMetadata.setText("Use ISTP Metadata Conventions");
         istpMetadata.setToolTipText("Use ISTP metadata conventions for the data, like LABLAXIS, UNITS and VALIDMIN");
+
+        justDataCB.setText("Just Data, don't format timetags and other dependencies");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -56,8 +59,12 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
                         .add(typeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 123, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())
                     .add(layout.createSequentialGroup()
-                        .add(istpMetadata, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)
+                        .add(istpMetadata, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .add(24, 24, 24))))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(justDataCB)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -68,7 +75,9 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
                     .add(typeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(istpMetadata)
-                .addContainerGap(233, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(justDataCB)
+                .addContainerGap(203, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -76,6 +85,7 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox istpMetadata;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JCheckBox justDataCB;
     private javax.swing.JComboBox typeComboBox;
     // End of variables declaration//GEN-END:variables
 
@@ -94,6 +104,9 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
     }
     @Override
     public void setURI(String uri) {
+        
+        super.setURI(uri);
+        
         URISplit split= URISplit.parse(uri);
         Map<String,String> args= URISplit.parseParams(split.params);
 
@@ -104,6 +117,8 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
         s= getParam( args,"metadata","");
         istpMetadata.setSelected(s.equals("istp"));
 
+        justDataCB.setSelected( ! getBooleanParam("doDep",false) );
+    
         file= split.file;
     }
 
@@ -117,6 +132,8 @@ public class HDF5DataSourceFormatEditorPanel extends javax.swing.JPanel implemen
         if ( !s.equals("double") ) args.put( "type", s );
         if ( istpMetadata.isSelected() ) args.put( "metadata", "istp" );
 
+        if ( justDataCB.isSelected() ) args.put( "doDep", "F" );
+        
         String params= URISplit.formatParams(args);
         if ( result==null ) result= "file:///";
         URISplit ss= URISplit.parse(result);
