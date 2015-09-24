@@ -27,6 +27,7 @@ import org.python.core.PyFunction;
 import org.python.core.PyInteger;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
+import org.python.core.PyLong;
 import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PySingleton;
@@ -127,6 +128,8 @@ public class JythonOps {
         } else if ( arg0 instanceof PyArray ) {
             return PyQDataSetAdapter.adaptArray( (PyArray) arg0 );
         } else if ( arg0 instanceof PyInteger ) {
+            return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
+        } else if ( arg0 instanceof PyLong ) {
             return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
         } else if ( arg0 instanceof PyFloat ) {
             return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
