@@ -20,10 +20,12 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-09-24 r17531):</p>
+        <p>Bugfixes (2015-09-25 r17533):</p>
         <ul> 
+            <li>1462: result of guessCadence mishandled in hugeScatter rendering mode</li>
+            <li>1463: null value in USER_PROPERTIES would result in NullPointerException</li>
+            <li>1440: vap+inline:ripp&lt;C> works now.</li>
             <li>null value in USER_PROPERTIES would result in NullPointerException</li>
-            <li>vap+inline:ripp&lt;C&gt; works now.</li>
             <li>Export to CDF didn't properly support append keyword.</li>
             <li>HugeScatter wouldn't to paint the exception if that's why it didn't have a dataset</li>
             <li>vap+inline each line needs to be URL-decoded.  Add monitor so downloadResourceAsTempFile can be used.</li>
