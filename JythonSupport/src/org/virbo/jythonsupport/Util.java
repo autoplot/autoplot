@@ -484,6 +484,10 @@ public class Util {
         tp.parse(sstart);
         DatumRange curr= tp.getTimeRange();
         
+        if ( curr.width().value()==0 ) {
+            throw new IllegalArgumentException("spec first interval width is 0., something has gone terribly wrong.");
+        }
+        
         int countLimit= 1000000;
         int approxCount= (int)( 1.01 * range.width().divide(curr.width()).value() ); // extra 1% for good measure.
 
