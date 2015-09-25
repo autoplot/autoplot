@@ -183,6 +183,7 @@ public class Test019 {
         testTimeParser1( "$Y",            "2012",     "2012-01-01T00:00 to 2013-01-01T00:00");
         testTimeParser1( "$Y-$j",         "2012-017", "2012-01-17T00:00 to 2012-01-18T00:00");
         testTimeParser1( "$(j,Y=2012)",   "017",      "2012-01-17T00:00 to 2012-01-18T00:00");
+        testTimeParser1( "ace_mag_$Y_$j_to_$(Y;end)_$j.cdf",   "ace_mag_2005_001_to_2005_003.cdf",      "2005-001T00:00 to 2005-003T00:00");
 
         // speed tests
         long t0;
