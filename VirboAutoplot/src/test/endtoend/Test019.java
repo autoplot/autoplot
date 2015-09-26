@@ -27,6 +27,7 @@ import org.das2.graph.DasDevicePosition;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.virbo.autoplot.ScriptContext;
 
 /**
  * tests of das2 internals.  These are tests of non-graphic parts (see test009 for this), and does not include
@@ -39,15 +40,13 @@ public class Test019 {
         
         String uri;
         FileStorageModel fsm;
-        File[] ff,ff2;
+        File[] ff;
 
         uri= "http://autoplot.org/data/pngwalk/";
         fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
                "product_$Y$m$d.png" );
         ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2008-003" ) );
         if ( ff.length==1 ) System.err.println(ff[0]); else throw new IllegalStateException("no files found");
-
-        ff2= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2008-003" ) );
 
         uri= "http://demo:demo@www-pw.physics.uiowa.edu/~jbf/data/restrict/";
         fsm= FileStorageModel.create(FileSystem.create( new URI( uri ) ),
@@ -324,6 +323,9 @@ public class Test019 {
     
     public static void main( String[] args ) {
         try {
+            
+            ScriptContext.generateTimeRanges( "$(o,id=rbspa-pp)", "orbit:rbspa-pp:70-99" );
+            
             System.err.println( "=testParseDatumRange=" );
             testParseDatumRange();
             
