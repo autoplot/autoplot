@@ -58,7 +58,7 @@
 
         <jar href="AutoplotVolatile.jar" />
         <jar href="AutoplotStable.jar" /><!--XXXX   Uncomment for devel and production (latest) releases
-        <jar href="../lib/AutoplotStable.20150401.jar" />
+        <jar href="../lib/AutoplotStable.20150828.jar" />
         XXXX-->
 
         <property name="jnlp.packEnabled" value="true"/>
