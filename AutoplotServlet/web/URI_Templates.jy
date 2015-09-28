@@ -1,0 +1,71 @@
+resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V03.cef', 'example file to load' )
+timerange= getParam( 'timerange', '2005-02-12/2005-02-19', 'timerange to load' )
+
+generate= getParam( 'generate', 'F', 'Generation doesn''t list remote folders', ['T','F'] )
+
+drtr= DatumRangeUtil.parseTimeRange(timerange)
+
+import time
+
+count=0
+
+if ( False ):
+  print params
+  print '# resourceURI='+resourceURI
+  print '# timerange='+timerange
+  print '# generate='+generate
+
+print '<html><body>'
+
+if ( generate=='T' ):
+   version= getParam( 'version', '', 'Version number to use' )
+   if ( resourceURI.find('$v')>-1 ):
+       resourceURI= resourceURI.replace('$v',version)
+
+   tp= TimeParser.create(resourceURI)
+   st= tp.format(drtr.min(),None)
+   dr= tp.parse( st,None ).getTimeRange()
+
+   print '<h3>'+resourceURI+'</h3>'
+   print '<p>search limited to '+timerange+'</p>'
+   
+   print '<table border=1>'
+   print '<tr><td>Time Range</td><td>Generated filename</td></tr>'
+
+   while ( dr.min().lt( drtr.max() ) ):
+      st= tp.format(dr.min(),None)
+      dr= dr.next()
+      print '<tr><td>'+ dr.toString() + '</td><td>'+st + '</td></tr>'
+      count= count+1
+
+else:
+    from org.das2.fsm import FileStorageModel
+    from org.das2.util.filesystem import FileSystem
+    i= FileStorageModel.splitIndex( resourceURI )
+
+    root= resourceURI[0:i]      # the static part of the name
+    template= resourceURI[i:]   # the templated part of the name
+
+    fs= FileSystem.create( root )
+    fsm= FileStorageModel.create( fs, template )
+
+    names= fsm.getNamesFor( DatumRangeUtil.parseTimeRange(timerange) )
+
+    print '<h3>'+resourceURI+'</h3>'
+    print '<p>search limited to '+timerange+'</p>'
+
+    print '<table border=1>'
+    print '<tr><td>Filename</td><td>Time Range</td><td>Version</td></tr>'
+    for n in names:
+       print '<tr>'
+       tr= fsm.getRangeFor( n )
+       v= fsm.getField('v',n)
+       print '<td>'+root + n + '</td><td>'+tr.toString() + '</td><td>' + v +'</td>'
+       count= count+1
+       print '</tr>'
+    print '</table>'
+
+if ( count==0 ):
+   print '(none found)'
+   print '</body>'
+
