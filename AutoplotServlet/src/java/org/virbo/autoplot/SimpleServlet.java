@@ -485,7 +485,8 @@ public class SimpleServlet extends HttpServlet {
                     List<String> problems= new ArrayList<String>(1);
                     if ( dsf.reject(suri, problems, new NullProgressMonitor() )) {
                         if ( problems.isEmpty() ) {
-                            throw new IllegalArgumentException("URI was rejected: "+suri);
+                            // no explanation provided.
+                            throw new IllegalArgumentException("URI was rejected: "+suri );
                         } else if ( problems.size()==1 ) {
                             throw new IllegalArgumentException("URI was rejected: "+problems.get(0) );
                         } else {
