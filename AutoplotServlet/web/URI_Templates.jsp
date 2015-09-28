@@ -47,12 +47,14 @@
         <a href="#" onclick="document.getElementById('resourceURI2').value='http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/$Y/$m/$d/rbsp-a_magnetometer_1sec-gse_emfisis-L3_$Y$m$d_v$(v,sep).cdf';">A</a>
         <a href="#" onclick="document.getElementById('resourceURI2').value='http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hourly/$Y/omni2_h0_mrg1hr_$Y$(m,delta=6)01_v$v.cdf';">B</a>
         <a href="#" onclick="document.getElementById('resourceURI2').value='http://autoplot.org/data/versioning/data_$Y_$m_$d_v$v.qds';">C</a>
+        <a href="#" onclick="document.getElementById('resourceURI2').value='data_bartels_$(periodic;offset=2285;start=2000-346T00:00;period=27d).txt';">D</a>
+        <a href="#" onclick="document.getElementById('resourceURI2').value='$Y-$j.$(hrinterval,values=A|B|C|D).txt';">E</a>
         <br>
         <textarea rows="1" cols="120" id="resourceURI2" name="resourceURI" >http://autoplot.org/data/versioning/data_$Y_$m_$d_v$v.qds</textarea><br>
         <br>Enter ISO8601 Time Range limiting the results printed: <br>
         <textarea rows="1" cols="50" name="timerange" >2010-03-01/2010-03-10</textarea><br>
         <br>Enter the version to match:</br>
-        <textarea rows='1' cols='8' name='version'>1.00</textarea>
+        <textarea rows='1' cols='8' name='version'>1.00</textarea> (used only when $v is in the template)
         <input type="checkbox" hidden="true" name="generate" checked />
         <input type="hidden" name="scriptFile" value="URI_Templates.jy" />
         <br>
