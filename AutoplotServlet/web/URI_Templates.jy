@@ -23,7 +23,7 @@ if ( generate=='T' ):
        resourceURI= resourceURI.replace('$v',version)
 
    tp= TimeParser.create(resourceURI)
-   st= tp.format(drtr.min(),None)
+   st= tp.format(drtr.min(),None) 
    dr= tp.parse( st,None ).getTimeRange()
 
    print '<h3>'+resourceURI+'</h3>'
@@ -34,8 +34,8 @@ if ( generate=='T' ):
 
    while ( dr.min().lt( drtr.max() ) ):
       st= tp.format(dr.min(),None)
-      dr= dr.next()
       print '<tr><td>'+ dr.toString() + '</td><td>'+st + '</td></tr>'
+      dr= dr.next()
       count= count+1
 
 else:
