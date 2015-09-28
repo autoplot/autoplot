@@ -88,7 +88,16 @@ public class SecureScriptServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
-        response.setContentType("text/plain;charset=UTF-8");
+        
+        String scriptFile= request.getParameter("scriptFile");
+        
+        if ( scriptFile!=null && scriptFile.equals("URI_Templates.jy") ) {
+            response.setContentType("text/html;charset=UTF-8");
+        } else {
+            response.setContentType("text/plain;charset=UTF-8");
+        }
+        
+        
         response.setHeader( "X-Served-By", java.net.InetAddress.getLocalHost().getCanonicalHostName() );
 
         long t0= System.currentTimeMillis();
@@ -98,7 +107,6 @@ public class SecureScriptServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
 
-            String scriptFile= request.getParameter("scriptFile");
             if ( scriptFile==null ) {
                 throw new ServletException("scriptFile parameter not specified");
             }
