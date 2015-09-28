@@ -107,8 +107,8 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
         
     }
 
-    public static final String PROB_DS= "dataset";
-    public static final String PROB_TIMERANGE= "timerange";
+    public static final String PROB_DS= "Dataset ID is not specified";
+    public static final String PROB_TIMERANGE= "Timerange is not specified";
     
     /**
      * Indicate if a URI is acceptable.
