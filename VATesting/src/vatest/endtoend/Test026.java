@@ -172,6 +172,7 @@ public class Test026 {
             doTest(43, "orbit:rbspa-pp:403-406", "2013-01-27T18:58:17.392Z to 2013-01-29T06:53:13.619Z", micros );
             doTest(44, "1972/now-P1D", "1972-01-01T00:00/" + now.subtract(1,Units.days), micros );
             doTest(45, "now-P10D/now-P1D", new DatumRange( now.subtract(10,Units.days), now.subtract(1,Units.days) ).toString(), micros );
+            doTest(46, "2006-01-05T07:16:45 to 2006-01-05T07:17:15 UTC", "2006-01-05T07:16:45/07:17:15", micros );
             
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (Exception ex) {
