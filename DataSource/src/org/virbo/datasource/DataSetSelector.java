@@ -221,6 +221,8 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     /**
      * provide direct access to the editor component.
+     * This should not be used, because it makes it more difficult to 
+     * control and define the state.
      * @return the text editor
      */
     public JTextField getEditor() {
