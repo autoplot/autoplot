@@ -36,6 +36,7 @@ import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
 import org.das2.event.MouseModule;
 import org.das2.graph.ColumnColumnConnector;
+import org.das2.graph.DasAnnotation;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasColorBar;
@@ -90,6 +91,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     final Map<BindingModel, Binding> bindingImpls;
     final Map<Connector, ColumnColumnConnector> connectorImpls;
+    final Map<Annotation, DasAnnotation> annotationImpls;
+    
     private final static Logger logger = LoggerManager.getLogger( "autoplot.dom" );
 
     private static final AtomicInteger canvasIdNum = new AtomicInteger(0);
@@ -98,6 +101,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     private static final AtomicInteger dsfIdNum = new AtomicInteger(0);
     private static final AtomicInteger rowIdNum = new AtomicInteger(0);
     private static final AtomicInteger columnIdNum = new AtomicInteger(0);
+    private static final AtomicInteger annotationNum = new AtomicInteger(0);
     private static final AtomicInteger appIdNum= new AtomicInteger(0);
 
     ApplicationControllerSyncSupport syncSupport;
@@ -152,7 +156,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         //implBindingContexts= new HashMap();
         bindingImpls = new HashMap();
         connectorImpls = new HashMap();
-
+        annotationImpls = new HashMap();
+        
         addListeners();
     }
 
@@ -786,7 +791,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      */
     public void addConnector(Plot upperPlot, Plot lowerPlot) {
         logger.log( Level.FINE, "addConnector({0},{1})", new Object[]{upperPlot, lowerPlot});
-        List<Connector> connectors = new ArrayList<Connector>(Arrays.asList(application.getConnectors()));
+        List<Connector> connectors = new ArrayList(Arrays.asList(application.getConnectors()));
         final Connector connector = new Connector(upperPlot.getId(), lowerPlot.getId());
         connectors.add(connector);
         connector.setController( new ConnectorController(application, connector) );
@@ -839,6 +844,51 @@ public class ApplicationController extends DomNodeController implements RunLater
         
         application.setConnectors(connectors.toArray(new Connector[connectors.size()]));
     }
+    
+    public void addAnnotation( ) {
+        DasAnnotation impl= new DasAnnotation("Annotation");
+        
+        Annotation annotation= new Annotation();
+        assignId(annotation);
+        
+        new AnnotationController( application, annotation, impl );
+        
+        annotationImpls.put(annotation, impl);
+        
+        List<Annotation> annotations=  DomUtil.asArrayList( application.getAnnotations() );
+        annotations.add( annotation );
+        
+        application.setAnnotations( annotations.toArray( new Annotation[annotations.size()]) );
+        
+        DasCanvas lcanvas = getDasCanvas();
+        Row r= application.getCanvases(0).getMarginRow();
+        Column c= application.getCanvases(0).getMarginColumn();
+        annotation.setColumnId( c.getId() );
+        annotation.setRowId( r.getId() );
+        
+        lcanvas.add( impl, r.controller.dasRow, c.controller.dasColumn );
+    }
+
+    void deleteAnnotation(Annotation c) {
+        logger.log( Level.FINE, "deleteAnnotation({0})", c);
+        
+        DasAnnotation impl = annotationImpls.get(c);
+        
+        if ( impl!=null ) {
+            getDasCanvas().remove(impl);
+        } else {
+            
+        }
+
+        List<Annotation> annotations = DomUtil.asArrayList(application.getAnnotations());
+        annotations.remove(c);
+
+        annotationImpls.remove(c);
+        c.getController().removeBindings();
+        
+        application.setAnnotations(annotations.toArray(new Annotation[annotations.size()]));
+    }
+    
 
     private void movePlotElement(PlotElement p, Plot src, Plot dst) {
         assert ( src==null || p.getPlotId().equals(src.getId()) || p.getPlotId().equals(dst.getId()));
@@ -1609,6 +1659,11 @@ public class ApplicationController extends DomNodeController implements RunLater
         logger.fine("got locks to reset application...");
 
         try {
+            
+            List<Annotation> annos= Arrays.asList( application.getAnnotations() );
+            for ( Annotation anno : annos ) {
+                application.controller.deleteAnnotation(anno);
+            }
             
             // set the focus to the last one remaining.
             application.controller.setPlot(application.getPlots(0));
@@ -2403,6 +2458,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         } else if ( node instanceof Column ) {
             node.setId( "column_"+columnIdNum.getAndIncrement() );
 
+        } else if ( node instanceof Annotation ) {
+            node.setId("annotation_" + annotationNum);
+            annotationNum.getAndIncrement();
+
         } else if ( node instanceof DataSourceFilter ) {
             node.setId("data_" + dsfIdNum);
             dsfIdNum.getAndIncrement();
@@ -2632,6 +2691,8 @@ public class ApplicationController extends DomNodeController implements RunLater
             syncSupport.syncBindings( that.getBindings(), nameMap );
             syncSupport.syncConnectors(that.getConnectors());
 
+            syncSupport.syncAnnotations( that.getAnnotations() );
+            
             resetIdSequenceNumbers();
         } finally {
             canvasLock.unlock();

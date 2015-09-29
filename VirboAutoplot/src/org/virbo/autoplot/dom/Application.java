@@ -121,6 +121,30 @@ public class Application extends DomNode {
         propertyChangeSupport.fireIndexedPropertyChange(PROP_PLOTS, index, old, newCanvas );
     }
     
+    protected Annotation[] annotations= new Annotation[0];
+
+    public static final String PROP_ANNOTATIONS = "annotations";
+
+    public Annotation[] getAnnotations() {
+        return annotations;
+    }
+
+    public void setAnnotations(Annotation[] annotations) {
+        Annotation[] oldAnnotations = this.annotations;
+        this.annotations = annotations;
+        propertyChangeSupport.firePropertyChange(PROP_ANNOTATIONS, oldAnnotations, annotations);
+    }
+
+    public Annotation getAnnotations(int index) {
+        return this.annotations[index];
+    }
+
+    public void setAnnotations(int index, Annotation annotations) {
+        Annotation oldAnnotations = this.annotations[index];
+        this.annotations[index] = annotations;
+        propertyChangeSupport.fireIndexedPropertyChange(PROP_ANNOTATIONS, index, oldAnnotations, annotations);
+    }
+
     ApplicationController controller;
 
     public ApplicationController getController() {
