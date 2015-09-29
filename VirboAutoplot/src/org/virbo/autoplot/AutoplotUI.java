@@ -696,7 +696,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 SwingUtilities.invokeLater( new Runnable() { public void run() {
-                    dataSetSelector.setValue( appController.getFocusUri() );
+                    if ( pendingVap==null ) { // non-null means we are loading something.
+                        dataSetSelector.setValue( appController.getFocusUri() );
+                    }
                 } } );
             }
         } );
