@@ -1792,7 +1792,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     org.das2.util.LoggerManager.logGuiEvent(e);        
-                    Bookmark bookmark = addBookmark(dataSetSelector.getEditor().getText());
+                    Bookmark bookmark = addBookmark(dataSetSelector.getValue());
                     setAddBookmark(bookmark);
                     if ( !isVisible() ) {
                         Container parent= BookmarksManager.this.getParent();
