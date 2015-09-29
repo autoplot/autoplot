@@ -540,33 +540,33 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         }
     }
 
-    /**
-     * it's the delegate Data Source Editor is null and we have just an address 
-     * bar, then go ahead and do completions.
-     */
-    public void hintAtCompletion() {
-        if ( delegateDataSetSelector!=null ) {
-            String text= delegateDataSetSelector.getEditor().getText();
-            delegateDataSetSelector.getEditor().setCaretPosition(text.length());
-            //delegateDataSetSelector.showCompletions();
-            //TODO: bug 3046638: it would be nice if we didn't show "empty" when there are no completions.
-        }
-        
-        // set the focus to the timerange if that's all we need.
-        String delegateUrl;
-        try {
-            delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri( getURI(), null );
-            DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.toUri(delegateUrl),new NullProgressMonitor() );
-            if ( !dsf.reject( delegateUrl, new ArrayList<String>() , new NullProgressMonitor()) ) {
-                if ( timeRangeTextField.getText().trim().length()==0 ) {
-                    timeRangeTextField.requestFocus();
-                }
-            }
-        } catch ( URISyntaxException ex ) {
-        } catch ( IOException ex ) {
-        } catch ( IllegalArgumentException ex ) {
-        }
-    }
+//    /**
+//     * it's the delegate Data Source Editor is null and we have just an address 
+//     * bar, then go ahead and do completions.
+//     */
+//    public void hintAtCompletion() {
+//        if ( delegateDataSetSelector!=null ) {
+//            String text= delegateDataSetSelector.getEditor().getText();
+//            delegateDataSetSelector.getEditor().setCaretPosition(text.length());
+//            //delegateDataSetSelector.showCompletions();
+//            //TODO: bug 3046638: it would be nice if we didn't show "empty" when there are no completions.
+//        }
+//        
+//        // set the focus to the timerange if that's all we need.
+//        String delegateUrl;
+//        try {
+//            delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri( getURI(), null );
+//            DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.toUri(delegateUrl),new NullProgressMonitor() );
+//            if ( !dsf.reject( delegateUrl, new ArrayList<String>() , new NullProgressMonitor()) ) {
+//                if ( timeRangeTextField.getText().trim().length()==0 ) {
+//                    timeRangeTextField.requestFocus();
+//                }
+//            }
+//        } catch ( URISyntaxException ex ) {
+//        } catch ( IOException ex ) {
+//        } catch ( IllegalArgumentException ex ) {
+//        }
+//    }
 
     @Override
     public void setURI(String url) {
@@ -598,63 +598,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             if (delegateEditorPanel == null) {
                 delegateEditorPanel = DataSourceEditorPanelUtil.getDataSourceEditorPanel( DataSetURI.toUri(delegateUrl) );
             }
-            if (delegateEditorPanel == null) {
-                try {
-                    DataSetURI.getDataSource(delegateUrl);
-                    JPanel delegateP = new JPanel( );
-                    BoxLayout l= new BoxLayout(delegateP,BoxLayout.Y_AXIS);
-                    delegateP.setLayout(l);
-                    delegateP.add( javax.swing.Box.createVerticalGlue() );
-                    delegateDataSetSelector = new DataSetSelector();
-                    delegateDataSetSelector.setValue(delegateUrl);
-                    delegateDataSetSelector.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                    JTextField jtf= ((DataSetSelector)delegateDataSetSelector).getEditor();
-
-                    int rolimit= delegateUrl.indexOf("?");
-                    if ( rolimit==-1 ) rolimit= delegateUrl.length(); else rolimit= rolimit+1;
-                    final int frolimit= rolimit;
-
-                    NavigationFilter nf= new NavigationFilter() {
-
-                        @Override
-                        public int getNextVisualPositionFrom(JTextComponent text, int pos, Bias bias, int direction, Bias[] biasRet) throws BadLocationException {
-                            return super.getNextVisualPositionFrom(text, pos, bias, direction, biasRet);
-                        }
-
-                        @Override
-                        public void moveDot(FilterBypass fb, int dot, Bias bias) {
-                            if ( dot < frolimit ) dot= frolimit;
-                            super.moveDot(fb, dot, bias);
-                        }
-
-                        @Override
-                        public void setDot(FilterBypass fb, int dot, Bias bias) {
-                            if ( dot < frolimit ) dot= frolimit;
-                            super.setDot(fb, dot, bias);
-                        }
-
-                    };
-
-                    jtf.setNavigationFilter( nf );
-
-
-
-                    JLabel la= new JLabel("<html>The delegate data source doesn't provide an editor.  " +
-                            "Use this editor to modify parameters, but not the delegate file name.</html>");
-                    la.setAlignmentX( Component.LEFT_ALIGNMENT );
-                    delegateP.add( la );
-                    delegateP.add( delegateDataSetSelector );
-                    setDelegateComponent(delegateP);
-                } catch ( IllegalArgumentException ex ) {
-                    SourceTypesBrowser browser= new SourceTypesBrowser();
-                    browser.getDataSetSelector().setValue(delegateUrl);
-                    setDelegateComponent(browser);
-                }
-            } else {
-                delegateEditorPanel.setURI(delegateUrl);
-                setDelegateComponent(delegateEditorPanel.getPanel());
-            }
+            
+            delegateEditorPanel.setURI(delegateUrl);
+            setDelegateComponent(delegateEditorPanel.getPanel());
 
         } catch (Exception ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
