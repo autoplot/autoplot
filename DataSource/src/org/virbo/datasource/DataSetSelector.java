@@ -1759,7 +1759,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         this.dataSetSelector.repaint();
         this.editor.setText(value);
         //we can't fire because of overflow...  firePropertyChange( "value", oldvalue, value );
-    }
+            }
     /**
      * Holds value of property browseTypeExt.
      */
@@ -2188,6 +2188,8 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     }
 
     public void setExpertMode( boolean expert ) {
+        getEditor().setEditable(expert);
+        getEditor().setEnabled(expert);        
         this.expertMode= expert;
         if ( expert ) {
             this.plotItButton.setToolTipText("<html>Plot this data location, or URI.<br> Ctrl modifier: plot the dataset by adding a new plot<br> Shift modifier: plot the dataset as an overplot<br> ");
