@@ -1439,7 +1439,7 @@ APSplash.checkTime("init 270");
                         org.das2.util.LoggerManager.logGuiEvent(e);                                
                         try {
                             String uri = "vap+" + fext + ":";
-                            String refuri= (String) dataSetSelector.getEditor().getText();
+                            String refuri= (String) dataSetSelector.getValue();
                             if ( refuri.startsWith(uri) ) {
                                 addToDiscoveryUseSoon(refuri);
                                 dataSetSelector.browseSourceType();
@@ -1812,7 +1812,7 @@ APSplash.checkTime("init 52.9");
                         int r= JOptionPane.showConfirmDialog(this, browser,"Select Data Source Type",JOptionPane.OK_CANCEL_OPTION);
                         if ( r==JOptionPane.OK_OPTION ) {
                             surl= browser.getUri();
-                            dataSetSelector.getEditor().setText(surl);
+                            dataSetSelector.getValue(); //TODO: this needs review
                             dataSetSelector.setValue(surl);
                             dataSetSelector.maybePlot(true);
                             return;
@@ -3447,9 +3447,9 @@ private void aggregateMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
 
 private void decodeURLItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decodeURLItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
-    String s = dataSetSelector.getEditor().getText();
+    String s = dataSetSelector.getValue();
     s = org.virbo.datasource.DataSourceUtil.unescape(s);
-    dataSetSelector.getEditor().setText(s);
+    dataSetSelector.getValue();
 }//GEN-LAST:event_decodeURLItemActionPerformed
 
 private void statusTextFieldMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_statusTextFieldMouseClicked
@@ -5065,8 +5065,7 @@ APSplash.checkTime("init 240");
             mi.setVisible(expert);
         }
         expertMenu.setText( expert ? "Expert" : "Basic" );
-        dataSetSelector.getEditor().setEditable(expert);
-        dataSetSelector.getEditor().setEnabled(expert);
+        dataSetSelector.setExpertMode(expert);
         if ( dataPanel!=null ) {
             dataPanel.setExpertMode(expert);
         }
