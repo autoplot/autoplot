@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.autoplot.dom;
 
@@ -15,24 +11,26 @@ import org.das2.util.LoggerManager;
 
 /**
  * Autoplot's state is stored in a tree of nodes, with Java types constraining to particular abstractions.  Each node
- * can have children, and implements:
- *   copy -- make a copy of this node and its children.
- *   syncTo -- make this node look like another node.  (e.g. undo to old state). syncTo can also be told to exclude properties.
- *   diffs -- show differences between this and another node.
- * All nodes have the property "id" which must be unique within the tree.  Each node has properties of the following types:
- *   String
- *   double
- *   boolean
- *   Datum
- *   DatumRange
- *   Color
- *   RenderType
- *   PlotSymbol
- *   PsymConnector
- *   Enum
- *   Connector
- *   LegendPosition
- *
+ * can have children, and implements:<ul>
+ *  <li> copy -- make a copy of this node and its children.
+ *  <li> syncTo -- make this node look like another node.  (e.g. undo to old state). syncTo can also be told to exclude properties.
+ *  <li> diffs -- show differences between this and another node.
+ * </ul>
+ * All nodes have the property "id" which must be unique within the tree.  Each node has properties of the following types:<ul>
+ *  <li> String
+ *  <li>  double
+ *  <li>  boolean
+ *  <li>  Datum
+ *  <li>  DatumRange
+ *  <li>  Color
+ *  <li>  RenderType
+ *  <li>  PlotSymbol
+ *  <li>  PsymConnector
+ *  <li>  Enum
+ *  <li>  Connector
+ *  <li>  LegendPosition
+ *  <li>  AnchorPosition
+ *</ul>
  * Any DomNode can be saved and restored using SerializeUtil, which uses Java introspection to look at all the properties.
  *
  * Some nodes currently have the method "setXAutomatically" where X is a property.  This is currently used to indicate who is setting
@@ -98,11 +96,11 @@ public abstract class DomNode implements Cloneable {
      * return a list of the differences between this and another node.  The
      * differences describe how to mutate that node to make it like this
      * node.
-     * @param node
+     * @param that
      * @return
      */
     public List<Diff> diffs( DomNode that ) {
-        List<Diff> result = new ArrayList<Diff>();
+        List<Diff> result = new ArrayList();
 
         boolean b;
 
