@@ -170,7 +170,7 @@ public class ApplicationControllerSyncSupport {
 
     }
 
-    void syncAnnotations(Annotation[] annotations) {
+    protected void syncAnnotations(Annotation[] annotations) {
         List<Annotation> addAnnotations= new ArrayList();
         List<Annotation> deleteAnnotations= new ArrayList();
 
@@ -186,7 +186,9 @@ public class ApplicationControllerSyncSupport {
         }
 
         for ( Annotation c: addAnnotations ) {
-            controller.addAnnotation();
+            Row row= (Row)DomUtil.getElementById( application, c.getRowId() );
+            Column column= (Column)DomUtil.getElementById( application, c.getColumnId() );
+            controller.addAnnotation( row, column, c.getText() );
         }
 
         for ( Annotation c: deleteAnnotations ) {
