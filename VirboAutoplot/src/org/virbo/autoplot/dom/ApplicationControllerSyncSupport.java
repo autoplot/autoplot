@@ -174,15 +174,15 @@ public class ApplicationControllerSyncSupport {
         List<Annotation> addAnnotations= new ArrayList();
         List<Annotation> deleteAnnotations= new ArrayList();
 
-        List<Annotation> thisConnectors= Arrays.asList(application.getAnnotations());
-        List<Annotation> thatConnectors= Arrays.asList(annotations);
+        List<Annotation> thisAnnotations= Arrays.asList(application.getAnnotations());
+        List<Annotation> thatAnnotations= Arrays.asList(annotations);
 
-        for ( Annotation c: thatConnectors ) {
-            if ( !thisConnectors.contains(c) ) addAnnotations.add(c);
+        for ( Annotation c: thatAnnotations ) {
+            if ( !thisAnnotations.contains(c) ) addAnnotations.add(c);
         }
 
-        for ( Annotation c: application.getAnnotations() ) {
-            if ( !thatConnectors.contains(c) ) deleteAnnotations.add(c);
+        for ( Annotation c: application.annotations ) {
+            if ( !thatAnnotations.contains(c) ) deleteAnnotations.add(c);
         }
 
         for ( Annotation c: addAnnotations ) {
