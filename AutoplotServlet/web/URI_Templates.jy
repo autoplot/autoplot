@@ -23,12 +23,10 @@ if ( generate=='T' ):
        print 'Template cannot contain $v.'
        count=-1
    else:
-       print 'here26'
        tp= TimeParser.create(resourceURI)
        
        i1= resourceURI.find('$(enum')
        if ( i1>-1 ):
-           print 'here31'
            
            ix= resourceURI.find('$(enum',i1+6)
            if (ix>-1 ): 
