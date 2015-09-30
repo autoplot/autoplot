@@ -64,7 +64,7 @@
         </p>
         
         <hr>
-        <small><%= SimpleServlet.version %> A</small>
-        <small><%= AboutUtil.getJenkinsURL() %> A</small>
+        <small><%= SimpleServlet.version %></small>
+        <small><%= AboutUtil.getJenkinsURL() %></small>
     </body>
 </html>
