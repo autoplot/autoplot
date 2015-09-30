@@ -261,6 +261,10 @@ public class Application extends DomNode {
     
     /*****  end properties *********************/
 
+    /**
+     * return a copy of this application state.
+     * @return a copy of this application state.
+     */
     @Override
     public DomNode copy() {
         Application result = (Application) super.copy();
@@ -291,6 +295,13 @@ public class Application extends DomNode {
             connectorsCopy[i]= (Connector)connectorsCopy[i].copy(); // this was way to hard to uncover...
         }
         result.setConnectors( connectorsCopy );
+
+        //Seems like we should do this for annotations, but this causes problems.  
+        //Annotation[] annotationsCopy= this.getAnnotations();
+        //for ( int i=0; i<annotationsCopy.length; i++ ) {
+        //    annotationsCopy[i]= (Annotation)annotationsCopy[i].copy(); 
+        //}
+        //result.setAnnotations( annotationsCopy );
         
         Canvas[] canvasesCopy= this.getCanvases();
         for ( int i=0; i<canvasesCopy.length; i++ ) {
@@ -308,6 +319,8 @@ public class Application extends DomNode {
         result.addAll(plotElements);
         result.addAll(dataSourceFilters);
         result.addAll(canvases);
+        result.addAll(connectors);
+        result.addAll(Arrays.asList(annotations));
         result.add(options);
         
         return result;
