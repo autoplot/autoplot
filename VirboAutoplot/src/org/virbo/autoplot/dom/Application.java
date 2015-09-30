@@ -370,6 +370,8 @@ public class Application extends DomNode {
 
         addArrayDiffs( "connectors", this.getConnectors(), that.getConnectors(), result );
 
+        addArrayDiffs( "annotations", this.getAnnotations(), that.getAnnotations(), result );
+
         for ( int i=0; i<Math.min(this.dataSourceFilters.size(),that.dataSourceFilters.size()); i++ ) {
             DataSourceFilter thisDataSourceFilter= this.dataSourceFilters.get(i);
             DataSourceFilter thatDataSourceFilter= that.dataSourceFilters.get(i);
@@ -392,6 +394,12 @@ public class Application extends DomNode {
             Connector thisConnector= this.connectors.get(i);
             Connector thatConnector= that.connectors.get(i);
             result.addAll( DomUtil.childDiffs( "connectors["+i+"]", thatConnector.diffs( thisConnector ) ) );
+        }
+
+        for ( int i=0; i<Math.min(this.annotations.length,that.annotations.length); i++ ) {
+            Annotation thisAnnotation= this.annotations[i];
+            Annotation thatAnnotation= that.annotations[i];
+            result.addAll( DomUtil.childDiffs( "annotations["+i+"]", thatAnnotation.diffs( thisAnnotation ) ) );
         }
         
         for ( int i=0; i<Math.min(this.plotElements.size(),that.plotElements.size()); i++ ) {
