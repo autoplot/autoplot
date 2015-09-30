@@ -5,6 +5,7 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import org.das2.graph.AnchorPosition;
@@ -81,7 +82,34 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_ANCHORPOSITION, oldAnchorPosition, anchorPosition);
     }
 
-    
+    private Color foreground = new Color(0, 0, 0, 0);
+
+    public static final String PROP_FOREGROUND = "foreground";
+
+    public Color getForeground() {
+        return foreground;
+    }
+
+    public void setForeground(Color foreground) {
+        Color oldForeground = this.foreground;
+        this.foreground = foreground;
+        propertyChangeSupport.firePropertyChange(PROP_FOREGROUND, oldForeground, foreground);
+    }
+
+    private Color background = new Color(0,0,0,0);
+
+    public static final String PROP_BACKGROUND = "background";
+
+    public Color getBackground() {
+        return background;
+    }
+
+    public void setBackground(Color background) {
+        Color oldBackground = this.background;
+        this.background = background;
+        propertyChangeSupport.firePropertyChange(PROP_BACKGROUND, oldBackground, background);
+    }
+
     private String rowId="";
     public static final String PROP_ROWID = "rowId";
 
@@ -123,9 +151,11 @@ public class Annotation extends DomNode {
         super.syncTo(n,exclude);
         Annotation that = (Annotation) n;
         if ( !exclude.contains( PROP_TEXT ) ) this.setText(that.getText());
-        if ( !exclude.contains( PROP_FONTSIZE ) ) this.setText(that.getFontSize());
+        if ( !exclude.contains( PROP_FONTSIZE ) ) this.setFontSize(that.getFontSize());
         if ( !exclude.contains( PROP_BORDERTYPE ) ) this.setBorderType(that.getBorderType() );
         if ( !exclude.contains( PROP_ANCHORPOSITION ) ) this.setAnchorPosition(that.getAnchorPosition() );
+        if ( !exclude.contains( PROP_FOREGROUND ) ) this.setForeground(that.getForeground() );
+        if ( !exclude.contains( PROP_BACKGROUND ) ) this.setBackground(that.getBackground() );
         if ( !exclude.contains( PROP_ROWID ) ) this.setRowId(that.getRowId());
         if ( !exclude.contains( PROP_COLUMNID ) ) this.setColumnId(that.getColumnId());
     }
@@ -153,6 +183,10 @@ public class Annotation extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_BORDERTYPE, that.borderType, this.borderType ) );
         b=  that.anchorPosition.equals(this.anchorPosition) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHORPOSITION, that.anchorPosition, this.anchorPosition ) );
+        b=  that.foreground.equals(this.foreground) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_FOREGROUND, that.foreground, this.foreground ) );
+        b=  that.background.equals(this.background) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_BACKGROUND, that.background, this.background ) );
         b=  that.rowId.equals(this.rowId) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ROWID, that.rowId, this.rowId ) );
         b=  that.columnId.equals(this.columnId) ;
