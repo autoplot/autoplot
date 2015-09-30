@@ -1,3 +1,4 @@
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -51,13 +52,20 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
 
+//METHOD TO GENERATE HTML
+//IMPORTS:
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.BufferedWriter;
+
 /**
  * MakePngWalk code implemented in Java.  This was once a Python script, but it got complex enough that it was useful to
  * rewrite it in Java.
  * @author jbf
  */
 public class CreatePngWalk {
-
+    private static final ArrayList<String> pngFilenameArray= new ArrayList();
     /**
      * Get the list of times, which can be one of:<ul>
      *   <li> rank 2 bins datasets  T[index;min,max]
@@ -432,7 +440,13 @@ public class CreatePngWalk {
             }
             
             String filename = getFilename( params, "", atime );
-
+            /**
+            * Code for adding images into global arrayList for use in HTML method
+            * @author Armond Luthens
+            * @date 09/21/15
+            */
+             pngFilenameArray.add(filename);
+            
             count = count + 1;
             if (mon.isCancelled()) {
                 break;
@@ -488,6 +502,9 @@ public class CreatePngWalk {
             
             if ( params.outputFormat.equals("png") ) {
                 image= myWriteToPng( filename, appmodel, dom2, w0, h0);
+                
+                
+                
             } else {
                 dom2.getCanvases(0).getController().getDasCanvas().writeToPDF(filename);
             }
@@ -674,6 +691,84 @@ public class CreatePngWalk {
         }
         return status;
     }
+    
+    /**
+     * Method to write HTML file of all the pictures to give a gallery view
+     * @author Armond Luthens
+     * @version 1.0
+     * @date 09/22/15
+     * @param outputFolder the file where the html should be written to.
+     */
+    public static void writeHTMLFile(String outputFolder){
+    //IMPORTS: 
+        //import java.io.File;
+        //import java.io.FileWriter;
+        //import java.io.IOException;
+        //import java.io.BufferedWriter;
+        
+    //FILENAME FOR GENERATED HTML PAGE: pngImagePage.html
+        // File path: /home/aluthens/batch/pngwalk-out/pngImagePage.html
+        // how to open file in terminal: firefox pngImagePage.html
+        
+        String filePath= outputFolder+"pngImagePage.html";
+        
+        File f= new File(filePath);
+        
+        String htmlOpen= "<html>";
+        String headerString="<head><title>PNG Gallery</title></head>";
+        String bodyString="<body style=\"background-color: #6B6B6B; margin=0;\">";
+        String htmlClose= "</div2Close></body></html>";
+
+        try ( BufferedWriter bw = new BufferedWriter(new FileWriter(f)) ) {
+            String currentPngFilename;
+            String fileNameToDisplay;
+            
+            String year;
+            String month;
+            String day;
+            String fullDate;
+            
+            String headerOpen= "<div style=\"top: 0px; margin-right=0px; background-color:black; color:white;height:100px;\">"
+                    + "EMFISIS PNG WALK CREATED BY ARMOND LUTHENS" + "</div>";
+            
+            String addImageString;
+            String htmlImageStringOpen="<img src=\"";
+            String htmlImageStringClose="\" style=\"width:304px;height:304px;margin-left:10px;margin-bottom:10px;\">";
+            String htmlImageCaptionOpen= "<figcaption style=\"color: white; text-align:center;\">";
+            String htmlImageCaptionClose= "</figcaption>";
+            String div2Open="<div style=\"background-color: #6B6B6B;\">";
+            String div2Close="</div>";
+            String htmlFigureOpen= "<figure style=\"width:350px; float:left;\">";
+            String htmlFigureClose= "</figure>";
+            String fullImageCaption;
+            
+            bw.write(htmlOpen);
+            bw.write(headerString);
+            bw.write(bodyString);
+            bw.write(headerOpen);
+            bw.write(div2Open);
+            
+            for (String pngFilenameArray1 : pngFilenameArray) {
+                currentPngFilename = pngFilenameArray1;
+                fileNameToDisplay= currentPngFilename.replace("/home/aluthens/batch/pngwalk-out/product_", "");
+                year=fileNameToDisplay.substring(0, 4);
+                month=fileNameToDisplay.substring(4, 6);;
+                day=fileNameToDisplay.substring(6, 8);
+                fullDate= "Date: " + year + "/" + month + "/" + day;
+                addImageString= htmlImageStringOpen+currentPngFilename+htmlImageStringClose;
+                fullImageCaption= htmlImageCaptionOpen + fullDate + htmlImageCaptionClose;
+                bw.write(htmlFigureOpen);
+                bw.write(addImageString);
+                bw.write(fullImageCaption);
+                bw.write(htmlFigureClose);
+            }
+            bw.write(htmlClose);
+
+        } 
+        catch(IOException e){
+            System.out.println("ERROR.");
+        }
+    }
 
     /**
      * command-line support for creating PNGWalks.  When PNGWalks are created 
@@ -737,7 +832,8 @@ public class CreatePngWalk {
         ScriptContext.plot(vap);
 
         int status= doIt( ScriptContext.getDocumentModel(), params );
-
+        
+        writeHTMLFile( params.outputFolder );
         System.exit(status); // something starts up thread that prevents java from exiting.
     }
 }
