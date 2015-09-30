@@ -18,25 +18,25 @@ if ( False ):
 print '<html><body>'
 
 if ( generate=='T' ):
-   version= getParam( 'version', '', 'Version number to use' )
    if ( resourceURI.find('$v')>-1 ):
-       resourceURI= resourceURI.replace('$v',version)
+       print 'Template cannot contain $v.'
+       count=-1
+   else:
+       tp= TimeParser.create(resourceURI)
+       st= tp.format(drtr.min(),None) 
+       dr= tp.parse( st,None ).getTimeRange()
 
-   tp= TimeParser.create(resourceURI)
-   st= tp.format(drtr.min(),None) 
-   dr= tp.parse( st,None ).getTimeRange()
+       print '<h3>'+resourceURI+'</h3>'
+       print '<p>search limited to '+timerange+'</p>'
 
-   print '<h3>'+resourceURI+'</h3>'
-   print '<p>search limited to '+timerange+'</p>'
-   
-   print '<table border=1>'
-   print '<tr><td>Time Range</td><td>Generated filename</td></tr>'
+       print '<table border=1>'
+       print '<tr><td>Time Range</td><td>Generated filename</td></tr>'
 
-   while ( dr.min().lt( drtr.max() ) ):
-      st= tp.format(dr.min(),None)
-      print '<tr><td>'+ dr.toString() + '</td><td>'+st + '</td></tr>'
-      dr= dr.next()
-      count= count+1
+       while ( dr.min().lt( drtr.max() ) ):
+          st= tp.format(dr.min(),None)
+          print '<tr><td>'+ dr.toString() + '</td><td>'+st + '</td></tr>'
+          dr= dr.next()
+          count= count+1
 
 else:
     from org.das2.fsm import FileStorageModel
@@ -67,5 +67,5 @@ else:
 
 if ( count==0 ):
    print '(none found)'
-   print '</body>'
+print '</body></html>'
 

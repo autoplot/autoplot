@@ -35,7 +35,7 @@
             by default in /tmp/autoplotservlet.  Also, scripts are logged in this location as well.
         </p>
         
-        <p>The <a href="unaggregate.jsp">"UnaggregateServlet"</a> allows how an Autoplot script can be used to implement a service, here demonstrating
+        <p>The <a href="URI_Templates.jsp">"URI_Templates"</a> allows how an Autoplot script can be used to implement a service, here demonstrating
             Autoplot's implementation of the URI templates (http://tsds.org/uri_templates).
         </p>
         

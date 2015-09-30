@@ -53,8 +53,6 @@
         <textarea rows="1" cols="120" id="resourceURI2" name="resourceURI" >http://autoplot.org/data/versioning/data_$Y_$m_$d_v$v.qds</textarea><br>
         <br>Enter ISO8601 Time Range limiting the results printed: <br>
         <textarea rows="1" cols="50" name="timerange" >2010-03-01/2010-03-10</textarea><br>
-        <br>Enter the version to match:</br>
-        <textarea rows='1' cols='8' name='version'>1.00</textarea> (used only when $v is in the template)
         <input type="checkbox" hidden="true" name="generate" checked />
         <input type="hidden" name="scriptFile" value="URI_Templates.jy" />
         <br>
