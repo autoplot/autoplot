@@ -4,6 +4,7 @@
     Author     : jbf
 --%>
 
+<%@page import="org.das2.util.AboutUtil"%>
 <%@page import="org.virbo.autoplot.SimpleServlet"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -64,5 +65,6 @@
         
         <hr>
         <small><%= SimpleServlet.version %> A</small>
+        <small><%= AboutUtil.getJenkinsURL() %> A</small>
     </body>
 </html>
