@@ -37,6 +37,21 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_TEXT, oldText, text);
     }
 
+    private String fontSize = "1em";
+
+    public static final String PROP_FONTSIZE = "fontSize";
+
+    public String getFontSize() {
+        return fontSize;
+    }
+
+    public void setFontSize(String fontSize) {
+        String oldFontSize = this.fontSize;
+        this.fontSize = fontSize;
+        propertyChangeSupport.firePropertyChange(PROP_FONTSIZE, oldFontSize, fontSize);
+    }
+
+    
     private String rowId="";
     public static final String PROP_ROWID = "rowId";
 
@@ -85,6 +100,7 @@ public class Annotation extends DomNode {
         } else {
             Annotation that = (Annotation) n;
             if ( !exclude.contains( PROP_TEXT ) ) this.setText(that.getText());
+            if ( !exclude.contains( PROP_FONTSIZE ) ) this.setText(that.getFontSize());
             if ( !exclude.contains( PROP_ROWID ) ) this.setRowId(that.getRowId());
             if ( !exclude.contains( PROP_COLUMNID ) ) this.setColumnId(that.getColumnId());
         }
@@ -107,6 +123,8 @@ public class Annotation extends DomNode {
 
         b=  that.text.equals(this.text) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_TEXT, that.text, this.text ) );
+        b=  that.fontSize.equals(this.fontSize) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_FONTSIZE, that.fontSize, this.fontSize ) );
         b=  that.rowId.equals(this.rowId) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ROWID, that.rowId, this.rowId ) );
         b=  that.columnId.equals(this.columnId) ;
