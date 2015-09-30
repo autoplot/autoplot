@@ -18,13 +18,15 @@ import org.jdesktop.beansbinding.Converter;
 public class AnnotationController extends DomNodeController {
     private final Annotation annotation;
     private final Application dom;
+    private final DasAnnotation dasAnnotation;
         
     public AnnotationController( Application dom, Annotation annotation, DasAnnotation dasAnnotation ) {
         super( annotation );
         this.dom = dom;
         this.annotation = annotation;
-        annotation.controller = this;
         bindTo(dasAnnotation);
+        this.dasAnnotation= dasAnnotation;
+        annotation.controller = this;
     }    
         
     void syncTo( DomNode n, List<String> exclude ) {
