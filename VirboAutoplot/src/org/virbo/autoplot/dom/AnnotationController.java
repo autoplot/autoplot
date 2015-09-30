@@ -76,6 +76,8 @@ public class AnnotationController extends DomNodeController {
         p.setFontSize( new Float(0.));
         ac.bind( annotation, "text", p, "text");
         ac.bind( annotation, "fontSize", p, "fontSize", fontConverter() );
+        ac.bind( annotation, "borderType", p, "borderType" );
+        ac.bind( annotation, "anchorPosition", p, "anchorPosition" );
         annotation.addPropertyChangeListener( Annotation.PROP_ROWID, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {

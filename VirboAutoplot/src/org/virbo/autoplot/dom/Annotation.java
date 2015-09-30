@@ -7,6 +7,8 @@ package org.virbo.autoplot.dom;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.das2.graph.AnchorPosition;
+import org.das2.graph.BorderType;
 
 /**
  * Annotations for annotating the canvas.
@@ -51,6 +53,34 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_FONTSIZE, oldFontSize, fontSize);
     }
 
+    private BorderType borderType = BorderType.NONE;
+
+    public static final String PROP_BORDERTYPE = "borderType";
+
+    public BorderType getBorderType() {
+        return borderType;
+    }
+
+    public void setBorderType(BorderType borderType) {
+        BorderType oldBorderType = this.borderType;
+        this.borderType = borderType;
+        propertyChangeSupport.firePropertyChange(PROP_BORDERTYPE, oldBorderType, borderType);
+    }
+
+    private AnchorPosition anchorPosition = AnchorPosition.NE;
+
+    public static final String PROP_ANCHORPOSITION = "anchorPosition";
+
+    public AnchorPosition getAnchorPosition() {
+        return anchorPosition;
+    }
+
+    public void setAnchorPosition(AnchorPosition anchorPosition) {
+        AnchorPosition oldAnchorPosition = this.anchorPosition;
+        this.anchorPosition = anchorPosition;
+        propertyChangeSupport.firePropertyChange(PROP_ANCHORPOSITION, oldAnchorPosition, anchorPosition);
+    }
+
     
     private String rowId="";
     public static final String PROP_ROWID = "rowId";
@@ -85,25 +115,19 @@ public class Annotation extends DomNode {
     @Override
     public void syncTo(DomNode n) {
         super.syncTo(n);
-        if ( controller!=null ) {
-            controller.syncTo(n,new ArrayList<String>());
-        } else {
-            syncTo(n,new ArrayList<String>() );
-        }
+        syncTo(n,new ArrayList<String>() );
     }
 
     @Override
     public void syncTo(DomNode n, List<String> exclude ) {
         super.syncTo(n,exclude);
-        if ( controller!=null ) {
-            controller.syncTo(n,exclude);
-        } else {
-            Annotation that = (Annotation) n;
-            if ( !exclude.contains( PROP_TEXT ) ) this.setText(that.getText());
-            if ( !exclude.contains( PROP_FONTSIZE ) ) this.setText(that.getFontSize());
-            if ( !exclude.contains( PROP_ROWID ) ) this.setRowId(that.getRowId());
-            if ( !exclude.contains( PROP_COLUMNID ) ) this.setColumnId(that.getColumnId());
-        }
+        Annotation that = (Annotation) n;
+        if ( !exclude.contains( PROP_TEXT ) ) this.setText(that.getText());
+        if ( !exclude.contains( PROP_FONTSIZE ) ) this.setText(that.getFontSize());
+        if ( !exclude.contains( PROP_BORDERTYPE ) ) this.setBorderType(that.getBorderType() );
+        if ( !exclude.contains( PROP_ANCHORPOSITION ) ) this.setAnchorPosition(that.getAnchorPosition() );
+        if ( !exclude.contains( PROP_ROWID ) ) this.setRowId(that.getRowId());
+        if ( !exclude.contains( PROP_COLUMNID ) ) this.setColumnId(that.getColumnId());
     }
 
     @Override
@@ -125,6 +149,10 @@ public class Annotation extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_TEXT, that.text, this.text ) );
         b=  that.fontSize.equals(this.fontSize) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_FONTSIZE, that.fontSize, this.fontSize ) );
+        b=  that.borderType.equals(this.borderType) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_BORDERTYPE, that.borderType, this.borderType ) );
+        b=  that.anchorPosition.equals(this.anchorPosition) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHORPOSITION, that.anchorPosition, this.anchorPosition ) );
         b=  that.rowId.equals(this.rowId) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ROWID, that.rowId, this.rowId ) );
         b=  that.columnId.equals(this.columnId) ;
