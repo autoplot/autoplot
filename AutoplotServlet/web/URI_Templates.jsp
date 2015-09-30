@@ -49,6 +49,7 @@
         <a href="#" onclick="document.getElementById('resourceURI2').value='http://autoplot.org/data/versioning/data_$Y_$m_$d_v$v.qds';">C</a>
         <a href="#" onclick="document.getElementById('resourceURI2').value='data_bartels_$(periodic;offset=2285;start=2000-346T00:00;period=27d).txt';">D</a>
         <a href="#" onclick="document.getElementById('resourceURI2').value='$Y-$j.$(hrinterval,values=A|B|C|D).txt';">E</a>
+        <a href="#" onclick="document.getElementById('resourceURI2').value='http://autoplot.org/data/versioning/data_$Y_$m_$d_$(enum,values=A|B|C|D,id=sc).qds';">F</a>
         <br>
         <textarea rows="1" cols="120" id="resourceURI2" name="resourceURI" >http://autoplot.org/data/versioning/data_$Y_$m_$d_v$v.qds</textarea><br>
         <br>Enter ISO8601 Time Range limiting the results printed: <br>
