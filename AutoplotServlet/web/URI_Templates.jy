@@ -1,7 +1,8 @@
-resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V03.cef', 'example file to load' )
+#resourceURI= getParam( 'resourceURI', 'http://autoplot.org/data/C1_CP_EDI_EGD__$Y$m$d_V03.cef', 'example file to load' )
+resourceURI= getParam( 'resourceURI', 'C1_CP_EDI_EGD__$Y$m$d_$(enum,values=A|B).cef', 'example file to load' )
 timerange= getParam( 'timerange', '2005-02-12/2005-02-19', 'timerange to load' )
 
-generate= getParam( 'generate', 'F', 'Generation doesn''t list remote folders', ['T','F'] )
+generate= getParam( 'generate', 'T', 'Generation doesn''t list remote folders', ['T','F'] )
 
 drtr= DatumRangeUtil.parseTimeRange(timerange)
 
@@ -9,7 +10,7 @@ import time
 
 count=0
 
-if ( False ):
+if ( True ):
   print params
   print '# resourceURI='+resourceURI
   print '# timerange='+timerange
@@ -22,8 +23,28 @@ if ( generate=='T' ):
        print 'Template cannot contain $v.'
        count=-1
    else:
+       print 'here26'
        tp= TimeParser.create(resourceURI)
-       st= tp.format(drtr.min(),None) 
+       
+       i1= resourceURI.find('$(enum')
+       if ( i1>-1 ):
+           print 'here31'
+           
+           ix= resourceURI.find('$(enum',i1+6)
+           if (ix>-1 ): 
+               print 'Template can only contain one $(enum).'
+               count=-1
+           else:
+               fh= tp.getFieldHandlerByCode('enum')
+               enums= fh.getValues()
+               id= fh.getId()
+       else:
+           enums= ['']
+           id= ''
+       
+       from java.util import Collections
+       
+       st= tp.format( drtr.min(), drtr.max(), Collections.singletonMap( id, enums[0] ) ) 
        dr= tp.parse( st,None ).getTimeRange()
 
        print '<h3>'+resourceURI+'</h3>'
@@ -33,11 +54,11 @@ if ( generate=='T' ):
        print '<tr><td>Time Range</td><td>Generated filename</td></tr>'
 
        while ( dr.min().lt( drtr.max() ) ):
-          st= tp.format(dr.min(),None)
-          print '<tr><td>'+ dr.toString() + '</td><td>'+st + '</td></tr>'
+          for enum in enums:
+             st= tp.format(dr.min(), dr.max(), Collections.singletonMap( id, enum ) ) 
+             print '<tr><td>'+ dr.toString() + '</td><td>'+st + '</td></tr>'
+             count= count+1
           dr= dr.next()
-          count= count+1
-
 else:
     from org.das2.fsm import FileStorageModel
     from org.das2.util.filesystem import FileSystem
