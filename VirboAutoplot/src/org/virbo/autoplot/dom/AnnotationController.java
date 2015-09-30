@@ -3,8 +3,13 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.ParseException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.graph.DasAnnotation;
+import org.das2.graph.DasDevicePosition;
+import org.jdesktop.beansbinding.Converter;
 
 /**
  * implements the annotation
@@ -29,9 +34,48 @@ public class AnnotationController extends DomNodeController {
         if ( !exclude.contains( Annotation.PROP_COLUMNID ) ) annotation.setColumnId(that.getColumnId());
     }
     
+    /**
+     * converts forward from relative font spec to point size.
+     * @return 
+     */
+    private Converter fontConverter() {
+        return new Converter() {
+            @Override
+            public Object convertForward(Object s) {
+                try {
+                    double[] dd= DasDevicePosition.parseLayoutStr((String)s);
+                    if ( dd[1]==1 && dd[2]==0 ) {
+                        return 0.f;
+                    } else {
+                        double parentSize= dom.getCanvases(0).controller.dasCanvas.getFont().getSize2D();
+                        double newSize= dd[1]*parentSize + dd[2];
+                        return (float)newSize;
+                    }
+                } catch (ParseException ex) {
+                    ex.printStackTrace();
+                    return 0.f;
+                }
+            }
+
+            @Override
+            public Object convertReverse(Object t) {
+                float size= (float)t;
+                if ( size==0 ) {
+                    return "1em";
+                } else {
+                    double parentSize= dom.getCanvases(0).controller.dasCanvas.getFont().getSize2D();
+                    double relativeSize= size / parentSize;
+                    return String.format( "%.2fem", relativeSize );
+                }
+            }  
+        };
+    }
+    
     private void bindTo( final DasAnnotation p ) {
         ApplicationController ac = dom.controller;
+        p.setFontSize( new Float(0.));
         ac.bind( annotation, "text", p, "text");
+        ac.bind( annotation, "fontSize", p, "fontSize", fontConverter() );
         annotation.addPropertyChangeListener( Annotation.PROP_ROWID, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
