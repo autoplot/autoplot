@@ -845,11 +845,21 @@ public class ApplicationController extends DomNodeController implements RunLater
         application.setConnectors(connectors.toArray(new Connector[connectors.size()]));
     }
     
-    public void addAnnotation( ) {
-        DasAnnotation impl= new DasAnnotation("Annotation");
+    /**
+     * add an annotation to the canvas.
+     * @param row the row or None.
+     * @param column the column or None.
+     * @param text initial text
+     * @return the annotation
+     */
+    public Annotation addAnnotation( Row row, Column column, String text ) {
+        
+        DasAnnotation impl= new DasAnnotation("");
         
         Annotation annotation= new Annotation();
         assignId(annotation);
+        
+        annotation.setText(text);
         
         new AnnotationController( application, annotation, impl );
         
@@ -861,12 +871,14 @@ public class ApplicationController extends DomNodeController implements RunLater
         application.setAnnotations( annotations.toArray( new Annotation[annotations.size()]) );
         
         DasCanvas lcanvas = getDasCanvas();
-        Row r= application.getCanvases(0).getMarginRow();
-        Column c= application.getCanvases(0).getMarginColumn();
+        Row r= row;
+        Column c= column;
         annotation.setColumnId( c.getId() );
         annotation.setRowId( r.getId() );
         
         lcanvas.add( impl, r.controller.dasRow, c.controller.dasColumn );
+        
+        return annotation;
     }
 
     void deleteAnnotation(Annotation c) {
