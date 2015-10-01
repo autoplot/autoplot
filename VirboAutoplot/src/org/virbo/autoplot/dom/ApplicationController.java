@@ -885,7 +885,11 @@ public class ApplicationController extends DomNodeController implements RunLater
         return annotation;
     }
 
-    void deleteAnnotation(Annotation c) {
+    /**
+     * delete the annotation
+     * @param c the annotation
+     */
+    public void deleteAnnotation(Annotation c) {
         logger.log( Level.FINE, "deleteAnnotation({0})", c);
         
         DasAnnotation impl = annotationImpls.get(c);
