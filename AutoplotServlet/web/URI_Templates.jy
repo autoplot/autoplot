@@ -51,11 +51,14 @@ if ( generate=='T' ):
        print '<table border=1>'
        print '<tr><td>Time Range</td><td>Generated filename</td></tr>'
 
-       while ( dr.min().lt( drtr.max() ) ):
+       while ( count<=10000 and dr.min().lt( drtr.max() ) ):
           for enum in enums:
              st= tp.format(dr.min(), dr.max(), Collections.singletonMap( id, enum ) ) 
              print '<tr><td>'+ dr.toString() + '</td><td>'+st + '</td></tr>'
              count= count+1
+             if ( count>10000 ):
+                 print '<tr><td></td><td>Search limited to 10000 results.</td></tr>'
+                 break
           dr= dr.next()
 else:
     from org.das2.fsm import FileStorageModel
