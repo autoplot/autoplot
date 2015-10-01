@@ -82,7 +82,21 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_ANCHORPOSITION, oldAnchorPosition, anchorPosition);
     }
 
-    private Color textColor = new Color(0, 0, 0, 0);
+    private boolean overrideColors = false;
+
+    public static final String PROP_OVERRIDECOLORS = "overrideColors";
+
+    public boolean isOverrideColors() {
+        return overrideColors;
+    }
+
+    public void setOverrideColors(boolean overrideColors) {
+        boolean oldOverrideColors = this.overrideColors;
+        this.overrideColors = overrideColors;
+        propertyChangeSupport.firePropertyChange(PROP_OVERRIDECOLORS, oldOverrideColors, overrideColors);
+    }
+    
+    private Color textColor = new Color(0, 0, 0);
 
     public static final String PROP_TEXTCOLOR = "textColor";
 
@@ -102,7 +116,7 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_TEXTCOLOR, oldTextColor, textColor);
     }
         
-    private Color foreground = new Color(0, 0, 0, 0);
+    private Color foreground = new Color(0, 0, 0);
 
     public static final String PROP_FOREGROUND = "foreground";
 
@@ -116,7 +130,7 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_FOREGROUND, oldForeground, foreground);
     }
 
-    private Color background = new Color(0,0,0,0);
+    private Color background = new Color(255,255,255);
 
     public static final String PROP_BACKGROUND = "background";
 
@@ -174,6 +188,7 @@ public class Annotation extends DomNode {
         if ( !exclude.contains( PROP_FONTSIZE ) ) this.setFontSize(that.getFontSize());
         if ( !exclude.contains( PROP_BORDERTYPE ) ) this.setBorderType(that.getBorderType() );
         if ( !exclude.contains( PROP_ANCHORPOSITION ) ) this.setAnchorPosition(that.getAnchorPosition() );
+        if ( !exclude.contains( PROP_OVERRIDECOLORS ) ) this.setOverrideColors(that.isOverrideColors() );
         if ( !exclude.contains( PROP_TEXTCOLOR ) ) this.setTextColor(that.getTextColor() );
         if ( !exclude.contains( PROP_FOREGROUND ) ) this.setForeground(that.getForeground() );
         if ( !exclude.contains( PROP_BACKGROUND ) ) this.setBackground(that.getBackground() );
