@@ -20,8 +20,11 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-09-25 r17533):</p>
+        <p>Bugfixes (2015-10-01 r17590):</p>
         <ul> 
+            <li>corrections to hrinterval and time format, correctly using the stop time and supporting end modifier.</li>
+            <li>clean up address bar as vap is loaded. </li>
+            <li>"2014-001 to 2015-001 UTC" is supported now.</li> 
             <li>1462: result of guessCadence mishandled in hugeScatter rendering mode</li>
             <li>1463: null value in USER_PROPERTIES would result in NullPointerException</li>
             <li>1440: vap+inline:ripp&lt;C> works now.</li>
@@ -136,6 +139,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>345: first go at annotations</li>
+            <li>improvements to $(enum) in timeranges, providing code to read out the enumerated values.</li>
             <li>449: bitwise operators in QDataSets.</li>
             <li>export to HDF supports append</li>
             <li>trim operator has GUI now.  Thanks Armond!</li>
