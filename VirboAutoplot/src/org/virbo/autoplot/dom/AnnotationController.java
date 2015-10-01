@@ -29,13 +29,6 @@ public class AnnotationController extends DomNodeController {
         this.dasAnnotation= dasAnnotation;
         annotation.controller = this;
     }    
-        
-    void syncTo( DomNode n, List<String> exclude ) {
-        Annotation that = (Annotation) n;
-        if ( !exclude.contains( Annotation.PROP_TEXT ) ) annotation.setText(that.getText());
-        if ( !exclude.contains( Annotation.PROP_ROWID ) ) annotation.setRowId(that.getRowId());
-        if ( !exclude.contains( Annotation.PROP_COLUMNID ) ) annotation.setColumnId(that.getColumnId());
-    }
     
     /**
      * converts forward from relative font spec to point size.
@@ -81,6 +74,7 @@ public class AnnotationController extends DomNodeController {
         ac.bind( annotation, "fontSize", p, "fontSize", fontConverter() );
         ac.bind( annotation, "borderType", p, "borderType" );
         ac.bind( annotation, "anchorPosition", p, "anchorPosition" );
+        ac.bind( annotation, "textColor", p, "textColor" );
         ac.bind( annotation, "foreground", p, "foreground" );
         ac.bind( annotation, "background", p, "background" );
         
