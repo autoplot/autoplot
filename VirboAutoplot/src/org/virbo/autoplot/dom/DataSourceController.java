@@ -34,6 +34,7 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
@@ -83,7 +84,8 @@ public class DataSourceController extends DomNodeController {
         }
 
         @Override
-        public void propertyChange(PropertyChangeEvent e) {
+        public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt);  
             if (dataSet != null) {
                 updateFill();// this should be done quickly.  Some filters (ffts) are sub-interactive and should not be done here.
             }
@@ -96,7 +98,8 @@ public class DataSourceController extends DomNodeController {
         }
 
         @Override
-        public void propertyChange(PropertyChangeEvent e) {
+        public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt);  
             if (dataSet != null) {
                 logger.fine("change in fill or valid range ->updateFillSoon()");
                 updateFillSoon(0);
@@ -112,17 +115,18 @@ public class DataSourceController extends DomNodeController {
         }
 
         @Override
-        public void propertyChange(PropertyChangeEvent e) {
-            logger.log(Level.FINE, "resetMe: {0} {1}->{2}", new Object[]{e.getPropertyName(), e.getOldValue(), e.getNewValue()});
-            if (e.getNewValue() == null && e.getOldValue() == null) {
+        public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt);  
+            logger.log(Level.FINE, "resetMe: {0} {1}->{2}", new Object[]{evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
+            if (evt.getNewValue() == null && evt.getOldValue() == null) {
                 // do nothing
             } else {
                 List<Object> whoIsChanging = changesSupport.whoIsChanging(PENDING_SET_DATA_SOURCE);
                 if (whoIsChanging.size() > 0) {
                     logger.log(Level.WARNING, "!!! someone is changing: {0} !!!  ignoring event.", whoIsChanging); // we probably need to do something with this.
-                    logger.log(Level.WARNING, " !! {0}", e.getPropertyName());
-                    logger.log(Level.WARNING, " !! {0}", e.getNewValue());
-                    logger.log(Level.WARNING, " !! {0}", e.getOldValue());
+                    logger.log(Level.WARNING, " !! {0}", evt.getPropertyName());
+                    logger.log(Level.WARNING, " !! {0}", evt.getNewValue());
+                    logger.log(Level.WARNING, " !! {0}", evt.getOldValue());
                     return;
                 }
                 DataSourceController.this.changesSupport.registerPendingChange(resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE);
@@ -187,6 +191,7 @@ public class DataSourceController extends DomNodeController {
         dsf.addPropertyChangeListener(Plot.PROP_ID, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);  
                 if (dom.controller.isValueAdjusting()) {
                     return;
                 }
@@ -946,6 +951,7 @@ public class DataSourceController extends DomNodeController {
     PropertyChangeListener parentListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt);  
             String prob = checkParents();
             if (prob != null) {
                 setStatus("warning: " + prob);
@@ -960,6 +966,7 @@ public class DataSourceController extends DomNodeController {
     PropertyChangeListener dsfListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt);  
             resolveParents();
         }
     };
@@ -1306,6 +1313,7 @@ public class DataSourceController extends DomNodeController {
     private PropertyChangeListener updatesListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt);  
             QDataSet ds = (QDataSet) evt.getNewValue();
             if (ds != null) {
                 setDataSetInternal(ds);

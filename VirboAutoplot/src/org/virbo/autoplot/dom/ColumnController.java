@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
+import org.das2.util.LoggerManager;
 
 /**
  *
@@ -42,6 +43,7 @@ public class ColumnController extends DomNodeController {
         PropertyChangeListener list= new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);  
                 if ( maxList.contains( evt.getPropertyName() ) ) {
                     column.setRight( DasDevicePosition.formatLayoutStr(dasColumn, false ) );
                 } else if ( minList.contains( evt.getPropertyName() ) ) {
@@ -53,6 +55,7 @@ public class ColumnController extends DomNodeController {
         list= new PropertyChangeListener() {
             @Override            
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);  
                 try {
                     double[] dd= DasDevicePosition.parseLayoutStr((String)evt.getNewValue());
                     if ( evt.getPropertyName().equals(Column.PROP_LEFT) ) {

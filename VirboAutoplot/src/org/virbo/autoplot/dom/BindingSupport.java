@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.graph.DasCanvasComponent;
+import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 
 /**
@@ -95,6 +96,7 @@ public class BindingSupport {
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);              
                 try {
                     if (c == null) {
                         Object oldValue= getter.invoke( p );

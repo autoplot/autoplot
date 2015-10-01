@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.graph.DasAnnotation;
 import org.das2.graph.DasDevicePosition;
+import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 
 /**
@@ -86,6 +87,7 @@ public class AnnotationController extends DomNodeController {
         annotation.addPropertyChangeListener( Annotation.PROP_ROWID, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                logger.finer("propertyChange "+Annotation.PROP_ROWID);
                 Row r= (Row) DomUtil.getElementById( dom.getCanvases(0), (String)evt.getNewValue() );
                 if ( r!=null ) {
                     p.setRow(r.controller.getDasRow());
@@ -95,6 +97,7 @@ public class AnnotationController extends DomNodeController {
         annotation.addPropertyChangeListener( Annotation.PROP_ROWID, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);                
                 Row r= (Row) DomUtil.getElementById( dom.getCanvases(0), (String)evt.getNewValue() );
                 if ( r!=null ) {
                     p.setRow(r.controller.getDasRow());
@@ -104,6 +107,7 @@ public class AnnotationController extends DomNodeController {
         annotation.addPropertyChangeListener( Annotation.PROP_COLUMNID, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);                
                 Column r= (Column) DomUtil.getElementById( dom.getCanvases(0), (String)evt.getNewValue() );
                 if ( r!=null ) {
                     p.setColumn(r.controller.getDasColumn());

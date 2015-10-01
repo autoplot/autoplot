@@ -40,6 +40,7 @@ import org.das2.graph.DasRow;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
+import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.MouseModuleType;
@@ -110,6 +111,7 @@ public class PlotController extends DomNodeController {
     public PropertyChangeListener rowColListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt);  
             if ( dasPlot!=null && evt.getPropertyName().equals(Plot.PROP_ROWID) ) {
                 String id= (String)evt.getNewValue();
                 Row row=  ( id.length()==0 ) ? null : (Row) DomUtil.getElementById( dom, id );
@@ -177,6 +179,7 @@ public class PlotController extends DomNodeController {
     private PropertyChangeListener labelListener= new PropertyChangeListener() {
          @Override
          public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"labelListener");               
             if ( evt.getPropertyName().equals(Plot.PROP_TITLE) ) {
                 plot.setAutoLabel(false);
             }
@@ -186,6 +189,7 @@ public class PlotController extends DomNodeController {
     private PropertyChangeListener ticksURIListener= new PropertyChangeListener() {
          @Override
          public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"ticksURIListener");  
             if ( evt.getPropertyName().equals(Plot.PROP_TICKS_URI) ) {
                 if ( ((String)evt.getNewValue()).length()>0 ) {
                     logger.log(Level.FINE, "prop_ticks_uri={0}", evt.getNewValue());
@@ -206,6 +210,7 @@ public class PlotController extends DomNodeController {
     private PropertyChangeListener idListener=new PropertyChangeListener() {
         @Override
         public void propertyChange( PropertyChangeEvent evt ) {
+            LoggerManager.logPropertyChangeEvent(evt,"idListener");  
             if ( dom.controller.isValueAdjusting() ) return;
             DomLock lock = dom.controller.mutatorLock();
             lock.lock( "Changing plot id" );
@@ -232,6 +237,7 @@ public class PlotController extends DomNodeController {
     private PropertyChangeListener dayOfYearListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"dayOfYearListener");  
             final DasAxis update= PlotController.this.plot.getXaxis().controller.dasAxis;
             updateAxisFormatter(update);
         }
@@ -240,6 +246,7 @@ public class PlotController extends DomNodeController {
     private PropertyChangeListener mouseModuleListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"mouseModuleListener");  
             DasPlot p= dasPlot;
             MouseModuleType mm= (MouseModuleType) evt.getNewValue();
             MouseModule m= null;
@@ -264,6 +271,7 @@ public class PlotController extends DomNodeController {
     private PropertyChangeListener autorangeListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"autorangeListener");  
             if ( evt.getPropertyName().equals("autoRange") && evt.getNewValue().equals(Boolean.TRUE) ) {
                 resetZoom( getPlot().getXaxis().isAutoRange(),
                         getPlot().getYaxis().isAutoRange(),
@@ -469,6 +477,7 @@ public class PlotController extends DomNodeController {
         xaxis.addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt,"xaxis datumrange");  
                 if ( dom.getOptions().isScanEnabled() ) {
                     List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
                     final DatumRange dr= (DatumRange)evt.getNewValue();
@@ -487,6 +496,7 @@ public class PlotController extends DomNodeController {
         xaxis.setNextAction( "scan", new AbstractAction( "scannext" ) {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);
                 List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
                 DatumRange dr= xaxis.getDatumRange();
                 if ( pele==null || pele.isEmpty() || scanNextRange==null ) {    
@@ -506,6 +516,7 @@ public class PlotController extends DomNodeController {
         xaxis.setPreviousAction( "scan", new AbstractAction( "scanprev" ) {
             @Override
             public void actionPerformed(ActionEvent e) {
+                LoggerManager.logGuiEvent(e);                
                 List<PlotElement> pele= getApplication().getController().getPlotElementsFor(plot);
                 DatumRange dr= xaxis.getDatumRange();
                 if ( pele==null || pele.isEmpty() || scanPrevRange==null ) {    
@@ -705,21 +716,22 @@ public class PlotController extends DomNodeController {
             return ""+PlotController.this;
         }
         @Override
-        public void propertyChange(PropertyChangeEvent e) {
-            if (e.getSource() instanceof DasAxis) {
-                DasAxis axis = (DasAxis) e.getSource();
+        public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"listener");
+            if (evt.getSource() instanceof DasAxis) {
+                DasAxis axis = (DasAxis) evt.getSource();
                 Axis domAxis= getDomAxis(axis);
                 if ( domAxis==null ) return;
-                if ( e.getPropertyName().equals("Frame.active") ) return;
-                if ( e.getPropertyName().equals(DasAxis.PROP_UNITS)
-                        || e.getPropertyName().equals(DasAxis.PROPERTY_DATUMRANGE ) ) {
+                if ( evt.getPropertyName().equals("Frame.active") ) return;
+                if ( evt.getPropertyName().equals(DasAxis.PROP_UNITS)
+                        || evt.getPropertyName().equals(DasAxis.PROPERTY_DATUMRANGE ) ) {
                     if ( axis.isDrawTca() && domAxis.getLabel().length()==0 ) {
                         domAxis.setLabel("%{RANGE}");
                     }
                 }
-                if ( e.getPropertyName().equals(DasAxis.PROP_UNITS) 
-                        || e.getPropertyName().equals(DasAxis.PROPERTY_DATUMRANGE )
-                        || e.getPropertyName().equals(DasAxis.PROP_LABEL) ) {
+                if ( evt.getPropertyName().equals(DasAxis.PROP_UNITS) 
+                        || evt.getPropertyName().equals(DasAxis.PROPERTY_DATUMRANGE )
+                        || evt.getPropertyName().equals(DasAxis.PROP_LABEL) ) {
                     updateAxisFormatter(axis);
                 }
 
@@ -729,12 +741,12 @@ public class PlotController extends DomNodeController {
                 //    return;
                 //}
 
-            } else if ( e.getPropertyName().equals( DasPlot.PROP_FOCUSRENDERER ) ) {
+            } else if ( evt.getPropertyName().equals( DasPlot.PROP_FOCUSRENDERER ) ) {
 
                 List<PlotElement> eles= PlotController.this.dom.controller.getPlotElementsFor(plot);
                 PlotElement fe= null;
                 for ( PlotElement ele: eles ) {
-                    if ( ele.getController().getRenderer()== e.getNewValue() ) {
+                    if ( ele.getController().getRenderer()== evt.getNewValue() ) {
                         fe= ele;
                     }
                 }
@@ -1042,6 +1054,7 @@ public class PlotController extends DomNodeController {
     PropertyChangeListener plotDefaultsListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"plotDefaultsListener");
             PlotElement pele= (PlotElement)evt.getSource();
             List<PlotElement> pp= PlotController.this.dom.getController().getPlotElementsFor(plot);
             if ( pp.contains(pele) ) {
@@ -1061,6 +1074,7 @@ public class PlotController extends DomNodeController {
     PropertyChangeListener renderTypeListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"renderTypeListener");
             checkRenderType();
         }
     };
@@ -1070,6 +1084,7 @@ public class PlotController extends DomNodeController {
     private PropertyChangeListener plotElementDataSetListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"plotElementDataSetListener");
             if ( plotElement==null ) {
                 System.err.println("whoops, getting there");
                 return;

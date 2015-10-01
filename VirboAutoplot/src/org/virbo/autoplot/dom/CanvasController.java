@@ -36,6 +36,7 @@ import org.das2.graph.GraphUtil;
 import org.das2.graph.Painter;
 import org.das2.graph.Renderer;
 import org.das2.graph.SelectionUtil;
+import org.das2.util.LoggerManager;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import static org.virbo.autoplot.dom.DomNodeController.logger;
 import org.virbo.autoplot.layout.LayoutConstants;
@@ -117,12 +118,14 @@ public class CanvasController extends DomNodeController {
         this.canvas.addPropertyChangeListener(Canvas.PROP_WIDTH, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);  
                 dasCanvas.setPreferredWidth( Math.min( 4000, CanvasController.this.canvas.getWidth()) );
             }
         });
         this.canvas.addPropertyChangeListener(Canvas.PROP_HEIGHT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);  
                 dasCanvas.setPreferredHeight( Math.min( 4000, CanvasController.this.canvas.getHeight()) );
             }
         });

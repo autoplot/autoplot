@@ -118,6 +118,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         changesSupport.addPropertyChangeListener( new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);                
                 if ( evt.getPropertyName().equals("status")
                         && "ready".equals(evt.getNewValue() ) ) {
                     fireActionEvent( new ActionEvent(this,0,"ready") );
@@ -211,7 +212,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     PropertyChangeListener controllerListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            
+            LoggerManager.logPropertyChangeEvent(evt,"controllerListener");            
             // only go into logger stuff if we know it's going to log.  This is for performance, I noticed a large number of Object instances when profiling and this could help performance.
             if ( logger.isLoggable(Level.FINEST) ) logger.log(Level.FINEST, "controller change: {0}.{1} ({2}->{3})", new Object[]{evt.getSource(), evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
             //if( evt.getPropertyName().equals("resetDimensions") && evt.getNewValue().equals(Boolean.TRUE) ) {
@@ -224,7 +225,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     PropertyChangeListener domListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-
+            LoggerManager.logPropertyChangeEvent(evt,"domListener");
             // only go into logger stuff if we know it's going to log.  This is for performance, I noticed a large number of Object instances when profiling and this could help performance.
             if ( logger.isLoggable(Level.FINEST) ) logger.log(Level.FINEST, "dom change: {0}.{1} ({2}->{3})", new Object[]{evt.getSource(), evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
 
@@ -603,6 +604,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);  
                 if (!isValueAdjusting()) {
                     PlotElement p = getPlotElement();
                     if (p != null) {
@@ -620,6 +622,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         this.application.addPropertyChangeListener( Application.PROP_PLOT_ELEMENTS, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);  
                 if ( application.getPlotElements().length>1 ) {
                     application.options.setLayoutVisible(true);
                 }
@@ -629,6 +632,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         this.application.addPropertyChangeListener( Application.PROP_BINDINGS, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);  
                 if ( isValueAdjusting() ) {
                     return;
                 }
@@ -922,6 +926,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"plotIdListener");  
             PlotElement p = (PlotElement) evt.getSource();
             String srcid = (String) evt.getOldValue();
             String dstid = (String) evt.getNewValue();
@@ -1037,6 +1042,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"renderFocusListener");  
             DasPlot dasPlot = (DasPlot) evt.getSource();
             Renderer r = dasPlot.getFocusRenderer();
             if (r == null) {

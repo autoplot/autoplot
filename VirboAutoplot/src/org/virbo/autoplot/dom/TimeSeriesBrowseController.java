@@ -26,6 +26,7 @@ import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
 import org.das2.datum.format.DateTimeDatumFormatter;
+import org.das2.util.LoggerManager;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -89,6 +90,7 @@ public class TimeSeriesBrowseController {
         updateTsbTimer = new TickleTimer(300, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt,"updateTsbTimer");                
                 //TODO: this would work, but the particular axis is not actually adjusting.  We need
                 //to figure out who it's attached to, and see if any are adjusting.  Maybe even
                 //put in new code in plot.getXAxis.valueIsAdjusting to check bindings.
@@ -173,11 +175,12 @@ public class TimeSeriesBrowseController {
                return ""+TimeSeriesBrowseController.this;
             }
             @Override
-            public void propertyChange(PropertyChangeEvent e) {
+            public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt,"timeSeriesBrowseListener");
                 //we should have something to listen for locks.
-                if (e.getPropertyName().equals(property)) {
+                if (evt.getPropertyName().equals(property)) {
                     changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
-                    DatumRange dr=(DatumRange)e.getNewValue();
+                    DatumRange dr=(DatumRange)evt.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
                         setTimeRange( dr );
                     } else {
@@ -263,23 +266,24 @@ public class TimeSeriesBrowseController {
                return ""+TimeSeriesBrowseController.this;
             }
             @Override
-            public void propertyChange(PropertyChangeEvent e) {
+            public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt,"timeSeriesBrowseListener");                
                 if (plot.getXAxis().valueIsAdjusting()) {
                     return;
                 } 
                 //if ( domPlot.getController().getApplication().getController().isValueAdjusting() ) { // This must be commented out because of 1140.  I'm not sure why this was inserted in the first place.
                 //    return;
                 //}
-                if (e.getPropertyName().equals("datumRange")) {
-                    DatumRange dr=(DatumRange)e.getNewValue();
+                if (evt.getPropertyName().equals("datumRange")) {
+                    DatumRange dr=(DatumRange)evt.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
                         changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
                         logger.log(Level.FINE, "setTimeRange({0}) because of datumRange", dr);
                         setTimeRange( dr );
                         updateTsbTimer.tickle();
                     }
-                } else if ( e.getPropertyName().equals( Plot.PROP_CONTEXT ) ) {
-                    DatumRange dr=(DatumRange)e.getNewValue();
+                } else if ( evt.getPropertyName().equals( Plot.PROP_CONTEXT ) ) {
+                    DatumRange dr=(DatumRange)evt.getNewValue();
                     if ( UnitsUtil.isTimeLocation(dr.getUnits()) ) {
                         changesSupport.registerPendingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
                         logger.log(Level.FINE, "setTimeRange({0}) because of context", dr);

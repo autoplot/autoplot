@@ -47,6 +47,7 @@ import org.das2.graph.SpectrogramRenderer;
 import org.das2.graph.TickCurveRenderer;
 import org.das2.graph.VectorPlotRenderer;
 import org.das2.system.RequestProcessor;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -195,6 +196,7 @@ public class PlotElementController extends DomNodeController {
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"dsfListener");
             if ( evt.getPropertyName().equals(DataSourceFilter.PROP_FILTERS) ) {
                 logger.log(Level.FINE, "property change in DSF means I need to autorange: {0}", evt.getPropertyName());
                 setResetRanges(true);
@@ -247,6 +249,7 @@ public class PlotElementController extends DomNodeController {
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"plotElementListener");            
             logger.log(Level.FINE, "plotElementListener: {0} {1}->{2}", new Object[]{evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
             if ( evt.getPropertyName().equals(PlotElement.PROP_RENDERTYPE) && !PlotElementController.this.isValueAdjusting() ) {
                 if ( dom.getController().isValueAdjusting() ) {
@@ -344,6 +347,7 @@ public class PlotElementController extends DomNodeController {
     PropertyChangeListener parentStyleListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"parentStyleListener");            
             try {
                 DomUtil.setPropertyValue(plotElement.style, evt.getPropertyName(), evt.getNewValue());
             } catch (IllegalAccessException ex) {
@@ -363,6 +367,7 @@ public class PlotElementController extends DomNodeController {
     PropertyChangeListener styleListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"styleListener");            
             if ( evt.getPropertyName().equals( PlotElementStyle.PROP_REBINMETHOD ) ) {
                 if ( plotElement.getRenderType()==RenderType.nnSpectrogram || plotElement.getRenderType()==RenderType.spectrogram ) {
                     if ( evt.getNewValue()==SpectrogramRenderer.RebinnerEnum.nearestNeighbor ) {
@@ -705,7 +710,7 @@ public class PlotElementController extends DomNodeController {
     PropertyChangeListener exceptionListener = new PropertyChangeListener() {
         @Override
         public synchronized void propertyChange(PropertyChangeEvent evt) {
-
+            LoggerManager.logPropertyChangeEvent(evt,"exceptionListener");
             changesSupport.performingChange( this, PENDING_SET_DATASET );
             try {
                 Exception ex = dsf.controller.getException();
@@ -738,6 +743,7 @@ public class PlotElementController extends DomNodeController {
 
         @Override
         public synchronized void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"fillDataSetListener");
             logger.fine("enter fillDataSetListener propertyChange");
             if (!Arrays.asList(dom.getPlotElements()).contains(plotElement)) {
                 //TODO: find a way to fix this properly or don't call it a kludge! logger.fine("kludge pec446 cannot be removed");
@@ -1211,6 +1217,7 @@ public class PlotElementController extends DomNodeController {
         PropertyChangeListener pcl= new PropertyChangeListener() { // need to listen for component changes for |slice1(x)|unbundle('A')
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt,"addParentComponentListener");            
                 if ( evt.getPropertyName().equals(PlotElement.PROP_COMPONENT) ) {
                     if ( DataSetOps.changesDimensions((String)evt.getOldValue(),(String)evt.getNewValue()) ) {
                         return;
@@ -1502,6 +1509,7 @@ public class PlotElementController extends DomNodeController {
     PropertyChangeListener dataSourceDataSetListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"dataSourceDataSetListener");            
             if ( dsfReset ) {
                 setResetComponent(true);
                 setResetPlotElement(true);
@@ -2555,6 +2563,7 @@ public class PlotElementController extends DomNodeController {
     PropertyChangeListener rebinnerListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"rebinnerListener");            
             if ( !PlotElementController.this.isValueAdjusting() ) {
                 plotElement.setAutoRenderType(false); // https://sourceforge.net/p/autoplot/bugs/1217/
             }

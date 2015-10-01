@@ -12,6 +12,7 @@ import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasAxis.Lock;
 import org.das2.graph.DasPlot;
+import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 
 /**
@@ -75,6 +76,7 @@ public class AxisController extends DomNodeController {
         }
 
         public synchronized void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt);  
             // ensure that log doesn't make axis invalid, or min trivially close to zero.
             if ( dom.controller.isValueAdjusting() || valueIsAdjusting() ) return;
             if ( evt.getPropertyName().equals( Axis.PROP_RANGE )

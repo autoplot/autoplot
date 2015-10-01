@@ -30,6 +30,7 @@ public class OptionsPrefsController {
     TickleTimer flushTimer= new TickleTimer( 300, new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"flushTimer");  
             try {
                 prefs.flush();
             } catch (BackingStoreException ex) {
@@ -51,6 +52,7 @@ public class OptionsPrefsController {
     PropertyChangeListener listener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            LoggerManager.logPropertyChangeEvent(evt,"listener");  
             if ( evt.getPropertyName().equals("id") ) return;
             if ( evt.getNewValue() instanceof String ) {
                 prefs.put( evt.getPropertyName(),(String) evt.getNewValue());
