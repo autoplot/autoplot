@@ -188,6 +188,15 @@ public class ApplicationControllerSyncSupport {
         for ( Annotation c: addAnnotations ) {
             Row row= (Row)DomUtil.getElementById( application, c.getRowId() );
             Column column= (Column)DomUtil.getElementById( application, c.getColumnId() );
+            if ( row==null ) {
+                logger.log(Level.WARNING, "unable to find row {0} using margin row", c.getRowId());
+                row= application.getCanvases(0).getMarginRow();
+            }
+            if ( column==null ) {
+                logger.log(Level.WARNING, "unable to find column {0} using margin column", c.getColumnId());
+                column= application.getCanvases(0).getMarginColumn();
+            }
+            
             controller.addAnnotation( row, column, c.getText() );
         }
 
