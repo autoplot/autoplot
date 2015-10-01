@@ -389,19 +389,19 @@ public class CdfDataSource extends AbstractDataSource {
 
         MutablePropertyDataSet result;
         if ( attr1!=null && attr1.containsKey("VIRTUAL") && ( attr1.containsKey("FUNCTION") || attr1.containsKey("FUNCT") ) ) {
-            List<QDataSet> attr= new ArrayList();
+            List<QDataSet> args= new ArrayList();
             String function= (String)attr1.get("FUNCTION");
             if ( function==null ) function= (String)attr1.get("FUNCT");
-            if ( attr1.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, -1, mon ) );
-            if ( attr1.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, -1, mon ) );
-            if ( attr1.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, -1, mon ) );
-            if ( attr1.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, -1, mon ) );
-            if ( attr1.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, -1, mon ) );
+            if ( attr1.get("COMPONENT_0")!=null ) args.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_0"), constraint, false, true, null, -1, mon ) );
+            if ( attr1.get("COMPONENT_1")!=null ) args.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_1"), constraint, false, true, null, -1, mon ) );
+            if ( attr1.get("COMPONENT_2")!=null ) args.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_2"), constraint, false, true, null, -1, mon ) );
+            if ( attr1.get("COMPONENT_3")!=null ) args.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_3"), constraint, false, true, null, -1, mon ) );
+            if ( attr1.get("COMPONENT_4")!=null ) args.add( wrapDataSet( cdf, (String)attr1.get("COMPONENT_4"), constraint, false, true, null, -1, mon ) );
             try {
                 Map<String,Object> qmetadata= new IstpMetadataModel().properties(attr1);
-                result= (MutablePropertyDataSet) CdfVirtualVars.execute( qmetadata, function, attr, mon );
+                result= (MutablePropertyDataSet) CdfVirtualVars.execute( qmetadata, function, args, mon );
             } catch ( IllegalArgumentException ex ) {
-                throw new IllegalArgumentException("virtual function "+function+" not supported",ex);
+                throw ex;
             }
 
         } else { // typical route
