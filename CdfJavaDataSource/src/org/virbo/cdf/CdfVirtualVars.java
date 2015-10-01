@@ -36,8 +36,9 @@ public class CdfVirtualVars {
      * @see isSupported
      * @return
      */
-    public static QDataSet execute( Map<String,Object> metadata, String function, List<QDataSet> args, ProgressMonitor mon ) {
+    public static QDataSet execute( Map<String,Object> metadata, String function, List<QDataSet> args, ProgressMonitor mon ) throws IllegalArgumentException {
         if ( function.equalsIgnoreCase("sum_values" ) ) {
+            if ( args.size()<1 ) throw new IllegalArgumentException("virtual variable function sum_values expects at least one argument");
             QDataSet sum= args.get(0);
             for ( int i=1; i<args.size(); i++ ) {
                 sum= Ops.add( sum, args.get(i) );
@@ -52,6 +53,7 @@ public class CdfVirtualVars {
         } else if (function.equalsIgnoreCase("fftPower1024")) {
             return Ops.fftPower(args.get(0), 1024, mon );
         } else if (function.equalsIgnoreCase("fftPower")) { // Dan Crawford's generic fft function.  args[0] is rank 2 waveforms, args[1] is the fft size, which must be 2**k and be smaller than args[0].length(0)
+            if ( args.size()!=2 ) throw new IllegalArgumentException("virtual variable function fftPower expects two arguments");
             QDataSet size=  args.get(1);
             while ( size.rank()>0 ) size= size.slice(0); // avoid any runtime errors by reducing to one scalar (rank 0) number.
             mon.setProgressMessage("apply FFT power");
@@ -126,7 +128,7 @@ public class CdfVirtualVars {
             }
             return esa_data;
         } else {
-            throw new IllegalArgumentException("unimplemented function: "+function );
+            throw new IllegalArgumentException("virtual variable function not implemented: "+function );
         }
     }
 
