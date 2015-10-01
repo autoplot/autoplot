@@ -115,6 +115,16 @@ public class AnnotationController extends DomNodeController {
             }
         });
         
+        dom.getCanvases(0).addPropertyChangeListener( Canvas.PROP_FONT, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);
+                annotation.propertyChangeSupport.firePropertyChange( Annotation.PROP_FONTSIZE, null, annotation.getFontSize() );
+                dasAnnotation.resize();
+            }
+            
+        });
+        
     }
 
     protected void removeBindings() {
