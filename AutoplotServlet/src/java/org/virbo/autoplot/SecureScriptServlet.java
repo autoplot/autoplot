@@ -147,15 +147,22 @@ public class SecureScriptServlet extends HttpServlet {
             interp.execfile( new FileInputStream(file) );
             
         } catch ( RuntimeException ex ) {
+            
+            out.append("<pre>\n");
             ex.printStackTrace(out);
+            out.append("</pre>\n");
             ex.printStackTrace();
             throw ex;
         } catch ( ServletException ex ) {
+            out.append("<pre>\n");
             ex.printStackTrace(out);
+            out.append("</pre>\n");
             ex.printStackTrace();
             throw ex;
         } catch ( IOException ex ) {
+            out.append("<pre>\n");
             ex.printStackTrace(out);
+            out.append("</pre>\n");
             ex.printStackTrace();
             throw ex;
         } finally { 
