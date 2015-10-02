@@ -54,7 +54,7 @@ public class Application extends DomNode {
 
     
     public static final String PROP_PLOT_ELEMENTS = "plotElements";
-    protected List<PlotElement> plotElements = new LinkedList<PlotElement>();
+    protected List<PlotElement> plotElements = new LinkedList();
 
     public PlotElement[] getPlotElements() {
         return plotElements.toArray(new PlotElement[plotElements.size()]);
@@ -76,7 +76,7 @@ public class Application extends DomNode {
         propertyChangeSupport.fireIndexedPropertyChange(PROP_PLOT_ELEMENTS, index, old, pele);
     }
     public static final String PROP_PLOTS = "plots";
-    protected List<Plot> plots = new LinkedList<Plot>();
+    protected List<Plot> plots = new LinkedList();
 
     public Plot[] getPlots() {
         return plots.toArray(new Plot[plots.size()]);
@@ -99,7 +99,7 @@ public class Application extends DomNode {
     }
     
     public static final String PROP_CANVASES = "canvases";
-    protected List<Canvas> canvases = new LinkedList<Canvas>();
+    protected List<Canvas> canvases = new LinkedList();
 
     public Canvas[] getCanvases() {
         return canvases.toArray(new Canvas[canvases.size()]);
@@ -121,28 +121,28 @@ public class Application extends DomNode {
         propertyChangeSupport.fireIndexedPropertyChange(PROP_PLOTS, index, old, newCanvas );
     }
     
-    protected Annotation[] annotations= new Annotation[0];
+    protected List<Annotation> annotations= Collections.emptyList();
 
     public static final String PROP_ANNOTATIONS = "annotations";
 
     public Annotation[] getAnnotations() {
-        return annotations;
+        return annotations.toArray(new Annotation[annotations.size()]);
     }
 
     public void setAnnotations(Annotation[] annotations) {
-        Annotation[] oldAnnotations = this.annotations;
-        this.annotations = annotations;
+        Annotation[] oldAnnotations = this.annotations.toArray(new Annotation[this.annotations.size()]);
+        this.annotations =  Arrays.asList(annotations);
         propertyChangeSupport.firePropertyChange(PROP_ANNOTATIONS, oldAnnotations, annotations);
     }
 
     public Annotation getAnnotations(int index) {
-        return this.annotations[index];
+        return this.annotations.get(index);
     }
 
-    public void setAnnotations(int index, Annotation annotations) {
-        Annotation oldAnnotations = this.annotations[index];
-        this.annotations[index] = annotations;
-        propertyChangeSupport.fireIndexedPropertyChange(PROP_ANNOTATIONS, index, oldAnnotations, annotations);
+    public void setAnnotations(int index, Annotation annotation) {
+        Annotation old = this.annotations.get(index);
+        this.annotations.set(index, annotation );
+        propertyChangeSupport.fireIndexedPropertyChange(PROP_ANNOTATIONS, index, old, annotation );
     }
 
     ApplicationController controller;
@@ -296,12 +296,11 @@ public class Application extends DomNode {
         }
         result.setConnectors( connectorsCopy );
 
-        //Seems like we should do this for annotations, but this causes problems.  
-        //Annotation[] annotationsCopy= this.getAnnotations();
-        //for ( int i=0; i<annotationsCopy.length; i++ ) {
-        //    annotationsCopy[i]= (Annotation)annotationsCopy[i].copy(); 
-        //}
-        //result.setAnnotations( annotationsCopy );
+        Annotation[] annotationsCopy= this.getAnnotations(); // note this is a copy!
+        for ( int i=0; i<annotationsCopy.length; i++ ) {
+            annotationsCopy[i]= (Annotation)annotationsCopy[i].copy(); 
+        }
+        result.setAnnotations( annotationsCopy );
         
         Canvas[] canvasesCopy= this.getCanvases();
         for ( int i=0; i<canvasesCopy.length; i++ ) {
@@ -314,13 +313,13 @@ public class Application extends DomNode {
 
     @Override
     public List<DomNode> childNodes() {
-        ArrayList<DomNode> result = new ArrayList<DomNode>();
+        ArrayList<DomNode> result = new ArrayList();
         result.addAll(plots);
         result.addAll(plotElements);
         result.addAll(dataSourceFilters);
         result.addAll(canvases);
         result.addAll(connectors);
-        result.addAll(Arrays.asList(annotations));
+        result.addAll(annotations);
         result.add(options);
         
         return result;
@@ -409,9 +408,9 @@ public class Application extends DomNode {
             result.addAll( DomUtil.childDiffs( "connectors["+i+"]", thatConnector.diffs( thisConnector ) ) );
         }
 
-        for ( int i=0; i<Math.min(this.annotations.length,that.annotations.length); i++ ) {
-            Annotation thisAnnotation= this.annotations[i];
-            Annotation thatAnnotation= that.annotations[i];
+        for ( int i=0; i<Math.min(this.annotations.size(),that.annotations.size()); i++ ) {
+            Annotation thisAnnotation= this.annotations.get(i);
+            Annotation thatAnnotation= that.annotations.get(i);
             result.addAll( DomUtil.childDiffs( "annotations["+i+"]", thatAnnotation.diffs( thisAnnotation ) ) );
         }
         

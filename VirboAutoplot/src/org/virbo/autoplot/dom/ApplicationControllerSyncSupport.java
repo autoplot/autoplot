@@ -205,7 +205,7 @@ public class ApplicationControllerSyncSupport {
         }
         
         for ( int i=0; i<annotations.length; i++ ) {
-            application.annotations[i].syncTo(annotations[i]);
+            application.annotations.get(i).syncTo(annotations[i]);
         }
     }
     
