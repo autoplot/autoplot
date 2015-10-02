@@ -50,6 +50,7 @@
         <a href="#" onclick="document.getElementById('resourceURI2').value='http://data.org/data_bartels_$(periodic;offset=2285;start=2000-346T00:00;period=27d).txt';">D</a>
         <a href="#" onclick="document.getElementById('resourceURI2').value='http://data.org/$Y-$j.$(hrinterval;values=A|B|C|D).txt';">E</a>
         <a href="#" onclick="document.getElementById('resourceURI2').value='http://autoplot.org/data/versioning/data_$Y_$m_$d_$(enum;values=1.00|1.02;id=version).qds';">F</a>
+        <a href="#" onclick="document.getElementById('resourceURI2').value='http://data.org/data_$Y_$j_$H$M$S.$(subsec,places=1)';">G</a> <!-- shows rounding error -->
         <br>
         <textarea rows="1" cols="120" id="resourceURI2" name="resourceURI" >http://autoplot.org/data/versioning/data_$Y_$m_$d_v1.00.qds</textarea><br>
         <br>Enter ISO8601 Time Range limiting the results printed: <br>
