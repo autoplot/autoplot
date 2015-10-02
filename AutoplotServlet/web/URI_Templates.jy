@@ -42,7 +42,7 @@ if ( generate=='T' ):
        
        from java.util import Collections
        
-       st= tp.format( drtr.min(), drtr.max(), Collections.singletonMap( id, enums[0] ) ) 
+       st= tp.format( drtr.min(), None, Collections.singletonMap( id, enums[0] ) ) 
        dr= tp.parse( st,None ).getTimeRange()
 
        print '<h3>'+resourceURI+'</h3>'
