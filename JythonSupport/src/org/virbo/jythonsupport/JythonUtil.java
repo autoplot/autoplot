@@ -414,10 +414,15 @@ public class JythonUtil {
         public String doc;
         public List<Object> enums;  // the allowed values
         /**
-         * T (TimeRange), A (String), F (Double or Integer), or R (URI)
-         * Note a string with the values enumerated either T or F is treated as a boolean.
-         * D datum
-         * S DatumRange
+         * The parameter type:<ul>
+         * <li>T (TimeRange), 
+         * <li>A (String, but note a string with the values enumerated either T or F is treated as a boolean.)
+         * <li>F (Double or Integer), 
+         * <li>D (Datum),
+         * <li>S (DatumRange),
+         * <li>U (Dataset URI),
+         * <li>or R (the resource URI) 
+         * </ul>
          */
         public char type;
         @Override
