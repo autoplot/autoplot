@@ -56,10 +56,11 @@ public class AggregatingDataSourceFormat implements DataSourceFormat {
             QDataSet data1= Ops.trim( data, DataSetUtil.asDataSet(dr1.min()), DataSetUtil.asDataSet(dr1.max() ) );
             if ( data1.length()>0 ) {
                 logger.log(Level.FINE, "formatting {0}", s);
-                String uri1= base + s;
-                if ( delegateParams!=null ) uri1= uri1 + "?" + delegateParams;
-                DataSourceFormat df= DataSetURI.getDataSourceFormat(new URI(uri1) );
-                df.formatData( uri1, data1, mon.getSubtaskMonitor( i, i+1, base ) );
+                StringBuilder uri1= new StringBuilder(base).append(s);
+                if ( delegateParams!=null ) uri1.append( "?").append( delegateParams );
+                String uri2= uri1.toString();
+                DataSourceFormat df= DataSetURI.getDataSourceFormat(new URI(uri2) );
+                df.formatData( uri2, data1, mon.getSubtaskMonitor( i, i+1, base ) );
             }
         }
     }
