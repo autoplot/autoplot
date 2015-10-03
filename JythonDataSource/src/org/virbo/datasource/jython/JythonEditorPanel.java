@@ -6,6 +6,7 @@
 
 package org.virbo.datasource.jython;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -32,6 +33,7 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -83,7 +85,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     List<JComponent> tflist;
     List<String> paramsList;
     List<String> deftsList;
-    List<Character> typesList;  // only 'A' and 'F' right now
+    List<Character> typesList; 
 
     /** Creates new form JythonEditorPanel */
     public JythonEditorPanel() {
@@ -378,7 +380,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 valuePanel.setLayout( new BoxLayout( valuePanel, BoxLayout.X_AXIS ) );
                 if ( !isBool ) valuePanel.add( getSpacer() );
 
-                if ( parm.type=='R' ) {
+                if ( parm.type=='R' ) { // ResourceURI
                     final DataSetSelector sel= new DataSetSelector();
                     sel.setPlotItButtonVisible(false);
                     sel.setEnableDataSource(false);
@@ -398,6 +400,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     
                     valuePanel.add( getSpacer(7) );  // kludge.  Set on Jeremy's home Ubuntu
                     valuePanel.add( sel );
+                    sel.setMaximumSize( new Dimension(Integer.MAX_VALUE,100) );
                     sel.setValue( val );
                     valuePanel.add( getSpacer(10) ); // put a little space in after the selector as well.
                             
@@ -423,7 +426,15 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                         val= String.valueOf( parm.deft );
                         params.put( vname, val );
                     }
+                    if ( timerange!=null ) {
+                        String blurVal= DataSetURI.blurTsbUri(val);
+                        if ( blurVal!=null ) {
+                            val= blurVal;
+                            logger.finer("blurring URI because timerange is used.");
+                        }
+                    }
                     sel.setRecent( DataSetSelector.getDefaultRecent() );
+                    sel.setMaximumSize( new Dimension(Integer.MAX_VALUE,100) );
                     sel.setValue( val );
                     
                     valuePanel.add( getSpacer(7) );  // kludge.  Set on Jeremy's home Ubuntu
