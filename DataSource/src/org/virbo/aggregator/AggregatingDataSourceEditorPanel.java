@@ -12,7 +12,6 @@ package org.virbo.aggregator;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -25,18 +24,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.NavigationFilter;
-import javax.swing.text.Position.Bias;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -50,7 +42,6 @@ import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
-import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.SourceTypesBrowser;
 import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
@@ -375,7 +366,6 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         return this;
     }
     JComponent delegateComponent = null;
-    DataSetSelector delegateDataSetSelector = null;
     DataSourceEditorPanel delegateEditorPanel = null;
     URISplit split;
     Map<String, String> params;
@@ -644,12 +634,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         if (delegateEditorPanel != null) {
             delegateUrl = delegateEditorPanel.getURI();
         } else {
-            if ( this.delegateComponent instanceof SourceTypesBrowser ) {
-                delegateUrl= ((SourceTypesBrowser)this.delegateComponent).getUri();
-                vapScheme= null;
-            } else {
-                delegateUrl = delegateDataSetSelector.getValue();
-            }
+            delegateUrl= ((SourceTypesBrowser)this.delegateComponent).getUri();
+            vapScheme= null;
         }
         URISplit dsplit = URISplit.parse(delegateUrl);
         Map<String, String> allParams = new LinkedHashMap<String, String>();
