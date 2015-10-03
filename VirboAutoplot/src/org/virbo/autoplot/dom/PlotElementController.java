@@ -103,6 +103,7 @@ public class PlotElementController extends DomNodeController {
     public static final int SYMSIZE_DATAPOINT_COUNT = 500;
     public static final int LARGE_DATASET_COUNT = 30000;
 
+    private final Object processLock= new Object();
     private QDataSet processDataSet= null;
     String procressStr= null;
 
@@ -512,7 +513,7 @@ public class PlotElementController extends DomNodeController {
             logger.log( Level.FINE, "component={0}", c);
             // slice and collapse specification
             if ( DataSetOps.isProcessAsync(c) ) {
-                synchronized (this) {
+                synchronized (processLock) {
                     if ( c.equals(this.procressStr) && this.processDataSet!=null ) { // caching
                         if ( logger.isLoggable( Level.FINE ) ) {
                             QDataSet bounds= DataSetOps.dependBounds( this.processDataSet );
@@ -535,7 +536,7 @@ public class PlotElementController extends DomNodeController {
                     }
                 }
             } else {
-                synchronized (this) {
+                synchronized (processLock) {
                     this.processDataSet= null;
                     this.procressStr= null;
                 }
@@ -709,7 +710,7 @@ public class PlotElementController extends DomNodeController {
 
     PropertyChangeListener exceptionListener = new PropertyChangeListener() {
         @Override
-        public synchronized void propertyChange(PropertyChangeEvent evt) {
+        public void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt,"exceptionListener");
             changesSupport.performingChange( this, PENDING_SET_DATASET );
             try {
@@ -742,28 +743,30 @@ public class PlotElementController extends DomNodeController {
     PropertyChangeListener fillDataSetListener = new PropertyChangeListener() {
 
         @Override
-        public synchronized void propertyChange(PropertyChangeEvent evt) {
-            LoggerManager.logPropertyChangeEvent(evt,"fillDataSetListener");
-            logger.fine("enter fillDataSetListener propertyChange");
-            if (!Arrays.asList(dom.getPlotElements()).contains(plotElement)) {
-                //TODO: find a way to fix this properly or don't call it a kludge! logger.fine("kludge pec446 cannot be removed");
-                return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
-            }
-            changesSupport.performingChange( this, PENDING_SET_DATASET );
-            try {
-                QDataSet fillDs = dsf.controller.getFillDataSet();
-                logger.log(Level.FINE, "{0} got new dataset: {1}  resetComponent={2}  resetPele={3}  resetRanges={4}", new Object[]{plotElement, fillDs, resetComponent, resetPlotElement, resetRanges});
-                if ( resetComponent ) {
-                    plotElement.setComponentAutomatically("");
-                    processDataSet= null;
-                    procressStr= null;
-                    setResetComponent(false);
-                } else {
-                    processDataSet= null;
+        public void propertyChange(PropertyChangeEvent evt) {
+            synchronized ( processLock ) {
+                LoggerManager.logPropertyChangeEvent(evt,"fillDataSetListener");
+                logger.fine("enter fillDataSetListener propertyChange");
+                if (!Arrays.asList(dom.getPlotElements()).contains(plotElement)) {
+                    //TODO: find a way to fix this properly or don't call it a kludge! logger.fine("kludge pec446 cannot be removed");
+                    return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
                 }
-                updateDataSet();
-            } finally {
-                changesSupport.changePerformed( this, PENDING_SET_DATASET );
+                changesSupport.performingChange( this, PENDING_SET_DATASET );
+                try {
+                    QDataSet fillDs = dsf.controller.getFillDataSet();
+                    logger.log(Level.FINE, "{0} got new dataset: {1}  resetComponent={2}  resetPele={3}  resetRanges={4}", new Object[]{plotElement, fillDs, resetComponent, resetPlotElement, resetRanges});
+                    if ( resetComponent ) {
+                        plotElement.setComponentAutomatically("");
+                        processDataSet= null;
+                        procressStr= null;
+                        setResetComponent(false);
+                    } else {
+                        processDataSet= null;
+                    }
+                    updateDataSet();
+                } finally {
+                    changesSupport.changePerformed( this, PENDING_SET_DATASET );
+                }
             }
         }
 
@@ -2766,7 +2769,7 @@ public class PlotElementController extends DomNodeController {
         doResetRenderTypeInt(renderType);
     }
 
-    public synchronized void bindToSeriesRenderer(SeriesRenderer seriesRenderer) {
+    public void bindToSeriesRenderer(SeriesRenderer seriesRenderer) {
         ApplicationController ac = this.dom.controller;
         ac.bind(plotElement.style, "lineWidth", seriesRenderer, "lineWidth");
         ac.bind(plotElement.style, "color", seriesRenderer, "color");
