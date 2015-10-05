@@ -631,6 +631,9 @@ public class GuiSupport {
                         DataSourceFormatEditorPanel opts= edp.getDataSourceFormatEditorPanel();
                         if ( opts!=null ) {
                             URISplit splitopts= URISplit.parse(opts.getURI());
+                            if ( splitopts.params!=null && splitopts.params.length()==0 ) {
+                                splitopts.params= null;
+                            }
                             URISplit splits= URISplit.parse(s);
                             splitopts.file= splits.file;
                             s= URISplit.format(splitopts); //TODO: this probably needs a lookin at.
