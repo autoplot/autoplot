@@ -3451,7 +3451,7 @@ private void decodeURLItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     org.das2.util.LoggerManager.logGuiEvent(evt);
     String s = dataSetSelector.getValue();
     s = org.virbo.datasource.DataSourceUtil.unescape(s);
-    dataSetSelector.getValue();
+    dataSetSelector.setValue(s);
 }//GEN-LAST:event_decodeURLItemActionPerformed
 
 private void statusTextFieldMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_statusTextFieldMouseClicked
