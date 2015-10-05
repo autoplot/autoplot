@@ -805,6 +805,7 @@ public class URISplit {
      * If file is present, then format with file and params:
      *   vap+cdf:file://tmp/my.cdf?myVar
      * Else, just use the surl that is in there already. 
+     * Note if split.params is non-null, it will be appended with a question mark, even if empty.
      * @param split
      * @return formatted URI.
      */
@@ -815,7 +816,7 @@ public class URISplit {
             result= result + split.params;
         } else if ( split.file!=null ) {
             result= result + split.file;
-            if (split.params != null && split.params.trim().length()>0 ) {
+            if (split.params != null ) {
                 result += "?" + split.params;
             }
         } else if ( split.surl!=null ) {
