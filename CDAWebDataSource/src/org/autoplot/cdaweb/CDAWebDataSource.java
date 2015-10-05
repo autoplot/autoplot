@@ -127,7 +127,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             boolean webService= getParam("ws", "F").equals("T");
             
-            String[] files= null;
+            String[] files;
 
             String tmpl= db.getNaming(ds.toUpperCase());
             String base= db.getBaseUrl(ds.toUpperCase());
@@ -211,8 +211,8 @@ public class CDAWebDataSource extends AbstractDataSource {
                                 comp= (String) metadata.get( "COMPONENT_"  + nc );
                             }
                             boolean missingComponent= false;
-                            for ( int j=0; j<comps.size(); j++ ) {
-                                if ( comps.get(j)==null ) {
+                            for (QDataSet comp1 : comps) {
+                                if (comp1 == null) {
                                     missingComponent= true;
                                 }
                             }
@@ -441,30 +441,37 @@ public class CDAWebDataSource extends AbstractDataSource {
         if ( clazz==TimeSeriesBrowse.class ) {
             return (T) new TimeSeriesBrowse() {
 
+                @Override
                 public void setTimeRange(DatumRange dr) {
                     tr= dr;
                 }
 
+                @Override
                 public DatumRange getTimeRange() {
                     return tr;
                 }
 
+                @Override
                 public void setTimeResolution(Datum d) {
                     
                 }
 
+                @Override
                 public Datum getTimeResolution() {
                     return null;
                 }
 
+                @Override
                 public String getURI() {
                     return "vap+cdaweb:ds="+ds+"&id="+param+"&timerange="+tr.toString().replace(" ", "+");
                 }
 
+                @Override
                 public String blurURI() {
                     return "vap+cdaweb:ds="+ds+"&id="+param;
                 }
 
+                @Override
                 public void setURI(String suri) throws ParseException {
                     URISplit split= URISplit.parse(suri);
                     Map<String,String> params= URISplit.parseParams(split.params);
