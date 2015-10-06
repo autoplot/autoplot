@@ -90,7 +90,8 @@ import org.virbo.jythonsupport.ui.ParametersFormPanel;
  */
 public class ScriptPanelSupport {
 
-    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.jython");
+    
     private static final int RECENT_FILES_COUNT = 20;
 
     File file;
