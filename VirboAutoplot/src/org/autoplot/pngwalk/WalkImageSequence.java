@@ -79,14 +79,35 @@ public class WalkImageSequence implements PropertyChangeListener  {
         //call initialLoad before any other methods.
     }
 
+    private DatumRange timerange = null;
+
+    public static final String PROP_TIMERANGE = "timerange";
+
+    public DatumRange getTimerange() {
+        return timerange;
+    }
+
+    /**
+     * constraint for the limit of the time ranges listed.  Note timespan
+     * is what was found.
+     * 
+     * @param timerange 
+     */
+    public void setTimerange(DatumRange timerange) {
+        DatumRange oldTimerange = this.timerange;
+        this.timerange = timerange;
+        pcs.firePropertyChange(PROP_TIMERANGE, oldTimerange, timerange);
+    }
+
     /**
      * do the initial listing of the remote filesystem.  This should not
      * be done on the event thread, and should be done before the
      * sequence is used.
+     * @throws java.io.IOException
      */
     public void initialLoad() throws java.io.IOException {
-        datumRanges = new ArrayList<DatumRange>();
-        subRange = new ArrayList<DatumRange>();
+        datumRanges = new ArrayList();
+        subRange = new ArrayList();
         List<URI> uris;
 
         if ( template==null ) {
@@ -94,7 +115,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
         } else {
             try {
                 setStatus( "busy: listing "+template );
-                uris = WalkUtil.getFilesFor(template, null, datumRanges, false, null);
+                uris = WalkUtil.getFilesFor(template, timerange, datumRanges, false, null);
                 if ( uris.size()>0 ) {
                     setStatus( "Done listing "+template );
                 } else {
