@@ -114,7 +114,9 @@ public class ScriptPanelSupport {
         applicationController.addPropertyChangeListener(ApplicationController.PROP_FOCUSURI, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                maybeDisplayDataSourceScript();
+                if ( panel.runningScript==null ) {
+                    maybeDisplayDataSourceScript();
+                }
             }
         });
 
