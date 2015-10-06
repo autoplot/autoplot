@@ -356,14 +356,12 @@ public class JythonUtil {
                         URISplit split= URISplit.parse(url.toString());
                         interp.set( "dom", dom );
                         interp.set( "PWD", split.path );  
-                        FileInputStream in= new FileInputStream(file);
-                        try {
+                        try ( FileInputStream in = new FileInputStream(file) ) {
                             interp.execfile( in, url.toString());
                         } finally {
-                            in.close();
-                        }
-                        //TODO: error annotations on the editor.
-                        if ( !mon.isFinished() ) mon.finished();
+                            if ( !mon.isFinished() ) mon.finished();
+                        } 
+                        //TODO: error annotations on the editor.  This really would be nice.
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
