@@ -60,10 +60,10 @@ import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -102,9 +102,11 @@ import javax.swing.JSeparator;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.DefaultEditorKit;
+import javax.xml.parsers.ParserConfigurationException;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.autoplot.pngwalk.CreatePngWalk;
 import org.autoplot.pngwalk.PngWalkTool;
@@ -127,6 +129,7 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
+import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.autoplot.bookmarks.DelayMenu;
 import org.virbo.autoplot.dom.Application;
@@ -159,6 +162,7 @@ import org.virbo.filters.AddFilterDialog;
 import org.virbo.filters.FiltersChainPanel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /**
  * The Autoplot application GUI.  This is the entry point for the application, wrapping the internal
@@ -310,12 +314,12 @@ public final class AutoplotUI extends javax.swing.JFrame {
         File booksDir= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
         if ( !toolsDir.exists() ) {
             if ( !toolsDir.mkdirs() ) {
-                logger.warning("unable to make directory: "+toolsDir );
+                logger.log(Level.WARNING, "unable to make directory: {0}", toolsDir);
             }
         }
         if ( !booksDir.exists() ) {
             if ( !booksDir.mkdirs() ) {
-                logger.warning("unable to make directory: "+booksDir );
+                logger.log(Level.WARNING, "unable to make directory: {0}", booksDir);
             }
         }
 
@@ -354,10 +358,16 @@ public final class AutoplotUI extends javax.swing.JFrame {
         applicationModel = model;
         undoRedoSupport = new UndoRedoSupport(applicationModel);
         undoRedoSupport.addPropertyChangeListener(new PropertyChangeListener() {
-
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-                SwingUtilities.invokeLater( new Runnable() { public void run() { refreshUndoRedoLabel(); } } );
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                SwingUtilities.invokeLater( 
+                    new Runnable() { 
+                        @Override
+                        public void run() { 
+                            refreshUndoRedoLabel(); 
+                        } 
+                    } 
+                );
             }
         });
 
@@ -695,11 +705,14 @@ public final class AutoplotUI extends javax.swing.JFrame {
         appController.addPropertyChangeListener( ApplicationController.PROP_FOCUSURI, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                SwingUtilities.invokeLater( new Runnable() { public void run() {
-                    if ( pendingVap==null ) { // non-null means we are loading something.
-                        dataSetSelector.setValue( appController.getFocusUri() );
-                    }
-                } } );
+                SwingUtilities.invokeLater( new Runnable() { 
+                    @Override
+                    public void run() {
+                        if ( pendingVap==null ) { // non-null means we are loading something.
+                            dataSetSelector.setValue( appController.getFocusUri() );
+                        }
+                    } 
+                } );
             }
         } );
         dataSetSelector.setValue( dom.getController().getFocusUri() );
@@ -767,16 +780,20 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_RECENT)) {
                     final List<Bookmark> recent = applicationModel.getRecent();
                     SwingUtilities.invokeLater(
-                        new Runnable() { public void run() {
-                            org.virbo.autoplot.bookmarks.Util.setRecent( dataSetSelector, recent );
-                            //dataSetSelector.setRecent(urls);
-                        }
+                        new Runnable() { 
+                            @Override
+                            public void run() {
+                                org.virbo.autoplot.bookmarks.Util.setRecent( dataSetSelector, recent );
+                                //dataSetSelector.setRecent(urls);
+                            }
                     } );
                 } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_BOOKMARKS)) {
                     SwingUtilities.invokeLater(
-                        new Runnable() { public void run() {
-                            updateBookmarks();
-                        }
+                        new Runnable() { 
+                            @Override
+                            public void run() {
+                                updateBookmarks();
+                            }
                     } );
                 }
             }
@@ -825,7 +842,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         addFeatures(fmodel);
         APSplash.checkTime("init 77");
         
-        List<String> uris = new ArrayList<String>();
+        List<String> uris = new ArrayList();
         List<Bookmark> recent = applicationModel.getRecent();
         APSplash.checkTime("init 80");
 
@@ -853,9 +870,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
         APSplash.checkTime("init 90");
 
         SwingUtilities.invokeLater(
-            new Runnable() { public void run() {
-                addTools();
-            }
+            new Runnable() { 
+                @Override
+                public void run() {
+                    addTools();
+                }
         } );
         
         addBindings();
@@ -919,6 +938,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
 
     private Runnable addStyle() {
         return new Runnable() {
+            @Override
             public void run() {
   APSplash.checkTime("addStyle in");
                 final JScrollPane sp= new JScrollPane();
@@ -971,7 +991,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
      */
     private static List<String> cleanMessages( List<String> messages ) {
         messages= new ArrayList(messages); // make local copy to avoid concurrent modifications
-        List<String> result= new LinkedList<String>(messages);
+        List<String> result= new LinkedList(messages);
         for ( String s: messages ) {
             if ( s==null ) {
                 System.err.println("here null in cleanMessages");
@@ -1035,9 +1055,12 @@ APSplash.checkTime("init 249");
                 if ( flayoutPane!=null ) {
                     final LayoutPanel lui= new LayoutPanel();
                     layoutPanel= lui;
-                    SwingUtilities.invokeLater( new Runnable() { public void run() {
-                        flayoutPane.setViewportView(lui);
-                    } } );
+                    SwingUtilities.invokeLater( new Runnable() { 
+                        @Override
+                        public void run() {
+                            flayoutPane.setViewportView(lui);
+                        } 
+                    } );
                     lui.setApplication(dom);
 APSplash.checkTime("init 250");
                 }
@@ -1053,9 +1076,12 @@ APSplash.checkTime("init 259");
                 if ( fdataPane!=null ) {
                     final DataPanel dp= new DataPanel(dom);
                     dataPanel= dp;
-                    SwingUtilities.invokeLater( new Runnable() { public void run() {
-                        fdataPane.setViewportView(dp);
-                    } } );
+                    SwingUtilities.invokeLater( new Runnable() { 
+                        @Override
+                        public void run() {
+                            fdataPane.setViewportView(dp);
+                        } 
+                    } );
 APSplash.checkTime("init 260");
                 }
             }
@@ -1067,9 +1093,12 @@ APSplash.checkTime("init 260");
             public void run() {
 APSplash.checkTime("init 269");
                 final MetadataPanel mdp = new MetadataPanel(applicationModel);
-                SwingUtilities.invokeLater( new Runnable() { public void run() {
-                    fmetadataPane.setViewportView(mdp);
-                } } );
+                SwingUtilities.invokeLater( new Runnable() { 
+                    @Override
+                    public void run() {
+                        fmetadataPane.setViewportView(mdp);
+                    }
+                } );
 APSplash.checkTime("init 270");
             }
         });
@@ -1119,7 +1148,7 @@ APSplash.checkTime("init 270");
                     return;
                 }
                 
-                Map<Object,Object> changes= new LinkedHashMap<Object,Object>();
+                Map<Object,Object> changes= new LinkedHashMap();
                 dom.getController().pendingChanges(changes);
                 if ( changes.size()>0 ) {
                     tickleTimer.tickle("app had pending changes");
@@ -1295,8 +1324,8 @@ APSplash.checkTime("init 270");
                     public void propertyChange(PropertyChangeEvent evt) {
                         BindingModel[] bms= dom.getBindings();
                         boolean isBound=false;
-                        for ( int i=0; i<bms.length; i++ ) {
-                            if ( bms[i].getSrcProperty().equals("timeRange") ) {
+                        for (BindingModel bm : bms) {
+                            if (bm.getSrcProperty().equals("timeRange")) {
                                 isBound= true;
                             }
                         }
@@ -2106,16 +2135,22 @@ APSplash.checkTime("init 52.9");
             toolsManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
-                    SwingUtilities.invokeLater( new Runnable() { public void run() {
-                        toolsManager.updateBookmarks( toolsMenu, "userSep", AutoplotUI.this, AutoplotUI.this.dataSetSelector );
-                    } } );
+                    SwingUtilities.invokeLater( new Runnable() { 
+                        @Override
+                        public void run() {
+                            toolsManager.updateBookmarks( toolsMenu, "userSep", AutoplotUI.this, AutoplotUI.this.dataSetSelector );
+                        } 
+                    } );
                 }
             });
         }
 
-        Runnable run= new Runnable() { public void run() {            
-            toolsManager.setPrefNode("tools"); 
-        } };
+        Runnable run= new Runnable() { 
+            @Override
+            public void run() {            
+                toolsManager.setPrefNode("tools"); 
+            } 
+        };
         invokeLater( -1, false, run );
 
     }
@@ -2156,9 +2191,12 @@ APSplash.checkTime("init 52.9");
             bookmarksManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
-                    SwingUtilities.invokeLater( new Runnable() { public void run() {
-                        bookmarksManager.updateBookmarks( bookmarksMenu, AutoplotUI.this, AutoplotUI.this.dataSetSelector );
-                    } } );
+                    SwingUtilities.invokeLater( new Runnable() { 
+                        @Override
+                        public void run() {
+                            bookmarksManager.updateBookmarks( bookmarksMenu, AutoplotUI.this, AutoplotUI.this.dataSetSelector );
+                        }
+                    } );
                 }
             });
         }
@@ -2182,14 +2220,15 @@ APSplash.checkTime("init 52.9");
             }
         }
 
-        Runnable run= new Runnable() { public void run() {            
-            bookmarksManager.setPrefNode("bookmarks"); 
-            if ( initialBookmarksUrl!=null ) {
-                loadInitialBookmarks(initialBookmarksUrl);
-                initialBookmarksUrl= null;
+        Runnable run= new Runnable() { 
+            public void run() {            
+                bookmarksManager.setPrefNode("bookmarks"); 
+                if ( initialBookmarksUrl!=null ) {
+                    loadInitialBookmarks(initialBookmarksUrl);
+                    initialBookmarksUrl= null;
+                }
             }
-
-        } };
+        };
         invokeLater( -1, false, run );
 
 //        addBookmarks(bookmarksMenu, bookmarks);
@@ -3138,13 +3177,13 @@ APSplash.checkTime("init 52.9");
             URL aboutHtml = AutoplotUI.class.getResource("aboutAutoplot.html");
 
             if ( aboutHtml!=null ) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(aboutHtml.openStream()));
-                String s = reader.readLine();
-                while (s != null) {
-                    buffy.append(s);
-                    s = reader.readLine();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(aboutHtml.openStream()))) {
+                    String s = reader.readLine();
+                    while (s != null) {
+                        buffy.append(s);
+                        s = reader.readLine();
+                    }
                 }
-                reader.close();
             } 
 
             buffy.append("<h2>Build Information:</h2>");
@@ -3182,15 +3221,7 @@ APSplash.checkTime("init 52.9");
                 }       
             } catch ( ClassNotFoundException ex ) {
                 // do nothing, show ??? for native.
-            } catch (NoSuchMethodException ex) {
-                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SecurityException ex) {
-                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IllegalArgumentException ex) {
-                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
+            } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
             }
             String pwd= new File("foo.txt").getAbsoluteFile().getParent();
@@ -3426,7 +3457,7 @@ private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt
                 setStatus( AutoplotUI.ERROR_ICON,"Unable to create PNG Walk: " + ex.getMessage() );
                 applicationModel.showMessage( "<html>Unable to create PNG Walk:<br>"+ex.getMessage(), "PNG Walk Error", JOptionPane.WARNING_MESSAGE );
                 logger.log( Level.SEVERE, ex.getMessage(), ex );
-            } catch ( Exception ex) {
+            } catch ( ParseException | InterruptedException ex) {
                 logger.log( Level.SEVERE, ex.getMessage(), ex );
                 throw new RuntimeException(ex);
                 // this mimics the jython behavior
@@ -3597,19 +3628,24 @@ private void replaceFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 private void reloadAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadAllMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
    // Reload All Data
-    RequestProcessor.invokeLater( new Runnable() { public void run() {
-        AutoplotUtil.reloadAll(dom);
-    } } );
+    RequestProcessor.invokeLater( new Runnable() {
+        @Override
+        public void run() {
+            AutoplotUtil.reloadAll(dom);
+        }
+    } );
 }//GEN-LAST:event_reloadAllMenuItemActionPerformed
 
 private void workOfflineCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_workOfflineCheckBoxMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
     final boolean workOffline= workOfflineCheckBoxMenuItem.isSelected();
     FileSystem.settings().setOffline( workOffline );
-    RequestProcessor.invokeLater( new Runnable() { public void run() {
-        FileSystem.reset();
-        setMessage( workOffline ? "Now working offline" : "Working online");
-    } } );
+    RequestProcessor.invokeLater( new Runnable() { 
+        public void run() {
+            FileSystem.reset();
+            setMessage( workOffline ? "Now working offline" : "Working online");
+        }
+    } );
 }//GEN-LAST:event_workOfflineCheckBoxMenuItemActionPerformed
 
 private void searchToolTipsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchToolTipsMenuItemActionPerformed
@@ -3833,6 +3869,7 @@ private void updateFrameTitle() {
     /**
      * raise the application window
      * http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
+     * @param frame the frame
      */
     public static void raiseApplicationWindow( java.awt.Frame frame ) {
         GuiSupport.raiseApplicationWindow(frame);
@@ -3973,16 +4010,20 @@ private void updateFrameTitle() {
                         "Incorporate New URI", JOptionPane.QUESTION_MESSAGE, new javax.swing.ImageIcon(getClass().getResource("/logo64x64.png")),
                         new String[] { "New Window", "Replace", "Add Plot" }, "Add Plot" );
                 if ( action!=null ) {
-                    if (action.equals("Replace")) {
-                        app.plotUri(suri);
-                        raise= true;
-                    } else if (action.equals("Add Plot")) {
-                        app.dataSetSelector.setValue(suri);
-                        app.dataSetSelector.maybePlot( KeyEvent.ALT_MASK ); // enter the editor
-                        raise= true;
-                    } else if (action.equals("New Window")) {
-                        AutoplotUI ui2= app.newApplication();
-                        ui2.plotUri(suri);
+                    switch (action) {
+                        case "Replace":
+                            app.plotUri(suri);
+                            raise= true;
+                            break;
+                        case "Add Plot":
+                            app.dataSetSelector.setValue(suri);
+                            app.dataSetSelector.maybePlot( KeyEvent.ALT_MASK ); // enter the editor
+                            raise= true;
+                            break;
+                        case "New Window":
+                            AutoplotUI ui2= app.newApplication();
+                            ui2.plotUri(suri);
+                            break;
                     }
                 } else {
                     raise= true;
@@ -4030,7 +4071,6 @@ private void updateFrameTitle() {
                 } catch ( IOException ex ) {
                     if ( quit ) {
                         logger.log( Level.WARNING, ex.getMessage(), ex );
-                        ex.printStackTrace();
                         AppManager.getInstance().quit(1);
                     } else {
                         model.getExceptionHandler().handle(ex);
@@ -4051,6 +4091,7 @@ private void updateFrameTitle() {
         //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new org.pushingpixels.tracing.TracingEventQueue());
 
         Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+            @Override
             public void eventDispatched(AWTEvent event) {
                 if ( event instanceof ActionEvent ) {
                     LoggerManager.logGuiEvent((ActionEvent)event);
@@ -4135,11 +4176,11 @@ private void updateFrameTitle() {
            if ( args[i].equals("-open") ) args[i]="--open";
         }
 
-        final List<String> scriptArgs= new ArrayList<String>();
+        final List<String> scriptArgs= new ArrayList();
 
         for ( int i=1; i<args.length; i++ ) { // grab any arguments after --script and hide them from the processor.
             if ( args.length>i && ( args[i-1].startsWith("--script") || args[i-1].equals("-s") ) ) {
-                List<String> apArgs= new ArrayList<String>();
+                List<String> apArgs= new ArrayList();
                 if ( args[i-1].length()>8 && args[i-1].charAt(8)=='=' ) {
                     for ( int j=0; j<i; j++ ) {
                         apArgs.add(args[j]);
@@ -4215,7 +4256,7 @@ private void updateFrameTitle() {
                         }
                         initialURL= pwd + initialURL;
                     } catch ( IOException ex ) {
-                        ex.printStackTrace();
+                        logger.log( Level.WARNING, null, ex );
                     }
                 }
             }
@@ -4239,7 +4280,7 @@ private void updateFrameTitle() {
             logger.fine("nativeLAF");
             try {
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
+            } catch ( ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e ) {
                 logger.log( Level.SEVERE, e.getMessage(), e );
             }
         }
@@ -4386,8 +4427,10 @@ APSplash.checkTime("init 220");
 
                     if ( System.getProperty("enableResponseMonitor","false").equals("true") ) {
                         EventThreadResponseMonitor emon= new EventThreadResponseMonitor();
-                        emon.addToMap( GuiExceptionHandler.UNDO_REDO_SUPPORT, app.undoRedoSupport );
-                        emon.addToMap( GuiExceptionHandler.APP_MODEL, app.applicationModel );
+                        if ( app!=null ) {
+                            emon.addToMap( GuiExceptionHandler.UNDO_REDO_SUPPORT, app.undoRedoSupport );
+                            emon.addToMap( GuiExceptionHandler.APP_MODEL, app.applicationModel );
+                        }
                         emon.start();
                     }
                     
@@ -4451,6 +4494,7 @@ APSplash.checkTime("init 240");
                 if ( !headless && finitialURL!=null) {
                     if ( app!=null ) {
                         Runnable run = new Runnable() {
+                            @Override
                             public void run() {
                                 app.dom.getController().performingChange( app, PENDING_CHANGE_INITIAL_URI);
                                 app.dom.getController().changePerformed( app, PENDING_CHANGE_INITIAL_URI);                
@@ -4471,6 +4515,7 @@ APSplash.checkTime("init 240");
      * update the current icon and tooltip text on the event thread.
      */
     private Runnable updateIconRunnable= new Runnable() {
+        @Override
         public void run() {
             statusLabel.setToolTipText(currentIconTooltip);
             if ( statusLabel.getIcon()!=WARNING_ICON ) {
@@ -4490,6 +4535,7 @@ APSplash.checkTime("init 240");
         //final long t0 = System.currentTimeMillis();
 
         TimerTask run = new TimerTask() {
+            @Override
             public String toString() {
                 return "apPendingChangesMonitor";
             }
@@ -4534,9 +4580,7 @@ APSplash.checkTime("init 240");
                 if (update) {
                     try {
                         SwingUtilities.invokeAndWait(app.updateIconRunnable);
-                    } catch (InterruptedException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    } catch (InvocationTargetException ex) {
+                    } catch (InterruptedException | InvocationTargetException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
                 }
@@ -4881,9 +4925,12 @@ APSplash.checkTime("init 240");
                 toolsManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
                 @Override
                     public void propertyChange(PropertyChangeEvent evt) {
-                        SwingUtilities.invokeLater( new Runnable() { public void run() {
-                            toolsManager.updateBookmarks( toolsMenu, "userSep", AutoplotUI.this, AutoplotUI.this.dataSetSelector );
-                        } } );
+                        SwingUtilities.invokeLater( new Runnable() { 
+                            @Override
+                            public void run() {
+                                toolsManager.updateBookmarks( toolsMenu, "userSep", AutoplotUI.this, AutoplotUI.this.dataSetSelector );
+                            }
+                        } );
                     }
                 });
                 toolsManager.updateBookmarks( toolsMenu, "userSep", AutoplotUI.this, dataSetSelector ); 
@@ -4895,9 +4942,7 @@ APSplash.checkTime("init 240");
         } else {
             try {
                 SwingUtilities.invokeAndWait(run);
-            } catch (InterruptedException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (InvocationTargetException ex) {
+            } catch (InterruptedException | InvocationTargetException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
@@ -4924,7 +4969,7 @@ APSplash.checkTime("init 240");
                 try {
                     logger.fine("found tools.xml, use it instead of old logic.");
                     return Bookmark.parseBookmarks(toolsFile.toURI().toURL());
-                } catch ( Exception ex ) {
+                } catch ( IOException | SAXException | BookmarksException ex ) {
                     
                 }
             } else {
@@ -4933,30 +4978,30 @@ APSplash.checkTime("init 240");
                     logger.log(Level.WARNING, "unable to read tools folder: {0}", toolsDir);
                     ff= new File[0];
                 }
-                for ( int i=0; i<ff.length; i++ ) {
-                    if ( ff[i].getName().toLowerCase().endsWith(".jy") ) {
-                        Bookmark book= new Bookmark.Item(ff[i].toURI().toString());
-                        String toolLabel= ff[i].getName();
+                for (File ff1 : ff) {
+                    if (ff1.getName().toLowerCase().endsWith(".jy")) {
+                        Bookmark book = new Bookmark.Item(ff1.toURI().toString());
+                        String toolLabel = ff1.getName();
                         // read header comments for label and description.
                         try {
-                            BufferedReader reader = new BufferedReader(new FileReader(ff[i]));
-                            String s = reader.readLine();
-                            while (s != null) {
-                                if ( s.startsWith("#") ) {
-                                    if ( s.startsWith("# label:" ) ) {
-                                       toolLabel= s.substring(8).trim();
-                                    } else if ( s.startsWith("# LABEL:" ) ) {
-                                       toolLabel= s.substring(8).trim();
-                                    } else if ( s.startsWith("#LABEL:" ) ) {
-                                       toolLabel= s.substring(7).trim();
+                            try (BufferedReader reader = new BufferedReader(new FileReader(ff1))) {
+                                String s = reader.readLine();
+                                while (s != null) {
+                                    if ( s.startsWith("#") ) {
+                                        if ( s.startsWith("# label:" ) ) {
+                                            toolLabel= s.substring(8).trim();
+                                        } else if ( s.startsWith("# LABEL:" ) ) {
+                                            toolLabel= s.substring(8).trim();
+                                        } else if ( s.startsWith("#LABEL:" ) ) {
+                                            toolLabel= s.substring(7).trim();
+                                        }
+                                    } else {
+                                        break;
                                     }
-                                } else {
-                                    break;
+                                    s = reader.readLine();
                                 }
-                                s = reader.readLine();
                             }
-                            reader.close();
-                        } catch (IOException ex) {
+                        }catch (IOException ex) {
                             logger.log( Level.SEVERE, ex.getMessage(), ex );
                         }
                         book.setTitle(toolLabel);
@@ -4971,7 +5016,7 @@ APSplash.checkTime("init 240");
                     Document doc = AutoplotUtil.readDoc(ins);
                     List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
                     tools.addAll(importBook);
-                } catch ( Exception ex ) {
+                } catch ( IOException | SAXException | ParserConfigurationException | BookmarksException ex ) {
                     logger.log(Level.SEVERE,null,ex);
                 } finally {
                     if ( ins!=null ) try {
@@ -5145,7 +5190,7 @@ APSplash.checkTime("init 240");
             List<Bookmark> l= mm.getList();
             mm.mergeList(b,l);
             mm.setList(l);
-        } catch (Exception ex) {
+        } catch (IOException | SAXException | ParserConfigurationException | BookmarksException ex) {
             logger.log( Level.SEVERE, ex.getMessage(), ex );
             applicationModel.getExceptionHandler().handleUncaught(ex);
         }
@@ -5295,11 +5340,7 @@ APSplash.checkTime("init 240");
                     DataSourceFactory factory=null;
                     try {
                         factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(furi), new NullProgressMonitor() );
-                    } catch (IOException ex) {
-                        Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (IllegalArgumentException ex) {
-                        Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (URISyntaxException ex) {
+                    } catch (IOException | IllegalArgumentException | URISyntaxException ex) {
                         Logger.getLogger(DelayMenu.class.getName()).log(Level.SEVERE, null, ex);
                     }
 
@@ -5308,7 +5349,7 @@ APSplash.checkTime("init 240");
                         sel.setValue(furi);
                         sel.maybePlot(modifiers); // have the user deal with the bad uri, and support plugins.
                     } else {
-                        List<String> problems= new ArrayList<String>();
+                        List<String> problems= new ArrayList();
                         if ( factory.reject( furi, problems, new NullProgressMonitor() )) {
                             sel.maybePlot( KeyEvent.ALT_MASK ); // this should enter the editor as before
                         } else {
