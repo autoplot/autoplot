@@ -81,7 +81,10 @@ else:
     for n in names:
        print '<tr>'
        tr= fsm.getRangeFor( n )
-       v= fsm.getField('v',n)
+       try:       
+           v= fsm.getField('v',n)
+       except:
+           v= 'N/A'
        print '<td>'+root + n + '</td><td>'+tr.toString() + '</td><td>' + v +'</td>'
        count= count+1
        print '</tr>'
