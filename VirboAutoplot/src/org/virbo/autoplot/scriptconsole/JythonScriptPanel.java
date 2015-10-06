@@ -46,6 +46,7 @@ import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import org.virbo.jythonsupport.ui.EditorTextPane;
 
 /**
@@ -554,4 +555,15 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
         }
     }
 
+    /**
+     * provide access to the annotations support, so that errors
+     * can be marked on the editor.  This may cause bugs as there
+     * are issues like ensuring the exception marked belongs to the code,
+     * and it should not be used without reservation.
+     *
+     * @return the annotations support.
+     */
+    public EditorAnnotationsSupport getAnnotationsSupport() {
+        return support.annotationsSupport;
+    }
 }
