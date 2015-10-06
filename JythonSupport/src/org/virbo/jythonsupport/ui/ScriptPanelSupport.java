@@ -33,8 +33,6 @@ import org.das2.util.DasExceptionHandler;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.python.core.PyException;
-import org.python.core.PyInteger;
-import org.python.core.PySyntaxError;
 import org.virbo.datasource.FileSystemUtil;
 
 /**
@@ -45,7 +43,7 @@ public class ScriptPanelSupport {
 
     private static final Logger logger= LoggerManager.getLogger("jython.editor");
     
-    private EditorTextPane editor;
+    private final EditorTextPane editor;
     private final EditorAnnotationsSupport annotationsSupport;
     private JLabel fileNameLabel;
     private boolean readOnly= false;
@@ -56,22 +54,22 @@ public class ScriptPanelSupport {
         this.editor= editor;
 
         dirtyListener= new DocumentListener() {
-
+            @Override
             public void insertUpdate(DocumentEvent e) {
                 setDirty(true);
             }
-
+            @Override
             public void removeUpdate(DocumentEvent e) {
                 setDirty(true);
             }
-
+            @Override
             public void changedUpdate(DocumentEvent e) {
             }
         };
 
         this.editor.getDocument().addDocumentListener(dirtyListener);
         this.editor.addPropertyChangeListener( "document", new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getOldValue()!=null ) {
                     ((Document)evt.getOldValue()).removeDocumentListener(dirtyListener);
@@ -111,8 +109,7 @@ public class ScriptPanelSupport {
         propertyChangeSupport.firePropertyChange(PROP_FILE, oldFile, file);
     }
 
-
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
@@ -159,6 +156,7 @@ public class ScriptPanelSupport {
             if (r != null) r.close();
         }
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 try {
                     Document d = editor.getDocument();
@@ -190,13 +188,11 @@ public class ScriptPanelSupport {
 
     private FileFilter getFileFilter() {
         return new FileFilter() {
-
             @Override
             public boolean accept(File f) {
                 if ( f.toString()==null ) return false;
                 return (f.isDirectory() || f.toString().endsWith(".jy") || f.toString().endsWith(".py") || f.toString().endsWith(".jyds"));
             }
-
             @Override
             public String getDescription() {
                 return "python and jython scripts";
@@ -204,7 +200,13 @@ public class ScriptPanelSupport {
         };
     }
 
-    public int getSaveFile() throws IOException {
+    /**
+     * show the save as dialog and return the result.  This was recently public, but
+     * no one appears to be using it and it seems like private is more appropriate.
+     * @return the result of showSaveDialog, e.g. JFileChooser.APPROVE_OPTION, etc.
+     * @throws IOException 
+     */
+    private int getSaveFile() throws IOException {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(getFileFilter());
         if (file != null && ! FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) {
@@ -221,7 +223,7 @@ public class ScriptPanelSupport {
         return r;
     }
 
-    protected void saveAs() {
+    private void saveAs() {
         OutputStream out = null;
         try {
             if ( getSaveFile() == JFileChooser.APPROVE_OPTION) {
@@ -245,16 +247,23 @@ public class ScriptPanelSupport {
         }
     }
 
+    /**
+     * set the save status to read only.
+     */
     public void setReadOnly() {
         this.editor.setEditable(false);
         this.readOnly= true;
         updateFileNameLabel();
     }
 
+    /**
+     * used by script panel.
+     * @param caretPositionLabel 
+     */
     public void addCaretLabel(final JLabel caretPositionLabel) {
 
        editor.addCaretListener(new CaretListener() {
-
+            @Override
             public void caretUpdate(CaretEvent e) {
                 int pos = editor.getCaretPosition();
                 Element root = editor.getDocument().getDefaultRootElement();
@@ -278,6 +287,10 @@ public class ScriptPanelSupport {
 
     }
 
+    /**
+     * used by the script panel.
+     * @param fileNameLabel 
+     */
     public void addFileLabel( final JLabel fileNameLabel ) {
         this.fileNameLabel= fileNameLabel;
         updateFileNameLabel();
