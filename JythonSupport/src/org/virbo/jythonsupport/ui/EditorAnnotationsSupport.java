@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.jythonsupport.ui;
 
 import java.awt.Color;
@@ -22,16 +19,23 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 import jsyntaxpane.components.Markers;
 import jsyntaxpane.components.Markers.SimpleMarker;
+import org.python.core.PyException;
+import org.python.core.PyInteger;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyObject;
 import org.python.core.PyString;
+import org.python.core.PySyntaxError;
 import org.python.util.PythonInterpreter;
 
 /**
- *
+ * annotations support for the editor, marking program counter position 
+ * and errors.
  * @author jbf
  */
 public class EditorAnnotationsSupport {
+    
+    private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.jython");
+    
     /**
      * error marked in the code
      */
@@ -168,6 +172,24 @@ public class EditorAnnotationsSupport {
             return ann;
         } else {
             return null;
+        }
+    }
+    
+    /**
+     * mark the error in the editor by looking at the python exception to get the line number.
+     * @param ex the python exception
+     * @param offset line offset from beginning of file where execution began.
+     * @throws javax.swing.text.BadLocationException
+     */
+    public void annotateError(PyException ex, int offset) throws BadLocationException {
+        if (ex instanceof PySyntaxError) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
+            //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
+            annotateLine(lineno, "error", ex.toString());
+        } else {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            annotateLine(offset + ex.traceback.tb_lineno, "error", ex.toString());
         }
     }
 
