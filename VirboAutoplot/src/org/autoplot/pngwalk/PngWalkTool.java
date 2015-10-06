@@ -1134,6 +1134,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
         }
         
+        URISplit split= URISplit.parse(template);
+        Map<String,String> params= URISplit.parseParams(split.params);
+        
         dataSetSelector1.setValue(template);
         
         WalkImageSequence oldseq= this.seq;
@@ -1146,6 +1149,20 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         try {
             seq= new WalkImageSequence( surl );
+            String tr= params.get("timerange");
+            if ( tr==null ) params.get("timeRange");
+            
+            if ( tr!=null ) {
+                try {
+                    DatumRange trdr;
+                    trdr= DatumRangeUtil.parseTimeRange(tr);
+                    seq.setTimerange( trdr );
+                } catch ( ParseException ex ) {
+                    setMessage( ERROR_ICON, "unable to parse timerange" );
+                }
+            }
+            
+                
             setNavButtonsEnabled(true);
             if ( navMenu!=null ) navMenu.setEnabled(true);
         } catch ( Exception ex ) {
@@ -1288,6 +1305,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
     /**
      * roughly the timerange displayed and selected.  This is left loose to support binding.
+     * This should not be confused with the &timerange= part of the URI.
      */
     transient DatumRange timeRange;
     public static final String PROP_TIMERANGE = "timeRange";
@@ -1297,7 +1315,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
     }
 
     /**
-     * timerange roughly the focus timerange.  This property is introduced to allow for binding between pngwalks.
+     * timerange roughly the focus timerange.  This property is introduced 
+     * to allow for binding between pngwalks.
+     * This should not be confused with the &timerange= part of the URI.
      * @param timeRange
      */
     public void setTimeRange(DatumRange timeRange) {
