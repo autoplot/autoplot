@@ -588,7 +588,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                         URISplit split= URISplit.parse(s);        //bug 1408--note runScript doesn't account for changes made to the GUI.
                         args= URISplit.parseParams(split.params);
                         if ( JOptionPane.OK_OPTION==JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
-                                args, true, true, new NullProgressMonitor() ) ) {
+                                args, true, true, scriptPanel.getAnnotationsSupport(), new NullProgressMonitor() ) ) {
                             split.params= URISplit.formatParams(args);
                             String history= URISplit.format(split);
                             dataSetSelector.setValue( history );
@@ -633,7 +633,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 if ( s.endsWith(".jy") ) {
                     try {
                         JythonUtil.invokeScriptSoon( DataSetURI.getURL(s), dom, 
-                                new HashMap(), true, true, new NullProgressMonitor() );
+                                new HashMap(), true, true, scriptPanel.getAnnotationsSupport(), new NullProgressMonitor() );
                     } catch ( IOException ex ) {
                         throw new RuntimeException(ex);
                     }
@@ -4878,28 +4878,6 @@ APSplash.checkTime("init 240");
     }
 
     /**
-     * run the tool at the given URI, with the modifiers. 
-     * @param suri URI of the script.
-     * @param modifiers 1:query for parameters  2:inspect before running.
-     * @throws MalformedURLException
-     * @throws IOException 
-     */
-    private void runTool( String suri, int modifiers ) throws MalformedURLException, IOException {
-        if (( ( modifiers & ActionEvent.SHIFT_MASK ) == ActionEvent.SHIFT_MASK ) ) { 
-            JythonUtil.invokeScriptSoon( DataSetURI.getURL(suri),
-                    applicationModel.getDocumentModel(),
-                    null, true, false,
-                    getStatusBarProgressMonitor("done running script") );
-        } else if (( ( modifiers & ActionEvent.CTRL_MASK ) == ActionEvent.CTRL_MASK ) ) {
-            plotUri("script:"+ suri );
-        } else {
-            JythonUtil.invokeScriptSoon(DataSetURI.getURL(suri),applicationModel.getDocumentModel(),getStatusBarProgressMonitor("done running script") );
-        }
-
-        
-    }
-    
-    /**
      * looks for and adds tools on a new thread.
      */
     public void reloadTools() {
@@ -5289,7 +5267,7 @@ APSplash.checkTime("init 240");
                 public void run() {
                     try {
                         int res= JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
-                                params, true, !fisTool, mon );
+                                params, true, !fisTool, scriptPanel.getAnnotationsSupport(), mon );
                         if ( res==JOptionPane.OK_OPTION ) {
                             if ( scriptPanel!=null ) {
                                 if ( ! scriptPanel.isDirty() && !fisTool ) {
