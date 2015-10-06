@@ -185,15 +185,7 @@ public class ScriptPanelSupport {
      * @throws javax.swing.text.BadLocationException
      */
     public void annotateError(PyException ex, int offset) throws BadLocationException {
-        if (ex instanceof PySyntaxError) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
-            //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
-            annotationsSupport.annotateLine(lineno, "error", ex.toString());
-        } else {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            annotationsSupport.annotateLine(offset + ex.traceback.tb_lineno, "error", ex.toString());
-        }
+        annotationsSupport.annotateError(ex,offset);
     }
 
     private FileFilter getFileFilter() {
