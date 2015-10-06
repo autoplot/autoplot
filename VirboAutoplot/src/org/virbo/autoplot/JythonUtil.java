@@ -319,7 +319,8 @@ public class JythonUtil {
      */
     public static int invokeScriptSoon( final URL url, final Application dom, 
             Map<String,String> vars, 
-            boolean askParams, boolean makeTool, 
+            boolean askParams, 
+            final boolean makeTool, 
             final JythonScriptPanel scriptPanel,
             ProgressMonitor mon1) throws IOException {
         
@@ -385,7 +386,14 @@ public class JythonUtil {
                         }
                         URISplit split= URISplit.parse(url.toString());
                         interp.set( "dom", dom );
-                        interp.set( "PWD", split.path );  
+                        interp.set( "PWD", split.path ); 
+                        
+                        if ( scriptPanel!=null ) {
+                            if ( ! scriptPanel.isDirty() && makeTool ) {
+                                scriptPanel.loadFile(file);
+                            }
+                            scriptPanel.setRunningScript(file);
+                        }
                         try ( FileInputStream in = new FileInputStream(file) ) {
                             
                             interp.execfile( in, url.toString());
@@ -401,7 +409,7 @@ public class JythonUtil {
                             throw ex;
                         } finally {
                             if ( !mon.isFinished() ) mon.finished();
-                            scriptPanel.setRunningScript(null);
+                            if ( scriptPanel!=null ) scriptPanel.setRunningScript(null);
                         } 
                         //TODO: error annotations on the editor.  This really would be nice.
                     } catch (IOException ex) {
