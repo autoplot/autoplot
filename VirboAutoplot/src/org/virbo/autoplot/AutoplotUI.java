@@ -5269,12 +5269,6 @@ APSplash.checkTime("init 240");
                         int res= JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
                                 params, true, !fisTool, scriptPanel, mon );
                         if ( res==JOptionPane.OK_OPTION ) {
-                            if ( scriptPanel!=null ) {
-                                if ( ! scriptPanel.isDirty() && !fisTool ) {
-                                    scriptPanel.setRunningScript(ff);
-                                    scriptPanel.loadFile(ff);
-                                }
-                            }
                             split.params= URISplit.formatParams(params);
                             dom.getController().getApplicationModel().addRecent(URISplit.format(split));
                             //TODO: bug 1408: can we not somehow set the address bar URI here?
