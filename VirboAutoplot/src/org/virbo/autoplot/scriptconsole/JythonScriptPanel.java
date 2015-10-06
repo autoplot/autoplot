@@ -461,7 +461,9 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         }
         System.err.println("== Executing Script ==");
         ScriptContext.setWindow(model);
+        if ( support.file!=null ) this.setRunningScript(support.file);
         support.executeScript( evt.getModifiers() );
+        if ( support.file!=null ) this.setRunningScript(null);
     }//GEN-LAST:event_executeButtonActionPerformed
 
     private void saveAsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsButtonActionPerformed
