@@ -26,9 +26,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.text.BadLocationException;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.python.core.PyException;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
@@ -37,6 +39,7 @@ import org.virbo.autoplot.scriptconsole.MakeToolPanel;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.URISplit;
+import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import org.virbo.jythonsupport.ui.EditorTextPane;
 import org.virbo.jythonsupport.ui.ParametersFormPanel;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
@@ -292,7 +295,33 @@ public class JythonUtil {
      * @return JOptionPane.OK_OPTION of the script is invoked.
      * @throws java.io.IOException
      */
-    public static int invokeScriptSoon( final URL url, final Application dom, Map<String,String> vars, boolean askParams, boolean makeTool, ProgressMonitor mon1) throws IOException {
+    public static int invokeScriptSoon( final URL url, final Application dom, 
+            Map<String,String> vars, 
+            boolean askParams, boolean makeTool, 
+            ProgressMonitor mon1) throws IOException {
+        return invokeScriptSoon( url, dom, vars, askParams, makeTool, null, mon1 );
+    }            
+    
+    /**
+     * invoke the python script on another thread.  Script parameters can be passed in, and the user can be 
+     * provided a dialog to set the parameters.  Note this will return before the script is actually
+     * executed, and monitor should be used to detect that the script is finished.
+     * @param url the address of the script.
+     * @param dom if null, then null is passed into the script and the script must not use dom.
+     * @param vars values for parameters, or null.
+     * @param askParams if true, query the user for parameter settings.
+     * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
+     * @param annotationsSupport null or place to mark error messages
+     * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
+     * @return JOptionPane.OK_OPTION of the script is invoked.
+     * @throws java.io.IOException
+     */
+    public static int invokeScriptSoon( final URL url, final Application dom, 
+            Map<String,String> vars, 
+            boolean askParams, boolean makeTool, 
+            final EditorAnnotationsSupport annotationsSupport,
+            ProgressMonitor mon1) throws IOException {
+        
         final ProgressMonitor mon;
         if ( mon1==null ) {
             mon= new NullProgressMonitor();
@@ -358,6 +387,15 @@ public class JythonUtil {
                         interp.set( "PWD", split.path );  
                         try ( FileInputStream in = new FileInputStream(file) ) {
                             interp.execfile( in, url.toString());
+                        } catch ( PyException ex ) {
+                            if ( annotationsSupport!=null ) {
+                                try {
+                                    annotationsSupport.annotateError( ex, 0 );
+                                } catch (BadLocationException ex1) {
+                                    logger.log(Level.SEVERE, null, ex1);
+                                }
+                            }
+                            throw ex;
                         } finally {
                             if ( !mon.isFinished() ) mon.finished();
                         } 
