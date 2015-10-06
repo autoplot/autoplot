@@ -82,10 +82,11 @@ public class WalkUtil {
 
 
     /**
-     * return an array of URLs that match the spec for the time range provided.
+     * return an array of URLs that match the spec for the timerange 
+     * (if provided), limiting the search to this range.
      *
      * @param surl an autoplot url with an aggregation specifier.
-     * @param timeRange a string that is parsed to a time range, such as "2001", or null.
+     * @param timeRange a string that is parsed to a time range, such as 2001, or null. 
      * @param timeRanges list which is populated
      * @param download (is not used)
      * @param mon progress monitor
@@ -94,10 +95,9 @@ public class WalkUtil {
      * @throws java.text.ParseException if the timerange cannot be parsed.
      * @throws java.net.URISyntaxException when the surl cannot be resolved to a web address.
      */
-    public static List<URI> getFilesFor( String surl, String timeRange, List<DatumRange> timeRanges, boolean download, ProgressMonitor mon ) throws IOException, ParseException, URISyntaxException {
-        DatumRange dr = null;
-        if ( timeRange!=null && timeRange.trim().length()>0 ) dr= DatumRangeUtil.parseTimeRange(timeRange);
-
+    public static List<URI> getFilesFor( String surl, DatumRange timeRange, List<DatumRange> timeRanges, boolean download, ProgressMonitor mon ) throws IOException, ParseException, URISyntaxException {
+        DatumRange dr = timeRange;
+        
         int i = surl.indexOf('?');
 
         String sansArgs = i == -1 ? surl : surl.substring(0, i);
