@@ -777,24 +777,25 @@ public final class AutoplotUI extends javax.swing.JFrame {
         applicationModel.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_RECENT)) {
-                    final List<Bookmark> recent = applicationModel.getRecent();
-                    SwingUtilities.invokeLater(
-                        new Runnable() { 
-                            @Override
-                            public void run() {
-                                org.virbo.autoplot.bookmarks.Util.setRecent( dataSetSelector, recent );
-                                //dataSetSelector.setRecent(urls);
+                switch (evt.getPropertyName()) {
+                    case ApplicationModel.PROPERTY_RECENT:
+                        final List<Bookmark> recent = applicationModel.getRecent();
+                        SwingUtilities.invokeLater(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        org.virbo.autoplot.bookmarks.Util.setRecent( dataSetSelector, recent );
+                                        //dataSetSelector.setRecent(urls);
+                                    }
+                                } );break;
+                    case ApplicationModel.PROPERTY_BOOKMARKS:
+                        SwingUtilities.invokeLater(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        updateBookmarks();
                             }
-                    } );
-                } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_BOOKMARKS)) {
-                    SwingUtilities.invokeLater(
-                        new Runnable() { 
-                            @Override
-                            public void run() {
-                                updateBookmarks();
-                            }
-                    } );
+                    } );break;
                 }
             }
         });
@@ -1506,19 +1507,24 @@ APSplash.checkTime("init 270");
                 while ( s!=null ) {
                     if ( s.length()>29 ) {
                         String ss= s.substring(25,29);
-                        if ( ss.equals("file") ) {
-                            String ex1= "file:";
-                            if ( exts.contains(ex1) ) {
-                                exts.remove(ex1);
-                                exts.add(0,ex1);
-                            }
-                        } else if ( ss.equals("vap+") ) {
-                            int i= s.indexOf(":",29);
-                            String ex1= "."+s.substring(29,i);
-                            if ( exts.contains(ex1) ) {
-                                exts.remove(ex1);
-                                exts.add(0,ex1);
-                            }
+                        switch (ss) {
+                            case "file":
+                                {
+                                    String ex1= "file:";
+                                    if ( exts.contains(ex1) ) {
+                                        exts.remove(ex1);
+                                        exts.add(0,ex1);
+                                    }       break;
+                                }
+                            case "vap+":
+                                {
+                                    int i= s.indexOf(":",29);
+                                    String ex1= "."+s.substring(29,i);
+                                    if ( exts.contains(ex1) ) {
+                                        exts.remove(ex1);
+                                        exts.add(0,ex1);
+                                    }       break;
+                                }
                         }
                     }
                     s= reader.readLine();
@@ -2221,6 +2227,7 @@ APSplash.checkTime("init 52.9");
         }
 
         Runnable run= new Runnable() { 
+            @Override
             public void run() {            
                 bookmarksManager.setPrefNode("bookmarks"); 
                 if ( initialBookmarksUrl!=null ) {
@@ -3641,6 +3648,7 @@ private void workOfflineCheckBoxMenuItemActionPerformed(java.awt.event.ActionEve
     final boolean workOffline= workOfflineCheckBoxMenuItem.isSelected();
     FileSystem.settings().setOffline( workOffline );
     RequestProcessor.invokeLater( new Runnable() { 
+        @Override
         public void run() {
             FileSystem.reset();
             setMessage( workOffline ? "Now working offline" : "Working online");
@@ -3745,41 +3753,42 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     @Override
     public void propertyChange( PropertyChangeEvent ev ) {
-        if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
-            if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
-                if ( layoutPanel == null ) {
-                    layoutPanel = new LayoutPanel();
-                    layoutPanel.setApplication(dom);
-                }
-                int idx= tabs.indexOfTab("style");
-                if ( idx==-1 ) idx=  tabs.getTabCount();
-                JScrollPane jsp = new JScrollPane();
-                jsp.setViewportView(layoutPanel);
-                tabs.insertTab("layout", null, jsp,
-                        String.format( TAB_TOOLTIP_LAYOUT, TABS_TOOLTIP ), idx+1 );
-            } else {
-                if ( layoutPanel!=null ) tabs.remove(layoutPanel.getParent().getParent());
-            }
-        } else if ( ev.getPropertyName().equals(Options.PROP_DATAVISIBLE ) ) {
-            if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
-                if ( dataPanel == null ) {
-                    dataPanel = new DataPanel(applicationModel.dom);
-                }
-                int idx= tabs.indexOfTab("metadata");
-                if ( idx==-1 ) idx=  tabs.getTabCount();
-                JScrollPane jsp = new JScrollPane();
-                jsp.setViewportView(dataPanel);
-                tabs.insertTab("data", null, jsp,
-                        String.format( TAB_TOOLTIP_DATA, TABS_TOOLTIP ), idx );
-            } else {
-                if ( dataPanel!=null ) tabs.remove(dataPanel.getParent().getParent());
-            }
-        } else if ( ev.getPropertyName().equals(Options.PROP_USE_TIME_RANGE_EDITOR ) ) {
-            if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
-                ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR );
-            } else {
-                ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_DATA_SET_SELECTOR );
-            }
+        switch (ev.getPropertyName()) {
+            case Options.PROP_LAYOUTVISIBLE:
+                if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
+                    if ( layoutPanel == null ) {
+                        layoutPanel = new LayoutPanel();
+                        layoutPanel.setApplication(dom);
+                    }
+                    int idx= tabs.indexOfTab("style");
+                    if ( idx==-1 ) idx=  tabs.getTabCount();
+                    JScrollPane jsp = new JScrollPane();
+                    jsp.setViewportView(layoutPanel);
+                    tabs.insertTab("layout", null, jsp,
+                            String.format( TAB_TOOLTIP_LAYOUT, TABS_TOOLTIP ), idx+1 );
+                } else {
+                    if ( layoutPanel!=null ) tabs.remove(layoutPanel.getParent().getParent());
+                }   break;
+            case Options.PROP_DATAVISIBLE:
+                if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
+                    if ( dataPanel == null ) {
+                        dataPanel = new DataPanel(applicationModel.dom);
+                    }
+                    int idx= tabs.indexOfTab("metadata");
+                    if ( idx==-1 ) idx=  tabs.getTabCount();
+                    JScrollPane jsp = new JScrollPane();
+                    jsp.setViewportView(dataPanel);
+                    tabs.insertTab("data", null, jsp,
+                            String.format( TAB_TOOLTIP_DATA, TABS_TOOLTIP ), idx );
+                } else {
+                    if ( dataPanel!=null ) tabs.remove(dataPanel.getParent().getParent());
+                }   break;
+            case Options.PROP_USE_TIME_RANGE_EDITOR:
+                if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
+                    ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR );
+                } else {
+                    ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_DATA_SET_SELECTOR );
+            }   break;
         }
     }
 };
