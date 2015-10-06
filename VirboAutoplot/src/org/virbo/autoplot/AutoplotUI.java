@@ -588,7 +588,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                         URISplit split= URISplit.parse(s);        //bug 1408--note runScript doesn't account for changes made to the GUI.
                         args= URISplit.parseParams(split.params);
                         if ( JOptionPane.OK_OPTION==JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
-                                args, true, true, scriptPanel.getAnnotationsSupport(), new NullProgressMonitor() ) ) {
+                                args, true, true, scriptPanel, new NullProgressMonitor() ) ) {
                             split.params= URISplit.formatParams(args);
                             String history= URISplit.format(split);
                             dataSetSelector.setValue( history );
@@ -633,7 +633,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 if ( s.endsWith(".jy") ) {
                     try {
                         JythonUtil.invokeScriptSoon( DataSetURI.getURL(s), dom, 
-                                new HashMap(), true, true, scriptPanel.getAnnotationsSupport(), new NullProgressMonitor() );
+                                new HashMap(), true, true, scriptPanel, new NullProgressMonitor() );
                     } catch ( IOException ex ) {
                         throw new RuntimeException(ex);
                     }
@@ -5267,10 +5267,11 @@ APSplash.checkTime("init 240");
                 public void run() {
                     try {
                         int res= JythonUtil.invokeScriptSoon( split.resourceUri.toURL(), dom, 
-                                params, true, !fisTool, scriptPanel.getAnnotationsSupport(), mon );
+                                params, true, !fisTool, scriptPanel, mon );
                         if ( res==JOptionPane.OK_OPTION ) {
                             if ( scriptPanel!=null ) {
                                 if ( ! scriptPanel.isDirty() && !fisTool ) {
+                                    scriptPanel.setRunningScript(ff);
                                     scriptPanel.loadFile(ff);
                                 }
                             }
