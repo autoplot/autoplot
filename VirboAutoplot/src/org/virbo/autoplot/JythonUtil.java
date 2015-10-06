@@ -35,6 +35,7 @@ import org.python.core.PySystemState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
 import org.virbo.autoplot.scriptconsole.MakeToolPanel;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
@@ -311,7 +312,7 @@ public class JythonUtil {
      * @param vars values for parameters, or null.
      * @param askParams if true, query the user for parameter settings.
      * @param makeTool if true, offer to put the script into the tools area for use later (only if askParams).
-     * @param annotationsSupport null or place to mark error messages
+     * @param scriptPanel null or place to mark error messages and to mark as running a script.
      * @param mon1 monitor to detect when script is finished.  If null, then a NullProgressMonitor is created.
      * @return JOptionPane.OK_OPTION of the script is invoked.
      * @throws java.io.IOException
@@ -319,7 +320,7 @@ public class JythonUtil {
     public static int invokeScriptSoon( final URL url, final Application dom, 
             Map<String,String> vars, 
             boolean askParams, boolean makeTool, 
-            final EditorAnnotationsSupport annotationsSupport,
+            final JythonScriptPanel scriptPanel,
             ProgressMonitor mon1) throws IOException {
         
         final ProgressMonitor mon;
@@ -386,11 +387,13 @@ public class JythonUtil {
                         interp.set( "dom", dom );
                         interp.set( "PWD", split.path );  
                         try ( FileInputStream in = new FileInputStream(file) ) {
+                            
                             interp.execfile( in, url.toString());
+                            
                         } catch ( PyException ex ) {
-                            if ( annotationsSupport!=null ) {
+                            if ( scriptPanel!=null ) {
                                 try {
-                                    annotationsSupport.annotateError( ex, 0 );
+                                    scriptPanel.getAnnotationsSupport().annotateError( ex, 0 );
                                 } catch (BadLocationException ex1) {
                                     logger.log(Level.SEVERE, null, ex1);
                                 }
@@ -398,6 +401,7 @@ public class JythonUtil {
                             throw ex;
                         } finally {
                             if ( !mon.isFinished() ) mon.finished();
+                            scriptPanel.setRunningScript(null);
                         } 
                         //TODO: error annotations on the editor.  This really would be nice.
                     } catch (IOException ex) {
