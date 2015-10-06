@@ -64,7 +64,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     static final int CONTEXT_DATA_SOURCE = 1;
     static final int CONTEXT_APPLICATION = 0;
     private int context = 0;
-    
+    File runningScript= null; // the script being run.
+
     /**
      * true if the current file contains tabs.
      */
@@ -565,5 +566,14 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
      */
     public EditorAnnotationsSupport getAnnotationsSupport() {
         return support.annotationsSupport;
+    }
+    
+    /**
+     * set the current script that is running.  This will prevent 
+     * automatic loads from occurring.
+     * @param f 
+     */
+    public void setRunningScript( File f ) {
+        this.runningScript= f;
     }
 }
