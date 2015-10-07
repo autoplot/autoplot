@@ -4,6 +4,10 @@ timerange= getParam( 'timerange', '2005-02-12/2005-02-19', 'timerange to load' )
 
 generate= getParam( 'generate', 'F', 'Generation doesn''t list remote folders', ['T','F'] )
 
+if ( len(timerange.split(' '))==10 ):  # make it easier to use Jon V.'s document "uri_template_test_cases.txt"
+   trs= timerange.split(' ')   
+   timerange= '-'.join( trs[0:3] ) + 'T' + ':'.join( trs[3:5] ) + '/' + '-'.join( trs[5:8] ) + 'T' + ':'.join( trs[8:10] )
+
 drtr= DatumRangeUtil.parseTimeRange(timerange)
 
 import time
