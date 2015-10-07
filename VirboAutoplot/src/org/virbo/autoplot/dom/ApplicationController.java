@@ -858,6 +858,9 @@ public class ApplicationController extends DomNodeController implements RunLater
      */
     public Annotation addAnnotation( Row row, Column column, String text ) {
         
+        if ( row==null ) row= application.getCanvases(0).getMarginRow();
+        if ( column==null ) column= application.getCanvases(0).getMarginColumn();
+            
         DasAnnotation impl= new DasAnnotation("");
         
         Annotation annotation= new Annotation();
