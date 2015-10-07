@@ -14,6 +14,11 @@ import org.das2.datum.UnitsConverter;
 import static org.das2.datum.DatumRangeUtil.*;
 import org.das2.datum.TimeUtil;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.BufferedWriter;
+
 /**
  * Tests of time parsing.  A little testing appears in Test019, but this
  * provides an comprehensive list that will be a good reference.
@@ -90,6 +95,7 @@ public class Test026 {
                 throw new IllegalArgumentException("no parse exception, but parsed incorrectly.");
             }
         }
+        writeToHTML(id, dr, drref);
     }
 
     private static void doTestDR( int id, String test, DatumRange norm ) throws Exception {
@@ -97,6 +103,36 @@ public class Test026 {
         if ( !norm.equals(dr) ) {
             throw new IllegalArgumentException("test \""+test+"\" is not equal to "+norm );
         }
+    }
+    
+    public static void writeToHTML(int id, DatumRange test, DatumRange ref){
+        String outputFolder= "/home/aluthens/batch/test026/";
+        String filePath= outputFolder+"Examples.html";
+        
+        File f= new File(filePath);
+        
+        String htmlOpen= "<html>";
+        String headerString="<head><title>Test 026</title></head>";
+        String bodyString="<body style=\"background-color: #6B6B6B; margin=0;\">";
+        String headerOpen= "<div style=\"top: 0px; margin-right=0px; font-size:40px; background-color:black; color:white;height:100px;\">"
+                    + "TEST 026" + "</div>"; 
+        
+        String table= "<table border=\"1\" style=\"width:100%; color:white;\"><tr><td><strong>Test Number:</strong> " 
+                + id + "</td><td><strong>Test: </strong> " + test + "</td><td><strong>Ref: </strong> " + ref + "</td></tr></table>";
+        String htmlClose= "</body></html>";
+        
+        try ( BufferedWriter bw = new BufferedWriter(new FileWriter(f)) ) {
+            bw.write(htmlOpen); //opens html
+            bw.write(headerString); //writes html header
+            bw.write(bodyString); //opens body and gives style
+            bw.write(headerOpen); //writes header of webpage
+            bw.write(table);
+            bw.write(htmlClose); //closes body and html
+        }
+        catch(IOException e){
+            System.out.println("ERROR.");
+        }
+
     }
 
     public static void main(String[] args) {
