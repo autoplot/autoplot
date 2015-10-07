@@ -8,6 +8,8 @@ package org.virbo.autoplot.dom;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import org.das2.datum.DatumRange;
+import org.das2.datum.Units;
 import org.das2.graph.AnchorPosition;
 import org.das2.graph.BorderType;
 
@@ -80,6 +82,48 @@ public class Annotation extends DomNode {
         AnchorPosition oldAnchorPosition = this.anchorPosition;
         this.anchorPosition = anchorPosition;
         propertyChangeSupport.firePropertyChange(PROP_ANCHORPOSITION, oldAnchorPosition, anchorPosition);
+    }
+    
+    private DatumRange xrange= DatumRange.newDatumRange(0,10,Units.dimensionless);
+
+    public static final String PROP_XRANGE = "xrange";
+
+    public DatumRange getXrange() {
+        return xrange;
+    }
+
+    public void setXrange(DatumRange xrange) {
+        DatumRange oldXrange = this.xrange;
+        this.xrange = xrange;
+        propertyChangeSupport.firePropertyChange(PROP_XRANGE, oldXrange, xrange);
+    }
+
+    private DatumRange yrange= DatumRange.newDatumRange(0,10,Units.dimensionless);;
+
+    public static final String PROP_YRANGE = "yrange";
+
+    public DatumRange getYrange() {
+        return yrange;
+    }
+
+    public void setYrange(DatumRange yrange) {
+        DatumRange oldYrange = this.yrange;
+        this.yrange = yrange;
+        propertyChangeSupport.firePropertyChange(PROP_YRANGE, oldYrange, yrange);
+    }
+
+    private BorderType anchorBorderType = BorderType.NONE;
+
+    public static final String PROP_ANCHORBORDERTYPE = "anchorBorderType";
+
+    public BorderType getAnchorBorderType() {
+        return anchorBorderType;
+    }
+
+    public void setAnchorBorderType(BorderType anchorBorderType) {
+        BorderType oldAnchorBorderType = this.anchorBorderType;
+        this.anchorBorderType = anchorBorderType;
+        propertyChangeSupport.firePropertyChange(PROP_ANCHORBORDERTYPE, oldAnchorBorderType, anchorBorderType);
     }
 
     private boolean overrideColors = false;
