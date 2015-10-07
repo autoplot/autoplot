@@ -16,7 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ * Secret function for adjusting the log level!
+ * .../SetLogLevel?logger=autoplot.servlet&level=FINE&handler=T
  * @author jbf
  */
 public class SetLogLevel extends HttpServlet {
