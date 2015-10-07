@@ -12,9 +12,12 @@
         <title>URI Templates Demo</title>
     </head>
     <body>
-        <h1>Parsing URLs</h1>
-        <p>URL Templates can be used to interpret a URL.  Given a URL, we can 
-            interpret the timespan covered and other information.</p>
+        <h1>Parsing URIs</h1>
+        <p>URI Templates can be used to interpret a URI.  Given a URI, we can 
+            interpret the timespan covered and other information.  Note only
+            URLs, a type of URI, are supported here, and it is assumed that the
+            server supports directory listings.
+        </p>
         
         
     <form action="SecureScriptServlet" method="GET">
@@ -33,7 +36,7 @@
         <input type="submit" value="Try it out" />
     </form>
         
-        <h1>Formatting URLs</h1>
+        <h1>Generating URIs</h1>
         
         <p>We can also use these templates to generate the names of files.  For example, 
             suppose a server doesn't support listings, so all we can do is to generate names.
@@ -42,15 +45,15 @@
         </p>
         
     <form action="SecureScriptServlet" method="GET">
-        Enter URL (<a href="http://autoplot.org/help#Wildcard_codes">help</a>):
+        Enter URI (<a href="http://autoplot.org/help#Wildcard_codes">help</a>):
         Examples:
         <a href="#" onclick="document.getElementById('resourceURI2').value='http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/$Y/$m/$d/rbsp-a_magnetometer_1sec-gse_emfisis-L3_$Y$m$d_v1.3.2.cdf';">A</a>
         <a href="#" onclick="document.getElementById('resourceURI2').value='http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hourly/$Y/omni2_h0_mrg1hr_$Y$(m;delta=6)01_v01.cdf';">B</a>
         <a href="#" onclick="document.getElementById('resourceURI2').value='http://autoplot.org/data/versioning/data_$Y_$m_$d_v1.00.qds';">C</a>
         <a href="#" onclick="document.getElementById('resourceURI2').value='http://data.org/data_bartels_$(periodic;offset=2285;start=2000-346T00:00;period=27d).txt';">D</a>
-        <a href="#" onclick="document.getElementById('resourceURI2').value='http://data.org/$Y-$j.$(hrinterval;values=A|B|C|D).txt';">E</a>
-        <a href="#" onclick="document.getElementById('resourceURI2').value='http://autoplot.org/data/versioning/data_$Y_$m_$d_$(enum;values=1.00|1.02;id=version).qds';">F</a>
-        <a href="#" onclick="document.getElementById('resourceURI2').value='http://data.org/data_$Y_$j_$H$M$S.$(subsec,places=1)';">G</a> <!-- shows rounding error -->
+        <a href="#" onclick="document.getElementById('resourceURI2').value='http://data.org/$Y-$j.$(hrinterval;values=A,B,C,D).txt';">E</a>
+        <a href="#" onclick="document.getElementById('resourceURI2').value='http://autoplot.org/data/versioning/data_$Y_$m_$d_$(enum;values=1.00,1.02;id=version).qds';">F</a>
+        <a href="#" onclick="document.getElementById('resourceURI2').value='http://data.org/data_$Y_$j_$H$M$S.$(subsec;places=1)';">G</a> <!-- shows rounding error -->
         <br>
         <textarea rows="1" cols="120" id="resourceURI2" name="resourceURI" >http://autoplot.org/data/versioning/data_$Y_$m_$d_v1.00.qds</textarea><br>
         <br>Enter ISO8601 Time Range limiting the results printed: <br>
