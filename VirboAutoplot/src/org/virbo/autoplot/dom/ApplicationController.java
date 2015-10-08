@@ -1467,6 +1467,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param domPlot
      */
     public void deletePlot(Plot domPlot) {
+        if ( domPlot==null ) throw new NullPointerException("plot is null");
         DomLock lock= changesSupport.mutatorLock();
         lock.lock("Delete Plot");
         try {
