@@ -22,6 +22,9 @@ if ( False ):
 
 print '<html><body>'
 
+from java.lang import System
+t0= System.currentTimeMillis()
+
 if ( generate=='T' ):
    if ( resourceURI.find('$v')>-1 ):
        print 'Template cannot contain $v.'
@@ -96,5 +99,9 @@ else:
 
 if ( count==0 ):
    print '(none found)'
+
+dt= System.currentTimeMillis() - t0
+print '%d results calculated in %d milliseconds.\n' % ( count,dt )
+
 print '</body></html>'
 
