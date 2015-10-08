@@ -73,6 +73,7 @@ public class AnnotationController extends DomNodeController {
         ac.bind( annotation, "borderType", p, "borderType" );
         ac.bind( annotation, "anchorPosition", p, "anchorPosition" );
         ac.bind( annotation, Annotation.PROP_ANCHORTYPE, p, DasAnnotation.PROP_ANCHORTYPE );
+        ac.bind( annotation, Annotation.PROP_ANCHOROFFSET, p, DasAnnotation.PROP_ANCHOROFFSET );
         ac.bind( annotation, "anchorBorderType", p, "anchorBorderType");
         ac.bind( annotation, "xrange", p, "xrange" );
         ac.bind( annotation, "yrange", p, "yrange" );

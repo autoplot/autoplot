@@ -126,6 +126,21 @@ public class Annotation extends DomNode {
         this.anchorType = anchorType;
         propertyChangeSupport.firePropertyChange(PROP_ANCHORTYPE, oldAnchorType, anchorType);
     }
+    
+    private String anchorOffset;
+
+    public static final String PROP_ANCHOROFFSET = "anchorOffset";
+
+    public String getAnchorOffset() {
+        return anchorOffset;
+    }
+
+    public void setAnchorOffset(String anchorOffset) {
+        String oldAnchorOffset = this.anchorOffset;
+        this.anchorOffset = anchorOffset;
+        propertyChangeSupport.firePropertyChange(PROP_ANCHOROFFSET, oldAnchorOffset, anchorOffset);
+    }
+
 
     private String plotId = "";
 
@@ -261,6 +276,7 @@ public class Annotation extends DomNode {
         if ( !exclude.contains( PROP_FONTSIZE ) ) this.setFontSize(that.getFontSize());
         if ( !exclude.contains( PROP_BORDERTYPE ) ) this.setBorderType(that.getBorderType() );
         if ( !exclude.contains( PROP_ANCHORPOSITION ) ) this.setAnchorPosition(that.getAnchorPosition() );
+        if ( !exclude.contains( PROP_ANCHOROFFSET ) ) this.setAnchorOffset(that.getAnchorOffset() );
         if ( !exclude.contains( PROP_OVERRIDECOLORS ) ) this.setOverrideColors(that.isOverrideColors() );
         if ( !exclude.contains( PROP_TEXTCOLOR ) ) this.setTextColor(that.getTextColor() );
         if ( !exclude.contains( PROP_FOREGROUND ) ) this.setForeground(that.getForeground() );
@@ -291,6 +307,8 @@ public class Annotation extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_BORDERTYPE, that.borderType, this.borderType ) );
         b=  that.anchorPosition.equals(this.anchorPosition) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHORPOSITION, that.anchorPosition, this.anchorPosition ) );
+        b=  that.anchorOffset.equals(this.anchorOffset) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHOROFFSET, that.anchorOffset, this.anchorOffset ) );
         b=  that.textColor.equals(this.textColor) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_TEXTCOLOR, that.textColor, this.textColor ) );
         b=  that.foreground.equals(this.foreground) ;
