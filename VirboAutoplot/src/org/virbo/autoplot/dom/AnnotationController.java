@@ -6,6 +6,7 @@ import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import org.das2.graph.DasAnnotation;
 import org.das2.graph.DasDevicePosition;
+import org.das2.graph.DasPlot;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 
@@ -109,6 +110,18 @@ public class AnnotationController extends DomNodeController {
                 }
             }
         });
+
+        annotation.addPropertyChangeListener( Annotation.PROP_PLOTID, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                LoggerManager.logPropertyChangeEvent(evt);  
+                Plot pl= (Plot) DomUtil.getElementById( dom, (String)evt.getNewValue() );                
+                if ( pl!=null ) {
+                    DasPlot dasPlot= pl.getController().getDasPlot();
+                    p.setPlot( dasPlot );
+                }
+            }
+        });
         
         dom.getCanvases(0).addPropertyChangeListener( Canvas.PROP_FONT, new PropertyChangeListener() {
             @Override
@@ -119,6 +132,7 @@ public class AnnotationController extends DomNodeController {
             }
             
         });
+        
         
     }
 

@@ -849,6 +849,17 @@ public class ApplicationController extends DomNodeController implements RunLater
         application.setConnectors(connectors.toArray(new Connector[connectors.size()]));
     }
     
+    public Annotation addAnnotation( Plot p, String text ) {
+        Row r= p.getController().getRow();
+        Column c= p.getController().getColumn();
+        
+        Annotation a= addAnnotation( r, c, text);
+        
+        a.setPlotId( p.getId() );
+            
+        return a;
+    }
+    
     /**
      * add an annotation to the canvas.
      * @param row the row or None.

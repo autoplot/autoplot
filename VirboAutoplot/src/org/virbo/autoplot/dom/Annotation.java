@@ -11,6 +11,7 @@ import java.util.List;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.AnchorPosition;
+import org.das2.graph.AnchorType;
 import org.das2.graph.BorderType;
 
 /**
@@ -110,6 +111,34 @@ public class Annotation extends DomNode {
         DatumRange oldYrange = this.yrange;
         this.yrange = yrange;
         propertyChangeSupport.firePropertyChange(PROP_YRANGE, oldYrange, yrange);
+    }
+
+    private AnchorType anchorType = AnchorType.CANVAS;
+
+    public static final String PROP_ANCHORTYPE = "anchorType";
+
+    public AnchorType getAnchorType() {
+        return anchorType;
+    }
+
+    public void setAnchorType(AnchorType anchorType) {
+        AnchorType oldAnchorType = this.anchorType;
+        this.anchorType = anchorType;
+        propertyChangeSupport.firePropertyChange(PROP_ANCHORTYPE, oldAnchorType, anchorType);
+    }
+
+    private String plotId = "";
+
+    public static final String PROP_PLOTID = "plotId";
+
+    public String getPlotId() {
+        return plotId;
+    }
+
+    public void setPlotId(String plotId) {
+        String oldPlotId = this.plotId;
+        this.plotId = plotId;
+        propertyChangeSupport.firePropertyChange(PROP_PLOTID, oldPlotId, plotId);
     }
 
     private BorderType anchorBorderType = BorderType.NONE;
@@ -236,6 +265,7 @@ public class Annotation extends DomNode {
         if ( !exclude.contains( PROP_TEXTCOLOR ) ) this.setTextColor(that.getTextColor() );
         if ( !exclude.contains( PROP_FOREGROUND ) ) this.setForeground(that.getForeground() );
         if ( !exclude.contains( PROP_BACKGROUND ) ) this.setBackground(that.getBackground() );
+        if ( !exclude.contains( PROP_PLOTID ) ) this.setPlotId(that.getPlotId());
         if ( !exclude.contains( PROP_ROWID ) ) this.setRowId(that.getRowId());
         if ( !exclude.contains( PROP_COLUMNID ) ) this.setColumnId(that.getColumnId());
     }
@@ -246,8 +276,6 @@ public class Annotation extends DomNode {
         result.controller= null;
         return result;
     }
-
-
 
     @Override
     public List<Diff> diffs(DomNode node) {
@@ -269,6 +297,8 @@ public class Annotation extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_FOREGROUND, that.foreground, this.foreground ) );
         b=  that.background.equals(this.background) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_BACKGROUND, that.background, this.background ) );
+        b=  that.plotId.equals(this.plotId) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_PLOTID, that.plotId, this.plotId ) );
         b=  that.rowId.equals(this.rowId) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ROWID, that.rowId, this.rowId ) );
         b=  that.columnId.equals(this.columnId) ;
