@@ -73,7 +73,7 @@
         
         
     <form action="URITemplatesServlet" method="GET">
-        Enter URL (<a href="http://tsds.org//uri_templates#Time_Range_Rules">help</a>):
+        Enter URI (<a href="http://tsds.org//uri_templates#Time_Range_Rules">help</a>):
         Examples:
         <a href="#" onclick="document.getElementById('resourceURI3').value='http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/$Y/$m/$d/rbsp-a_magnetometer_1sec-gse_emfisis-L3_$Y$m$d_v$(v,sep).cdf';">A</a>
         <a href="#" onclick="document.getElementById('resourceURI3').value='http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hourly/$Y/omni2_h0_mrg1hr_$Y$(m;delta=6)01_v$v.cdf';">B</a>
@@ -88,6 +88,6 @@
         <br>
         <input type="submit" value="Try it out" />
     </form>        
-        <small>version 20151007T1207</small>
+        <br><small>version 20151008T1033</small>
     </body>
 </html>
