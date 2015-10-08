@@ -171,10 +171,15 @@ public class DomUtil {
      * return the list of nodes (Plots) that is this row.
      */
     static List<DomNode> rowUsages(Application app, String rowId) {
-        List<DomNode> result = new ArrayList<DomNode>();
+        List<DomNode> result = new ArrayList<>();
         for (Plot p : app.getPlots()) {
             if (p.getRowId().equals(rowId)) {
                 result.add(p);
+            }
+        }
+        for (Annotation a : app.getAnnotations()) {
+            if (a.getRowId().equals(rowId)) {
+                result.add(a);
             }
         }
         return result;
