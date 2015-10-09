@@ -34,6 +34,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
+import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.event.MouseModule;
 import org.das2.graph.ColumnColumnConnector;
 import org.das2.graph.DasAnnotation;
@@ -874,12 +875,27 @@ public class ApplicationController extends DomNodeController implements RunLater
             
         DasAnnotation impl= new DasAnnotation("");
         
-        Annotation annotation= new Annotation();
+        final Annotation annotation= new Annotation();
         assignId(annotation);
         
         annotation.setText(text);
         
         new AnnotationController( application, annotation, impl );
+                
+        JMenuItem  mi= new JMenuItem(new AbstractAction("Annotation Properties") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
+                PropertyEditor pp = new PropertyEditor(annotation);
+                pp.showDialog(application.getCanvases(0).getController().getDasCanvas());
+            }
+        });        
+        impl.getDasMouseInputAdapter().addMenuItem(mi);
+        
+        impl.getDasMouseInputAdapter().removeMenuItem("Properties");
+        impl.getDasMouseInputAdapter().removeMenuItem("remove arrow");
+        impl.getDasMouseInputAdapter().removeMenuItem("remove");
+        impl.getDasMouseInputAdapter().removeMouseModule( impl.getDasMouseInputAdapter().getModuleByLabel("Point At"));
         
         annotationImpls.put(annotation, impl);
         
