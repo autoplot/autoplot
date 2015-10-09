@@ -38,6 +38,10 @@
         <servlet-name>ServletInfo</servlet-name>
         <servlet-class>org.virbo.autoplot.ServletInfo</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>URITemplatesServlet</servlet-name>
+        <servlet-class>org.virbo.autoplot.URITemplatesServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SimpleServlet</servlet-name>
         <url-pattern>/SimpleServlet</url-pattern>
@@ -69,6 +73,10 @@
     <servlet-mapping>
         <servlet-name>ServletInfo</servlet-name>
         <url-pattern>/ServletInfo</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>URITemplatesServlet</servlet-name>
+        <url-pattern>/URITemplatesServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
