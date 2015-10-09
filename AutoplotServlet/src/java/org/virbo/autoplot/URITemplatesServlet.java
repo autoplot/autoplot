@@ -54,7 +54,7 @@ public class URITemplatesServlet extends HttpServlet {
             } catch ( Exception ex ) {
                 v= "N/A";
             }
-            out.printf(  "<td>"+root + n + "</td><td>"+tr.toString() + "</td><td>" + v +"</td>\n" );
+            out.printf(  "<td>"+root + "/" + n + "</td><td>"+tr.toString() + "</td><td>" + v +"</td>\n" );
             out.printf(  "</tr>" );
             count= count+1;
         }
