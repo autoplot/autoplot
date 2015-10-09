@@ -77,12 +77,12 @@
         Examples:
         <a href="#" onclick="document.getElementById('resourceURI3').value='http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/$Y/$m/$d/rbsp-a_magnetometer_1sec-gse_emfisis-L3_$Y$m$d_v$(v,sep).cdf';">A</a>
         <a href="#" onclick="document.getElementById('resourceURI3').value='http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hourly/$Y/omni2_h0_mrg1hr_$Y$(m;delta=6)01_v$v.cdf';">B</a>
-        <a href="#" onclick="document.getElementById('resourceURI3').value='http://autoplot.org/datadata_$Y_$m_$d_v$v.qds';">C</a>
-        <a href="#" onclick="document.getElementById('resourceURI3').value='http://sarahandjeremy.net/~jbf/powerMeter/$Y/$m/$d/$H$M$(S,sparse).d2s';">D</a>
+        <a href="#" onclick="document.getElementById('resourceURI3').value='http://autoplot.org/data/agg/hyd/$Y/po_h0_hyd_$Y$m$d_v$v.cdf';document.getElementById('timerange3').value='1999-2000';">C</a>
+        <a href="#" onclick="document.getElementById('resourceURI3').value='http://sarahandjeremy.net/~jbf/powerMeter/$Y/$m/$d/$H$M$(S,sparse).jpg';document.getElementById('timerange3').value='2015-05-01';">D</a>
         <br>
         <textarea rows="1" cols="120" id="resourceURI3" name="resourceURI" >http://autoplot.org/data/versioning/data_$Y_$m_$d_v$v.qds</textarea><br>
         <br>Enter ISO8601 Time Range limiting the results printed: <br>
-        <textarea rows="1" cols="50" name="timerange" >2010-03-01/2010-03-10</textarea><br>
+        <textarea rows="1" cols="50" id="timerange3" name="timerange" >2010-03-01/2010-03-10</textarea><br>
         <input type="checkbox" hidden="true" name="generate"/>
         <input type="hidden" name="mode" value="hybrid" />
         <br>
