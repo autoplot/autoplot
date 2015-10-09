@@ -1,18 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +16,8 @@ import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
 
 /**
- *
+ * URI Templates servlet implements the hybrid generate/parse method
+ * for resolving URIs.
  * @author jbf
  */
 public class URITemplatesServlet extends HttpServlet {
