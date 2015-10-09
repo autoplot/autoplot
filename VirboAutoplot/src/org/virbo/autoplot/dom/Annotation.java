@@ -127,7 +127,7 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_ANCHORTYPE, oldAnchorType, anchorType);
     }
     
-    private String anchorOffset;
+    private String anchorOffset= "";
 
     public static final String PROP_ANCHOROFFSET = "anchorOffset";
 
