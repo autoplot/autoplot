@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import org.das2.beans.BeansUtil;
 import org.das2.datum.Datum;
 import org.das2.graph.AnchorPosition;
+import org.das2.graph.AnchorType;
 import org.das2.graph.BorderType;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DefaultPlotSymbol;
@@ -68,6 +69,7 @@ public class SerializeUtil {
         SerializeRegistry.register( LegendPosition.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( AnchorPosition.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( BorderType.class, new TypeSafeEnumSerializeDelegate() );
+        SerializeRegistry.register( AnchorType.class, new TypeSafeEnumSerializeDelegate() );
         SerializeRegistry.register( Level.class, new LevelSerializeDelegate() );
     }
     
