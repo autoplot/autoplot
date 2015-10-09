@@ -142,4 +142,13 @@ public class AnnotationController extends DomNodeController {
         ApplicationController ac = dom.controller;
         ac.unbind( annotation );
     }
+
+    /**
+     * provide direct access to the annotation
+     * @return the implementing das2 annotation
+     */
+    public DasAnnotation getDasAnnotation() {
+        return dasAnnotation;
+    }
+    
 }
