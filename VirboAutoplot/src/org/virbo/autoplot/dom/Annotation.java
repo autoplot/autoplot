@@ -277,6 +277,8 @@ public class Annotation extends DomNode {
         if ( !exclude.contains( PROP_BORDERTYPE ) ) this.setBorderType(that.getBorderType() );
         if ( !exclude.contains( PROP_ANCHORPOSITION ) ) this.setAnchorPosition(that.getAnchorPosition() );
         if ( !exclude.contains( PROP_ANCHOROFFSET ) ) this.setAnchorOffset(that.getAnchorOffset() );
+        if ( !exclude.contains( PROP_ANCHORTYPE ) ) this.setAnchorType(that.getAnchorType() );
+        if ( !exclude.contains( PROP_ANCHORBORDERTYPE ) ) this.setAnchorBorderType(that.getAnchorBorderType() );
         if ( !exclude.contains( PROP_OVERRIDECOLORS ) ) this.setOverrideColors(that.isOverrideColors() );
         if ( !exclude.contains( PROP_TEXTCOLOR ) ) this.setTextColor(that.getTextColor() );
         if ( !exclude.contains( PROP_FOREGROUND ) ) this.setForeground(that.getForeground() );
@@ -309,6 +311,10 @@ public class Annotation extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHORPOSITION, that.anchorPosition, this.anchorPosition ) );
         b=  that.anchorOffset.equals(this.anchorOffset) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHOROFFSET, that.anchorOffset, this.anchorOffset ) );
+        b=  that.anchorType.equals(this.anchorType) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHORTYPE, that.anchorType, this.anchorType ) );
+        b=  that.anchorType.equals(this.anchorBorderType) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_ANCHORBORDERTYPE, that.anchorBorderType, this.anchorBorderType ) );
         b=  that.textColor.equals(this.textColor) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_TEXTCOLOR, that.textColor, this.textColor ) );
         b=  that.foreground.equals(this.foreground) ;
