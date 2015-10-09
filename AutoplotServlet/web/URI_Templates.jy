@@ -52,6 +52,7 @@ if ( generate=='T' ):
        st= tp.format( drtr.min(), None, Collections.singletonMap( id, enums[0] ) ) 
        dr= tp.parse( st,None ).getTimeRange()
 
+       print( "<h1>Generate Result</h1>")
        print '<h3>'+resourceURI+'</h3>'
        print '<p>search limited to '+timerange+'</p>'
 
@@ -79,6 +80,8 @@ else:
     fsm= FileStorageModel.create( fs, template )
 
     names= fsm.getNamesFor( DatumRangeUtil.parseTimeRange(timerange) )
+
+    print( "<h1>Parse Result</h1>")
 
     print '<h3>'+resourceURI+'</h3>'
     print '<p>search limited to '+timerange+'</p>'
