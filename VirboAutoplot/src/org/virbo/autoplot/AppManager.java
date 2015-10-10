@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.autoplot;
 
@@ -67,6 +63,7 @@ public class AppManager {
                 resetMain= true;
             }
             if ( requestQuit() ) {
+                this.appCloseCallbacks.remove(app);        
                 this.apps.remove(app);
                 if ( this.apps.isEmpty() ) {
                     quit();
@@ -81,6 +78,7 @@ public class AppManager {
                 }
             }
         } else {
+            //TODO: why are there two branches?  These should be nothing Autoplot-specific in here.
             this.apps.remove(app);
             if ( this.apps.size()==1 && this.apps.get(0) instanceof JFrame && ( (JFrame)this.apps.get(0) ).isVisible()==false ) {
                 // when the PngWalkTool is started first, AutoplotUI is also started but hidden.
@@ -116,15 +114,17 @@ public class AppManager {
      */
     public boolean requestQuit() {
         boolean okay= true;
-        for ( Entry<String,CloseCallback> ent: closeCallbacks.entrySet() ) {
-            try {
-                okay= okay && ent.getValue().checkClose();
-            } catch ( Exception e ) {
-                Object parent = this.apps.size()>0 ? this.apps.get(0) : null;
-                if ( ! ( parent instanceof Component ) ) {
-                    parent=null;
+        for ( Entry<Object,Map<String,CloseCallback>> closeCallbacks : appCloseCallbacks.entrySet() ) {
+            for ( Entry<String,CloseCallback> ent: closeCallbacks.getValue().entrySet() ) {
+                try {
+                    okay= okay && ent.getValue().checkClose();
+                } catch ( Exception e ) {
+                    Object parent = this.apps.size()>0 ? this.apps.get(0) : null;
+                    if ( ! ( parent instanceof Component ) ) {
+                        parent=null;
+                    }
+                    JOptionPane.showMessageDialog( (Component)parent, String.format( "<html>Unable to call closeCallback id=\"%s\",<br>because of exception:<br>%s", ent.getKey(), e ) );
                 }
-                JOptionPane.showMessageDialog( (Component)parent, String.format( "<html>Unable to call closeCallback id=\"%s\",<br>because of exception:<br>%s", ent.getKey(), e ) );
             }
         }
         return okay;
@@ -140,6 +140,8 @@ public class AppManager {
                 boolean okay= requestQuit();
                 if ( !okay ) {
                     return;
+                } else {
+                    appCloseCallbacks.remove(app); // kludge, otherwise this is called twice.
                 }
                 if ( closeAction!=null ) {
                     closeAction.actionPerformed( new ActionEvent(this,e.getID(),"close") );
@@ -184,15 +186,27 @@ public class AppManager {
     public interface CloseCallback {
         /**
          * return true if the callback okays the close.
-         * @return
+         * @return true if the callback okays the close.
          */
         boolean checkClose();
     }
 
-    HashMap<String,CloseCallback> closeCallbacks= new LinkedHashMap();
+    HashMap<Object,Map<String,CloseCallback>> appCloseCallbacks= new LinkedHashMap();
+    //HashMap<String,CloseCallback> appCloseCallbacks= new LinkedHashMap();
 
-    public synchronized void addCloseCallback( String id, CloseCallback c ) {
-        closeCallbacks.remove(id);
-        closeCallbacks.put(id,c);
+    /**
+     * add a close callback which can prevent a close.  The callback
+     * can open a dialog requesting that the user save a file, for example.
+     * @param app to associate the callback.
+     * @param id
+     * @param c 
+     */
+    public synchronized void addCloseCallback( Object app, String id, CloseCallback c ) {
+        Map<String,CloseCallback> appCallbacks= this.appCloseCallbacks.get(id);
+        if ( appCallbacks==null ) {
+            appCallbacks= new LinkedHashMap();
+        }
+        appCallbacks.put(id,c);
+        this.appCloseCallbacks.put( app, appCallbacks );
     }
 }
