@@ -256,10 +256,18 @@ public class ScriptPanelSupport {
         return r;
     }
 
-    protected void save() throws FileNotFoundException, IOException {
+    /**
+     * save the editor contents to a file.
+     * @return JOptionPane.OK_OPTION if successful, or JOptionPane.CANCEL_OPTION if the operator cancelled the saveAs operation.
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
+    protected int save() throws FileNotFoundException, IOException {
         if ( file==null || file.toString().contains( FileSystem.settings().getLocalCacheDir().toString()) ) {
-            if ( panel.isDirty() ) saveAs();
-            return;
+            if ( panel.isDirty() ) {
+                return saveAs();
+            }
+            return JOptionPane.OK_OPTION;
         }
         OutputStream out = null;
         try {
@@ -271,12 +279,11 @@ public class ScriptPanelSupport {
         } finally {
             if ( out!=null ) out.close();
         }
+        return JOptionPane.OK_OPTION;
     }
 
     protected void loadFile(File file) throws IOException, FileNotFoundException {
-        InputStream r= null;
-        try {
-            r= new FileInputStream(file);
+        try (InputStream r = new FileInputStream(file)) {
             this.file= file;
             panel.setFilename( file.toString() );
             loadInputStream( r );
@@ -285,8 +292,6 @@ public class ScriptPanelSupport {
             } else {
                 panel.setContext(JythonScriptPanel.CONTEXT_APPLICATION);
             }
-        } finally {
-            if ( r!=null ) r.close();
         }
     }
 
@@ -892,7 +897,7 @@ public class ScriptPanelSupport {
 
     /**
      * returns JFileChooser.APPROVE_OPTION or JFileChooser.CANCEL_OPTION
-     * @return
+     * @return JFileChooser.APPROVE_OPTION or JFileChooser.CANCEL_OPTION
      */
     protected int saveAs() {
         OutputStream out = null;
