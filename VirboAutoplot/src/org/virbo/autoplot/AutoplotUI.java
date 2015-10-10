@@ -4059,11 +4059,13 @@ private void updateFrameTitle() {
      * @param script the name of the script, which can be relative to PWD.
      * @param scriptArgs arguments passed to the script, each is name=value.
      * @param quit if true then quit this application.
+     * @param outputPngName if non-null, then write canvas to this png name.
      * @return the runnable.
      */
     private static Runnable getRunScriptRunnable( final AutoplotUI app, 
             final ApplicationModel model, final String script, 
-            final List<String> scriptArgs, final boolean quit  ) {
+            final List<String> scriptArgs, final boolean quit, 
+            final String testPngFilename ) {
         Runnable r= new Runnable() {
             @Override
             public String toString() { return "runScriptRunnable"; }
@@ -4073,6 +4075,12 @@ private void updateFrameTitle() {
                     String pwd= URISplit.parse(script).path;
                     ScriptContext.setApplicationModel(model); // initialize
                     JythonUtil.runScript( model, script, scriptArgs.toArray(new String[scriptArgs.size()]), pwd );
+                    
+                    if ( testPngFilename!=null && testPngFilename.length()>0 ) {
+                        logger.log(Level.FINE, "Writing to {0}", testPngFilename);
+                        ScriptContext.writeToPng(testPngFilename);
+                    }
+                    
                     if ( app!=null ) app.setStatus( READY_MESSAGE );
                     if ( quit ) { 
                         AppManager.getInstance().quit();
@@ -4172,6 +4180,7 @@ private void updateFrameTitle() {
         alm.addOptionalSwitchArgument("script", "s", "script", "", "run this script after starting.  " +
                 "Arguments following are " +
                 "passed into the script as sys.argv");
+        alm.addOptionalSwitchArgument("testPngFilename", null, "testPngFilename", "", "write canvas to this png file after script is run" );
         alm.addOptionalSwitchArgument("autoLayout",null,"autoLayout",alm.TRUE,"turn on/off initial autolayout setting");
         alm.addOptionalSwitchArgument("mode","m","mode","expert","start in basic (browse,reduced) mode or expert mode" );
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
@@ -4195,6 +4204,7 @@ private void updateFrameTitle() {
                         apArgs.add(args[j]);
                     }
                     for ( int j=i; j<args.length; j++ ) {
+                        if ( args[j].startsWith("--testPngFilename") ) throw new IllegalArgumentException("--testPngFilename needs to come before --script");
                         scriptArgs.add(args[j]);
                     }        
                 } else {
@@ -4202,6 +4212,7 @@ private void updateFrameTitle() {
                         apArgs.add(args[j]);
                     }        
                     for ( int j=i+1; j<args.length; j++ ) {
+                        if ( args[j].startsWith("--testPngFilename") ) throw new IllegalArgumentException("--testPngFilename needs to come before --script");
                         scriptArgs.add(args[j]);
                     }
                 }
@@ -4489,7 +4500,7 @@ APSplash.checkTime("init 230");
                         }
                     }
                     if ( app!=null ) app.setStatus("running script "+s);
-                    Runnable run= getRunScriptRunnable( app, model, s, scriptArgs, headless && !server );
+                    Runnable run= getRunScriptRunnable(app, model, s, scriptArgs, headless && !server, alm.getValue("testPngFilename") );
                     new Thread(run,"batchRunScriptThread").start();
                 } else {
 APSplash.checkTime("init 240");
@@ -4511,11 +4522,6 @@ APSplash.checkTime("init 240");
                         };
                         SwingUtilities.invokeLater(run);
                     }
-                }
-                
-                if ( true ) {
-                    app.dom.getController().waitUntilIdle();
-                    
                 }
                 
             };
