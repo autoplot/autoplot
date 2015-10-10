@@ -1116,7 +1116,7 @@ APSplash.checkTime("init 270");
                 public String toString() { return "addScriptPanel"; }
                 @Override
                 public void run() {
-                    scriptPanel= new JythonScriptPanel(applicationModel, fdataSetSelector);
+                    scriptPanel= new JythonScriptPanel( AutoplotUI.this, fdataSetSelector);
                     jythonScriptPanel.add(scriptPanel,BorderLayout.CENTER);
                     scriptPanelMenuItem.setSelected(true);
                 }
@@ -3318,7 +3318,7 @@ private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     applicationModel.getDocumentModel().getOptions().setScriptVisible(scriptPanelMenuItem.isSelected());
     if (scriptPanelMenuItem.isSelected() && jythonScriptPanel == null) {
         jythonScriptPanel= new JPanel( new BorderLayout() );
-        scriptPanel = new JythonScriptPanel(applicationModel, this.dataSetSelector);
+        scriptPanel = new JythonScriptPanel( AutoplotUI.this, this.dataSetSelector);
         jythonScriptPanel.add(scriptPanel, BorderLayout.CENTER );
         tabs.insertTab(TAB_SCRIPT, null, jythonScriptPanel,
                 String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP), 4);
@@ -4513,6 +4513,11 @@ APSplash.checkTime("init 240");
                     }
                 }
                 
+                if ( true ) {
+                    app.dom.getController().waitUntilIdle();
+                    
+                }
+                
             };
         } );
     }
@@ -4642,6 +4647,14 @@ APSplash.checkTime("init 240");
      */
     public DropTargetListener getDropTargetListener() {
         return dropListener;
+    }
+    
+    /**
+     * provide access to the universal application model.
+     * @return access to the universal application model.
+     */
+    public ApplicationModel getApplicationModel() {
+        return applicationModel;
     }
 
     /**

@@ -39,7 +39,9 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
+import org.virbo.autoplot.AppManager;
 import org.virbo.autoplot.ApplicationModel;
+import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.ApplicationController;
@@ -82,18 +84,23 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         }
     }
     
-    /** Creates new form JythonScriptPanel */
-    public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector) {
+    /** 
+     * Creates new form JythonScriptPanel 
+     * 
+     * @param app the app with which we'll register the close callback.
+     * @param selector the selector which might receive jyds URIs when "execute" is pressed.
+     */
+    public JythonScriptPanel( AutoplotUI app, final DataSetSelector selector) {
         initComponents();
         setMinimumSize( new Dimension(400,400) );
-
+        
         jScrollPane2.getVerticalScrollBar().setUnitIncrement( 12 ); // TODO: should be line height.
 
         setContext(CONTEXT_APPLICATION);
-        
+
+        this.model = app.getApplicationModel();
         support = new ScriptPanelSupport(this, model, selector);
 
-        this.model = model;
         this.applicationController= model.getDocumentModel().getController();
         
         this.selector = selector;
@@ -164,6 +171,30 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         });
 
+        AppManager.getInstance().addCloseCallback( app, "jythonScriptPanel", new AppManager.CloseCallback() {
+            @Override
+            public boolean checkClose() {
+                if ( isDirty() && isVisible() ) { 
+                    int resp= JOptionPane.showConfirmDialog( JythonScriptPanel.this, "Script Editor contains unsaved changes.  Save these changes?" );
+                    if ( resp==JOptionPane.CANCEL_OPTION ) {
+                        return false;
+                    } else if ( resp==JOptionPane.OK_OPTION ) {
+                        try {
+                            return support.save() == JOptionPane.OK_OPTION;
+                        } catch ( IOException ex ) {       
+                            return false;
+                        }
+                    } else if ( resp==JOptionPane.NO_OPTION ) {
+                        return true;
+                    }
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        });
+
+        
         this.textArea.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_S,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ), "save" );
 
         EditorContextMenu menu= new EditorContextMenu( this.textArea );
