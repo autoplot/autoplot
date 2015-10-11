@@ -1643,8 +1643,7 @@ public class GuiSupport {
                         }
                     }
                 };
-                SwingUtilities.invokeLater(run);
-                //run.run();
+                new Thread(run,"copyPlotElementsDown").start();
             }
         });
         item.setToolTipText("make a new plot below, and copy the plot elements into it.  New plot is bound by the x axis.");
@@ -1669,8 +1668,7 @@ public class GuiSupport {
                         domPlot.getController().contextOverview();
                     }
                 };
-                SwingUtilities.invokeLater(run);
-                //run.run();
+                new Thread(run,"contextOverview").start();
             }
         });
         item.setToolTipText("make a new plot, and copy the plot elements into it.  The plot is not bound,\n" +
