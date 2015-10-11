@@ -90,6 +90,7 @@ public class PlotElementController extends DomNodeController {
     private static final String PENDING_SET_DATASET= "setDataSet";
     private static final String PENDING_COMPONENT_OP= "componentOp";
     private static final String PENDING_UPDATE_DATASET= "updateDataSet";
+    private static final String PENDING_RESET_DATASOURCEFILTERID="resetDataSourceFilterId";
     /**
      * we need to reset the render type, but we can't do this from the event thread.
      */
@@ -211,7 +212,7 @@ public class PlotElementController extends DomNodeController {
         PlotElement parentEle= getParentPlotElement();
         if (parentEle != null) {
             if ( parentEle.getRenderType().equals(newRenderType) ) {
-                if ( plotElement.getPlotId().length()>0 ) {  //https://sourceforge.net/tracker/?func=detail&aid=3613187&group_id=199733&atid=970682
+                if ( plotElement.getPlotId().length()>0 ) {  //https://sourceforge.net/p/autoplot/bugs/1038/
                     doResetRenderTypeInt(newRenderType);
                     updateDataSet();
                 }
@@ -259,23 +260,22 @@ public class PlotElementController extends DomNodeController {
                 }
                 final RenderType newRenderType = (RenderType) evt.getNewValue();
                 final RenderType oldRenderType = (RenderType) evt.getOldValue();
-                if ( SwingUtilities.isEventDispatchThread() ) {
-                    changesSupport.registerPendingChange( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
-                    Runnable run= new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                changesSupport.performingChange( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
-                                resetRenderTypeImp( oldRenderType, newRenderType ); 
-                            } finally {
-                                changesSupport.changePerformed( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
-                            }
+                changesSupport.registerPendingChange( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            changesSupport.performingChange( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
+                            resetRenderTypeImp( oldRenderType, newRenderType ); 
+                        } finally {
+                            changesSupport.changePerformed( PlotElementController.this, PENDING_RESET_RENDER_TYPE );
                         }
-                    };
-                    run.run(); //TODO: figure this out.  The autoranging fails because it happens elsewhere...
-                    //RequestProcessor.invokeLater(run);
+                    }
+                };
+                if ( SwingUtilities.isEventDispatchThread() ) {
+                    new Thread(run,"updateDataSetOffEvent").start();
                 } else {
-                    resetRenderTypeImp( oldRenderType, newRenderType );
+                    run.run();
                 }
             } else if (evt.getPropertyName().equals(PlotElement.PROP_DATASOURCEFILTERID)) {
                 changeDataSourceFilter();
@@ -288,10 +288,16 @@ public class PlotElementController extends DomNodeController {
                         //updateDataSet();
                         if ( getRenderer()!=null ) getRenderer().setDataSet(null); // transitional state associated with undo.  https://sourceforge.net/tracker/?func=detail&aid=3316754&group_id=199733&atid=970682
                     } else {
+                        changesSupport.registerPendingChange( PlotElementController.this, PENDING_RESET_DATASOURCEFILTERID );                
                         Runnable run= new Runnable() {
                             @Override
                             public void run() { 
-                                updateDataSet();
+                                try {
+                                    changesSupport.performingChange( PlotElementController.this, PENDING_RESET_DATASOURCEFILTERID  );
+                                    updateDataSet();
+                                } finally {
+                                    changesSupport.changePerformed( PlotElementController.this, PENDING_RESET_DATASOURCEFILTERID  );
+                                }
                             } 
                         };
                         if ( SwingUtilities.isEventDispatchThread() ) {
