@@ -290,9 +290,9 @@ public class PlotElementController extends DomNodeController {
                     } else {
                         Runnable run= new Runnable() {
                             @Override
-                            public void run() {
+                            public void run() { 
                                 updateDataSet();
-                            }
+                            } 
                         };
                         if ( SwingUtilities.isEventDispatchThread() ) {
                             new Thread(run,"updateDataSetOffEvent").start();
