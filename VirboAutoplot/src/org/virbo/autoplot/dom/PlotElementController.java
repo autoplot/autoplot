@@ -5,6 +5,7 @@
 package org.virbo.autoplot.dom;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -287,7 +288,17 @@ public class PlotElementController extends DomNodeController {
                         //updateDataSet();
                         if ( getRenderer()!=null ) getRenderer().setDataSet(null); // transitional state associated with undo.  https://sourceforge.net/tracker/?func=detail&aid=3316754&group_id=199733&atid=970682
                     } else {
-                        updateDataSet();
+                        Runnable run= new Runnable() {
+                            @Override
+                            public void run() {
+                                updateDataSet();
+                            }
+                        };
+                        if ( SwingUtilities.isEventDispatchThread() ) {
+                            new Thread(run,"updateDataSetOffEvent").start();
+                        } else {
+                            run.run();
+                        }
                     }
                 }
             } else if ( evt.getPropertyName().equals( PlotElement.PROP_COMPONENT ) ) {
@@ -938,6 +949,10 @@ public class PlotElementController extends DomNodeController {
      * @throws IllegalArgumentException
      */
     private void updateDataSet() throws IllegalArgumentException {
+        if ( EventQueue.isDispatchThread() ) {
+            logger.warning("updateDataSet called from event thread.  Stack track follows.");
+            new Exception("updateDataSet called from event thread").printStackTrace();
+        }
         //if ( getRenderer()!=null ) getRenderer().setDataSet(null); //bug 1073 bug 1065.
         registerPendingChange( this, PENDING_UPDATE_DATASET );
         //TODO: we should hand off the dataset here instead of mucking around with it...  
