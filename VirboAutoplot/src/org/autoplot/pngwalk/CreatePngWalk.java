@@ -735,7 +735,7 @@ public class CreatePngWalk {
             String htmlImageStringClose="\" style=\"width:304px;height:304px;margin-left:10px;margin-bottom:10px;\">";
             String htmlImageCaptionOpen= "<figcaption style=\"color: white; text-align:center;\">";
             String htmlImageCaptionClose= "</figcaption>";
-            String div2Open="<div style=\"background-color: #6B6B6B;\">";
+            String div2Open="<div style=\"background-color: #6B6B6B;margin-left:100px;\">";
             String div2Close="</div>";
             String htmlFigureOpen= "<figure style=\"width:350px; float:left;\">";
             String htmlFigureClose= "</figure>";
