@@ -95,7 +95,7 @@ public class Test026 {
                 throw new IllegalArgumentException("no parse exception, but parsed incorrectly.");
             }
         }
-        writeToHTML(id, dr, drref);
+        //writeToHTML(id, dr, drref); // uncomment this for testing.
     }
 
     private static void doTestDR( int id, String test, DatumRange norm ) throws Exception {
