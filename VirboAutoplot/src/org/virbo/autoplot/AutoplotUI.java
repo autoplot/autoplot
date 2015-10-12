@@ -86,6 +86,7 @@ import javax.jnlp.SingleInstanceListener;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -403,7 +404,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         //Autoplot script doesn't steal focus (see sftp:papco.org:/home/jbf/ct/autoplot/script/fun/jeremy/randImages.jy)
         //but makes it so URIs cannot be entered. https://sourceforge.net/tracker/index.php?func=detail&aid=3532217&group_id=199733&atid=970682
         //this.setFocusableWindowState(false);
-                
+                    
         referenceCacheCheckBoxMenuItem.setSelected( System.getProperty( "enableReferenceCache", "true" ).equals("true") ); 
         
         expertMenuItems.add( editDomMenuItem );
@@ -448,15 +449,49 @@ public final class AutoplotUI extends javax.swing.JFrame {
         APSplash.checkTime("init 25");
 
         timeRangeEditor = new TimeRangeEditor();
+        Dimension d= new Dimension( 1000, (int)( timeRangeEditor.getFont().getSize()*1.8 ) );
+               
+        if ( "true".equals(System.getProperty("showTimeAndUriEditors")) ) {
+            timeUriPanel.remove(timeRangePanel);
+            timeUriPanel.setLayout( new BoxLayout(timeUriPanel, BoxLayout.Y_AXIS ) );
+            
+            timeUriPanel.removeAll();
+            timeUriPanel.add( Box.createVerticalStrut(4) );
+            JPanel rowInsetPanel= new JPanel();
+            rowInsetPanel.setPreferredSize( new Dimension( timeRangeEditor.getPreferredSize().width, d.height ) );
+            rowInsetPanel.setMaximumSize( new Dimension( 10000, timeRangeEditor.getFont().getSize() ) );
+            rowInsetPanel.setLayout( new BoxLayout(rowInsetPanel,BoxLayout.X_AXIS ) );
+            rowInsetPanel.add( Box.createHorizontalStrut(5) );
+            rowInsetPanel.add( timeRangeEditor );
+            rowInsetPanel.add( Box.createHorizontalStrut(5) );
+            timeUriPanel.add( rowInsetPanel );
+            rowInsetPanel= new JPanel();
+            rowInsetPanel.setLayout( new BoxLayout(rowInsetPanel,BoxLayout.X_AXIS ) );
+            rowInsetPanel.add( Box.createHorizontalStrut(5) );
+            rowInsetPanel.add( dataSetSelector );
+            rowInsetPanel.add( Box.createHorizontalStrut(5) );
+            timeUriPanel.add( rowInsetPanel  );
+            timeUriPanel.add( Box.createVerticalStrut(2) );
+            
+            timeUriPanel.setMinimumSize( new Dimension( timeUriPanel.getMinimumSize().width, d.height*2 ) );    
+            timeUriPanel.setSize( new Dimension( d.width, d.height*3 ) ); 
 
-        Dimension d= timeRangeEditor.getMinimumSize();
-        timeRangePanel.add( timeRangeEditor, "card1" );
-        timeRangeEditor.setMinimumSize( d );
-        timeRangePanel.setMinimumSize( d );
-        timeRangeEditor.setDataSetSelectorPeer(dataSetSelector);
-        timeRangeEditor.setAlternatePeer("Switch to Data Set Selector","card2");
-        dataSetSelector.setAlternatePeer("Switch to Time Range Editor","card1");
-
+            timeUriPanel.setMaximumSize( new Dimension( 10000, d.height*2 ) );
+            dataSetSelector.setAlignmentX( Component.RIGHT_ALIGNMENT );
+            dataSetSelector.setMaximumSize( new Dimension( 10000, d.height ) );
+            timeRangeEditor.setAlignmentX( Component.RIGHT_ALIGNMENT );
+            timeRangeEditor.setMaximumSize( new Dimension( 10000, d.height ) );
+            tabbedPanelContainer.setLocation( 0, 300 );
+            
+            this.revalidate();
+        } else {
+            timeRangePanel.add( timeRangeEditor, "card1" );
+            timeRangePanel.setMinimumSize( d );
+            timeRangeEditor.setDataSetSelectorPeer(dataSetSelector);
+            timeRangeEditor.setAlternatePeer("Switch to Data Set Selector","card2");
+            dataSetSelector.setAlternatePeer("Switch to Time Range Editor","card1");
+        }
+        
         timeRangeEditor.setNoOneListeningRange( Application.DEFAULT_TIME_RANGE );
         timeRangeEditor.setRange( Application.DEFAULT_TIME_RANGE );
 
@@ -2286,9 +2321,10 @@ APSplash.checkTime("init 52.9");
         statusLabel = new javax.swing.JLabel();
         tabbedPanelContainer = new javax.swing.JPanel();
         statusTextField = new javax.swing.JTextField();
+        uriTimeRangeToggleButton1 = new org.virbo.autoplot.UriTimeRangeToggleButton();
+        timeUriPanel = new javax.swing.JPanel();
         timeRangePanel = new javax.swing.JPanel();
         dataSetSelector = new org.virbo.datasource.DataSetSelector();
-        uriTimeRangeToggleButton1 = new org.virbo.autoplot.UriTimeRangeToggleButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         editMenu = new javax.swing.JMenu();
@@ -2408,6 +2444,19 @@ APSplash.checkTime("init 52.9");
             }
         });
 
+        org.jdesktop.layout.GroupLayout uriTimeRangeToggleButton1Layout = new org.jdesktop.layout.GroupLayout(uriTimeRangeToggleButton1);
+        uriTimeRangeToggleButton1.setLayout(uriTimeRangeToggleButton1Layout);
+        uriTimeRangeToggleButton1Layout.setHorizontalGroup(
+            uriTimeRangeToggleButton1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 0, Short.MAX_VALUE)
+        );
+        uriTimeRangeToggleButton1Layout.setVerticalGroup(
+            uriTimeRangeToggleButton1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 28, Short.MAX_VALUE)
+        );
+
+        timeUriPanel.setBorder(null);
+
         timeRangePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         timeRangePanel.setLayout(new java.awt.CardLayout());
 
@@ -2420,15 +2469,18 @@ APSplash.checkTime("init 52.9");
         });
         timeRangePanel.add(dataSetSelector, "card2");
 
-        org.jdesktop.layout.GroupLayout uriTimeRangeToggleButton1Layout = new org.jdesktop.layout.GroupLayout(uriTimeRangeToggleButton1);
-        uriTimeRangeToggleButton1.setLayout(uriTimeRangeToggleButton1Layout);
-        uriTimeRangeToggleButton1Layout.setHorizontalGroup(
-            uriTimeRangeToggleButton1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 0, Short.MAX_VALUE)
+        org.jdesktop.layout.GroupLayout timeUriPanelLayout = new org.jdesktop.layout.GroupLayout(timeUriPanel);
+        timeUriPanel.setLayout(timeUriPanelLayout);
+        timeUriPanelLayout.setHorizontalGroup(
+            timeUriPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(timeUriPanelLayout.createSequentialGroup()
+                .add(6, 6, 6)
+                .add(timeRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+                .add(6, 6, 6))
         );
-        uriTimeRangeToggleButton1Layout.setVerticalGroup(
-            uriTimeRangeToggleButton1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 28, Short.MAX_VALUE)
+        timeUriPanelLayout.setVerticalGroup(
+            timeUriPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
         );
 
         fileMenu.setText("File");
@@ -3039,42 +3091,32 @@ APSplash.checkTime("init 52.9");
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(timeRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 708, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(statusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 16, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(4, 4, 4)
-                        .add(statusTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)))
-                .addContainerGap())
-            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(org.jdesktop.layout.GroupLayout.TRAILING, tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE))
+            .add(layout.createSequentialGroup()
+                .add(statusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 16, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(4, 4, 4)
+                .add(statusTextField))
+            .add(timeUriPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(layout.createSequentialGroup()
                     .add(uriTimeRangeToggleButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(0, 722, Short.MAX_VALUE)))
+                    .add(0, 695, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 693, Short.MAX_VALUE)
+                .add(timeUriPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(statusLabel)
                     .add(statusTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                    .add(48, 48, 48)
-                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 686, Short.MAX_VALUE)
-                    .add(20, 20, 20)))
-            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(layout.createSequentialGroup()
                     .addContainerGap()
                     .add(uriTimeRangeToggleButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(714, Short.MAX_VALUE)))
+                    .addContainerGap(521, Short.MAX_VALUE)))
         );
 
         bindingGroup.bind();
@@ -3561,19 +3603,24 @@ private void canvasSizeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     }
 }//GEN-LAST:event_canvasSizeMenuItemActionPerformed
 
+private void switchToEditorCard( String selector ) {
+    if ( (CardLayout)timeRangePanel.getLayout() instanceof CardLayout ) {
+        ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, selector );
+    }
+    dom.getOptions().setUseTimeRangeEditor(CARD_TIME_RANGE_SELECTOR.equals(selector));
+}
+
 private void dataSetSelectorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
     if ( dataSetSelectorMenuItem.isSelected() ) {
-        ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_DATA_SET_SELECTOR);
-        dom.getOptions().setUseTimeRangeEditor(false);
+        switchToEditorCard( CARD_DATA_SET_SELECTOR);
     }
 }//GEN-LAST:event_dataSetSelectorMenuItemActionPerformed
 
 private void timeRangeSelectorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeSelectorMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
     if ( timeRangeSelectorMenuItem.isSelected() ) {
-        ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR);
-        dom.getOptions().setUseTimeRangeEditor(true);
+        switchToEditorCard( CARD_TIME_RANGE_SELECTOR );
     }
 }//GEN-LAST:event_timeRangeSelectorMenuItemActionPerformed
 
@@ -3716,9 +3763,9 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
                 evt.getY() < dssBounds.y + dssBounds.height ) {
                         
             if ( evt.getY()< dssBounds.y + dssBounds.height/2 ) {
-                ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_DATA_SET_SELECTOR );
+                switchToEditorCard( CARD_DATA_SET_SELECTOR );
             } else {
-                ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR );
+                switchToEditorCard( CARD_TIME_RANGE_SELECTOR );
             }
         }
     }//GEN-LAST:event_formMouseClicked
@@ -3785,9 +3832,9 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
                 }   break;
             case Options.PROP_USE_TIME_RANGE_EDITOR:
                 if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
-                    ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR );
+                    switchToEditorCard( CARD_TIME_RANGE_SELECTOR );
                 } else {
-                    ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_DATA_SET_SELECTOR );
+                    switchToEditorCard( CARD_DATA_SET_SELECTOR );
             }   break;
         }
     }
@@ -4850,6 +4897,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenu textSizeMenu;
     private javax.swing.JPanel timeRangePanel;
     private javax.swing.JRadioButtonMenuItem timeRangeSelectorMenuItem;
+    private javax.swing.JPanel timeUriPanel;
     private javax.swing.JMenu toolsMenu;
     private javax.swing.JPopupMenu.Separator toolsUserSep;
     private javax.swing.JMenuItem undoMenuItem;
@@ -5153,11 +5201,9 @@ APSplash.checkTime("init 240");
             @Override
             public void run() {
                 if ( !fexpert ) {
-                    ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR);
-                    dom.getOptions().setUseTimeRangeEditor(true);
+                    switchToEditorCard( CARD_TIME_RANGE_SELECTOR);
                 } else {
-                    ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_DATA_SET_SELECTOR);
-                    dom.getOptions().setUseTimeRangeEditor(false);
+                    switchToEditorCard( CARD_DATA_SET_SELECTOR);
                 }
             }
         } );
