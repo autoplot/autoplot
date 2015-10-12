@@ -68,6 +68,7 @@ import org.virbo.filters.FiltersChainPanel;
 public class DataPanel extends javax.swing.JPanel {
 
     Application dom;
+    AutoplotUI app;
     ApplicationController applicationController;
     DataSourceFilter dsf; // current focus
     BindingGroup dataSourceFilterBindingGroup;
@@ -86,8 +87,10 @@ public class DataPanel extends javax.swing.JPanel {
     
     private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui");
 
-    public DataPanel( Application dom ) {
+    public DataPanel( AutoplotUI app) {
         initComponents();
+        
+        this.app= app;
         
         // org.virbo.datasource.GuiUtil.addResizeListenerToAll(this);  // On 2015-01-16 it was doing strange things.
         
@@ -161,7 +164,7 @@ public class DataPanel extends javax.swing.JPanel {
         //dataSetSelector= new DataSetSelector();
         //dataAddressPanel.add( dataSetSelector, BorderLayout.NORTH );
         
-        this.dom = dom;
+        this.dom = app.getDocumentModel();
         this.applicationController= this.dom.getController();
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
             @Override
@@ -587,7 +590,7 @@ public class DataPanel extends javax.swing.JPanel {
         BindingGroup bc = new BindingGroup();
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("fill"), this.fillValueComboBox, BeanProperty.create("selectedItem")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("validRange"), this.validRangeComboBox, BeanProperty.create("selectedItem")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("uri"), this.uriTextField, BeanProperty.create("text")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("uri"), this.dataSetSelector, BeanProperty.create("value")));
         Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("controller.fillDataSet"),this.dataSetLabel, BeanProperty.create("text"));
         b.setConverter( BindingSupport.toStringConverter );
         bc.addBinding(b);
@@ -695,7 +698,7 @@ public class DataPanel extends javax.swing.JPanel {
         fillValueComboBox = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        uriTextField = new javax.swing.JTextField();
+        dataSetSelector = new org.virbo.datasource.DataSetSelector();
 
         setName("dataPanel"); // NOI18N
 
@@ -783,7 +786,7 @@ public class DataPanel extends javax.swing.JPanel {
                         .add(operationsLabel)
                         .add(operatorsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(filtersChainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
+                .add(filtersChainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(sliceAutorangesCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -855,10 +858,11 @@ public class DataPanel extends javax.swing.JPanel {
         jPanel3.setToolTipText("The Data Address, or URI, identifies the data that is loaded.  Plug-in data sources, resolved from this address, are used to load in the data for the given URI.  (This is not editable, but will be soon.)");
         jPanel3.setName("uriPanel"); // NOI18N
 
-        uriTextField.setEditable(false);
-        uriTextField.setFont(uriTextField.getFont().deriveFont(uriTextField.getFont().getSize()-2f));
-        uriTextField.setText("This will be the current focus URI");
-        uriTextField.setToolTipText("After the data is loaded, the plot element can apply additional operations before displaying the data.  ");
+        dataSetSelector.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dataSetSelectorActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -866,14 +870,14 @@ public class DataPanel extends javax.swing.JPanel {
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(uriTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
+                .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel3Layout.createSequentialGroup()
-                .add(uriTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(0, 12, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -887,7 +891,7 @@ public class DataPanel extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 51, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 68, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -951,6 +955,12 @@ public class DataPanel extends javax.swing.JPanel {
         logger.log(Level.FINE, "operatorsComboBox: {0}", operatorsComboBox.getSelectedItem());
     }//GEN-LAST:event_operatorsComboBoxActionPerformed
 
+    private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
+        String uri= dataSetSelector.getValue();
+        int modifiers= evt.getModifiers();
+        app.doPlotGoButton( uri, modifiers );
+    }//GEN-LAST:event_dataSetSelectorActionPerformed
+
     /**
      * for testing, provide access.
      * @return the FiltersChainPanel
@@ -961,6 +971,7 @@ public class DataPanel extends javax.swing.JPanel {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dataSetLabel;
+    private org.virbo.datasource.DataSetSelector dataSetSelector;
     private javax.swing.JButton editComponentPanel;
     private javax.swing.JComboBox fillValueComboBox;
     private javax.swing.JLabel fillValueLabel;
@@ -974,7 +985,6 @@ public class DataPanel extends javax.swing.JPanel {
     private org.virbo.datasource.RecentComboBox operatorsComboBox;
     private javax.swing.JLabel processDataSetLabel;
     private javax.swing.JCheckBox sliceAutorangesCB;
-    private javax.swing.JTextField uriTextField;
     private javax.swing.JComboBox validRangeComboBox;
     private javax.swing.JLabel validRangeLabel;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
