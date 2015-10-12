@@ -1818,6 +1818,17 @@ public class GuiSupport {
             }
         }));
 
+        plot.getDasMouseInputAdapter().addMenuItem(new JMenuItem(new AbstractAction("Add Annotation...") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                AddAnnotationDialog dia= new AddAnnotationDialog();
+                if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( app, dia ) ) {
+                    controller.addAnnotation( domPlot, dia.getText() );
+                }
+            }
+        }));
+        
         plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
 
         plotController.setExpertMenuItems( expertMenuItems.toArray(new JMenuItem[expertMenuItems.size()] ) );
