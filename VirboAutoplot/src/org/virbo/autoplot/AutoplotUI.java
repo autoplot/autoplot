@@ -1117,7 +1117,7 @@ APSplash.checkTime("init 250");
                 //System.err.println("  invokeLater set, layout panel "+(System.currentTimeMillis()-t0));
 APSplash.checkTime("init 259");
                 if ( fdataPane!=null ) {
-                    final DataPanel dp= new DataPanel(dom);
+                    final DataPanel dp= new DataPanel(AutoplotUI.this);
                     dataPanel= dp;
                     SwingUtilities.invokeLater( new Runnable() { 
                         @Override
@@ -3138,10 +3138,12 @@ APSplash.checkTime("init 52.9");
         support.doPasteDataSetURL();
     }//GEN-LAST:event_pasteDataSetURLMenuItemActionPerformed
 
-    private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
-        org.das2.util.LoggerManager.logGuiEvent(evt);
-        final String uri= (String) dataSetSelector.getValue();
-        final int modifiers= evt.getModifiers();
+    /**
+     * Action performed when the green "play" button is pressed.
+     * @param uri the URI
+     * @param modifiers the modifiers, such as KeyEvent.CTRL_MASK and KeyEvent.SHIFT_MASK.
+     */
+    protected void doPlotGoButton( final String uri, final int modifiers ) {
         org.das2.util.LoggerManager.getLogger("gui").log(Level.FINE, "plot URI \"{0}\"", uri);
         ExceptionHandler eh= applicationModel.getExceptionHandler();
         if ( eh instanceof GuiExceptionHandler ) {
@@ -3165,7 +3167,14 @@ APSplash.checkTime("init 52.9");
             }
         };
         //run.run(); // simulate old code.
-        new Thread(run,"dataSetSelectThread").start();
+        new Thread(run,"dataSetSelectThread").start();        
+    }
+    
+    private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+        String uri= (String) dataSetSelector.getValue();
+        int modifiers= evt.getModifiers();
+        doPlotGoButton( uri, modifiers );
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
     private void zoomOutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomOutMenuItemActionPerformed
@@ -3819,7 +3828,7 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
             case Options.PROP_DATAVISIBLE:
                 if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
                     if ( dataPanel == null ) {
-                        dataPanel = new DataPanel(applicationModel.dom);
+                        dataPanel = new DataPanel( AutoplotUI.this );
                     }
                     int idx= tabs.indexOfTab("metadata");
                     if ( idx==-1 ) idx=  tabs.getTabCount();
