@@ -18,6 +18,10 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
         initComponents();
     }
 
+    public String getText() {
+        return jTextField1.getText();
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
