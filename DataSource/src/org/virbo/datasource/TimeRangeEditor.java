@@ -490,7 +490,9 @@ public class TimeRangeEditor extends javax.swing.JPanel {
                 public void actionPerformed(ActionEvent ev) {
                     org.das2.util.LoggerManager.logGuiEvent(ev);                    
                     Container trp= TimeRangeEditor.this.getParent();
-                    ((CardLayout)trp.getLayout()).show( trp, alternatePeerCard );
+                    if ( trp.getLayout() instanceof CardLayout ) {
+                        ((CardLayout)trp.getLayout()).show( trp, alternatePeerCard );
+                    }
                 }
             } );
         }
