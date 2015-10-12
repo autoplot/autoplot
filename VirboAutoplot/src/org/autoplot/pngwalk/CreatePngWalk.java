@@ -722,14 +722,13 @@ public class CreatePngWalk {
         try ( BufferedWriter bw = new BufferedWriter(new FileWriter(f)) ) {
             String currentPngFilename;
             String fileNameToDisplay;
-            
             String year;
             String month;
             String day;
             String fullDate;
             
             String headerOpen= "<div style=\"top: 0px; margin-right=0px; background-color:black; color:white;height:100px;\">"
-                    + "EMFISIS PNG WALK CREATED BY ARMOND LUTHENS" + "</div>";
+                    + "EMFISIS PNG WALK" + "</div>";
             
             String addImageString;
             String htmlImageStringOpen="<img src=\"";
