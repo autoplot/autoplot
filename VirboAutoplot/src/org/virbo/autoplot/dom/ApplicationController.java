@@ -892,6 +892,15 @@ public class ApplicationController extends DomNodeController implements RunLater
         });        
         impl.getDasMouseInputAdapter().addMenuItem(mi);
         
+        mi= new JMenuItem(new AbstractAction("Delete Annotation") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
+                deleteAnnotation(annotation);
+            }
+        });        
+        
+        impl.getDasMouseInputAdapter().addMenuItem(mi);
         impl.getDasMouseInputAdapter().removeMenuItem("Properties");
         impl.getDasMouseInputAdapter().removeMenuItem("remove arrow");
         impl.getDasMouseInputAdapter().removeMenuItem("remove");
