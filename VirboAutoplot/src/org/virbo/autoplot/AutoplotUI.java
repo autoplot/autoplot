@@ -449,7 +449,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
         APSplash.checkTime("init 25");
 
         timeRangeEditor = new TimeRangeEditor();
-        Dimension d= new Dimension( 1000, (int)( timeRangeEditor.getFont().getSize()*1.8 ) );
+        Dimension d= new Dimension( 1000, (int)( timeRangeEditor.getFont().getSize()*1.7 ) );
                
         if ( "true".equals(System.getProperty("showTimeAndUriEditors")) ) {
             timeUriPanel.remove(timeRangePanel);
@@ -486,7 +486,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
             this.revalidate();
         } else {
             timeRangePanel.add( timeRangeEditor, "card1" );
-            timeRangePanel.setMinimumSize( d );
+            timeRangePanel.setMinimumSize( new Dimension( timeUriPanel.getMinimumSize().width, d.height ) );
             timeRangeEditor.setDataSetSelectorPeer(dataSetSelector);
             timeRangeEditor.setAlternatePeer("Switch to Data Set Selector","card2");
             dataSetSelector.setAlternatePeer("Switch to Time Range Editor","card1");
@@ -2455,8 +2455,6 @@ APSplash.checkTime("init 52.9");
             .add(0, 28, Short.MAX_VALUE)
         );
 
-        timeUriPanel.setBorder(null);
-
         timeRangePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         timeRangePanel.setLayout(new java.awt.CardLayout());
 
@@ -2480,7 +2478,10 @@ APSplash.checkTime("init 52.9");
         );
         timeUriPanelLayout.setVerticalGroup(
             timeUriPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+            .add(timeUriPanelLayout.createSequentialGroup()
+                .add(11, 11, 11)
+                .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         fileMenu.setText("File");
@@ -3105,9 +3106,9 @@ APSplash.checkTime("init 52.9");
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(timeUriPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(timeUriPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 48, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+                .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 516, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(statusLabel)
@@ -3116,7 +3117,7 @@ APSplash.checkTime("init 52.9");
                 .add(layout.createSequentialGroup()
                     .addContainerGap()
                     .add(uriTimeRangeToggleButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(521, Short.MAX_VALUE)))
+                    .addContainerGap(554, Short.MAX_VALUE)))
         );
 
         bindingGroup.bind();
