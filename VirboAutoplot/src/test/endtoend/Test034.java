@@ -28,15 +28,10 @@ public class Test034 {
         reset();
         final Application dom = getDocumentModel();
         plot(tsbURI);
-        Runnable run= new Runnable() {
-            public void run() {
-                dom.getPlots(0).getController().contextOverview();
-                DatumRange z = dom.getPlots(1).getXaxis().getRange();
-                z = DatumRangeUtil.rescale(z, -0.3, 1.3);
-                dom.getPlots(1).getXaxis().setRange(z);
-            }
-        };
-        SwingUtilities.invokeAndWait(run);
+        dom.getPlots(0).getController().contextOverview();
+        DatumRange z = dom.getPlots(1).getXaxis().getRange();
+        z = DatumRangeUtil.rescale(z, -0.3, 1.3);
+        dom.getPlots(1).getXaxis().setRange(z);
         writeToPng( "test034_001.png" );
     }
 
@@ -44,13 +39,8 @@ public class Test034 {
         reset();
         final Application dom= getDocumentModel();
         plot( tsbURI );
-        Runnable run= new Runnable() {
-            public void run() {
-                dom.getPlots(0).getController().contextOverview();
-                dom.getPlotElements(1).setComponent("|slice0(100)");
-            }
-        };
-        SwingUtilities.invokeAndWait(run);
+        dom.getPlots(0).getController().contextOverview();
+        dom.getPlotElements(1).setComponent("|slice0(100)");
         writeToPng( "test034_002.png" );
     }
 
@@ -59,13 +49,8 @@ public class Test034 {
         org.das2.util.LoggerManager.getLogger("autoplot.dom").setLevel(Level.ALL);
         final Application dom= getDocumentModel();
         plot( noTsbURI );
-        Runnable run= new Runnable() {
-            public void run() {
-                dom.getPlots(0).getController().contextOverview();
-                dom.getPlotElements(1).setComponent("|slice0(100)");
-            }
-        };
-        SwingUtilities.invokeAndWait(run);
+        dom.getPlots(0).getController().contextOverview();
+        dom.getPlotElements(1).setComponent("|slice0(100)");
 
         writeToPng( "test034_003.png" );
     }
