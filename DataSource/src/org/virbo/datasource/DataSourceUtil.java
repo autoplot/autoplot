@@ -10,6 +10,7 @@
 package org.virbo.datasource;
 
 import java.awt.Component;
+import java.awt.Desktop;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -835,11 +836,20 @@ public class DataSourceUtil {
      * open the URL in a browser.   Borrowed from http://www.centerkey.com/java/browser/.  See also openBrowser in VirboAutoplot,
      * which this replaces.
      * 
-     * TODO: this needs to be verified for newer desktops.
-     * 
+     * Java 6 introduced standard code for doing this.  The old code is still 
+     * used in case there's a problem.
+     *
      * @param url the URL
      */
     public static void openBrowser(String url) {
+        try {
+            Desktop.getDesktop().browse( java.net.URI.create(url) );
+            return;
+            
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        
         final String errMsg = "Error attempting to launch web browser";
         String osName;
         try {
