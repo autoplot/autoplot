@@ -125,6 +125,8 @@ public class DataSourceUtil {
      * @param spec if spec is a fully specified URL, then it is used, otherwise
      *    it is appended to context.  If spec refers to the name of a file,
      *    but doesn't start with "file:/", "file:/" is appended.
+     * @return the URL.
+     * @throws java.net.MalformedURLException 
      */
     public static URL newURL( URL context, String spec ) throws MalformedURLException {
         if ( context==null || spec.contains("://") || ( spec.startsWith("file:/") ) ) {
@@ -143,6 +145,9 @@ public class DataSourceUtil {
     
     /**
      * presents the spec for the url within a context.
+     * @param context the context.
+     * @param url the URL.
+     * @return the part made relative, if possible, to context.
      */
     public static String urlWithinContext( URL context, String url ) {
         String result;
@@ -156,6 +161,8 @@ public class DataSourceUtil {
     
     /**
      * remove quotes from string, which pops up a lot in metadata
+     * @param s the string.
+     * @return the string without quotes.
      */
     public static String unquote( String s ) {
         if ( s==null ) return null;
@@ -324,7 +331,7 @@ public class DataSourceUtil {
             String sagg = makeAggregation(surl);
             if (sagg==null || sagg.equals(surl))
                 return surl;
-            DatumRange dr = null;
+            DatumRange dr;
             // remove parameter
             sagg = URISplit.removeParam(sagg, "timerange");
             TimeParser tp = TimeParser.create(sagg);
@@ -396,6 +403,7 @@ public class DataSourceUtil {
             if ( best>-1 ) {
                 String date= s.substring(last);
                 String ch= date.substring(4,5); // get the $2 char.  Assumes all are $Y
+                assert frepl!=null;
                 String stp= frepl.replaceAll("\\\\",""); 
                 stp= stp.replaceAll("\\$2",ch);
                 stp= stp.replaceAll("\\$3",ch);
@@ -826,6 +834,10 @@ public class DataSourceUtil {
     /**
      * open the URL in a browser.   Borrowed from http://www.centerkey.com/java/browser/.  See also openBrowser in VirboAutoplot,
      * which this replaces.
+     * 
+     * TODO: this needs to be verified for newer desktops.
+     * 
+     * @param url the URL
      */
     public static void openBrowser(String url) {
         final String errMsg = "Error attempting to launch web browser";
@@ -865,17 +877,14 @@ public class DataSourceUtil {
     }
 
     /**
-     * returns true if the stream appears to be html.  Right now the test is
+     * returns true if the text appears to be html.  Right now the test is
      * for "<htm" "<HTM" or "<!doc" "<!DOC".
      *
-     * @param magic
+     * @param text the text.
+     * @return true if the stream appears to be html.
      */
-    public static boolean isHtmlStream( String magic ) {
-         if ( magic.toLowerCase().startsWith("<!doc") || magic.toLowerCase().startsWith("<html")) {
-            return true;
-         } else {
-             return false;
-         }
+    public static boolean isHtmlStream( String text ) {
+        return text.toLowerCase().startsWith("<!doc") || text.toLowerCase().startsWith("<html");
     }
 
     /**
@@ -892,8 +901,12 @@ public class DataSourceUtil {
      * to the given timerange if it does.  For example, modify the bookmark so that the
      * timerange is the current axis timerange before using it.
      * @param uri An Autoplot URI, which must resolve to a DataSource.
-     * @param timerange the timerange to use.  If this is null or a non-timerange, then the URI is returned unchanged.
+     * @param timeRange the timerange to use.  If this is null or a non-timerange, then the URI is returned unchanged.
+     * @param mon the monitor
      * @return A URI that would yield data from the same dataset but for a different time.
+     * @throws java.net.URISyntaxException
+     * @throws java.io.IOException
+     * @throws java.text.ParseException
      */
     public static String setTimeRange( String uri, DatumRange timeRange, ProgressMonitor mon ) throws URISyntaxException, IOException, ParseException {
         if ( timeRange==null ) {
