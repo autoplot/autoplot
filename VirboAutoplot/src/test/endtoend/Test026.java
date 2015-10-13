@@ -105,43 +105,54 @@ public class Test026 {
         }
     }
     
-    public static void writeToHTML(int id, DatumRange test, DatumRange ref){
-        /*
-        String outputFolder= "/home/aluthens/batch/test026/";
-        
-        String outputFolder= ".";
-        String filePath= outputFolder+"Examples.html";
-        
+    public static void createHTMLHead(){
+        //write to HTML
+        String filePath= "Examples.html";
         File f= new File(filePath);
         
-        String htmlOpen= "<html>";
-        String headerString="<head><title>Test 026</title></head>";
-        String bodyString="<body style=\"background-color: #6B6B6B; margin=0;\">";
-        String headerOpen= "<div style=\"top: 0px; margin-right=0px; font-size:40px; background-color:black; color:white;height:100px;\">"
-                    + "TEST 026" + "</div>";
-        String tableOpen= "<table border=\"1\" style=\"width:100%; color:white;\">";
-        String htmlClose= "</table></body></html>";
-        */
+        String htmlOpen = "<html>";
+        String headerString = "<head><title>Test 026</title></head>";
+        String bodyString = "<body style=\"background-color: #6B6B6B; margin=0;\">";
+        String headerOpen = "<div style=\"top: 0px; margin-right=0px; font-size:40px; background-color:black; color:white;height:100px;\">"
+                            + "TEST 026" + "</div>";
+        String tableOpen = "<table border=\"1\" style=\"width:100%; color:white;\">";
+       
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter(f))){
+            bw.write(htmlOpen); //opens html
+            bw.write(headerString); //writes html header
+            bw.write(bodyString); //opens body and gives style
+            bw.write(headerOpen); //writes header of webpage
+            bw.write(tableOpen);
+        }
+        catch(IOException e){
+            System.out.println("Error");
+        }
+            
+    }
+    
+    public static void closeHTML(){
+        String filePath= "Examples.html";
+        File f= new File(filePath); 
+        String htmlClose = "</table></body></html>";
         
-        String outputFolder= ".";
-        String filePath= outputFolder+"Examples.html";
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter(f.getName(), true))){
+            bw.write(htmlClose);
+        }
+        catch(IOException e){
+            System.out.println("Error");
+        }
+    }
+    
+    public static void writeToHTML(int id, DatumRange test, DatumRange ref){ 
+        String filePath= "Examples.html";
         File f= new File(filePath);
-        
         
         String table1=  "<tr><td><strong>Test Number:</strong> " + id + "</td>" +
                         "<td><strong>Test: </strong> " + test + "</td>" + 
                         "<td><strong>Ref: </strong> " + ref + "</td></tr>";
         
-        
-        
-        try ( BufferedWriter bw = new BufferedWriter(new FileWriter(f)) ) {
-            //bw.write(htmlOpen); //opens html
-            //bw.write(headerString); //writes html header
-            //bw.write(bodyString); //opens body and gives style
-            //bw.write(headerOpen); //writes header of webpage
-            //bw.write(tableOpen);
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter(f.getName(), true))){
             bw.write(table1);
-            //bw.write(htmlClose); //closes body and html
         }
         catch(IOException e){
             System.out.println("ERROR.");
@@ -151,26 +162,8 @@ public class Test026 {
 
     public static void main(String[] args) {
         try {
-            //write to HTML
-            String outputFolder= ".";
-            String filePath= outputFolder+"Examples.html";
-        
-            File f= new File(filePath);
-        
-            String htmlOpen= "<html>";
-            String headerString="<head><title>Test 026</title></head>";
-            String bodyString="<body style=\"background-color: #6B6B6B; margin=0;\">";
-            String headerOpen= "<div style=\"top: 0px; margin-right=0px; font-size:40px; background-color:black; color:white;height:100px;\">"
-                                + "TEST 026" + "</div>";
-            String tableOpen= "<table border=\"1\" style=\"width:100%; color:white;\">";
-            String htmlClose= "</table></body></html>";
-            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
-            bw.write(htmlOpen); //opens html
-            bw.write(headerString); //writes html header
-            bw.write(bodyString); //opens body and gives style
-            bw.write(headerOpen); //writes header of webpage
-            bw.write(tableOpen);
             
+            createHTMLHead();
             //doTests
             doTestDR( 70, "0 to 35", DatumRange.newDatumRange(0,35,Units.dimensionless) );
             doTestDR( 71, "0to35", DatumRange.newDatumRange(0,35,Units.dimensionless) );
@@ -241,7 +234,7 @@ public class Test026 {
             doTest(44, "1972/now-P1D", "1972-01-01T00:00/" + now.subtract(1,Units.days), micros );
             doTest(45, "now-P10D/now-P1D", new DatumRange( now.subtract(10,Units.days), now.subtract(1,Units.days) ).toString(), micros );
             
-            bw.write(htmlClose); //closes body and html
+            closeHTML(); //closes body and html
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (Exception ex) {
             ex.printStackTrace();
