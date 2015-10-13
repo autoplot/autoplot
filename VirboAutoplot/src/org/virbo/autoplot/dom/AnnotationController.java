@@ -77,6 +77,9 @@ public class AnnotationController extends DomNodeController {
         ac.bind( annotation, "anchorBorderType", p, "anchorBorderType");
         ac.bind( annotation, "xrange", p, "xrange" );
         ac.bind( annotation, "yrange", p, "yrange" );
+        ac.bind( annotation, "x", p, "x" );
+        ac.bind( annotation, "y", p, "y" );
+        ac.bind( annotation, "showArrow", p, "showArrow" );
         ac.bind( annotation, "overrideColors", p, "overrideColors" );
         ac.bind( annotation, "textColor", p, "textColor" );
         ac.bind( annotation, "foreground", p, "foreground" );

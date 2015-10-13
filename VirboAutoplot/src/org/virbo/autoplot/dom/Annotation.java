@@ -8,6 +8,7 @@ package org.virbo.autoplot.dom;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.AnchorPosition;
@@ -111,6 +112,48 @@ public class Annotation extends DomNode {
         DatumRange oldYrange = this.yrange;
         this.yrange = yrange;
         propertyChangeSupport.firePropertyChange(PROP_YRANGE, oldYrange, yrange);
+    }
+
+    private Datum pointAtX = Datum.create(0);
+
+    public static final String PROP_POINTATX = "pointAtX";
+
+    public Datum getPointAtX() {
+        return pointAtX;
+    }
+
+    public void setPointAtX(Datum pointAtX) {
+        Datum oldPointAtX = this.pointAtX;
+        this.pointAtX = pointAtX;
+        propertyChangeSupport.firePropertyChange(PROP_POINTATX, oldPointAtX, pointAtX);
+    }
+
+    private Datum pointAtY = Datum.create(0);
+
+    public static final String PROP_POINTATY = "pointAtY";
+
+    public Datum getPointAtY() {
+        return pointAtY;
+    }
+
+    public void setPointAtY(Datum pointAtY) {
+        Datum oldPointAtY = this.pointAtY;
+        this.pointAtY = pointAtY;
+        propertyChangeSupport.firePropertyChange(PROP_POINTATY, oldPointAtY, pointAtY);
+    }
+    
+    private boolean showArrow = false;
+
+    public static final String PROP_SHOWARROW = "showArrow";
+
+    public boolean isShowArrow() {
+        return showArrow;
+    }
+
+    public void setShowArrow(boolean showArrow) {
+        boolean oldShowArrow = this.showArrow;
+        this.showArrow = showArrow;
+        propertyChangeSupport.firePropertyChange(PROP_SHOWARROW, oldShowArrow, showArrow);
     }
 
     private AnchorType anchorType = AnchorType.CANVAS;
@@ -281,6 +324,9 @@ public class Annotation extends DomNode {
         if ( !exclude.contains( PROP_ANCHORBORDERTYPE ) ) this.setAnchorBorderType(that.getAnchorBorderType() );
         if ( !exclude.contains( PROP_XRANGE ) ) this.setXrange( that.getXrange() );
         if ( !exclude.contains( PROP_YRANGE ) ) this.setYrange( that.getYrange() );
+        if ( !exclude.contains( PROP_POINTATX ) ) this.setPointAtX( that.getPointAtX() );
+        if ( !exclude.contains( PROP_POINTATY ) ) this.setPointAtY( that.getPointAtY() );
+        if ( !exclude.contains( PROP_SHOWARROW ) ) this.setShowArrow( that.isShowArrow() );
         if ( !exclude.contains( PROP_OVERRIDECOLORS ) ) this.setOverrideColors(that.isOverrideColors() );
         if ( !exclude.contains( PROP_TEXTCOLOR ) ) this.setTextColor(that.getTextColor() );
         if ( !exclude.contains( PROP_FOREGROUND ) ) this.setForeground(that.getForeground() );
@@ -321,6 +367,12 @@ public class Annotation extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_XRANGE, that.xrange, this.xrange ) );
         b=  that.yrange.equals(this.yrange) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_YRANGE, that.yrange, this.yrange ) );
+        b=  that.pointAtX.equals(this.pointAtX) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_POINTATX, that.pointAtX, this.pointAtX ) );
+        b=  that.pointAtY.equals(this.pointAtY) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_POINTATY, that.pointAtY, this.pointAtY ) );
+        b=  that.showArrow==this.showArrow;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_SHOWARROW, that.showArrow, this.showArrow ) );
         b=  that.textColor.equals(this.textColor) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_TEXTCOLOR, that.textColor, this.textColor ) );
         b=  that.foreground.equals(this.foreground) ;
