@@ -45,6 +45,7 @@ import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.DataSourceUtil;
 //import org.virbo.datasource.ReferenceCache;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AsciiHeadersParser;
@@ -896,12 +897,20 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 Matcher m= p.matcher(w);
                 int ieq;
                 if ( !m.find() ) {
-                    throw new IllegalArgumentException("where can only contain .eq,.gt,or.lt");
+                    Pattern p2= Pattern.compile("\\.(within)\\(");
+                    Matcher m2= p2.matcher(w);
+                    if ( !m2.find() ) {
+                        throw new IllegalArgumentException("where can only contain .eq,.ne,.ge,.gt,.le,.lt, or .within");
+                    } else {
+                        ieq= m2.start();
+                        String sval= w.substring(ieq+8,w.length()-1);
+                        String sparm= w.substring(0,ieq);
+                        parser.setWhereConstraint( sparm, "within", DataSourceUtil.unescape(sval) );
+                    }
                 } else {
                     ieq= m.start();
                     String op= m.group(1);
-                    String sval= w.substring(ieq+4);
-                    if ( sval.endsWith(")") ) sval= sval.substring(0,sval.length()-1);
+                    String sval= w.substring(ieq+4,w.length()-1);
                     String sparm= w.substring(0,ieq);
                     parser.setWhereConstraint( sparm, op, sval );
                 }
