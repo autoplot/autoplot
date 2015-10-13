@@ -91,6 +91,34 @@ public class DataSourceUtil {
     }
     
     /**
+     * Carefully remove pluses from URIs that mean to interpret pluses
+     * as spaces.  Note this is not done automatically because some data sources
+     * need the pluses, like vap+inline:ripples(20)+linspace(0.,10.,20).
+     * This should be done carefully, because we realize that some pluses may
+     * intentionally exist in URIs, such as &where=energy.gt(1e+3).  While this
+     * is discouraged, it will inevitably happen.  
+     * 
+     * <table>
+     * <tr><td>&where=energy.gt(1e+3)</td><td>&where=energy.gt(1e+3)</td><tr>
+     * <tr><td>&where=energy.within(1e+3+to+1e+5)</td><td>&where=energy.gt(1e+3 to 1e+5)</td><tr>
+     * </table>
+     * @param s the parameter string, such as 
+     * @return 
+     */
+    public static String unescapeParam( String s ) {
+        String[] ss= s.split("\\+\\D");
+        if ( ss.length==1 ) return s;
+        // return String.join( " ",ss ); // Oh, for Java 8 I can't wait. (Note I realized later that it couldn't be used anyway.
+        StringBuilder b= new StringBuilder(ss[0]);
+        int ich= ss[0].length()+1; // we need to preserve the \D
+        for ( int i=1; i<ss.length; i++ ) {
+            b.append(" ").append(s.charAt(ich)).append(ss[i]);
+            ich= ich + ss[i].length()+1;
+        }
+        return b.toString();
+    }
+    
+    /**
      * interprets spec within the context of URL context.
      * @param context the context for the spec.  null may be used to
      *    indicate no context.
