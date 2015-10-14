@@ -122,7 +122,7 @@ echo "done special handling of META-INF stuff."
 
 echo "copy resources..."
 cd temp-src
-for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.jyds' -o -name '*.xml' -o -name '*.xsl' -o -name '*.xsd' -o -name '*.CSV' ); do
+for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.jyds' -o -name '*.xml' -o -name '*.xsl' -o -name '*.xsd' -o -name '*.CSV' -o -name '*.properties' ); do
    mkdir -p $(dirname ../temp-classes/$i)
    cp $i ../temp-classes/$i
 done
