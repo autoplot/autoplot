@@ -1051,8 +1051,8 @@ public class PlotElementController extends DomNodeController {
     }
 
     /**
-     * calculate the slices based on the slices command.  This results in a trivial amount of extra work
-     * but makes the code cleaner.
+     * calculate the slices based on the slices command.  This results in 
+     * a trivial amount of extra work but makes the code cleaner.
      * 
      * @param fillDs
      * @param slicePref
@@ -1114,9 +1114,13 @@ public class PlotElementController extends DomNodeController {
         Units[] depUnits= getDimensionUnits(fillDs);
 
         int lat = -1, lon = -1;
-
-        List<Integer> slicePref = new ArrayList( Arrays.asList( 2, 2, 2, 2, 2 ) ); // slicePref big means more likely to slice.//TODO: hard-code rank 5.
-        for (int i = 0; i < depNames.length; i++) {
+        
+        int rank= fillDs.rank();
+        
+        List<Integer> slicePref = new ArrayList( rank );
+        for ( int i=0; i<fillDs.rank(); i++ ) slicePref.add(2);
+                
+        for (int i = 0; i <rank; i++) {
             String n = depNames[i].toLowerCase();
             Units u= depUnits[i];
             if (n.startsWith("lat")) {
@@ -1145,7 +1149,7 @@ public class PlotElementController extends DomNodeController {
 
         List<Integer> qube= new ArrayList(); // we remove elements from this one.
         int[] a= DataSetUtil.qubeDims(fillDs);
-        for ( int i=0; i<a.length; i++ ) {
+        for ( int i=0; i<rank; i++ ) {
             qube.add(a[i]);
         }
 
@@ -1155,13 +1159,17 @@ public class PlotElementController extends DomNodeController {
 
         String newResult= guessSliceSlices( fillDs, slicePref );
 
+        if ( rank>4 ) {
+            return newResult;
+        }
+        
         for ( int islice=0; islice<nslice; islice++ ) {
             int sliceIndex = 0;
             int bestSlice = 0;
             boolean noPref= true;
             
-            for (int i = 0; i < depNames.length; i++) {
-                if ( i>0 && slicePref.get(i)!=slicePref.get(i-1) ) noPref= false;
+            for (int i = 0; i <rank; i++) {
+                if ( i>0 && slicePref.get(i).equals(slicePref.get(i-1)) ) noPref= false;
                 if (slicePref.get(i) > bestSlice) {
                     sliceIndex = i;
                     bestSlice = slicePref.get(i);
