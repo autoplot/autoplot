@@ -1168,7 +1168,7 @@ public class PlotElementController extends DomNodeController {
             int bestSlice = 0;
             boolean noPref= true;
             
-            for (int i = 0; i <rank; i++) {
+            for (int i = 0; i <slicePref.size(); i++) {
                 if ( i>0 && slicePref.get(i).equals(slicePref.get(i-1)) ) noPref= false;
                 if (slicePref.get(i) > bestSlice) {
                     sliceIndex = i;
