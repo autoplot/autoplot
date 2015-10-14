@@ -592,7 +592,7 @@ public class DataSourceController extends DomNodeController {
 
             doDimensionNames();
 
-            if (DataSetUtil.totalLength(ds) < 200000 && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(ds)) ) {
+            if ( ds.rank()<=QDataSet.MAX_RANK && DataSetUtil.totalLength(ds) < 200000 && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(ds)) ) {
                 setStatus("busy: do statistics on the data...");
                 setHistogram(new AutoHistogram().doit(ds, null));
             } else {
