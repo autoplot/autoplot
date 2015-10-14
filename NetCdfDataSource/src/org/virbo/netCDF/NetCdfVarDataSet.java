@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import org.das2.datum.Units;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
@@ -40,6 +42,7 @@ import ucar.nc2.dataset.NetcdfDataset;
  * @author jbf
  */
 public class NetCdfVarDataSet extends AbstractDataSet {
+
     Variable v;
     double[] data;
     int[] shape;
@@ -400,5 +403,25 @@ public class NetCdfVarDataSet extends AbstractDataSet {
     public int length( int dim0, int dim1, int dim2 ) {
         return shape[3];
     }
+
+    @Override
+    public QDataSet trim(int start, int end) {
+        return super.trim(start, end); // TODO: introduce offset so we don't need to copy.
+    }
+
+    @Override
+    public QDataSet slice(int i) {
+        if ( this.rank()>1 ) {
+            NetCdfVarDataSet result= new NetCdfVarDataSet();
+            result.shape= Arrays.copyOfRange( this.shape, 1, this.shape.length );
+            int recLength= DataSetUtil.product(result.shape);
+            result.data= Arrays.copyOfRange( this.data, recLength*i, recLength*(i+1) ); // TODO: introduce offset so we don't need to copy.
+            result.properties.putAll( DataSetUtil.sliceProperties( this, i, null ) );
+            return result;
+        } else {
+            return DataSetOps.slice0( this, i );
+        }
+    }
+    
     
 }
