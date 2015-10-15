@@ -83,7 +83,8 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         });
 
         recentComboBox.setVerifier( new TimeRangeVerifier() );
-
+        browseButton.setVisible(false);
+        
         revalidate();
         addMousePopupListener();
     }
@@ -164,7 +165,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         DatumRange value= this.range;
 
         String text= (String)recentComboBox.getSelectedItem();
-        if ( text.equals("") ) return;
+        if ( text==null || text.equals("") ) return;
         
         try {
             String rangeString= text;
@@ -330,9 +331,19 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     DataSetSelector peer;
 
+    /**
+     * provide a shortcut to a DataSetSelector editor.
+     * @param peer 
+     */
     public void setDataSetSelectorPeer( DataSetSelector peer ) {
         this.peer= peer;
-        browseButton.setEnabled(true);
+        if ( peer!=null ) {
+            browseButton.setEnabled(true);
+            browseButton.setVisible(true);
+        } else {
+            browseButton.setEnabled(false);
+            browseButton.setVisible(false);
+        }
     }
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
@@ -420,7 +431,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     }
 
     private String alternatePeer;
-    private String alternatePeerCard;
+    private String alternatePeerCard=null;
 
     public void setAlternatePeer(String label, String card ) {
         this.alternatePeer= label;
