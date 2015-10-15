@@ -899,10 +899,10 @@ public class ApplicationController extends DomNodeController implements RunLater
                 deleteAnnotation(annotation);
             }
         });        
-        
+
         impl.getDasMouseInputAdapter().addMenuItem(mi);
         impl.getDasMouseInputAdapter().removeMenuItem("Properties");
-        impl.getDasMouseInputAdapter().removeMenuItem("remove arrow");
+        //impl.getDasMouseInputAdapter().removeMenuItem("remove arrow");
         impl.getDasMouseInputAdapter().removeMenuItem("remove");
         impl.getDasMouseInputAdapter().removeMouseModule( impl.getDasMouseInputAdapter().getModuleByLabel("Point At"));
         
