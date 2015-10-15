@@ -7,6 +7,7 @@ package org.virbo.autoplot.dom;
 import java.awt.AWTEventMulticaster;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -30,12 +31,18 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.event.MouseModule;
+import org.das2.graph.AnchorPosition;
+import org.das2.graph.AnchorType;
+import org.das2.graph.BorderType;
 import org.das2.graph.ColumnColumnConnector;
 import org.das2.graph.DasAnnotation;
 import org.das2.graph.DasCanvas;
@@ -873,7 +880,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         if ( row==null ) row= application.getCanvases(0).getMarginRow();
         if ( column==null ) column= application.getCanvases(0).getMarginColumn();
             
-        DasAnnotation impl= new DasAnnotation("");
+        final DasAnnotation impl= new DasAnnotation("");
         
         final Annotation annotation= new Annotation();
         assignId(annotation);
@@ -899,8 +906,44 @@ public class ApplicationController extends DomNodeController implements RunLater
                 deleteAnnotation(annotation);
             }
         });        
-
         impl.getDasMouseInputAdapter().addMenuItem(mi);
+        
+        final JCheckBoxMenuItem cbmi= new JCheckBoxMenuItem(new AbstractAction("Anchor to Data") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);                
+                if ( ((JCheckBoxMenuItem)e.getSource()).isSelected() ) {
+                    Rectangle r= impl.getActiveRegion().getBounds();
+                    Datum x= plot.getController().getDasPlot().getXAxis().invTransform(r.x);
+                    Datum y= plot.getController().getDasPlot().getYAxis().invTransform(r.y);
+                    Datum x2= plot.getController().getDasPlot().getXAxis().invTransform(r.x+r.width);
+                    Datum y2= plot.getController().getDasPlot().getYAxis().invTransform(r.y+r.height);                   
+                    annotation.setXrange( DatumRangeUtil.union(x,x2) );
+                    annotation.setYrange( DatumRangeUtil.union(y,y2) );
+                    annotation.setAnchorPosition(AnchorPosition.W);
+                    annotation.setAnchorOffset("");
+                    annotation.setAnchorType(AnchorType.DATA);
+                } else {
+                    annotation.setAnchorType(AnchorType.CANVAS);
+                    annotation.setAnchorOffset("");
+                }
+            }
+        }); 
+        impl.getDasMouseInputAdapter().addMenuItem(cbmi);
+        
+        bind( annotation, "anchorType", mi, "selected", new Converter() {
+            @Override
+            public Object convertForward(Object s) {
+                return s.equals( AnchorType.CANVAS );
+            }
+            @Override
+            public Object convertReverse(Object t) {
+                if ( ((Boolean)t) ) return AnchorType.DATA; else return AnchorType.CANVAS;
+            }
+        } ); 
+        
+        impl.getDasMouseInputAdapter().addMenuItem(mi);
+        impl.getDasMouseInputAdapter().getModuleByLabel("Move Component").setLabel("Move Annotation");
         impl.getDasMouseInputAdapter().removeMenuItem("Properties");
         impl.getDasMouseInputAdapter().removeMenuItem("remove arrow");
         impl.getDasMouseInputAdapter().removeMenuItem("remove");
