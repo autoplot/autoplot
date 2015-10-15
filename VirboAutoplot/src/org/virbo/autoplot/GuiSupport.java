@@ -87,6 +87,7 @@ import org.das2.datum.UnitsUtil;
 import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
 import org.das2.event.PointSlopeDragRenderer;
+import org.das2.graph.BorderType;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
@@ -98,6 +99,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.bookmarks.DelayMenu;
+import org.virbo.autoplot.dom.Annotation;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
@@ -1693,7 +1695,6 @@ public class GuiSupport {
         item.setToolTipText("change URI or add plot");
         addPlotMenu.add(item);
 
-
         expertMenuItems.add(addPlotMenu);
 
         JMenu editPlotMenu = new JMenu("Edit Plot");
@@ -1823,8 +1824,11 @@ public class GuiSupport {
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 AddAnnotationDialog dia= new AddAnnotationDialog();
-                if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( app, dia ) ) {
-                    controller.addAnnotation( domPlot, dia.getText() );
+                if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( app, dia, "Add Annotation", JOptionPane.OK_CANCEL_OPTION ) ) {
+                    Annotation ann= controller.addAnnotation( domPlot, dia.getText() );
+                    ann.setAnchorOffset("1em,1em");
+                    ann.setBorderType(BorderType.ROUNDED_RECTANGLE);
+                    ann.setFontSize("1.4em");
                 }
             }
         }));
