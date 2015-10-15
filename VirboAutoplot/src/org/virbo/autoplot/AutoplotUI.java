@@ -2957,6 +2957,7 @@ APSplash.checkTime("init 52.9");
         });
         toolsMenu.add(replaceFileMenuItem);
 
+        filtersMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/resources/pipeMag2.png"))); // NOI18N
         filtersMenuItem.setText("Additional Operations...");
         filtersMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
