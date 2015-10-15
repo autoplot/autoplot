@@ -277,7 +277,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        recentComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        recentComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2010-01-01", "2010-01-02" }));
         jPanel1.add(recentComboBox, java.awt.BorderLayout.CENTER);
 
         timeRangeToolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/calendar.png"))); // NOI18N
