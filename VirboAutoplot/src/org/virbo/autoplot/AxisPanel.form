@@ -19,7 +19,7 @@
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="yAxisPanel" max="32767" attributes="2"/>
-                  <Component id="xAxisPanel" alignment="1" max="32767" attributes="2"/>
+                  <Component id="xAxisPanel" max="32767" attributes="2"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -61,7 +61,7 @@
               <Group type="102" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="xAxisRangePanel" alignment="0" pref="187" max="32767" attributes="2"/>
+                      <Component id="xAxisRangePanel" alignment="0" max="32767" attributes="2"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="xLog" min="-2" max="-2" attributes="1"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -70,7 +70,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="xTitleTextField" pref="133" max="32767" attributes="0"/>
+                          <Component id="xTitleTextField" pref="162" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -253,13 +253,13 @@
               <Group type="102" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="yAxisRangePanel" alignment="0" pref="187" max="32767" attributes="0"/>
+                      <Component id="yAxisRangePanel" alignment="0" max="32767" attributes="0"/>
                       <Component id="yLog" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="isotropicCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="yTitleTextField" pref="133" max="32767" attributes="0"/>
+                          <Component id="yTitleTextField" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -348,20 +348,21 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="titleCB" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="titleTextField" pref="290" max="32767" attributes="0"/>
+                          <Component id="titleTextField" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="legendEnableCheckbox" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Component id="legendTextField" pref="227" max="32767" attributes="0"/>
                       </Group>
+                      <Component id="timeRangeEditor1" alignment="0" pref="0" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -377,7 +378,9 @@
                       <Component id="legendEnableCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="legendTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="48" max="32767" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="timeRangeEditor1" min="-2" pref="25" max="-2" attributes="0"/>
+                  <EmptySpace pref="20" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -421,6 +424,8 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="titleCBActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="org.virbo.datasource.TimeRangeEditor" name="timeRangeEditor1">
         </Component>
       </SubComponents>
     </Container>
