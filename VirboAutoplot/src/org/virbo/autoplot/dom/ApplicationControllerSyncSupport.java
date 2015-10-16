@@ -171,37 +171,12 @@ public class ApplicationControllerSyncSupport {
     }
 
     protected void syncAnnotations(Annotation[] annotations) {
-        List<Annotation> addAnnotations= new ArrayList();
-        List<Annotation> deleteAnnotations= new ArrayList();
 
-        List<Annotation> thisAnnotations= Arrays.asList(application.getAnnotations());
-        List<Annotation> thatAnnotations= Arrays.asList(annotations);
-
-        for ( Annotation c: thatAnnotations ) {
-            if ( !thisAnnotations.contains(c) ) addAnnotations.add(c);
+        while ( application.annotations.size() < annotations.length) {
+            controller.addAnnotation( new Annotation() );
         }
-
-        for ( Annotation c: application.annotations ) {
-            if ( !thatAnnotations.contains(c) ) deleteAnnotations.add(c);
-        }
-
-        for ( Annotation c: addAnnotations ) {
-            Row row= (Row)DomUtil.getElementById( application, c.getRowId() );
-            Column column= (Column)DomUtil.getElementById( application, c.getColumnId() );
-            if ( row==null ) {
-                logger.log(Level.WARNING, "unable to find row {0} using margin row", c.getRowId());
-                row= application.getCanvases(0).getMarginRow();
-            }
-            if ( column==null ) {
-                logger.log(Level.WARNING, "unable to find column {0} using margin column", c.getColumnId());
-                column= application.getCanvases(0).getMarginColumn();
-            }
-            
-            controller.addAnnotation( row, column, c.getText() );
-        }
-
-        for ( Annotation c: deleteAnnotations ) {
-            controller.deleteAnnotation( c );
+        while (application.annotations.size() > annotations.length) {
+            controller.deleteAnnotation( application.annotations.get(application.annotations.size()-1) );
         }
         
         for ( int i=0; i<annotations.length; i++ ) {
