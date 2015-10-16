@@ -59,13 +59,13 @@ public class Test005 {
             xxx("demo2");
 
             {
-                String suri = "ftp://ftp.virbo.org/LANL/LANL1991/SOPA+ESP/H0/LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?";
+                String suri = "http://virbo.org/ftp/LANL/LANL1991/SOPA+ESP/H0/LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?";
                 List<CompletionResult> completionResult = DataSetURI.getCompletions(suri, suri.length(), new NullProgressMonitor());
-                PrintWriter out = new PrintWriter("test005_demo3.txt");
-                for (CompletionResult l : completionResult) {
-                    out.println(l.completion);
+                try (PrintWriter out = new PrintWriter("test005_demo3.txt")) {
+                    for (CompletionResult l : completionResult) {
+                        out.println(l.completion);
+                    }
                 }
-                out.close();
             }
             xxx("demo3");
 
@@ -103,11 +103,11 @@ public class Test005 {
 
             {
                 String[] list = org.virbo.jythonsupport.Util.listDirectory("http://cdaweb.gsfc.nasa.gov/istp_public/data/");
-                PrintWriter out = new PrintWriter("test005_demo11.txt");
-                for (String l : list) {
-                    out.println(l);
+                try (PrintWriter out = new PrintWriter("test005_demo11.txt")) {
+                    for (String l : list) {
+                        out.println(l);
+                    }
                 }
-                out.close();
             }
             xxx("demo11");
  
