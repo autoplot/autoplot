@@ -856,38 +856,31 @@ public class ApplicationController extends DomNodeController implements RunLater
         
         application.setConnectors(connectors.toArray(new Connector[connectors.size()]));
     }
-    
-    public Annotation addAnnotation( Plot p, String text ) {
+
+    /**
+     * experiment with Jython-friendly method where the annotation is instantiated 
+     * within the script.
+     * @param annotation
+     * @return the annotation, configured.
+     */
+    public Annotation addAnnotation( final Annotation annotation ) {
+        
+        if ( annotation.getPlotId().length()==0 ) {
+            annotation.setPlotId( getApplication().getPlots(0).getId() );
+        }
+        
+        Plot p= (Plot)DomUtil.getElementById( getApplication(), annotation.getPlotId() );
+        
         Row r= p.getController().getRow();
         Column c= p.getController().getColumn();
-        
-        Annotation a= addAnnotation( r, c, text);
-        
-        a.setPlotId( p.getId() );
-            
-        return a;
-    }
-    
-    /**
-     * add an annotation to the canvas.
-     * @param row the row or None.
-     * @param column the column or None.
-     * @param text initial text
-     * @return the annotation
-     */
-    public Annotation addAnnotation( Row row, Column column, String text ) {
-        
-        if ( row==null ) row= application.getCanvases(0).getMarginRow();
-        if ( column==null ) column= application.getCanvases(0).getMarginColumn();
-            
+                
         final DasAnnotation impl= new DasAnnotation("");
         
-        final Annotation annotation= new Annotation();
         assignId(annotation);
         
-        annotation.setText(text);
-        
         new AnnotationController( application, annotation, impl );
+        
+        impl.setPlot( p.controller.getDasPlot() );
                 
         JMenuItem  mi= new JMenuItem(new AbstractAction("Annotation Properties") {
             @Override
@@ -957,12 +950,41 @@ public class ApplicationController extends DomNodeController implements RunLater
         application.setAnnotations( annotations.toArray( new Annotation[annotations.size()]) );
         
         DasCanvas lcanvas = getDasCanvas();
-        Row r= row;
-        Column c= column;
+
         annotation.setColumnId( c.getId() );
         annotation.setRowId( r.getId() );
         
         lcanvas.add( impl, r.controller.dasRow, c.controller.dasColumn );
+                
+        return annotation;
+    }
+    
+    public Annotation addAnnotation( Plot p, String text ) {
+        Row r= p.getController().getRow();
+        Column c= p.getController().getColumn();
+        
+        Annotation a= addAnnotation( r, c, text);
+        
+        a.setPlotId( p.getId() );
+            
+        return a;
+    }
+    
+    /**
+     * add an annotation to the canvas.
+     * @param row the row or None.
+     * @param column the column or None.
+     * @param text initial text
+     * @return the annotation
+     */
+    public Annotation addAnnotation( Row row, Column column, String text ) {
+        
+        if ( row==null ) row= application.getCanvases(0).getMarginRow();
+        if ( column==null ) column= application.getCanvases(0).getMarginColumn();
+                    
+        final Annotation annotation= new Annotation();
+        
+        addAnnotation(annotation);
         
         return annotation;
     }
