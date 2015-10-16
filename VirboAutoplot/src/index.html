@@ -20,8 +20,14 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-10-01 r17590):</p>
-        <ul> 
+        <p>Bugfixes (2015-10-16 r17722):</p>
+        <ul>
+            <li>1472: HTTPFileSystem fails to query for username after typo</li>
+            <li>1470: de-internationalize the three codes that were accidentally internationalized.</li>
+            <li>1468: Chris pointed out the setting for the default browser in the settings, which pointed out that Java handles this now, since Java6.</li>
+            <li>1465: check before closing an editor with changes.</li>
+            <li>invokeScriptSoon dialog would leave progress monitor hanging if there's a exception thrown in the script..</li>
+            <li>remove extra question mark when reporting data was exported.</li>
             <li>corrections to hrinterval and time format, correctly using the stop time and supporting end modifier.</li>
             <li>clean up address bar as vap is loaded. </li>
             <li>"2014-001 to 2015-001 UTC" is supported now.</li> 
@@ -101,6 +107,7 @@
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
+            <li>support where=IsoDateTime.within(2012-11-01T03:00/09:00) in ascii plugin.</li>
             <li>minor tweaks to property editor</li>
             <li>update RBSP orbits to 2827</li>
             <li>hide the "filters" name which is meaningless to the scientists, and use "operations" (which is just as meaningless, but there's one fewer name).</li>
@@ -139,6 +146,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe453: axis tab has timerange editor for when the timerange isn't an axis.</li>
+            <li>rfe454: support arbitrary rank data with HDF5 plugin.</li>
+            <li>pngwalk allows &amp;timerange= in URI to constrain the image timeranges.</li>
+            <li>451: keep track of running script so buffer doesn't swap</li>
             <li>345: first go at annotations</li>
             <li>improvements to $(enum) in timeranges, providing code to read out the enumerated values.</li>
             <li>449: bitwise operators in QDataSets.</li>
