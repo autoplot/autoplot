@@ -925,7 +925,8 @@ public class ApplicationController extends DomNodeController implements RunLater
                     annotation.setAnchorType(AnchorType.DATA);
                 } else {
                     annotation.setAnchorType(AnchorType.CANVAS);
-                    annotation.setAnchorOffset("");
+                    annotation.setAnchorOffset("1em,1em");
+                    annotation.setAnchorPosition(AnchorPosition.NE);
                 }
             }
         }); 
@@ -943,11 +944,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         } ); 
         
         impl.getDasMouseInputAdapter().addMenuItem(mi);
-        impl.getDasMouseInputAdapter().getModuleByLabel("Move Component").setLabel("Move Annotation");
         impl.getDasMouseInputAdapter().removeMenuItem("Properties");
         impl.getDasMouseInputAdapter().removeMenuItem("remove arrow");
         impl.getDasMouseInputAdapter().removeMenuItem("remove");
-        //impl.getDasMouseInputAdapter().removeMouseModule( impl.getDasMouseInputAdapter().getModuleByLabel("Point At"));
+        impl.getDasMouseInputAdapter().setSecondaryModuleByLabel("Move Annotation");
         
         annotationImpls.put(annotation, impl);
         
