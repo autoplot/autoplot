@@ -33,6 +33,7 @@ import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
+import org.virbo.datasource.TimeRangeEditor;
 
 /**
  * Panel for controlling the axes of the current focus plot.
@@ -129,13 +130,18 @@ public class AxisPanel extends javax.swing.JPanel {
         doPlotBindings();
         doPlotElementBindings();
         
-        timeRangeEditor1.addPropertyChangeListener( new PropertyChangeListener() {
+        timeRangeEditor1.setNoOneListeningRange( Application.DEFAULT_TIME_RANGE );
+        timeRangeEditor1.setRange( Application.DEFAULT_TIME_RANGE );
+        
+        dom.getController().bind( dom, Application.PROP_TIMERANGE, timeRangeEditor1, TimeRangeEditor.PROP_RANGE );
+
+        dom.addPropertyChangeListener( Application.PROP_TIMERANGE, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 Object o= evt.getNewValue();
                 if ( o instanceof DatumRange ) {
                     DatumRange v= (DatumRange) evt.getNewValue();
-                    timeRangeEditor1.setEnabled(v.equals(Axis.DEFAULT_RANGE)); // TODO: kludge
+                    timeRangeEditor1.setEnabled(v==Application.DEFAULT_TIME_RANGE ); // TODO: kludge
                 }
                 
             }
@@ -184,7 +190,6 @@ public class AxisPanel extends javax.swing.JPanel {
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("zaxis.log"), zLog, BeanProperty.create("selected")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("zaxis.visible"), cbVisibleCB, BeanProperty.create("selected")));
 
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("context"), timeRangeEditor1, BeanProperty.create("range")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("title"), titleTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("displayTitle"), titleCB, BeanProperty.create("selected")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("isotropic"), this.isotropicCheckBox, BeanProperty.create("selected")));
