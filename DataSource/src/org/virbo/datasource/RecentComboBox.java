@@ -34,6 +34,8 @@ import org.das2.datum.LoggerManager;
  * Specifically, the event is validated and recorded into the file, then the file is loaded, sorted and saved
  * again.
  * 
+ * This needs work.
+ * 
  * @author jbf
  */
 public class RecentComboBox extends JComboBox {
@@ -42,6 +44,8 @@ public class RecentComboBox extends JComboBox {
 
     File bookmarksFolder= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
     File recentFile;
+    
+    boolean suppressEvents= false;
 
     private final static Logger logger= LoggerManager.getLogger("apdss.uri");
     
@@ -124,6 +128,7 @@ public class RecentComboBox extends JComboBox {
 
             Runnable run= new Runnable() {
                 public void run() {
+                    suppressEvents= true;
                     ComboBoxModel cbm= getModel();
                     if ( cbm instanceof MutableComboBoxModel ) {
                         MutableComboBoxModel mcbm= (MutableComboBoxModel)cbm;
@@ -133,6 +138,7 @@ public class RecentComboBox extends JComboBox {
                     } else {
                         setModel( new DefaultComboBoxModel( fitems.toArray() ) );
                     }
+                    suppressEvents= false;
                 }
             };
             SwingUtilities.invokeLater(run);
@@ -143,6 +149,15 @@ public class RecentComboBox extends JComboBox {
         }
     }
 
+    /**
+     * nasty kludge to prevent listeners from responding to events.
+     * TODO: do this right.
+     * @return true if the events should be ignored.
+     */
+    public boolean isSuppressEvents() {
+        return suppressEvents;
+    }
+    
     /**
      * save the recent items to the disk.  items.get(0) is the most recent item, and will be saved last on the disk.
      * @param items
