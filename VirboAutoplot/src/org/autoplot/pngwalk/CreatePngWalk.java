@@ -470,8 +470,11 @@ public class CreatePngWalk {
                 } else {
                     dr= DatumRangeUtil.parseTimeRange(exactTime);
                 }
-                if ( params.rescalex!=null && !params.rescalex.equals("0%,100%") ) {
-                    dr= DatumRangeUtil.rescale( dr,params.rescalex );
+                if ( params.rescalex!=null ) {
+                    String rescalex= params.rescalex.trim();
+                    if ( rescalex.length()>0 && !params.rescalex.equals("0%,100%") ) {
+                        dr= DatumRangeUtil.rescale( dr,params.rescalex );
+                    }
                 }
                 dom2.setTimeRange(dr);
 
