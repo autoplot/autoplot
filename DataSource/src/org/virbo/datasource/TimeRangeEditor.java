@@ -278,6 +278,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         recentComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2010-01-01", "2010-01-02" }));
+        recentComboBox.setMinimumSize(new java.awt.Dimension(120, 27));
         jPanel1.add(recentComboBox, java.awt.BorderLayout.CENTER);
 
         timeRangeToolButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/calendar.png"))); // NOI18N
@@ -293,7 +294,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeRangeToolButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)

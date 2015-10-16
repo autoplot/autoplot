@@ -22,7 +22,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="jPanel1" pref="290" max="32767" attributes="0"/>
+              <Component id="jPanel1" pref="120" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="timeRangeToolButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -120,6 +120,9 @@
                 <StringItem index="0" value="2010-01-01"/>
                 <StringItem index="1" value="2010-01-02"/>
               </StringArray>
+            </Property>
+            <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[120, 27]"/>
             </Property>
           </Properties>
           <Constraints>
