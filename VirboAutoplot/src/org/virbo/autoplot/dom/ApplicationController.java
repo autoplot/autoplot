@@ -858,8 +858,13 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
-     * experiment with Jython-friendly method where the annotation is instantiated 
-     * within the script.
+     * experiment with Jython-friendly method where the annotation is 
+     * instantiated within the script.  This allows code like:
+     *
+     *<blockquote><pre><small>{@code
+     * ann= Annotation( text='Feature', pointAtX=datum(tt), pointAtY=datum('100nT'), showArrow=True )
+     *}</small></pre></blockquote>
+     * 
      * @param annotation
      * @return the annotation, configured.
      */
@@ -871,8 +876,43 @@ public class ApplicationController extends DomNodeController implements RunLater
         
         Plot p= (Plot)DomUtil.getElementById( getApplication(), annotation.getPlotId() );
         
-        Row r= p.getController().getRow();
-        Column c= p.getController().getColumn();
+        Row r;
+        if ( annotation.getRowId().length()>0 ) {
+            r= (Row)DomUtil.getElementById( getApplication().getCanvases(0), annotation.getRowId() );
+            if ( r==null ) {
+                logger.log(Level.WARNING, "unable to find row with id=\"{0}\"", annotation.getRowId());
+                if ( p==null ) {
+                    r= application.getCanvases(0).getMarginRow();
+                } else {
+                    r= p.getController().getRow();
+                }
+            }
+        } else {
+            if ( p==null ) {
+                r= application.getCanvases(0).getMarginRow();
+            } else {
+                r= p.getController().getRow();
+            }
+            
+        }
+        Column c;
+        if ( annotation.getRowId().length()>0 ) {
+            c= (Column)DomUtil.getElementById( getApplication().getCanvases(0), annotation.getColumnId() );
+            if ( c==null ) {
+                logger.log(Level.WARNING, "unable to find column with id=\"{0}\"", annotation.getColumnId());
+                if ( p==null ) {
+                    c= application.getCanvases(0).getMarginColumn();
+                } else {
+                    c= p.getController().getColumn();
+                }
+            }
+        } else {
+            if ( p==null ) {
+                c= application.getCanvases(0).getMarginColumn();
+            } else {
+                c= p.getController().getColumn();
+            }
+        }
                 
         final DasAnnotation impl= new DasAnnotation("");
         
@@ -963,7 +1003,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         Row r= p.getController().getRow();
         Column c= p.getController().getColumn();
         
-        Annotation a= addAnnotation( r, c, text);
+        Annotation a= addAnnotation( r, c, text );
         
         a.setPlotId( p.getId() );
             
@@ -983,6 +1023,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         if ( column==null ) column= application.getCanvases(0).getMarginColumn();
                     
         final Annotation annotation= new Annotation();
+        annotation.setRowId( row.getId() );
+        annotation.setColumnId( column.getId() );
         
         addAnnotation(annotation);
         
