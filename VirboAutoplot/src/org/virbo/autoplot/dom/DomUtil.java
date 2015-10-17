@@ -91,15 +91,18 @@ public class DomUtil {
     /**
      * Either sets or gets the property at the expression.
      * Expressions like:
+     *<blockquote><pre><small>{@code
      *    timeRange
      *    plots[0].range
-     * @param node
+     *}</small></pre></blockquote>
+     * 
+     * @param node the node containing the property
      * @param propertyName the value, (or the old value if we were setting it.)
      * @param getClass return the property class type instead of the value.
      * @throws IllegalArgumentException if the property cannot be found
      * @return propertyDescriptor or null.
      */
-    private static Object setGetPropertyInt( DomNode node, String propertyName, boolean setit, boolean getClass, Object value ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    private static Object setGetPropertyInternal( DomNode node, String propertyName, boolean setit, boolean getClass, Object value ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         String[] props= propertyName.split("\\.",-2);
         int iprop=0;
         Pattern indexedPattern= Pattern.compile("([a-zA-Z_]+)\\[(\\d+)\\]");
@@ -109,18 +112,17 @@ public class DomUtil {
             String prop1= props[iprop];
             Matcher m= indexedPattern.matcher(prop1);
             PropertyDescriptor[] pds= BeansUtil.getPropertyDescriptors(thisNode.getClass());
-            PropertyDescriptor prop;
             if ( m.matches() ) {
                 String name= m.group(1);
                 int idx= Integer.valueOf(m.group(2));
-                for ( int i=0; i<pds.length; i++ ) {
-                    if ( pds[i].getName().equals(name) ) {
-                        Object thisValue= ((IndexedPropertyDescriptor)pds[i]).getIndexedReadMethod().invoke( thisNode, idx );
-                        if ( iprop==props.length-1 ) {
-                            if ( setit ) {
-                                ((IndexedPropertyDescriptor)pds[i]).getIndexedWriteMethod().invoke( thisNode, idx, value );
-                            } else if ( getClass ) {
-                                return ((IndexedPropertyDescriptor)pds[i]).getPropertyType();
+                for (PropertyDescriptor pd : pds) {
+                    if (pd.getName().equals(name)) {
+                        Object thisValue = ((IndexedPropertyDescriptor) pd).getIndexedReadMethod().invoke(thisNode, idx);
+                        if (iprop==props.length-1) {
+                            if (setit) {
+                                ((IndexedPropertyDescriptor) pd).getIndexedWriteMethod().invoke(thisNode, idx, value);
+                            } else if (getClass) {
+                                return ((IndexedPropertyDescriptor) pd).getPropertyType();
                             } else {
                                 return thisValue;
                             }
@@ -131,14 +133,14 @@ public class DomUtil {
                 }
             } else {
                 String name= prop1;
-                for ( int i=0; i<pds.length; i++ ) {
-                    if ( pds[i].getName().equals(name) ) {
-                        Object thisValue= (pds[i]).getReadMethod().invoke( thisNode );
-                        if ( iprop==props.length-1 ) {
-                            if ( setit ) {
-                                (pds[i]).getWriteMethod().invoke( thisNode, value );
-                            } else if ( getClass ) {
-                                return (pds[i]).getPropertyType();
+                for (PropertyDescriptor pd : pds) {
+                    if (pd.getName().equals(name)) {
+                        Object thisValue = (pd).getReadMethod().invoke(thisNode);
+                        if (iprop==props.length-1) {
+                            if (setit) {
+                                (pd).getWriteMethod().invoke(thisNode, value);
+                            } else if (getClass) {
+                                return (pd).getPropertyType();
                             } else {
                                 return thisValue;
                             }
@@ -155,16 +157,43 @@ public class DomUtil {
         return result;
     }
 
+    /**
+     * get the node property value
+     * @param node the dom node
+     * @param propertyName the property name
+     * @return the node property value
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException 
+     */
     public static Object getPropertyValue(DomNode node, String propertyName) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        return setGetPropertyInt( node, propertyName, false,false, null );
+        return setGetPropertyInternal( node, propertyName, false,false, null );
     }
 
+    /**
+     * set the property value
+     * @param node the dom node
+     * @param propertyName the property name
+     * @param val the new value
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException 
+     */
     public static void setPropertyValue(DomNode node, String propertyName, Object val ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        setGetPropertyInt( node, propertyName, true,false, val );
+        setGetPropertyInternal( node, propertyName, true,false, val );
     }
 
+    /**
+     * get the property type, e.g. Datum.class or [Lorg.virbo.autoplot.dom.Canvas (array of Canvases.)
+     * @param node the dom node
+     * @param propertyName the property name
+     * @return the property type
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException 
+     */
     public static Class getPropertyType( DomNode node, String propertyName ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        return (Class)setGetPropertyInt( node, propertyName, false, true, null );
+        return (Class)setGetPropertyInternal( node, propertyName, false, true, null );
     }
 
     /**
@@ -200,6 +229,16 @@ public class DomUtil {
         return new DatumRange(base.add(Datum.create(min10, hu)), base.add(Datum.create(max10, hu)));
     }
 
+    /**
+     * describe the change in axis range.  These include:<ul>
+     * <li>zoom in, zoom out - one range completely contains the other.
+     * <li>pan - the range is adjusted but partially overlaps
+     * <li>scan - the range is adjusted so that the two do not intersect.
+     * </ul>
+     * @param init the initial range
+     * @param fin the final range
+     * @return the human consumable string, e.g. "zoom out"
+     */
     public static String describe(DatumRange init, DatumRange fin) {
         if (init.getUnits().isConvertibleTo(fin.getUnits())) {
             String scaleString = "";
@@ -249,9 +288,9 @@ public class DomUtil {
 
     /**
      * return the node with this id, or null if the id is not found.
-     * @param root
-     * @param id
-     * @return
+     * @param root the root, such as the dom or the canvas.
+     * @param id the id of the node.
+     * @return the node with this id, or null id the id is not found.
      */
     public static DomNode getElementById(DomNode root, String id) {
         if (id == null ) {
