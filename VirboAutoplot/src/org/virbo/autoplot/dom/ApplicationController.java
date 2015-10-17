@@ -503,7 +503,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);
-                List<BindingModel> bms= new ArrayList<BindingModel>();
+                List<BindingModel> bms= new ArrayList<>();
 
                 List<PlotElement> peles = getPlotElementsFor(domPlot);
                 for (PlotElement pele : peles) {
@@ -596,7 +596,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         DataSourceController dsfc= new DataSourceController(this.model, dsf);
         dsf.controller = dsfc;
         assignId(dsf);
-        List<DataSourceFilter> dataSourceFilters = new ArrayList<DataSourceFilter>(Arrays.asList(this.application.getDataSourceFilters()));
+        List<DataSourceFilter> dataSourceFilters = new ArrayList<>(Arrays.asList(this.application.getDataSourceFilters()));
         dataSourceFilters.add(dsf);
         this.application.setDataSourceFilters(dataSourceFilters.toArray(new DataSourceFilter[dataSourceFilters.size()]));
         //dsf.addPropertyChangeListener(application.childListener);
@@ -762,7 +762,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             DataSourceFilter dsf = getDataSourceFilterFor(pelement);
 
             ArrayList<PlotElement> elements =
-                    new ArrayList<PlotElement>(Arrays.asList(application.getPlotElements()));
+                    new ArrayList<>(Arrays.asList(application.getPlotElements()));
             elements.remove(pelement);
             PlotElement selected= getPlotElement();
             if ( elements.size()>0 ) {
@@ -1382,7 +1382,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         DomLock lock = mutatorLock();
         lock.lock( String.format("addPlots(%d,%d,%s)",nrow,ncol,dir) );
         try {
-            List<Plot> result= new ArrayList<Plot>(nrow*ncol);
+            List<Plot> result= new ArrayList<>(nrow*ncol);
             List<Column> cols;
             final CanvasController ccontroller = getCanvas().getController();
             if (ncol > 1) {
@@ -1451,7 +1451,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 return newPlot;
             }
 
-            newElements = new ArrayList<PlotElement>();
+            newElements = new ArrayList<>();
             for (PlotElement srcElement : srcElements) {
                 if (!srcElement.getComponent().equals("")) {
                     if ( srcElement.getController().getParentPlotElement()==null ) {
@@ -1680,7 +1680,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
 
             synchronized (this) {
-                List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
+                List<Plot> plots = new ArrayList<>(Arrays.asList(application.getPlots()));
                 plots.remove(domPlot);
 
                 if (!plots.contains(getPlot())) {
@@ -1717,7 +1717,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected synchronized void deleteAnyParentsOfDataSourceFilter(DataSourceFilter dsf) {
         DataSourceFilter[] parents = dsf.controller.getParentSources();
         // look for orphaned parents
-        List<DataSourceFilter> alsoRemove = new ArrayList<DataSourceFilter>();
+        List<DataSourceFilter> alsoRemove = new ArrayList<>();
         for (DataSourceFilter pdf : parents) {
             if ( pdf==null ) continue; // bad reference
             String dsfId = pdf.getId();
@@ -1729,7 +1729,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
         if ( alsoRemove.size()>0 ) {
-            List<DataSourceFilter> dsfs = new ArrayList<DataSourceFilter>(Arrays.asList(application.getDataSourceFilters()));
+            List<DataSourceFilter> dsfs = new ArrayList<>(Arrays.asList(application.getDataSourceFilters()));
             dsfs.removeAll(alsoRemove);
             application.setDataSourceFilters(dsfs.toArray(new DataSourceFilter[dsfs.size()]));
 
@@ -1767,7 +1767,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         //TODO: this is a repeat of code in deleteAnyParentsOfDataSourceFilter.  Why can't it be used?
         DataSourceFilter[] parents = dsf.controller.getParentSources();
         // look for orphaned parents
-        List<DataSourceFilter> alsoRemove = new ArrayList<DataSourceFilter>();
+        List<DataSourceFilter> alsoRemove = new ArrayList<>();
         for (DataSourceFilter pdf : parents) {
             if ( pdf==null ) continue;
             String dsfId = pdf.getId();
@@ -1778,7 +1778,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         }
 
-        List<DataSourceFilter> dsfs = new ArrayList<DataSourceFilter>(Arrays.asList(application.getDataSourceFilters()));
+        List<DataSourceFilter> dsfs = new ArrayList<>(Arrays.asList(application.getDataSourceFilters()));
         dsfs.remove(dsf);
         dsfs.removeAll(alsoRemove);
 
@@ -2007,9 +2007,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 } else {
                     SwingUtilities.invokeAndWait(run);
                 }
-            } catch (InterruptedException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (InvocationTargetException ex) {
+            } catch (InterruptedException | InvocationTargetException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
@@ -2092,9 +2090,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             if ( dst instanceof DomNode ) {
                  DomUtil.getPropertyType((DomNode)dst, dstProp);
             }
-        } catch (IllegalAccessException ex) {
-            throw new IllegalArgumentException(ex);
-        } catch (InvocationTargetException ex) {
+        } catch (IllegalAccessException | InvocationTargetException ex) {
             throw new IllegalArgumentException(ex);
         }
 
@@ -2130,7 +2126,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 binding = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
                 if ( converter!=null ) binding.setConverter( converter );
 
-                List<BindingModel> bindings = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
+                List<BindingModel> bindings = new ArrayList<>(Arrays.asList(application.getBindings()));
                 bindings.add(bindingModel);
                 application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
                 bc.addBinding(binding);
@@ -2272,7 +2268,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                             logger.log(Level.WARNING,ex.getMessage(),ex);
                         }
                         bindingImpls.remove(b);
-                        logger.fine("bindingImpls.size()="+bindingImpls.size());
+                        logger.log(Level.FINE, "bindingImpls.size()={0}", bindingImpls.size());
                     }
                     changed= true;
                 }
@@ -2291,7 +2287,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
                 String bcid = src.getId();
                 List<BindingModel> bindings = DomUtil.asArrayList(application.getBindings());
-                List<BindingModel> remove = new ArrayList<BindingModel>();
+                List<BindingModel> remove = new ArrayList<>();
                 boolean changed= false;
                 for (BindingModel bb : bindings) { // avoid concurrent modification
                     if (bb.getBindingContextId().equals(bcid)) {
@@ -2307,7 +2303,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
             for ( Entry<Object,BindingGroup> e: bindingContexts.entrySet() ) { // app_0.timeRange->plot_0.context
                 BindingGroup bg= e.getValue();
-                List<Binding> remove = new ArrayList<Binding>();
+                List<Binding> remove = new ArrayList<>();
                 for ( Binding b: bg.getBindings() ) {
                     if ( b.getTargetObject().equals(src) ) {
                         remove.add(b);
@@ -2337,7 +2333,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             b.unbind();
         }
         bindingImpls.remove(binding);
-        logger.fine("bindingImpls.size()="+bindingImpls.size());
+        logger.log(Level.FINE, "bindingImpls.size()={0}", bindingImpls.size());
 
         BindingGroup bc= bindingContexts.get(DomUtil.getElementById(application,binding.srcId));
         if ( bc!=null ) {
@@ -2566,7 +2562,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      */
     public List<PlotElement> getPlotElementsFor(DataSourceFilter dsf) {
         String id = dsf.getId();
-        List<PlotElement> result = new ArrayList<PlotElement>();
+        List<PlotElement> result = new ArrayList<>();
         for (PlotElement p : application.getPlotElements()) {
             if (p.getDataSourceFilterId().equals(id)) {
                 result.add(p);
