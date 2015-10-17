@@ -999,6 +999,12 @@ public class ApplicationController extends DomNodeController implements RunLater
         return annotation;
     }
     
+    /**
+     * add an annotation to the plot
+     * @param p the plot
+     * @param text initial text
+     * @return the annotation
+     */
     public Annotation addAnnotation( Plot p, String text ) {
         Row r= p.getController().getRow();
         Column c= p.getController().getColumn();
@@ -1012,8 +1018,8 @@ public class ApplicationController extends DomNodeController implements RunLater
     
     /**
      * add an annotation to the canvas.
-     * @param row the row or None.
-     * @param column the column or None.
+     * @param row the row or null.
+     * @param column the column or null.
      * @param text initial text
      * @return the annotation
      */
@@ -1025,6 +1031,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         final Annotation annotation= new Annotation();
         annotation.setRowId( row.getId() );
         annotation.setColumnId( column.getId() );
+        annotation.setText(text);
         
         addAnnotation(annotation);
         
