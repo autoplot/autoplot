@@ -124,22 +124,22 @@ public class Test026 {
         bw.write(headerString); //writes html header
         bw.write(bodyString); //opens body and gives style
         bw.write(headerOpen); //writes header of webpage
-        bw.write(tableOpen);
+        bw.write(tableOpen);  //opens table for doTest method to write to
     }
 
     public static void closeHTML() throws IOException {
         String htmlClose = "</table></body></html>";
 
-        bw.write(htmlClose);
-        bw.close();
+        bw.write(htmlClose); //closes html page
+        bw.close(); //closes buffer
     }
 
     public static void writeToHTML(int id, DatumRange test, DatumRange ref) throws IOException {
-        String table1 = "<tr><td><strong>Test Number:</strong> " + id + "</td>"
+        String table = "<tr><td><strong>Test Number:</strong> " + id + "</td>"
                 + "<td><strong>Test: </strong> " + test + "</td>"
                 + "<td><strong>Ref: </strong> " + ref + "</td></tr>\n";
 
-        bw.write(table1);
+        bw.write(table);
     }
 
     public static void main(String[] args) {
