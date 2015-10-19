@@ -56,7 +56,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
     }
 
     private NetCdfVarDataSet(  )  {
-        
+        putProperty(QDataSet.QUBE, Boolean.TRUE);
     }
 
     public static String sliceConstraints( String constraints, int i ) {
@@ -417,6 +417,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             int recLength= DataSetUtil.product(result.shape);
             result.data= Arrays.copyOfRange( this.data, recLength*i, recLength*(i+1) ); // TODO: introduce offset so we don't need to copy.
             result.properties.putAll( DataSetUtil.sliceProperties( this, i, null ) );
+            if ( result.rank()>1 ) result.properties.put( QDataSet.QUBE, Boolean.TRUE );
             return result;
         } else {
             return DataSetOps.slice0( this, i );
