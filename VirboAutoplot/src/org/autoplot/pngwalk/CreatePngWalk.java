@@ -698,21 +698,9 @@ public class CreatePngWalk {
     /**
      * Method to write HTML file of all the pictures to give a gallery view
      * @author Armond Luthens
-     * @version 1.0
-     * @date 09/22/15
      * @param outputFolder the file where the html should be written to.
      */
     public static void writeHTMLFile(String outputFolder){
-    //IMPORTS: 
-        //import java.io.File;
-        //import java.io.FileWriter;
-        //import java.io.IOException;
-        //import java.io.BufferedWriter;
-        
-    //FILENAME FOR GENERATED HTML PAGE: pngImagePage.html
-        // File path: /home/aluthens/batch/pngwalk-out/pngImagePage.html
-        // how to open file in terminal: firefox pngImagePage.html
-        
         String filePath= outputFolder+"pngImagePage.html";
         
         File f= new File(filePath);
