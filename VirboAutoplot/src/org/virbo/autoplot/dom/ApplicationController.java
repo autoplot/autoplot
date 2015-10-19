@@ -965,10 +965,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         }); 
         impl.getDasMouseInputAdapter().addMenuItem(cbmi);
         
-        bind( annotation, "anchorType", mi, "selected", new Converter() {
+        bind( annotation, "anchorType", cbmi, "selected", new Converter() {
             @Override
             public Object convertForward(Object s) {
-                return s.equals( AnchorType.CANVAS );
+                return !s.equals( AnchorType.CANVAS );
             }
             @Override
             public Object convertReverse(Object t) {
