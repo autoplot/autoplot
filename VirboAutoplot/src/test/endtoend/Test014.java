@@ -91,7 +91,7 @@ public class Test014 {
                 if ( cadence==null ) {
                  
                 } else {
-                    final int ix= (int)xAxis.transform( DataSetUtil.asDatum((RankZeroDataSet)cadence) );
+                    final int ix= (int)xAxis.transform( DataSetUtil.asDatum(cadence) );
                     g.drawLine( ix, 0, ix, cc.getHeight() );
                 }
             }
