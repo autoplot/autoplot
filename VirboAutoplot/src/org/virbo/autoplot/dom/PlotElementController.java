@@ -1060,9 +1060,10 @@ public class PlotElementController extends DomNodeController {
      */
     private static String guessSliceSlices( QDataSet fillDs, List<Integer> slicePref ) {
         StringBuilder newResult= new StringBuilder( "|slices(" );
-        String[] slices= new String[] { "':'", "':'", "':'", "':'", "':'" } ;
+        String[] slices= new String[fillDs.rank()];
+        for ( int i=0; i<fillDs.rank(); i++ ) slices[i]= "':'";
 
-        List<Integer> slicePref1= new ArrayList<Integer>();
+        List<Integer> slicePref1= new ArrayList();
         slicePref1.addAll(slicePref);
         slicePref= slicePref1;
 
