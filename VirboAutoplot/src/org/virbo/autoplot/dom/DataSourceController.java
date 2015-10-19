@@ -1164,6 +1164,17 @@ public class DataSourceController extends DomNodeController {
         if (ds == null) {
             return;
         }
+        
+        String validRange= dsf.getValidRange();
+        String fillValue= dsf.getFill();
+        String filters= dsf.getFilters();
+        
+        if ( validRange.length()==0 && fillValue.length()==0 && filters.length()==0 ) {
+            setFillProperties(getProperties());
+            setFillDataSet(ds);
+            return;  // boom.  done.  outta here.
+        }
+        
 
         changesSupport.performingChange(this, PENDING_FILL_DATASET);
         try {
@@ -1171,8 +1182,6 @@ public class DataSourceController extends DomNodeController {
             Map props = getProperties();
 
             MutablePropertyDataSet fillDs;
-
-            String filters = dsf.getFilters();
 
             boolean doSlice = filters.length() > 0;
 
@@ -1237,7 +1246,7 @@ public class DataSourceController extends DomNodeController {
             double vmin = Double.NEGATIVE_INFINITY, vmax = Double.POSITIVE_INFINITY, fill = Double.NaN;
 
             try {
-                double[] vminMaxFill = PlotElementUtil.parseFillValidRangeInternal(dsf.getValidRange(), dsf.getFill());
+                double[] vminMaxFill = PlotElementUtil.parseFillValidRangeInternal(validRange, fillValue);
                 vmin = vminMaxFill[0];
                 vmax = vminMaxFill[1];
                 fill = vminMaxFill[2];
