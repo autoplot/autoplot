@@ -421,7 +421,7 @@ public class MetadataPanel extends javax.swing.JPanel {
                 cadence.join( DataSetUtil.asDataSet(1) );
             } else {
                 if ( dep0.property(QDataSet.CADENCE)!=null ) {
-                    cadence.join( (RankZeroDataSet) dep0.property(QDataSet.CADENCE) );
+                    cadence.join( (QDataSet) dep0.property(QDataSet.CADENCE) );
                 }
             }
         }
@@ -467,7 +467,7 @@ public class MetadataPanel extends javax.swing.JPanel {
                 map.put("Mean", s);
 
                 if (validCount > 1 && moments.property("stddev")!=null ) {
-                    s = String.valueOf(DatumUtil.asOrderOneUnits(DataSetUtil.asDatum((RankZeroDataSet) moments.property("stddev"))));
+                    s = String.valueOf(DatumUtil.asOrderOneUnits(DataSetUtil.asDatum((QDataSet) moments.property("stddev"))));
                 } else {
                     s = "";
                 }
@@ -489,7 +489,7 @@ public class MetadataPanel extends javax.swing.JPanel {
                     cadence = DataSetUtil.asDataSet(1);
                 }
             } else {
-                cadence = (RankZeroDataSet) dep0.property(QDataSet.CADENCE);
+                cadence = (QDataSet) dep0.property(QDataSet.CADENCE);
             }
 
             if (cadence != null) {
