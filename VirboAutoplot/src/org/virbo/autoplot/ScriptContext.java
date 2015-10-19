@@ -581,21 +581,15 @@ public class ScriptContext extends PyJavaInstance {
      * plot the dataset in the specified  dataSource node.
      * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param label the label for the plot dependent parameter
-     * @param x QDataSet for the independent parameter for the X values, or null.
-     * @param y QDataSet for the independent parameter for the Y values.
-     * @param renderType string explicitly controlling the renderType and hints, or null.
+     * @param x QDataSet for the independent parameter for the X values
+     * @param y QDataSet for the independent parameter for the Y values
+     * @param renderType string explicitly controlling the renderType and hints.
      */    
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType ) {
         maybeInitModel();
-        QDataSet yds;
-        if ( x==null && renderType==null && y.property(QDataSet.DEPEND_0)==null ) {
-            yds= y;  // case occurs often and avoids copy.
-        } else {
-            ArrayDataSet myds= ArrayDataSet.copy(y);
-            if ( x!=null ) myds.putProperty( QDataSet.DEPEND_0, x );
-            myds.putProperty( QDataSet.RENDER_TYPE, renderType );
-            yds= myds;
-        }
+        ArrayDataSet yds= ArrayDataSet.copy(y);
+        if ( x!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
+        yds.putProperty( QDataSet.RENDER_TYPE, renderType );
         model.setDataSet( chNum, label, yds);
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
