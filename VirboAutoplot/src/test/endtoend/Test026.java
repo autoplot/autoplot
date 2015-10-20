@@ -98,7 +98,8 @@ public class Test026 {
                 throw new IllegalArgumentException("no parse exception, but parsed incorrectly.");
             }
         }
-        writeToHTML(id, dr, drref); // uncomment this for testing.
+        //writeToHTML(id, dr, drref); // uncomment this for testing.
+        writeToHTML(id, test, ref); // uncomment this for testing.
     }
 
     private static void doTestDR(int id, String test, DatumRange norm) throws Exception {
@@ -134,7 +135,8 @@ public class Test026 {
         bw.close(); //closes buffer
     }
 
-    public static void writeToHTML(int id, DatumRange test, DatumRange ref) throws IOException {
+    public static void writeToHTML(int id, String test, String ref) throws IOException {    
+        
         String table = "<tr><td><strong>Test Number:</strong> " + id + "</td>"
                 + "<td><strong>Test: </strong> " + test + "</td>"
                 + "<td><strong>Ref: </strong> " + ref + "</td></tr>\n";
