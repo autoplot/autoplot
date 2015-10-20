@@ -9,9 +9,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeParser;
+import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
 
@@ -154,12 +156,14 @@ public class URITemplatesServlet extends HttpServlet {
 
             int count= 0;
             
-            while ( count<=10000 && dr.min().lt( drtr.max() ) ) {
+            Datum stop= drtr.max().subtract( Datum.create(500,Units.ns ) ); //2010-03-01T00:00:00/10  http://data.org/data_$Y_$j_$H$M$S.$(subsec;places=1) would have extra because of roundoff.
+            while ( count<=10000 && dr.min().lt( stop ) ) {
                 for ( String enum1 : enums ) {
                     st= tp.format( dr.min(), dr.max(), Collections.singletonMap( id, enum1 ) ); 
                     
                     if ( parseUri.length()==0 ) {
-                        out.printf(  "<td>"+st + "</td><td>"+dr + "</td><td>N/A</td>\n" );
+                        out.printf(  "<tr><td>"+st + "</td><td>"+dr + "</td><td>N/A</td><tr>\n" );
+                        count++;
                     } else {
                         count+= doParse( drtr, st, parseUri, out );
                     }
