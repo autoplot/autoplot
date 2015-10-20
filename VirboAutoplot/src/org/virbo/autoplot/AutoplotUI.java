@@ -4109,6 +4109,34 @@ private void updateFrameTitle() {
 
     }
 
+    private static void runScriptImmediately( AutoplotUI app, 
+            ApplicationModel model, String script, 
+            List<String> scriptArgs, boolean quit, 
+            String testPngFilename ) {
+        try {
+            String pwd= URISplit.parse(script).path;
+            ScriptContext.setApplicationModel(model); // initialize
+            JythonUtil.runScript( model, script, scriptArgs.toArray(new String[scriptArgs.size()]), pwd );
+
+            if ( testPngFilename!=null && testPngFilename.length()>0 ) {
+                logger.log(Level.FINE, "Writing to {0}", testPngFilename);
+                ScriptContext.writeToPng(testPngFilename);
+            }
+
+            if ( app!=null ) app.setStatus( READY_MESSAGE );
+            if ( quit ) { 
+                AppManager.getInstance().quit();
+            }
+        } catch ( IOException ex ) {
+            if ( quit ) {
+                logger.log( Level.WARNING, ex.getMessage(), ex );
+                AppManager.getInstance().quit(1);
+            } else {
+                model.getExceptionHandler().handle(ex);
+            }
+        }        
+    }
+    
     /**
      * get the runnable for the script.
      * @param app the application UI, if not headless.
@@ -4128,28 +4156,7 @@ private void updateFrameTitle() {
             public String toString() { return "runScriptRunnable"; }
             @Override
             public void run() {
-                try {
-                    String pwd= URISplit.parse(script).path;
-                    ScriptContext.setApplicationModel(model); // initialize
-                    JythonUtil.runScript( model, script, scriptArgs.toArray(new String[scriptArgs.size()]), pwd );
-                    
-                    if ( testPngFilename!=null && testPngFilename.length()>0 ) {
-                        logger.log(Level.FINE, "Writing to {0}", testPngFilename);
-                        ScriptContext.writeToPng(testPngFilename);
-                    }
-                    
-                    if ( app!=null ) app.setStatus( READY_MESSAGE );
-                    if ( quit ) { 
-                        AppManager.getInstance().quit();
-                    }
-                } catch ( IOException ex ) {
-                    if ( quit ) {
-                        logger.log( Level.WARNING, ex.getMessage(), ex );
-                        AppManager.getInstance().quit(1);
-                    } else {
-                        model.getExceptionHandler().handle(ex);
-                    }
-                }
+                runScriptImmediately( app, model, script, scriptArgs, quit, testPngFilename );
             }
         };
         return r;
@@ -4547,18 +4554,18 @@ APSplash.checkTime("init 230");
                             }
                         } );
                     }
-                    String s= script;
-                    File f= new File( script );
-                    if ( !f.isAbsolute() ) {
-                        try {
-                            s= f.getAbsoluteFile().getCanonicalPath();
-                        } catch (IOException ex) {
-                            Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
+                    String s= URISplit.makeAbsolute( new File(".").getAbsolutePath(), script );
+                    
                     if ( app!=null ) app.setStatus("running script "+s);
                     Runnable run= getRunScriptRunnable(app, model, s, scriptArgs, headless && !server, alm.getValue("testPngFilename") );
                     new Thread(run,"batchRunScriptThread").start();
+                    
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    
                 } else {
 APSplash.checkTime("init 240");
                     if ( app!=null ) app.setStatus( READY_MESSAGE );
