@@ -2,9 +2,12 @@
 package org.autoplot.pngwalk;
 
 import java.text.ParseException;
+import java.util.LinkedList;
+import java.util.List;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,19 +37,30 @@ import org.json.JSONObject;
 public class RichPngUtil {
     
     /**
-     * attempt to get  the range of the first plot's x axis.
+     * attempt to get the time range of the plots, looking at each x axis
+     * for a timerange.
      * @param json rich png ascii string
-     * @return null or the range of the first plot's x axis.
+     * @return null or the range found.
      */
     public static DatumRange getXRange( String json ) {
         try {
             JSONObject jo = new JSONObject( json );
             JSONArray plots= jo.getJSONArray("plots");
-            JSONObject plot= plots.getJSONObject(0);
-            if ( plot!=null ) {
-                JSONObject xaxis= plot.getJSONObject("xaxis");
-                DatumRange range= getRange(xaxis);
-                return range;
+            List<DatumRange> ranges= new LinkedList();
+            for ( int i=0; i<plots.length(); i++ ) {
+                JSONObject plot= plots.getJSONObject(i);
+                if ( plot!=null ) {
+                    JSONObject xaxis= plot.getJSONObject("xaxis");
+                    DatumRange range= getRange(xaxis);
+                    if ( UnitsUtil.isTimeLocation( range.getUnits() ) ) {
+                        ranges.add(0,range);
+                    } else {
+                        ranges.add(range);
+                    }
+                }
+            }
+            if ( ranges.size()>0 ) {
+                return ranges.get(0);
             } else {
                 return null;
             }
