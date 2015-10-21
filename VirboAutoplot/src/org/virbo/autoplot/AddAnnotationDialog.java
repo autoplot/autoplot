@@ -5,17 +5,28 @@
  */
 package org.virbo.autoplot;
 
+import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.datum.Datum;
+import org.das2.graph.AnchorType;
+import org.virbo.autoplot.dom.Annotation;
+
 /**
  *
  * @author jbf
  */
 public class AddAnnotationDialog extends javax.swing.JPanel {
 
+    private static Logger logger= Logger.getLogger("autoplot.gui");
+    
     /**
      * Creates new form AddAnnotationDialog
      */
     public AddAnnotationDialog() {
         initComponents();
+        pointAtCB.setSelected(false);
+        pointAtCB.setEnabled(false);
     }
 
     public String getText() {
@@ -30,13 +41,25 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jTextField1 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
+        pointAtCB = new javax.swing.JCheckBox();
+        xDatumField = new javax.swing.JTextField();
+        yDatumField = new javax.swing.JTextField();
 
         jTextField1.setText("Sign Here");
 
         jLabel2.setText("Annotation Text: ");
+
+        pointAtCB.setText("Point At:");
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, pointAtCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), xDatumField, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, pointAtCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), yDatumField, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -44,9 +67,17 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(pointAtCB)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(xDatumField)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(yDatumField, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -56,13 +87,54 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 91, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(pointAtCB)
+                    .addComponent(xDatumField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(yDatumField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 60, Short.MAX_VALUE))
         );
+
+        bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel2;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JCheckBox pointAtCB;
+    private javax.swing.JTextField xDatumField;
+    private javax.swing.JTextField yDatumField;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
+
+    void configure(Annotation ann) {
+        ann.setText(jTextField1.getText());
+        ann.setAnchorType( pointAtCB.isSelected() ? AnchorType.PLOT : AnchorType.DATA );
+        if ( pointAtCB.isSelected() ) {
+            try {
+                ann.setPointAtX( x.getUnits().parse( xDatumField.getText()) );
+            } catch (ParseException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+            try {
+                ann.setPointAtY( y.getUnits().parse( yDatumField.getText()) );
+            } catch (ParseException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    Datum x;
+    Datum y;
+    
+    void setPointAtX(Datum invTransform) {
+        this.xDatumField.setText( invTransform.toString() );
+        this.x= invTransform;
+    }
+
+    void setPointAtY(Datum invTransform) {
+        this.yDatumField.setText( invTransform.toString() );
+        this.y= invTransform;
+    }
 }
