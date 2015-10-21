@@ -58,6 +58,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.BufferedWriter;
+import java.util.regex.*;
 
 /**
  * MakePngWalk code implemented in Java.  This was once a Python script, but it got complex enough that it was useful to
@@ -701,62 +702,66 @@ public class CreatePngWalk {
      * @param outputFolder the file where the html should be written to.
      */
     public static void writeHTMLFile(String outputFolder){
-        String filePath= outputFolder+"pngImagePage.html";
+        //String filePath= outputFolder+"pngImagePage.html";
         
+        
+        String filePath = "pngImagePage.html";
         File f= new File(filePath);
         
         String htmlOpen= "<html>";
-        String headerString="<head><title>PNG Gallery</title></head>";
-        String bodyString="<body style=\"background-color: #6B6B6B; margin=0;\">";
+        String htmlHead="<head><title>PNG Gallery</title></head>";
+        String htmlBody="<body style=\"background-color: #6B6B6B; margin=0;\">";
         String htmlClose= "</div2Close></body></html>";
-
+        String pageHeaderOpen= "<div style=\"padding:20px; top: 0px; margin-right=0px; background-color:black; color:white;height:100px;\">"
+                    + "<strong>EMFISIS PNG WALK</strong>" + "</div>";
+            
+        String addImageString;
+        String htmlImageStringOpen = "<img src=\"";
+        String htmlImageStringClose = "\" style=\"width:304px;height:304px;margin-left:10px;margin-bottom:10px;\">";
+        String htmlImageCaptionOpen = "<figcaption style=\"color: white; text-align:center;\">";
+        String htmlImageCaptionClose = "</figcaption>";
+        String htmlImageContainer = "<div style=\"background-color: #6B6B6B;margin-left:100px;\">";
+        String htmlFigureOpen = "<figure style=\"width:350px; float:left;\">";
+        String htmlFigureClose = "</figure>";
+        
+        String currentPngFilename;
+        String fileNameToDisplay;
+        String year;
+        String month;
+        String day;
+        String fullDate;
+        String fullImageCaption;
+        
         try ( BufferedWriter bw = new BufferedWriter(new FileWriter(f)) ) {
-            String currentPngFilename;
-            String fileNameToDisplay;
-            String year;
-            String month;
-            String day;
-            String fullDate;
-            
-            String headerOpen= "<div style=\"top: 0px; margin-right=0px; background-color:black; color:white;height:100px;\">"
-                    + "EMFISIS PNG WALK" + "</div>";
-            
-            String addImageString;
-            String htmlImageStringOpen="<img src=\"";
-            String htmlImageStringClose="\" style=\"width:304px;height:304px;margin-left:10px;margin-bottom:10px;\">";
-            String htmlImageCaptionOpen= "<figcaption style=\"color: white; text-align:center;\">";
-            String htmlImageCaptionClose= "</figcaption>";
-            String div2Open="<div style=\"background-color: #6B6B6B;margin-left:100px;\">";
-            String div2Close="</div>";
-            String htmlFigureOpen= "<figure style=\"width:350px; float:left;\">";
-            String htmlFigureClose= "</figure>";
-            String fullImageCaption;
-            
             bw.write(htmlOpen);
-            bw.write(headerString);
-            bw.write(bodyString);
-            bw.write(headerOpen);
-            bw.write(div2Open);
+            bw.write(htmlHead);
+            bw.write(htmlBody);
+            bw.write(pageHeaderOpen);
+            bw.write(htmlImageContainer);
             
-            for (String pngFilenameArray1 : pngFilenameArray) {
+            for (String pngFilenameArray1 : pngFilenameArray) { 
                 currentPngFilename = pngFilenameArray1;
-                fileNameToDisplay= currentPngFilename.replace("/home/aluthens/batch/pngwalk-out/product_", "");
-                year=fileNameToDisplay.substring(0, 4);
-                month=fileNameToDisplay.substring(4, 6);;
-                day=fileNameToDisplay.substring(6, 8);
+                fileNameToDisplay= currentPngFilename.replaceAll("\\D+", ""); //replaces string with only the date digits 
+                year=fileNameToDisplay.substring(0, 4); //gets year
+                month=fileNameToDisplay.substring(4, 6); //gets month
+                day=fileNameToDisplay.substring(6, 8); //gets day
                 fullDate= "Date: " + year + "/" + month + "/" + day;
-                addImageString= htmlImageStringOpen+currentPngFilename+htmlImageStringClose;
-                fullImageCaption= htmlImageCaptionOpen + fullDate + htmlImageCaptionClose;
+                
+                addImageString= htmlImageStringOpen+currentPngFilename+htmlImageStringClose; //insert image into html code
+                fullImageCaption= htmlImageCaptionOpen + fullDate + htmlImageCaptionClose; //insert corresponding date for image into html code
+                
                 bw.write(htmlFigureOpen);
                 bw.write(addImageString);
                 bw.write(fullImageCaption);
                 bw.write(htmlFigureClose);
             }
             bw.write(htmlClose);
-
         } 
         catch(IOException e){
-            System.out.println("ERROR.");
+            System.err.println("IO ERROR.");
+        }
+        catch(Exception e2){
+            System.err.println("UNKNOWN ERROR.");
         }
     }
 
