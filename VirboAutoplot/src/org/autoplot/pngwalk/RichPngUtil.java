@@ -27,7 +27,7 @@ import org.json.JSONObject;
  *      "xaxis": { "label":"", "min":"2014-01-02T00:00:00.000Z", "max":"2014-01-03T00:00:00.000Z", "left":78, "right":644, "type":"lin", "units":"UTC" },
  *      "yaxis": { "label":"[PRELIM] <|B|> (nT)", "min":4.440892098500626E-16, "max":8.9, "top":52, "bottom":587, "type":"lin", "units":"nT" }
  *    }
- * ]
+ * ] }
  *</pre></blockquote>
  *
  * See http://autoplot.org/richPng
