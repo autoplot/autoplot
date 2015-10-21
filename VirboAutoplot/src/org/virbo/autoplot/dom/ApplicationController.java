@@ -920,7 +920,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         
         new AnnotationController( application, annotation, impl );
         
-        impl.setPlot( p.controller.getDasPlot() );
+        if ( p!=null ) {
+            impl.setPlot( p.controller.getDasPlot() );
+        }
                 
         JMenuItem  mi= new JMenuItem(new AbstractAction("Annotation Properties") {
             @Override
