@@ -193,7 +193,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         try {
             if ( interp == null ) { // caching might leave the interpretter open.  This needs to be tweaked--the TSB could set interp to null for example.
 
-                logger.log(Level.FINE, "running script {0}", jythonScript );
+                logger.log(Level.FINE, "running script {0} {1}", new Object[] { jythonScript, paramsl } );
 
                 mon.setProgressMessage( "initialize Jython interpreter...");
 
