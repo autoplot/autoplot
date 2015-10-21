@@ -1824,8 +1824,11 @@ public class GuiSupport {
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 AddAnnotationDialog dia= new AddAnnotationDialog();
+                dia.setPointAtX( plot.getXAxis().invTransform( plot.getDasMouseInputAdapter().getMousePressPositionOnCanvas().x ) );
+                dia.setPointAtY( plot.getYAxis().invTransform( plot.getDasMouseInputAdapter().getMousePressPositionOnCanvas().y ) );
                 if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( app, dia, "Add Annotation", JOptionPane.OK_CANCEL_OPTION ) ) {
                     Annotation ann= controller.addAnnotation( domPlot, dia.getText() );
+                    dia.configure(ann);
                     ann.setAnchorOffset("1em,1em");
                     ann.setBorderType(BorderType.ROUNDED_RECTANGLE);
                     ann.setFontSize("1.4em");
