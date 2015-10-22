@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
 import org.das2.graph.AnchorType;
 import org.virbo.autoplot.dom.Annotation;
 
@@ -25,8 +26,8 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
      */
     public AddAnnotationDialog() {
         initComponents();
-        pointAtCB.setSelected(false);
-        pointAtCB.setEnabled(false);
+        //pointAtCB.setSelected(false);
+        //pointAtCB.setEnabled(false);
     }
 
     public String getText() {
@@ -110,31 +111,44 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
 
     void configure(Annotation ann) {
         ann.setText(jTextField1.getText());
-        ann.setAnchorType( pointAtCB.isSelected() ? AnchorType.PLOT : AnchorType.DATA );
+        ann.setAnchorType( pointAtCB.isSelected() ? AnchorType.PLOT : AnchorType.CANVAS );
         if ( pointAtCB.isSelected() ) {
             try {
-                ann.setPointAtX( x.getUnits().parse( xDatumField.getText()) );
+                Datum x= this.x.getUnits().parse( xDatumField.getText()) ;
+                ann.setPointAtX( x );
+                ann.setXrange( new DatumRange( x, x ) );
             } catch (ParseException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
             try {
-                ann.setPointAtY( y.getUnits().parse( yDatumField.getText()) );
+                Datum y= this.y.getUnits().parse( yDatumField.getText() );
+                ann.setPointAtY( y );
+                ann.setYrange( new DatumRange( y, y ) );
             } catch (ParseException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
+            ann.setShowArrow(true);                    
+            
         }
     }
 
-    Datum x;
-    Datum y;
+    Datum x=null;
+    Datum y=null;
     
     void setPointAtX(Datum invTransform) {
         this.xDatumField.setText( invTransform.toString() );
         this.x= invTransform;
+        pointAtCB.setEnabled(true);
+        if ( this.y!=null ) {
+            pointAtCB.setEnabled(true);
+        }
     }
 
     void setPointAtY(Datum invTransform) {
         this.yDatumField.setText( invTransform.toString() );
         this.y= invTransform;
+        if ( this.x!=null ) {
+            pointAtCB.setEnabled(true);
+        }
     }
 }
