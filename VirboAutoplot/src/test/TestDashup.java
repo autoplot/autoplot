@@ -18,9 +18,15 @@ import org.virbo.jythonsupport.ui.NamedURIListTool;
  */
 public class TestDashup {
     public static void main( String[] args ) {
-        //test1();
+        test1();
         DataSetSelector.setDefaultRecent( Arrays.asList( "http://autoplot.org/data/autoplot.csv?","http://autoplot.org/data/autoplot.cdf?") );
-        test2();
+        //test3();
+    }
+    
+    public static void test3() {
+        DataMashUp dmu= new DataMashUp();
+        dmu.setAsJythonInline("vap+inline:ds1=getDataSet('http://autoplot.org/data/autoplot.cdf?Magnitude')&ds2=getDataSet('http://autoplot.org/data/autoplot.cdf?BGSM&slice1=0')&add(ds1,ds2)");
+        System.err.println(dmu.getAsJythonInline());
     }
     
     public static void test2() {
