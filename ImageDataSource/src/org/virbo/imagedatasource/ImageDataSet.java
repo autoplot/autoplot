@@ -50,7 +50,7 @@ public class ImageDataSet extends AbstractDataSet {
         if ( mask==null ) {
             if ( op==null ) {
                 rank= 3;
-                putProperty( QDataSet.DEPEND_2, Ops.labels( new String[] { "red", "green", "blue" } ) );
+                putProperty( QDataSet.DEPEND_2, Ops.labelsDataset(new String[] { "red", "green", "blue" } ) );
             } else {
                 this.op= op;
             }
