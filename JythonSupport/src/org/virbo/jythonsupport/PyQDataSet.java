@@ -500,7 +500,7 @@ public class PyQDataSet extends PyJavaInstance {
                         fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
                         if ( i==rods.rank()-1 ) {
                             QDataSet bds= (QDataSet) rods.property( "BUNDLE_"+i );
-                            if ( bds!=null ) {
+                            if ( bds!=null && rods.property( "DEPEND_"+i )==null ) { // https://sourceforge.net/p/autoplot/bugs/1478/
                                 DataSetUtil.sliceProperties( bds, idx, bundleProps );
                             }
                         }
@@ -524,7 +524,7 @@ public class PyQDataSet extends PyJavaInstance {
                 
                 DataSetUtil.copyDimensionProperties( rods, result );
 
-                if ( !bundleProps.isEmpty() ) {
+                if ( !bundleProps.isEmpty() ) { 
                     DataSetUtil.putProperties( bundleProps, result );
                 }
                 
