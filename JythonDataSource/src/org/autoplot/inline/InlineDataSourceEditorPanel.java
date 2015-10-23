@@ -413,6 +413,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     TableModel tm;
     String text;
     JTextField tf;
+    String mashupUri= null;
     
     @Override
     public boolean reject(String uri) throws Exception {
@@ -532,7 +533,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             uri= uri.substring(11);
         }
         if ( DataMashUp.isDataMashupJythonInline( uri ) ) {
-            dataMashUp1.setAsJythonInline( uri );
+            mashupUri= uri;
+            
         } else if ( uri.length()==0 || Character.isDigit( uri.charAt(0) ) ) {
             int amp= uri.indexOf("&");
             if ( amp==-1 ) amp= uri.length();
@@ -566,7 +568,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         initComponents();
 
         jTabbedPane1.remove(2); // remove dashup tab
-
+        mashupUri= null;
+        
         if ( text!=null ) jTextPane1.setText(text);
         if ( ltm!=null ) {
             if ( tm.getColumnCount()==2 ) {
@@ -582,6 +585,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
             table.setRowHeight( cellHeight );
 
+        } else if ( mashupUri!=null ) {
+            dataMashUp1.setAsJythonInline(mashupUri);
+            this.jTabbedPane1.setSelectedIndex(2);
+            
         } else {
             this.schemeComboBox.setSelectedIndex(0);
             this.jTabbedPane1.setSelectedIndex(1);
@@ -625,7 +632,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     
     public static void main( String[] args ) {
         //String uri= "vap+inline:ripples(20,20)";
-        String uri= "vap+inline:20,30,40";
+        //String uri= "vap+inline:20,30,40";
+        String uri= "vap+inline:ds=getDataSet('vap+inline:ripples(10)')&ff=getDataSet('vap+inline:ones(10)')&ds-ff";
         DataSourceEditorPanel ds= new InlineDataSourceEditorPanel();
         ds.setURI(uri);
         if ( JOptionPane.OK_OPTION== JOptionPane.showConfirmDialog( null, ds.getPanel(), "Test Inline Editor", JOptionPane.OK_CANCEL_OPTION ) ) {
