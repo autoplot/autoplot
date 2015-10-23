@@ -8,7 +8,6 @@ package org.virbo.jythonsupport;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.python.core.PyInteger;
-import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -41,9 +40,9 @@ public class BinaryInfixOps {
 
     /**
      * perform eq, allowing string arguments to be converted to enumerations.
-     * @param arg1
-     * @param arg2
-     * @return 
+     * @param arg1 None, a QDataSet, String, array, scalar, etc
+     * @param arg2 None, a QDataSet, String, array, scalar, etc
+     * @return PyInteger for rank 0 inputs, or PyQDataSet
      */
     public static PyObject eq( PyObject arg1, PyObject arg2 ) {
         QDataSet jarg1= JythonOps.dataset(arg1);
@@ -52,6 +51,16 @@ public class BinaryInfixOps {
         jarg1= enumerationUnitsCheck( jarg2, arg1, jarg1 );
         if ( jarg1==null || jarg2==null ) return new PyInteger( jarg1==jarg2 ? 1 : 0 );
         QDataSet r= Ops.eq(  jarg1, jarg2 );
+        return mycast( r );
+    }
+
+    public static PyObject ne( PyObject arg1, PyObject arg2 ) {
+        QDataSet jarg1= JythonOps.dataset(arg1);
+        QDataSet jarg2= JythonOps.dataset(arg2);
+        jarg2= enumerationUnitsCheck( jarg1, arg2, jarg2 );
+        jarg1= enumerationUnitsCheck( jarg2, arg1, jarg1 );        
+        if ( jarg1==null || jarg2==null ) return new PyInteger( jarg1!=jarg2 ? 1 : 0 );
+        QDataSet r= Ops.ne( jarg1, jarg2 );
         return mycast( r );
     }
 
@@ -72,16 +81,6 @@ public class BinaryInfixOps {
 
     public static PyObject le( PyObject arg1, PyObject arg2 ) {
         QDataSet r= Ops.le(  JythonOps.dataset(arg1), JythonOps.dataset(arg2) );
-        return mycast( r );
-    }
-
-    public static PyObject ne( PyObject arg1, PyObject arg2 ) {
-        QDataSet jarg1= JythonOps.dataset(arg1);
-        QDataSet jarg2= JythonOps.dataset(arg2);
-        jarg2= enumerationUnitsCheck( jarg1, arg2, jarg2 );
-        jarg1= enumerationUnitsCheck( jarg2, arg1, jarg1 );        
-        if ( jarg1==null || jarg2==null ) return new PyInteger( jarg1!=jarg2 ? 1 : 0 );
-        QDataSet r= Ops.ne( jarg1, jarg2 );
         return mycast( r );
     }
 
