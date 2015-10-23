@@ -5,9 +5,12 @@
 
 package org.virbo.jythonsupport;
 
+import org.das2.datum.EnumerationUnits;
+import org.das2.datum.Units;
 import org.python.core.PyInteger;
 import org.python.core.PyObject;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
 
 /**
@@ -17,49 +20,76 @@ import org.virbo.dsops.Ops;
  */
 public class BinaryInfixOps {
 
+    /**
+     * if ds1 is enumeration, then check if o2 could be interpreted as 
+     * such, otherwise return the existing interpretation.
+     * @param ds1 the context in which we interpret o2.
+     * @param o2 the String, QDataSet, array, etc.
+     * @param ds2
+     * @return 
+     */
+    private static QDataSet enumerationUnitsCheck( QDataSet ds1, PyObject o2, QDataSet ds2 ) {
+        Units u= SemanticOps.getUnits(ds1);
+        if ( u instanceof EnumerationUnits ) {
+            return JythonOps.dataset( o2, u );
+        } else {
+            return ds2;
+        }
+    }
+
+    /**
+     * perform eq, allowing string arguments to be converted to enumerations.
+     * @param arg1
+     * @param arg2
+     * @return 
+     */
     public static PyObject eq( PyObject arg1, PyObject arg2 ) {
-        QDataSet jarg1= JythonOps.coerceToDs(arg1);
-        QDataSet jarg2= JythonOps.coerceToDs(arg2);
+        QDataSet jarg1= JythonOps.dataset(arg1);
+        QDataSet jarg2= JythonOps.dataset(arg2);
+        jarg2= enumerationUnitsCheck( jarg1, arg2, jarg2 );
+        jarg1= enumerationUnitsCheck( jarg2, arg1, jarg1 );
         if ( jarg1==null || jarg2==null ) return new PyInteger( jarg1==jarg2 ? 1 : 0 );
         QDataSet r= Ops.eq(  jarg1, jarg2 );
         return mycast( r );
     }
 
     public static PyObject gt( PyObject arg1, PyObject arg2 ) {
-        QDataSet r= Ops.gt(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        QDataSet r= Ops.gt(  JythonOps.dataset(arg1), JythonOps.dataset(arg2) );
         return mycast( r );
     }
 
     public static PyObject ge( PyObject arg1, PyObject arg2 ) {
-        QDataSet r= Ops.ge(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        QDataSet r= Ops.ge(  JythonOps.dataset(arg1), JythonOps.dataset(arg2) );
         return mycast( r );
     }
 
     public static PyObject lt( PyObject arg1, PyObject arg2 ) {
-        QDataSet r= Ops.lt(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) ) ;
+        QDataSet r= Ops.lt(  JythonOps.dataset(arg1), JythonOps.dataset(arg2) ) ;
         return mycast( r );
     }
 
     public static PyObject le( PyObject arg1, PyObject arg2 ) {
-        QDataSet r= Ops.le(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        QDataSet r= Ops.le(  JythonOps.dataset(arg1), JythonOps.dataset(arg2) );
         return mycast( r );
     }
 
     public static PyObject ne( PyObject arg1, PyObject arg2 ) {
-        QDataSet jarg1= JythonOps.coerceToDs(arg1);
-        QDataSet jarg2= JythonOps.coerceToDs(arg2);
+        QDataSet jarg1= JythonOps.dataset(arg1);
+        QDataSet jarg2= JythonOps.dataset(arg2);
+        jarg2= enumerationUnitsCheck( jarg1, arg2, jarg2 );
+        jarg1= enumerationUnitsCheck( jarg2, arg1, jarg1 );        
         if ( jarg1==null || jarg2==null ) return new PyInteger( jarg1!=jarg2 ? 1 : 0 );
         QDataSet r= Ops.ne( jarg1, jarg2 );
         return mycast( r );
     }
 
     public static PyObject and( PyObject arg1, PyObject arg2 ) {
-        QDataSet r= Ops.and(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        QDataSet r= Ops.and(  JythonOps.dataset(arg1), JythonOps.dataset(arg2) );
         return mycast( r );
     }
 
     public static PyObject or( PyObject arg1, PyObject arg2 ) {
-        QDataSet r= Ops.or(  JythonOps.coerceToDs(arg1), JythonOps.coerceToDs(arg2) );
+        QDataSet r= Ops.or(  JythonOps.dataset(arg1), JythonOps.dataset(arg2) );
         return mycast( r );
     }
 

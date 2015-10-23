@@ -152,6 +152,41 @@ public class JythonOps {
         }
         
     }
+    
+    public static QDataSet dataset( PyObject arg0, Units u ) {
+        if ( arg0 instanceof PyQDataSet ) {
+            return ((PyQDataSet)arg0).rods;
+        } else if ( arg0 instanceof PyList ) {
+            return PyQDataSetAdapter.adaptList( (PyList)arg0 ) ;
+        } else if ( arg0 instanceof PyArray ) {
+            return PyQDataSetAdapter.adaptArray( (PyArray) arg0 );
+        } else if ( arg0 instanceof PyInteger ) {
+            return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
+        } else if ( arg0 instanceof PyLong ) {
+            return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
+        } else if ( arg0 instanceof PyFloat ) {
+            return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
+        } else if ( arg0 instanceof PyJavaInstance && ( ((PyJavaInstance)arg0).__tojava__(Datum.class) instanceof Datum ) ) {
+            return DataSetUtil.asDataSet( (Datum)((PyJavaInstance)arg0).__tojava__(org.das2.datum.Datum.class) );
+        } else if ( arg0 instanceof PyJavaInstance && ( ((PyJavaInstance)arg0).__tojava__(DatumRange.class) instanceof DatumRange ) ) {
+            return DataSetUtil.asDataSet( (DatumRange)((PyJavaInstance)arg0).__tojava__(org.das2.datum.DatumRange.class) );
+
+        } else if ( arg0 instanceof PyString ) {
+            try {
+                return DataSetUtil.asDataSet( u.parse(arg0.toString()) );
+            } catch ( ParseException ex ) {
+                throw Py.SyntaxError( "unable to parse string: "+arg0 );
+            } catch (IllegalArgumentException ex) {
+                throw Py.SyntaxError( "unable to parse string: "+arg0 );
+            }
+        } else if ( arg0 instanceof PyNone ) {
+            // In python code, support test like "ds!=None"
+            return null;
+        } else {
+            throw Py.TypeError("JythonOps is unable to coerce "+arg0+" to QDataSet");
+        }
+        
+    }
 
     /**
      * coerce python objects to Datum

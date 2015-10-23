@@ -124,6 +124,91 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
             q.putProperty( QDataSet.UNITS, u );
             return q;
         }
+    }
+    
+    // see usages elsewhere, this is sloppy.
+    // TODO: consider if [ DSA, DSB ] should append( DSA, DSB ) where DSA DSB are datasets.
+    /**
+     * adapts list to QDataSet.
+     * @param p
+     * @param u the units which are often known.
+     * @return
+     */
+    public static QDataSet adaptList( PyList p, Units u ) {
+        double[] j= new double[ p.size() ];
+        QDataSet d1;
+        JoinDataSet jds= null; // support list of lists.
+        for ( int i=0; i<p.size(); i++ ) {
+            Object n= p.get(i);
+            //if ( u!=null || n instanceof String ) {
+            //    u= EnumerationUnits.getByName("default");
+            //    j[i]= ((EnumerationUnits)u).createDatum( n ).doubleValue( u );
+            //} else {
+            if ( n instanceof PyObject ) {
+                d1= JythonOps.dataset((PyObject)n,u);
+            } else {
+                d1= Ops.dataset(n,u);
+            }
+          
+            if ( d1.rank()==0 ) {
+                j[i]= d1.value();
+            } else {
+                if ( jds==null ) {
+                    jds= new JoinDataSet(d1);
+                } else {
+                    jds.join(d1);
+                }
+            }
+        }
+        
+        if ( jds==null ) {
+            DDataSet q= DDataSet.wrap( j );
+            q.putProperty( QDataSet.UNITS, u );
+            return q;
+        } else {
+            jds.putProperty( QDataSet.UNITS, u );
+            return jds;
+        }
+    }
+
+    protected static QDataSet adaptArray(PyArray pyArray, Units u ) {
+        Object arr= pyArray.getArray();
+        double[] j= new double[ pyArray.__len__() ];
+        JoinDataSet jds=null;
+        QDataSet d1;
+        for ( int i=0; i<pyArray.__len__(); i++ ) {
+            Object n= Array.get( arr, i );
+            if ( n instanceof PyObject ) {
+                d1= JythonOps.dataset((PyObject)n,u);
+            } else if ( n.getClass().isArray() ) {
+                d1= Ops.dataset(n,u);
+                if ( jds==null ) {
+                    jds = new JoinDataSet(d1);
+                } else {
+                    jds.join(d1);
+                }
+            } else {
+                d1= Ops.dataset(n,u);
+            }
+            if ( u==null )  u= SemanticOps.getUnits(d1);
+
+            if ( d1.rank()==0 ) {
+                j[i]= d1.value(); 
+            }
+            
+        }
+        
+        if ( jds!=null ) {
+            jds.putProperty( QDataSet.UNITS, u );
+            //TODO: QUBE property would be nice.
+            jds.putProperty( QDataSet.JOIN_0, null );
+            return ArrayDataSet.copy(jds);
+        } else {
+            DDataSet q= DDataSet.wrap( j );
+            q.putProperty( QDataSet.UNITS, u );
+            return q;
+        }
+            
             
     }
     
