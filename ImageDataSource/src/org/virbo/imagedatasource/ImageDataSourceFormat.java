@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.imagedatasource;
 
@@ -21,6 +17,8 @@ import org.virbo.datasource.DataSourceFormat;
 /**
  * formatter assumes data is (m,n,3) or (3,m,n) RGB.
  * or [m,n,4] where ds[:,:,3] is the alpha channel.
+ * When data is (m,n,4) then [:,:,0] should be the alpha channel,
+ * [:,:,1] should be the red channel, and so on.
  * @author jbf
  */
 public class ImageDataSourceFormat implements DataSourceFormat {
