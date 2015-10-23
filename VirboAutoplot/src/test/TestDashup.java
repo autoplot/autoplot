@@ -50,7 +50,10 @@ public class TestDashup {
         n.setIds( Arrays.asList( "data1", "data2" ) );
         n.setUris( Arrays.asList("http://autoplot.org/data/autoplot.cdf?","http://autoplot.org/data/autoplot.cdf?") );
         n.refresh();
-        JOptionPane.showConfirmDialog(null,n);
+        while ( true ) {
+            JOptionPane.showConfirmDialog(null,n);
+            System.err.println( n );
+        }
     }
  
     
