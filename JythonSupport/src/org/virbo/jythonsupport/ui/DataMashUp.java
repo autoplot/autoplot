@@ -34,6 +34,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.das2.util.LoggerManager;
+import org.python.parser.ast.Assign;
+import org.python.parser.ast.Call;
 import org.python.parser.ast.Module;
 import org.python.parser.ast.stmtType;
 import org.virbo.jythonsupport.JythonUtil;
@@ -101,8 +103,12 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }
     
+    /**
+     * return the mashup as a jython inline script.
+     * @return  the mashup as a jython inline script.
+     */
     public String getAsJythonInline() {
-        StringBuilder b= new StringBuilder();
+        StringBuilder b= new StringBuilder("vap+inline:");
         b.append( namedURIListTool1.getAsJythonInline() );
         
         DefaultTreeModel m= (DefaultTreeModel) jTree1.getModel();
@@ -113,10 +119,26 @@ public class DataMashUp extends javax.swing.JPanel {
         
     }
     
+    private void fillTreeCall( Call c, DefaultTreeModel m, MutableTreeNode parent ) {
+        MutableTreeNode child= new DefaultMutableTreeNode( c.func.getImage() );
+        m.insertNodeInto( child, parent, 0 );
+        for ( int i=0; i<c.args.length; i++ ) {
+            child.insert( new DefaultMutableTreeNode(c.args[i].getImage()), i );
+        }
+    }
+    
     private void fillTree( String expr ) {
         Module n= (Module)org.python.core.parser.parse( "x="+expr, "exec" );
-        for ( stmtType st: n.body ) {
-            System.err.println(st);
+        
+        Assign assign= (Assign)n.body[0];
+        DefaultMutableTreeNode root= new DefaultMutableTreeNode(assign.value.getImage().toString());
+        DefaultTreeModel model= new DefaultTreeModel( root );
+        if ( assign.value instanceof Call ) {
+            Call c= (Call)assign.value;
+            fillTreeCall( c, model, root );
+        }
+        for ( int i=2; i<n.body.length; i++ ) {
+            System.err.println(n.body[i]);
         }
     }
     
@@ -174,6 +196,8 @@ public class DataMashUp extends javax.swing.JPanel {
                 if ( m.matches() ) {
                     ids.add(m.group(1));
                     uris.add(m.group(2));
+                } else {
+                    throw new IllegalArgumentException("script is not jython mashup");
                 }
             } else {
                 fillTree( s );
@@ -228,7 +252,12 @@ public class DataMashUp extends javax.swing.JPanel {
      * @return true if the script conforms to the jython dashup requirements.
      */
     public static boolean isDataMashupJythonInline( String jython ) {
-        return false;
+        try {
+            new DataMashUp().setAsJythonInline(jython);
+        } catch ( Exception ex ) {
+            return false;
+        }
+        return true;
     }
         
     /**
