@@ -476,6 +476,9 @@ public class PyQDataSet extends PyJavaInstance {
                 if ( slices.__len__()>rods.rank() ) {
                     throw new IllegalArgumentException("rank "+slices.__len__()+" access on a rank "+rods.rank()+" dataset" );
                 }
+                
+                Map<String,Object> bundleProps= new HashMap();
+                
                 QubeDataSetIterator iter = new QubeDataSetIterator(rods);
                 for (int i = 0; i < slices.__len__(); i++) {
                     PyObject a = slices.__getitem__(i);
@@ -495,6 +498,12 @@ public class PyQDataSet extends PyJavaInstance {
                     } else if (a.isNumberType()) {
                         int idx = ((Number) getNumber( a )).intValue();
                         fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
+                        if ( i==rods.rank()-1 ) {
+                            QDataSet bds= (QDataSet) rods.property( "BUNDLE_"+i );
+                            if ( bds!=null ) {
+                                DataSetUtil.sliceProperties( bds, idx, bundleProps );
+                            }
+                        }
                     } else {
                         QDataSet that = coerce_ds(a);
                         fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
@@ -512,8 +521,13 @@ public class PyQDataSet extends PyJavaInstance {
                     resultIter.next();
                     resultIter.putValue(result, d);
                 }
+                
                 DataSetUtil.copyDimensionProperties( rods, result );
 
+                if ( !bundleProps.isEmpty() ) {
+                    DataSetUtil.putProperties( bundleProps, result );
+                }
+                
                 return new PyQDataSet(result);
             } else {
                 throw Py.TypeError("invalid index type: "+arg0);
@@ -857,11 +871,7 @@ public class PyQDataSet extends PyJavaInstance {
             public PyObject __iternext__() {
                 if (i < rods.length()) {
                     PyObject result;
-                    if (rods.rank() == 1) {
-                        result = new PyFloat(rods.value(i));
-                    } else {
-                        result = new PyQDataSet( rods.slice(i) );
-                    }
+                    result = new PyQDataSet( rods.slice(i) );
                     i++;
                     return result;
                 } else {
