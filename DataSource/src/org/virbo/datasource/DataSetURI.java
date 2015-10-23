@@ -210,6 +210,9 @@ public class DataSetURI {
      * @return
      */
     public static boolean isAggregating(String surl) {
+        if ( !DataSourceRegistry.getInstance().hasResourceUri(surl) ) {
+            return false;
+        }
         int iquest = surl.indexOf("?");
         if ( iquest>0 ) surl= surl.substring(0,iquest);
         surl= surl.replaceAll("%25", "%");
