@@ -218,17 +218,21 @@ public class NamedURIListTool extends JPanel {
         DataSourceEditorPanel edit=null;
         try {
             edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel( DataSetURI.getURIValid( uris.get(fi) ) );
-            String uri= uris.get(fi);
-            try {
-                if ( !edit.reject( uri ) ) {
-                    edit.prepare( uri, null, new NullProgressMonitor() );
-                    edit.setURI( uri );
-                    JPanel editPanel= edit.getPanel();
-                    editPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
-                    p.add( editPanel );
+            if ( edit==null ) {
+                logger.warning("can't get editor for #"+fi);
+            } else {
+                String uri= uris.get(fi);
+                try {
+                    if ( !edit.reject( uri ) ) {
+                        edit.prepare( uri, null, new NullProgressMonitor() );
+                        edit.setURI( uri );
+                        JPanel editPanel= edit.getPanel();
+                        editPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
+                        p.add( editPanel );
+                    }
+                } catch ( Exception ex ) {
+                    ex.printStackTrace(); //TODO
                 }
-            } catch ( Exception ex ) {
-                ex.printStackTrace(); //TODO
             }
             
         } catch (URISyntaxException ex) {
