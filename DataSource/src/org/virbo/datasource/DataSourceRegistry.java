@@ -789,11 +789,12 @@ public class DataSourceRegistry {
     /**
      * returns true if the vap scheme requires a resource URL.  For example,
      * vap+cdf: needs a resource URI (the file) but vap+inline doesn't.
-     * @param vapScheme
+     * @param vapScheme the scheme part of the Autoplot URI, or a URI.
      * @return true if the vapScheme needs a URL.
      */
     public boolean hasResourceUri(String vapScheme) {
-        if (vapScheme.endsWith(":") ) vapScheme= vapScheme.substring(0,vapScheme.length()-1);
+        int i= vapScheme.indexOf(":");
+        if ( i>0 ) vapScheme= vapScheme.substring(0,i);
         boolean noUri= vapScheme.endsWith("cdaweb") || vapScheme.endsWith("inline" ) || vapScheme.endsWith("pdsppi");
         return !noUri;
     }
