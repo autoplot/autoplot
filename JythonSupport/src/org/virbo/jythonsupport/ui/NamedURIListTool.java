@@ -88,6 +88,20 @@ public class NamedURIListTool extends JPanel {
         return result;
     }
     
+    public String makeupName( List<String> names ) {
+        int max= 0;
+        for (String n : names) {
+            if ( n.startsWith("ds" ) ) {
+                try {
+                    int j= Integer.parseInt(n.substring(2) );
+                    max= Math.max(max,j);
+                } catch ( NumberFormatException ex ) {
+                }
+            }
+        }
+        return "ds"+(max+1);
+    }
+    
     /**
      * return the panel with the add and remove icons.
      * @param fi the position 
@@ -125,7 +139,8 @@ public class NamedURIListTool extends JPanel {
                     org.das2.util.LoggerManager.logGuiEvent(e);
                     List<String> ids= new ArrayList<String>(NamedURIListTool.this.ids);
                     List<String> uris= new ArrayList<String>(NamedURIListTool.this.uris);
-                    ids.add("ds1");
+                    String newName= makeupName( ids );
+                    ids.add(newName);
                     uris.add("");
                     setIds(ids);
                     setUris(uris);
@@ -141,6 +156,7 @@ public class NamedURIListTool extends JPanel {
             subDelete.setMaximumSize( limit );
             subDelete.setPreferredSize( limit );
             subDelete.setToolTipText( "remove uri " );
+            final int ffi= fi;
             subDelete.addActionListener( new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -148,6 +164,9 @@ public class NamedURIListTool extends JPanel {
                     Container parent= sub.getParent();
                     parent.remove(sub);
                     parent.validate();
+                    uris.remove(ffi);
+                    ids.remove(ffi);
+                    refresh();
                 }
             } );
             sub.add( subDelete, BorderLayout.EAST );
