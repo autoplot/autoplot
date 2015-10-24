@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The new annotations feature set is done.  Here a static image (left) is used to annotate the figure, and the text annotation (right) is being modified. 
+        <p><small>The application timerange control appears on the axis tab now.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,8 +20,11 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without netwok access and from the command line.</p>
 
-        <p>Bugfixes (2015-10-22 r17763):</p>
+        <p>Bugfixes (2015-10-24 r17801):</p>
         <ul>
+            <li>update security certificates to enable running on Mac.  Note Linux and Windows fuss about the certificate, and single-jar release should be used.</li>
+            <li>1478: slice and unbundle operations properly preserve units, eq and ne operators improve support for nominal data.</li>
+            <li>PNG support corrects problems with alpha channel when reading and formatting PNG files.</li>
             <li>TimeParser $(subsec) had a bug with rounding.</li>
             <li>1473: create pongwalk by orbit without rescale fails</li>
             <li>1472: HTTPFileSystem fails to query for username after typo</li>
@@ -33,6 +36,9 @@
             <li>corrections to hrinterval and time format, correctly using the stop time and supporting end modifier.</li>
             <li>clean up address bar as vap is loaded. </li>
             <li>"2014-001 to 2015-001 UTC" is supported now.</li> 
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>1462: result of guessCadence mishandled in hugeScatter rendering mode</li>
             <li>1463: null value in USER_PROPERTIES would result in NullPointerException</li>
             <li>1440: vap+inline:ripp&lt;C> works now.</li>
@@ -107,45 +113,6 @@
             <li>bugfixes in block from 2015-07-15 to 2015-07-26</li>
             <li>FFTPower would apply the window twice, affecting the data.  Thanks, Chris!</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>support where=IsoDateTime.within(2012-11-01T03:00/09:00) in ascii plugin.</li>
-            <li>minor tweaks to property editor</li>
-            <li>update RBSP orbits to 2827</li>
-            <li>hide the "filters" name which is meaningless to the scientists, and use "operations" (which is just as meaningless, but there's one fewer name).</li>
-            <li>check to see that the bookmarks are loaded before assuming they had been, to support running scripts within 10 seconds of launch.</li>
-            <li>total of total showed a bug where the weights were not properly accounted for.</li>
-            <li>1422: filters GUI would run filters on the event thread, hanging app for slow filters.</li>
-            <li>old code for managing the tick formatter assumed that milliseconds would be sufficient.</li>
-            <li>CollapseFilterEditor panel would loose the selected index when resetting the dimension names.</li>
-            <li>add progress monitor to InlineDataSource</li>
-            <li>das2server GUIs would drop intrinsic and item keywords.</li>
-            <li>add missing sqrt and pow filters to FilterChain GUI.</li>
-            <li>vap+inline: supports more complex URIs that contain getDataSet calls with ampersands within.</li>
-            <li>ds1 + '5nT' will preserve the DEPEND_0 of ds1.</li>
-            <li>SpectrogramRenderer would incorrectly guess the limit when NN rebinning was used, after new code was added earlier this Spring.</li>
-            <li>USER_PROPERTIES copied over for Juno das2stream in odd branch.</li>
-            <li>filters tool keeps alpha list and tree list synchronized to the same selection.</li>
-            <li>1347: finally make the result from reducex have uniform timetags.</li>
-            <li>next/prev buttons check log property so that we avoid RTE with negative numbers.</li>
-            <li>rte_2038937185: handle case where WWWAuthenticate is not provided by HTTP server.</li>
-            <li>use "alphabetical" where "alpha" was used before.  Brevity didn't help and could confuse.</li>
-            <li>format to CDF with append multiple sets of timetags.</li>
-            <li>Vertical slice on two-record spectrogram can now access the first record.</li>
-            <li>1415: plotting one day of data from a yearly aggregation.  The exact URI timerange now appears.</li>
-            <li>1414: previous scan button needs to check for log property</li>
-            <li>slices have properly hidden next/previous buttons</li>
-            <li>1408: make sure .vap file name is in address bar after loading.</li>
-            <li>move getCompletions and sleep over from the application context to data source context.  Thanks, Simon!</li>
-            <li>1408: put the script arguments on the address bar and in history.  Thanks, George!</li>
-            <li>label for atan2 function was acos, left over from cut-n-paste code.  Thanks, Dave!</li>
-            <li>rte_0484501685: don't allow format to XLS when the dataset is more than 65000 records, because it will crash.  Thanks, Mary!</li>
-            <li>rte_1830226672: check for valid name in reject method.  Thanks acho!</li>
-            <li>1409: subsetting with new CDF library fails, with rank 1 DEPEND_1.</li>
-            <li>rte_1765707187: export to file when filename is relative is allowed now.  Thanks Ananya!</li>
-            <li>rte_0874741227: nullPointerException with Jython scripts, thanks Bill and Dan!</li>
-            <li>setDepend0Cadence supports rank 3 joins</li>
-        </ul>
         <p>Features:</p>
         <ul>
             <li>rfe453: axis tab has timerange editor for when the timerange isn't an axis.</li>
@@ -154,6 +121,9 @@
             <li>451: keep track of running script so buffer doesn't swap</li>
             <li>345: first go at annotations</li>
             <li>improvements to $(enum) in timeranges, providing code to read out the enumerated values.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>           
             <li>449: bitwise operators in QDataSets.</li>
             <li>export to HDF supports append</li>
             <li>trim operator has GUI now.  Thanks Armond!</li>
@@ -193,21 +163,6 @@
             <li>improvements to DashupTool.</li>
             <li>update the port reported when the server is on, to support automatic selection of port with --server=0.</li>
             <li>support Units.RGBColor for the units of the colorBy dataset.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>           
-            <li>improvements to feedback in CDF parameter editor panel.</li>
-            <li>1425: implicit events file format allows any text file with ISO8601, ISO8601 for the first two columns to be implicitly treated as an events file.</li>
-            <li>add rank 4 ones and replicate functions.</li>
-            <li>1421: filters can now be cancelled.</li>
-            <li>add fft and magnitude to the filters.</li>
-            <li>intrinsic checkbox in das2server editor panel.  Bold font used to improve readability.</li>
-            <li>compile in new Dashup GUI for testing.</li>
-            <li>in Jython, add datumRange method for coercing various object types into DatumRange.</li>
-            <li>allow vap+jyds:http://... when the whitelist contains just http://...</li>
-            <li>system property AUTOPLOT_DATA can be used to specify autoplot_data folder location.</li>
-            <li>GUI title indicates if problematic 32bit Java is used.</li>
-            <li>layout tab has add plots and delete plots button.</li>
         </ul>
 
         <p>Known issues:</p>
