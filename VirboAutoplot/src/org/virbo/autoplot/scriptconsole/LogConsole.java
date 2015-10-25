@@ -303,7 +303,7 @@ public class LogConsole extends javax.swing.JPanel {
                             recMsg= String.valueOf( rec.getMessage() ); //TODO: fix this log message! bug https://sourceforge.net/p/autoplot/bugs/1194/
                         }
                     }
-                    if ( ( recMsg==null || recMsg.length()==0 ) && rec.getThrown()!=null ) {
+                    if ( ( recMsg==null || recMsg.length()<4 ) && rec.getThrown()!=null ) {
                         recMsg= rec.getThrown().toString();
                         //TODO: consider if "debug" property should be set instead.  Also it would be nice to digest this for jython errors.
                         rec.getThrown().printStackTrace();
