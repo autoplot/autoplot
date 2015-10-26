@@ -181,7 +181,7 @@ public class Application extends DomNode {
         }
         DatumRange oldTimeRange = this.timeRange;
         this.timeRange = timeRange;
-        if ( timeRange.width().value()>0 ) {
+        if ( timeRange.width().value()>0 && timeRange.getUnits()==oldTimeRange.getUnits() ) {
             int dmin= (int)( DatumRangeUtil.normalize(timeRange,oldTimeRange.min())*10000 + 0.5 );
             int dmax= (int)( DatumRangeUtil.normalize(timeRange,oldTimeRange.max())*10000 + 0.5 );
             if ( dmin==0 && dmax==10000 ) {
