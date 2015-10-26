@@ -13,7 +13,7 @@ public class PlotElementControllerUtil {
 
     /**
      * return the DatumRange for the plot element's data.  When there is a
-     * TimeSeriesBrowse, this is it's timerange, otherwise it comes from
+     * TimeSeriesBrowse, this is its timerange, otherwise it comes from
      * the data.  If none is found, then null is returned.
      * @param dom
      * @param pe
@@ -21,10 +21,11 @@ public class PlotElementControllerUtil {
      */
     public static DatumRange getTimeRange( Application dom, PlotElement pe ) {
 
+        if ( pe==null ) return null;
+        
         DataSourceFilter dsf= dom.getController().getDataSourceFilterFor(pe);
-        if ( dsf==null ) {
-            return null;
-        }
+        if ( dsf==null ) return null;
+        
         TimeSeriesBrowse tsb= dsf.getController().getTsb();
         if ( tsb!= null ) {
             return tsb.getTimeRange();
