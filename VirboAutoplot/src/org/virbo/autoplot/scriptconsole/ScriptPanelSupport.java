@@ -29,6 +29,13 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.ClosedWatchServiceException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
@@ -272,16 +279,79 @@ public class ScriptPanelSupport {
         OutputStream out = null;
         try {
             if ( !( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) throw new IOException("unable to write to file: "+file);
+            watcher.close();
             out = new FileOutputStream(file);
             String text = panel.getEditorPanel().getText();
             out.write(text.getBytes());
             panel.setDirty(false);
+            restartWatcher(file);
         } finally {
             if ( out!=null ) out.close();
         }
         return JOptionPane.OK_OPTION;
     }
-
+    
+    WatchService watcher;
+    
+    private void watcherRunnable( final WatchService watch, final Path fpath ) {
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                Path parent= fpath.getParent();
+                while ( true ) {
+                    try {
+                        WatchKey key= watcher.take();
+                        for ( WatchEvent e : key.pollEvents() ) {
+                            
+                            WatchEvent<Path> ev = (WatchEvent<Path>) e;
+                            Path name = ev.context();
+                            logger.log(Level.FINER, "watch event {0} {1}", new Object[]{ev.kind(), ev.context()});
+                            if ( parent.resolve(name).equals(fpath) ) {
+                                if ( JOptionPane.OK_OPTION== 
+                                    JOptionPane.showConfirmDialog( panel, 
+                                    "File Changed On Disk.  Do you want to reload?", 
+                                    "File Changed on Disk",
+                                    JOptionPane.OK_CANCEL_OPTION ) ) {
+                                    try {
+                                        loadFile( ScriptPanelSupport.this.file );
+                                    } catch (IOException ex) {
+                                        logger.log(Level.SEVERE, null, ex);
+                                    }
+                                } else {
+                                    ScriptPanelSupport.this.panel.setDirty(true);
+                                }
+                            }
+                        }   
+                        if ( !key.reset() ) {
+                            logger.log(Level.FINER, "watch key could not be reset: {0}", key);
+                            return;
+                        }
+                    } catch ( ClosedWatchServiceException ex ) {
+                        logger.log(Level.FINER, "watch service was closed: {0}", watch);
+                        return;
+                        
+                    } catch (InterruptedException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            }            
+        };
+        new Thread(run).start();
+    }
+    
+    private void restartWatcher( File file ) throws IOException {
+        if ( watcher!=null ) {
+            watcher.close();
+        } 
+        watcher = FileSystems.getDefault().newWatchService();
+        Path fpath= file.toPath();
+        Path parent= fpath.getParent();
+        parent.register( watcher, StandardWatchEventKinds.ENTRY_MODIFY );
+        parent.register( watcher, StandardWatchEventKinds.ENTRY_CREATE );
+        parent.register( watcher, StandardWatchEventKinds.ENTRY_DELETE );
+        watcherRunnable( watcher, file.toPath() );
+    }
+    
     protected void loadFile(File file) throws IOException, FileNotFoundException {
         try (InputStream r = new FileInputStream(file)) {
             this.file= file;
@@ -293,6 +363,7 @@ public class ScriptPanelSupport {
                 panel.setContext(JythonScriptPanel.CONTEXT_APPLICATION);
             }
         }
+        restartWatcher(file);
     }
 
     protected void loadInputStream( InputStream in ) throws IOException {
@@ -905,12 +976,14 @@ public class ScriptPanelSupport {
         try {
             result= getSaveFile();
             if (result == JFileChooser.APPROVE_OPTION) {
+                if ( watcher!=null ) watcher.close();
                 out = new FileOutputStream(file);
                 String text = panel.getEditorPanel().getText();
                 out.write(text.getBytes());
                 panel.setDirty(false);
                 panel.setFilename(file.toString());
-
+                restartWatcher(file);
+                
                 Preferences prefs = Preferences.userNodeForPackage(ScriptPanelSupport.class);
                 prefs.put(PREFERENCE_OPEN_FILE, file.toString() );
                 
