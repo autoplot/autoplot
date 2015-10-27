@@ -279,7 +279,13 @@ public class ScriptPanelSupport {
         OutputStream out = null;
         try {
             if ( !( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) throw new IOException("unable to write to file: "+file);
-            watcher.close();
+            if ( watcher!=null ) {
+                try {
+                    watcher.close();
+                } catch ( IOException ex ) {
+                    logger.log( Level.WARNING, ex.getMessage(), ex );
+                }
+            }
             out = new FileOutputStream(file);
             String text = panel.getEditorPanel().getText();
             out.write(text.getBytes());
@@ -298,6 +304,7 @@ public class ScriptPanelSupport {
             @Override
             public void run() {
                 Path parent= fpath.getParent();
+                logger.log(Level.FINER, "start watch event loop on {0}", new Object[]{parent});
                 while ( true ) {
                     try {
                         WatchKey key= watcher.take();
@@ -340,6 +347,7 @@ public class ScriptPanelSupport {
     }
     
     private void restartWatcher( File file ) throws IOException {
+        logger.entering( "org.virbo.autoplot.scriptconsole", "restartWatcher {0}", file );
         if ( watcher!=null ) {
             watcher.close();
         } 
@@ -350,6 +358,7 @@ public class ScriptPanelSupport {
         parent.register( watcher, StandardWatchEventKinds.ENTRY_CREATE );
         parent.register( watcher, StandardWatchEventKinds.ENTRY_DELETE );
         watcherRunnable( watcher, file.toPath() );
+        logger.exiting("org.virbo.autoplot.scriptconsole", "restartWatcher {0}", file );
     }
     
     protected void loadFile(File file) throws IOException, FileNotFoundException {
@@ -976,7 +985,13 @@ public class ScriptPanelSupport {
         try {
             result= getSaveFile();
             if (result == JFileChooser.APPROVE_OPTION) {
-                if ( watcher!=null ) watcher.close();
+                if ( watcher!=null ) {
+                    try {
+                        watcher.close();
+                    } catch ( IOException ex ) {
+                        logger.log( Level.WARNING, ex.getMessage(), ex );
+                    }
+                }
                 out = new FileOutputStream(file);
                 String text = panel.getEditorPanel().getText();
                 out.write(text.getBytes());
@@ -1013,11 +1028,18 @@ public class ScriptPanelSupport {
     protected void newScript() {
         if (panel.isDirty()) {
             int result = JOptionPane.showConfirmDialog(panel,"save edits first?", "new script", JOptionPane.YES_NO_CANCEL_OPTION );
-            if (result == JOptionPane.OK_CANCEL_OPTION) {
+            if (result == JOptionPane.CANCEL_OPTION) {
                 return;
             }
             if ( result==JOptionPane.OK_OPTION ) {
                 if ( saveAs()==JOptionPane.CANCEL_OPTION ) return;
+            }
+        }
+        if ( file!=null && watcher!=null ) {
+            try {
+                watcher.close();
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         try {
