@@ -569,9 +569,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
         if ( !System.getProperty("enableDashup").equals("true")) {
             jTabbedPane1.remove(2); // remove dashup tab
+            mashupUri= null;
         }
-        
-        mashupUri= null;
         
         if ( text!=null ) jTextPane1.setText(text);
         if ( ltm!=null ) {
