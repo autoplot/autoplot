@@ -20,8 +20,10 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without netwok access and from the command line.</p>
 
-        <p>Bugfixes (2015-10-24 r17801):</p>
-        <ul>
+        <p>Bugfixes (2015-10-27 r17822):</p>
+        <ul>            
+            <li>rte_2066281934: catch IndexOutOfBoundsException when trying to parse "...+...+...", now throws parse exception.</li>
+            <li>rte_1417924229: transitional state produced NullPointerException</li>
             <li>1478: slice and unbundle operations properly preserve units, eq and ne operators improve support for nominal data.</li>
             <li>PNG support corrects problems with alpha channel when reading and formatting PNG files.</li>
             <li>TimeParser $(subsec) had a bug with rounding.</li>
@@ -114,6 +116,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe456: jython editor detects external changes</li>
+            <li>dashup can be enabled with environment variable "enableDashup=true" in config/system.properties.</li>
             <li>rfe453: axis tab has timerange editor for when the timerange isn't an axis.</li>
             <li>rfe454: support arbitrary rank data with HDF5 plugin.</li>
             <li>pngwalk allows &amp;timerange= in URI to constrain the image timeranges.</li>
