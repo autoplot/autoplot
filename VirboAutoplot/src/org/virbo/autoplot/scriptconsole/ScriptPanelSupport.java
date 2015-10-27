@@ -354,9 +354,10 @@ public class ScriptPanelSupport {
         watcher = FileSystems.getDefault().newWatchService();
         Path fpath= file.toPath();
         Path parent= fpath.getParent();
-        parent.register( watcher, StandardWatchEventKinds.ENTRY_MODIFY );
-        parent.register( watcher, StandardWatchEventKinds.ENTRY_CREATE );
-        parent.register( watcher, StandardWatchEventKinds.ENTRY_DELETE );
+        parent.register( watcher, StandardWatchEventKinds.ENTRY_MODIFY,
+            StandardWatchEventKinds.ENTRY_CREATE,
+            StandardWatchEventKinds.ENTRY_DELETE );
+        //parent.register( watcher, StandardWatchEventKinds.OVERFLOW );
         watcherRunnable( watcher, file.toPath() );
         logger.exiting("org.virbo.autoplot.scriptconsole", "restartWatcher {0}", file );
     }
