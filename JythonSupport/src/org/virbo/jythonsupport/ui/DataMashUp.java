@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.jythonsupport.ui;
 
 import java.awt.datatransfer.DataFlavor;
@@ -25,9 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.BoxLayout;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -37,11 +30,13 @@ import org.das2.util.LoggerManager;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.Module;
-import org.python.parser.ast.stmtType;
-import org.virbo.jythonsupport.JythonUtil;
+import org.python.parser.ast.Name;
+import org.python.parser.ast.exprType;
 
 /**
- *
+ * GUI for specifying mashups, where a number of 
+ * data sets are loaded and combined.  These are implemented as small
+ * jython scripts, consisting only of declarations and an expression.
  * @author jbf
  */
 public class DataMashUp extends javax.swing.JPanel {
@@ -120,26 +115,34 @@ public class DataMashUp extends javax.swing.JPanel {
     }
     
     private void fillTreeCall( Call c, DefaultTreeModel m, MutableTreeNode parent ) {
-        MutableTreeNode child= new DefaultMutableTreeNode( c.func.getImage() );
-        m.insertNodeInto( child, parent, 0 );
         for ( int i=0; i<c.args.length; i++ ) {
-            child.insert( new DefaultMutableTreeNode(c.args[i].getImage()), i );
+            exprType et= c.args[i];
+            if ( et instanceof Name ) {
+                parent.insert( new DefaultMutableTreeNode(((Name)et).id), i );
+            } else {
+                Call call= (Call)et;
+                DefaultMutableTreeNode child= new DefaultMutableTreeNode( funcCallName( call ) );
+                fillTreeCall( call, m, child );
+            }
         }
+    }
+    
+    private String funcCallName( Call c ) {
+        Name name= (Name)c.func;
+        return name.id;
     }
     
     private void fillTree( String expr ) {
         Module n= (Module)org.python.core.parser.parse( "x="+expr, "exec" );
         
         Assign assign= (Assign)n.body[0];
-        DefaultMutableTreeNode root= new DefaultMutableTreeNode(assign.value.getImage().toString());
+        DefaultMutableTreeNode root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
         DefaultTreeModel model= new DefaultTreeModel( root );
         if ( assign.value instanceof Call ) {
             Call c= (Call)assign.value;
             fillTreeCall( c, model, root );
         }
-        for ( int i=2; i<n.body.length; i++ ) {
-            System.err.println(n.body[i]);
-        }
+        jTree1.setModel(model);
     }
     
     /**
@@ -420,7 +423,10 @@ public class DataMashUp extends javax.swing.JPanel {
         };
     };
     
-
+    public static void main( String[] args ) {
+        new DataMashUp().fillTree("sin(cos(a))");
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JList jList1;
     private javax.swing.JPanel jPanel1;
