@@ -13,7 +13,6 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import static test.WatchDir.cast;
 
 /**
  *
@@ -34,14 +33,10 @@ public class DemoFileWatcher {
             WatchKey key= watcher.take();
             for ( WatchEvent e : key.pollEvents() ) {
                 
-                WatchEvent<Path> ev = cast(e);
+                WatchEvent<Path> ev = (WatchEvent<Path>)(e);
                 Path name = ev.context();
                 
-                if ( parent.resolve(name).equals(fpath) ) {
-                    System.err.println(ev.kind() + " " + ev.context() );
-                } else {
-                    System.err.println("     "+ev);
-                }
+                System.err.println( " " + name + " " + ev.kind() + " " + ev.context() );
 
             }
             
