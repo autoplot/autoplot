@@ -87,7 +87,8 @@ public class DataMashUp extends javax.swing.JPanel {
         } else {
             String sn= n.toString();
             int iparen= sn.indexOf("(");
-            StringBuilder t= new StringBuilder( sn.substring(0,iparen) + "(" );
+            if ( iparen>-1 ) sn= sn.substring(0,iparen);
+            StringBuilder t= new StringBuilder( sn + "(" );
             int nchild= m.getChildCount(n);
             for ( int i=0; i<nchild; i++ ) {
                 if ( i>0 ) t.append(",");
