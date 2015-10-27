@@ -212,7 +212,7 @@ public class NamedURIListTool extends JPanel {
         try {
             edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel( DataSetURI.getURIValid( uris.get(fi) ) );
             if ( edit==null ) {
-                logger.warning("can't get editor for #"+fi);
+                logger.log(Level.WARNING, "can''t get editor for #{0}", fi);
             } else {
                 String uri= uris.get(fi);
                 try {
@@ -224,7 +224,7 @@ public class NamedURIListTool extends JPanel {
                         p.add( editPanel );
                     }
                 } catch ( Exception ex ) {
-                    ex.printStackTrace(); //TODO
+                    logger.log( Level.SEVERE, null, ex );
                 }
             }
             
@@ -237,6 +237,7 @@ public class NamedURIListTool extends JPanel {
                 uris.set( fi, edit.getURI() );
             }
             SwingUtilities.invokeLater( new Runnable() {
+                @Override
                 public void run() {
                     refresh();
                 }
@@ -254,9 +255,9 @@ public class NamedURIListTool extends JPanel {
         this.uris= new ArrayList<String>(uris);
         if ( uris.size()==ids.size() ) refresh();
     }
-
+    
     /**
-     * return the jython code that gets these.
+     * return the Jython code that gets these.
      * @return 
      */
     String getAsJython() {
@@ -268,7 +269,7 @@ public class NamedURIListTool extends JPanel {
     }
 
     /**
-     * return the jython code that gets these, to prefix vap+inline:...
+     * return the Jython code that gets these, to prefix vap+inline:...
      * @return 
      */
     String getAsJythonInline() {
@@ -281,6 +282,7 @@ public class NamedURIListTool extends JPanel {
     
     /**
      * return null if nothing is selected, the URI otherwise.
+     * @param id the current selection
      * @return null if nothing is selected, the URI otherwise.
      */
     public String selectDataId( String id ) {
