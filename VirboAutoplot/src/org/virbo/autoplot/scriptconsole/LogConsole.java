@@ -79,7 +79,7 @@ public class LogConsole extends javax.swing.JPanel {
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot");
 
     public static final int RECORD_SIZE_LIMIT = 4000;
-    List<LogRecord> records = new LinkedList<LogRecord>();
+    List<LogRecord> records = new LinkedList<>();
     int eventThreadId = -1;
     int level = Level.ALL.intValue(); // let each logger do the filtering now.
     boolean showLoggerId = false;
@@ -281,16 +281,22 @@ public class LogConsole extends javax.swing.JPanel {
                     String recMsg;
                     String rm1= rec.getMessage();
                     if ( rm1!=null ) {
-                        if ( rec.getMessage().equals("ENTRY {0}") ) {
-                            recMsg= "ENTRY " + rec.getSourceClassName() + "." +rec.getSourceMethodName() + " {0}";
-                        } else if ( rec.getMessage().equals("ENTRY") ) {
-                            recMsg= "ENTRY " + rec.getSourceClassName() + "." +rec.getSourceMethodName();
-                        } else if ( rec.getMessage().equals("RETURN {0}") ) {
-                            recMsg= "RETURN " + rec.getSourceClassName() + "." +rec.getSourceMethodName() + " {0}";
-                        } else if ( rec.getMessage().equals("RETURN") ) {
-                            recMsg= "RETURN " + rec.getSourceClassName() + "." +rec.getSourceMethodName();
-                        } else {
-                            recMsg = rec.getMessage();
+                        switch (rec.getMessage()) {
+                            case "ENTRY {0}":
+                                recMsg= "ENTRY " + rec.getSourceClassName() + "." +rec.getSourceMethodName() + " {0}";
+                                break;
+                            case "ENTRY":
+                                recMsg= "ENTRY " + rec.getSourceClassName() + "." +rec.getSourceMethodName();
+                                break;
+                            case "RETURN {0}":
+                                recMsg= "RETURN " + rec.getSourceClassName() + "." +rec.getSourceMethodName() + " {0}";
+                                break;
+                            case "RETURN":
+                                recMsg= "RETURN " + rec.getSourceClassName() + "." +rec.getSourceMethodName();
+                                break;
+                            default:
+                                recMsg = rec.getMessage();
+                                break;
                         }
                     } else {
                         recMsg= null;
@@ -410,7 +416,7 @@ public class LogConsole extends javax.swing.JPanel {
         }
     }
 
-    Map<String,Long> entryTimes= new HashMap<String, Long>();    
+    Map<String,Long> entryTimes= new HashMap<>();    
     
     private String getRecMsg( long baseTime, LogRecord rec ) {
         
@@ -472,7 +478,7 @@ public class LogConsole extends javax.swing.JPanel {
     public void update() {
         List<LogRecord> lrecords;
         synchronized ( this ) {
-            lrecords= new ArrayList<LogRecord>(records);
+            lrecords= new ArrayList<>(records);
         }
         try {
             //long t0= System.currentTimeMillis();
@@ -489,7 +495,7 @@ public class LogConsole extends javax.swing.JPanel {
             
             long t = n == 0 ? 0 : lrecords.get(n-1).getMillis();
             
-            entryTimes= new HashMap<String, Long>();    
+            entryTimes= new HashMap<>();    
             
             for (LogRecord rec : lrecords) {
                 if (rec.getLevel().intValue() >= level) {
@@ -669,13 +675,7 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
             try {
                 fo = new FileInputStream(chooser.getSelectedFile());
                 records = LogConsoleUtil.deserializeLogRecords(fo);
-            } catch (ParserConfigurationException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (SAXException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (FileNotFoundException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (IOException ex) {
+            } catch (ParserConfigurationException | SAXException | IOException ex ) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             } finally {
                 try {
