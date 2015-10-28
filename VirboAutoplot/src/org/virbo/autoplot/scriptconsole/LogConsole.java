@@ -698,11 +698,9 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
             }
         });
         if (JFileChooser.APPROVE_OPTION == chooser.showSaveDialog(this)) {
-            FileOutputStream fo = null;
-            try {
-                File f= chooser.getSelectedFile();
-                fo = new FileOutputStream(chooser.getSelectedFile());
-                List<LogRecord> copy= new ArrayList(records);
+            File f= chooser.getSelectedFile();            
+            List<LogRecord> copy= new ArrayList(records);
+            try ( FileOutputStream fo=  new FileOutputStream(chooser.getSelectedFile()) ) {
                 if ( f.toString().endsWith(".xml") ) {
                     LogConsoleUtil.serializeLogRecords(copy, fo);
                 } else {
@@ -723,12 +721,6 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } finally {
-                try {
-                    if ( fo!=null ) fo.close();
-                } catch (IOException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                }
             }
         }
     }
