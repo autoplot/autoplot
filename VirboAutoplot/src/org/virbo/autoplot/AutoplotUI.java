@@ -3602,7 +3602,7 @@ private void canvasSizeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     p.updateSizeEnabled(); // ???
     p.getHeightTextField().setValue( dom.getCanvases(0).getHeight() );
     p.getWidthTextField().setValue( dom.getCanvases(0).getWidth() );
-    if ( JOptionPane.showConfirmDialog( this,p,"Set Canvas Size",JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+    if ( AutoplotUtil.showConfirmDialog( this,p,"Set Canvas Size",JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
         if ( p.getResizeRadioButton().isSelected() ) {
             dom.getCanvases(0).setFitted(true);
         } else {
