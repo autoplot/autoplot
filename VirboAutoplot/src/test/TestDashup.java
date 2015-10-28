@@ -52,7 +52,11 @@ public class TestDashup {
         n.refresh();
         while ( true ) {
             JOptionPane.showConfirmDialog(null,n);
-            System.err.println( n );
+            System.err.println("----");
+            for ( String s: n.getUris() ) {
+                System.err.println( s );
+            }
+            
         }
     }
  
