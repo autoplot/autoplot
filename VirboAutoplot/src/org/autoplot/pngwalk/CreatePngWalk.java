@@ -67,6 +67,7 @@ import java.util.regex.*;
  */
 public class CreatePngWalk {
     private static final ArrayList<String> pngFilenameArray= new ArrayList();
+    private static final ArrayList<String> timeLabels= new ArrayList();
     /**
      * Get the list of times, which can be one of:<ul>
      *   <li> rank 2 bins datasets  T[index;min,max]
@@ -429,6 +430,7 @@ public class CreatePngWalk {
             }
         });
         
+        String currentTimeLabel;
         for ( String atime : times ) {
 
             returnCode1= 0;
@@ -446,7 +448,9 @@ public class CreatePngWalk {
             * @author Armond Luthens
             * @date 09/21/15
             */
-             pngFilenameArray.add(filename);
+           
+            pngFilenameArray.add(filename);
+             
             
             count = count + 1;
             if (mon.isCancelled()) {
@@ -477,6 +481,9 @@ public class CreatePngWalk {
                         dr= DatumRangeUtil.rescale( dr,params.rescalex );
                     }
                 }
+                currentTimeLabel= dr.toString();
+                timeLabels.add(currentTimeLabel);
+                
                 dom2.setTimeRange(dr);
 
             } catch (ParseException ex) {
@@ -703,8 +710,6 @@ public class CreatePngWalk {
      */
     public static void writeHTMLFile(String outputFolder){
         //String filePath= outputFolder+"pngImagePage.html";
-        
-        
         String filePath = "pngImagePage.html";
         File f= new File(filePath);
         
@@ -731,6 +736,7 @@ public class CreatePngWalk {
         String day;
         String fullDate;
         String fullImageCaption;
+        int count=0;
         
         try ( BufferedWriter bw = new BufferedWriter(new FileWriter(f)) ) {
             bw.write(htmlOpen);
@@ -739,16 +745,19 @@ public class CreatePngWalk {
             bw.write(pageHeaderOpen);
             bw.write(htmlImageContainer);
             
-            for (String pngFilenameArray1 : pngFilenameArray) { 
+            for (String pngFilenameArray1 : pngFilenameArray) {
+                
                 currentPngFilename = pngFilenameArray1;
-                fileNameToDisplay= currentPngFilename.replaceAll("\\D+", ""); //replaces string with only the date digits 
-                year=fileNameToDisplay.substring(0, 4); //gets year
-                month=fileNameToDisplay.substring(4, 6); //gets month
-                day=fileNameToDisplay.substring(6, 8); //gets day
-                fullDate= "Date: " + year + "/" + month + "/" + day;
+                fileNameToDisplay= timeLabels.get(count);
+                count++;
+                //fileNameToDisplay= currentPngFilename.replaceAll("\\D+", ""); //replaces string with only the date digits 
+                //year=fileNameToDisplay.substring(0, 4); //gets year
+                //month=fileNameToDisplay.substring(4, 6); //gets month
+                //day=fileNameToDisplay.substring(6, 8); //gets day
+                //fullDate= "Date: " + year + "/" + month + "/" + day;
                 
                 addImageString= htmlImageStringOpen+currentPngFilename+htmlImageStringClose; //insert image into html code
-                fullImageCaption= htmlImageCaptionOpen + fullDate + htmlImageCaptionClose; //insert corresponding date for image into html code
+                fullImageCaption= htmlImageCaptionOpen + fileNameToDisplay + htmlImageCaptionClose; //insert corresponding date for image into html code
                 
                 bw.write(htmlFigureOpen);
                 bw.write(addImageString);
