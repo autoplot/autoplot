@@ -13,8 +13,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -63,6 +66,9 @@ public class NamedURIListTool extends JPanel {
         refresh();
     }
     
+    /**
+     * rebuild the GUI based on the uris.
+     */
     final public void refresh() {
         JPanel content= new JPanel();
         BoxLayout lo= new BoxLayout( content, BoxLayout.Y_AXIS );
@@ -76,9 +82,12 @@ public class NamedURIListTool extends JPanel {
         
     }
     
+    /**
+     * return the uris.
+     * @return the uris.
+     */
     public String[] getUris() {
-        String[] result= new String[0];
-        return result;
+        return uris.toArray( new String[uris.size()] );
     }
     
     public String makeupName( List<String> names ) {
@@ -105,6 +114,7 @@ public class NamedURIListTool extends JPanel {
         final JPanel sub= new JPanel( new BorderLayout() );
         
         Dimension limit= new Dimension(100,24);
+        Dimension dim= new Dimension(24,24);
         
         if ( fi>=0 ) {
             JButton name= new JButton( ids.get(fi) + "=" );
@@ -147,7 +157,8 @@ public class NamedURIListTool extends JPanel {
             JButton subDelete= new JButton("");
             subDelete.setIcon( new ImageIcon( FiltersChainPanel.class.getResource("/resources/subtract.png") ) );
             subDelete.setMaximumSize( limit );
-            subDelete.setPreferredSize( limit );
+            subDelete.setPreferredSize( dim );
+            
             subDelete.setToolTipText( "remove uri " );
             final int ffi= fi;
             subDelete.addActionListener( new ActionListener() {
@@ -180,6 +191,12 @@ public class NamedURIListTool extends JPanel {
                     uris.set( fi,dss.getValue());
                 }
             });
+            dss.getEditor().addFocusListener( new FocusAdapter() {
+                @Override
+                public void focusLost(FocusEvent e) {
+                    uris.set( fi,dss.getValue());
+                }
+            }) ;
             sub.add( dss, BorderLayout.CENTER );
 
         } else {
