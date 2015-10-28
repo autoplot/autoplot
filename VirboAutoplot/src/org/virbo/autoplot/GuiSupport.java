@@ -1826,7 +1826,7 @@ public class GuiSupport {
                 AddAnnotationDialog dia= new AddAnnotationDialog();
                 dia.setPointAtX( plot.getXAxis().invTransform( plot.getDasMouseInputAdapter().getMousePressPositionOnCanvas().x ) );
                 dia.setPointAtY( plot.getYAxis().invTransform( plot.getDasMouseInputAdapter().getMousePressPositionOnCanvas().y ) );
-                if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( app, dia, "Add Annotation", JOptionPane.OK_CANCEL_OPTION ) ) {
+                if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( app, dia, "Add Annotation", JOptionPane.OK_CANCEL_OPTION ) ) {
                     Annotation ann= controller.addAnnotation( domPlot, dia.getText() );
                     dia.configure(ann);
                     ann.setAnchorOffset("1em,1em");

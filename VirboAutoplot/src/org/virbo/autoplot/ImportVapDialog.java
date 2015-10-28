@@ -41,10 +41,11 @@ public class ImportVapDialog extends javax.swing.JPanel {
 
     /**
      * returns JOptionPane.OKAY_OPTION or JOptionPane.CANCEL_OPTION
+     * @param parent position the dialog 
      * @return
      */
     public int showDialog( Component parent ) {
-        return JOptionPane.showConfirmDialog( parent, sels.toArray(), "Import URIs", JOptionPane.OK_CANCEL_OPTION );
+        return AutoplotUtil.showConfirmDialog( parent, sels.toArray(), "Import URIs", JOptionPane.OK_CANCEL_OPTION );
     }
 
     public void setVap( String vap ) throws IOException {

@@ -21,6 +21,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.EventsListToolUtil;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.TimeRangeTool;
@@ -484,7 +485,7 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
     private void timeRangeToolButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolButtonActionPerformed
         TimeRangeTool t=new TimeRangeTool();
         t.setSelectedRange( timeRangeTf.getText() );//TODO: goofy
-        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
+        if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
             String str= t.getSelectedRange();
             timeRangeTf.setText(str);
         }

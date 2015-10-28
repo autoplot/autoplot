@@ -117,7 +117,7 @@ public class ScreenshotsTool extends EventQueue {
         if ( r==JOptionPane.OK_OPTION ) {
             File f= new File( tf.getText() );
             if ( f.exists() && f.listFiles().length>1 ) {
-                if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( parent,"Folder is not empty.  Delete contents before starting?", "Folder must be empty", JOptionPane.OK_CANCEL_OPTION ) ) {
+                if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( parent,"Folder is not empty.  Delete contents before starting?", "Folder must be empty", JOptionPane.OK_CANCEL_OPTION ) ) {
                     if ( !FileUtil.deleteFileTree(f) ) {
                         JOptionPane.showMessageDialog(parent,"Unable to delete files");
                     }
@@ -707,7 +707,7 @@ public class ScreenshotsTool extends EventQueue {
                 ".<br>Operation should now be normal.<br><br>Enter Pngwalk?" ), BorderLayout.CENTER );
         JCheckBox cb= new JCheckBox( String.format( "first trim %d images", count ) );
         p.add( cb, BorderLayout.SOUTH );
-        if ( JOptionPane.YES_OPTION== JOptionPane.showConfirmDialog( parent,
+        if ( JOptionPane.YES_OPTION== AutoplotUtil.showConfirmDialog( parent,
             p,
             "Record Screenshots", JOptionPane.YES_NO_OPTION ) ) {
             if ( cb.isSelected() ) {

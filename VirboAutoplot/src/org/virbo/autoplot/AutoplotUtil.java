@@ -442,7 +442,7 @@ public class AutoplotUtil {
            ReplaceFilePanel p= new ReplaceFilePanel();
            p.setCurrentFile(oldf);
            
-           int result= JOptionPane.showConfirmDialog( parent,
+           int result= AutoplotUtil.showConfirmDialog( parent,
             p, "Replace Filename", JOptionPane.OK_CANCEL_OPTION );
 
            if ( result==JOptionPane.OK_OPTION ) {
@@ -2267,11 +2267,11 @@ public class AutoplotUtil {
     /**
      * Wrapper for displaying ok,cancel dialogs.  
      * If the message is a component, then the dialog will be resizeable.
-     * @param parentComponent
-     * @param message
-     * @param title
-     * @param optionType
-     * @return 
+     * @param parentComponent determines the Frame in which the dialog is displayed; if null, or if the parentComponent has no Frame, a default Frame is used
+     * @param message the String or GUI component to display
+     * @param title the title string for the dialog
+     * @param optionType an int designating the options available on the dialog: YES_NO_OPTION, YES_NO_CANCEL_OPTION, or OK_CANCEL_OPTION
+     * @return JOptionPane.OK_OPTION, JOptionPane.CANCEL_OPTION, etc.
      */
     public static int showConfirmDialog( Component parentComponent, Object message, String title, int optionType ) {
         

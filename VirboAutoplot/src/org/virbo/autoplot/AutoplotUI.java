@@ -1888,7 +1888,7 @@ APSplash.checkTime("init 52.9");
                     } catch ( IllegalArgumentException ex ) {
                         SourceTypesBrowser browser= new SourceTypesBrowser();
                         browser.getDataSetSelector().setValue(DataSetURI.fromUri(DataSetURI.getResourceURI(surl)));
-                        int r= JOptionPane.showConfirmDialog(this, browser,"Select Data Source Type",JOptionPane.OK_CANCEL_OPTION);
+                        int r= AutoplotUtil.showConfirmDialog(this, browser,"Select Data Source Type",JOptionPane.OK_CANCEL_OPTION);
                         if ( r==JOptionPane.OK_OPTION ) {
                             surl= browser.getUri();
                             dataSetSelector.getValue(); //TODO: this needs review
@@ -2143,7 +2143,7 @@ APSplash.checkTime("init 52.9");
     }
 
     private void clearCache() {
-        if (JOptionPane.showConfirmDialog(this, "delete all cached files?", "clear cache", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+        if ( AutoplotUtil.showConfirmDialog(this, "delete all cached files?", "clear cache", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
             try {
                 if (applicationModel.clearCache()) {
                     setStatus("cache cleared");
@@ -3638,7 +3638,7 @@ private void editOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     org.das2.util.LoggerManager.logGuiEvent(evt);
     OptionsDialog p= new OptionsDialog();
     p.setOptions( applicationModel.dom.getOptions() );
-    if ( JOptionPane.showConfirmDialog( this, p, "Options", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+    if ( AutoplotUtil.showConfirmDialog( this, p, "Options", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
         p.copyOptions( applicationModel.dom.getOptions() );
     }
     
@@ -3755,7 +3755,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         org.das2.util.LoggerManager.logGuiEvent(evt);
         OptionsDialog p= new OptionsDialog();
         p.setOptions( applicationModel.dom.getOptions() );
-        if ( JOptionPane.showConfirmDialog( this, p, "Additional Options", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+        if ( AutoplotUtil.showConfirmDialog( this, p, "Additional Options", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
             p.copyOptions( applicationModel.dom.getOptions() );
         }
     }//GEN-LAST:event_additionalOptionsMIActionPerformed

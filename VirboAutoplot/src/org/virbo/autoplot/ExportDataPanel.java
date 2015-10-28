@@ -387,7 +387,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
     private void additionalOptionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_additionalOptionsButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);                
         javax.swing.JPanel j= editorPanel.getPanel();
-        JOptionPane.showConfirmDialog( this, j, "Additional Options", JOptionPane.OK_CANCEL_OPTION );
+        AutoplotUtil.showConfirmDialog( this, j, "Additional Options", JOptionPane.OK_CANCEL_OPTION );
     }//GEN-LAST:event_additionalOptionsButtonActionPerformed
 
     DataSourceFormatEditorPanel editorPanel=null;
