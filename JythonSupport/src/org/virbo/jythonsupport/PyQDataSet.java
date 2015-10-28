@@ -590,8 +590,8 @@ public class PyQDataSet extends PyJavaInstance {
 
     /**
      * See http://autoplot.org/developer.python.indexing
-     * @param arg0
-     * @param arg1
+     * @param arg0 the indeces
+     * @param arg1 the values to assign
      */
     @Override
     public void __setitem__(PyObject arg0, PyObject arg1) {
