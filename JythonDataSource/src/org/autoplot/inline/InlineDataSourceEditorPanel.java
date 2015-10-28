@@ -407,7 +407,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     // End of variables declaration//GEN-END:variables
 
     TableModel tm;
-    String text;
+    String program;
     JTextField tf;
     String mashupUri= null;
     
@@ -530,8 +530,9 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         }
         if ( DataMashUp.isDataMashupJythonInline( uri ) ) {
             mashupUri= uri;
-            
-        } else if ( uri.length()==0 || Character.isDigit( uri.charAt(0) ) ) {
+        }
+        
+        if ( uri.length()==0 || Character.isDigit( uri.charAt(0) ) ) {
             int amp= uri.indexOf("&");
             if ( amp==-1 ) amp= uri.length();
             String lit= uri.substring(0,amp);
@@ -548,7 +549,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 if ( i>0 ) t.append("\n");
                 t.append(ss[i]);
             }
-            text= t.toString();
+            program= t.toString();
             this.tm= null;
         }
     }
@@ -568,7 +569,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             mashupUri= null;
         }
         
-        if ( text!=null ) jTextPane1.setText(text);
+        if ( program!=null ) jTextPane1.setText(program);
         if ( ltm!=null ) {
             if ( tm.getColumnCount()==2 ) {
                 this.schemeComboBox.setSelectedIndex(1);
