@@ -864,8 +864,8 @@ public class PlotController extends DomNodeController {
                     Datum currentCenter= DatumRangeUtil.rescale( range, 0.5, 0.5 ).min();
                     range= new DatumRange( currentCenter.subtract(w), currentCenter.add(w) );
                 }
-            } catch (ParseException ex) {
-                Logger.getLogger(PlotController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParseException | InconvertibleUnitsException ex ) {
+                logger.log(Level.WARNING, null, ex);
             }
         }
         if ( widths!=null ) {
@@ -891,7 +891,7 @@ public class PlotController extends DomNodeController {
                             break;
                         }
                     }
-                } catch ( ParseException ex ) {
+                } catch (ParseException | InconvertibleUnitsException ex ) {
                     logger.log( Level.WARNING, null, ex );
                 }
             }
@@ -925,8 +925,8 @@ public class PlotController extends DomNodeController {
                     Datum currentCenter= u.parse(center);
                     range= new DatumRange( currentCenter.subtract(w), currentCenter.add(w) );
                 }
-            } catch (ParseException ex) {
-                Logger.getLogger(PlotController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParseException | InconvertibleUnitsException ex ) {
+                logger.log(Level.WARNING, null, ex);
             }              
         }
         axis.setRange( range );
