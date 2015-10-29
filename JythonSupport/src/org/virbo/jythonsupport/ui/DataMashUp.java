@@ -34,6 +34,8 @@ import org.python.parser.ast.Assign;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.Module;
 import org.python.parser.ast.Name;
+import org.python.parser.ast.Num;
+import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.exprType;
 
 /**
@@ -124,17 +126,26 @@ public class DataMashUp extends javax.swing.JPanel {
         
     }
     
+    private void fillTreeExprType( exprType et, DefaultTreeModel m, MutableTreeNode parent, int i ) {
+        if ( et instanceof Name ) {
+            parent.insert( new DefaultMutableTreeNode(((Name)et).id), i );
+        } else if ( et instanceof Num ) {
+            parent.insert( new DefaultMutableTreeNode( String.valueOf(((Num)et).n) ),i );
+        } else if ( et instanceof UnaryOp ) {
+            exprType et1= ((UnaryOp)et).operand;
+            fillTreeExprType( et1, m, parent, i );
+        } else {
+            Call call= (Call)et;
+            DefaultMutableTreeNode child= new DefaultMutableTreeNode( funcCallName( call ) );
+            fillTreeCall( call, m, child );
+            parent.insert( child, i);
+        }        
+    }
+    
     private void fillTreeCall( Call c, DefaultTreeModel m, MutableTreeNode parent ) {
         for ( int i=0; i<c.args.length; i++ ) {
             exprType et= c.args[i];
-            if ( et instanceof Name ) {
-                parent.insert( new DefaultMutableTreeNode(((Name)et).id), i );
-            } else {
-                Call call= (Call)et;
-                DefaultMutableTreeNode child= new DefaultMutableTreeNode( funcCallName( call ) );
-                fillTreeCall( call, m, child );
-                parent.insert( child, i);
-            }
+            fillTreeExprType( et, m, parent, i );
         }
     }
     
@@ -154,6 +165,9 @@ public class DataMashUp extends javax.swing.JPanel {
             fillTreeCall( c, model, root );
         }
         jTree1.setModel(model);
+        for (int i = 0; i < jTree1.getRowCount(); i++) {
+            jTree1.expandRow(i);
+        }
     }
     
     /**
