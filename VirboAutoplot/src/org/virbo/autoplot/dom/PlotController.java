@@ -643,7 +643,7 @@ public class PlotController extends DomNodeController {
 
         ac.bind(application.getOptions(), Options.PROP_OVERRENDERING, dasPlot1, "overSize");
 
-        ac.bind(this.plot, Plot.PROP_VISIBLE, dasPlot1, "visible" );
+        ac.bind(this.plot, Plot.PROP_VISIBLE, dasPlot1, "plotVisible" );
         ac.bind(this.plot, Plot.PROP_COLORTABLE, colorbar, "type" );
 
         dasPlot1.addPropertyChangeListener(listener);
