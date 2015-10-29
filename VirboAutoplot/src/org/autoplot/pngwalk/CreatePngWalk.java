@@ -619,7 +619,7 @@ public class CreatePngWalk {
 
             CreatePngWalkDialog p = new CreatePngWalkDialog();
 
-            if ( AutoplotUtil.showConfirmDialog(ScriptContext.getViewWindow(), p, "PngWalk Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            if ( AutoplotUtil.showConfirmDialog(ScriptContext.getViewWindow(), p, "Create PngWalk Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                 
                 p.writeDefaults();
 
