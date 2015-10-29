@@ -306,27 +306,51 @@ public class NamedURIListTool extends JPanel {
         JPanel dsSelector= new JPanel();
         dsSelector.setLayout( new BoxLayout(dsSelector,BoxLayout.Y_AXIS ) );
         ButtonGroup bg= new ButtonGroup();
-        JCheckBox[] butts= new JCheckBox[this.uris.size()];
+        JCheckBox[] butts= new JCheckBox[this.uris.size()+1];
         GridBagLayout layout= new GridBagLayout();
         dsSelector.setLayout(layout);
         GridBagConstraints c= new GridBagConstraints();
-        for ( int i=0; i<this.uris.size(); i++ ) {
+        c.anchor= GridBagConstraints.WEST;
+        int i;
+        for ( i=0; i<this.uris.size(); i++ ) {
             JCheckBox cb= new JCheckBox( this.ids.get(i) );
             if ( this.ids.get(i).equals(id) ) cb.setSelected(true);
             butts[i]= cb;
-            c.gridx= 1;
             c.gridy= i;
+            c.gridx= 1;
             dsSelector.add( cb, c );
             c.gridx= 2;
-            c.anchor= GridBagConstraints.WEST;
             dsSelector.add( new JLabel( this.uris.get(i) ), c );
             bg.add(cb);
         }
+        JCheckBox cb= new JCheckBox( "Literal: " );
+        butts[i]= cb;
+        cb.setToolTipText("enter a literal like 0.0");
+        c.gridy= this.uris.size();
+        c.gridx= 1;
+        dsSelector.add( cb, c );
+        c.gridx= 2;
+        JTextField literalTF= new JTextField("      0.0");
+        try {
+            Double.parseDouble(id);
+            if ( id.length()<20 ) {
+                id= String.format( "%20s", id );
+            }
+            literalTF.setText( id );
+            butts[i].setSelected(true);
+        } catch ( NumberFormatException ex ) {
+            // do nothing
+        }
+        dsSelector.add( literalTF, c );
+        bg.add(cb);
         if ( JOptionPane.showConfirmDialog( this, dsSelector, "Select Variable", JOptionPane.OK_CANCEL_OPTION ) ==JOptionPane.OK_OPTION ) {
-            for ( int i=0; i<this.uris.size(); i++ ) {
+            for ( i=0; i<this.uris.size(); i++ ) {
                 if ( butts[i].isSelected() ) {
                     return this.ids.get(i);
                 }
+            }
+            if ( butts[this.uris.size()].isSelected() ) {
+                return literalTF.getText().trim();
             }
             return null;
         } else {
