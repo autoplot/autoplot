@@ -170,11 +170,11 @@ public class AxisController extends DomNodeController {
         ac.bind(axis, "range", p, "datumRange");
         ac.bind(axis, "log", p, "log");
         ac.bind(axis, "label", p, "label", plot.getController().labelContextConverter(axis) );
+        ac.bind(axis, "fontSize", p, "fontSize" );
         ac.bind(axis, "drawTickLabels", p, "tickLabelsVisible");
         ac.bind(axis, "flipped", p, "flipped");
         ac.bind(axis, "visible", p, "visible" );
         ac.bind(axis, "opposite", p, "orientation", getOppositeConverter(axis,dasAxis) );
-        ac.bind(axis, "fontSize", p, "fontSize" );
     }
 
     public DasAxis getDasAxis() {
@@ -194,6 +194,7 @@ public class AxisController extends DomNodeController {
         if ( !exclude.contains( Axis.PROP_OPPOSITE ) ) axis.setOpposite(that.isOpposite());
         if ( !exclude.contains( Axis.PROP_RANGE ) ) axis.setRange(that.getRange());
         if ( !exclude.contains( Axis.PROP_LABEL ) ) axis.setLabel(that.getLabel());
+        if ( !exclude.contains( Axis.PROP_FONTSIZE ) ) axis.setFontSize( that.getFontSize() );
         if ( !exclude.contains( Axis.PROP_AUTORANGE ) ) axis.setAutoRange(that.isAutoRange());
         if ( !exclude.contains( Axis.PROP_AUTOLABEL ) ) axis.setAutoLabel(that.isAutoLabel());
         if ( !exclude.contains( Axis.PROP_DRAWTICKLABELS ) ) axis.setDrawTickLabels( that.isDrawTickLabels() );
