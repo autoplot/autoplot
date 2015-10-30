@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The application timerange control appears on the axis tab now.
+        <p><small>Autoplot is misused and used to make the white background in a pumpkin image transparent. <a href="pumpkin.jy">Here</a> is the script.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,14 +20,15 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without netwok access and from the command line.</p>
 
-        <p>Bugfixes (2015-10-27 r17822):</p>
+        <p>Bugfixes (2015-10-28 r17822):</p>
         <ul>            
+            <li>rte_0553700540: index out of bounds exception when "|log10" was missing parens, this is allowed now.</li>
             <li>rte_2066281934: catch IndexOutOfBoundsException when trying to parse "...+...+...", now throws parse exception.</li>
             <li>rte_1417924229: transitional state produced NullPointerException</li>
             <li>1478: slice and unbundle operations properly preserve units, eq and ne operators improve support for nominal data.</li>
             <li>PNG support corrects problems with alpha channel when reading and formatting PNG files.</li>
             <li>TimeParser $(subsec) had a bug with rounding.</li>
-            <li>1473: create pongwalk by orbit without rescale fails</li>
+            <li>1473: create pngwalk by orbit without rescale fails</li>
             <li>1472: HTTPFileSystem fails to query for username after typo</li>
             <li>1470: de-internationalize the three codes that were accidentally internationalized.</li>
             <li>1468: Chris pointed out the setting for the default browser in the settings, which pointed out that Java handles this now, since Java6.</li>
@@ -116,6 +117,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>plot visible property no longer hides the data renderers.</li>
+            <li>axes and plots now have fontSize property, which works like the annotation fontSize property, so '2em' is twice the canvas font height.</li>
+            <li>putValues method added to support Dashup and also to match putProperty method.</li>
             <li>rfe456: jython editor detects external changes</li>
             <li>dashup can be enabled with environment variable "enableDashup=true" in config/system.properties.</li>
             <li>rfe453: axis tab has timerange editor for when the timerange isn't an axis.</li>
