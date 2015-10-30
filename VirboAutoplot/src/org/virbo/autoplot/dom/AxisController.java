@@ -7,12 +7,10 @@ package org.virbo.autoplot.dom;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
-import jdk.nashorn.internal.ir.TryNode;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasAxis.Lock;
-import org.das2.graph.DasPlot;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 
