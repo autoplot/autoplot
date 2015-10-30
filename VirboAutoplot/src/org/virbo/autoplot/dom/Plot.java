@@ -72,6 +72,26 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_TITLE, oldTitle, title);
     }
 
+    private String fontSize = "1em";
+
+    public static final String PROP_FONTSIZE = "fontSize";
+
+    public String getFontSize() {
+        return fontSize;
+    }
+
+    /**
+     * set the font size relative to the canvas font size.  For example 
+     * "2em" will be twice the size.  "" is an alias for 1em.
+     * 
+     * @param fontSize 
+     */
+    public void setFontSize(String fontSize) {
+        String oldFontSize = this.fontSize;
+        this.fontSize = fontSize;
+        propertyChangeSupport.firePropertyChange(PROP_FONTSIZE, oldFontSize, fontSize);
+    }
+    
     /**
      * do display the title.  Turning this off has the same effect as setting the title to ""
      */
@@ -293,6 +313,7 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_CONTEXT)) this.setContext(that.getContext());
         if (!exclude.contains(PROP_TICKS_URI)) this.setTicksURI(that.getTicksURI());
         if (!exclude.contains(PROP_LEGENDPOSITION)) this.setLegendPosition(that.getLegendPosition());
+        if (!exclude.contains(PROP_FONTSIZE) ) this.setFontSize(that.getFontSize());
         if (!exclude.contains(PROP_DISPLAYLEGEND)) this.setDisplayLegend(that.isDisplayLegend());
         if (!exclude.contains(PROP_DISPLAYTITLE)) this.setDisplayTitle(that.isDisplayTitle());
     }
@@ -341,8 +362,10 @@ public class Plot extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_TICKS_URI, that.ticksURI, this.ticksURI));
         b= that.legendPosition.equals(this.legendPosition);
         if (!b) result.add(new PropertyChangeDiff(PROP_LEGENDPOSITION, that.legendPosition, this.legendPosition ));
-        b= that.displayLegend==this.displayLegend;
+        b= that.displayLegend==this.displayLegend;        
         if (!b) result.add(new PropertyChangeDiff(PROP_DISPLAYLEGEND, that.displayLegend, this.displayLegend ));
+        b=  that.fontSize.equals(this.fontSize) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_FONTSIZE, that.fontSize , this.fontSize ) );        
         b= that.displayTitle==this.displayTitle;
         if (!b) result.add(new PropertyChangeDiff(PROP_DISPLAYTITLE, that.displayTitle, this.displayTitle ));
         result.addAll(DomUtil.childDiffs( PROP_XAXIS, this.getXaxis().diffs(that.getXaxis())));

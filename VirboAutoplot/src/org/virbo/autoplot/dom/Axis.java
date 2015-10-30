@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Level;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
+import static org.virbo.autoplot.dom.Plot.PROP_FONTSIZE;
 
 /**
  * The state of an axis, X, Y, or a Z axis colorbar, such as range and the
@@ -268,6 +269,7 @@ public class Axis extends DomNode {
             if ( !exclude.contains( PROP_OPPOSITE ) ) this.setFlipped(that.isOpposite());
             if ( !exclude.contains( PROP_RANGE ) ) this.setRange(that.getRange());
             if ( !exclude.contains( PROP_LABEL ) ) this.setLabel(that.getLabel());
+            if (!exclude.contains(PROP_FONTSIZE) ) this.setFontSize(that.getFontSize());
             if ( !exclude.contains( PROP_AUTORANGE ) ) this.setAutoRange(that.isAutoRange());
             if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutoLabel(that.isAutoLabel());
             if ( !exclude.contains( PROP_DRAWTICKLABELS ) ) this.setDrawTickLabels(that.isDrawTickLabels());
@@ -300,6 +302,8 @@ public class Axis extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_RANGE, that.range , this.range ) );
         b=  that.label.equals(this.label) ;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_LABEL, that.label , this.label ) );
+        b=  that.fontSize.equals(this.fontSize) ;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_FONTSIZE, that.fontSize , this.fontSize ) );
         b=  that.autoRange==this.autoRange;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTORANGE, that.autoRange , this.autoRange ) );
         b=  that.autoLabel==this.autoLabel;
