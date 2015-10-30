@@ -7,6 +7,7 @@ package org.virbo.autoplot.dom;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import jdk.nashorn.internal.ir.TryNode;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
@@ -163,7 +164,7 @@ public class AxisController extends DomNodeController {
             }
         };
     }
-            
+    
     public final synchronized void bindTo(DasAxis p) {
         ApplicationController ac = dom.controller;
         ac.bind(axis, "range", p, "datumRange");
@@ -173,6 +174,7 @@ public class AxisController extends DomNodeController {
         ac.bind(axis, "flipped", p, "flipped");
         ac.bind(axis, "visible", p, "visible" );
         ac.bind(axis, "opposite", p, "orientation", getOppositeConverter(axis,dasAxis) );
+        ac.bind(axis, "fontSize", p, "fontSize" );
     }
 
     public DasAxis getDasAxis() {

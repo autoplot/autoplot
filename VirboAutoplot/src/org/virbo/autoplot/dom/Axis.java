@@ -91,6 +91,27 @@ public class Axis extends DomNode {
         this.label = label;
         propertyChangeSupport.firePropertyChange(PROP_LABEL, oldLabel, label);
     }
+    
+    private String fontSize = "1em";
+
+    public static final String PROP_FONTSIZE = "fontSize";
+
+    public String getFontSize() {
+        return fontSize;
+    }
+
+    /**
+     * set the font size relative to the canvas font size.  For example 
+     * "2em" will be twice the size.  "" is an alias for 1em.
+     * 
+     * @param fontSize 
+     */
+    public void setFontSize(String fontSize) {
+        String oldFontSize = this.fontSize;
+        this.fontSize = fontSize;
+        propertyChangeSupport.firePropertyChange(PROP_FONTSIZE, oldFontSize, fontSize);
+    }
+
     protected boolean drawTickLabels = true;
     public static final String PROP_DRAWTICKLABELS = "drawTickLabels";
 

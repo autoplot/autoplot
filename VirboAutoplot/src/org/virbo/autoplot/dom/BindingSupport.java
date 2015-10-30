@@ -168,7 +168,8 @@ public class BindingSupport {
                 bi.dstGetter = getter;
             }
         } catch (IntrospectionException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new RuntimeException(ex);
+            //logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -201,13 +202,21 @@ public class BindingSupport {
         lookupGetterSetter(src, srcProp, bi);
         lookupGetterSetter(dst, dstProp, bi);
 
+        if ( bi.dstSetter==null ) {
+            throw new NullPointerException("unable to find setter for "+dstProp );
+        }
+        
         //copy the current settings before binding the two.
         try {
             Object val = bi.srcGetter.invoke(src);
             if (c != null) {
                 val = c.convertForward(val);
             }
-            bi.dstSetter.invoke(dst, val);
+            try {
+                bi.dstSetter.invoke(dst, val);
+            } catch ( IllegalArgumentException ex ) {
+                System.err.println("here");
+            }
         } catch (IllegalArgumentException ex) {
             String msg= String.format( "failed to bind %s.%s to %s.%s", src, srcProp, dst, dstProp );
             throw new RuntimeException(msg,ex);
