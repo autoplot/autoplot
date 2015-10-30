@@ -5,6 +5,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import org.das2.graph.DasAnnotation;
+import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
 import org.das2.util.LoggerManager;
@@ -29,10 +30,12 @@ public class AnnotationController extends DomNodeController {
     }    
     
     /**
-     * converts forward from relative font spec to point size.
-     * @return 
+     * converts forward from relative font spec to point size, used by
+     * the annotation and axis nodes.
+     * @param dcc the canvas component.
+     * @return the converter that converts between strings like "1em" and the font.
      */
-    private Converter fontConverter() {
+    public Converter getFontConverter( final DasCanvasComponent dcc ) {
         return new Converter() {
             @Override
             public Object convertForward(Object s) {
@@ -41,7 +44,7 @@ public class AnnotationController extends DomNodeController {
                     if ( dd[1]==1 && dd[2]==0 ) {
                         return 0.f;
                     } else {
-                        double parentSize= dom.getCanvases(0).controller.dasCanvas.getFont().getSize2D();
+                        double parentSize= dcc.getFont().getSize2D();
                         double newSize= dd[1]*parentSize + dd[2];
                         return (float)newSize;
                     }
@@ -57,7 +60,7 @@ public class AnnotationController extends DomNodeController {
                 if ( size==0 ) {
                     return "1em";
                 } else {
-                    double parentSize= dom.getCanvases(0).controller.dasCanvas.getFont().getSize2D();
+                    double parentSize= dcc.getFont().getSize2D();
                     double relativeSize= size / parentSize;
                     return String.format( "%.2fem", relativeSize );
                 }
@@ -65,11 +68,12 @@ public class AnnotationController extends DomNodeController {
         };
     }
     
+
     private void bindTo( final DasAnnotation p ) {
         ApplicationController ac = dom.controller;
         p.setFontSize( new Float(0.));
         ac.bind( annotation, "text", p, "text");
-        ac.bind( annotation, "fontSize", p, "fontSize", fontConverter() );
+        ac.bind( annotation, "fontSize", p, "fontSize", getFontConverter(p) );
         ac.bind( annotation, "borderType", p, "borderType" );
         ac.bind( annotation, "anchorPosition", p, "anchorPosition" );
         ac.bind( annotation, Annotation.PROP_ANCHORTYPE, p, DasAnnotation.PROP_ANCHORTYPE );
