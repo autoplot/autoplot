@@ -2275,25 +2275,31 @@ public class AutoplotUtil {
      * @return JOptionPane.OK_OPTION, JOptionPane.CANCEL_OPTION, etc.
      */
     public static int showConfirmDialog( Component parentComponent, Object message, String title, int optionType ) {
-        return showConfirmDialog2( parentComponent, message, title, optionType );
-        
+        if ( optionType!=JOptionPane.OK_CANCEL_OPTION ) {
+            return JOptionPane.showConfirmDialog( parentComponent, message, title, optionType );
+        } else {
+            return showConfirmDialog2( parentComponent, message, title, optionType );
+        }
     }
     
     /**
      * new okay/cancel dialog that is resizable and is made with a simple dialog.
      * @param parent
-     * @param message
+     * @param omessage String or Component.
      * @param title
-     * @param optionType.  This must be OK_CANCEL_OPTION.
+     * @param optionType.  This must be OK_CANCEL_OPTION or YES_NO_CANCEL_OPTION
      * @return JOptionPane.OK_OPTION, JOptionPane.CANCEL_OPTION.
      */
-    public static int showConfirmDialog2( Component parent, final Object message, final String title, int optionType ) {
+    public static int showConfirmDialog2( Component parent, Object omessage, final String title, int optionType ) {
         final String name= title.replaceAll( "\\s","");
-        if ( optionType!=JOptionPane.OK_CANCEL_OPTION ) {
-            throw new IllegalArgumentException("must be OK_CANCEL_OPTION");
+        if ( optionType!=JOptionPane.OK_CANCEL_OPTION && optionType!=JOptionPane.YES_NO_CANCEL_OPTION ) {
+            throw new IllegalArgumentException("must be OK_CANCEL_OPTION or YES_NO_CANCEL_OPTION");
         }
-        if ( !( message instanceof Component ) ) {
-            throw new IllegalArgumentException("message must be component for now.");
+        final Component message;
+        if ( !( omessage instanceof Component ) ) {
+            message= new JLabel( omessage.toString() );
+        } else {
+            message= (Component)omessage;
         }
         final Window p= ( parent instanceof Window ) ? ((Window)parent) : SwingUtilities.getWindowAncestor(parent);
         final JDialog dia= new JDialog( p, Dialog.ModalityType.APPLICATION_MODAL );
@@ -2304,23 +2310,56 @@ public class AutoplotUtil {
         result.add( JOptionPane.CANCEL_OPTION );
         BoxLayout b= new BoxLayout(pc,BoxLayout.X_AXIS);
         pc.setLayout( b );
+        
         pc.add( Box.createGlue() );
-        pc.add( new JButton( new AbstractAction("Cancel") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                org.das2.util.LoggerManager.logGuiEvent(e);                        
-                dia.setVisible(false);
-            }
-        }) );
-        pc.add( Box.createHorizontalStrut(7) );
-        pc.add( new JButton( new AbstractAction("Okay") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                org.das2.util.LoggerManager.logGuiEvent(e);        
-                result.set( 0, JOptionPane.OK_OPTION );
-                dia.setVisible(false);
-            }
-        }) );
+        
+        if ( optionType==JOptionPane.OK_CANCEL_OPTION ) {
+            pc.add( new JButton( new AbstractAction("Cancel") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);
+                    result.set( 0, JOptionPane.CANCEL_OPTION );
+                    dia.setVisible(false);
+                }
+            }) );
+            pc.add( Box.createHorizontalStrut(7) );
+            pc.add( new JButton( new AbstractAction("Okay") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);        
+                    result.set( 0, JOptionPane.OK_OPTION );
+                    dia.setVisible(false);
+                }
+            }) );
+        } else if ( optionType==JOptionPane.YES_NO_CANCEL_OPTION ) {
+            pc.add( new JButton( new AbstractAction("Yes") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);                        
+                    result.set( 0, JOptionPane.YES_OPTION );
+                    dia.setVisible(false);
+                }
+            }) );
+            pc.add( Box.createHorizontalStrut(7) );
+            pc.add( new JButton( new AbstractAction("No") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);                        
+                    result.set( 0, JOptionPane.NO_OPTION );
+                    dia.setVisible(false);
+                }
+            }) );
+            pc.add( Box.createHorizontalStrut(7) );
+            pc.add( new JButton( new AbstractAction("Cancel") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);        
+                    result.set( 0, JOptionPane.CANCEL_OPTION );
+                    dia.setVisible(false);
+                }
+            }) );
+        }
+        
         pc.add( Box.createHorizontalStrut(7) );
         
         Runnable run = new Runnable() {
@@ -2330,7 +2369,7 @@ public class AutoplotUtil {
                 dia.add( (Component)message );
                 dia.add( pc, BorderLayout.SOUTH );
                 dia.setTitle(title);
-                dia.setMinimumSize( new Dimension(300,300) );
+                //dia.setMinimumSize( new Dimension(300,300) );
                 dia.pack();
                 dia.setLocationRelativeTo(p);
                 WindowManager.getInstance().recallWindowSizePosition(dia);
