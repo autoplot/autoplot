@@ -7,8 +7,6 @@ package org.virbo.datasource;
 
 import java.lang.reflect.Constructor;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import org.virbo.aggregator.AggregatingDataSourceEditorPanel;
 
 /**
@@ -32,6 +30,7 @@ public class DataSourceEditorPanelUtil {
                 if (edit != null) {
                     result.setDelegateEditorPanel(edit);
                 }
+                result.setName( edit.getPanel().getName() );
                 return result;
             } else {
                 return new AggregatingDataSourceEditorPanel();
