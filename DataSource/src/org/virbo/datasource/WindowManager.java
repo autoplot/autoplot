@@ -35,6 +35,7 @@ public class WindowManager {
     public void recallWindowSizePosition( Window window ) {
         Container c= window.getParent();
         String name= window.getName(); 
+        if ( name==null ) return;
         final Preferences prefs= Preferences.userNodeForPackage(WindowManager.class);
         if ( prefs.getInt( "window."+name+".screenwidth", 0 )==java.awt.Toolkit.getDefaultToolkit().getScreenSize().width ) {
             int w= prefs.getInt( "window."+name+".width", -9999 );
@@ -71,6 +72,8 @@ public class WindowManager {
         
         Container c= window.getParent();
         String name= window.getName(); 
+        
+        if ( name==null ) return;
         
         final Preferences prefs= Preferences.userNodeForPackage(WindowManager.class);
         logger.log( Level.FINE, "saving last location {0} {1} {2} {3}", new Object[]{x, y, h, w});
