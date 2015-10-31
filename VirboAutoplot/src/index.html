@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot is misused and used to make the white background in a pumpkin image transparent. <a href="pumpkin.jy">Here</a> is the script.
+        <p><small>Autoplot is misused (left) and used (right) to make the white background in a pumpkin image transparent. <a href="pumpkin.jy">Here</a> is the script.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,7 +20,7 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without netwok access and from the command line.</p>
 
-        <p>Bugfixes (2015-10-31 r17862):</p>
+        <p>Bugfixes (2015-10-31 r17889):</p>
         <ul>            
             <li>add TailBundleDataSet, which allows bundle(alpha,red,green,blue) to work with rank 2 datasets.</li>
             <li>rte_0553700540: index out of bounds exception when "|log10" was missing parens, this is allowed now.</li>
@@ -118,6 +118,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>313: remember dialog size and positions</li>
             <li>plot visible property no longer hides the data renderers.</li>
             <li>axes and plots now have fontSize property, which works like the annotation fontSize property, so '2em' is twice the canvas font height.</li>
             <li>putValues method added to support Dashup and also to match putProperty method.</li>
