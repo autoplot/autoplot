@@ -20,8 +20,9 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without netwok access and from the command line.</p>
 
-        <p>Bugfixes (2015-10-28 r17822):</p>
+        <p>Bugfixes (2015-10-31 r17862):</p>
         <ul>            
+            <li>add TailBundleDataSet, which allows bundle(alpha,red,green,blue) to work with rank 2 datasets.</li>
             <li>rte_0553700540: index out of bounds exception when "|log10" was missing parens, this is allowed now.</li>
             <li>rte_2066281934: catch IndexOutOfBoundsException when trying to parse "...+...+...", now throws parse exception.</li>
             <li>rte_1417924229: transitional state produced NullPointerException</li>
