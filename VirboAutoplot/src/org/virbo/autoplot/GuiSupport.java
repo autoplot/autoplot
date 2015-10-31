@@ -128,6 +128,7 @@ import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.WindowManager;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.xml.sax.SAXException;
 
@@ -255,7 +256,9 @@ public class GuiSupport {
         setAddPlotElementUris( applicationModel, dom, dia, suri );
 
         dia.setTitle( "Editing Plot Element" ); 
-        dia.setVisible(true);
+        
+        WindowManager.getInstance().showModalDialog( dia );
+        
         if (dia.isCancelled()) {
             return;
         }
@@ -338,7 +341,9 @@ public class GuiSupport {
             title= "Adding Plot Element";
         }
         dia.setTitle( title );
-        dia.setVisible(true);
+        
+        WindowManager.getInstance().showModalDialog(dia);
+
         if (dia.isCancelled()) {
             return;
         }
@@ -418,7 +423,9 @@ public class GuiSupport {
             title= "Adding Plot Element";
         }
         dia.setTitle( title );
-        dia.setVisible(true);
+        
+        WindowManager.getInstance().showModalDialog(dia);
+
         if (dia.isCancelled()) {
             return;
         }
@@ -1208,7 +1215,9 @@ public class GuiSupport {
                     List<String> problems= new ArrayList<String>();
                     while ( factory.reject( uri, problems, new NullProgressMonitor() ) ) {
                         dia.setTitle("Add Plot, URI was rejected...");
-                        dia.setVisible(true);
+                        
+                        WindowManager.getInstance().showModalDialog(dia);
+
                         if ( dia.isCancelled() ) {
                             return;
                         }
