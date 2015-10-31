@@ -156,6 +156,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         paramsPanel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
 
+        setName("jythonDataSourceEditorPanel"); // NOI18N
+
         variableComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(running script)" }));
 
         jLabel1.setText("Select variable:");
@@ -209,7 +211,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(variableComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-            .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 671, Short.MAX_VALUE)
+            .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
