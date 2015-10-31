@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.datasource;
 
 import java.awt.Container;
@@ -13,7 +9,13 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 /**
- * Keep track of window positions
+ * Keep track of window positions.  Windows should be passed by this class
+ * before they are realized, and the name property of the dialog will be 
+ * used to look up the last size and position.  When the window has a parent,
+ * the position is stored relative to the parent.  Finally when a window
+ * is dismissed, this class should be called again so that the 
+ * position is kept.
+ *
  * @author jbf
  */
 public class WindowManager {
@@ -26,6 +28,10 @@ public class WindowManager {
         return instance;
     }
     
+    /**
+     * call this before the window.
+     * @param window the window.
+     */
     public void recallWindowSizePosition( Window window ) {
         Container c= window.getParent();
         String name= window.getName(); 
@@ -53,8 +59,9 @@ public class WindowManager {
     }
     
     /**
-     * record the final position of the dialog.
-     * @param window 
+     * record the final position of the dialog.  This will store the 
+     * position in the Java prefs manager for this class.
+     * @param window the window
      */
     public void recordWindowSizePosition( Window window ) {
         int x= window.getLocation().x;
