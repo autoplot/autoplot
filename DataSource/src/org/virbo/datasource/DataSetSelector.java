@@ -108,7 +108,7 @@ import org.virbo.dsops.Ops;
  */
 public class DataSetSelector extends javax.swing.JPanel {
     public static final String PROP_RECENT = "recent";
-    private static int MAX_RECENT=20;
+    private static final int MAX_RECENT=20;
     
     public static final Icon BUSY_ICON= new javax.swing.ImageIcon( DataSetSelector.class.getResource("/org/virbo/aggregator/spinner_16.gif"));
     public static final Icon FILEMAG_ICON= new javax.swing.ImageIcon( DataSetSelector.class.getResource("/org/virbo/datasource/fileMag.png"));
@@ -118,17 +118,17 @@ public class DataSetSelector extends javax.swing.JPanel {
     /**
      * the edit (inspect) button has been pressed.
      */
-    private Object PENDING_EDIT="edit";
+    private final Object PENDING_EDIT="edit";
     
     /**
      * the go button has been pressed.
      */
-    private Object PENDING_GO="gobutton"; 
+    private final Object PENDING_GO="gobutton"; 
     
     /**
      * a plotDataSetURL is going to be fired off.
      */
-    private Object PENDING_PLOT="plot";
+    private final Object PENDING_PLOT="plot";
     
     /** Creates new form DataSetSelector */
     public DataSetSelector() {
@@ -243,11 +243,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * @return
      */
     public boolean isPendingChanges() {
-        if ( maybePlotTimer.isRunning() || !pendingChanges.isEmpty() ) {
-            return true;
-        } else {
-            return false;
-        }
+        return maybePlotTimer.isRunning() || !pendingChanges.isEmpty();
     }
 
     /**
@@ -583,6 +579,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
 
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 ActionEvent e = new ActionEvent(this, 123, "dataSetSelect", keyModifiers);
                 fireActionListenerActionPerformed(e);
@@ -595,8 +592,8 @@ public class DataSetSelector extends javax.swing.JPanel {
     /**
      * there are two places in the code where FileNotFound messages 
      * are passed in with just the file name.  
-     * @param s
-     * @return 
+     * @param msg the message, which might just be the filename.
+     * @return the message clarified.
      */
     public static String maybeAddFileNotFound( String msg ) {
         if ( msg.startsWith("file:/") || msg.startsWith("http://") || msg.startsWith("https://" ) ) {  
@@ -976,10 +973,9 @@ public class DataSetSelector extends javax.swing.JPanel {
         } else if ( carotpos<6 && !shortFsCompletion  ) {
             String[] types= new String[] { "ftp://", "http://", "https://", "file:/", "sftp://" };
             List<CompletionResult> result= new ArrayList<CompletionResult>();
-            for ( int i=0; i<types.length; i++ ) {
-                if ( types[i].length()>= carotpos &&
-                        surl.substring(0, carotpos).equals(types[i].substring(0,carotpos) ) ) {
-                    result.add( new CompletionResult(types[i],"") );
+            for (String type : types) {
+                if (type.length() >= carotpos && surl.substring(0, carotpos).equals(type.substring(0, carotpos))) {
+                    result.add(new CompletionResult(type, ""));
                 }
             }
             clearBusyIcon();
@@ -991,10 +987,9 @@ public class DataSetSelector extends javax.swing.JPanel {
             String test= sp[1];
             int testCarotpos= carotpos - ( sp[0].length() + 1 );
             List<CompletionResult> result= new ArrayList<CompletionResult>();
-            for ( int i=0; i<types.length; i++ ) {
-                if ( types[i].length()>= testCarotpos &&
-                        test.substring(0, testCarotpos).equals(types[i].substring(0,testCarotpos) ) ) {
-                    result.add( new CompletionResult(sp[0]+":"+types[i],"") );
+            for (String type : types) {
+                if (type.length() >= testCarotpos && test.substring(0, testCarotpos).equals(type.substring(0, testCarotpos))) {
+                    result.add(new CompletionResult(sp[0]+":" + type, ""));
                 }
             }
             clearBusyIcon();
@@ -1147,8 +1142,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                         || doHost.endsWith(".com") || doHost.endsWith(".net") ) ) {
                     CompletionResult extra= new CompletionResult(doHost+"/", "explore this host");
                     boolean haveIt= false;
-                    for ( int i=0; i<completions.size(); i++ ) {
-                        if ( completions.get(i).completion.equals(extra.completion) ) haveIt= true;
+                    for (CompletionResult completion : completions) {
+                        if (completion.completion.equals(extra.completion)) {
+                            haveIt= true;
+                        }
                     }
                     if ( !haveIt ) { 
                         completions.add( extra );
@@ -1215,8 +1212,8 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void mergeLocalIntoRemote( List<CompletionResult> remote, List<CompletionResult> local ) {
         boolean sep= false;
         List<String> remoteLabels= new ArrayList(remote.size());
-        for ( int i=0; i<remote.size(); i++ ) {
-            remoteLabels.add(remote.get(i).completion);
+        for (CompletionResult remote1 : remote) {
+            remoteLabels.add(remote1.completion);
         }
         
         for ( CompletionResult l: local ) {
@@ -1258,10 +1255,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                         } else {
                             completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
                         }
-                        for ( int i=0; i<completions.size(); i++ ) {
-                            completions.get(i).completable= atrigger + ":" + completions.get(i).completable;
-                            completions.get(i).completion= atrigger + ":" + completions.get(i).completion;
-                            completions.get(i).maybePlot= false;
+                        for (CompletionResult completion : completions) {
+                            completion.completable = atrigger + ":" + completion.completable;
+                            completion.completion = atrigger + ":" + completion.completion;
+                            completion.maybePlot = false;
                         }
                     } else {
                         if ( suggestFile.size()>0 ) {
@@ -1310,6 +1307,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * @param parent
      * @param msg
      * @param title
+     * @param ex
      * @param messageType
      */
     public void showUserExceptionDialog( Component parent, String msg, String title, final Exception ex, int messageType ) {
@@ -1449,7 +1447,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         needToAddKeys = false;
     }
-    private Action ABOUT_PLUGINS_ACTION = new AbstractAction("About Plugins") {
+    private final Action ABOUT_PLUGINS_ACTION = new AbstractAction("About Plugins") {
         @Override
         public void actionPerformed(ActionEvent e) {
             org.das2.util.LoggerManager.logGuiEvent(e);            
@@ -1650,7 +1648,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                                         "downloading "+split.file.substring(split.path.length()) );
                                     try {
                                         FileSystemUtil.doDownload(fcontext, mon);
-                                    } catch (Exception ex) {
+                                    } catch (IOException ex) {
+                                        FileSystem.getExceptionHandler().handle(ex);
+                                    } catch (URISyntaxException ex) {
                                         FileSystem.getExceptionHandler().handle(ex);
                                     }
                                     browseSourceType();
@@ -1853,15 +1853,15 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      * @param event The event to be fired
      */
     private void fireActionListenerActionPerformed(java.awt.event.ActionEvent event) {
-        java.util.ArrayList list;
+        java.util.ArrayList<ActionListener> list;
         synchronized (this) {
             if (actionListenerList == null) {
                 return;
             }
             list = (java.util.ArrayList) actionListenerList.clone();
         }
-        for (int i = 0; i < list.size(); i++) {
-            ((java.awt.event.ActionListener) list.get(i)).actionPerformed(event);
+        for (ActionListener list1 : list) {
+            list1.actionPerformed(event);
         }
     }
     /**
@@ -1960,6 +1960,8 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     /**
      * This is how we allow .vap files to be in the datasetSelector.  We register
      * a pattern for which an action is invoked.
+     * @param regex regular expression for the trigger.
+     * @param action the action to take.
      */
     public void registerActionTrigger(String regex, Action action) {
         actionTriggers.put(regex, action);
@@ -2064,7 +2066,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     }
 
 
-    private List<String> suggestFile= new ArrayList();
+    private final List<String> suggestFile= new ArrayList();
 
     /**
      * show completions for this regex.
