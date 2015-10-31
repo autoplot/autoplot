@@ -133,6 +133,7 @@ import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.WindowManager;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AutoHistogram;
@@ -2274,29 +2275,7 @@ public class AutoplotUtil {
      * @return JOptionPane.OK_OPTION, JOptionPane.CANCEL_OPTION, etc.
      */
     public static int showConfirmDialog( Component parentComponent, Object message, String title, int optionType ) {
-        
-        if ( message instanceof Component ) {
-            final Component editorPane= (Component)message;
-            // Sandip Chitale's solution
-            // https://blogs.oracle.com/scblog/entry/tip_making_joptionpane_dialog_resizable
-            // TIP: Make the JOptionPane resizable using the HierarchyListener.  
-            editorPane.addHierarchyListener(new HierarchyListener() {
-                @Override
-                public void hierarchyChanged(HierarchyEvent e) {
-                    Window window = SwingUtilities.getWindowAncestor(editorPane);
-                    if (window instanceof Dialog) {
-                        final Dialog dialog = (Dialog)window;
-                        if (!dialog.isResizable()) {
-                            SwingUtilities.invokeLater( new Runnable() { public void run() {
-                                dialog.setResizable(true);
-                            } } );
-                        }
-                    }
-                }
-            });        
-        }
-        
-        return JOptionPane.showConfirmDialog( parentComponent, message, title, optionType, JOptionPane.PLAIN_MESSAGE );
+        return showConfirmDialog2( parentComponent, message, title, optionType );
         
     }
     
@@ -2309,6 +2288,7 @@ public class AutoplotUtil {
      * @return JOptionPane.OK_OPTION, JOptionPane.CANCEL_OPTION.
      */
     public static int showConfirmDialog2( Component parent, final Object message, final String title, int optionType ) {
+        final String name= title.replaceAll( "\\s","");
         if ( optionType!=JOptionPane.OK_CANCEL_OPTION ) {
             throw new IllegalArgumentException("must be OK_CANCEL_OPTION");
         }
@@ -2317,7 +2297,7 @@ public class AutoplotUtil {
         }
         final Window p= ( parent instanceof Window ) ? ((Window)parent) : SwingUtilities.getWindowAncestor(parent);
         final JDialog dia= new JDialog( p, Dialog.ModalityType.APPLICATION_MODAL );
-        
+        dia.setName(name);
         dia.setLayout( new BorderLayout() );
         final JPanel pc= new JPanel();
         final List<Integer> result= new ArrayList(1);
@@ -2353,9 +2333,9 @@ public class AutoplotUtil {
                 dia.setMinimumSize( new Dimension(300,300) );
                 dia.pack();
                 dia.setLocationRelativeTo(p);
-
+                WindowManager.getInstance().recallWindowSizePosition(dia);
                 dia.setVisible(true);
-                
+                WindowManager.getInstance().recordWindowSizePosition(dia);
             }
         };
         if ( EventQueue.isDispatchThread() ) {
