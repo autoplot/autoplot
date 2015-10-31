@@ -43,6 +43,8 @@ public class CdfDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         insertCB = new javax.swing.JCheckBox();
         epochTimeTagsCB = new javax.swing.JCheckBox();
 
+        setName("dataSourceFormatEditorPanel"); // NOI18N
+
         jLabel1.setText("Type:");
 
         typeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "double", "float", "int4", "int2", "byte" }));
