@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
  * CDAWebDataSetIdDialog.java
@@ -18,15 +14,19 @@ import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
 
 /**
- *
+ * Dialog for picking dataset ID.
  * @author jbf
  */
 public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
 
     boolean isCancelled= false;
     
-    /** Creates new form CDAWebDataSetIdDialog */
     public CDAWebDataSetIdDialog(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+        initComponents();
+    }
+    
+    public CDAWebDataSetIdDialog(java.awt.Dialog parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }
@@ -107,6 +107,7 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
         okButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setName("cdawebDataSetIdDialog"); // NOI18N
 
         jLabel1.setText("Select the dataset to work with:");
 

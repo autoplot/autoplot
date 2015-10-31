@@ -38,6 +38,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JDialog;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -50,6 +51,7 @@ import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.WindowManager;
 
 /**
  *
@@ -85,19 +87,26 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     private boolean pickDs() {
         Window win = SwingUtilities.getWindowAncestor(this);
         JFrame frame = null;
+        
+        CDAWebDataSetIdDialog t;
         if ( win!=null ) {
-            Window own = win.getOwner();
-            if (own instanceof JFrame) {
-                frame = (JFrame) own;
+            if ( win instanceof JDialog ) {
+                t= new CDAWebDataSetIdDialog( (JDialog)win, true);
+            } else {
+                t= new CDAWebDataSetIdDialog( frame, true);
             }
+        } else {
+            t= new CDAWebDataSetIdDialog( frame, true);
         }
-        CDAWebDataSetIdDialog t = new CDAWebDataSetIdDialog(frame, true);
+         
         t.setLocationRelativeTo(this);
         t.setTitle("Pick Dataset");
         t.setFilter(filter);
         t.refresh();
         t.setResizable(true);
-        t.setVisible(true);
+        
+        WindowManager.getInstance().showModalDialog(t);
+        
         if (t.isCancelled()) {
             return false;
         }
@@ -439,6 +448,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         availableTextField = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         descriptionLabel = new javax.swing.JLabel();
+
+        setName("cdawebEditorPanel"); // NOI18N
 
         jLabel1.setText("Dataset:");
 
