@@ -29,6 +29,7 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
         setLocationRelativeTo(parent);
         problemsList.setVisible(false);
         this.validate();
+        this.setName( message.getName() ); // used for dialog positions
     }
 
     public DataSourceEditorDialog( java.awt.Dialog parent, Component message, boolean modal ) {
@@ -37,6 +38,7 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
         this.jPanel1.add(message,BorderLayout.CENTER);
         setLocationRelativeTo(parent);
         this.validate();
+        this.setName( message.getName() ); // used for dialog positions
     }
     
     public void setProblems( List<String> problems ) {
