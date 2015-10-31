@@ -871,7 +871,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                 }
 
                 pendingChanges.put( PENDING_EDIT, DataSetSelector.this );
-                dialog.setVisible(true);
+                
+                WindowManager.getInstance().showModalDialog(dialog);
+                
                 if (!dialog.isCancelled()) {
                     String surl= fedit.getURI();                                
                     logger.log( Level.FINE, "dataSetSelector.setSelectedItem(\"{0}\");", surl );
