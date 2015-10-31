@@ -11,9 +11,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import org.das2.util.LoggerManager;
 
 /**
  * Count the number of open applications and call exit when there are zero.
@@ -22,6 +24,8 @@ import javax.swing.JOptionPane;
  */
 public class AppManager {
 
+    private static Logger logger= LoggerManager.getLogger("autoplot.appmanager");
+    
     private static AppManager instance;
 
     public synchronized static AppManager getInstance() {
@@ -129,13 +133,13 @@ public class AppManager {
         }
         return okay;
     }
-
+    
     public WindowListener getWindowListener( final Object app, final Action closeAction ) {
         return new WindowListener() {
-
+            @Override
             public void windowOpened(WindowEvent e) {
             }
-
+            @Override
             public void windowClosing(WindowEvent e) {
                 boolean okay= requestQuit();
                 if ( !okay ) {
@@ -148,20 +152,20 @@ public class AppManager {
                 }
                 e.getWindow().dispose();
             }
-
+            @Override
             public void windowClosed(WindowEvent e) {
                 closeApplication(app);
             }
-
+            @Override
             public void windowIconified(WindowEvent e) {
             }
-
+            @Override
             public void windowDeiconified(WindowEvent e) {
             }
-
+            @Override
             public void windowActivated(WindowEvent e) {
             }
-
+            @Override
             public void windowDeactivated(WindowEvent e) {
             }
         };
