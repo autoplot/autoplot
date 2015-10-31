@@ -21,7 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -158,15 +157,21 @@ public class DataMashUp extends javax.swing.JPanel {
         Module n= (Module)org.python.core.parser.parse( "x="+expr, "exec" );
         
         Assign assign= (Assign)n.body[0];
-        DefaultMutableTreeNode root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
-        DefaultTreeModel model= new DefaultTreeModel( root );
-        if ( assign.value instanceof Call ) {
-            Call c= (Call)assign.value;
-            fillTreeCall( c, model, root );
-        }
-        jTree1.setModel(model);
-        for (int i = 0; i < jTree1.getRowCount(); i++) {
-            jTree1.expandRow(i);
+        if ( assign.value instanceof Name ) {
+            DefaultMutableTreeNode root= new DefaultMutableTreeNode( ((Name)assign.value).id );
+            DefaultTreeModel model= new DefaultTreeModel( root );
+            jTree1.setModel(model);
+        } else {
+            DefaultMutableTreeNode root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
+            DefaultTreeModel model= new DefaultTreeModel( root );
+            if ( assign.value instanceof Call ) {
+                Call c= (Call)assign.value;
+                fillTreeCall( c, model, root );
+            }
+            jTree1.setModel(model);
+            for (int i = 0; i < jTree1.getRowCount(); i++) {
+                jTree1.expandRow(i);
+            }
         }
     }
     
