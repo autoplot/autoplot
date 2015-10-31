@@ -66,6 +66,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         jPanel3 = new javax.swing.JPanel();
         dataMashUp1 = new org.virbo.jythonsupport.ui.DataMashUp();
 
+        setName("inlineDataSourceEditorPanel"); // NOI18N
+
         jTabbedPane1.setToolTipText("jython tab allows short scripts to be constructed");
         jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -189,7 +191,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(examplesButton)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
