@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import org.das2.util.LoggerManager;
 
 /**
  * Keep track of window positions.  Windows should be passed by this class
@@ -36,7 +37,7 @@ import javax.swing.SwingUtilities;
  */
 public class WindowManager {
     
-    private static final Logger logger= Logger.getLogger("apdss.windowmanager");
+    private static final Logger logger= LoggerManager.getLogger("apdss.windowmanager");
     
     private static final WindowManager instance= new WindowManager();
     
@@ -51,6 +52,7 @@ public class WindowManager {
     public void recallWindowSizePosition( Window window ) {
         Container c= window.getParent();
         String name= window.getName(); 
+        logger.log(Level.FINE, "looking up position for {0}", name);
         if ( name==null ) return;
         final Preferences prefs= Preferences.userNodeForPackage(WindowManager.class);
         if ( prefs.getInt( "window."+name+".screenwidth", 0 )==java.awt.Toolkit.getDefaultToolkit().getScreenSize().width ) {
@@ -89,6 +91,7 @@ public class WindowManager {
         Container c= window.getParent();
         String name= window.getName(); 
         
+        logger.log(Level.FINE, "storing position for {0}", name);
         if ( name==null ) return;
         
         final Preferences prefs= Preferences.userNodeForPackage(WindowManager.class);
