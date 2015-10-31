@@ -105,6 +105,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Recent History");
+        setName("recentUrisDialog"); // NOI18N
 
         jLabel1.setText("Filter:");
         jLabel1.setToolTipText("Filter URIs with free text, as in 'vap+cdf:'");
