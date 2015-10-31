@@ -99,6 +99,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         jScrollPane2 = new javax.swing.JScrollPane();
         paramInfo = new javax.swing.JLabel();
 
+        setName("cdfDataSourceEditorPanel"); // NOI18N
         setPreferredSize(new java.awt.Dimension(615, 452));
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
