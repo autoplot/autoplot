@@ -1,12 +1,28 @@
 
 package org.virbo.datasource;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
+import java.awt.EventQueue;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  * Keep track of window positions.  Windows should be passed by this class
@@ -100,6 +116,115 @@ public class WindowManager {
         WindowManager.getInstance().recallWindowSizePosition(dia);
         dia.setVisible(true);
         WindowManager.getInstance().recordWindowSizePosition(dia);        
+    }
+    
+    /**
+     * new okay/cancel dialog that is resizable and is made with a simple dialog.
+     * @param parent
+     * @param omessage String or Component.
+     * @param title
+     * @param optionType.  This must be OK_CANCEL_OPTION or YES_NO_CANCEL_OPTION
+     * @return JOptionPane.OK_OPTION, JOptionPane.CANCEL_OPTION.
+     */
+    public static int showConfirmDialog( Component parent, Object omessage, final String title, int optionType ) {
+        final String name= title.replaceAll( "\\s","");
+        if ( optionType!=JOptionPane.OK_CANCEL_OPTION && optionType!=JOptionPane.YES_NO_CANCEL_OPTION ) {
+            throw new IllegalArgumentException("must be OK_CANCEL_OPTION or YES_NO_CANCEL_OPTION");
+        }
+        final Component message;
+        if ( !( omessage instanceof Component ) ) {
+            message= new JLabel( omessage.toString() );
+        } else {
+            message= (Component)omessage;
+        }
+        final Window p= ( parent instanceof Window ) ? ((Window)parent) : SwingUtilities.getWindowAncestor(parent);
+        final JDialog dia= new JDialog( p, Dialog.ModalityType.APPLICATION_MODAL );
+        dia.setName(name);
+        dia.setLayout( new BorderLayout() );
+        final JPanel pc= new JPanel();
+        final List<Integer> result= new ArrayList(1);
+        result.add( JOptionPane.CANCEL_OPTION );
+        BoxLayout b= new BoxLayout(pc,BoxLayout.X_AXIS);
+        pc.setLayout( b );
+        
+        pc.add( Box.createGlue() );
+        
+        if ( optionType==JOptionPane.OK_CANCEL_OPTION ) {
+            pc.add( new JButton( new AbstractAction("Cancel") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);
+                    result.set( 0, JOptionPane.CANCEL_OPTION );
+                    dia.setVisible(false);
+                }
+            }) );
+            pc.add( Box.createHorizontalStrut(7) );
+            pc.add( new JButton( new AbstractAction("Okay") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);        
+                    result.set( 0, JOptionPane.OK_OPTION );
+                    dia.setVisible(false);
+                }
+            }) );
+        } else if ( optionType==JOptionPane.YES_NO_CANCEL_OPTION ) {
+            pc.add( new JButton( new AbstractAction("Yes") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);                        
+                    result.set( 0, JOptionPane.YES_OPTION );
+                    dia.setVisible(false);
+                }
+            }) );
+            pc.add( Box.createHorizontalStrut(7) );
+            pc.add( new JButton( new AbstractAction("No") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);                        
+                    result.set( 0, JOptionPane.NO_OPTION );
+                    dia.setVisible(false);
+                }
+            }) );
+            pc.add( Box.createHorizontalStrut(7) );
+            pc.add( new JButton( new AbstractAction("Cancel") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    org.das2.util.LoggerManager.logGuiEvent(e);        
+                    result.set( 0, JOptionPane.CANCEL_OPTION );
+                    dia.setVisible(false);
+                }
+            }) );
+        }
+        
+        pc.add( Box.createHorizontalStrut(7) );
+        
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                dia.setResizable(true);
+                dia.add( (Component)message );
+                dia.add( pc, BorderLayout.SOUTH );
+                dia.setTitle(title);
+                //dia.setMinimumSize( new Dimension(300,300) );
+                dia.pack();
+                dia.setLocationRelativeTo(p);
+                WindowManager.getInstance().recallWindowSizePosition(dia);
+                dia.setVisible(true);
+                WindowManager.getInstance().recordWindowSizePosition(dia);
+            }
+        };
+        if ( EventQueue.isDispatchThread() ) {
+            run.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch (InterruptedException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+        return result.get(0);
     }
 
 }
