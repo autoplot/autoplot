@@ -5,7 +5,7 @@ See http://autoplot.org
 
 = Building Autoplot =
 
-The svn for Autoplot is https://vxoware.svn.sourceforge.net/svnroot/vxoware/autoplot/trunk.  (Tagged versions are in https://vxoware.svn.sourceforge.net/svnroot/vxoware/autoplot/tags.)
+The svn for Autoplot is https://svn.code.sf.net/p/autoplot/code/autoplot/trunk.  (Tagged versions are in https://svn.code.sf.net/p/autoplot/code/autoplot/trunk, but these are not done often and the head is typically what people are using, see http://autoplot.org/jnlp/ for release dates and perform checkouts based on these times.)
 
 Check out the sources with Netbeans or some other svn client.
 
