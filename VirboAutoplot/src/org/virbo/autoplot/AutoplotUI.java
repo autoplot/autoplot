@@ -158,6 +158,7 @@ import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.SourceTypesBrowser;
 import org.virbo.datasource.TimeRangeEditor;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.WindowManager;
 import org.virbo.filters.AddFilterDialog;
 import org.virbo.filters.FiltersChainPanel;
 import org.w3c.dom.Document;
@@ -1644,7 +1645,9 @@ APSplash.checkTime("init 52.3");
                   org.das2.util.LoggerManager.logGuiEvent(e);                                
                   RecentUrisDialog dia= new RecentUrisDialog( (java.awt.Frame)SwingUtilities.getWindowAncestor(fileMenu), true );
                   dia.setExpertMode( isExpertMode() );
-                  dia.setVisible(true);
+                  
+                  WindowManager.getInstance().showModalDialog(dia);
+                  
                   if (dia.isCancelled()) {
                     return;
                   }
