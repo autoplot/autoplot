@@ -360,6 +360,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         depend0unitsTF = new javax.swing.JTextField();
         jLayeredPane1 = new javax.swing.JLayeredPane();
 
+        setName("asciiTableDataSourceEditorPanel"); // NOI18N
+
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jScrollPane1.setViewportView(jTable1);
 
