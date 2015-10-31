@@ -12,6 +12,7 @@ import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Frame;
+import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -59,7 +60,6 @@ import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -98,7 +98,6 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
-import org.virbo.autoplot.bookmarks.DelayMenu;
 import org.virbo.autoplot.dom.Annotation;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
@@ -159,10 +158,8 @@ public class GuiSupport {
         if (hasTransferableText) {
             try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
-            } catch (UnsupportedFlavorException ex) {
+            } catch (UnsupportedFlavorException | IOException ex) {
                 //highly unlikely since we are using a standard DataFlavor
-                logger.log( Level.WARNING, ex.getMessage(), ex );
-            } catch (IOException ex) {
                 logger.log( Level.WARNING, ex.getMessage(), ex );
             }
         }
@@ -361,11 +358,7 @@ public class GuiSupport {
         DataSourceFactory factory=null;
         try {
             factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(furi), new NullProgressMonitor() );
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        } catch (URISyntaxException ex) {
+        } catch (IOException | IllegalArgumentException | URISyntaxException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
         assert factory!=null; // we checked this earlier.
@@ -391,11 +384,7 @@ public class GuiSupport {
             if ( dr!=uriRange ) {
                 try {
                     uri= DataSourceUtil.setTimeRange(uri,dom.getTimeRange(),new NullProgressMonitor());
-                } catch (URISyntaxException ex) {
-                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ParseException ex) {
+                } catch (URISyntaxException | IOException | ParseException ex) {
                     Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -597,10 +586,10 @@ public class GuiSupport {
                         if ( !split.file.endsWith(ext) ) {
                             String s=  split.file;
                             boolean addExt= true;
-                            for ( int i=0; i<exts.size(); i++  ) {
-                                if ( s.endsWith(exts.get(i)) ) {
+                            for (String ext1 : exts) {
+                                if (s.endsWith(ext1)) {
                                     addExt= false;
-                                    ext= exts.get(i);
+                                    ext = ext1;
                                 }
                             }
                             if ( addExt ) {
@@ -680,12 +669,11 @@ public class GuiSupport {
 
                         new Thread( run ).start();
 
-                    } catch ( IllegalArgumentException ex ) {
+                    } catch ( IllegalArgumentException | IOException | HeadlessException | URISyntaxException ex) {
                         parent.applicationModel.getExceptionHandler().handle(ex);
+
                     } catch (RuntimeException ex ) {
                         parent.applicationModel.getExceptionHandler().handleUncaught(ex);
-                    } catch (Exception ex) {
-                        parent.applicationModel.getExceptionHandler().handle(ex);
                     }
 
                 }
@@ -759,9 +747,7 @@ public class GuiSupport {
             } else {
                 SwingUtilities.invokeAndWait(run);
             }
-        } catch ( InterruptedException ex ) {
-            throw new RuntimeException(ex);
-        } catch ( InvocationTargetException ex ) {
+        } catch ( InterruptedException | InvocationTargetException ex ) {
             throw new RuntimeException(ex);
         }
         return model;
@@ -800,9 +786,7 @@ public class GuiSupport {
             } else {
                 SwingUtilities.invokeAndWait(run);
             }
-        } catch ( InterruptedException ex ) {
-            throw new RuntimeException(ex);
-        } catch ( InvocationTargetException ex ) {
+        } catch ( InterruptedException | InvocationTargetException ex ) {
             throw new RuntimeException(ex);
         }
         model.dom.syncTo( parent.applicationModel.dom );
@@ -939,10 +923,13 @@ public class GuiSupport {
         thisPanel.getActionMap().put("RELOAD_ALL", new AbstractAction() {
             @Override
             public void actionPerformed( ActionEvent e ) {
-               org.das2.util.LoggerManager.logGuiEvent(e);
-               RequestProcessor.invokeLater( new Runnable() { public void run() {
-                    AutoplotUtil.reloadAll(parent.dom);
-                } } );
+                org.das2.util.LoggerManager.logGuiEvent(e);
+                RequestProcessor.invokeLater( new Runnable() { 
+                    @Override
+                    public void run() {
+                        AutoplotUtil.reloadAll(parent.dom);
+                    }
+                } );
             }
         });
 
@@ -984,12 +971,8 @@ public class GuiSupport {
                 if (!f.toString().endsWith(".xml")) {
                     f = new File(f.toString() + ".xml");
                 }
-                FileOutputStream out=null;
-                try {
-                    out= new FileOutputStream(f);
+                try (FileOutputStream out = new FileOutputStream(f)) {
                     Bookmark.formatBooks(out,parent.applicationModel.getRecent());
-                } finally {
-                    if ( out!=null ) out.close();
                 }
             } catch (IOException e) {
                 logger.log( Level.WARNING, e.getMessage(), e );
@@ -1051,40 +1034,43 @@ public class GuiSupport {
                         @Override
                         public void run() {
                             try {
-                                if ( ext.equals("png") ) {
-                                    canvas.writeToPng(ffname);
-                                } else if ( ext.equals("pdf") ) {
-                                    FileOutputStream out=null;
-                                    try {
-                                        out = new FileOutputStream(ffname);
-                                        PdfGraphicsOutput go = new PdfGraphicsOutput();
-
-                                        PdfOptionsPanel pdecor= (PdfOptionsPanel)decor;
-                                        go.setGraphicsShapes( pdecor.fontsAsShapesCB.isSelected() );
-                                        go.setOutputStream(out);
-                                        if ( pdecor.manualWidthCB.isSelected() ) {
-                                            double mant= Double.parseDouble(pdecor.widthTF.getText()); //TODO>: FormattedTextField
-                                            String units= (String)pdecor.unitsCB.getSelectedItem();
-                                            if ( units.equals("inches") ) {
-                                                mant= mant * 72;
-                                            } else if ( units.equals("centimeters")) {
-                                                mant= mant * 72 / 2.54;
+                                switch (ext) {
+                                    case "png":
+                                        canvas.writeToPng(ffname);
+                                        break;
+                                    case "pdf":
+                                        try ( FileOutputStream out = new FileOutputStream(ffname) ){
+                                            
+                                            PdfGraphicsOutput go = new PdfGraphicsOutput();
+                                            
+                                            PdfOptionsPanel pdecor= (PdfOptionsPanel)decor;
+                                            go.setGraphicsShapes( pdecor.fontsAsShapesCB.isSelected() );
+                                            go.setOutputStream(out);
+                                            if ( pdecor.manualWidthCB.isSelected() ) {
+                                                double mant= Double.parseDouble(pdecor.widthTF.getText()); //TODO>: FormattedTextField
+                                                String units= (String)pdecor.unitsCB.getSelectedItem();
+                                                switch (units) {
+                                                    case "inches":
+                                                        mant= mant * 72;
+                                                        break;
+                                                    case "centimeters":
+                                                        mant= mant * 72 / 2.54;
+                                                        break;
+                                                }
+                                                double aspect= canvas.getHeight() / (double)canvas.getWidth();
+                                                go.setSize( canvas.getWidth(), canvas.getHeight() );
+                                                canvas.prepareForOutput( (int)mant, (int)(mant*aspect));
+                                            } else {
+                                                go.setSize( canvas.getWidth(), canvas.getHeight() );
                                             }
-                                            double aspect= canvas.getHeight() / (double)canvas.getWidth();
-                                            go.setSize( canvas.getWidth(), canvas.getHeight() );
-                                            canvas.prepareForOutput( (int)mant, (int)(mant*aspect));
-                                        } else {
-                                            go.setSize( canvas.getWidth(), canvas.getHeight() );
-                                        }
-                                        go.start();
-                                        canvas.print(go.getGraphics());
-                                        go.finish();
-                                    } finally {
-                                        if ( out!=null ) out.close();                                    
-                                    }
-
-                                } else if ( ext.equals("svg") ) {
-                                    canvas.writeToSVG(ffname);
+                                            go.start();
+                                            canvas.print(go.getGraphics());
+                                            go.finish();
+                                        }   
+                                        break;
+                                    case "svg":
+                                        canvas.writeToSVG(ffname);
+                                        break;
                                 }
                                 app.getController().setStatus("wrote to " + ffname);
                             } catch (java.io.IOException ioe) {
@@ -1212,7 +1198,7 @@ public class GuiSupport {
                     if ( factory==null ) {
                         throw new IllegalArgumentException("unable to resolve URI: "+uri);
                     }
-                    List<String> problems= new ArrayList<String>();
+                    List<String> problems= new ArrayList<>();
                     while ( factory.reject( uri, problems, new NullProgressMonitor() ) ) {
                         dia.setTitle("Add Plot, URI was rejected...");
                         
@@ -1242,7 +1228,7 @@ public class GuiSupport {
                 //    pelement = dom.getController().addPlotElement(plot, null);
                 //}
             }
-        } catch ( Exception ex ) { // TODO: the IllegalArgumentException is wrapped in a RuntimeException, I don't know why.  I should have MalformedURIException
+        } catch ( URISyntaxException | IOException | IllegalArgumentException ex ) { // TODO: the IllegalArgumentException is wrapped in a RuntimeException, I don't know why.  I should have MalformedURIException
             applicationModel.showMessage( ex.getMessage(), "Illegal Argument", JOptionPane.ERROR_MESSAGE );
         }
     }
@@ -1901,6 +1887,8 @@ public class GuiSupport {
     /**
      * show the pick font dialog.  The font chosen, is applied and returned, or null if cancel was pressed. 
      * 
+     * @param parent dialog parent.
+     * @param app the applicationModel with canvas.
      * @return
      */
     public static Font pickFont( Frame parent, ApplicationModel app ) {
@@ -1913,7 +1901,7 @@ public class GuiSupport {
         chooser.setFontCheck( new JFontChooser.FontCheck() {
             @Override
             public String checkFont(Font c) {
-                String font= PdfGraphicsOutput.ttfFromNameInteractive(c);
+                Object font= PdfGraphicsOutput.ttfFromNameInteractive(c);
                 if ( font==PdfGraphicsOutput.READING_FONTS ) {
                     return null;
                 } else if ( font!=null ) {
@@ -1948,6 +1936,7 @@ public class GuiSupport {
      * raise the application window
      * http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
      * This is not working for me on Ubuntu 10.04.
+     * @param frame
      */
     public static void raiseApplicationWindow( java.awt.Frame frame ) {
         // http://stackoverflow.com/questions/309023/howto-bring-a-java-window-to-the-front
@@ -1963,6 +1952,10 @@ public class GuiSupport {
 
     /**
      * legacy code for adding examples to a text field.
+     * @param tf
+     * @param labels
+     * @param tooltips
+     * @return 
      */
     public static MouseAdapter createExamplesPopup( final JTextField tf, final String [] labels, final String[] tooltips ) {
         return new MouseAdapter() {
