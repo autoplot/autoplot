@@ -27,7 +27,11 @@ import org.virbo.datasource.DataSetSelector;
  */
 public class AddPlotElementDialog extends javax.swing.JDialog {
 
-    /** Creates new form AddPlotElementDialog */
+    /** 
+     * Creates new form AddPlotElementDialog
+     * @param parent the parent
+     * @param modal true if the dialog should be modal
+     */
     public AddPlotElementDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -35,8 +39,8 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         secondaryDataSetSelector.setVisible(secondaryCheckBox.isSelected());
         tertiaryCheckBox.setVisible(secondaryCheckBox.isSelected());
         tertiaryDataSetSelector.setVisible(secondaryCheckBox.isSelected()&&tertiaryCheckBox.isSelected());
-        DataSetSelector source= null;
         if ( parent instanceof AutoplotUI ) {
+            DataSetSelector source= null;
             source= ((AutoplotUI)parent).getDataSetSelector();
             primaryDataSetSelector.setTimeRange( source.getTimeRange() );
             secondaryDataSetSelector.setTimeRange( source.getTimeRange() );
@@ -101,6 +105,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setName("addPlotElementDialog"); // NOI18N
 
         secondaryCheckBox.setText("Plot Against (X):");
         secondaryCheckBox.addActionListener(new java.awt.event.ActionListener() {
