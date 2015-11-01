@@ -325,6 +325,7 @@ public class PlotElementController extends DomNodeController {
                     logger.severe("this is a sad, leftover PlotElementController that should have been GC'd");
                     return;
                 }
+                changesSupport.registerPendingChange(plotElementListener, PENDING_COMPONENT_OP);
                 Runnable run= new Runnable() {
                     @Override
                     public void run() {
@@ -334,12 +335,8 @@ public class PlotElementController extends DomNodeController {
                         }
                         // we reenter this code, so only set lock once.  See test.endtoend.Test015.java
                         // vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_PEA_CP3DXPH_DNFlux__20020811_140000_20020811_150000_V061018.cef?Data__C1_CP_PEA_CP3DXPH_DNFlux
-                        List<Object> lock= changesSupport.whoIsChanging(PENDING_COMPONENT_OP);  // bug 1480 insert breakpoint here
-                        if ( lock.isEmpty() ) {
-                            changesSupport.performingChange(plotElementListener, PENDING_COMPONENT_OP);
-                        } else {
-                            if ( !lock.contains(plotElementListener) ) throw new IllegalStateException("shouldn't happen");
-                        }
+                        // bug 1480 insert breakpoint here
+                        changesSupport.performingChange(plotElementListener, PENDING_COMPONENT_OP);
                         setStatus("busy: update data set");
                         try {
                             updateDataSet();
@@ -348,7 +345,7 @@ public class PlotElementController extends DomNodeController {
                             setStatus("warning: "+ex.toString());
                             throw ex;
                         } finally {
-                            if ( lock.isEmpty() ) changesSupport.changePerformed(plotElementListener, PENDING_COMPONENT_OP);
+                            changesSupport.changePerformed(plotElementListener, PENDING_COMPONENT_OP);
                         }
                     }
                 };
