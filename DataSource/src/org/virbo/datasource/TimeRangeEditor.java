@@ -113,19 +113,28 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     public DatumRange getRange() {
         return range;
     }
+    
+    /**
+     * avoid ringing and extra parsing caused by roundoff in parsing.
+     */
+    private boolean suppressRecentComboBoxActionEvents= false;
 
     public void setRange( DatumRange value ) {
         if ( !UnitsUtil.isTimeLocation(value.getUnits()) ) return;
         DatumRange oldValue= this.range;
         this.range= value;
         if (oldValue != value && oldValue != null && !oldValue.equals(value)) {
-            super.firePropertyChange( PROP_RANGE, oldValue, value);
+            if ( !suppressRecentComboBoxActionEvents ) {
+                super.firePropertyChange( PROP_RANGE, oldValue, value);
+            }
         }
+        this.suppressRecentComboBoxActionEvents= true;
         if ( value==noOneListening ) {
             this.recentComboBox.setSelectedItem("");
         } else {
             this.recentComboBox.setSelectedItem( value.toString() );
         }
+        this.suppressRecentComboBoxActionEvents= false;
     }
 
     DatumRange noOneListening= range;
