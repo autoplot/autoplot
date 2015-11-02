@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -181,14 +183,14 @@ public class Application extends DomNode {
         }
         DatumRange oldTimeRange = this.timeRange;
         this.timeRange = timeRange;
-        if ( timeRange.width().value()>0 && timeRange.getUnits()==oldTimeRange.getUnits() && !timeRange.equals(oldTimeRange) ) {
-            int dmin= (int)( DatumRangeUtil.normalize(timeRange,oldTimeRange.min())*10000 + 0.5 );
-            int dmax= (int)( DatumRangeUtil.normalize(timeRange,oldTimeRange.max())*10000 + 0.5 );
-            if ( dmin==0 && dmax==10000 ) {
-                logger.severe("strange ringing where events are tiny changes");
-            }
-        }
-        propertyChangeSupport.firePropertyChange(PROP_TIMERANGE, oldTimeRange, timeRange);
+//        if ( timeRange.width().value()>0 && timeRange.getUnits()==oldTimeRange.getUnits() && !timeRange.equals(oldTimeRange) ) {
+//            int dmin= (int)( DatumRangeUtil.normalize(timeRange,oldTimeRange.min())*10000 + 0.5 );
+//            int dmax= (int)( DatumRangeUtil.normalize(timeRange,oldTimeRange.max())*10000 + 0.5 );
+//            if ( dmin==0 && dmax==10000 ) {
+//                logger.severe("strange ringing where events are tiny changes");
+//            }
+//        }
+        propertyChangeSupport.firePropertyChange(PROP_TIMERANGE, oldTimeRange, timeRange);        
     }
 
     /**
