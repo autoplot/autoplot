@@ -93,12 +93,15 @@
                         <Component class="javax.swing.JList" name="jList1">
                           <Properties>
                             <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
-                              <StringArray count="5">
+                              <StringArray count="8">
                                 <StringItem index="0" value="add(x,y)"/>
                                 <StringItem index="1" value="subtract(x,y)"/>
-                                <StringItem index="2" value="sin(a)"/>
-                                <StringItem index="3" value="atan2(x,y)"/>
-                                <StringItem index="4" value=" "/>
+                                <StringItem index="2" value="multiply(x,y)"/>
+                                <StringItem index="3" value="divide(x,y)"/>
+                                <StringItem index="4" value="pow(x,y)"/>
+                                <StringItem index="5" value="atan2(x,y)"/>
+                                <StringItem index="6" value="toRadians(x)"/>
+                                <StringItem index="7" value="toDegrees(x)"/>
                               </StringArray>
                             </Property>
                             <Property name="selectionMode" type="int" value="0"/>
@@ -184,11 +187,17 @@
                         <Component class="javax.swing.JList" name="jList3">
                           <Properties>
                             <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
-                              <StringArray count="4">
+                              <StringArray count="10">
                                 <StringItem index="0" value="putValues(ds1,w,v)"/>
                                 <StringItem index="1" value="removeValues(ds1,w)"/>
                                 <StringItem index="2" value="where(c)"/>
                                 <StringItem index="3" value="lt(ds1,ds2)"/>
+                                <StringItem index="4" value="le(ds1,ds2)"/>
+                                <StringItem index="5" value="gt(ds1,ds2)"/>
+                                <StringItem index="6" value="ge(ds1,ds2)"/>
+                                <StringItem index="7" value="eq(ds1,ds2)"/>
+                                <StringItem index="8" value="ne(ds1,ds2)"/>
+                                <StringItem index="9" value="or(ds1,ds2)"/>
                               </StringArray>
                             </Property>
                             <Property name="selectionMode" type="int" value="0"/>

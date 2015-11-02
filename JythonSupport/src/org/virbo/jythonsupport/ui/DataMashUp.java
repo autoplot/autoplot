@@ -329,7 +329,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jSplitPane2.setDividerLocation(300);
 
         jList1.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "add(x,y)", "subtract(x,y)", "sin(a)", "atan2(x,y)", " " };
+            String[] strings = { "add(x,y)", "subtract(x,y)", "multiply(x,y)", "divide(x,y)", "pow(x,y)", "atan2(x,y)", "toRadians(x)", "toDegrees(x)" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
@@ -371,7 +371,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jTabbedPane1.addTab("dataset", jPanel3);
 
         jList3.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "putValues(ds1,w,v)", "removeValues(ds1,w)", "where(c)", "lt(ds1,ds2)" };
+            String[] strings = { "putValues(ds1,w,v)", "removeValues(ds1,w)", "where(c)", "lt(ds1,ds2)", "le(ds1,ds2)", "gt(ds1,ds2)", "ge(ds1,ds2)", "eq(ds1,ds2)", "ne(ds1,ds2)", "or(ds1,ds2)" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
@@ -510,14 +510,13 @@ public class DataMashUp extends javax.swing.JPanel {
             public void dragGestureRecognized(DragGestureEvent dge) {
                 String s=null;
                 
-                System.err.println( "dragGestureRecognized "+dge.getComponent() );
-                
                 if ( dge.getComponent() instanceof JList ) {
                     s= (String)((JList)dge.getComponent()).getSelectedValue();
                 } else if  ( dge.getComponent()==jTree1 ) {
                     if ( jTree1.getSelectionCount()==1 ) {
                         TreePath tp= jTree1.getSelectionPath();
-                        s= (String)tp.getLastPathComponent();
+                        DefaultMutableTreeNode n= (DefaultMutableTreeNode)tp.getLastPathComponent();
+                        s= getJython( (DefaultTreeModel)jTree1.getModel(), n );
                     }
                 } else if  ( dge.getComponent()==namedURIListTool1 ) {
                     System.err.println("herehere");
