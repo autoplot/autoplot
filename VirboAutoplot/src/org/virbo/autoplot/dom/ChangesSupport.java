@@ -51,10 +51,10 @@ public final class ChangesSupport {
      * @param parent  the object this is supporting, for debugging purposes.
      */
     ChangesSupport( PropertyChangeSupport pcs, Object parent ) {
-        this.parent= new WeakReference<Object>(parent);
-        this.changesPending= new HashMap<Object,Object>(); // lockObject -> client
-        this.changeCount= new HashMap<Object,Integer>();
-        this.threads= new HashMap<Object,String>(); // lockObject -> thread ID.
+        this.parent= new WeakReference<>(parent);
+        this.changesPending= new HashMap<>(); // lockObject -> client
+        this.changeCount= new HashMap<>();
+        this.threads= new HashMap<>(); // lockObject -> thread ID.
         if ( pcs==null ) {
             pcs= new PropertyChangeSupport(parent);
         }
@@ -180,11 +180,7 @@ public final class ChangesSupport {
      * @return true if someone has registered a pending change.
      */
     public boolean isPendingChanges() {
-        if ( changesPending.size() > 0 ) {
-            return true;
-        } else {
-            return false;
-        }
+        return changesPending.size() > 0;
     }
 
     /**
@@ -193,10 +189,10 @@ public final class ChangesSupport {
      * @return a map listing the pending changes.
      */
     public synchronized Map getChangesPending() {
-        if ( changesPending.size() > 0 ) {
-            return new HashMap(changesPending);
-        } else {
+        if ( changesPending.isEmpty() ) {
             return Collections.emptyMap();            
+        } else {
+            return new HashMap(changesPending);
         }
     }
     
