@@ -303,7 +303,12 @@ public class NamedURIListTool extends JPanel {
      * @return null if nothing is selected, the URI otherwise.
      */
     public String selectDataId( String id ) {
+        JPanel dsSelector1= new JPanel();
         JPanel dsSelector= new JPanel();
+        dsSelector1.add( new JScrollPane( dsSelector, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS ) );
+        dsSelector1.setPreferredSize( new Dimension(600,500 ) );
+        dsSelector1.setMaximumSize( new Dimension(600,500 ) );
+        
         dsSelector.setLayout( new BoxLayout(dsSelector,BoxLayout.Y_AXIS ) );
         ButtonGroup bg= new ButtonGroup();
         JCheckBox[] butts= new JCheckBox[this.uris.size()+1];
