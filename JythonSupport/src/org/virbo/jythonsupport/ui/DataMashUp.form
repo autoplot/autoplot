@@ -184,10 +184,11 @@
                         <Component class="javax.swing.JList" name="jList3">
                           <Properties>
                             <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
-                              <StringArray count="3">
-                                <StringItem index="0" value="putValues(ds1,r,v)"/>
-                                <StringItem index="1" value="where(c)"/>
-                                <StringItem index="2" value="lt(ds1,ds2)"/>
+                              <StringArray count="4">
+                                <StringItem index="0" value="putValues(ds1,w,v)"/>
+                                <StringItem index="1" value="removeValues(ds1,w)"/>
+                                <StringItem index="2" value="where(c)"/>
+                                <StringItem index="3" value="lt(ds1,ds2)"/>
                               </StringArray>
                             </Property>
                             <Property name="selectionMode" type="int" value="0"/>

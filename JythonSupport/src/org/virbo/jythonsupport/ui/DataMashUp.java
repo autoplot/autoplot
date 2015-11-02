@@ -371,7 +371,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jTabbedPane1.addTab("dataset", jPanel3);
 
         jList3.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "putValues(ds1,r,v)", "where(c)", "lt(ds1,ds2)" };
+            String[] strings = { "putValues(ds1,w,v)", "removeValues(ds1,w)", "where(c)", "lt(ds1,ds2)" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
