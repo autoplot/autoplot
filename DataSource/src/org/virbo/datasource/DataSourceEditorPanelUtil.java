@@ -19,7 +19,15 @@ public class DataSourceEditorPanelUtil {
      * @return an EditorPanel or null if one is not found.
      */
     public static DataSourceEditorPanel getDataSourceEditorPanel(URI uri) {
-        String surl = DataSetURI.fromUri(uri);
+        return getDataSourceEditorPanel( uri.toString() );
+    } 
+    
+    /**
+     * @param suri the autoplot vap+xxx: URI.
+     * @return an EditorPanel or null if one is not found.
+     */
+    public static DataSourceEditorPanel getDataSourceEditorPanel( String suri) {
+        String surl = suri;
         String ext = DataSetURI.getExt(surl);
 
         if (  DataSetURI.isAggregating(surl) ) {
@@ -42,6 +50,11 @@ public class DataSourceEditorPanelUtil {
         return edit;
     }
 
+    /**
+     * return the editor by the extension, like "cdf"
+     * @param extension
+     * @return 
+     */
     public static DataSourceEditorPanel getEditorByExt(String extension) {
         if ( extension==null ) return null;
         extension= DataSourceRegistry.getExtension(extension);
