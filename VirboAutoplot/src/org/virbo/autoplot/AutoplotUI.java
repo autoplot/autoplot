@@ -164,6 +164,7 @@ import org.virbo.filters.FiltersChainPanel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import sun.awt.SunToolkit;
 
 /**
  * The Autoplot application GUI.  This is the entry point for the application, wrapping the internal
@@ -4366,7 +4367,14 @@ private void updateFrameTitle() {
         if ( !headless && alm.getBooleanValue("nativeLAF")) {
             logger.fine("nativeLAF");
             try {
-                javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+                String s= javax.swing.UIManager.getSystemLookAndFeelClassName();
+                if ( s.endsWith("MetalLookAndFeel") && System.getProperty("os.name").equals("Linux") ) { // Linux Mint, for one...
+                    Toolkit toolkit = Toolkit.getDefaultToolkit();
+                    if (((SunToolkit) toolkit).isNativeGTKAvailable()) {
+                        s= "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+                    }
+                }
+                javax.swing.UIManager.setLookAndFeel(s);
             } catch ( ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e ) {
                 logger.log( Level.SEVERE, e.getMessage(), e );
             }
