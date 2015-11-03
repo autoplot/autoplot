@@ -15,9 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.das2.beans.BeansUtil;
 import org.das2.util.LoggerManager;
-import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -90,7 +88,7 @@ public class ReferenceCache {
          * query this to see if the current thread should load the resource, or just park while
          * the loading thread loads the resource.
          * @param t the current thread (Thread.currentThread())
-         * @return
+         * @return true if the data should be loaded.
          */
         public boolean shouldILoad( Thread t ) {
             logger.log( Level.FINE, "shouldILoad({0})= {1}", new Object[]{Thread.currentThread(), this.loadThread==t } );
@@ -102,9 +100,11 @@ public class ReferenceCache {
         }
 
         /**
-          * park this thread until the other guy has finished loading.
-          * @param mon monitor that will monitor the load status.
-          */
+         * park this thread until the other guy has finished loading.
+         * @param mon monitor that will monitor the load status.
+         * @return the dataset
+         * @throws java.lang.Exception when the data cannot be read.
+         */
         public QDataSet park( ProgressMonitor mon ) throws Exception {
             logger.log( Level.FINE, "parking thread {0} {1}", new Object[]{Thread.currentThread(), uri} );
             getInstance().park( this, mon );
