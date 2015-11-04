@@ -30,7 +30,7 @@ public class Annotation extends DomNode {
     /**
      * the granny text to display.
      */
-    private String text = "";
+    private String text = "Annotation";
 
     public static final String PROP_TEXT = "text";
 
@@ -44,7 +44,7 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_TEXT, oldText, text);
     }
 
-    private String fontSize = "1em";
+    private String fontSize = "1.4em";
 
     public static final String PROP_FONTSIZE = "fontSize";
 
@@ -170,7 +170,7 @@ public class Annotation extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_ANCHORTYPE, oldAnchorType, anchorType);
     }
     
-    private String anchorOffset= "";
+    private String anchorOffset= "1em,1em";
 
     public static final String PROP_ANCHOROFFSET = "anchorOffset";
 
