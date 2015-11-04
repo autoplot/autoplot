@@ -4368,12 +4368,12 @@ private void updateFrameTitle() {
             logger.fine("nativeLAF");
             try {
                 String s= javax.swing.UIManager.getSystemLookAndFeelClassName();
-                if ( s.endsWith("MetalLookAndFeel") && System.getProperty("os.name").equals("Linux") ) { // Linux Mint, for one...
-                    Toolkit toolkit = Toolkit.getDefaultToolkit();
-                    if (((SunToolkit) toolkit).isNativeGTKAvailable()) {
-                        s= "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
-                    }
-                }
+//                if ( s.endsWith("MetalLookAndFeel") && System.getProperty("os.name").equals("Linux") ) { // Linux Mint, for one...
+//                    Toolkit toolkit = Toolkit.getDefaultToolkit();
+//                    if (((SunToolkit) toolkit).isNativeGTKAvailable()) {
+//                        s= "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+//                    }
+//                }
                 javax.swing.UIManager.setLookAndFeel(s);
             } catch ( ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e ) {
                 logger.log( Level.SEVERE, e.getMessage(), e );
