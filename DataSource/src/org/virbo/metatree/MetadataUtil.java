@@ -155,8 +155,7 @@ public class MetadataUtil {
                 }
             } else if ( cmd.startsWith("|slice") ) {
                 int dim= cmd.charAt(6)-'0';
-                String sidx= s.next();
-                Object idx= DataSetOps.getArgumentIndex(sidx,0); // note we don't actually use the index.
+                s.next();
                 properties= sliceProperties( properties, dim );
             } else if ( cmd.startsWith("|collapse") ) {
                 int dim= cmd.charAt(9)-'0';
