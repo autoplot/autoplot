@@ -228,7 +228,7 @@ echo "done copy help files."
 
 hasErrors=0
 
-# compile key java classes.
+# compile key java classes.  These contain references that cause all needed Java classes to be compiled in.
 echo "=== compile sources..."
 cd temp-volatile-src
 echo "pwd=" `pwd`
