@@ -918,8 +918,6 @@ public class ApplicationController extends DomNodeController implements RunLater
         
         assignId(annotation);
         
-        new AnnotationController( application, annotation, impl );
-        
         if ( p!=null ) {
             impl.setPlot( p.controller.getDasPlot() );
         }
@@ -997,7 +995,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         annotation.setRowId( r.getId() );
         
         lcanvas.add( impl, r.controller.dasRow, c.controller.dasColumn );
-                
+        new AnnotationController( application, annotation, impl );
+                        
         return annotation;
     }
     
