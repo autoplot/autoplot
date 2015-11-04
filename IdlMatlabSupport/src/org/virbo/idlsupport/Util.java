@@ -112,7 +112,7 @@ public class Util {
      * @throws Exception 
      */
     public String enterEditor( String uri ) throws Exception {
-        DataSourceEditorPanel p = (DataSourceEditorPanel) DataSourceEditorPanelUtil.getDataSourceEditorPanel( new URI(uri) );
+        DataSourceEditorPanel p = (DataSourceEditorPanel) DataSourceEditorPanelUtil.getDataSourceEditorPanel( uri );
         if ( p.reject(uri) ) {
             System.err.printf("           (nope) %s: %s\n", uri, p);
             return uri;
