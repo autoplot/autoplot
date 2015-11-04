@@ -42,7 +42,6 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
@@ -53,14 +52,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -395,7 +391,7 @@ public class AutoplotUtil {
     }
 
     public static List<String> getUrls(List<Bookmark> recent) {
-        List<String> urls = new ArrayList<String>(recent.size());
+        List<String> urls = new ArrayList<>(recent.size());
 
         for (Bookmark b : recent) {
             if (b instanceof Bookmark.Item) {
@@ -479,9 +475,12 @@ public class AutoplotUtil {
                 if ( c!=null ) {
                     c.reset();
                 }
-                RequestProcessor.invokeLater( new Runnable() { public void run() {
-                    fdsf.getController().update();
-                } } );
+                RequestProcessor.invokeLater( new Runnable() { 
+                    @Override
+                    public void run() {
+                        fdsf.getController().update();
+                    }
+                } );
             } else {
                 System.err.println( "not updating: " + dsf.getUri() );
             }
@@ -495,7 +494,7 @@ public class AutoplotUtil {
         }
     }
 
-    static void doSearchToolTips1( final JComponent aThis, Pattern p, Map<Component,String> result  ) {
+    private static void doSearchToolTips1( final JComponent aThis, Pattern p, Map<Component,String> result  ) {
         String s= aThis.getToolTipText();
         boolean foundIt= false;
         if ( s!=null ) {
@@ -522,7 +521,7 @@ public class AutoplotUtil {
             }
             if ( s!=null && p.matcher(s).find() ) {
                 result.put( aThis, s );
-                foundIt= true;
+                //foundIt= true;
             }
         }
         for ( int i=0; i<aThis.getComponentCount(); i++ ) {
@@ -678,9 +677,7 @@ public class AutoplotUtil {
         }
         File propFile= new File( config, "system.properties" );
         if ( !propFile.exists() ) {
-            PrintWriter w=null;
-            try {
-                w= new PrintWriter( new FileWriter( propFile ) );
+            try (PrintWriter w = new PrintWriter( new FileWriter( propFile ) )) {
                 w.println("# Autoplot loads these system properties on startup.  See http://autoplot.org/systemProperties");
                 w.println("");
                 w.println("# reference cache allows some URIs to be resolved once per plot.");
@@ -712,9 +709,7 @@ public class AutoplotUtil {
                 w.println("");
                 w.close();
             } catch ( IOException ex ) {
-                logger.log(Level.WARNING, "write initial {0} failed", propFile );
-            } finally {
-                if ( w!=null ) w.close();
+                logger.log(Level.WARNING, "write initial {0} failed.  {1}", new Object[] { propFile, ex } );
             }
         } else {
             logger.log( Level.FINER, "loading %s", propFile );
@@ -1594,6 +1589,7 @@ public class AutoplotUtil {
 
     /**
      * open the URL in a browser.   Borrowed from http://www.centerkey.com/java/browser/.
+     * @param url the URL.
      */
     public static void openBrowser(String url) {
         DataSourceUtil.openBrowser(url);
@@ -1687,7 +1683,6 @@ public class AutoplotUtil {
     /**
      * extract the properties from the dataset into the same format as metadata model returns.
      * @param ds
-     * @param spec
      * @return
      */
     public static Map<String, Object> extractProperties(QDataSet ds) {
@@ -1740,7 +1735,7 @@ public class AutoplotUtil {
     public static Map<String, Object> mergeProperties(Map<String, Object> properties, Map<String, Object> deflt) {
         if (deflt == null)
             return properties;
-        HashMap<String, Object> result = new HashMap<String, Object>(deflt);
+        HashMap<String, Object> result = new HashMap<>(deflt);
         for (Entry<String, Object> entry : properties.entrySet()) {
             Object val = entry.getValue();
             String key = entry.getKey();
@@ -1770,6 +1765,9 @@ public class AutoplotUtil {
 
     /**
      * set the device position, using spec string like "+5em,80%-5em"
+     * @param row the row/column to modify
+     * @param spec the spec
+     * @throws java.text.ParseException
      */
     public static void setDevicePosition(DasDevicePosition row, String spec) throws ParseException {
         int i = spec.indexOf(",");
@@ -2231,7 +2229,7 @@ public class AutoplotUtil {
     /**
      * wrapper for displaying messages.  This will eventually use the Autoplot icon, etc.
      * This should be called, not JOptionPane.showMessageDialog(...)
-     * @param parent
+     * @param parentComponent
      * @param message, String or Component for the message.
      * @param title
      * @param messageType, like JOptionPane.ERROR_MESSAGE, JOptionPane.INFORMATION_MESSAGE, JOptionPane.WARNING_MESSAGE, JOptionPane.QUESTION_MESSAGE, or JOptionPane.PLAIN_MESSAGE
@@ -2252,9 +2250,12 @@ public class AutoplotUtil {
                     if (window instanceof Dialog) {
                         final Dialog dialog = (Dialog)window;
                         if (!dialog.isResizable()) {
-                            SwingUtilities.invokeLater( new Runnable() { public void run() {
-                                dialog.setResizable(true);
-                            } } );
+                            SwingUtilities.invokeLater( new Runnable() { 
+                                @Override
+                                public void run() {
+                                    dialog.setResizable(true);
+                                }
+                            } );
                         }
                     }
                 }
