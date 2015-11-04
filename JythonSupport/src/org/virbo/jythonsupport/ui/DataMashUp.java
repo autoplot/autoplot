@@ -273,6 +273,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jTree1.collapsePath(tp);
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 jTree1.expandPath(tp);
             }
@@ -288,7 +289,7 @@ public class DataMashUp extends javax.swing.JPanel {
         try {
             new DataMashUp().setAsJythonInline(jython);
         } catch ( Exception ex ) {
-            ex.printStackTrace();
+            logger.log( Level.FINER, null, ex );
             return false;
         }
         return true;
