@@ -184,10 +184,12 @@ public class PlotElementController extends DomNodeController {
      * remove any bindings and listeners
      */
     void unbindDsf() {
-        dsf.removePropertyChangeListener(DataSourceFilter.PROP_FILTERS, dsfListener);
-        dsf.controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
-        dsf.controller.removePropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
-        dsf.controller.removePropertyChangeListener(DataSourceController.PROP_EXCEPTION, exceptionListener);
+        if ( dsf!=null ) { //TODO: This should never be null, but it is
+            dsf.removePropertyChangeListener(DataSourceFilter.PROP_FILTERS, dsfListener);
+            dsf.controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
+            dsf.controller.removePropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
+            dsf.controller.removePropertyChangeListener(DataSourceController.PROP_EXCEPTION, exceptionListener);
+        }
     }
     
     PropertyChangeListener dsfListener = new PropertyChangeListener() {
@@ -434,7 +436,8 @@ public class PlotElementController extends DomNodeController {
         dsf = dom.controller.getDataSourceFilterFor(plotElement);
 
         if ( dsf==null ) {
-            throw new NullPointerException("couldn't find the data for this plot element");
+            logger.log(Level.WARNING, "Unable to find datasource for plotElement {0}", plotElement);
+            return;
         } else {
             dsf.addPropertyChangeListener( DataSourceFilter.PROP_FILTERS, dsfListener );
         }
@@ -865,6 +868,11 @@ public class PlotElementController extends DomNodeController {
     private void updateDataSetImmediately() throws Exception {
         performingChange( this, PENDING_UPDATE_DATASET );
         try {
+            if ( dsf==null ) {
+                getRenderer().setDataSet(null);
+                getRenderer().setException(new RuntimeException("Data Source Reference"));
+                return;
+            }
             QDataSet fillDs = dsf.controller.getFillDataSet();
             Exception renderException= null;
             if (fillDs != null) {
