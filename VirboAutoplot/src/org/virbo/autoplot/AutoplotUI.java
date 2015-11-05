@@ -6,7 +6,6 @@
 package org.virbo.autoplot;
 
 import java.awt.event.MouseEvent;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import javax.swing.Icon;
 import org.virbo.autoplot.bookmarks.Bookmark;
@@ -82,7 +81,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
-import java.util.regex.Pattern;
 import javax.help.CSH;
 import javax.jnlp.SingleInstanceListener;
 import javax.swing.AbstractAction;
@@ -105,7 +103,6 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.colorchooser.ColorChooserComponentFactory;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.DefaultEditorKit;
@@ -168,8 +165,6 @@ import org.virbo.filters.FiltersChainPanel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-import quicktime.sound.SoundConstants;
-import sun.awt.SunToolkit;
 
 /**
  * The Autoplot application GUI.  This is the entry point for the application, wrapping the internal
