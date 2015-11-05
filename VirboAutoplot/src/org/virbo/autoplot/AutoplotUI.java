@@ -46,6 +46,7 @@ import java.awt.event.MouseAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -81,6 +82,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
 import javax.help.CSH;
 import javax.jnlp.SingleInstanceListener;
 import javax.swing.AbstractAction;
@@ -103,6 +105,7 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.colorchooser.ColorChooserComponentFactory;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.DefaultEditorKit;
@@ -111,6 +114,7 @@ import org.autoplot.help.AutoplotHelpSystem;
 import org.autoplot.pngwalk.CreatePngWalk;
 import org.autoplot.pngwalk.PngWalkTool;
 import org.das2.DasApplication;
+import org.das2.components.propertyeditor.ColorEditor;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.Datum;
 import org.das2.datum.TimeParser;
@@ -164,6 +168,7 @@ import org.virbo.filters.FiltersChainPanel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import quicktime.sound.SoundConstants;
 import sun.awt.SunToolkit;
 
 /**
@@ -987,6 +992,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
             public void run() {
   APSplash.checkTime("addStyle in");
                 final JScrollPane sp= new JScrollPane();
+                try {
+                    loadMyColors();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
                 tabs.insertTab("style", null, sp,
                         String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
                 invokeLater( 2500, true, new Runnable() {
@@ -1000,6 +1010,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
                             @Override                    
                             public void run( ) { sp.setViewportView(c); }
                         } );
+                        
   APSplash.checkTime("addStyle1 out");
                     }
                 } );
@@ -1028,6 +1039,53 @@ public final class AutoplotUI extends javax.swing.JFrame {
 //        }
 //    }
 
+
+    private static void loadMyColors() throws IOException {
+        File f= new File( new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) ), "config" );
+        if ( f.exists() ) {
+            f= new File( f, "colors.txt" );
+            if ( f.exists() && f.canRead() ) {
+                try (  BufferedReader reader= new BufferedReader( new FileReader(f) ) ) {
+                     String line= reader.readLine();
+                     while ( line!=null ) {
+                         int i= line.indexOf("#");
+                         if ( i>-1 ) line= line.substring(0,i);
+                         String[] ss= line.trim().split("\\s+");
+                         if ( ss.length==1 && ss[0].length()==0 ) {
+                             // ignore blank line.
+                         } else if ( ss.length==1 ) {
+                             ColorEditor.addColor( Color.decode(ss[0]), ss[0] );
+                         } else if ( ss.length==2 ) {
+                             ColorEditor.addColor( Color.decode(ss[0]), ss[1] );
+                         } else if ( ss.length==4 ) {
+                             ColorEditor.addColor( new Color( Integer.parseInt(ss[0]), 
+                                     Integer.parseInt(ss[1]),
+                                     Integer.parseInt(ss[2])), ss[3] );
+
+                         } else if ( ss.length>4 ) {
+                             if ( ss[3].startsWith("\"" ) ) {
+                                 for ( int j=4; j<ss.length; j++ ) {
+                                     ss[3]+= " " + ss[j];
+                                 }
+                                 if ( ss[ss.length-1].endsWith("\"") ) {
+                                     ss[3]= ss[3].substring(0,ss[3].length()-1);
+                                 }
+                                 ColorEditor.addColor( new Color( Integer.parseInt(ss[0]), 
+                                     Integer.parseInt(ss[1]),
+                                     Integer.parseInt(ss[2])), ss[3] );
+                             }
+                         }
+                         line= reader.readLine();
+                     }
+                }
+            } else {
+                try ( BufferedWriter write= new BufferedWriter( new FileWriter(f) ) ) {
+                    write.append("# red(0-255) green(0-255) blue(0-255) colorName\n");
+                    write.close();
+                }
+            }
+        }
+    }
 
     /**
      * often one message causes another, so we can subsume these
