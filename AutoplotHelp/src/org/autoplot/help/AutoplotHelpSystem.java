@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.help.HelpSet;
+import javax.help.HelpSetException;
 import javax.help.SwingHelpUtilities;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
@@ -46,9 +48,9 @@ public class AutoplotHelpSystem {
         // custom viewer supports external web links
         SwingHelpUtilities.setContentViewerUI("org.autoplot.help.AutoplotHelpViewer");
 
-        helpIds= new HashMap<Component, String>();
-        kls= new HashMap<Component, KeyListener>();
-        mls= new HashMap<Component, MouseListener>();
+        helpIds= new HashMap<>();
+        kls= new HashMap<>();
+        mls= new HashMap<>();
 
         // First, load the main autoplot helpset.
         URL hsurl;
@@ -89,7 +91,7 @@ public class AutoplotHelpSystem {
                                 hsurl1= new URL(spec);
                             }
                             mainHS.add(new HelpSet(null, hsurl1));
-                        } catch ( Exception ex ) {
+                        } catch ( MalformedURLException | HelpSetException ex ) {
                             log.log(Level.WARNING, "Error loading helpset {0}", hsurl1);
                         }
                     }
@@ -128,6 +130,7 @@ public class AutoplotHelpSystem {
 
     /** Returns a reference to the help system, or <code>null</code> if it hasn't been
      * initialized.
+     * @return the single instance
      */
     public static AutoplotHelpSystem getHelpSystem() {
         return instance;
@@ -157,18 +160,18 @@ public class AutoplotHelpSystem {
      * @param c
      * @param helpID
      */
-    public void registerHelpID( final Component c, final String helpID) {
+    public final void registerHelpID( final Component c, final String helpID) {
      //  broker.enableHelp(c, helpID, mainHS);
         c.setFocusable(true);
         helpIds.put(c, helpID);
         KeyListener kl=  new KeyListener() {
-
+            @Override
             public void keyTyped(KeyEvent e) {
             }
-
+            @Override
             public void keyPressed(KeyEvent e) {
             }
-
+            @Override
             public void keyReleased(KeyEvent e) {
                 if ( e.getKeyCode()==KeyEvent.VK_F1 ) {
                     Util.openBrowser( "http://autoplot.org/help#"+helpID );
@@ -196,6 +199,7 @@ public class AutoplotHelpSystem {
             Border b= jPanel1.getBorder();
             if ( ( b instanceof TitledBorder ) ) {
                 TitledBorderDecorator.makeLink( jPanel1, new ActionListener() {
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         Util.openBrowser( "http://autoplot.org/help#"+helpID );
                     }
@@ -208,6 +212,7 @@ public class AutoplotHelpSystem {
                     b= jPanel2.getBorder();
                     if ( ( b instanceof TitledBorder ) ) {
                         TitledBorderDecorator.makeLink( jPanel2, new ActionListener() {
+                            @Override
                             public void actionPerformed(ActionEvent e) {
                                 Util.openBrowser( "http://autoplot.org/help#"+helpID );
                             }
@@ -236,6 +241,8 @@ public class AutoplotHelpSystem {
     /** A component action listener can pass the event here and the
      * help topic corresponding to the event source will be displayed, assuming an
      * appropriate call has been made to <code>registerHelpID</code>.
+     * @param e
+     * @param focus
      */
     public void displayHelpFromEvent(ActionEvent e, Object focus ) {
         //helper.actionPerformed(e);
