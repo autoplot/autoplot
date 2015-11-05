@@ -20,8 +20,10 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-11-02 r17906):</p>
+        <p>Bugfixes (2015-11-05 r17906):</p>
         <ul>
+            <li>arrow is included in the annotation bounds.</li>
+            <li>finally name dark green and purple color.</li>
             <li>1479: format then parse in time range event firing could cause very deep stacks.</li>
             <li>1480: old bug where change in component (|slice) wouldn't properly lock the application is fixed.</li>
             <li>add TailBundleDataSet, which allows bundle(alpha,red,green,blue) to work with rank 2 datasets.</li>
@@ -120,6 +122,13 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>inline jython editor has syntax highliting and completions.</li>
+            <li>purple-yellow colorbar added.  Thanks, Chris!</li>
+            <li>style editor for digital renderer added, controls are now formatted to vap file.</li>
+            <li>contour plot is finally added to list of plot types.</li>
+            <li>AUTOPLOT_DATA/config/colors.txt allows new colors to be added to palette.</li>
+            <li>add experimental caching of intermediate results in process string.</li>
+            <li>introduce histogram2d process</li>
             <li>dashup removeValues introduced.  Finish off the original list of functions.</li>
             <li>313: remember dialog size and positions</li>
             <li>plot visible property no longer hides the data renderers.</li>
