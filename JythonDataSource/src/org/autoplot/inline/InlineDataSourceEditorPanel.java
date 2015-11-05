@@ -21,6 +21,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
+import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSourceEditorPanel;
@@ -59,10 +60,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         jLabel2 = new javax.swing.JLabel();
         directionsLabel = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTextPane1 = new javax.swing.JTextPane();
         jLabel1 = new javax.swing.JLabel();
         examplesButton = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        editorTextPane1 = new org.virbo.jythonsupport.ui.EditorTextPane();
         jPanel3 = new javax.swing.JPanel();
         dataMashUp1 = new org.virbo.jythonsupport.ui.DataMashUp();
 
@@ -156,8 +157,6 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
         jTabbedPane1.addTab("data", jPanel1);
 
-        jScrollPane2.setViewportView(jTextPane1);
-
         jLabel1.setText("<html>Enter lines of jython assignments and expressions.  Expressions are interpreted as the X values, then Y values, then Z values if specified.");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
@@ -169,18 +168,25 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             }
         });
 
+        editorTextPane1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                editorTextPane1FocusGained(evt);
+            }
+        });
+        jScrollPane3.setViewportView(editorTextPane1);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane3)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(examplesButton, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2))
+                        .addComponent(examplesButton, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -191,8 +197,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(examplesButton)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("jython", jPanel2);
@@ -385,15 +390,21 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         p.add( examples, BorderLayout.NORTH );
         p.add( tf1, BorderLayout.CENTER );
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( examplesButton, p, "Example Inline Jython", JOptionPane.OK_CANCEL_OPTION ) ) {
-            jTextPane1.setText( tf1.getText() );
+            editorTextPane1.setText( tf1.getText() );
         }
     }//GEN-LAST:event_examplesButtonActionPerformed
+
+    private void editorTextPane1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_editorTextPane1FocusGained
+        CompletionImpl impl = CompletionImpl.get();
+        impl.startPopup(editorTextPane1);
+    }//GEN-LAST:event_editorTextPane1FocusGained
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private org.virbo.jythonsupport.ui.DataMashUp dataMashUp1;
     private javax.swing.JButton deleteSelectedButton;
     private javax.swing.JLabel directionsLabel;
+    private org.virbo.jythonsupport.ui.EditorTextPane editorTextPane1;
     private javax.swing.JButton examplesButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -401,9 +412,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextPane jTextPane1;
     private javax.swing.JComboBox schemeComboBox;
     private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
@@ -571,7 +581,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             mashupUri= null;
         }
         
-        if ( program!=null ) jTextPane1.setText(program);
+        if ( program!=null ) {
+            editorTextPane1.setContentType("text/python");
+            editorTextPane1.setText(program);
+        }
         if ( ltm!=null ) {
             if ( tm.getColumnCount()==2 ) {
                 this.schemeComboBox.setSelectedIndex(1);
@@ -619,7 +632,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             return s.toString();
         } else if ( jTabbedPane1.getSelectedIndex()==1 ) {
             StringBuilder s= new StringBuilder( "vap+inline:" );
-            String t= jTextPane1.getText();
+            String t= editorTextPane1.getText();
             String[] ss= t.split("\n");
             for ( int i=0; i<ss.length; i++ ) {
                 if ( i>0 ) s.append("&");
