@@ -82,6 +82,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
 
     /**
      * Creates new form PlotStylePanel
+     * @param applicationModel
      */
     public PlotStylePanel(final ApplicationModel applicationModel) {
 
@@ -96,8 +97,6 @@ public class PlotStylePanel extends javax.swing.JPanel {
             }
         });
 
-        ColorEditor.addColor( new Color( 139,148,118 ), "sage green"  );
-        
         initComponents();
 
         validate();
