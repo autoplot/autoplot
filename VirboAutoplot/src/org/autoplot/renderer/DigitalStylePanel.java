@@ -4,6 +4,8 @@ package org.autoplot.renderer;
 import java.awt.Color;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.das2.components.propertyeditor.EnumerationEditor;
+import org.das2.graph.DigitalRenderer;
 import org.das2.graph.Renderer;
 import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -18,6 +20,8 @@ import org.virbo.autoplot.dom.PlotElement;
  */
 public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePanel.StylePanel {
 
+    EnumerationEditor ened;
+    
     /**
      * Creates new form DigitalStylePanel
      */
@@ -25,6 +29,9 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         initComponents();
         colorEditor1.setValue(Color.BLACK);
         colorPanel.add( colorEditor1.getSmallEditor() );
+        ened= new EnumerationEditor();
+        ened.setValue( DigitalRenderer.Align.CENTER );
+        alignPanel.add( ened.getCustomEditor() );
         validate();
     }
 
@@ -58,6 +65,7 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         controls.put( "size", fontSizeTF.getText() );
         controls.put( "format", formatTF.getText() );
         controls.put( Renderer.CONTROL_KEY_COLOR, Renderer.encodeColorControl( (Color)colorEditor1.getValue() ) );
+        controls.put( "align", ened.getValue().toString() );
         String c= Renderer.formatControl(controls);
         this.control= c;
         firePropertyChange( Renderer.PROP_CONTROL, oldValue, c );
@@ -67,6 +75,10 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         fontSizeTF.setText( renderer.getControl( "size", "0" ) );
         colorEditor1.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, Color.BLACK ) );
         formatTF.setText( renderer.getControl( "format", "" ) );
+        try {
+            ened.setValue( DigitalRenderer.Align.valueOf( renderer.getControl( "align", "CENTER" ) ) );
+        } catch ( IllegalArgumentException ex ) {
+        }
     }
     
     @Override
@@ -116,6 +128,8 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         fontSizeTF = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         formatTF = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        alignPanel = new javax.swing.JPanel();
 
         jLabel1.setText("Font Size:");
 
@@ -161,6 +175,19 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
             }
         });
 
+        jLabel4.setText("Align:");
+
+        javax.swing.GroupLayout alignPanelLayout = new javax.swing.GroupLayout(alignPanel);
+        alignPanel.setLayout(alignPanelLayout);
+        alignPanelLayout.setHorizontalGroup(
+            alignPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 94, Short.MAX_VALUE)
+        );
+        alignPanelLayout.setVerticalGroup(
+            alignPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -178,7 +205,11 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
                         .addComponent(jLabel2)
                         .addGap(18, 18, 18)
                         .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel1))
+                    .addComponent(jLabel1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(alignPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(228, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -197,7 +228,11 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(formatTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
-                .addContainerGap(195, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(alignPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(172, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -215,6 +250,7 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel alignPanel;
     private org.das2.components.propertyeditor.ColorEditor colorEditor1;
     private javax.swing.JPanel colorPanel;
     private javax.swing.JTextField fontSizeTF;
@@ -222,5 +258,6 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     // End of variables declaration//GEN-END:variables
 }
