@@ -828,6 +828,7 @@ public class GuiSupport {
         tt.put( "Image", RenderType.image);
         tt.put( "Pitch Angle Distribution", RenderType.pitchAngleDistribution);
         tt.put( "Orbit Plot", RenderType.orbitPlot );
+        tt.put( "Contour Plot", RenderType.contour);
         return tt;
     }
 
