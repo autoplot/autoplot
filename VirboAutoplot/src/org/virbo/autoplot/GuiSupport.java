@@ -77,6 +77,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
 import org.autoplot.renderer.ContourStylePanel;
+import org.autoplot.renderer.DigitalStylePanel;
 import org.autoplot.renderer.EventsStylePanel;
 import org.autoplot.renderer.PitchAngleDistributionStylePanel;
 import org.das2.components.DasProgressPanel;
@@ -230,6 +231,8 @@ public class GuiSupport {
                 editorPanel= new ColorScatterStylePanel( );
             } else if ( renderType==RenderType.contour ) {
                 editorPanel= new ContourStylePanel( );
+            } else if ( renderType==RenderType.digital ) {
+                editorPanel= new DigitalStylePanel( );
             } else if ( renderType==RenderType.eventsBar ) {
                 editorPanel= new EventsStylePanel( );
             } else {
