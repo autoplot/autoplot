@@ -81,6 +81,7 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         controls.put( "format", formatTF.getText() );
         controls.put( Renderer.CONTROL_KEY_COLOR, Renderer.encodeColorControl( (Color)colorEditor1.getValue() ) );
         controls.put( "align", ened.getValue().toString() );
+        controls.put( "fillLabel", fillLabelTF.getText() );
         String c= Renderer.formatControl(controls);
         this.control= c;
         firePropertyChange( Renderer.PROP_CONTROL, oldValue, c );
@@ -94,6 +95,7 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
             ened.setValue( DigitalRenderer.Align.valueOf( renderer.getControl( "align", "CENTER" ) ) );
         } catch ( IllegalArgumentException ex ) {
         }
+        fillLabelTF.setText( renderer.getControl( "fillLabel", "fill" ) );
     }
     
     @Override
@@ -145,6 +147,8 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         formatTF = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         alignPanel = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        fillLabelTF = new javax.swing.JTextField();
 
         jLabel1.setText("Font Size:");
 
@@ -154,34 +158,48 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
 
         fontSizeTF.setText("0");
         fontSizeTF.setToolTipText("Font size, relative to canvas font size");
-        fontSizeTF.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                DigitalStylePanel.this.focusLost(evt);
-            }
-        });
         fontSizeTF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fontSizeTFActionPerformed(evt);
+            }
+        });
+        fontSizeTF.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                DigitalStylePanel.this.focusLost(evt);
             }
         });
 
         jLabel3.setText("Format:");
         jLabel3.setToolTipText("Format specifier like %9.2f");
 
-        formatTF.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                DigitalStylePanel.this.focusLost(evt);
-            }
-        });
         formatTF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 formatTFActionPerformed(evt);
+            }
+        });
+        formatTF.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                DigitalStylePanel.this.focusLost(evt);
             }
         });
 
         jLabel4.setText("Align:");
 
         alignPanel.setLayout(new java.awt.BorderLayout());
+
+        jLabel5.setText("Fill Label:");
+
+        fillLabelTF.setText("fill");
+        fillLabelTF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fillLabelTFActionPerformed(evt);
+            }
+        });
+        fillLabelTF.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                DigitalStylePanel.this.focusLost(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -204,9 +222,13 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
                         .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(alignPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(249, Short.MAX_VALUE))
+                        .addGap(35, 35, 35)
+                        .addComponent(alignPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel5)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(60, 60, 60)
+                        .addComponent(fillLabelTF, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(226, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -228,7 +250,11 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
                     .addComponent(alignPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(167, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(fillLabelTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(136, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -244,16 +270,22 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         update();
     }//GEN-LAST:event_focusLost
 
+    private void fillLabelTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fillLabelTFActionPerformed
+        update();
+    }//GEN-LAST:event_fillLabelTFActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel alignPanel;
     private org.das2.components.propertyeditor.ColorEditor colorEditor1;
     private javax.swing.JPanel colorPanel;
+    private javax.swing.JTextField fillLabelTF;
     private javax.swing.JTextField fontSizeTF;
     private javax.swing.JTextField formatTF;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     // End of variables declaration//GEN-END:variables
 }
