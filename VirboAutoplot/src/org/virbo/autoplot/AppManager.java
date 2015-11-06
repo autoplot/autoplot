@@ -119,17 +119,8 @@ public class AppManager {
     public boolean requestQuit() {
         boolean okay= true;
         for ( Entry<Object,Map<String,CloseCallback>> closeCallbacks : appCloseCallbacks.entrySet() ) {
-            for ( Entry<String,CloseCallback> ent: closeCallbacks.getValue().entrySet() ) {
-                try {
-                    okay= okay && ent.getValue().checkClose();
-                } catch ( Exception e ) {
-                    Object parent = this.apps.size()>0 ? this.apps.get(0) : null;
-                    if ( ! ( parent instanceof Component ) ) {
-                        parent=null;
-                    }
-                    JOptionPane.showMessageDialog( (Component)parent, String.format( "<html>Unable to call closeCallback id=\"%s\",<br>because of exception:<br>%s", ent.getKey(), e ) );
-                }
-            }
+            Object app= closeCallbacks.getKey();
+            okay= okay && requestClose(app);
         }
         return okay;
     }
