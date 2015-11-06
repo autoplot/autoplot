@@ -468,7 +468,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     }
 
                     String timeRange;
-                    if ( jsonTimeRange==null ) {
+                    if ( jsonTimeRange==null || !UnitsUtil.isTimeLocation(jsonTimeRange.getUnits()) ) {
                         TimeParser tp= TimeParser.create( template );
                         timeRange = s;
                         try {
