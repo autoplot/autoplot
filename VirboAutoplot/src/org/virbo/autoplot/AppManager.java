@@ -134,6 +134,30 @@ public class AppManager {
         return okay;
     }
     
+    /**
+     * returns true if close can be called, exiting the program.  If the callback throws an exception, then a warning is displayed.  I expect
+     * this will often occur in scripts.
+     * @param app the app that is closing.
+     * @return true if the callback okays the close.
+     */
+    public boolean requestClose( Object app ) {
+        boolean okay= true;
+        Map<String,CloseCallback> closeCallbacks= appCloseCallbacks.get(app);
+        if ( closeCallbacks==null ) return true;
+        for ( Entry<String,CloseCallback> ent: closeCallbacks.entrySet() ) {
+            try {
+                okay= okay && ent.getValue().checkClose();
+            } catch ( Exception e ) {
+                Object parent = this.apps.size()>0 ? this.apps.get(0) : null;
+                if ( ! ( parent instanceof Component ) ) {
+                    parent=null;
+                }
+                JOptionPane.showMessageDialog( (Component)parent, String.format( "<html>Unable to call closeCallback id=\"%s\",<br>because of exception:<br>%s", ent.getKey(), e ) );
+            }
+        }
+        return okay;
+    }
+    
     public WindowListener getWindowListener( final Object app, final Action closeAction ) {
         return new WindowListener() {
             @Override
@@ -141,7 +165,7 @@ public class AppManager {
             }
             @Override
             public void windowClosing(WindowEvent e) {
-                boolean okay= requestQuit();
+                boolean okay= requestClose(app);
                 if ( !okay ) {
                     return;
                 } else {
