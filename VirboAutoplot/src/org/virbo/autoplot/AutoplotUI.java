@@ -1035,6 +1035,12 @@ public final class AutoplotUI extends javax.swing.JFrame {
 //    }
 
 
+    /**
+     * load the colors from the colors.txt file.  This expects any of the following
+     * forms:
+     * 
+     * @throws IOException 
+     */
     private static void loadMyColors() throws IOException {
         File f= new File( new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) ), "config" );
         if ( f.exists() ) {
@@ -1043,32 +1049,37 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 try (  BufferedReader reader= new BufferedReader( new FileReader(f) ) ) {
                      String line= reader.readLine();
                      while ( line!=null ) {
-                         int i= line.indexOf("#");
-                         if ( i>-1 ) line= line.substring(0,i);
-                         String[] ss= line.trim().split("\\s+");
-                         if ( ss.length==1 && ss[0].length()==0 ) {
-                             // ignore blank line.
-                         } else if ( ss.length==1 ) {
-                             ColorEditor.addColor( Color.decode(ss[0]), ss[0] );
-                         } else if ( ss.length==2 ) {
-                             ColorEditor.addColor( Color.decode(ss[0]), ss[1] );
-                         } else if ( ss.length==4 ) {
-                             ColorEditor.addColor( new Color( Integer.parseInt(ss[0]), 
-                                     Integer.parseInt(ss[1]),
-                                     Integer.parseInt(ss[2])), ss[3] );
-
-                         } else if ( ss.length>4 ) {
-                             if ( ss[3].startsWith("\"" ) ) {
+                         try {
+                             int i= line.indexOf("#");
+                             if ( i>-1 ) line= line.substring(0,i);
+                             String[] ss= line.trim().split("\\s+");
+                             if ( ss.length==1 && ss[0].length()==0 ) {
+                                 // ignore blank line.
+                             } else if ( ss.length==1 ) {
+                                 ColorEditor.addColor( Color.decode(ss[0]), ss[0] );  //0xFFFFFF
+                             } else if ( ss.length==2 ) {
+                                 ColorEditor.addColor( Color.decode(ss[0]), ss[1] );  //0xFFFFFF white
+                             } else if ( ss.length>=4 ) {
                                  for ( int j=4; j<ss.length; j++ ) {
                                      ss[3]+= " " + ss[j];
                                  }
-                                 if ( ss[ss.length-1].endsWith("\"") ) {
-                                     ss[3]= ss[3].substring(0,ss[3].length()-1);
+                                 if ( ss[3].startsWith("\"") && ss[3].endsWith("\"") ) {
+                                     ss[3]= ss[3].substring(1,ss[3].length()-1);
                                  }
-                                 ColorEditor.addColor( new Color( Integer.parseInt(ss[0]), 
-                                     Integer.parseInt(ss[1]),
-                                     Integer.parseInt(ss[2])), ss[3] );
+                                 if ( ss[0].endsWith("%") ) {  // 100% 100% 100% white 
+                                     int rr= 255 * Integer.parseInt(ss[0].substring(0,ss[0].length()-1)) / 100;
+                                     int gg= 255 * Integer.parseInt(ss[1].substring(0,ss[1].length()-1)) / 100;
+                                     int bb= 255 * Integer.parseInt(ss[2].substring(0,ss[2].length()-1)) / 100;
+                                     ColorEditor.addColor( new Color( rr, gg, bb ), ss[3] );
+                                 } else {
+                                     ColorEditor.addColor( new Color( // 255 255 255 white
+                                         Integer.parseInt(ss[0]), 
+                                         Integer.parseInt(ss[1]),
+                                         Integer.parseInt(ss[2])), ss[3] );
+                                 }
                              }
+                         } catch ( NumberFormatException ex ) {
+                             logger.log(Level.WARNING, "unable to parse color: {0}", line);
                          }
                          line= reader.readLine();
                      }
