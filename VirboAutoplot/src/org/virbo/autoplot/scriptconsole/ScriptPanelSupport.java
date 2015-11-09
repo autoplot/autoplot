@@ -281,6 +281,7 @@ public class ScriptPanelSupport {
             if ( !( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) throw new IOException("unable to write to file: "+file);
             if ( watcher!=null ) {
                 try {
+                    logger.info("closing watcher");
                     watcher.close();
                 } catch ( IOException ex ) {
                     logger.log( Level.WARNING, ex.getMessage(), ex );
@@ -290,7 +291,26 @@ public class ScriptPanelSupport {
             String text = panel.getEditorPanel().getText();
             out.write(text.getBytes());
             panel.setDirty(false);
-            restartWatcher(file);
+            
+            final File ffile= file;
+            Runnable run= new Runnable() {
+                public void run() {
+                    try {
+                        logger.info("pausing before restarting watcher");
+                        Thread.sleep(10000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    try {
+                        logger.info("restarting watcher");
+                        restartWatcher(ffile);
+                    } catch (IOException ex) {
+                        Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            new Thread(run).start();
+            
         } finally {
             if ( out!=null ) out.close();
         }
