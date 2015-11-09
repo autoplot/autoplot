@@ -67,7 +67,7 @@ public class AppManager {
             if ( ScriptContext.getViewWindow()==null ) {
                 resetMain= true;
             }
-            if ( requestQuit() ) {
+            if ( requestClose(app) ) {
                 this.appCloseCallbacks.remove(app);        
                 this.apps.remove(app);
                 if ( this.apps.isEmpty() ) {
