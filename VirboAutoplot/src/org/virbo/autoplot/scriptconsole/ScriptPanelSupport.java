@@ -271,6 +271,7 @@ public class ScriptPanelSupport {
      */
     protected int save() throws FileNotFoundException, IOException {
         if ( file==null || file.toString().contains( FileSystem.settings().getLocalCacheDir().toString()) ) {
+            logger.fine("file is null ");
             if ( panel.isDirty() ) {
                 return saveAs();
             }
@@ -281,11 +282,13 @@ public class ScriptPanelSupport {
             if ( !( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) throw new IOException("unable to write to file: "+file);
             if ( watcher!=null ) {
                 try {
-                    logger.info("closing watcher");
+                    logger.fine("closing watcher");
                     watcher.close();
                 } catch ( IOException ex ) {
                     logger.log( Level.WARNING, ex.getMessage(), ex );
                 }
+            } else {
+                logger.fine("logger was null");
             }
             out = new FileOutputStream(file);
             String text = panel.getEditorPanel().getText();
@@ -296,13 +299,13 @@ public class ScriptPanelSupport {
             Runnable run= new Runnable() {
                 public void run() {
                     try {
-                        logger.info("pausing before restarting watcher");
+                        logger.fine("pausing before restarting watcher");
                         Thread.sleep(10000);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     try {
-                        logger.info("restarting watcher");
+                        logger.fine("restarting watcher");
                         restartWatcher(ffile);
                     } catch (IOException ex) {
                         Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
