@@ -2067,7 +2067,7 @@ public class PlotElementController extends DomNodeController {
 
         logger.log(Level.FINE, "doAutoranging for {0}", spec);
 
-        if ( spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ) {
+        if ( spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram || spec==RenderType.stackedHistogram ) {
 
             QDataSet xds = (QDataSet) SemanticOps.xtagsDataSet(fillDs);
             if (xds == null) {

@@ -20,6 +20,7 @@ public enum RenderType {
     image,
     pitchAngleDistribution,
     eventsBar,
+    stackedHistogram, // Voyager uses these
     vectorPlot,
     orbitPlot,  // call-outs with time vs position
     contour;

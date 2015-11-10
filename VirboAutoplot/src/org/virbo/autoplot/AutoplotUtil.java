@@ -98,6 +98,7 @@ import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.das2.graph.SpectrogramRenderer.RebinnerEnum;
+import org.das2.graph.StackedHistogramRenderer;
 import org.das2.graph.TickCurveRenderer;
 import org.das2.graph.VectorPlotRenderer;
 import org.das2.system.RequestProcessor;
@@ -2075,6 +2076,14 @@ public class AutoplotUtil {
                 return recyclable;
             } else {
                 Renderer result = new EventsRenderer();
+                result.setDataSetLoader(null);
+                return result;
+            }
+        } else if ( renderType==RenderType.stackedHistogram ) {
+            if (recyclable != null && recyclable instanceof StackedHistogramRenderer ) {
+                return recyclable;
+            } else {
+                Renderer result = new StackedHistogramRenderer( colorbar);
                 result.setDataSetLoader(null);
                 return result;
             }
