@@ -304,7 +304,7 @@ public class InlineDataSource extends AbstractDataSource {
                     propName= arg.substring(0,ieq).trim();
                 }
                 if ( propName!=null ) { // it's a directive
-                    String propValue= arg.substring(0,ieq+1).trim();
+                    String propValue= arg.substring(ieq+1).trim();
                     if ( (m=depPat.matcher(propName)).matches() ) {
                         int idep= Integer.parseInt( m.group(1) );
                         if ( m.group(3)!=null ) {
