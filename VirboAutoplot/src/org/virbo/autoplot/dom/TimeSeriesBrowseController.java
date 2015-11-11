@@ -43,7 +43,7 @@ public class TimeSeriesBrowseController {
     private DasPlot plot;
     private Plot domPlot;
     private PlotElementController plotElementController;
-    private DataSourceController dataSourceController;
+    private final DataSourceController dataSourceController;
     private DataSourceFilter dsf;
     private ChangesSupport changesSupport;
 
@@ -59,7 +59,7 @@ public class TimeSeriesBrowseController {
 
     private static List<Axis> getTimerangeBoundAxes( Application dom ) {
         List<BindingModel> bms= DomUtil.findBindings( dom, dom, Application.PROP_TIMERANGE );
-        List<Axis> result= new ArrayList<Axis>();
+        List<Axis> result= new ArrayList<>();
         for ( BindingModel bm: bms ) {
             if ( bm.getDstProperty().equals( Axis.PROP_RANGE ) ) {
                 result.add( (Axis)DomUtil.getElementById( dom, bm.getDstId() ) );
@@ -70,14 +70,16 @@ public class TimeSeriesBrowseController {
     
     private static List<Axis> getOtherBoundAxes( Application dom, Axis axis ) {
         List<BindingModel> bms= DomUtil.findBindings( dom, axis, Axis.PROP_RANGE );
-        List<Axis> result= new ArrayList<Axis>();
+        List<Axis> result= new ArrayList<>();
         for ( BindingModel bm: bms ) {
             if ( bm.getSrcProperty().equals(Application.PROP_TIMERANGE) ) {
                 result.addAll( getTimerangeBoundAxes( dom ) );
             } else if ( bm.getSrcId().equals(axis.getId()) ) {
-                result.add( (Axis) DomUtil.getElementById( dom, bm.getDstId() ) );
+                DomNode n= DomUtil.getElementById( dom, bm.getDstId() );
+                if ( n instanceof Axis ) result.add( (Axis)n  );
             } else if ( bm.getDstId().equals(axis.getId()) ) {
-                result.add( (Axis) DomUtil.getElementById( dom, bm.getSrcId() ) );
+                DomNode n= DomUtil.getElementById( dom, bm.getSrcId() );
+                if ( n instanceof Axis ) result.add( (Axis)n  );
             }
         }
         return result;
