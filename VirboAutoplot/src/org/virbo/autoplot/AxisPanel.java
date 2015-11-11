@@ -133,8 +133,6 @@ public class AxisPanel extends javax.swing.JPanel {
         timeRangeEditor1.setNoOneListeningRange( Application.DEFAULT_TIME_RANGE );
         timeRangeEditor1.setRange( Application.DEFAULT_TIME_RANGE );
         
-        dom.getController().bind( dom, Application.PROP_TIMERANGE, timeRangeEditor1, TimeRangeEditor.PROP_RANGE );
-
         dom.addPropertyChangeListener( Application.PROP_TIMERANGE, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -175,6 +173,7 @@ public class AxisPanel extends javax.swing.JPanel {
         Plot p = applicationController.getPlot();
         
         if (plotBindingGroup != null) plotBindingGroup.unbind(); // consider synchronized block, or require that this always be called from the event thread, or check that the plot has changed.
+        
         //http://www.infoq.com/news/2007/09/beans-binding
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.label"), xTitleTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p,BeanProperty.create( "xaxis.range"), xredit, BeanProperty.create("value")));
@@ -189,6 +188,8 @@ public class AxisPanel extends javax.swing.JPanel {
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("zaxis.range"), zredit, BeanProperty.create("value")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("zaxis.log"), zLog, BeanProperty.create("selected")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("zaxis.visible"), cbVisibleCB, BeanProperty.create("selected")));
+
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("context"), timeRangeEditor1, BeanProperty.create( TimeRangeEditor.PROP_RANGE )));
 
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("title"), titleTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("displayTitle"), titleCB, BeanProperty.create("selected")));
