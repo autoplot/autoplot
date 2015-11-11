@@ -357,7 +357,10 @@ public class TimeSeriesBrowseController {
                         //this.setupGen( dsf.getController().getApplication(), Application.PROP_TIMERANGE );
                         this.setupGen( domPlot, Plot.PROP_CONTEXT );
                         Application dom= domPlot.getController().getApplication();
-                        dom.getController().bind( dom, Application.PROP_TIMERANGE, domPlot, Plot.PROP_CONTEXT );
+                        if ( !dom.getController().isPendingChanges() ) {
+                            // I'm unable to figure out how to get the code to come through here
+                            dom.getController().bind( dom, Application.PROP_TIMERANGE, domPlot, Plot.PROP_CONTEXT );
+                        }
                         
                     } else {
                         logger.fine("  unable to bind to application timeRange because of units." );
