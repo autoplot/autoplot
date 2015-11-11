@@ -65,6 +65,9 @@ public class LabelConverter extends Converter {
                     }
                 }
             }
+            if ( title.contains("PLOT_CONTEXT") ) {
+                title= insertString( title, "PLOT_CONTEXT", "%{CONTEXT}");
+            }
             if ( title.contains("USER_PROPERTIES" ) ) {
                 if ( pe!=null ) {
                     QDataSet dataSet= pe.getController().getDataSet();
@@ -151,6 +154,8 @@ public class LabelConverter extends Converter {
         
         if ( containsString( ptitle, "CONTEXT", title) ) {
             title= ptitle;
+        } else if ( ptitle.contains( "%{PLOT_CONTEXT}" ) ) {
+            title= ptitle;
         } else if ( ptitle.contains( "%{USER_PROPERTIES" ) ) { //kludgy
             title= ptitle;
         } else if ( ptitle.contains( "%{PROPERTIES" ) ) { //kludgy
@@ -190,11 +195,11 @@ public class LabelConverter extends Converter {
     }
 
     /**
-     * return true if %{LABEL} or $(LABEL) is found.
-     * @param ptitle
-     * @param label
-     * @param value
-     * @return
+     * return true if %{LABEL} or $(LABEL) is found in ptitle.
+     * @param ptitle the string which contains the macro.
+     * @param label the macro name to look for in %{macro} or $(macro)
+     * @param value the string with the macro inserted.
+     * @return true if ptitle is consistent.
      */
     protected static boolean containsString( String ptitle, String label, String value ) {
         String search;
