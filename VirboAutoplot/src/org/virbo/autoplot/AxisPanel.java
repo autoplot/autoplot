@@ -679,6 +679,7 @@ public class AxisPanel extends javax.swing.JPanel {
         processMenu= new JPopupMenu();
         processMenu.add( createMenuItem( tf, "%{COMPONENT}", "Component property from the plot element" ) );
         processMenu.add( createMenuItem( tf, "%{CONTEXT}", "Context from the dataset, such as slice location or component" ) );
+        processMenu.add( createMenuItem( tf, "%{PLOT_CONTEXT}", "plot context control" ) );
         processMenu.add( createMenuItem( tf, "%{TIMERANGE}", "Special timerange property from the plot element controller" ) );
         processMenu.add( createMenuItem( tf, "!c", "Line Break", "Insert new line escape character" ) );
         return processMenu;
@@ -694,6 +695,7 @@ public class AxisPanel extends javax.swing.JPanel {
         processMenu= new JPopupMenu();
         processMenu.add( createMenuItem( tf, "%{CONTEXT}", "Context from the dataset, such as slice location or component" ) );
         processMenu.add( createMenuItem( tf, "%{TIMERANGE}", "Special timerange property from the plot element controller" ) );
+        processMenu.add( createMenuItem( tf, "%{PLOT_CONTEXT}", "plot context control" ) );        
         processMenu.add( createMenuItem( tf, "!c", "Line Break", "Insert new line escape character" ) );
         processMenu.add( createMenuItem( tf, "&epsilon;", "Insert named character reference for epsilon symbol") );
         processMenu.add( createMenuItem( tf, "&#0229;", "Insert unicode symbol") );        
