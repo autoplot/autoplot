@@ -1616,7 +1616,7 @@ public class PlotController extends DomNodeController {
             dom.getController().bind( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
 
             BindingModel b= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
-            if ( b!=null ) dom.getController().deleteBinding(b); // 3516161
+            if ( b!=null ) dom.getController().deleteBinding(b); // https://sourceforge.net/p/autoplot/bugs/868/
             //if ( !CanvasUtil.getMostBottomPlot(dom.getController().getCanvasFor(plot))==plot ) {
             //    plot.getXaxis().setDrawTickLabels(false);
             //} //TODO: could disable tick label drawing automatically.
@@ -1624,7 +1624,7 @@ public class PlotController extends DomNodeController {
         } else if ( bm!=null && !shouldBindX ) {
             logger.log(Level.FINER, "remove binding: {0}", bm);
             //BindingModel b= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
-            //if ( b!=null ) dom.getController().deleteBinding(b); // 3516161
+            //if ( b!=null ) dom.getController().deleteBinding(b); // 3516161 https://sourceforge.net/p/autoplot/bugs/868/
             plot.setContext( dom.getTimeRange() );
             dom.getController().deleteBinding(bm);
         }
