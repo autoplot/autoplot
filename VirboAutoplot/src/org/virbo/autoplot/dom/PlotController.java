@@ -1623,7 +1623,7 @@ public class PlotController extends DomNodeController {
 
         } else if ( bm!=null && !shouldBindX ) {
             logger.log(Level.FINER, "remove binding: {0}", bm);
-            BindingModel b= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
+            //BindingModel b= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot, Plot.PROP_CONTEXT );
             //if ( b!=null ) dom.getController().deleteBinding(b); // 3516161
             plot.setContext( dom.getTimeRange() );
             dom.getController().deleteBinding(bm);
