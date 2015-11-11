@@ -706,11 +706,11 @@ public class CreatePngWalk {
     /**
      * Method to write HTML file of all the pictures to give a gallery view
      * @author Armond Luthens
-     * @param outputFolder the file where the html should be written to.
+     *
      */
-    public static void writeHTMLFile(String outputFolder){
+    public static void writeHTMLFile(){
         //String filePath= outputFolder+"pngImagePage.html";
-        String filePath = "pngImagePage.html";
+        String filePath = "pngImagePage2.html";
         File f= new File(filePath);
         
         String htmlOpen= "<html>";
@@ -750,11 +750,6 @@ public class CreatePngWalk {
                 currentPngFilename = pngFilenameArray1;
                 fileNameToDisplay= timeLabels.get(count);
                 count++;
-                //fileNameToDisplay= currentPngFilename.replaceAll("\\D+", ""); //replaces string with only the date digits 
-                //year=fileNameToDisplay.substring(0, 4); //gets year
-                //month=fileNameToDisplay.substring(4, 6); //gets month
-                //day=fileNameToDisplay.substring(6, 8); //gets day
-                //fullDate= "Date: " + year + "/" + month + "/" + day;
                 
                 addImageString= htmlImageStringOpen+currentPngFilename+htmlImageStringClose; //insert image into html code
                 fullImageCaption= htmlImageCaptionOpen + fileNameToDisplay + htmlImageCaptionClose; //insert corresponding date for image into html code
@@ -837,7 +832,7 @@ public class CreatePngWalk {
 
         int status= doIt( ScriptContext.getDocumentModel(), params );
         
-        writeHTMLFile( params.outputFolder );
+        writeHTMLFile();
         System.exit(status); // something starts up thread that prevents java from exiting.
     }
 }
