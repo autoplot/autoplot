@@ -1489,6 +1489,18 @@ public class ApplicationController extends DomNodeController implements RunLater
                 newp.getController().setDsfReset(true);
             }
             
+            List<BindingModel> bms= findBindings( domPlot, Plot.PROP_CONTEXT );
+            for ( BindingModel bm: bms ) {
+                if ( bm.srcId.equals(domPlot.id) ) {
+                    DomNode other= DomUtil.getElementById( node, bm.dstId );
+                    if ( other!=null ) bind( newPlot, Plot.PROP_CONTEXT, other, bm.dstProperty );
+                } else {
+                    DomNode other= DomUtil.getElementById( node, bm.srcId );
+                    if ( other!=null ) bind( other, bm.srcProperty, newPlot, Plot.PROP_CONTEXT );
+                }
+            }
+            
+            
         } finally {
             lock.unlock();
         }
