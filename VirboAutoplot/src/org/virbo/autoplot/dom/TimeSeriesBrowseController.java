@@ -40,7 +40,7 @@ public class TimeSeriesBrowseController {
 
     private PlotElement p;
     private DasAxis xAxis;
-    private DasPlot plot;
+    private DasPlot dasPlot;
     private Plot domPlot;
     private PlotElementController plotElementController;
     private final DataSourceController dataSourceController;
@@ -95,7 +95,7 @@ public class TimeSeriesBrowseController {
                 LoggerManager.logPropertyChangeEvent(evt,"updateTsbTimer");                
                 //TODO: this would work, but the particular axis is not actually adjusting.  We need
                 //to figure out who it's attached to, and see if any are adjusting.  Maybe even
-                //put in new code in plot.getXAxis.valueIsAdjusting to check bindings.
+                //put in new code in dasPlot.getXAxis.valueIsAdjusting to check bindings.
                 
                 Application dom= dsf.getController().getApplication();
                 
@@ -155,7 +155,7 @@ public class TimeSeriesBrowseController {
         }
 
         if ( p!=null ) {
-            this.plot = plotElementController.getDasPlot();
+            this.dasPlot = plotElementController.getDasPlot();
             this.xAxis = plotElementController.getDasPlot().getXAxis();
         }
     }
@@ -244,15 +244,15 @@ public class TimeSeriesBrowseController {
                     DatumRange appRange= dsf.getController().getApplication().getTimeRange();
                     if ( appRange.getUnits().isConvertibleTo( tr.getUnits() )
                             && isBoundTimeRange( bms, this.domPlot.getXaxis().getId() ) ) { // check to see if the dom has a compatible timerange.
-                        this.plot.getXAxis().resetRange(appRange);
+                        this.dasPlot.getXAxis().resetRange(appRange);
                     } else {
-                        this.plot.getXAxis().resetRange(tr);
+                        this.dasPlot.getXAxis().resetRange(tr);
                     }
-                    if ( !this.plot.getXAxis().getLabel().contains("%{RANGE}") ) {
-                        this.plot.getXAxis().setUserDatumFormatter(new DateTimeDatumFormatter( dsf.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 )); // See PlotController.createDasPeer and listener that doesn't get event
+                    if ( !this.dasPlot.getXAxis().getLabel().contains("%{RANGE}") ) {
+                        this.dasPlot.getXAxis().setUserDatumFormatter(new DateTimeDatumFormatter( dsf.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 )); // See PlotController.createDasPeer and listener that doesn't get event
                     }
                     this.domPlot.getXaxis().setAutoRange(true); // need to turn it back on because resetRange
-                    this.plot.getXAxis().setScanRange(null);
+                    this.dasPlot.getXAxis().setScanRange(null);
                 }
                 updateTsb(true);
             } catch ( RuntimeException e ) {
@@ -270,7 +270,7 @@ public class TimeSeriesBrowseController {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt,"timeSeriesBrowseListener");                
-                if (plot.getXAxis().valueIsAdjusting()) {
+                if (dasPlot.getXAxis().valueIsAdjusting()) {
                     return;
                 } 
                 //if ( domPlot.getController().getApplication().getController().isValueAdjusting() ) { // This must be commented out because of 1140.  I'm not sure why this was inserted in the first place.
@@ -297,7 +297,7 @@ public class TimeSeriesBrowseController {
             }
         };
 
-        this.plot.getXAxis().addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, timeSeriesBrowseListener);
+        this.dasPlot.getXAxis().addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, timeSeriesBrowseListener);
         this.domPlot.addPropertyChangeListener( Plot.PROP_CONTEXT, timeSeriesBrowseListener ) ;
 
     }
@@ -384,7 +384,7 @@ public class TimeSeriesBrowseController {
                     return;
                 }
                 if ( xAxis!=null ) {
-                    //if (plot.isOverSize() && autorange==false ) {
+                    //if (dasPlot.isOverSize() && autorange==false ) {
                     //    visibleRange = DatumRangeUtil.rescale(visibleRange, -0.3, 1.3); //TODO: be aware of
                     //}
                     tsb.setTimeRange(trange);
@@ -445,11 +445,11 @@ public class TimeSeriesBrowseController {
     }
 
     /**
-     * return the plot element that is responsible for handling this data source.  This
-     * is the guy that was focused when this was created, and is attached to the plot x-axis
-     * that controls this (if there is one).
-     *
-     * This was introduced because classes were accessing the local variable p.
+     * return the dasPlot element that is responsible for handling this data source.  This
+ is the guy that was focused when this was created, and is attached to the dasPlot x-axis
+ that controls this (if there is one).
+
+ This was introduced because classes were accessing the local variable p.
      *
      * @return a PlotElement or null.
      */
@@ -471,7 +471,7 @@ public class TimeSeriesBrowseController {
 
     void release() {
         if (  isListeningToAxis() ) {
-            this.plot.getXAxis().removePropertyChangeListener(DasAxis.PROPERTY_DATUMRANGE,timeSeriesBrowseListener);
+            this.dasPlot.getXAxis().removePropertyChangeListener(DasAxis.PROPERTY_DATUMRANGE,timeSeriesBrowseListener);
             this.domPlot.removePropertyChangeListener( Plot.PROP_CONTEXT, timeSeriesBrowseListener ) ;
             this.xAxis= null;
         } else {
@@ -548,7 +548,7 @@ public class TimeSeriesBrowseController {
     }
 
     /**
-     * provide access to the TSB plot.
+     * provide access to the TSB dasPlot.
      * @return 
      */
     Plot getPlot() {
