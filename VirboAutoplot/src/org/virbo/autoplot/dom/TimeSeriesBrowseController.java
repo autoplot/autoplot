@@ -85,7 +85,7 @@ public class TimeSeriesBrowseController {
         return result;
     }
     
-    TimeSeriesBrowseController( DataSourceController dataSourceController, final PlotElement p ) {
+    protected TimeSeriesBrowseController( DataSourceController dataSourceController, final PlotElement p ) {
 
         this.changesSupport= new ChangesSupport(this.propertyChangeSupport,this);
         
@@ -119,7 +119,7 @@ public class TimeSeriesBrowseController {
                     updateTsbTimer.tickle(); 
                     logger.log( Level.FINEST, "applicationController is adjusting" );
                 } else {
-                    Map<Object,Object> changes= new HashMap<Object, Object>();
+                    Map<Object,Object> changes= new HashMap<>();
                     if ( fpe!=null ) {
                         fpe.getController().getDataSourceFilter().getController().pendingChanges(changes);
                         changes.remove( PENDING_AXIS_OR_TIMERANGE_DIRTY );
@@ -469,7 +469,11 @@ public class TimeSeriesBrowseController {
         c.putAll( changesSupport.changesPending );
     }
 
-    void release() {
+    /**
+     * the axis we were listening to turned out to not be a time axis (or
+     * vise-versa), so we need to release the thing we were listening to.
+     */
+    protected void release() {
         if (  isListeningToAxis() ) {
             this.dasPlot.getXAxis().removePropertyChangeListener(DasAxis.PROPERTY_DATUMRANGE,timeSeriesBrowseListener);
             this.domPlot.removePropertyChangeListener( Plot.PROP_CONTEXT, timeSeriesBrowseListener ) ;
