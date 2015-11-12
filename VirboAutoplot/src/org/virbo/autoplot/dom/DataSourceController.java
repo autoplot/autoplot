@@ -420,9 +420,11 @@ public class DataSourceController extends DomNodeController {
 
                     Plot p = dom.controller.getFirstPlotFor(dsf);
                     if (p == null) {
+                        logger.fine("unable to identify a plot for the dsf, binding tsb to app.timerange");
                         node1 = dom;
                         propertyName = Application.PROP_TIMERANGE;
                     } else {
+                        logger.log(Level.FINE, "binding tsb to plot.context of {0}", p.getId());
                         node1 = p;
                         propertyName = Plot.PROP_CONTEXT;
                     }
@@ -557,10 +559,11 @@ public class DataSourceController extends DomNodeController {
             // the dataset we get back isn't part of a time series.  So we should connect the TSB
             // to the application TimeRange property.
             this.timeSeriesBrowseController.release();
-            Axis xaxis = this.getTimeSeriesBrowseController().getPlot().getXaxis();
+            Plot plot= this.getTimeSeriesBrowseController().getPlot();
+            Axis xaxis = plot.getXaxis();
             dom.getController().unbind(dom, Application.PROP_TIMERANGE, xaxis, Axis.PROP_RANGE);
-            dom.setTimeRange(this.timeSeriesBrowseController.getTimeRange());//TODO: think about if this is really correct
-            this.timeSeriesBrowseController.setupGen(dom, Application.PROP_TIMERANGE);
+            dom.setTimeRange(this.tsb.getTimeRange());//TODO: think about if this is really correct
+            this.timeSeriesBrowseController.setupGen( plot, Plot.PROP_CONTEXT );
         }
 
         ApplicationController ac = this.dom.controller;
