@@ -213,13 +213,7 @@ public class TimeSeriesBrowseController {
 
             //dsf.getController().getApplication().getController().bind( node, property, this, PROP_TIMERANGE ); // use node's property value.
             node.addPropertyChangeListener( property, timeSeriesBrowseListener );
-        } catch (IntrospectionException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IllegalAccessException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IllegalArgumentException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (InvocationTargetException ex) {
+        } catch (IntrospectionException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
         listenNode= node;
@@ -446,14 +440,13 @@ public class TimeSeriesBrowseController {
 
     /**
      * return the dasPlot element that is responsible for handling this data source.  This
- is the guy that was focused when this was created, and is attached to the dasPlot x-axis
- that controls this (if there is one).
-
- This was introduced because classes were accessing the local variable p.
+     * is the guy that was focused when this was created, and is attached to the dasPlot x-axis
+     * that controls this (if there is one).
+     * This was introduced because classes were accessing the local variable p.
      *
      * @return a PlotElement or null.
      */
-    public PlotElement getPlotElement() {
+    private PlotElement getPlotElement() {
         return p;
     }
 
@@ -492,11 +485,11 @@ public class TimeSeriesBrowseController {
     protected DatumRange timeRange = null;
     public static final String PROP_TIMERANGE = "timeRange";
 
-    public DatumRange getTimeRange() {
+    private DatumRange getTimeRange() {
         return timeRange;
     }
 
-    public void setTimeRange(DatumRange timeRange) {
+    private void setTimeRange(DatumRange timeRange) {
         if ( !UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
             logger.log(Level.FINE, "ignoring call to setTimeRange with non-time-location {0}", timeRange);
             return;
@@ -504,19 +497,6 @@ public class TimeSeriesBrowseController {
         DatumRange oldTimeRange = this.timeRange;
         this.timeRange = timeRange;
         propertyChangeSupport.firePropertyChange(PROP_TIMERANGE, oldTimeRange, timeRange);
-    }
-
-    protected Datum resolution = null;
-    public static final String PROP_RESOLUTION = "resolution";
-
-    public Datum getResolution() {
-        return resolution;
-    }
-
-    public void setResolution(Datum resolution) {
-        Datum oldResolution = this.resolution;
-        this.resolution = resolution;
-        propertyChangeSupport.firePropertyChange(PROP_RESOLUTION, oldResolution, resolution);
     }
     
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
@@ -547,10 +527,18 @@ public class TimeSeriesBrowseController {
      * This is the typical mode.
      * @return
      */
-    boolean isListeningToAxis() {
+    public boolean isListeningToAxis() {
         return xAxis!=null;
     }
 
+    /**
+     * return the id of the plot to which we are listening.
+     * @return the id of the plot 
+     */
+    public String getPlotId() {
+        return this.domPlot.getId();
+    }
+    
     /**
      * provide access to the TSB dasPlot.
      * @return 
