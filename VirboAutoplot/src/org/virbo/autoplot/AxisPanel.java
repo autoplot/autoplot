@@ -18,6 +18,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
@@ -65,7 +66,18 @@ public class AxisPanel extends javax.swing.JPanel {
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                doPlotBindings();
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        doPlotBindings();
+                    }
+                };
+                if ( SwingUtilities.isEventDispatchThread() ) {
+                    run.run();
+                } else {
+                    SwingUtilities.invokeLater(run);
+                }
+                
             }
         });
 
@@ -73,7 +85,17 @@ public class AxisPanel extends javax.swing.JPanel {
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                doPlotElementBindings();
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        doPlotElementBindings();
+                    }
+                };
+                if ( SwingUtilities.isEventDispatchThread() ) {
+                    run.run();
+                } else {
+                    SwingUtilities.invokeLater(run);
+                }
             }
         });
             // there's a strange delay here on a mac.  We work around this be delaying construction on gui.
@@ -170,6 +192,10 @@ public class AxisPanel extends javax.swing.JPanel {
 
         BindingGroup bc = new BindingGroup();
 
+        if ( !SwingUtilities.isEventDispatchThread() ) {
+            System.err.println("here not event thread");
+        }
+        
         Plot p = applicationController.getPlot();
         
         if (plotBindingGroup != null) plotBindingGroup.unbind(); // consider synchronized block, or require that this always be called from the event thread, or check that the plot has changed.
