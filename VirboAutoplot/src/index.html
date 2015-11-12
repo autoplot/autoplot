@@ -20,8 +20,10 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-11-05 r17906):</p>
+        <p>Bugfixes (2015-11-12 r17994):</p>
         <ul>
+            <li>external script editor save detect failed on Windows, this is fixed.</li>
+            <li>1482: vaps with two time-series-browse datasets, each listening to plot.context property</li>
             <li>pngwalks with images without timeaxes would incorrectly use xaxis ranges instead of filename</li>
             <li>arrow is included in the annotation bounds.</li>
             <li>finally name dark green and purple color.</li>
@@ -123,6 +125,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>crosshair digitizer supports meta-C copy, putting the X,Y,Z values into the paste buffer.</li>
+            <li>crosshair digitizer reports R,G,B values for images.</li>
+            <li>hugeScatter zooms in to one-pixel width connector, when connector is used</li>
+            <li>StackedHistogram mode added to support Voyager and ISEE datasets from U. Iowa Plasma Wave Group</li>
+            <li>Color dialog allows colors to be sampled from other applications on the screen.</li>
             <li>inline jython editor has syntax highliting and completions.</li>
             <li>purple-yellow colorbar added.  Thanks, Chris!</li>
             <li>style editor for digital renderer added, controls are now formatted to vap file.</li>
