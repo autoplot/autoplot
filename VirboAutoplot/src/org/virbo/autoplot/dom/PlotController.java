@@ -1707,7 +1707,25 @@ public class PlotController extends DomNodeController {
         titleConverter.dom= dom;
         titleConverter.plot= plot;
         ac.bind( this.plot, Plot.PROP_TITLE, p, DasPlot.PROP_TITLE, titleConverter );
-        ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT );
+        Converter contextConverter= new Converter() {
+            @Override
+            public Object convertForward(Object s) {
+                if ( s==Application.DEFAULT_TIME_RANGE ) {
+                    return null;
+                } else {
+                    return s;
+                }                
+            }
+            @Override
+            public Object convertReverse(Object t) {
+                if ( t==null ) {
+                    return Application.DEFAULT_TIME_RANGE;
+                } else {
+                    return t;
+                }
+            }
+        };
+        ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT, contextConverter );
         ac.bind( this.plot, Plot.PROP_ISOTROPIC, p, DasPlot.PROP_ISOTROPIC );
         ac.bind( this.plot, Plot.PROP_DISPLAYTITLE, p, DasPlot.PROP_DISPLAYTITLE );
         ac.bind( this.plot, Plot.PROP_DISPLAYLEGEND, p, DasPlot.PROP_DISPLAYLEGEND );
