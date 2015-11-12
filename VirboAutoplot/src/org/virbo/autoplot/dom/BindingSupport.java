@@ -112,8 +112,8 @@ public class BindingSupport {
                             setter.invoke(p, evt.getNewValue());
                         }
                     } else {
-                        if ( Thread.currentThread().getStackTrace().length>100 ) {
-                            System.err.println("Problem detected in stack trace, circular call indicated by stackTraceLength>100");
+                        if ( Thread.currentThread().getStackTrace().length>200 ) {
+                            System.err.println("Problem detected in stack trace, circular call indicated by stackTraceLength>200");
                             return; // put an end to it so it doesn't crash
                         }
                         if (forward) {
