@@ -7,6 +7,9 @@
 package org.virbo.autoplot;
 
 import java.awt.EventQueue;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -22,6 +25,7 @@ import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.TimeRangeToolEventsList;
+import org.virbo.datasource.WindowManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -111,7 +115,8 @@ public class EventsListToolUtil {
     public static TimeRangeToolEventsList getEventsList( final AutoplotUI t ) {
         JDialog dialog= instances.get(t);
         if ( dialog==null ) {
-            JDialog d= new JDialog( t, "Events List");
+            final JDialog d= new JDialog( t, "Events List");
+            d.setName("eventsListTool");
             d.setModal(false);
             
             final TimeRangeToolEventsList ll= new TimeRangeToolEventsList();
@@ -145,6 +150,16 @@ public class EventsListToolUtil {
             d.getContentPane().add( ll );
             d.pack();
             d.setLocationRelativeTo(t);
+            
+            WindowManager.getInstance().recallWindowSizePosition(d);
+       
+            d.addWindowListener( new WindowAdapter() {
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    super.windowClosing(e); //To change body of generated methods, choose Tools | Templates.
+                    WindowManager.getInstance().recordWindowSizePosition(d);
+                }
+            } );
             
             instances.put( t, d );
             instances2.put( t, ll);
