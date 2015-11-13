@@ -20,14 +20,16 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-11-12 r17994):</p>
+        <p>Bugfixes (2015-11-12 r18002):</p>
         <ul>
+            <li>progress monitor cleaned up when aggregation is used as events list in events list tool.</li>
             <li>webstart jar files resigned with this year's signature</li>
             <li>external script editor save detect failed on Windows, this is fixed.</li>
             <li>1482: vaps with two time-series-browse datasets, each listening to plot.context property</li>
             <li>pngwalks with images without timeaxes would incorrectly use xaxis ranges instead of filename</li>
             <li>arrow is included in the annotation bounds.</li>
             <li>finally name dark green and purple color.</li>
+            <li>huge scatter uses 1-pixel connecting line when zoomed in closely.</li>
             <li>1479: format then parse in time range event firing could cause very deep stacks.</li>
             <li>1480: old bug where change in component (|slice) wouldn't properly lock the application is fixed.</li>
             <li>add TailBundleDataSet, which allows bundle(alpha,red,green,blue) to work with rank 2 datasets.</li>
