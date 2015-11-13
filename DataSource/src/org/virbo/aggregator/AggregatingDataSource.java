@@ -402,6 +402,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 URISplit split= URISplit.parse(getURI() );
                 result.putProperty( QDataSet.TITLE, split.file );
 
+                mon.finished();
                 if ( cacheEntry!=null ) cacheEntry.finished(result);
                 
                 return result;
