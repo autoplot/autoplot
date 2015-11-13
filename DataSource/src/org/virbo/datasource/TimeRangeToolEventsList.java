@@ -598,6 +598,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         } catch ( Exception ex ) {
             currentDataSet= null;
         } finally {
+            if ( !mon.isFinished() ) mon.finished();
             fillList();
             if ( dir==-1 ) {
                 intervalsList.setSelectedIndex(intervalsList.getModel().getSize()-2);
