@@ -1689,17 +1689,15 @@ public class DataSourceController extends DomNodeController {
                 logger.log(Level.FINE, "{0} read dataset: {1}", new Object[]{dss, result});
                 Map<String, Object> props = dss.getMetadata(new AlertNullProgressMonitor("getMetadata"));
 
-                Plot p = timeSeriesBrowseController.getPlot();
-                if (result != null && getTsb() != null && result.rank() > 0 
-                        && !UnitsUtil.isTimeLocation(SemanticOps.getUnits(SemanticOps.xtagsDataSet(result)))
-                        && ( p==null || UnitsUtil.isTimeLocation( p.getXaxis().getRange().getUnits() ) )
-                        ) {
-                    // we had turned off the autoranging, but turns out we need to turn it back on.
-                    if (p == null) {
+                if ( result != null && getTsb() != null && result.rank() > 0 
+                        && !UnitsUtil.isTimeLocation(SemanticOps.getUnits(SemanticOps.xtagsDataSet(result))) ) {
+                    Plot p = timeSeriesBrowseController.getPlot();
+                    if ( p==null ) {
                         logger.warning("unexpected timeSeriesBrowseController.domPlot==null");
-                        
                     } else {
-                        p.getXaxis().setAutoRange(true);
+                        if ( UnitsUtil.isTimeLocation( p.getXaxis().getRange().getUnits() ) ) {
+                            p.getXaxis().setAutoRange(true);
+                        }
                     }
                 }
 
