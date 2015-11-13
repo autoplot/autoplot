@@ -18,7 +18,6 @@ import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
-import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
@@ -26,8 +25,6 @@ import org.das2.datum.UnitsUtil;
 import org.das2.event.DataRangeSelectionEvent;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -85,7 +82,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     /**
      * populate the list.
      */
-    private void fillList() {
+    private void fillList() { 
         DefaultListModel lm= new DefaultListModel();
         if ( tsb!=null ) {
             lm.add(lm.getSize(),"Load Previous Set...");
