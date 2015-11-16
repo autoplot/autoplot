@@ -1038,7 +1038,13 @@ public final class AutoplotUI extends javax.swing.JFrame {
     /**
      * load the colors from the colors.txt file.  This expects any of the following
      * forms:
-     * 
+     * <pre>
+     * 255 255 255 white
+     * 100% 100% 100% white
+     * 99% 99% 99% "Almost White"
+     * 0xFFFFFF white
+     * 0xFFFFFF
+     * </pre>
      * @throws IOException 
      */
     private static void loadMyColors() throws IOException {
