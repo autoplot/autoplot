@@ -60,6 +60,7 @@ import javax.swing.InputMap;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -1540,7 +1541,10 @@ public class GuiSupport {
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
                 PropertyEditor pp = new PropertyEditor(domPlot);
-                pp.showDialog(plot.getCanvas());
+                JDialog d= pp.getDialog(plot.getCanvas());
+                WindowManager.getInstance().recallWindowSizePosition(d);
+                d.setVisible(true);
+                WindowManager.getInstance().recordWindowSizePosition(d);
             }
         });
         plot.getDasMouseInputAdapter().addMenuItem(mi);
@@ -1552,7 +1556,10 @@ public class GuiSupport {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 PlotElement p = controller.getPlotElement();
                 PropertyEditor pp = new PropertyEditor(p);
-                pp.showDialog(plot.getCanvas());
+                JDialog d= pp.getDialog(plot.getCanvas());
+                WindowManager.getInstance().recallWindowSizePosition(d);
+                d.setVisible(true);
+                WindowManager.getInstance().recordWindowSizePosition(d);
             }
         } );
         plot.getDasMouseInputAdapter().addMenuItem( mi );
