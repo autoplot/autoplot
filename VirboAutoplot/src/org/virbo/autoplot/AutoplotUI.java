@@ -1086,7 +1086,9 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 }
             } else {
                 try ( BufferedWriter write= new BufferedWriter( new FileWriter(f) ) ) {
-                    write.append("# red(0-255) green(0-255) blue(0-255) colorName\n");
+                    write.append("# red green blue colorName\n");
+                    write.append("# 255 255 255 white\n");
+                    write.append("# 100% 100% 100% white\n");
                     write.close();
                 }
             }
