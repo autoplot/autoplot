@@ -87,7 +87,7 @@ public class DataMashUp extends javax.swing.JPanel {
     }
 
     private boolean isInfix( String op ) {
-        return op.equals("or");
+        return op.equals("or") || op.equals("and");
     }
     
     // this is not-trivial because of parentheses.
@@ -153,13 +153,25 @@ public class DataMashUp extends javax.swing.JPanel {
             parent.insert( new DefaultMutableTreeNode(((Name)et).id), i );
         } else if ( et instanceof Num ) {
             parent.insert( new DefaultMutableTreeNode( String.valueOf(((Num)et).n) ),i );
-        } else if ( et instanceof UnaryOp ) {
+        } else if ( et instanceof UnaryOp ) {  
             exprType et1= ((UnaryOp)et).operand;
-            fillTreeExprType( et1, m, parent, i );
+            if ( ((UnaryOp)et).op==4 ) {
+                fillTreeExprType( et1, m, parent, i );
+                ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject( "-"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
+            } else if ( ((UnaryOp)et).op==3 ) {
+                fillTreeExprType( et1, m, parent, i );
+                ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject( "+"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
+            } else {
+                fillTreeExprType( et1, m, parent, i );
+            }
         } else {
             Call call= (Call)et;
             DefaultMutableTreeNode child= new DefaultMutableTreeNode( funcCallName( call ) );
-            fillTreeCall( call, m, child );
+            if ( call.func instanceof Attribute ) {
+                fillTreeCall( ((Attribute)call.func).value, call, m, child );
+            } else {
+                fillTreeCall( call, m, child );
+            }
             parent.insert( child, i);
         }        
     }
