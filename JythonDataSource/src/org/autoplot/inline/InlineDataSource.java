@@ -155,7 +155,7 @@ public class InlineDataSource extends AbstractDataSource {
             try {
                 return jyCommand(s);
             } catch ( Exception ex ) {
-                throw new IllegalArgumentException( "inline jython code raises exception", ex );
+                throw new IllegalArgumentException( "inline jython code raises exception: "+ex, ex );
             }
         }
 
