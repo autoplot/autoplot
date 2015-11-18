@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>histogram2d is used to get a contour around some buckshot data.
+        <p><small>Data exported from Moves phone app works with Autoplot without reformatting.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
@@ -20,7 +20,13 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-11-12 r18002):</p>
+        <p>Bugfixes (2015-11-18 r18008):</p>
+        <ul>
+            <li>introduce rank0 transform methods to support Jython rank 1 iterator returns rank 0 datasets instead of doubles, breaking Juno/Waves planning script.</li>
+            <li>rfe 457: add hidden plot would intercept mouse events, making the connected plots difficult to work with.</li>
+            <li>rfe 464: update the initial colors.txt template so that it is not confusing.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
         <ul>
             <li>progress monitor cleaned up when aggregation is used as events list in events list tool.</li>
             <li>webstart jar files resigned with this year's signature</li>
@@ -50,84 +56,12 @@
             <li>clean up address bar as vap is loaded. </li>
             <li>"2014-001 to 2015-001 UTC" is supported now.</li> 
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>1462: result of guessCadence mishandled in hugeScatter rendering mode</li>
-            <li>1463: null value in USER_PROPERTIES would result in NullPointerException</li>
-            <li>1440: vap+inline:ripp&lt;C> works now.</li>
-            <li>null value in USER_PROPERTIES would result in NullPointerException</li>
-            <li>Export to CDF didn't properly support append keyword.</li>
-            <li>HugeScatter wouldn't to paint the exception if that's why it didn't have a dataset</li>
-            <li>vap+inline each line needs to be URL-decoded.  Add monitor so downloadResourceAsTempFile can be used.</li>
-            <li>if the first filter was an implicit unbundle, then it Filters GUI wouldn't update properly</li>
-            <li>FFTPower GUI supports slide of 8 (7/8 overlap)</li>
-            <li>use case where GCD didn't work to calculate the needed cadence for ephemeris ticks, fall back to difference</li>
-            <li>CACHE_TAG was getting through the subset operator, causing strange caching problems.</li>
-            <li>copyTo needs to reset the limit of the new buffer, I believe because of append.</li>
-            <li>handle case where there is a CONTEXT_0 with Units.us2000 and DEPEND_0 with Units.seconds in fftFilter.</li>
-            <li>1458: valid function would return result with fill_value of its input for reference, but this could be zero, which is incorrect. SUGGEST_FILL property added.</li>
-            <li>properly size the x-axis when running headless jobs with TimeSeriesBrowse-capable datasets.</li>
-            <li>properly format the leap second with 23:59:60</li>
-            <li>support for huge (&gt;2GB) CDF files, switch to 20150828 CDF library version</li>
-            <li>improvements to Huge Scatter mode allow 67 million points to be plotted interactively (somewhat).</li>
-            <li>sloppy code in spinner progress bar be left behind when loading ephemeris.</li>
-            <li>refactor ascii parser to make it more consistent.</li>
-            <li>screenshots tool includes Windows as well as Frames when masking for privacy.</li>
-            <li>1453: AggregatingDataSource now uses the time constraint when identifying the delegate file for retrieving metadata, avoiding extraneous load.</li>
-            <li>1448: allow capitalized extentions like ".PNG" when explicit filenames are used.</li>
-            <li>1433: double check on timetags was too restrictive and throwing out too much data from RBSP waveform data, George pointed out.</li>
-            <li>2015 leap second was applied 64 seconds too early.</li>
-            <li>Ephemeris ticks now use resolution when tick labels are sourced from TimeSeriesBrowse.</li>
-            <li>PNGWalk "View in Autoplot" button will look at PNG metadata to extract the timerange.</li>
-            <li>More zaxis properties are loaded in das2streams.</li>
-            <li>1165: create pngwalk uses user prefs for grid and other options.</li>
-            <li>xls files would drop the last record.</li>
-            <li>xls files would have times shifted by local time zone.</li>
-            <li>null pointer when no color was selected in pick colors dialog on Linux.
-            <li>rank 3 data in QStream wasn't properly read in.</li>
-            <li>Autoplot dialogs like the "additional operators" don't have goofy default question mark icons.</li>
-            <li>output of contour hard to use, breaks in non-monotonic data. Thanks Sebastian!</li>
-            <li>rte 2091983907: thread safety in pngwalk.  Thanks usuario!</li>
-            <li>rte_1604359977: limit the total number of filePollUpdates threads that can be started to 10000.  Thanks, Bob!</li>
-            <li>completions within a function call are corrected.  plot( ripples&lt;C&gt; ) corrected. </li>
-            <li>1439: add "delete selected items" to edit menu of DataPointRecorder</li>
-            <li>Sebastian demonstrated that QStream with DEPEND_0 having DEPEND_0 would cause failure.
-            <li>Sebastian demonstrated that embed data failed when the URI was ''.
-            <li>Kristoff demonstrated that embed data doesn't work when the file came via http.</li>
-            <li>1442-6: camelCase for the plotx command.</li>
-            <li>1442-7 symbolSize instead of symSize</li>
-            <li>1442-10:  height and width boxes on mac</li>
-            <li>resizeForCanvasSize didn't consider that the canvas may already be disconnected from the application</li>
-            <li>1433: Kristoff pointed out that when records contain fill or are not long enough for the interval, then the ytags would be left with a different length.</li>
-            <li>bugfixes with rich ascii.</li>
-            <li>1088: clip off the extra stuff when we do completions in the middle of a parameter.</li>
-            <li>tolerate mixed case DISPLAY_TYPE metadata in CDF files.</li>
-            <li>1434: metadata propagation through operators is inconsistent, inconvenient </li>
-            <li>1433: allow waveform cadence to change in fftPower.</li>
-            <li>1432: list of list to declare double arrays (and rank 2 datasets) in Jython.</li>
-            <li>1431: "Cannot create PyString from null" popup in editor. </li>
-            <li>Ops.labels renamed to Ops.labelsDataset, to avoid name clashes.</li>
-            <li>completions within command, like plotx(&lt;C&gt;) where we need to look up the documentation for plotx.</li>
-            <li>more support for color argument in plotx</li>
-            <li>plot and plotx command are finally one and the same.</li>
-            <li>check for null in setSymbolConnector, setColor, setFillColor.</li>
-            <li>cdfn and cdfj loggers combined to "cdf" since there's just one cdf source.</li>
-            <li>bug where cdf editor had no visible variables because of bugs with CDF editor (Thanks Mark and Matt).</li>
-            <li>bug where labels were array [N] instead of [1,N] corrected.</li>
-            <li>ds[rank0ds] handled in Jython</li>
-            <li>flattenRank2 handles rank 1 DEPEND_1.</li>
-            <li>correction where FFT window was applied twice corrected.</li>
-            <li>qds supports BIN_PLUS and BIN_MINUS properties, WEIGHTS.</li>
-            <li>verify the qstream packet length is less than 1000000, to aid in debugging.</li>
-            <li>warning icon persists, where it was cleared mistakenly before.</li>
-            <li>scriptContext formatDataSet allows progress monitor.</li>
-            <li>imports are allowed with server port again.</li>
-            <li>updates to many of the example scripts. </li>
-            <li>bugfixes in block from 2015-07-15 to 2015-07-26</li>
-            <li>FFTPower would apply the window twice, affecting the data.  Thanks, Chris!</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>ISO8601 parser now supports time zone offsets.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>           
             <li>crosshair digitizer supports meta-C copy, putting the X,Y,Z values into the paste buffer.</li>
             <li>crosshair digitizer reports R,G,B values for images.</li>
             <li>hugeScatter zooms in to one-pixel width connector, when connector is used</li>
@@ -153,48 +87,6 @@
             <li>451: keep track of running script so buffer doesn't swap</li>
             <li>345: first go at annotations</li>
             <li>improvements to $(enum) in timeranges, providing code to read out the enumerated values.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>           
-            <li>449: bitwise operators in QDataSets.</li>
-            <li>export to HDF supports append</li>
-            <li>trim operator has GUI now.  Thanks Armond!</li>
-            <li>ascii formatter now allows header=none and doDep=F, depend0Units=seconds+since+1970-01-01 to support import to Matlab and IDL.</li>
-            <li>ascii parser depend0Units=seconds+since+1970-01-01</li>
-            <li>add ctrl+0 to reset the font.</li>
-            <li>446: add binsWithin function, motivated by Ivar's script.</li>
-            <li>ds[rand()*100]= 1 now works.</li>
-            <li>plot command [xy]drawTickLabels=False added</li>
-            <li>445: speed enhancements for lanlNNRebinner, experiments with extent</li>
-            <li>setWindowLocation command.  commands for multiple windows in scripts.</li>
-            <li>441: allow non-time aggregations like data_$x.dat</li>
-            <li>444: data source editors may have list of reasons why the URI was rejected</li>
-            <li>443: autoRangingHints property allows more control over autoranging (https://sourceforge.net/p/autoplot/feature-requests/443/)</li>
-            <li>axes have dialog supporting units change to convertible units</li>
-            <li>442: special support for MMS data website, which has uses login and cookies </li>
-            <li>Add native memory available to the "About Autoplot" dialog.</li>
-            <li>http://autoplot.org//developer.datasetToString clean up</li>
-            <li>.pngwalk file has filepattern to support more pngwalks and subdirectories</li>
-            <li>URI about:classpath added for debugging</li>
-            <li>441: allow $v and $x to trigger the split index.</li>
-            <li>Introduce "flaky server" code to model slow servers so Autoplot can deal with them more effectively.</li>
-            <li>1448: explicit control of output filenames in pngwalk.</li>
-            <li>where keyword support in HDF5</li>
-            <li>HDF5 now has an editor panel.</li>
-            <li>improvements to completions in Jython editor panel.</li>
-            <li>plot named parameters have consistent capitalization and index named parameter introduced.</li>
-            <li>embed data found in data sources that does not have a URI ("vap+internal:")</li>
-            <li>opposite property for axes.</li>
-            <li>support $x/$Y_$m for file storage models </li>
-            <li>rfe 439: Need standard method for getting a second Autoplot app in a script.</li>
-            <li>avoid filesystem completions with  inline, cdaweb, or pdsppi.</li>
-            <li>completions are working somewhat with vap+inline.</li>
-            <li>within parameter added to CDF</li>
-            <li>plotx command legendLabel named parameter added.</li>
-            <li>plotx linestyle added.</li>
-            <li>improvements to DashupTool.</li>
-            <li>update the port reported when the server is on, to support automatic selection of port with --server=0.</li>
-            <li>support Units.RGBColor for the units of the colorBy dataset.</li>
         </ul>
 
         <p>Known issues:</p>
