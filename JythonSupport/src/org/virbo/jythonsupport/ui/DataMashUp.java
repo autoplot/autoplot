@@ -30,6 +30,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import org.das2.util.LoggerManager;
 import org.python.parser.ast.Assign;
+import org.python.parser.ast.Attribute;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.Module;
 import org.python.parser.ast.Name;
@@ -86,7 +87,7 @@ public class DataMashUp extends javax.swing.JPanel {
     }
 
     private boolean isInfix( String op ) {
-        return op.equals("or") || op.equals("add");
+        return op.equals("or");
     }
     
     // this is not-trivial because of parentheses.
@@ -170,9 +171,25 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }
     
+    private void fillTreeCall( exprType n, Call c, DefaultTreeModel m, MutableTreeNode parent ) {
+        fillTreeExprType( n, m, parent, 0 );
+        for ( int i=0; i<c.args.length; i++ ) {
+            exprType et= c.args[i];
+            fillTreeExprType( et, m, parent, i+1 );
+        }
+    }    
+    
     private String funcCallName( Call c ) {
-        Name name= (Name)c.func;
-        return name.id;
+        exprType et= c.func;
+        if ( et instanceof Name ) {
+            Name name= (Name)et;
+            return name.id;
+        } else if ( et instanceof Attribute ) {  // x.or(y)
+            Attribute attr= (Attribute)et;
+            return attr.attr;
+        } else {
+            throw new IllegalArgumentException("unsupported call type");
+        }
     }
     
     private void fillTree( String expr ) {
@@ -188,7 +205,12 @@ public class DataMashUp extends javax.swing.JPanel {
             DefaultTreeModel model= new DefaultTreeModel( root );
             if ( assign.value instanceof Call ) {
                 Call c= (Call)assign.value;
-                fillTreeCall( c, model, root );
+                if ( c.func instanceof Attribute ) {
+                    Attribute attr= (Attribute)c.func;
+                    fillTreeCall( attr.value, c, model, root );
+                } else {
+                    fillTreeCall( c, model, root );
+                }
             }
             jTree1.setModel(model);
             for (int i = 0; i < jTree1.getRowCount(); i++) {
