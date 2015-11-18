@@ -85,6 +85,19 @@ public class DataMashUp extends javax.swing.JPanel {
         doDrop(data,tp);
     }
 
+    private boolean isInfix( String op ) {
+        return op.equals("or") || op.equals("add");
+    }
+    
+    // this is not-trivial because of parentheses.
+//    private String getOverloaded( String op ) {
+//        if ( op.equals("add") ) {
+//            return "+";
+//        } else {
+//            return null;
+//        }
+//    }
+    
     /**
      * return the jython expression for this tree.
      * @param m
@@ -98,14 +111,23 @@ public class DataMashUp extends javax.swing.JPanel {
             String sn= n.toString();
             int iparen= sn.indexOf("(");
             if ( iparen>-1 ) sn= sn.substring(0,iparen);
-            StringBuilder t= new StringBuilder( sn + "(" );
             int nchild= m.getChildCount(n);
-            for ( int i=0; i<nchild; i++ ) {
-                if ( i>0 ) t.append(",");
-                t.append( getJython( m, m.getChild( n, i ) ) );
+            if ( isInfix(sn) && nchild==2 ) {
+                String alt= null; //getOverloaded(sn);
+                if ( alt!=null ) {
+                    return getJython( m, m.getChild( n, 0 ) ) + alt + getJython( m, m.getChild(n,1) ) ;
+                } else {
+                    return getJython( m, m.getChild( n, 0 ) ) + "."+sn+"("+ getJython( m, m.getChild(n,1) ) +")" ;
+                }
+            } else {
+                StringBuilder t= new StringBuilder( sn + "(" );
+                for ( int i=0; i<nchild; i++ ) {
+                    if ( i>0 ) t.append(",");
+                    t.append( getJython( m, m.getChild( n, i ) ) );
+                }
+                t.append(")");
+                return t.toString();
             }
-            t.append(")");
-            return t.toString();
         }
     }
     
@@ -534,8 +556,9 @@ public class DataMashUp extends javax.swing.JPanel {
     
     public static void main( String[] args ) {
         DataMashUp dmu= new DataMashUp();
-        dmu.fillTree("sin(cos(a))");
+        dmu.fillTree("add(a,b)");
         JOptionPane.showConfirmDialog( null, dmu );
+        System.err.println( dmu.getAsJythonInline() );
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
