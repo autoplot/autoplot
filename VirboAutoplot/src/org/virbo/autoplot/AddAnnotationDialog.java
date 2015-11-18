@@ -50,7 +50,7 @@ public class AddAnnotationDialog extends javax.swing.JPanel {
         xDatumField = new javax.swing.JTextField();
         yDatumField = new javax.swing.JTextField();
 
-        jTextField1.setText("Sign Here");
+        jTextField1.setText("Annotation 1");
 
         jLabel2.setText("Annotation Text: ");
 
