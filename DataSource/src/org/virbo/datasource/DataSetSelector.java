@@ -484,7 +484,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             setMessage(ex.getMessage());
         } catch (IOException ex) {
             logger.log( Level.SEVERE, ex.getMessage(), ex );
-            setMessage(ex.getMessage());
+            setMessage("warning: "+ex.getMessage());
         }
         
     }
