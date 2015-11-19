@@ -475,23 +475,28 @@ public class DataSetURI {
             mon.setTaskSize(-1);
             mon.started();
             mon.setProgressMessage("doing HEAD request to find dataset type");
-            URLConnection c = url.openConnection();
-            String mime = c.getContentType();
-            if (mime == null) {
-                throw new IOException("failed to connect");
-            }
-            String cd = c.getHeaderField("Content-Disposition"); // support VxOWare
-            if (cd != null) {
-                int i0 = cd.indexOf("filename=\"");
-                i0 += "filename=\"".length();
-                int i1 = cd.indexOf("\"", i0);
-                String filename = cd.substring(i0, i1);
-                i0 = filename.lastIndexOf(".");
-                ext = filename.substring(i0);
-            }
+            try {
+                URLConnection c = url.openConnection();
+                c.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() );
+                c.setReadTimeout( FileSystem.settings().getConnectTimeoutMs() );
+                String mime = c.getContentType();
+                if (mime == null) {
+                    throw new IOException("failed to connect");
+                }
+                String cd = c.getHeaderField("Content-Disposition"); // support VxOWare
+                if (cd != null) {
+                    int i0 = cd.indexOf("filename=\"");
+                    i0 += "filename=\"".length();
+                    int i1 = cd.indexOf("\"", i0);
+                    String filename = cd.substring(i0, i1);
+                    i0 = filename.lastIndexOf(".");
+                    ext = filename.substring(i0);
+                }
 
-            mon.finished();
-            factory = DataSourceRegistry.getInstance().getSourceByMime(mime);
+                factory = DataSourceRegistry.getInstance().getSourceByMime(mime);
+            } finally {
+                mon.finished();
+            }
         }
 
 // maybe it was actually a directory
