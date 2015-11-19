@@ -838,14 +838,19 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         org.das2.util.LoggerManager.logGuiEvent(evt);
         String item= (String) examplesComboBox.getSelectedItem();
         if ( !item.equals(EXAMPLE_TIME_RANGES) ) {
-            int i= item.indexOf("<i>");
+            int i= item.indexOf(EXAMPLE_TIME_RANGE_HTML_DELIM);
             if ( i>-1 && item.startsWith("<html>") ) {
                 timeRangeTextField.setText(item.substring(6,i).trim());
             } else {
-                timeRangeTextField.setText(item.trim());
+                if ( i>-1 ) {
+                    timeRangeTextField.setText(item.substring(0,i).trim()); // ??? where did the <html> go???
+                } else {
+                    timeRangeTextField.setText(item.trim()); 
+                }
             }
         }
     }//GEN-LAST:event_examplesComboBoxActionPerformed
+    private static final String EXAMPLE_TIME_RANGE_HTML_DELIM = "<i>";
 
     private void timeRangeToolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeToolActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
