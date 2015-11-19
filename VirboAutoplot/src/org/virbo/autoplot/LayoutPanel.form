@@ -280,25 +280,26 @@
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <Component id="canvasLayoutPanel1" min="-2" pref="305" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="shorterButton" pref="0" max="32767" attributes="0"/>
-                              <Component id="tallerButton" min="-2" pref="77" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jButton1" min="-2" max="-2" attributes="0"/>
-                              <Component id="sameHeightButton" pref="0" max="32767" attributes="0"/>
+                              <Component id="canvasLayoutPanel1" min="-2" pref="305" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="tallerButton" linkSize="3" max="32767" attributes="0"/>
+                                      <Component id="shorterButton" linkSize="3" pref="95" max="32767" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="sameHeightButton" linkSize="3" pref="93" max="32767" attributes="0"/>
+                                      <Component id="fixLayoutButton" linkSize="3" max="32767" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="addPlotsButton" linkSize="3" max="32767" attributes="0"/>
+                                      <Component id="deletePlotButton" linkSize="3" pref="100" max="32767" attributes="0"/>
+                                  </Group>
+                              </Group>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="deletePlotButton" linkSize="2" min="-2" max="-2" attributes="0"/>
-                              <Component id="addPlotsButton" linkSize="2" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="8" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -306,7 +307,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="canvasLayoutPanel1" pref="268" max="32767" attributes="0"/>
+                          <Component id="canvasLayoutPanel1" pref="262" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="tallerButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -315,7 +316,7 @@
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="fixLayoutButton" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="shorterButton" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="deletePlotButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -365,12 +366,13 @@
                     <Property name="toolTipText" type="java.lang.String" value="Add plots around the focus plot"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="jButton1">
+                <Component class="javax.swing.JButton" name="fixLayoutButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Fix Layout"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Remove gaps and overlaps in vertical stack of plots"/>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fixLayoutButtonActionPerformed"/>
                   </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="deletePlotButton">
