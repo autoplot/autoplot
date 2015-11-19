@@ -236,7 +236,7 @@ public class CanvasLayoutPanel extends JLabel {
             Component c= target.getComponent(i);
             Color color = types.get(c.getClass());
             if ( color!=null ) {
-                Rectangle b= GraphUtil.shrinkRectangle(c.getBounds(),80);
+                Rectangle b= GraphUtil.shrinkRectangle(c.getBounds(),30);
                 if ( r.contains( b ) ) {
                     newSelect.add(c);
                 }
