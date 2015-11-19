@@ -283,23 +283,23 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="canvasLayoutPanel1" min="-2" pref="305" max="-2" attributes="0"/>
                               <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="tallerButton" linkSize="3" max="32767" attributes="0"/>
-                                      <Component id="shorterButton" linkSize="3" pref="95" max="32767" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="tallerButton" max="32767" attributes="0"/>
+                                      <Component id="shorterButton" pref="100" max="32767" attributes="0"/>
                                   </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="sameHeightButton" linkSize="3" pref="93" max="32767" attributes="0"/>
-                                      <Component id="fixLayoutButton" linkSize="3" max="32767" attributes="0"/>
+                                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="sameHeightButton" pref="100" max="32767" attributes="0"/>
+                                      <Component id="fixLayoutButton" max="32767" attributes="0"/>
                                   </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="addPlotsButton" linkSize="3" max="32767" attributes="0"/>
-                                      <Component id="deletePlotButton" linkSize="3" pref="100" max="32767" attributes="0"/>
+                                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="addPlotsButton" max="32767" attributes="0"/>
+                                      <Component id="deletePlotButton" pref="100" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace min="0" pref="8" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -307,7 +307,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="canvasLayoutPanel1" pref="262" max="32767" attributes="0"/>
+                          <Component id="canvasLayoutPanel1" pref="265" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="tallerButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -412,7 +412,7 @@
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jScrollPane2" alignment="1" pref="79" max="32767" attributes="0"/>
+                      <Component id="jScrollPane2" alignment="1" pref="82" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
               </Layout>
