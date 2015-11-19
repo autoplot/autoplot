@@ -1427,7 +1427,12 @@ public class DataSetSelector extends javax.swing.JPanel {
                 org.das2.util.LoggerManager.logGuiEvent(ev);                
                 dataSetSelector.setSelectedItem(tf.getText());
                 keyModifiers = ev.getModifiers();
-                maybePlot(true);
+                try {
+                    setValue(getEditor().getText());
+                    maybePlot(true);
+                } catch ( IllegalArgumentException ex ) {
+                    JOptionPane.showMessageDialog( DataSetSelector.this, ex.getMessage(), "Unable to parse URI", JOptionPane.WARNING_MESSAGE );
+                }
             }
         });
 
@@ -1600,8 +1605,12 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void plotItButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotItButtonActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);            
         keyModifiers = evt.getModifiers();
-        setValue(getEditor().getText());
-        maybePlot(true);
+        try {
+            setValue(getEditor().getText());
+            maybePlot(true);
+        } catch ( IllegalArgumentException ex ) {
+            JOptionPane.showMessageDialog( DataSetSelector.this, ex.getMessage(), "Unable to parse URI", JOptionPane.WARNING_MESSAGE );
+        }
     }//GEN-LAST:event_plotItButtonActionPerformed
 
     private void inspectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inspectButtonActionPerformed
@@ -1759,7 +1768,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         this.dataSetSelector.repaint();
         this.editor.setText(value);
         //we can't fire because of overflow...  firePropertyChange( "value", oldvalue, value );
-            }
+    }
     /**
      * Holds value of property browseTypeExt.
      */
