@@ -80,9 +80,11 @@ public class DodsAdapter {
      * @param variable the variable to read, like TerrainReflectivity
      */
     public DodsAdapter(URL source, String variable) {
+        logger.entering("org.virbo.dods.DodsAdapter", "DodsAdapter {0} {1}", new Object[] { source, variable } );
         this.source = source;
         this.variable = variable;
         properties = new HashMap();
+        logger.exiting("org.virbo.dods.DodsAdapter", "DodsAdapter {0} {1}", new Object[] { source, variable } );
     }
 
     void setVariable(String variable) {
@@ -205,30 +207,12 @@ public class DodsAdapter {
     }
 
     /**
-     * Load the dataset.  
-     * @param mon
-     * @param attr look for hints in attr about the length of the load.  Virbo/TSDS put a recCount for sequences.
-     * @throws java.io.FileNotFoundException
-     * @throws java.net.MalformedURLException
-     * @throws java.io.IOException
-     * @throws opendap.dap.parser.ParseException
-     * @throws opendap.dap.DDSException
-     * @throws org.das2.util.monitor.CancelledOperationException
+     * adapt the das2 progress monitor to what openDap is expecting.
+     * @param mon das monitor.
+     * @return Dods monitor.
      */
-    public void loadDataset(final ProgressMonitor mon, Map<String,Object> attr ) throws FileNotFoundException, MalformedURLException,
-            IOException, ParseException, DDSException, DDSException,
-            CancelledOperationException, DAP2Exception {
-
-        if ( constraint==null ) {
-            constraint="";
-        }
-        
-        long size = calcSize(  attr );
-        mon.setTaskSize(size);
-
-        DConnect dconnect = new DConnect(source.toString(), true);
-        StatusUI statusUI = new StatusUI() {
-
+    private StatusUI adaptStatusUI( final ProgressMonitor mon ) {
+        return new StatusUI() {
             long byteCount = 0;
             @Override
             public void incrementByteCount(int bytes) {
@@ -244,8 +228,37 @@ public class DodsAdapter {
                 mon.finished();
             }
         };
+    }
+    
+    /**
+     * Load the dataset.  
+     * @param mon progress monitor
+     * @param attr look for hints in attr about the length of the load.  Virbo/TSDS put a recCount for sequences.
+     * @throws java.io.FileNotFoundException
+     * @throws java.net.MalformedURLException
+     * @throws java.io.IOException
+     * @throws opendap.dap.parser.ParseException
+     * @throws opendap.dap.DDSException
+     * @throws org.das2.util.monitor.CancelledOperationException
+     */
+    public void loadDataset(final ProgressMonitor mon, Map<String,Object> attr ) throws FileNotFoundException, MalformedURLException,
+            IOException, ParseException, DDSException, DDSException,
+            CancelledOperationException, DAP2Exception {
 
+        logger.entering("org.virbo.dods.DodsAdapter", "loadDataset source={0}", source.toString() );
+        
+        if ( constraint==null ) {
+            constraint="";
+        }
+        
+        long size = calcSize(  attr );
+        mon.setTaskSize(size);
+
+        DConnect dconnect = new DConnect(source.toString(), true);
+        StatusUI statusUI = adaptStatusUI(mon);
+        
         mon.started();
+        
         try {
             logger.finest("There is suddenly a NullPointerException when using webstart");
             logger.log(Level.FINEST, "constraint: {0}", constraint);
@@ -259,11 +272,11 @@ public class DodsAdapter {
             } else {
                 throw ex;
             }
-        } catch ( NullPointerException ex ) {
-            logger.log( Level.WARNING, ex.getMessage(), ex );
-            throw ex;
+
         } finally {
             if ( !mon.isFinished() ) mon.finished();
+            logger.exiting("org.virbo.dods.DodsAdapter", "loadDataset source={0}", source.toString() );    
+            
         }
        
 

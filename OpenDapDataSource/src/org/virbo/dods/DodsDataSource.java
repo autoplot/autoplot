@@ -116,6 +116,7 @@ public class DodsDataSource extends AbstractDataSource {
     public DodsDataSource(URI uri) throws IOException {
 
         super(uri);
+        logger.entering( "org.virbo.dods.DodsDataSource", "DodsDataSource {0}", uri );
 
         // remove the .dds (or .html) extension.
         String surl = uri.getRawSchemeSpecificPart();
@@ -155,7 +156,7 @@ public class DodsDataSource extends AbstractDataSource {
         } catch (MalformedURLException ex) {
             throw new RuntimeException(ex);
         }
-
+        logger.exiting( "org.virbo.dods.DodsDataSource", "DodsDataSource {0}", uri );
     }
 
     private String getIstpConstraint(DodsAdapter da, Map meta, MyDDSParser parser, String variable) throws DDSException {
@@ -262,15 +263,21 @@ public class DodsDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, 
         IOException, ParseException, DDSException, CancelledOperationException, DASException, InvalidParameterException, DAP2Exception {
 
+        logger.entering( "org.virbo.dods.DodsAdapter", "getDataSet" );
         mon.setTaskSize(-1);
         mon.started();
 
-        String label= adapter.getSource().toString();
-        mon.setProgressMessage( "parse " + label+".dds" );
+        String surl= adapter.getSource().toString();
+        
+        if ( surl==null ) {
+            throw new NullPointerException("adapter to URL failed");
+        }
+        
+        mon.setProgressMessage( "parse " + surl+".dds" );
 
         try {
             MyDDSParser parser = new MyDDSParser();
-            URL url= new URL(adapter.getSource().toString() + ".dds");
+            URL url= new URL( surl + ".dds");
             logger.log(Level.FINE, "getDataSet opening {0}", url);
             try ( InputStream in= url.openStream() ) {
                 parser.parse(in);
@@ -278,11 +285,11 @@ public class DodsDataSource extends AbstractDataSource {
                 throw new FileNotFoundException( "OpenDAP Server unavailable, file not found: \n"+ex.getMessage());
             }
 
-            DodsDataSource.this.getMetadata( mon.getSubtaskMonitor("metadata") );
+            getMetadata( mon.getSubtaskMonitor("metadata") );
 
             Map<String,Object> interpretedMetadata = null;
 
-            boolean isIstp = adapter.getSource().toString().endsWith(".cdf");
+            boolean isIstp = surl.endsWith(".cdf");
             if (isIstp) {
                 Map<String,Object> m = new IstpMetadataModel().properties(metadata);
                 interpretedMetadata = m;
@@ -383,8 +390,9 @@ public class DodsDataSource extends AbstractDataSource {
             //ds.putProperty( QDataSet.UNITS, null );
             //ds.putProperty( QDataSet.DEPEND_0, null );
             return ds;
-        } finally {
             
+        } finally {
+            logger.exiting( "org.virbo.dods.DodsAdapter", "getDataSet" );
             mon.finished();
 
         }
