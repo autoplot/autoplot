@@ -3,8 +3,6 @@
  *
  * Created on January 29, 2007, 8:42 AM
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 package org.virbo.dods;
 
@@ -26,7 +24,7 @@ import org.virbo.dataset.TrimDataSet;
 import org.virbo.dataset.WritableDataSet;
 
 /**
- *
+ * Adapter from Dods DArray to look like QDataSet.
  * @author jbf
  */
 public abstract class DodsVarDataSet implements WritableDataSet {
@@ -37,7 +35,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
     int[] dimSizes = new int[4];
     HashMap properties;
 
-    /** Creates a new instance of DodsVarDataSet */
+    /** 
+     * Creates a new instance of DodsVarDataSet 
+     * @param array the openDap array.
+     */
     public DodsVarDataSet(DArray array) {
         int idim = 0;
         for (Enumeration enumm = array.getDimensions(); enumm.hasMoreElements();) {
@@ -63,82 +64,81 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         return "dataSet[" + dimStr.toString() + "] (" + u + ")";
     }
 
+    @Override
     public int rank() {
         return rank;
     }
 
+    @Override
     abstract public double value(int i);
 
+    @Override
     abstract public double value(int i0, int i1);
 
+    @Override
     abstract public double value(int i0, int i1, int i2);
 
+    @Override
     abstract public double value(int i0, int i1, int i2, int i3);
 
+    @Override
     public void putValue( int i0, int i1, int i2, int i3, double v ) {
         throw new IllegalArgumentException("rank limit");
     }
 
-
+    @Override
     public Object property(String name) {
         return properties.get(name);
     }
 
+    @Override
     public Object property(String name, int i) {
         return property(name);
     }
 
-    public Object property(String name, int i0, int i1) {
-        return property(name);
-    }
-
-    public Object property(String name, int i0, int i1, int i2) {
-        return property(name);
-    }
-
-    public Object property(String name, int i0, int i1, int i2, int i3 ) {
-        return property(name);
-    }
-
-    @SuppressWarnings("unchecked")
+    @Override
     public void putProperty(String name, Object value) {
         checkImmutable();
         properties.put(name, value);
     }
 
+    @Override
     public void putProperty(String name, int i, Object value) {
-        putProperty(name, value);
+        putProperty( name, value); //TODO: should probably be name__i
     }
 
-    public void putProperty(String name, int i0, int i1, Object value) {
-        putProperty(name, value);
-    }
-
+    @Override
     public int length() {
         return dimSizes[0];
     }
 
+    @Override
     public int length(int i) {
         return dimSizes[1];
     }
 
+    @Override
     public int length(int i0, int i1) {
         return dimSizes[2];
     }
 
+    @Override
     public int length(int i0, int i1, int i2 ) {
         throw new IllegalArgumentException("rank limit");
     }
 
 
+    @Override
     public <T> T capability(Class<T> clazz) {
         return null;
     }
 
+    @Override
     public QDataSet slice(int i) {
         return new Slice0DataSet(this, i);
     }
 
+    @Override
     public QDataSet trim(int start, int end) {
         return new TrimDataSet(this, start, end);
     }
@@ -146,10 +146,12 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         
     boolean immutable= false;
         
+    @Override
     public void makeImmutable() {
         immutable= true;
     }
 
+    @Override
     public boolean isImmutable() {
         return immutable;
     }
@@ -176,10 +178,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             super(array);
             back = (int[]) array.getPrimitiveVector().getInternalStorage();
             if (properties.get("add_offset") != null) {
-                addOffset = ((Double) properties.get("add_offset")).doubleValue();
+                addOffset = ((Double) properties.get("add_offset"));
             }
             if (properties.get("scale_factor") != null) {
-                scaleFactor = ((Double) properties.get("scale_factor")).doubleValue();
+                scaleFactor = ((Double) properties.get("scale_factor"));
             }
             validMin = Double.NEGATIVE_INFINITY;
             validMax = Double.POSITIVE_INFINITY;
@@ -198,50 +200,59 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             this.properties.putAll( properties );
         }
 
-        private final double doubleValue(int val) {
+        private double doubleValue(int val) {
             double r = val * scaleFactor + addOffset;
             return r >= validMin && r <= validMax ? r : Units.dimensionless.getFillDouble();
         }
         
 
+        @Override
         public double value() {
             throw new IllegalArgumentException("rank 0 not supported");
         }
 
+        @Override
         public double value(int i) {
             return doubleValue(back[i]);
         }
 
+        @Override
         public double value(int i0, int i1) {
             return doubleValue(back[i0 * dimSizes[1] + i1]);
         }
 
+        @Override
         public double value(int i0, int i1, int i2) {
             return doubleValue(back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]);
         }
 
+        @Override
         public double value(int i0, int i1, int i2, int i3) {
             return doubleValue(back[i0 * dimSizes[1] * dimSizes[2] * dimSizes[3] + i1 * dimSizes[1] * dimSizes[2] + i2 * dimSizes[2] + i3]);
         }
         
-        private final int putIntValue( double val ) {
+        private int putIntValue( double val ) {
             return (int)( ( val - addOffset ) / scaleFactor );
         }
 
+        @Override
         public void putValue(double d) {
             throw new IllegalArgumentException("rank 0 not supported");
         }
 
+        @Override
         public void putValue(int i0, double d) {
             checkImmutable();
             back[i0]= putIntValue(d);
         }
 
+        @Override
         public void putValue(int i0, int i1, double d) {
             checkImmutable();
             back[i0 * dimSizes[1] + i1]= putIntValue(d);
         }
 
+        @Override
         public void putValue(int i0, int i1, int i2, double d) {
             checkImmutable();
             back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= putIntValue(d);
@@ -259,10 +270,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             super(array);
             back = (short[]) array.getPrimitiveVector().getInternalStorage();
             if (properties.get("add_offset") != null) {
-                addOffset = ((Double) properties.get("add_offset")).doubleValue();
+                addOffset = ((Double) properties.get("add_offset"));
             }
             if (properties.get("scale_factor") != null) {
-                scaleFactor = ((Double) properties.get("scale_factor")).doubleValue();
+                scaleFactor = ((Double) properties.get("scale_factor"));
             }
             validMin = Double.NEGATIVE_INFINITY;
             validMax = Double.POSITIVE_INFINITY;
@@ -281,27 +292,32 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             this.properties.putAll( properties );
         }
 
-        private final double doubleValue(short val) {
+        private double doubleValue(short val) {
             double r = val * scaleFactor + addOffset;
             return r >= validMin && r <= validMax ? r : Units.dimensionless.getFillDouble();
         }
 
+        @Override
         public double value() {
             throw new IllegalArgumentException("rank 0 not supported");
         }
         
+        @Override
         public double value(int i) {
             return doubleValue(back[i]);
         }
 
+        @Override
         public double value(int i0, int i1) {
             return doubleValue(back[i0 * dimSizes[1] + i1]);
         }
 
+        @Override
         public double value(int i0, int i1, int i2) {
             return doubleValue(back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]);
         }
 
+        @Override
         public double value(int i0, int i1, int i2, int i3) {
             return doubleValue(back[i0 * dimSizes[1] * dimSizes[2] * dimSizes[3] + i1 * dimSizes[1] * dimSizes[2] + i2 * dimSizes[2] + i3]);
         }
@@ -310,20 +326,24 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             return (short)( ( val - addOffset ) / scaleFactor );
         }
 
+        @Override
         public void putValue(double d) {
             throw new IllegalArgumentException("rank 0 not supported");
         }
 
+        @Override
         public void putValue(int i0, double d) {
             checkImmutable();            
             back[i0]= putIntValue(d);
         }
 
+        @Override
         public void putValue(int i0, int i1, double d) {
             checkImmutable();            
             back[i0 * dimSizes[1] + i1]= putIntValue(d);
         }
 
+        @Override
         public void putValue(int i0, int i1, int i2, double d) {
             checkImmutable();            
             back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= putIntValue(d);
@@ -364,41 +384,50 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             return (float)val;
         }
 
+        @Override
         public double value() {
             throw new IllegalArgumentException("rank 0 not supported");
         }
         
+        @Override
         public double value(int i) {
             return doubleValue(back[i]);
         }
 
+        @Override
         public double value(int i0, int i1) {
             return doubleValue(back[i0 * dimSizes[1] + i1]);
         }
 
+        @Override
         public double value(int i0, int i1, int i2) {
             return doubleValue(back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]);
         }
 
+        @Override
         public double value(int i0, int i1, int i2, int i3) {
             int index = i0 * dimSizes[1] * dimSizes[2] * dimSizes[3] + i1 * dimSizes[2] * dimSizes[3] + i2 * dimSizes[3] + i3;
             return doubleValue(back[index]);
         }
 
+        @Override
         public void putValue(double d) {
             throw new IllegalArgumentException("rank 0 not supported");
         }
 
+        @Override
         public void putValue(int i0, double d) {
             checkImmutable();
             back[i0]= putFloatValue(d);
         }
 
+        @Override
         public void putValue(int i0, int i1, double d) {
             checkImmutable();
             back[i0 * dimSizes[1] + i1]= putFloatValue(d);
         }
 
+        @Override
         public void putValue(int i0, int i1, int i2, double d) {
             checkImmutable();
             back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= putFloatValue(d);
@@ -415,40 +444,49 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             this.properties.putAll(properties);
         }
 
+        @Override
         public double value() {
             throw new IllegalArgumentException("rank 0 not supported");
         }
         
+        @Override
         public double value(int i) {
             return back[i];
         }
 
+        @Override
         public double value(int i0, int i1) {
             return back[i0 * dimSizes[1] + i1];
         }
 
+        @Override
         public double value(int i0, int i1, int i2) {
             return back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2];
         }
 
+        @Override
         public double value(int i0, int i1, int i2, int i3) {
             return back[i0 * dimSizes[1] * dimSizes[2] * dimSizes[3] + i1 * dimSizes[1] * dimSizes[2] + i2 * dimSizes[2] + i3];
         }
 
+        @Override
         public void putValue(double d) {
             throw new IllegalArgumentException("rank 0 not supported");
         }
 
+        @Override
         public void putValue(int i0, double d) {
             checkImmutable();
             back[i0]= d;
         }
 
+        @Override
         public void putValue(int i0, int i1, double d) {
             checkImmutable();
             back[i0 * dimSizes[1] + i1]= d;
         }
 
+        @Override
         public void putValue(int i0, int i1, int i2, double d) {
             checkImmutable();
             back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= d;
@@ -472,40 +510,49 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             this.properties.put(QDataSet.UNITS, u);
         }
 
+        @Override
         public double value() {
             throw new IllegalArgumentException("rank 0 not supported");
         }
         
+        @Override
         public double value(int i) {
             return u.createDatum(((DString) back[i]).getValue()).doubleValue(u);
         }
 
+        @Override
         public double value(int i0, int i1) {
             throw new IllegalArgumentException("not supported");
         }
 
+        @Override
         public double value(int i0, int i1, int i2) {
             throw new IllegalArgumentException("not supported");
         }
 
+        @Override
         public double value(int i0, int i1, int i2, int i3) {
             throw new IllegalArgumentException("not supported");
         }
 
+        @Override
         public void putValue(double d) {
             throw new IllegalArgumentException("rank 0 not supported");
         }
 
+        @Override
         public void putValue(int i0, double d) {
             checkImmutable();            
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public void putValue(int i0, int i1, double d) {
             checkImmutable();            
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public void putValue(int i0, int i1, int i2, double d) {
             checkImmutable();            
             throw new UnsupportedOperationException("Not supported yet.");
@@ -525,10 +572,12 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             this.properties.put(QDataSet.UNITS, u);
         }
 
+        @Override
         public double value() {
             throw new IllegalArgumentException("rank 0 not supported");
         }
         
+        @Override
         public double value(int i) {
             try {
                 return u.parse(((DString) back[i]).getValue()).doubleValue(u);
@@ -537,39 +586,46 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             }
         }
 
+        @Override
         public double value(int i0, int i1) {
             throw new IllegalArgumentException("not supported");
         }
 
+        @Override
         public double value(int i0, int i1, int i2) {
             throw new IllegalArgumentException("not supported");
         }
 
+        @Override
         public double value(int i0, int i1, int i2, int i3) {
             throw new IllegalArgumentException("not supported");
         }
 
+        @Override
         public void putValue(double d) {
             throw new IllegalArgumentException("rank 0 not supported");
         }
 
+        @Override
         public void putValue(int i0, double d) {
             checkImmutable();            
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public void putValue(int i0, int i1, double d) {
             checkImmutable();            
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public void putValue(int i0, int i1, int i2, double d) {
             checkImmutable();            
             throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 
-    static DodsVarDataSet newDataSet(DArray z, HashMap properties) {
+    protected static DodsVarDataSet newDataSet(DArray z, HashMap properties) {
         Object o = z.getPrimitiveVector().getInternalStorage();
         if (o instanceof double[]) {
             DDataSet.wrap((double[])o);
