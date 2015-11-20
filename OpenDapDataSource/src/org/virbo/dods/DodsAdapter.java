@@ -257,21 +257,20 @@ public class DodsAdapter {
         
         long size = calcSize(  attr );
         mon.setTaskSize(size);
-
+        
+        logger.log(Level.FINE, "constructing dconnect on {0}", source.toString() );
         DConnect dconnect = new DConnect(source.toString(), true);
         StatusUI statusUI = adaptStatusUI(mon);
         
         mon.started();
         
         try {
-            logger.finest("There is suddenly a NullPointerException when using webstart");
-            logger.log(Level.FINEST, "constraint: {0}", constraint);
-            logger.log(Level.FINEST, "sui: {0}", statusUI);
-            logger.log(Level.FINEST, "source: {0}", source);
-            logger.log(Level.FINEST, "url: {0}", dconnect);
+            logger.log(Level.FINE, "calling dconnect.getData{0}", constraint);
             dds = dconnect.getData(constraint, statusUI);
+            logger.log(Level.FINE, "called dconnect.getData{0} -> ", dds );
         } catch (DDSException ex) {
             if (mon.isCancelled()) {
+                logger.log( Level.FINE, ex.getMessage(), ex );
                 throw new CancelledOperationException("Dods load cancelled");
             } else {
                 logger.log( Level.SEVERE, ex.getMessage(), ex );
