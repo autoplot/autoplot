@@ -61,14 +61,17 @@ public class DodsAdapter {
      * http://www.cdc.noaa.gov/cgi-bin/nph-nc/Datasets/kaplan_sst/sst.mean.anom.nc
      */
     private final URL source;
+    
     /**
      * sst
      */
     private String variable;
+    
     /**
      *?sst[0:100:1811][0:10:35][0:10:71]
      */
     private String constraint;
+    
     private DDS dds;
     private final HashMap properties;
 
@@ -86,13 +89,25 @@ public class DodsAdapter {
         this.variable= variable;
     }
 
+    /**
+     * get the variable, such as "sst"
+     * @return the variable
+     */
+    public String getVariable() {
+        return this.variable;
+    }
+    
     public void setConstraint(String c) {
         if (!c.startsWith("?")) {
             throw new IllegalArgumentException("constraint must start with question mark(?)");
         }
         this.constraint = c;
     }
-
+    
+    /**
+     * get the constraint, such as "?sst[0:100:1811][0:10:35][0:10:71]"
+     * @return the constraint
+     */
     public String getConstraint() {
         return this.constraint;
     }
@@ -588,10 +603,6 @@ public class DodsAdapter {
 
     public URL getSource() {
         return this.source;
-    }
-
-    public String getVariable() {
-        return this.variable;
     }
 
     private void putValue(WritableDataSet result, int i, BaseType value) {
