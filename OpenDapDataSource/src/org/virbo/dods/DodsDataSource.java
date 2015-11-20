@@ -263,7 +263,7 @@ public class DodsDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, 
         IOException, ParseException, DDSException, CancelledOperationException, DASException, InvalidParameterException, DAP2Exception {
 
-        logger.entering( "org.virbo.dods.DodsAdapter", "getDataSet" );
+        logger.entering( "org.virbo.dods.DodsDataSource", "getDataSet" );
         mon.setTaskSize(-1);
         mon.started();
 
@@ -392,7 +392,7 @@ public class DodsDataSource extends AbstractDataSource {
             return ds;
             
         } finally {
-            logger.exiting( "org.virbo.dods.DodsAdapter", "getDataSet" );
+            logger.exiting( "org.virbo.dods.DodsDataSource", "getDataSet" );
             mon.finished();
 
         }

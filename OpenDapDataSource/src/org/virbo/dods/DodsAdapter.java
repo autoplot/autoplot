@@ -202,7 +202,7 @@ public class DodsAdapter {
                     size += s1;
                 }
             }
-            logger.exiting("org.virbo.dods.DodsAdapter", "calcSize constraint" );
+            logger.exiting("org.virbo.dods.DodsAdapter", "calcSize" );
             
             return size;
         } catch (DDSException e) {
@@ -449,7 +449,7 @@ public class DodsAdapter {
             throw new RuntimeException(ex);
             
         } finally {
-            logger.entering("org.virbo.dods.DodsAdapter", "getDataSet" );
+            logger.exiting("org.virbo.dods.DodsAdapter", "getDataSet" );
         }
 
         QDataSet ds = zds;
