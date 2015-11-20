@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.FileSystemUtil;
 
 /**
  * Format the QDataSet into CDF tables, using Nand Lal's library.
@@ -172,7 +173,16 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         write( file.toString() );
         
         if ( !file.renameTo(ffile) ) {
-            throw new IllegalArgumentException("unable to move temporary file to final name: "+file);
+            if ( !FileSystemUtil.copyFile( file, ffile ) ) {
+                throw new IllegalArgumentException("unable move or copy temporary file to final name: "+ffile);
+            } else {
+                if ( !file.delete() ) {
+                    logger.warning("the file will be deleted later.");
+                    file.deleteOnExit();
+                } else {
+                    logger.fine("rename was implemented with copy.");
+                }
+            }
         }
         
     }
