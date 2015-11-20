@@ -143,6 +143,8 @@ public class DodsAdapter {
 
     private long calcSize( Map<String,Object> attr ) throws MalformedURLException, IOException, ParseException {
         try {
+            logger.entering("org.virbo.dods.DodsAdapter", "calcSize constraint={0}", new Object[] { constraint } );
+            
             DDS ldds = new DDS();
             
             URL url= new URL(this.getSource().toString() + ".dds" + constraint);
@@ -200,6 +202,8 @@ public class DodsAdapter {
                     size += s1;
                 }
             }
+            logger.exiting("org.virbo.dods.DodsAdapter", "calcSize constraint={0}", new Object[] { constraint } );
+            
             return size;
         } catch (DDSException e) {
             throw new RuntimeException(e);
