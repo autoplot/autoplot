@@ -55,7 +55,7 @@ import org.virbo.metatree.MetadataUtil;
  */
 public class DodsAdapter {
     
-    private final static Logger logger= Logger.getLogger("apdss.dods");
+    private final static Logger logger= Logger.getLogger("apdss.opendap");
 
     /**
      * http://www.cdc.noaa.gov/cgi-bin/nph-nc/Datasets/kaplan_sst/sst.mean.anom.nc
@@ -270,6 +270,7 @@ public class DodsAdapter {
             if (mon.isCancelled()) {
                 throw new CancelledOperationException("Dods load cancelled");
             } else {
+                logger.log( Level.SEVERE, ex.getMessage(), ex );
                 throw ex;
             }
 
@@ -292,6 +293,7 @@ public class DodsAdapter {
     public QDataSet getDataSet(Map<String, Object> attributes) {
         DodsVarDataSet zds;
 
+        logger.entering("org.virbo.dods.DodsAdapter", "getDataSet variable={0}", variable );
         if (attributes == null) attributes = new HashMap<>();
         BaseType btvar;
         try {

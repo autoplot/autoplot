@@ -45,6 +45,7 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
     public DodsDataSourceFactory() {
     }
     
+    @Override
     public DataSource getDataSource(URI uri) throws IOException {
         try {
             return new DodsDataSource( uri );
@@ -81,6 +82,9 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
     }
 
     private List<CompletionContext> getVars( String file ) throws DDSException, IOException, MalformedURLException, ParseException {
+        
+        logger.entering("org.virbo.dods.DodsDataSourceFactory", "getVars {0}", file );
+        
         List<CompletionContext> result= new ArrayList<>();
         
         int i = file.lastIndexOf('.');
@@ -115,6 +119,8 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
             }
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, var, this, "arg_0", null, label.toString(), true));
         }
+        logger.exiting("org.virbo.dods.DodsDataSourceFactory", "getVars {0}", file );
+        
         return result;
     }
 

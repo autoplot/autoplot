@@ -29,7 +29,7 @@ import org.virbo.dataset.WritableDataSet;
  */
 public abstract class DodsVarDataSet implements WritableDataSet {
 
-    private static final Logger logger= LoggerManager.getLogger("apdss.dods");
+    private static final Logger logger= LoggerManager.getLogger("apdss.opendap");
     
     int rank;
     int[] dimSizes = new int[4];

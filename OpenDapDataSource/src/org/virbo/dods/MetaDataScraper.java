@@ -36,7 +36,7 @@ import org.das2.util.LoggerManager;
  */
 public class MetaDataScraper {
     
-    private final static Logger logger= LoggerManager.getLogger("apdss.dods");
+    private final static Logger logger= LoggerManager.getLogger("apdss.opendap");
     
     HashMap varAttrs;
     HashMap varAttrsData;
