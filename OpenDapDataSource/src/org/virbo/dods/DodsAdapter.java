@@ -3,8 +3,6 @@
  *
  * Created on January 29, 2007, 5:59 AM
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 package org.virbo.dods;
 
@@ -13,7 +11,6 @@ import opendap.dap.DArray;
 import opendap.dap.DArrayDimension;
 import opendap.dap.DConnect;
 import opendap.dap.DDS;
-import opendap.dap.DDSException;
 import opendap.dap.DFloat32;
 import opendap.dap.DFloat64;
 import opendap.dap.DGrid;
@@ -63,7 +60,7 @@ public class DodsAdapter {
     /**
      * http://www.cdc.noaa.gov/cgi-bin/nph-nc/Datasets/kaplan_sst/sst.mean.anom.nc
      */
-    private URL source;
+    private final URL source;
     /**
      * sst
      */
@@ -73,12 +70,14 @@ public class DodsAdapter {
      */
     private String constraint;
     private DDS dds;
-    private HashMap properties;
+    private final HashMap properties;
 
-    /** Creates a new instance of DodsAdapter */
+    /** Creates a new instance of DodsAdapter
+     * @param source the base URL, like http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5
+     * @param variable the variable to read, like TerrainReflectivity
+     */
     public DodsAdapter(URL source, String variable) {
         this.source = source;
-        //this.variable= doEscapes(variable); // TODO: why was this introduced?
         this.variable = variable;
         properties = new HashMap();
     }
