@@ -80,11 +80,11 @@ public class DodsAdapter {
      * @param variable the variable to read, like TerrainReflectivity
      */
     public DodsAdapter(URL source, String variable) {
-        logger.entering("org.virbo.dods.DodsAdapter", "DodsAdapter {0} {1}", new Object[] { source, variable } );
+        logger.entering("org.virbo.dods.DodsAdapter", "DodsAdapter" );
         this.source = source;
         this.variable = variable;
         properties = new HashMap();
-        logger.exiting("org.virbo.dods.DodsAdapter", "DodsAdapter {0} {1}", new Object[] { source, variable } );
+        logger.exiting("org.virbo.dods.DodsAdapter", "DodsAdapter" );
     }
 
     void setVariable(String variable) {
@@ -143,7 +143,7 @@ public class DodsAdapter {
 
     private long calcSize( Map<String,Object> attr ) throws MalformedURLException, IOException, ParseException {
         try {
-            logger.entering("org.virbo.dods.DodsAdapter", "calcSize constraint={0}", new Object[] { constraint } );
+            logger.entering("org.virbo.dods.DodsAdapter", "calcSize" );
             
             DDS ldds = new DDS();
             
@@ -202,7 +202,7 @@ public class DodsAdapter {
                     size += s1;
                 }
             }
-            logger.exiting("org.virbo.dods.DodsAdapter", "calcSize constraint={0}", new Object[] { constraint } );
+            logger.exiting("org.virbo.dods.DodsAdapter", "calcSize constraint" );
             
             return size;
         } catch (DDSException e) {
@@ -249,7 +249,7 @@ public class DodsAdapter {
             IOException, ParseException, DDSException, DDSException,
             CancelledOperationException, DAP2Exception {
 
-        logger.entering("org.virbo.dods.DodsAdapter", "loadDataset source={0}", source.toString() );
+        logger.entering("org.virbo.dods.DodsAdapter", "loadDataset" );
         
         if ( constraint==null ) {
             constraint="";
@@ -280,7 +280,7 @@ public class DodsAdapter {
 
         } finally {
             if ( !mon.isFinished() ) mon.finished();
-            logger.exiting("org.virbo.dods.DodsAdapter", "loadDataset source={0}", source.toString() );    
+            logger.exiting("org.virbo.dods.DodsAdapter", "loadDataset" );
             
         }
        
@@ -297,7 +297,7 @@ public class DodsAdapter {
     public QDataSet getDataSet(Map<String, Object> attributes) {
         DodsVarDataSet zds;
 
-        logger.entering("org.virbo.dods.DodsAdapter", "getDataSet variable={0}", variable );
+        logger.entering("org.virbo.dods.DodsAdapter", "getDataSet" );
         if (attributes == null) attributes = new HashMap<>();
         BaseType btvar;
         try {
@@ -439,15 +439,17 @@ public class DodsAdapter {
                         }
                     }
                 }
-
                 return zresult;
 
             } else {
-
                 throw new IllegalStateException("not supported dds type:" + type);
+                
             }
         } catch (NoSuchVariableException ex) {
             throw new RuntimeException(ex);
+            
+        } finally {
+            logger.entering("org.virbo.dods.DodsAdapter", "getDataSet" );
         }
 
         QDataSet ds = zds;
