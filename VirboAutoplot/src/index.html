@@ -20,8 +20,14 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-11-18 r18008):</p>
+        <p>Bugfixes (2015-11-19 r18022):</p>
         <ul>
+            <li>stackedHistogram mode bug when reading data from CDFs so reduction must be done client side, with xtagWidth</li>
+            <li>rte 1586184923: user exceptions were confusing because RTE dialog showed</li>
+            <li>try/finally block used with web communication to get mime type.</li>
+            <li>1486: minor corrections to layout tab to improve usability</li>
+            <li>corrections to Dashup tool caused by minus sign vs negation in Jython AST.</li>
+            <li>and and or must be implemented as inline operators in Dashup tool</li>
             <li>introduce rank0 transform methods to support Jython rank 1 iterator returns rank 0 datasets instead of doubles, breaking Juno/Waves planning script.</li>
             <li>rfe 457: add hidden plot would intercept mouse events, making the connected plots difficult to work with.</li>
             <li>rfe 464: update the initial colors.txt template so that it is not confusing.</li>
