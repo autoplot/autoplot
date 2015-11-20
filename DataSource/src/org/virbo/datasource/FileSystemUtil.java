@@ -10,11 +10,17 @@
 package org.virbo.datasource;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.FileUtil;
 import org.das2.util.LoggerManager;
@@ -229,6 +235,24 @@ public class FileSystemUtil {
         }
         
         return success;
+    }
+    
+
+    /**
+     * copy the file to a new name.
+     * @param partFile
+     * @param targetFile
+     * @return
+     * @throws IOException 
+     */
+    public static boolean copyFile(File partFile, File targetFile) throws IOException {
+        logger.log( Level.FINER, "ftpBeanFilesystem copyFile({0},{1}", new Object[]{partFile, targetFile});
+        try ( WritableByteChannel dest = Channels.newChannel(new FileOutputStream(targetFile)) ) {
+            try ( ReadableByteChannel src = Channels.newChannel(new FileInputStream(partFile)) ) {
+                DataSourceUtil.transfer(src, dest);        
+            }
+        }
+        return true;
     }
     
 }
