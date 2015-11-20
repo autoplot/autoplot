@@ -34,6 +34,7 @@ import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -127,7 +128,13 @@ public class DodsAdapter {
     private long calcSize( Map<String,Object> attr ) throws MalformedURLException, IOException, ParseException {
         try {
             DDS ldds = new DDS();
-            ldds.parse(new URL(this.getSource().toString() + ".dds" + constraint).openStream());
+            
+            URL url= new URL(this.getSource().toString() + ".dds" + constraint);
+            
+            logger.log(Level.FINE, "calcSize opening {0}", url);
+            try ( InputStream in = url.openStream() ) {
+                ldds.parse(in);
+            }
 
             // calculate size
             Enumeration variables = ldds.getVariables();
@@ -192,8 +199,7 @@ public class DodsAdapter {
      * @throws java.io.IOException
      * @throws opendap.dap.parser.ParseException
      * @throws opendap.dap.DDSException
-     * @throws opendap.dap.DODSException
-     * @throws org.das2.CancelledOperationException
+     * @throws org.das2.util.monitor.CancelledOperationException
      */
     public void loadDataset(final ProgressMonitor mon, Map<String,Object> attr ) throws FileNotFoundException, MalformedURLException,
             IOException, ParseException, DDSException, DDSException,
@@ -206,20 +212,20 @@ public class DodsAdapter {
         long size = calcSize(  attr );
         mon.setTaskSize(size);
 
-        DConnect url = new DConnect(source.toString(), true);
-        StatusUI sui = new StatusUI() {
+        DConnect dconnect = new DConnect(source.toString(), true);
+        StatusUI statusUI = new StatusUI() {
 
             long byteCount = 0;
-
+            @Override
             public void incrementByteCount(int bytes) {
                 byteCount += bytes;
                 mon.setTaskProgress(byteCount);
             }
-
+            @Override
             public boolean userCancelled() {
                 return mon.isCancelled();
             }
-
+            @Override
             public void finished() {
                 mon.finished();
             }
@@ -227,12 +233,12 @@ public class DodsAdapter {
 
         mon.started();
         try {
-            logger.fine("There is suddenly a NullPointerException when using webstart");
-            logger.log(Level.FINE, "constraint: {0}", constraint);
-            logger.log(Level.FINE, "sui: {0}", sui);
-            logger.log(Level.FINE, "source: {0}", source);
-            logger.log(Level.FINE, "url: {0}", url);
-            dds = url.getData(constraint, sui);
+            logger.finest("There is suddenly a NullPointerException when using webstart");
+            logger.log(Level.FINEST, "constraint: {0}", constraint);
+            logger.log(Level.FINEST, "sui: {0}", statusUI);
+            logger.log(Level.FINEST, "source: {0}", source);
+            logger.log(Level.FINEST, "url: {0}", dconnect);
+            dds = dconnect.getData(constraint, statusUI);
         } catch (DDSException ex) {
             if (mon.isCancelled()) {
                 throw new CancelledOperationException("Dods load cancelled");
@@ -240,7 +246,7 @@ public class DodsAdapter {
                 throw ex;
             }
         } catch ( NullPointerException ex ) {
-            System.err.println("null is thrown at 233");
+            logger.log( Level.WARNING, ex.getMessage(), ex );
             throw ex;
         } finally {
             if ( !mon.isFinished() ) mon.finished();
@@ -259,7 +265,7 @@ public class DodsAdapter {
     public QDataSet getDataSet(Map<String, Object> attributes) {
         DodsVarDataSet zds;
 
-        if (attributes == null) attributes = new HashMap<String, Object>();
+        if (attributes == null) attributes = new HashMap<>();
         BaseType btvar;
         try {
             btvar = dds.getVariable(variable);
@@ -355,7 +361,7 @@ public class DodsAdapter {
                             putValue( dss[j], i, (BaseType) ele);
                             j++;
                         } else {
-                            throw new IllegalArgumentException("huh");
+                            throw new IllegalArgumentException("only BaseType and DStructure supported");
                         }
                     }
                 }
@@ -475,8 +481,9 @@ public class DodsAdapter {
      */
     public void setAddOffset(double addOffset) {
         this.addOffset = addOffset;
-        properties.put("add_offset", new Double(addOffset));
+        properties.put("add_offset", addOffset );
     }
+    
     /**
      * Holds value of property scaleFactor.
      */
@@ -496,7 +503,7 @@ public class DodsAdapter {
      */
     public void setScaleFactor(double scaleFactor) {
         this.scaleFactor = scaleFactor;
-        properties.put("scale_factor", new Double(scaleFactor));
+        properties.put("scale_factor", scaleFactor );
     }
 
     public void setValidRange(double min, double max) {
@@ -505,7 +512,7 @@ public class DodsAdapter {
     /**
      * Holds value of property dimUnits.
      */
-    private Units[] dimUnits = new Units[8];
+    private final Units[] dimUnits = new Units[8];
 
     /**
      * Indexed getter for property dimUnits, which specifies the units of a dimension tag.
@@ -528,7 +535,7 @@ public class DodsAdapter {
     public void putAllProperties(Map p) {
         properties.putAll(p);
     }
-    private HashMap[] dimProperties = new HashMap[8];
+    private final HashMap[] dimProperties = new HashMap[8];
 
     public void setDimProperties(int dim, Map p) {
         dimProperties[dim] = new HashMap(p);
@@ -560,7 +567,7 @@ public class DodsAdapter {
     /**
      * Holds value of property dependName.
      */
-    private String[] dependName = new String[8];
+    private final String[] dependName = new String[8];
 
     /**
      * Indexed getter for property dependName.

@@ -16,6 +16,7 @@ import opendap.dap.parser.ParseException;
 import opendap.dap.parser.TokenMgrError;
 import java.net.MalformedURLException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -71,13 +72,7 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
                 URISplit split= URISplit.parse(surl);
                 List<CompletionContext> cc = getVars(split.file);
                 return cc.size() > 1;
-            } catch ( DDSException ex ) {
-                logger.log(Level.WARNING,null,ex);
-                return true; // let someone else indicate the error.
-            } catch (IOException ex) {
-                logger.log(Level.WARNING,null,ex);
-                return true; // let someone else indicate the error.
-            } catch (ParseException ex) {
+            } catch ( DDSException | IOException | ParseException ex ) {
                 logger.log(Level.WARNING,null,ex);
                 return true; // let someone else indicate the error.
             }
@@ -86,20 +81,19 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
     }
 
     private List<CompletionContext> getVars( String file ) throws DDSException, IOException, MalformedURLException, ParseException {
-        List<CompletionContext> result= new ArrayList<CompletionContext>();
+        List<CompletionContext> result= new ArrayList<>();
         
         int i = file.lastIndexOf('.');
         String sMyUrl = file.substring(0, i);
         URL url;
 
-        url = new URL(sMyUrl + ".dds");
-
         MyDDSParser parser = new MyDDSParser();
-        try {
-            parser.parse(url.openStream());
-        } catch ( TokenMgrError ex  ) {
-            throw new ParseException("Does not appear to be a DDS: "+url);
-        } catch (RuntimeException ex ) {
+
+        url = new URL(sMyUrl + ".dds");
+        logger.log(Level.FINE, "getVars opening {0}", url);
+        try ( InputStream in = url.openStream() ) {
+            parser.parse(in);
+        } catch ( TokenMgrError | RuntimeException ex  ) {
             throw new ParseException("Does not appear to be a DDS: "+url);
         }
 
@@ -116,10 +110,8 @@ public class DodsDataSourceFactory extends AbstractDataSourceFactory implements 
                     }
                     label.append("]");
                 }
-            } catch (NoSuchVariableException ex) {
-                Logger.getLogger(DodsDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvalidParameterException ex) {
-                Logger.getLogger(DodsDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchVariableException | InvalidParameterException ex) {
+                logger.log(Level.SEVERE, null, ex);
             }
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, var, this, "arg_0", null, label.toString(), true));
         }

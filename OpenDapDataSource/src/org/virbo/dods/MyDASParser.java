@@ -2,18 +2,13 @@
  * MyDASParser.java
  *
  * Created on July 31, 2007, 11:11 AM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 
 package org.virbo.dods;
 
 import opendap.dap.BaseType;
-import opendap.dap.BaseTypeFactory;
 import opendap.dap.DAS;
 import opendap.dap.DASException;
-import opendap.dap.DefaultFactory;
 import opendap.dap.parser.DASParser;
 import opendap.dap.parser.ParseException;
 import java.io.InputStream;
@@ -33,6 +28,12 @@ public class MyDASParser {
     
     private DAS myDAS;
     
+    /**
+     * parse the stream.  The stream is left open.
+     * @param in an InputStream 
+     * @throws ParseException
+     * @throws DASException 
+     */
     public void parse( InputStream in ) throws ParseException, DASException {
         
         DASParser p= new DASParser(in);
@@ -45,7 +46,7 @@ public class MyDASParser {
     
     String[] getVariableNames() {
         Enumeration en= myDAS.getNames();
-        ArrayList<String> result= new ArrayList<String>();
+        ArrayList<String> result= new ArrayList<>();
         while ( en.hasMoreElements() ) {
             result.add( ((BaseType)en.nextElement()).getName() );
         }
@@ -57,8 +58,10 @@ public class MyDASParser {
     }
      
     public static void main( String[] args ) throws Exception {
-        URL url= new URL( "http://www.papco.org:8080/opendap/onera_cdf/lanl_1990_95/LANL_1990_095_H0_SOPA_ESP_19980505_V01.cdf.das" );
+        URL url= new URL( "http://acdisc.gsfc.nasa.gov/opendap/HDF-EOS5/Aura_OMI_Level3/OMAEROe.003/2005/OMI-Aura_L3-OMAEROe_2005m0101_v003-2011m1109t081947.he5.dds?TerrainReflectivity" );
         MyDASParser parser= new MyDASParser();
-        parser.parse( url.openStream() );
+        try ( InputStream in= url.openStream() ) {
+            parser.parse( in );
+        }
     }
 }

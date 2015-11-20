@@ -241,7 +241,7 @@ public class DodsDataSource extends AbstractDataSource {
                 if ( dimsStr!=null) constraint1.append(dimsStr);
                 da.setDependName(i, var);
 
-                //Map<String, Object> depMeta = getMetaData(var);
+                //Map<String, Object> depMeta = getMetadata(var);
 
                 //Map m = new IstpMetadataModel().properties(depMeta);
 
@@ -270,13 +270,15 @@ public class DodsDataSource extends AbstractDataSource {
 
         try {
             MyDDSParser parser = new MyDDSParser();
-            try {
-                parser.parse(new URL(adapter.getSource().toString() + ".dds").openStream());
+            URL url= new URL(adapter.getSource().toString() + ".dds");
+            logger.log(Level.FINE, "getDataSet opening {0}", url);
+            try ( InputStream in= url.openStream() ) {
+                parser.parse(in);
             } catch ( FileNotFoundException ex ) {
                 throw new FileNotFoundException( "OpenDAP Server unavailable, file not found: \n"+ex.getMessage());
             }
 
-            getMetadata( mon.getSubtaskMonitor("metadata") );
+            DodsDataSource.this.getMetadata( mon.getSubtaskMonitor("metadata") );
 
             Map<String,Object> interpretedMetadata = null;
 
@@ -405,22 +407,22 @@ public class DodsDataSource extends AbstractDataSource {
     protected Map<String, Object> getMetaData(String variable) {
         try {
             AttributeTable at = das.getAttributeTable(variable);
-            return getMetaData(at);
+            return getMetadata(at);
         } catch ( NoSuchAttributeException ex ) {
             return Collections.emptyMap();
         }
     }
      
-    private Map<String,Object> getMetaData( AttributeTable at ) {
+    private Map<String,Object> getMetadata( AttributeTable at ) {
         
         if (at == null) {
-            return new HashMap<String, Object>();
+            return new HashMap<>();
         } else {
             Pattern p = Pattern.compile("DEPEND_[0-9]");
             Pattern p2 = Pattern.compile("LABL_PTR_([0-9])");
             Enumeration n = at.getNames();
 
-            Map<String, Object> result = new HashMap<String, Object>();
+            Map<String, Object> result = new HashMap<>();
 
             while (n.hasMoreElements()) {
                 Object key = n.nextElement();
@@ -429,7 +431,7 @@ public class DodsDataSource extends AbstractDataSource {
                 try {
                     int type = att.getType();
                     if (type == Attribute.CONTAINER) {
-                        Object val= getMetaData( att.getContainer() );
+                        Object val= getMetadata( att.getContainer() );
                         result.put( att.getName(), val );
                     } else {
                         String val = att.getValueAt(0);
@@ -468,11 +470,9 @@ public class DodsDataSource extends AbstractDataSource {
         if (metadata == null) {
             MyDASParser parser = new MyDASParser();
             URL url = new URL(adapter.getSource().toString() + ".das");
-            
-            InputStream in= url.openStream();
-            try {
-//TODO: openStream is never explicitly closed.
-                parser.parse(url.openStream());
+            logger.log(Level.FINE, "getMetadata opening {0}", url);
+            try ( InputStream in= url.openStream() ) {
+                parser.parse( in );
 
                 das = parser.getDAS();
                 if ( variable==null ) {
@@ -480,8 +480,6 @@ public class DodsDataSource extends AbstractDataSource {
                     adapter.setVariable(variable);
                 }
                 metadata = getMetaData(variable);  
-            } finally {
-                in.close();
             }
         }
 

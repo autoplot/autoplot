@@ -15,14 +15,17 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.ParserDelegator;
+import org.das2.util.LoggerManager;
 
 /**
- * Scrape the metadata from the <dods URL>.html form of the data.  
- * Get a new instance, call parse( <dods URL>.html ), then 
+ * Scrape the metadata from the &lt;dods URL&gt;.html form of the data.  
+ * Get a new instance, call parse( &lt;dods URL&gt;.html ), then 
  * call getAttr(String varName) which returns a Map of the properties.
  *
  * Note the scraping is only necessary because Jeremy forgot about the
@@ -32,6 +35,8 @@ import javax.swing.text.html.parser.ParserDelegator;
  * @author jbf
  */
 public class MetaDataScraper {
+    
+    private final static Logger logger= LoggerManager.getLogger("apdss.dods");
     
     HashMap varAttrs;
     HashMap varAttrsData;
@@ -90,6 +95,7 @@ public class MetaDataScraper {
      *
      * After parseURL is performed, getAttr is used to get Attributes.
      * @param url
+     * @throws java.io.IOException
      * @throws IllegalArgumentException when the url does not end in .html
      */
     public void parseURL( URL url ) throws IOException {
@@ -97,25 +103,25 @@ public class MetaDataScraper {
         varAttrs= new HashMap();
         varAttrsData= new HashMap();
         recDims= new HashMap();
-        InputStream in= url.openStream();
-        new ParserDelegator().parse( new InputStreamReader(in), new MyCallBack(), true );
-        in.close();
+        logger.log(Level.FINE, "parseURL opening {0}", url);
+        try ( InputStream in= url.openStream() ) {
+            new ParserDelegator().parse( new InputStreamReader(in), new MyCallBack(), true );
+        }
     }
     
     private Map parseData( char[] data ) {
-        int ipos= 0;
         HashMap result= new HashMap();
         String s= new String(data);
         String[] ss= s.split("\n");
-        for ( int i=0; i<ss.length; i++ ) {
-            int ic= ss[i].indexOf(":");
-            String name= ss[i].substring(0,ic);
-            String value= ss[i].substring(ic+1).trim();
+        for (String s1 : ss) {
+            int ic = s1.indexOf(":");
+            String name = s1.substring(0, ic);
+            String value = s1.substring(ic+1).trim();
             if ( value.startsWith("\"") ) {
                 value= value.substring(1,value.length()-1);
                 result.put( name, value );
             } else {
-                result.put( name, new Double( Double.parseDouble(value) ) );
+                result.put(name, Double.parseDouble(value));
             }
         }
         return result;
@@ -124,6 +130,8 @@ public class MetaDataScraper {
     /**
      * provides the attributes for this variable in a map.  The keys are the String 
      * attribute name (e.g. UNITS) and the values are either type String or Double.
+     * @param varName the variable name
+     * @return the attributes
      */
     public Map getAttr( String varName ) {
         if ( varAttrs==null ) throw new IllegalArgumentException("need to parse URL first");
