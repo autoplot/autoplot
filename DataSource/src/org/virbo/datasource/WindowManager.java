@@ -17,6 +17,7 @@ import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -43,6 +44,20 @@ public class WindowManager {
     
     public static WindowManager getInstance() {
         return instance;
+    }
+
+    /**
+     * TODO: this will show the icon.
+     * @param parent
+     * @param omessage
+     * @param title
+     * @param optionType
+     * @param messageType
+     * @param icon
+     * @return 
+     */
+    public static int showConfirmDialog( Component parent, JPanel omessage, String title, int optionType, int messageType, Icon icon ) {
+        return showConfirmDialog( parent, omessage, title, optionType );
     }
     
     /**
