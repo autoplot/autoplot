@@ -230,6 +230,8 @@ public class EditorTextPane extends JEditorPane {
             int i0= Utilities.getRowStart( this, pos );
             int i2= Utilities.getRowEnd( this, pos );
         
+            int lineStart= i0;
+            
             String line= this.getText( i0, i2-i0 );
             int i1= i0;
                 
@@ -268,8 +270,8 @@ public class EditorTextPane extends JEditorPane {
             Icon icon= new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png") );
             if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( this, parent, "Editing URI", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon ) ) {
                 String newUri= p.getURI();
-                this.setSelectionStart(i0+uri0);
-                this.setSelectionEnd(i0+uri1);
+                this.setSelectionStart(lineStart+uri0);
+                this.setSelectionEnd(lineStart+uri1);
                 this.replaceSelection(newUri);
             }
             
