@@ -1,6 +1,7 @@
 
 package org.virbo.jythonsupport.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Toolkit;
@@ -52,6 +53,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSourceEditorDialog;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
+import org.virbo.datasource.WindowManager;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.PyQDataSet;
 import org.virbo.qstream.StreamException;
@@ -256,6 +258,7 @@ public class EditorTextPane extends JEditorPane {
             int uri1= uri0 + oldUri.length();
             
             JPanel parent= new JPanel();
+            parent.setLayout( new BorderLayout() );
             DataSourceEditorPanel p= DataSourceEditorPanelUtil.getDataSourceEditorPanel(parent,oldUri);
             if ( p==null ) {
                 JOptionPane.showMessageDialog( this, "<html>Unable to find editor for URI<br>"+oldUri, "URI needed", JOptionPane.INFORMATION_MESSAGE );
@@ -263,7 +266,7 @@ public class EditorTextPane extends JEditorPane {
             }
             
             Icon icon= new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png") );
-            if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, parent, "Editing URI "+oldUri, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon ) ) {
+            if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( this, parent, "Editing URI", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon ) ) {
                 String newUri= p.getURI();
                 this.setSelectionStart(i0+uri0);
                 this.setSelectionEnd(i0+uri1);
