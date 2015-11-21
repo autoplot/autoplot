@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.jythonsupport.ui;
 
 import java.awt.BorderLayout;
@@ -15,9 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -35,9 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.das2.util.LoggerManager;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
 import org.virbo.filters.FiltersChainPanel;
