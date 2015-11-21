@@ -28,9 +28,23 @@ public class CompletionContext {
      */
     public static final String COMMAND_ARGUMENT="commandArgument";
     
-    String contextType;
-    String contextString;  // depends on type
-    String completable;
+    /**
+     * the context type, such as COMMAND_ARGUMENT or STRING_LITERAL_ARGUMENT.
+     * In ds= getDataSet('/hom&lt;C&gt;'), this is STRING_LITERAL_ARGUMENT
+     */
+    public String contextType;
+    
+    /**
+     * the context string, such as a command name.
+     * In ds= getDataSet('/hom&lt;C&gt;'), this is 'getDataSet'
+     */
+    public String contextString;  // depends on type
+    
+    /**
+     * the item on which completion was triggered.
+     * In ds= getDataSet('/hom&lt;C&gt;'), this is '/hom'
+     */
+    public String completable;
     
     /**
      * 
@@ -44,6 +58,7 @@ public class CompletionContext {
         this.completable= completable;
     }
 
+    @Override
     public String toString() {
         return "" + this.contextType + ": " + this.contextString + " " + this.completable;
     }
