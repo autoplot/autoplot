@@ -177,7 +177,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 throw new IllegalArgumentException("unable move or copy temporary file to final name: "+ffile);
             } else {
                 if ( !file.delete() ) {
-                    logger.warning("the file will be deleted later.");
+                    logger.warning("the file should be deleted later.");
                     file.deleteOnExit();
                 } else {
                     logger.fine("rename was implemented with copy.");
