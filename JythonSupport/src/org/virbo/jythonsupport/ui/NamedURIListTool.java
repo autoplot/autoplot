@@ -227,26 +227,10 @@ public class NamedURIListTool extends JPanel {
         p.add( Box.createVerticalStrut( p.getFont().getSize() ) );
         DataSourceEditorPanel edit=null;
         try {
-            edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel( DataSetURI.getURIValid( uris.get(fi) ) );
-            if ( edit==null ) {
-                logger.log(Level.WARNING, "can''t get editor for #{0}", fi);
-            } else {
-                String uri= uris.get(fi);
-                try {
-                    if ( !edit.reject( uri ) ) {
-                        edit.prepare( uri, null, new NullProgressMonitor() );
-                        edit.setURI( uri );
-                        JPanel editPanel= edit.getPanel();
-                        editPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
-                        p.add( editPanel );
-                    }
-                } catch ( Exception ex ) {
-                    logger.log( Level.SEVERE, null, ex );
-                }
-            }
-            
-        } catch (URISyntaxException ex) {
-            logger.log(Level.SEVERE, null, ex);
+            String uri= uris.get(fi);
+            edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel( p, uri );
+        } catch ( IllegalArgumentException ex ) {
+            logger.log(Level.SEVERE, "can''t get editor for #{0}", fi);
         }
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( scrollPane, p, "Rename parameter and dataset editor", JOptionPane.OK_CANCEL_OPTION ) ) {
             ids.set( fi,tf.getText() );
@@ -262,7 +246,7 @@ public class NamedURIListTool extends JPanel {
             
         }
     }
-        
+
     public void setIds( List<String> ids ) {
         this.ids= new ArrayList<String>(ids);
         if ( uris.size()==ids.size() ) refresh();
