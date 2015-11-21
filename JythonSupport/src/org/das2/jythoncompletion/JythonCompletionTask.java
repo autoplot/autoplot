@@ -751,6 +751,14 @@ public class JythonCompletionTask implements CompletionTask {
         return sig.toString();
     }
 
+    /**
+     * Do dataset URL completions on strings that start with / and getDataSet calls.
+     * There's a bug here where "formatDataSet" is not detected as the context in 
+     * formatDataSet(ds,'/home/jbf/foo.cdf')
+     * @param cc
+     * @param arg0
+     * @return 
+     */
     private int queryStringLiteralArgument(CompletionContext cc, CompletionResultSet arg0) {
         String method = cc.contextString;
         int [] pos= new int[2];
