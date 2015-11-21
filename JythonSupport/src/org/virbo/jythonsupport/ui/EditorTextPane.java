@@ -1,11 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.jythonsupport.ui;
 
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -28,8 +25,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -39,14 +38,20 @@ import javax.swing.undo.UndoManager;
 import jsyntaxpane.DefaultSyntaxKit;
 import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
+import org.das2.jythoncompletion.CompletionContext;
 import org.das2.jythoncompletion.CompletionSettings;
+import org.das2.jythoncompletion.CompletionSupport;
 import org.das2.jythoncompletion.JythonCompletionProvider;
+import org.das2.jythoncompletion.Utilities;
 import org.das2.util.LoggerManager;
 import org.python.core.PyObject;
 import org.python.parser.SimpleNode;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.DataSourceEditorDialog;
+import org.virbo.datasource.DataSourceEditorPanel;
+import org.virbo.datasource.DataSourceEditorPanelUtil;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.PyQDataSet;
 import org.virbo.qstream.StreamException;
@@ -122,13 +127,18 @@ public class EditorTextPane extends JEditorPane {
                     }
                 } );
                 
-                getActionMap().put( "inspect", new AbstractAction( "inspect" ) {
+                getActionMap().put( "plotItem", new AbstractAction( "plotItem" ) {
                     @Override
                     public void actionPerformed( ActionEvent e ) {
                         LoggerManager.logGuiEvent(e);                
                         String doThis= getSelectedText();
                         if ( doThis==null ) return;
-                        plotSoon(doThis);
+                        try {
+                            plotSoon(doThis);
+                        } catch ( IllegalArgumentException ex ) {
+                            JOptionPane.showMessageDialog(EditorTextPane.this,
+                                    "<html>A debugging session must be active.  Insert stop to halt script execution.</html>");
+                        }
                     }
                 } );                
 
@@ -147,7 +157,7 @@ public class EditorTextPane extends JEditorPane {
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, tk.getMenuShortcutKeyMask() ), "biggerFont" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask() ), "smallerFont" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK ), "settings" );
-                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "inspect" );
+                getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "plotItem" );
                 getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_U, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK ), "usages" );
                 
                 doLayout(); // kludge for DefaultSyntaxKit
@@ -198,7 +208,7 @@ public class EditorTextPane extends JEditorPane {
             support.annotateChars( n.beginLine, n.beginColumn, n.beginColumn+var.length(), EditorAnnotationsSupport.ANNO_USAGE, var, null );
         }
     }
-
+    
     @Override
     public String getToolTipText( MouseEvent event ) {
          return support.getToolTipText(event);
@@ -212,6 +222,59 @@ public class EditorTextPane extends JEditorPane {
         return support;
     }
 
+    protected void inspectURI( ) {
+        try {
+            int pos= this.getCaretPosition();
+            int i0= Utilities.getRowStart( this, pos );
+            int i2= Utilities.getRowEnd( this, pos );
+        
+            String line= this.getText( i0, i2-i0 );
+            int i1= i0;
+                
+            pos= pos - i0;
+            i2= pos;
+            i1= i1- i0;
+            i0= 0;
+        
+            CompletionContext cc= CompletionSupport.getCompletionContext( line, pos, i0, i1, i2 );
+            if ( cc==null ) {
+                JOptionPane.showMessageDialog( this, "<html>String URI argument must start with vap+cdaweb:, vap+inline:,etc", "URI needed", JOptionPane.INFORMATION_MESSAGE );
+                return;
+            }
+            String oldUri= cc.completable;
+            if ( oldUri.startsWith("'") ) oldUri= oldUri.substring(1);
+            if ( oldUri.endsWith("'") ) oldUri= oldUri.substring(0,oldUri.length()-1);
+            if ( oldUri.startsWith("\"") ) oldUri= oldUri.substring(1);
+            if ( oldUri.endsWith("\"") ) oldUri= oldUri.substring(0,oldUri.length()-1);            
+            
+            if ( oldUri.length()==0 || !oldUri.contains(":") ) {
+                JOptionPane.showMessageDialog( this, "<html>String URI argument must start with vap+cdaweb:, vap+inline:,etc", "URI needed", JOptionPane.INFORMATION_MESSAGE );
+                return;
+            }
+            
+            int uri0= line.indexOf(oldUri);
+            int uri1= uri0 + oldUri.length();
+            
+            JPanel parent= new JPanel();
+            DataSourceEditorPanel p= DataSourceEditorPanelUtil.getDataSourceEditorPanel(parent,oldUri);
+            if ( p==null ) {
+                JOptionPane.showMessageDialog( this, "<html>Unable to find editor for URI<br>"+oldUri, "URI needed", JOptionPane.INFORMATION_MESSAGE );
+                return;
+            }
+            
+            Icon icon= new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png") );
+            if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, parent, "Editing URI "+oldUri, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, icon ) ) {
+                String newUri= p.getURI();
+                this.setSelectionStart(i0+uri0);
+                this.setSelectionEnd(i0+uri1);
+                this.replaceSelection(newUri);
+            }
+            
+        } catch (BadLocationException ex) {
+            Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     /**
      * this makes the connection to another Autoplot.  This should not be called off the event thread.
      * @param doThis expression to evaluate
@@ -267,6 +330,7 @@ public class EditorTextPane extends JEditorPane {
     /**
      * send the QDataSet resolved from the String doThis to the Autoplot server on port 12345.
      * @param doThis an expression evaluated by the current interpreter.
+     * @throws IllegalArgumentException if a session is not running.
      */
     void plotSoon( final String doThis ) {
         EditorAnnotationsSupport.ExpressionLookup l= EditorAnnotationsSupport.getExpressionLookup();
@@ -281,7 +345,14 @@ public class EditorTextPane extends JEditorPane {
         };
         new Thread(run,"plotExpression").start();
     }
-
+    
+    /**
+     * copy the file into a string using readLine and a StringBuilder.
+     * @param f the file
+     * @return the string contents.
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
     public static String loadFileToString( File f ) throws FileNotFoundException, IOException {
         BufferedReader r = null;
         StringBuilder buf = new StringBuilder();

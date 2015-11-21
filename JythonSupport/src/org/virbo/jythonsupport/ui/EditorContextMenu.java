@@ -409,17 +409,36 @@ public class EditorContextMenu {
             jumpToMenuPosition= actionsMenu.getItemCount();
             actionsMenu.add(jumpToMenu);
             
-            JMenuItem mi= new JMenuItem( new AbstractAction("Plot") {
+            JMenuItem mi;
+            
+            mi= new JMenuItem( new AbstractAction("Plot") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);                
                     String doThis= editor.getSelectedText();
                     if ( doThis==null ) return;
-                    editor.plotSoon(doThis);
+                    try {
+                        editor.plotSoon(doThis);
+                    } catch ( IllegalArgumentException ex ) {
+                        JOptionPane.showMessageDialog( editor,
+                            "<html>A debugging session must be active.  Insert stop to halt script execution.</html>");
+                    }
                 }
             } );
             mi.setToolTipText("Plot dataset reference in a second Autoplot with its server port open");
             actionsMenu.add( mi );
+                        
+            mi= new JMenuItem( new AbstractAction("Inspect URI") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    LoggerManager.logGuiEvent(e);                
+                    editor.inspectURI();
+                }
+            } );
+            mi.setIcon( new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png") ) );
+            mi.setToolTipText("Use the data source editor panel to modify URI");
+            actionsMenu.add( mi );
+            
             mi= new JMenuItem( new AbstractAction("Indent Block") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -427,7 +446,7 @@ public class EditorContextMenu {
                     int[] il= roundLines();
                     try {
                         String txt= editor.getText( il[0], il[1] );
-                        txt= indent( txt, 2 );
+                        txt= indent( txt, 4 );
                         editor.getDocument().remove( il[0], il[1] );
                         editor.getDocument().insertString( il[0], txt, null );
                         editor.setSelectionStart(il[0]);
@@ -446,7 +465,7 @@ public class EditorContextMenu {
                     int[] il= roundLines();
                     try {
                         String txt= editor.getText( il[0], il[1] );
-                        txt= indent( txt, -2 );
+                        txt= indent( txt, -4 );
                         editor.getDocument().remove( il[0], il[1] );
                         editor.getDocument().insertString( il[0], txt, null );
                         editor.setSelectionStart(il[0]);
