@@ -9,9 +9,10 @@
         <img alt="screenshot"  src="screen.png">
         <p><small>Data exported from Moves phone app works with Autoplot without reformatting.
             </small></p>
-        <p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
-	   Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
-           displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
+        <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
+	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
+           displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.  Data can then 
+           be additionally processed with other operations like smooth and FFT, and Jython scripting provides a capable programming environment.
         </p>
 
         <p>This is the Autoplot2015a branch.  This is an update to the production version containing bugfixes and minor new features.
@@ -22,7 +23,7 @@
 
         <p>Bugfixes (2015-11-19 r18029):</p>
         <ul>
-            <li>stackedHistogram mode bug when reading data from CDFs so reduction must be done client side, with xtagwidth</li>
+            <li>formatDataSet to CDF on Windows with Webstart failed because of move, so we fall back to copy.</li>
             <li>rte 1586184923: user exceptions were confusing because RTE dialog showed</li>
             <li>try/finally block used with web communication to get mime type.</li>
             <li>1486: minor corrections to layout tab to improve usability</li>
