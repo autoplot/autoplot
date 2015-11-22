@@ -21,8 +21,9 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-11-19 r18029):</p>
+        <p>Bugfixes (2015-11-22 r18054):</p>
         <ul>
+            <li>annotation bounds were not set properly for pngwalks and with the servlet.</li>
             <li>formatDataSet to CDF on Windows with Webstart failed because of move, so we fall back to copy.</li>
             <li>rte 1586184923: user exceptions were confusing because RTE dialog showed</li>
             <li>try/finally block used with web communication to get mime type.</li>
@@ -65,6 +66,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>script editor allows entry into data source editors with right-click&rarr;actions&rarr;"inspect URI"</li>
             <li>ISO8601 parser now supports time zone offsets.</li>
             <li>Clean-up and logging of OpenDap code so more predicatable failures can be studied.</li>
             <li>nc4 extension is recognized as NetCDF.</li>
