@@ -5,6 +5,7 @@ import external.PlotCommand;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.File;
 import java.io.FileInputStream;
@@ -204,6 +205,9 @@ public class JythonUtil {
      */
     private static int showScriptDialog( Component parent, Map<String,Object> env, File file, Map<String,String> fvars, boolean makeTool, final URI resourceUri ) throws IOException {
         
+        if ( !EventQueue.isDispatchThread() ) {
+            System.err.println("*** called from off of event thread!!!");
+        }
         JPanel p= new JPanel();
         p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
         

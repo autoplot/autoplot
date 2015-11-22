@@ -8,6 +8,9 @@ import java.awt.AWTEventMulticaster;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -15,6 +18,11 @@ import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -30,6 +38,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -68,7 +77,9 @@ import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.LayoutListener;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.layout.LayoutConstants;
+import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.autoplot.util.RunLaterListener;
+import org.virbo.datasource.DataSourceUtil;
 
 /**
  * The ApplicationController, one per dom, is in charge of managing the 
@@ -499,6 +510,17 @@ public class ApplicationController extends DomNodeController implements RunLater
         item.setToolTipText("Replace the focus plot with stack of plots.");
         editPlotMenu.add(item);
         
+        item= new JMenuItem( new AbstractAction("Copy Plot to Clipboard") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String s= DomUtil.getPlotAsString( application, domPlot );
+                StringSelection stringSelection = new StringSelection(s);
+                Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clpbrd.setContents(stringSelection, null);
+            }
+        } );
+        editPlotMenu.add(item);
+                
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
             @Override
             public void actionPerformed(ActionEvent e) {

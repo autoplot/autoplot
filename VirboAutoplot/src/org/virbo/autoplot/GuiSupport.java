@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,6 +42,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +96,7 @@ import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
+import org.das2.util.ByteBufferInputStream;
 import org.das2.util.Entities;
 import org.das2.util.awt.PdfGraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -1657,6 +1660,46 @@ public class GuiSupport {
         item.setToolTipText("make a new plot below, and copy the plot elements into it.  New plot is bound by the x axis.");
         addPlotMenu.add(item);
 
+        item = new JMenuItem( new  AbstractAction("Paste Plot From Clipboard") {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Clipboard clpbrd= Toolkit.getDefaultToolkit().getSystemClipboard();
+                    String s= (String) clpbrd.getData(DataFlavor.stringFlavor);
+                    System.err.println(s);
+                    Application state= (Application)StatePersistence.restoreState(new ByteArrayInputStream(s.getBytes()));
+                    Plot p= state.getPlots(0);
+                    Plot newP= controller.addPlot( domPlot, LayoutConstants.BELOW );
+                    newP.syncTo(p,Arrays.asList("id","rowId","columnId") );
+                    Map<String,String> nameMap= new HashMap<>();
+                    nameMap.put( p.getId(), newP.getId() );
+                    for ( int i=0; i<state.getDataSourceFilters().length; i++ ) {
+                        DataSourceFilter newDsf= controller.addDataSourceFilter();
+                        newDsf.syncTo(state.getDataSourceFilters(i),Collections.singletonList("id"));
+                        nameMap.put( state.getDataSourceFilters(i).getId(), newDsf.getId() );
+                    }
+                    Application theApp= controller.getApplication();
+                    for ( int i=0; i<state.getPlotElements().length; i++ ) {
+                        PlotElement pe1= state.getPlotElements(i);
+                        DataSourceFilter dsf1= 
+                                (DataSourceFilter) DomUtil.getElementById( theApp,nameMap.get(pe1.getDataSourceFilterId()) );
+                        Plot plot1= (Plot) DomUtil.getElementById( theApp, nameMap.get(pe1.getPlotId()) );
+                        
+                        PlotElement pe= controller.addPlotElement( plot1, dsf1 );
+                        pe.syncTo( pe1, Arrays.asList( "id", "plotId", "dataSourceFilterId") );
+                        
+                    }                            
+                            
+                } catch (UnsupportedFlavorException ex) {
+                    Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+            }
+        });
+        item.setToolTipText("Paste the plot in the system clipboard.");
+        addPlotMenu.add(item);
+            
 //        item = new JMenuItem(new AbstractAction("Copy Plot Elements Right") {
 //
 //            public void actionPerformed(ActionEvent e) {

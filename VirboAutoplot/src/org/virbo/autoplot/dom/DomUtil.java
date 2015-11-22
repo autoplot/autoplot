@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.beans.IndexedPropertyDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,6 +33,8 @@ import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
+import org.virbo.autoplot.state.SerializeUtil;
+import org.virbo.autoplot.state.StatePersistence;
 
 /**
  * operations for the DOM, such as search-for-node and child properties
@@ -896,6 +900,30 @@ public class DomUtil {
                 logger.log( Level.WARNING, ex.getMessage(), ex );
             }
 
+        }
+    }
+
+    static String getPlotAsString(Application application, Plot domPlot) {
+        Application newApp= new Application();
+        newApp.setPlots( new Plot[] { domPlot } );
+        List<PlotElement> pes= getPlotElementsFor( application, domPlot );
+        newApp.setPlotElements(pes.toArray(new PlotElement[pes.size()] ) );
+        List<DataSourceFilter> dsfs= new ArrayList<>();
+        for ( PlotElement pe: pes ) {
+            DataSourceFilter dsf= (DataSourceFilter) getElementById( application, pe.getDataSourceFilterId() );
+            dsfs.add( dsf );
+            //TODO: check for internal references
+        }
+        newApp.setDataSourceFilters( dsfs.toArray(new DataSourceFilter[dsfs.size()]) );
+        newApp.setCanvases(application.getCanvases());
+        
+        ByteArrayOutputStream baos= new ByteArrayOutputStream(1000);
+        try {
+            StatePersistence.saveState( baos, newApp, "" );
+            return baos.toString();
+            
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
