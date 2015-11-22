@@ -7,6 +7,8 @@ package org.virbo.autoplot;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,43 +40,61 @@ public class SetLogLevel extends HttpServlet {
             String logger= request.getParameter("logger");
             String level= request.getParameter("level");
             String handler= request.getParameter("handler");
-            
-            if ( logger==null ) {
+            String remoteAddr= request.getRemoteAddr();
+            if ( !remoteAddr.equals("127.0.0.1" ) ) {
                 out.println("<html>");
                 out.println("<head>");
                 out.println("<title>Servlet SetLogLevel</title>");  
                 out.println("</head>");
                 out.println("<body>");
-                out.println("<p>.../SetLogLevel?logger=autoplot.servlet&level=FINE&handler=T<p><code><small>");
-                out.println("  logger  the logger name, autoplot.servlet is used in this servlet<br>");
-                out.println("  level   the level, FINE or FINER is used in this servlet<br>");
-                out.println("  handler if T then reset and report the handler levels as well<br>");
+                out.println("<p>.../SetLogLevel must be called from 127.0.0.1<br>");
                 out.println("</code>");
-            } else {
-
-                Handler[] hh= Logger.getLogger(logger).getHandlers();
-                Level lev= Level.parse(level);            
-                Logger l= Logger.getLogger(logger);
-                l.setLevel( lev );
-                Logger.getLogger(logger).log(lev, "reset to "+level);
-
-                out.println("<html>");
-                out.println("<head>");
-                out.println("<title>Servlet SetLogLevel</title>");  
-                out.println("</head>");
-                out.println("<body>");
-
-                out.println(""+l +" @ "+l.getLevel()+"<br>" );
-            
-                out.println("handlers:<br>");
-                for ( Handler h: hh ) {
-                    if ( handler!=null && lev!=null ) h.setLevel(lev);
-                    out.println("  "+h+" @ "+h.getLevel()+"<br>");
-                }
-                if ( hh.length==0 ) {
-                    out.println("  (no handlers)");
-                }
                 
+            } else {
+                if ( logger==null ) {
+                    out.println("<html>");
+                    out.println("<head>");
+                    out.println("<title>Servlet SetLogLevel</title>");  
+                    out.println("</head>");
+                    out.println("<body>");
+                    out.println("<p>.../SetLogLevel?logger=autoplot.servlet&level=FINE&handler=T<p><code><small>");
+                    out.println("  logger  the logger name, autoplot.servlet is used in this servlet<br>");
+                    out.println("  level   the level, FINE or FINER is used in this servlet<br>");
+                    out.println("  handler if T then reset and report the handler levels as well<br>");
+                    out.println("</code>");
+                } else {
+
+                    Handler[] hh= Logger.getLogger(logger).getHandlers();
+                    Level lev= Level.parse(level);            
+                    Logger l= Logger.getLogger(logger);
+                    l.setLevel( lev );
+                    Logger.getLogger(logger).log(lev, "reset to "+level);
+
+                    out.println("<html>");
+                    out.println("<head>");
+                    out.println("<title>Servlet SetLogLevel</title>");  
+                    out.println("</head>");
+                    out.println("<body>");
+
+                    out.println("<b>Loggers:</b><br>");
+                    out.println(""+l +" @ "+l.getLevel()+"<br>" );
+
+                    if ( hh.length==0 ) {
+                        Logger.getLogger(logger).addHandler( new ConsoleHandler() );
+                        hh= Logger.getLogger(logger).getHandlers();
+                        out.println("<p>Added ConsoleHandler</p>"); 
+                    }
+
+                    out.println("<b>Handlers:</b><br>");
+                    for ( Handler h: hh ) {
+                        if ( handler!=null && lev!=null ) h.setLevel(lev);
+                        out.println("  "+h+" @ "+h.getLevel()+"<br>");
+                    }
+                    if ( hh.length==0 ) {
+                        out.println("  (no handlers)");
+                    }
+
+                }
             }
             
             out.println("</body>");
