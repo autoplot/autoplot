@@ -265,9 +265,14 @@ public class DodsAdapter {
         mon.started();
         
         try {
-            logger.log(Level.FINE, "calling dconnect.getData{0}", constraint);
+            logger.log(Level.FINE, "calling dconnect.getData constraint={0}", constraint);
             dds = dconnect.getData(constraint, statusUI);
-            logger.log(Level.FINE, "called dconnect.getData{0} -> ", dds );
+            logger.log(Level.FINE, "called dconnect.getData -> {0}", dds );
+            if ( dds==null ) {
+                System.err.println( "Webstart/Opendap interaction results in dconnect.getData -> null");
+                System.err.println( "opendap.Version.getVersionString()="+opendap.Version.getVersionString() );
+            }
+            
         } catch (DDSException ex) {
             if (mon.isCancelled()) {
                 logger.log( Level.FINE, ex.getMessage(), ex );
