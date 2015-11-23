@@ -33,9 +33,9 @@ public class DomNodeController {
     protected PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
     protected final ChangesSupport changesSupport = new ChangesSupport(propertyChangeSupport, this);
 
-    private static WeakHashMap<DomNode,Long> instances= new WeakHashMap();
+    private static final WeakHashMap<DomNode,Long> instances= new WeakHashMap();
 
-    private static long t0= System.currentTimeMillis();
+    private static final long t0= System.currentTimeMillis();
 
     public DomNodeController( DomNode node ) {
         this.node= node;
@@ -86,11 +86,7 @@ public class DomNodeController {
         try {
             Method m= n.getClass().getMethod( "getController" );
             return (DomNodeController) m.invoke( n );
-        } catch (IllegalAccessException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IllegalArgumentException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (InvocationTargetException ex) {
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch ( NoSuchMethodException ex ) {
         }
@@ -111,7 +107,7 @@ public class DomNodeController {
 
     /**
      * Some sort of processing is going on, so wait until idle.
-     * @return
+     * @return true if there are changes pending.
      */
     public boolean isPendingChanges() {
         if (changesSupport.isPendingChanges()) {
@@ -211,7 +207,8 @@ public class DomNodeController {
     /**
      * the change is complete, and as far as the client is concerned, the canvas
      * is valid.
-     * @param lockObject
+     * @param client the object that is mutating the bean.
+     * @param lockObject an object identifying the change.  
      */    
     public void changePerformed(Object client, Object lockObject) {
         changesSupport.changePerformed(client, lockObject);
