@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot.dom;
 
 import java.awt.AWTEventMulticaster;
@@ -18,11 +15,6 @@ import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -38,7 +30,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
@@ -51,7 +42,6 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.event.MouseModule;
 import org.das2.graph.AnchorPosition;
 import org.das2.graph.AnchorType;
-import org.das2.graph.BorderType;
 import org.das2.graph.ColumnColumnConnector;
 import org.das2.graph.DasAnnotation;
 import org.das2.graph.DasCanvas;
@@ -77,9 +67,7 @@ import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.LayoutListener;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.layout.LayoutConstants;
-import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.autoplot.util.RunLaterListener;
-import org.virbo.datasource.DataSourceUtil;
 
 /**
  * The ApplicationController, one per dom, is in charge of managing the 
@@ -1306,7 +1294,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 domRow = ccontroller.addInsertRow( ccontroller.getRowFor(focus), direction);
             }
 
-            Column domColumn= c.getMarginColumn();
+            Column domColumn;
 
             // the logic for columns is different because we optimize the application for a stack of time
             // series.
@@ -2450,6 +2438,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     /**
      * clients can get status here.  
      * @return the last status message.
+     * @see #waitUntilIdle() 
      */
     public String getStatus() {
         return status;
