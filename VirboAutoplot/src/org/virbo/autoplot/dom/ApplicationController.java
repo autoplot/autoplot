@@ -1912,6 +1912,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             application.getPlots(0).getXaxis().setAutoRange(true);
             application.getPlots(0).getYaxis().setAutoRange(true);
             application.getPlots(0).getZaxis().setAutoRange(true);
+            application.getPlots(0).getXaxis().setAutoRangeHints("");
+            application.getPlots(0).getYaxis().setAutoRangeHints("");
+            application.getPlots(0).getZaxis().setAutoRangeHints("");
             
             for ( int i=application.getBindings().length-1; i>=0; i-- ) {
                 deleteBinding( application.getBindings(i) );
