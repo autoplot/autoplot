@@ -827,7 +827,7 @@ public class PlotController extends DomNodeController {
     }
     
     /**
-     * implement hints like width=40.  
+     * implement hints like width=40&includeZero=T.  
      * <blockquote><pre>
      * includeZero   T or F     make sure that zero is within the result.
      * width         30nT       use this width.  This is a formatted datum which 
@@ -838,22 +838,38 @@ public class PlotController extends DomNodeController {
      * (not yet) reluctant     T or F     use the old range if it is acceptable.
      * </pre></blockquote>
 
-     * @param axis
-     * @param hintsString 
+     * @param axis the axis to which we are applying the hints.
+     * @param hintsString the string, ampersand-delimited.
      */
     private void doHints( Axis axis, String hintsString ) {
         Map<String,String> hints= URISplit.parseParams(hintsString);
         DatumRange range=axis.getRange();
+        boolean log= axis.isLog();
 
         boolean includeZero= "T".equals(hints.get("includeZero"));
         String width= hints.get("width");
         String widths= hints.get("widths");
         String center= hints.get("center");
+        String logHint= hints.get("log");
 
+        if ( logHint!=null && UnitsUtil.isRatioMeasurement( axis.getRange().getUnits() ) ) {
+            if ( logHint.equals("T") ) {
+                if ( range.min().value() <= 0. ) {
+                    if ( range.max().value()>0 ) {
+                        double m= range.max().value();
+                        range= new DatumRange( m/1e3, m, range.getUnits() );
+                    } else {
+                        range= new DatumRange( 1, 1000, range.getUnits() );
+                    }
+                }
+            }
+            log= logHint.equals("T");
+        }
+        
         if ( width!=null ) {
             Units u= range.getUnits().getOffsetUnits();
             try {
-                if ( axis.log ) {
+                if ( log ) {
                     Datum w= Units.log10Ratio.parse(width);
                     w= w.divide(2);
                     Datum currentCenter= DatumRangeUtil.rescaleLog( range, 0.5, 0.5 ).min();
@@ -870,11 +886,11 @@ public class PlotController extends DomNodeController {
         }
         if ( widths!=null ) {
             String[] wss= widths.split("\\,");
-            Datum limit= axis.log ? Units.log10Ratio.createDatum( Math.log10( range.max().divide(range.min()).value() ) ) : range.width();
+            Datum limit= log ? Units.log10Ratio.createDatum( Math.log10( range.max().divide(range.min()).value() ) ) : range.width();
             Units u= range.getUnits().getOffsetUnits();
             for ( String ws: wss ) {
                 try {
-                    if ( axis.log ) {
+                    if ( log ) {
                         Datum w= Units.log10Ratio.parse(ws);
                         if ( w.gt(limit) || ws.equals(wss[wss.length-1])) {
                             w= w.divide(2);
@@ -913,7 +929,7 @@ public class PlotController extends DomNodeController {
         if ( center!=null ) {
             Units u= range.getUnits();
             try {
-                if ( axis.log ) {
+                if ( log ) {
                     Datum w= range.max().divide(range.min() );
                     w= w.divide(2);
                     Datum currentCenter;
@@ -930,6 +946,7 @@ public class PlotController extends DomNodeController {
             }              
         }
         axis.setRange( range );
+        axis.setLog(log);
     }
     
     /**
