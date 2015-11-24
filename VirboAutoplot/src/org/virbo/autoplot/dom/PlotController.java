@@ -912,17 +912,17 @@ public class PlotController extends DomNodeController {
                 }
             }
         }
-        if ( includeZero && UnitsUtil.isNominalMeasurement(range.getUnits() ) ) {
+        if ( includeZero && UnitsUtil.isRatioMeasurement(range.getUnits() ) ) {
             Datum z= range.getUnits().createDatum(0);
             if ( widths==null && width==null ) {
                 range= DatumRangeUtil.union( range, z ); //TODO: consider extra 10%
             } else {
                 if ( range.min().value()>0 ) {
                     double n= DatumRangeUtil.normalize( range, z );
-                    range= DatumRangeUtil.rescale( range, -n, -n+1 );
+                    range= DatumRangeUtil.rescale( range, n, n+1 );
                 } else if ( range.max().value()<0. ) {
                     double n= DatumRangeUtil.normalize( range, z );
-                    range= DatumRangeUtil.rescale( range, -n-1, -n );                    
+                    range= DatumRangeUtil.rescale( range, n-1, n );                    
                 }
             }
         }
@@ -930,11 +930,11 @@ public class PlotController extends DomNodeController {
             Units u= range.getUnits();
             try {
                 if ( log ) {
-                    Datum w= range.max().divide(range.min() );
-                    w= w.divide(2);
+                    double w= Math.log10( range.max().divide(range.min() ).value() );
+                    w= w/2;
                     Datum currentCenter;
                     currentCenter = u.parse(center);
-                    range= new DatumRange( currentCenter.divide( Math.pow(10,w.value()) ), currentCenter.multiply( Math.pow(10,w.value()) ) );
+                    range= new DatumRange( currentCenter.divide( Math.pow(10,w) ), currentCenter.multiply( Math.pow(10,w) ) );
                 } else {
                     Datum w= range.width();
                     w= w.divide(2);
