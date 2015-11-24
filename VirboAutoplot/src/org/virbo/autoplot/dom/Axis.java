@@ -185,13 +185,13 @@ public class Axis extends DomNode {
      * when the dimension is autoranged, consider these hints.  These
      * could include:
      * <li>includeZero
-     * <li>log or linear
+     * <li>log=T or log=F
      * <li>center=DATUM
      * <li>width=DATUM, note percent increase can be used with log.
      * <li>reluctant=true
      * <li>units=UNITS, explicitly set the units.
      * These are formed by combining them with ampersands, so for example:
-     * <code>linear&width=40</code>
+     * <code>log=F&width=40</code>
      * would have the two hints.
      */
     private String autoRangeHints = "";
@@ -203,6 +203,7 @@ public class Axis extends DomNode {
     }
 
     public void setAutoRangeHints(String autoRangeHints) {
+        System.err.println(getId()+".autoRangeHints="+autoRangeHints);
         String oldAutoRangeHints = this.autoRangeHints;
         this.autoRangeHints = autoRangeHints;
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGEHINTS, oldAutoRangeHints, autoRangeHints);
@@ -269,8 +270,9 @@ public class Axis extends DomNode {
             if ( !exclude.contains( PROP_OPPOSITE ) ) this.setFlipped(that.isOpposite());
             if ( !exclude.contains( PROP_RANGE ) ) this.setRange(that.getRange());
             if ( !exclude.contains( PROP_LABEL ) ) this.setLabel(that.getLabel());
-            if (!exclude.contains(PROP_FONTSIZE) ) this.setFontSize(that.getFontSize());
+            if ( !exclude.contains( PROP_FONTSIZE ) ) this.setFontSize(that.getFontSize());
             if ( !exclude.contains( PROP_AUTORANGE ) ) this.setAutoRange(that.isAutoRange());
+            if ( !exclude.contains( PROP_AUTORANGEHINTS ) ) this.setAutoRangeHints(that.getAutoRangeHints());
             if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutoLabel(that.isAutoLabel());
             if ( !exclude.contains( PROP_DRAWTICKLABELS ) ) this.setDrawTickLabels(that.isDrawTickLabels());
             if ( !exclude.contains( PROP_VISIBLE ) ) this.setVisible(that.isVisible());
@@ -289,7 +291,7 @@ public class Axis extends DomNode {
     @Override
     public List<Diff> diffs(DomNode node) {
         Axis that = (Axis) node;
-        List<Diff> result = new ArrayList<Diff>();
+        List<Diff> result = new ArrayList<>();
         boolean b;
 
         b= that.log==this.log ;
@@ -306,6 +308,8 @@ public class Axis extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff( PROP_FONTSIZE, that.fontSize , this.fontSize ) );
         b=  that.autoRange==this.autoRange;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTORANGE, that.autoRange , this.autoRange ) );
+        b=  that.autoRangeHints.equals(this.autoRangeHints);
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTORANGEHINTS, that.autoRangeHints, this.autoRangeHints ) );
         b=  that.autoLabel==this.autoLabel;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTOLABEL, that.autoLabel , this.autoLabel ) );
         b=  that.drawTickLabels==this.drawTickLabels;
