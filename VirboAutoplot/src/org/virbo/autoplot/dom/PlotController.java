@@ -831,8 +831,8 @@ public class PlotController extends DomNodeController {
      * <blockquote><pre>
      * includeZero   T or F     make sure that zero is within the result.
      * width         30nT       use this width.  This is a formatted datum which 
-     *                            is parsed with the units of the axis, or with ratiometric units for log.
-     * (not yet) log           T or F     force log or linear axis
+     *                          is parsed with the units of the axis, or with the number of cycles for log.
+     * log           T or F     force log or linear axis
      * widths        30nT,300nT,3000nT   use one of these widths
      * center        0          constrain the center to be this location
      * (not yet) reluctant     T or F     use the old range if it is acceptable.
