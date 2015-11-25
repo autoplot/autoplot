@@ -203,7 +203,6 @@ public class Axis extends DomNode {
     }
 
     public void setAutoRangeHints(String autoRangeHints) {
-        System.err.println(getId()+".autoRangeHints="+autoRangeHints);
         String oldAutoRangeHints = this.autoRangeHints;
         this.autoRangeHints = autoRangeHints;
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGEHINTS, oldAutoRangeHints, autoRangeHints);
