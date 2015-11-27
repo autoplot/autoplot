@@ -48,10 +48,14 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.net.UnknownHostException;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Properties;
@@ -611,7 +615,7 @@ public class AutoplotUtil {
      * show a list of the filesystems
      * @param parent
      */
-    protected static void doManageFilesystems( Component parent ) {
+    protected static void doManageFilesystems( final Component parent ) {
         FileSystem[] fss= FileSystem.peekInstances();
         Arrays.sort(fss, new Comparator() {
             @Override
@@ -619,16 +623,48 @@ public class AutoplotUtil {
                 return o1.toString().compareTo(o2.toString());
             }
         });
-        JPanel p= new JPanel();
+        final JPanel p= new JPanel();
         p.setLayout( new GridBagLayout() );
         GridBagConstraints c= new GridBagConstraints();
         c.gridy=0;
         c.fill = GridBagConstraints.HORIZONTAL;
+        
+        p.add( new JLabel("<html><em>Double-click on file system name to reset status</em>"),c );
+        c.gridy++;
+        
         for ( FileSystem fs: fss ) {
             c.weightx= 0.8;
             c.gridx= 0;
             c.anchor= GridBagConstraints.WEST;
-            p.add( new JLabel( fs.toString() ), c );
+            JLabel l= new JLabel( fs.toString() );
+            p.add( l, c );
+            final FileSystem ffs= fs;
+            l.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if ( e.getClickCount()==2 ) {
+                        Runnable run= new Runnable() {
+                            @Override
+                            public void run() {
+                                FileSystem.reset(ffs);
+                                try {
+                                    FileSystem x= FileSystem.create(ffs.getRootURI());
+                                } catch (FileSystem.FileSystemOfflineException | UnknownHostException | FileNotFoundException ex) {
+                                    Logger.getLogger(AutoplotUtil.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                                Runnable run2= new Runnable() {
+                                    public void run() {
+                                        SwingUtilities.getWindowAncestor(p).setVisible(false);
+                                        doManageFilesystems( parent );        
+                                    }
+                                };
+                                SwingUtilities.invokeLater(run2);
+                            }
+                        };    
+                        new Thread(run).start();
+                    }
+                }
+            });               
             c.weightx= 0.1;
             c.gridx= 1;
             c.anchor= GridBagConstraints.EAST;
@@ -637,13 +673,14 @@ public class AutoplotUtil {
             c.gridx= 2;
             c.anchor= GridBagConstraints.EAST;
             if ( fs instanceof LocalFileSystem ) {
-                p.add( new JLabel( "" ), c );
+                p.add( new JLabel( "ok" ), c );
             } else if ( fs instanceof WebFileSystem ) {
                 String s= ((WebFileSystem)fs).isOffline() ? "offline" : "ok" ;
                 if (((WebFileSystem)fs).isOffline()) {
                     s= "<html>"+s+"<br>"+((WebFileSystem)fs).getOfflineMessage();
                 }
-                p.add( new JLabel(s), c );
+                l=new JLabel(s);
+                p.add( l, c );
             }
             c.gridy++;
         }
