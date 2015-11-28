@@ -45,6 +45,7 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import org.autoplot.wgetfs.WGetFileSystemFactory;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.DasProgressMonitorInputStream;
 import org.das2.util.LoggerManager;
@@ -1670,6 +1671,19 @@ public class DataSetURI {
         String prefixPrefix= "";
 
         if ( surlDir.contains("$Y") ) { // $Y must be first for now.  This will be generalized after verified
+            
+            DatumRange timeRange= null;
+            try {
+                URISplit split1= URISplit.parse(surl);
+                Map<String,String> parms= URISplit.parseParams(split1.params);
+                String stimeRange= parms.get(URISplit.PARAM_TIME_RANGE);
+                if ( stimeRange!=null ) {
+                    timeRange= DatumRangeUtil.parseTimeRange(stimeRange);
+                }
+            } catch ( Exception e ) {
+                
+            }
+            
             int ip= surlDir.indexOf("$Y");
             String s1= surlDir.substring(0,ip);
             String s2= surlDir.substring(ip,surlDir.length()-1);
@@ -1678,7 +1692,7 @@ public class DataSetURI {
 
             fs= fsp; // careful, we only use this for case insensitive check
             List<String> ss= new ArrayList();
-            String [] ss2= fsm.getNamesFor(null);
+            String [] ss2= fsm.getNamesFor(timeRange);
 
             int nn= Math.min( 2, ss2.length );
 
