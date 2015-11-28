@@ -101,7 +101,7 @@ public class DataSetURI {
             FileSystem.settings().setLocalCacheDir(apDataHome);
         }
     }
-    static WeakHashMap<DataSource, DataSourceFactory> dsToFactory = new WeakHashMap<DataSource, DataSourceFactory>();
+    static WeakHashMap<DataSource, DataSourceFactory> dsToFactory = new WeakHashMap<>();
 
     /**
      * returns the explicit extension, or the file extension if found, or null.
@@ -251,7 +251,7 @@ public class DataSetURI {
 
         String[] names= fsm.getNamesFor( timerange );
 
-        List<String> result= new ArrayList<String>();
+        List<String> result= new ArrayList<>();
         for ( String n: names ) {
             result.add( root + n );
         }
@@ -342,13 +342,7 @@ public class DataSetURI {
             if (tsb==null ) return null;
             tsb.setURI(value);
             return tsb.blurURI();
-        } catch (URISyntaxException ex) {
-            return null;
-        } catch (IOException ex) {
-            return null;
-        } catch (IllegalArgumentException ex) {
-            return null;
-        } catch (ParseException ex) {
+        } catch (URISyntaxException | IOException | IllegalArgumentException | ParseException ex) {
             return null;
         }
         
@@ -367,13 +361,7 @@ public class DataSetURI {
             tsb.setURI(value);
             tsb.setTimeResolution(null);
             return tsb.getURI();
-        } catch (URISyntaxException ex) {
-            return null;
-        } catch (IOException ex) {
-            return null;
-        } catch (IllegalArgumentException ex) {
-            return null;
-        } catch (ParseException ex) {
+        } catch (URISyntaxException | IOException | IllegalArgumentException | ParseException ex) {
             return null;
         }
         
@@ -1078,9 +1066,9 @@ public class DataSetURI {
                 }
                 logger.log(Level.FINE, "this thread will downloading temp resource {0}", tempfile);
                 action= ACTION_DOWNLOAD;
-                OutputStream out= new FileOutputStream(result);  // touch the file
-                out.write( "DataSetURI.downloadResourceAsTempFile: This placeholding temporary file should not be used.\n".getBytes() ); // I bet we see this message again!
-                out.close();
+                try (OutputStream out = new FileOutputStream(result) ) { // touch the file
+                    out.write( "DataSetURI.downloadResourceAsTempFile: This placeholding temporary file should not be used.\n".getBytes() ); // I bet we see this message again!
+                } // I bet we see this message again!
                 OutputStream outf= new FileOutputStream(tempfile);
                 outf.close();
             }
@@ -1109,7 +1097,7 @@ public class DataSetURI {
                             tlength= System.currentTimeMillis();
                         } else {
                             if ( System.currentTimeMillis()-tlength >  3 * FileSystem.settings().getConnectTimeoutMs() ) { 
-                                logger.warning("timeout waiting for lengthening of file "+tempfile+" which another thread is loading");
+                                logger.log(Level.WARNING, "timeout waiting for lengthening of file {0} which another thread is loading", tempfile);
                                 throw new IOException("timeout waiting for lengthening of file "+tempfile+" which another thread is loading");
                             }
                         }
@@ -1384,7 +1372,7 @@ public class DataSetURI {
         } else {
             if ( split.vapScheme==null && split.scheme==null ) {
                 String[] types= new String[] { "ftp://", "http://", "https://", "file:/", "sftp://" };
-                List<CompletionResult> result= new ArrayList<CompletionResult>();
+                List<CompletionResult> result= new ArrayList<>();
                 String completable= surl.substring(0, carotpos);
                 for (String type : types) {
                     if (type.length() >= carotpos && type.startsWith(completable)) {
@@ -1429,7 +1417,7 @@ public class DataSetURI {
         String[] s;
 
         if ( split.scheme==null ) {
-            List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>();
+            List<DataSetURI.CompletionResult> completions = new ArrayList<>();
             s= new String[] { "ftp://", "http://", "https://", "file:///", "sftp://",  };
             for (String item : s) {
                 completions.add(new DataSetURI.CompletionResult(item + surl + "/", item + surl + "/"));
@@ -1447,7 +1435,7 @@ public class DataSetURI {
             prefix = prefix.toLowerCase();
         }
 
-        List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(s.length);
+        List<DataSetURI.CompletionResult> completions = new ArrayList<>(s.length);
         for (String item : s) {
             String scomp = foldCase ? item.toLowerCase() : item;
             if (scomp.startsWith(prefix)) {
@@ -1514,7 +1502,7 @@ public class DataSetURI {
 
         Arrays.sort(s);
 
-        List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(5);
+        List<DataSetURI.CompletionResult> completions = new ArrayList<>(5);
 
         String[] s2= new String[s.length];
         for ( int i=0; i<s.length; i++ ) {
@@ -1597,7 +1585,7 @@ public class DataSetURI {
             prefix = prefix.toLowerCase();
         }
 
-        List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(s.length);
+        List<DataSetURI.CompletionResult> completions = new ArrayList<>(s.length);
         for (String item : s) {
             String scomp = foldCase ? item.toLowerCase() : item;
             if (scomp.startsWith(prefix) && !scomp.endsWith(".listing")) {
@@ -1734,7 +1722,7 @@ public class DataSetURI {
 
         if ( acceptPattern!=null ) {
             Pattern p= Pattern.compile(acceptPattern);
-            List<String> res= new ArrayList<String>(s.length);
+            List<String> res= new ArrayList<>(s.length);
             for (String item : s) {
                 if (item.endsWith("/")) {
                     res.add(item);
@@ -1769,7 +1757,7 @@ public class DataSetURI {
             prefix= prefixPrefix + prefix;
         }
         
-        List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(s.length);
+        List<DataSetURI.CompletionResult> completions = new ArrayList<>(s.length);
 
         String[] s2= new String[s.length];
         for ( int i=0; i<s.length; i++ ) {
@@ -1918,7 +1906,7 @@ public class DataSetURI {
      */
     public static List<String> getDiscoverableExtensions() {
         List<String> exts= DataSourceRegistry.getInstance().getSourceEditorExtensions();
-        List<String> result= new ArrayList<String>();
+        List<String> result= new ArrayList<>();
         for ( String ext: exts ) {
             try {
                 DataSourceFactory o = DataSourceRegistry.getInstance().getSource(ext);
@@ -1960,7 +1948,7 @@ public class DataSetURI {
 
         boolean hasResourceUri= split.vapScheme==null || DataSourceRegistry.getInstance().hasResourceUri(split.vapScheme);
             
-        List<CompletionResult> result = new ArrayList<CompletionResult>();
+        List<CompletionResult> result = new ArrayList<>();
 
         if ( ( qpos==-1 && !hasResourceUri ) || ( qpos != -1 && qpos < carotPos) ) { // in query section
 
