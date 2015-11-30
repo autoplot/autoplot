@@ -66,8 +66,7 @@ import java.util.regex.*;
  * @author jbf
  */
 public class CreatePngWalk {
-    private static final ArrayList<String> pngFilenameArray= new ArrayList();
-    private static final ArrayList<String> timeLabels= new ArrayList();
+    
     /**
      * Get the list of times, which can be one of:<ul>
      *   <li> rank 2 bins datasets  T[index;min,max]
@@ -258,7 +257,9 @@ public class CreatePngWalk {
      * @throws InterruptedException 
      */
     public static int doBatch( String[] times, Application readOnlyDom, Params params, ProgressMonitor mon ) throws IOException, InterruptedException {
-
+        final ArrayList<String> pngFilenameArray= new ArrayList();
+        final ArrayList<String> timeLabels= new ArrayList();
+    
         int returnCodeAll= 10;
         
         logger.log( Level.CONFIG, "CreatePngWalk.doBatch with params {0}", params);
@@ -565,7 +566,11 @@ public class CreatePngWalk {
                 mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/sec%s)", imagesPerSec, etaStr ) );
             }
         }
+        
+        writeHTMLFile( params, pngFilenameArray, timeLabels );
+        
         mon.finished();
+        
         
         return returnCodeAll;
     }
@@ -708,9 +713,9 @@ public class CreatePngWalk {
      * @author Armond Luthens
      *
      */
-    public static void writeHTMLFile(){
-        //String filePath= outputFolder+"pngImagePage.html";
-        String filePath = "pngImagePage2.html";
+    public static void writeHTMLFile( Params params, ArrayList<String> pngFilenameArray, ArrayList<String> timeLabels ){
+        String filePath= params.outputFolder+"pngImagePage.html";
+        //String filePath = "pngImagePage2.html";
         File f= new File(filePath);
         
         String htmlOpen= "<html>";
@@ -832,7 +837,7 @@ public class CreatePngWalk {
 
         int status= doIt( ScriptContext.getDocumentModel(), params );
         
-        writeHTMLFile();
+        
         System.exit(status); // something starts up thread that prevents java from exiting.
     }
 }
