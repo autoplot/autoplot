@@ -41,6 +41,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.stream.MIME;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
+import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -50,6 +51,7 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.dsops.Ops;
 import org.virbo.qstream.QDataSetStreamHandler;
 
 /**
@@ -460,16 +462,39 @@ class Das2ServerDataSource extends AbstractDataSource {
             } else {
                 DataSet das2ds;
                 das2ds= ds.getPlanarView( item );
+                //TODO: there's a bug where item=x shows where the 0th item label is always used.
                 if ( das2ds==null ) {
-                    int iitem= Integer.parseInt(item);
-                    if ( iitem==0 ) {
-                        das2ds= ds.getPlanarView( "" );
+                    if ( item.contains(",") ) {
+                        BundleDataSet bds=null;
+                        String[] ss= item.split(",");
+                        for ( String s: ss ) {
+                            das2ds= ds.getPlanarView( s );
+                            if ( das2ds==null ) {
+                                int iitem= Integer.parseInt(s);
+                                if ( iitem==0 ) {
+                                    das2ds= ds.getPlanarView( "" );
+                                } else {
+                                    das2ds= ds.getPlanarView( "plane_"+iitem );
+                                }
+                            }
+                            QDataSet bds1= DataSetAdapter.create( das2ds ); 
+                            bds= (BundleDataSet) Ops.bundle( bds, bds1 );
+                        }
+                        result= bds;
                     } else {
-                        das2ds= ds.getPlanarView( "plane_"+iitem );
+                        int iitem= Integer.parseInt(item);
+                        if ( iitem==0 ) {
+                            das2ds= ds.getPlanarView( "" );
+                        } else {
+                            das2ds= ds.getPlanarView( "plane_"+iitem );
+                        }
+                        if ( das2ds==null ) throw new IllegalArgumentException("no such plane, looking for " + item  );
+                        result= DataSetAdapter.create( das2ds ); // fragile                
                     }
+                } else {
+                    if ( das2ds==null ) throw new IllegalArgumentException("no such plane, looking for " + item  );
+                    result= DataSetAdapter.create( das2ds ); // fragile
                 }
-                if ( das2ds==null ) throw new IllegalArgumentException("no such plane, looking for " + item  );
-                result= DataSetAdapter.create( das2ds ); // fragile
             }
 
             if ( tcaDesc!=null && tcaDesc.size()>0 ) {
