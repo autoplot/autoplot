@@ -509,7 +509,9 @@ class Das2ServerDataSource extends AbstractDataSource {
                         result.putProperty( QDataSet.LABEL, tcaDesc.get(0) );
                     }
                 } else {
-                    result.putProperty( QDataSet.LABEL, tcaDesc.get( Integer.parseInt(item) ) );
+                    if ( !item.contains(",") ) {
+                        result.putProperty( QDataSet.LABEL, tcaDesc.get( Integer.parseInt(item) ) );
+                    }
                 }
             }
             result1= result;
