@@ -932,7 +932,7 @@ public class JythonUtil {
          
          int lastLine= -1;
          for ( int i=0; i<ss.length; i++ ) {
-             if ( ss[i].contains("getParam(") ) lastLine= i+1;
+             if ( ss[i].contains("getParam") ) lastLine= i+1;
          }
          
          if ( lastLine==-1 ) {
