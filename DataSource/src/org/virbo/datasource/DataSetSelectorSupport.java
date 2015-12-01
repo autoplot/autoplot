@@ -122,8 +122,7 @@ public class DataSetSelectorSupport {
                 }
                 String t = f.toString();
                 if (t==null ) {
-                    logger.fine("here is that bad state on windows.  bug http://sourceforge.net/tracker/?func=detail&aid=3038977&group_id=199733&atid=970682");
-                    //t= "" + f;  //TODO: do we still get this?
+                    // bug https://sourceforge.net/p/autoplot/bugs/429/, where Windows returns an f whose toString returns null.
                     return false;
                 }
                 String ext = DataSetURI.getExt(t);
