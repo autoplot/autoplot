@@ -1,7 +1,11 @@
 
 package org.virbo.datasource;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,9 +14,17 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
+import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
+import org.jdesktop.beansbinding.BindingGroup;
 
 /**
  * Additional actions for the DataSetSelector.
@@ -40,10 +52,12 @@ public class DataSetSelectorSupport {
     
     /**
      * Show a file chooser component, and return the name of a .vap file.
-     * @param parent parent component for focus.
-     * @return the URI for the vap file.
+     * @param parent parent component for focus.  If a dataSetSelector is
+     * used then its timerange is used for the initial timerange.
+     * @param initialSelection if non-null, then the initial selection.
+     * @return the URI for the vap file, or null if cancel was pressed.
      */
-    public static String browseLocalVap( java.awt.Component parent ) {
+    public static String browseLocalVap( java.awt.Component parent, String initialSelection) {
         Preferences prefs = Preferences.userNodeForPackage( AutoplotSettings.class);
 
         String currentDirectory = prefs.get( PREF_LAST_OPEN_VAP_FOLDER, prefs.get(PREF_LAST_OPEN_FOLDER, userHome().toString() ) );
@@ -53,6 +67,55 @@ public class DataSetSelectorSupport {
         if ( currentFile.length()>0 ) {
             chooser.setSelectedFile( new File( currentFile ) );
         }
+        if ( initialSelection!=null ) {
+            URISplit split= URISplit.parse(initialSelection);
+            if ( split.file!=null ) {
+                chooser.setSelectedFile( new File( split.file ));
+            }
+        }
+        
+        JPanel trPanel= new JPanel();
+        trPanel.setLayout( new BoxLayout(trPanel, BoxLayout.Y_AXIS ));
+        trPanel.setMaximumSize( new Dimension(230,9999) );
+        trPanel.setPreferredSize( new Dimension(230,200) );
+        ButtonGroup bg= new ButtonGroup();
+        JCheckBox b1= new JCheckBox("Use timerange in .vap file");
+        b1.setAlignmentX(Component.LEFT_ALIGNMENT);
+        bg.add(b1);
+        final TimeRangeEditor t= new TimeRangeEditor();
+        if ( parent!=null && parent instanceof DataSetSelector ) {
+            t.setRange( ((DataSetSelector)parent).getTimeRange() );
+        }
+        t.makeThinner();
+        JPanel customTRPanel= new JPanel();
+        customTRPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        customTRPanel.setLayout( new BoxLayout(customTRPanel,BoxLayout.X_AXIS)) ;
+        final JCheckBox b2= new JCheckBox("");
+        bg.add(b2);
+        customTRPanel.add(b2);
+        customTRPanel.add(t);
+        customTRPanel.setMaximumSize( new Dimension( 230, t.getPreferredSize().height ) );
+        b1.setSelected(true);
+        
+        trPanel.add(b1);
+        trPanel.add( Box.createVerticalStrut(14) );
+        trPanel.add( new JLabel("Reset the .vap timerange:"));
+        trPanel.add(customTRPanel);
+        
+        ActionListener enableTR= new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                t.setEnabled( b2.isSelected() );
+            }
+        };
+        b1.addActionListener(enableTR);
+        b2.addActionListener(enableTR);
+        
+        t.setEnabled(false);
+        
+        trPanel.add( Box.createVerticalGlue() );
+        
+        chooser.setAccessory(trPanel);
         
         FileFilter ff;
         ff = new FileFilter() {
@@ -85,7 +148,11 @@ public class DataSetSelectorSupport {
         int result = chooser.showOpenDialog(parent);
         if (result == JFileChooser.APPROVE_OPTION) {
             prefs.put(PREF_LAST_OPEN_VAP_FOLDER, chooser.getSelectedFile().getParent() );
-            return chooser.getSelectedFile().toURI().toString();
+            if ( b2.isSelected() ) {
+                return chooser.getSelectedFile().toURI().toString() + "?timerange="+ t.getRange().toString().replaceAll("\\s+", "+");
+            } else {
+                return chooser.getSelectedFile().toURI().toString();
+            }
         } else {
             return null;
         }
@@ -227,7 +294,7 @@ public class DataSetSelectorSupport {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
-                String result= browseLocalVap(ui);
+                String result= browseLocalVap(ui, ui.getValue() );
 
                 if (result != null ) {
                     ui.setValue(result);
