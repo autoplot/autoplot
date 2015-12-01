@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -532,5 +533,36 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     }
 
+    /**
+     * re-layout the GUI to make it thinner.
+     */
+    public void makeThinner() {
+        removeAll();
+        setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
+        add( recentComboBox );
+        javax.swing.JPanel p2= new javax.swing.JPanel();
+        p2.setLayout( new BoxLayout( p2, BoxLayout.X_AXIS ) );
+        p2.add( timeRangeToolButton );
+        p2.add( prevButton );
+        p2.add( nextButton );
+        recentComboBox.setMaximumSize( recentComboBox.getPreferredSize() );
+        prevButton.setPreferredSize(nextButton.getPreferredSize());
+        prevButton.setMinimumSize(nextButton.getMinimumSize());
+        prevButton.setMaximumSize(nextButton.getMaximumSize());
+        add( p2 );
+        setMinimumSize( new Dimension( recentComboBox.getMinimumSize().width, recentComboBox.getMinimumSize().height + prevButton.getMinimumSize().height + 5 ));
+        setPreferredSize(getMinimumSize());
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        prevButton.setEnabled(enabled);
+        nextButton.setEnabled(enabled);
+        timeRangeToolButton.setEnabled(enabled);
+        recentComboBox.setEnabled(enabled);
+    }
+    
+    
 
 }
