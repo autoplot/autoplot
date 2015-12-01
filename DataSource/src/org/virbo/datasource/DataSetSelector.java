@@ -730,7 +730,17 @@ public class DataSetSelector extends javax.swing.JPanel {
                     //experiment with GUI based on completions.
                     edit= new CompletionsDataSourceEditor();
                 } else {
-                    JOptionPane.showMessageDialog( DataSetSelector.this, "Unable to inspect .vap files" );
+                    if ( split.path.startsWith("file:") ) {
+                        String result= DataSetSelectorSupport.browseLocalVap(this, surl);
+                        if (result != null ) {
+                            this.setValue(result);
+                            this.maybePlot(false);
+                        }
+                        return;
+                    } else {
+                        JOptionPane.showMessageDialog( DataSetSelector.this, "Unable to inspect .vap files" );
+                        return;
+                    }
                 }
             }
             
