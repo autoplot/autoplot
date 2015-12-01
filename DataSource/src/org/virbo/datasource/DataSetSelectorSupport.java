@@ -95,7 +95,10 @@ public class DataSetSelectorSupport {
         customTRPanel.add(b2);
         customTRPanel.add(t);
         customTRPanel.setMaximumSize( new Dimension( 230, t.getPreferredSize().height ) );
-        b1.setSelected(true);
+        
+        boolean notimerange= ( initialSelection==null || !initialSelection.contains("?timerange=") );
+        b1.setSelected( notimerange );
+        b2.setSelected( !notimerange );
         
         trPanel.add(b1);
         trPanel.add( Box.createVerticalStrut(14) );
@@ -111,7 +114,7 @@ public class DataSetSelectorSupport {
         b1.addActionListener(enableTR);
         b2.addActionListener(enableTR);
         
-        t.setEnabled(false);
+        t.setEnabled(b2.isSelected());
         
         trPanel.add( Box.createVerticalGlue() );
         
