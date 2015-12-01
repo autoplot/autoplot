@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Two plots showing two different days' correlations.  The legend label uses the macro %{PLOT_CONTEXT} to indicate the day.
+        <p><small>The open vap file dialog now has a control to reset the timerange.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -23,6 +23,8 @@
 
         <p>Bugfixes (2015-11-24 r18066):</p>
         <ul>
+            <li>"getParam (" wasn't parsed properly when generating GUI.  Thanks Rich!</li>
+            <li>Agg listings constrained to timerange, when timerange is in the URI.</li>
             <li>das2stream supports yFormat property</li>
             <li>annotations now visible in pngwalks and with the server.</li>
             <li>qds formatter also handles BIN_MINUS and BIN_PLUS</li>
@@ -70,6 +72,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>467: add accessory to allow override timerange when loading vap files.</li>
+            <li>das2server items can now be a comma-delimited list of indeces.</li>
+            <li>Single filesystems can be reset now, double-clicking in FileSystem manager will trigger reset.</li>
+            <li>format to QDS supports BIN_PLUS and BIN_MINUS properies</li>
+            <li>443: autorange hint log=T supported, corrections to initial implementation of center and includeZero</li>
             <li>466: copy-n-paste plots.</li>
             <li>script editor allows entry into data source editors with right-click&rarr;actions&rarr;"inspect URI"</li>
             <li>ISO8601 parser now supports time zone offsets.</li>
