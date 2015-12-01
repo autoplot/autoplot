@@ -50,7 +50,7 @@ public class APSplash extends JFrame {
     private static APSplash instance=null;
 
     private Handler handler;
-    private JLabel messageLabel;
+    private final JLabel messageLabel;
     private long t0; // time of application start
 
     private static final Logger logger= LoggerManager.getLogger("autoplot.splash");
@@ -74,11 +74,14 @@ public class APSplash extends JFrame {
 
     private Handler createhandler() {
         Handler result= new Handler() {
+            @Override
             public void publish( LogRecord logRecord ) {
                 messageLabel.setText(logRecord.getMessage() );
                 messageLabel.paint( messageLabel.getGraphics() );
             }
+            @Override
             public void flush() {}
+            @Override
             public void close() {}
         };
         return result;
