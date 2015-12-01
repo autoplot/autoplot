@@ -1737,10 +1737,6 @@ mi.setIcon( new ImageIcon( getClass().getResource("/resources/history.png") ) );
 APSplash.checkTime("init 52.5");
         fileMenu.add( mi );
 
-        //mi= new JMenuItem(dataSetSelector.getOpenLocalAction() );
-        //mi.setToolTipText("Open local data file");
-        //expertItems.add(mi);
-        //fileMenu.add(mi);
 APSplash.checkTime("init 52.7");
         fileMenu.add( new JSeparator() );
 
