@@ -714,7 +714,7 @@ public class CreatePngWalk {
      *
      */
     public static void writeHTMLFile( Params params, ArrayList<String> pngFilenameArray, ArrayList<String> timeLabels ){
-        String filePath= params.outputFolder+"pngImagePage.html";
+        String filePath= params.outputFolder+""+ params.product + ".html";
         //String filePath = "pngImagePage2.html";
         File f= new File(filePath);
         
@@ -722,8 +722,8 @@ public class CreatePngWalk {
         String htmlHead="<head><title>PNG Gallery</title></head>";
         String htmlBody="<body style=\"background-color: #6B6B6B; margin=0;\">";
         String htmlClose= "</div2Close></body></html>";
-        String pageHeaderOpen= "<div style=\"padding:20px; top: 0px; margin-right=0px; background-color:black; color:white;height:100px;\">"
-                    + "<strong>EMFISIS PNG WALK</strong>" + "</div>";
+        String pageHeaderOpen= "<div style=\"padding:20px; top: 0px; margin-right=0px; background-color:black; color:white;height:30px;\">"
+                    + "<strong>" + params.product + "_"+ params.timeFormat + "</strong>" + "</div>";
             
         String addImageString;
         String htmlImageStringOpen = "<img src=\"";
