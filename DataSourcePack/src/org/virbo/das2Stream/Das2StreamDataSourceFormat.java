@@ -24,6 +24,7 @@ import org.virbo.datasource.DataSourceFormat;
  */
 public class Das2StreamDataSourceFormat implements DataSourceFormat {
 
+    @Override
     public void formatData( String url, QDataSet data, ProgressMonitor mon) throws Exception {
 
         URISplit split = URISplit.parse(url);
@@ -74,10 +75,12 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
         }
     }
 
+    @Override
     public boolean canFormat(QDataSet ds) {
         return true; // at least it should, so if it can't it's a bug elsewhere.
     }
 
+    @Override
     public String getDescription() {
         return "QDataSet transfer format";
     }
