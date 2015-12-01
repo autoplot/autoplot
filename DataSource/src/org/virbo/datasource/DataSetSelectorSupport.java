@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.datasource;
 
 import java.awt.event.ActionEvent;
@@ -18,7 +15,7 @@ import javax.swing.JMenu;
 import javax.swing.filechooser.FileFilter;
 
 /**
- *
+ * Additional actions for the DataSetSelector.
  * @author jbf
  */
 public class DataSetSelectorSupport {
@@ -40,6 +37,12 @@ public class DataSetSelectorSupport {
     private static File userHome() {
         return new File(System.getProperty("user.home"));
     }
+    
+    /**
+     * Show a file chooser component, and return the name of a .vap file.
+     * @param parent parent component for focus.
+     * @return the URI for the vap file.
+     */
     public static String browseLocalVap( java.awt.Component parent ) {
         Preferences prefs = Preferences.userNodeForPackage( AutoplotSettings.class);
 
@@ -61,8 +64,7 @@ public class DataSetSelectorSupport {
                 }
                 String t = f.toString();
                 if (t==null ) {
-                    logger.fine("here is that bad state on windows.  bug http://sourceforge.net/tracker/?func=detail&aid=3038977&group_id=199733&atid=970682");
-                    //t= "" + f; // TODO: do we still get this?
+                    // bug https://sourceforge.net/p/autoplot/bugs/429/, where Windows returns an f whose toString returns null.
                     return false;
                 }
                 return t.endsWith(".vap");
@@ -192,6 +194,10 @@ public class DataSetSelectorSupport {
 
     }
 
+    /**
+     * get "Add Plot from Local File..." action
+     * @return the action
+     */
     public Action openLocalAction() {
         return new AbstractAction("Add Plot from Local File...") {
             @Override
@@ -208,7 +214,10 @@ public class DataSetSelectorSupport {
         };
     }
 
-
+    /**
+     * get the "Open .vap File..." action
+     * @return the action
+     */
     public Action openLocalVapAction() {
         return new AbstractAction("Open .vap File...") {
             @Override
@@ -231,7 +240,7 @@ public class DataSetSelectorSupport {
             if (ui.getRecent() == null) {
                 return;
             }
-            ArrayList<String> recent = new ArrayList<String>(ui.getRecent());
+            ArrayList<String> recent = new ArrayList<>(ui.getRecent());
             Collections.reverse(recent);
             for (String s : recent) {
                 final String f = s;
