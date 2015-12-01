@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
+import org.das2.datum.DatumRange;
 import org.jdesktop.beansbinding.BindingGroup;
 
 /**
@@ -84,7 +85,8 @@ public class DataSetSelectorSupport {
         bg.add(b1);
         final TimeRangeEditor t= new TimeRangeEditor();
         if ( parent!=null && parent instanceof DataSetSelector ) {
-            t.setRange( ((DataSetSelector)parent).getTimeRange() );
+            DatumRange tr=  ((DataSetSelector)parent).getTimeRange() ;
+            if ( tr!=null ) t.setRange(tr);
         }
         t.makeThinner();
         JPanel customTRPanel= new JPanel();
