@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
  * TimeRangeEditor.java
@@ -41,12 +37,12 @@ import org.das2.DasApplication;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.LoggerManager;
-import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.virbo.datasource.ui.PromptComboBoxEditor;
 
 /**
- *  
+ * Standard control for controlling a DatumRange containing times, with
+ * next/prev buttons, and a launcher into the TimeRangeTool.
  * @author jbf
  */
 public class TimeRangeEditor extends javax.swing.JPanel {
@@ -92,17 +88,24 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     DatumRange range= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
 
     public static final String PROP_USE_DOY= "useDoy";
-    public static final String PROP_RANGE= "range";
 
     /**
      * use DOY instead of Y-M-D
      */
     boolean useDoy=false;
 
+    /**
+     * true if day of year should be used instead of year, month, day.
+     * @return true if day of year should be used
+     */
     public boolean isUseDoy() {
         return useDoy;
     }
 
+    /**
+     * prefer use of day of year rather than year, month, day.
+     * @param useDoy 
+     */
     public void setUseDoy(boolean useDoy) {
         boolean old= this.useDoy;
         this.useDoy = useDoy;
@@ -110,6 +113,12 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         firePropertyChange( PROP_USE_DOY,old,useDoy);
     }
 
+    public static final String PROP_RANGE= "range";
+
+    /**
+     * get the timerange.
+     * @return the timerange.
+     */
     public DatumRange getRange() {
         return range;
     }
@@ -361,8 +370,8 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         if ( peer!=null ) {
             String surl = (String) peer.getLastValue().trim();//TODO:check
             peer.setValue(surl);
-            boolean wasRejected= false;
-            DataSourceEditorPanel edit = null;
+            //boolean wasRejected= false;
+            DataSourceEditorPanel edit;
             
             // hooks for browsing, such as "vap+internal"
             for (String browseTriggerRegex : peer.browseTriggers.keySet()) {
@@ -378,7 +387,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
                 edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel(DataSetURI.getURIValid(surl));
                 if ( edit!=null && edit.reject(surl) ) {
                     edit= null;
-                    wasRejected= true;
+                    //wasRejected= true;
                 }
             } catch (URISyntaxException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
