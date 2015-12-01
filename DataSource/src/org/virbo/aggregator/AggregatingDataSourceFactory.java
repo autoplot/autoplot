@@ -20,7 +20,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.das2.datum.DatumRange;
@@ -208,6 +207,10 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     /**
+     * @param suri the aggregation, containing the template and the timerange parameter.
+     * @param mon a progress monitor.
+     * @return the URI for each granule.
+     * @throws java.io.IOException
      * @throws IllegalArgumentException if it is not able to find any data files.
      */
     protected static String getDelegateDataSourceFactoryUri(String suri, ProgressMonitor mon) throws IOException, IllegalArgumentException {
@@ -273,7 +276,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             delegateFactory= getDelegateDataSourceFactory(cc.surl);
         }
         DataSourceFactory f = delegateFactory;
-        List<CompletionContext> result = new ArrayList<CompletionContext>();
+        List<CompletionContext> result = new ArrayList<>();
         CompletionContext delegatecc = getDelegateDataSourceCompletionContext(cc);
 
         List<CompletionContext> delegateCompletions = f.getCompletions(delegatecc,mon);
@@ -322,10 +325,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
                 return false;
             }
             
-        } catch (URISyntaxException e) {
-            logger.log( Level.SEVERE, surl, e );
-            return false;
-        } catch (IOException e) {
+        } catch (URISyntaxException | IOException e) {
             logger.log( Level.SEVERE, surl, e );
             return false;
         } catch (IllegalArgumentException e) {
