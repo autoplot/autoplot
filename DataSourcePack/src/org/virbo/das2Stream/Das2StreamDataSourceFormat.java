@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.das2Stream;
 
 import org.das2.dataset.TableDataSet;
@@ -19,7 +16,7 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 
 /**
- * Format the data into das2streams.
+ * Format the data into das2streams and QStreams.
  * @author jbf
  */
 public class Das2StreamDataSourceFormat implements DataSourceFormat {
@@ -82,7 +79,7 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
 
     @Override
     public String getDescription() {
-        return "QDataSet transfer format";
+        return "QDataSet QStream and Das2Stream transfer format";
     }
 
 }
