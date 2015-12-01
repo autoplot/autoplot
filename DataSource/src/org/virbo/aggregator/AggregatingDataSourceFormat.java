@@ -39,7 +39,7 @@ public class AggregatingDataSourceFormat implements DataSourceFormat {
         String delegateParams= URISplit.formatParams(params);
         
         int i= AggregatingDataSourceFactory.splitIndex(surl);
-        String base= surl.substring(0,i+1);
+        String base= surl.substring(0,i);
         
         FileStorageModel fsm = AggregatingDataSourceFactory.getFileStorageModel(surl);
         QDataSet dep0= (QDataSet) data.property(QDataSet.DEPEND_0);
@@ -57,7 +57,7 @@ public class AggregatingDataSourceFormat implements DataSourceFormat {
             if ( data1.length()>0 ) {
                 logger.log(Level.FINE, "formatting {0}", s);
                 StringBuilder uri1= new StringBuilder(base).append(s);
-                if ( delegateParams!=null ) uri1.append( "?").append( delegateParams );
+                if ( delegateParams!=null && delegateParams.length()>0 ) uri1.append( "?").append( delegateParams );
                 String uri2= uri1.toString();
                 DataSourceFormat df= DataSetURI.getDataSourceFormat(new URI(uri2) );
                 df.formatData( uri2, data1, mon.getSubtaskMonitor( i, i+1, base ) );
