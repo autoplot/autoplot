@@ -92,6 +92,11 @@ public class DataSetSelectorSupport {
 
     }
 
+    /**
+     * Show a file chooser component, and return the name of a data or .vap file.
+     * @param parent parent component for focus.
+     * @return the URI for the vap file.
+     */
     public static String browseLocal( java.awt.Component parent ) {
         Preferences prefs = Preferences.userNodeForPackage(DataSetSelectorSupport.class);
 
