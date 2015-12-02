@@ -69,7 +69,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
     AsciiParser parser;
     boolean focusDep0 = false;
     TableCellRenderer defaultCellRenderer;
-
+    boolean isRichHeader= false;
+    
     @Override
     public void markProblems(List<String> problems) {
         
@@ -1317,7 +1318,11 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                     params.put("column", getColumn());
                 }
             } else {
-                params.put("column", getColumn());
+                if ( isRichHeader ) {
+                    params.put( URISplit.PARAM_ARG_0, getColumn());
+                } else {
+                    params.put("column", getColumn());
+                }
             }
             params.remove("rank2");
             params.remove("bundle");
@@ -1432,7 +1437,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             model.setRecParser(p);
             columns = getColumnNames();
             Exception richHeaderWarn = null;
-            boolean isRichHeader = AsciiParser.isRichHeader(p.header);
+            isRichHeader = AsciiParser.isRichHeader(p.header);
             if (isRichHeader) {
                 try {
                     String[] columns1=  new String[p.fieldCount()];
