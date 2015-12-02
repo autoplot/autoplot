@@ -150,8 +150,8 @@ public class EditorContextMenu {
         try {
             StringBuilder result= new StringBuilder();
             BufferedReader r= new BufferedReader( new StringReader(txt) );
-            String dedent= amount<0 ? "   ".substring(0,-1*amount) : "";
-            String indent= amount>0 ? "   ".substring(0,   amount) : "";
+            String dedent= amount<0 ? "         ".substring(0,-1*amount) : "";
+            String indent= amount>0 ? "         ".substring(0,   amount) : "";
             String line= r.readLine();
             while ( line!=null ) {
                 if ( amount<0 && line.startsWith(dedent) ) line= line.substring(dedent.length());
@@ -177,8 +177,6 @@ public class EditorContextMenu {
         try {
             StringBuilder result= new StringBuilder();
             BufferedReader r= new BufferedReader( new StringReader(txt) );
-            String dedent= amount<0 ? "   ".substring(0,-1*amount) : "";
-            String indent= amount>0 ? "   ".substring(0,   amount) : "";
             String line= r.readLine();
             String hash= "#";
             while ( line!=null ) {
