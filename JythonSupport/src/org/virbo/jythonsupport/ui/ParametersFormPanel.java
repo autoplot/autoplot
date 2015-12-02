@@ -45,6 +45,7 @@ import org.python.util.PythonInterpreter;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.WindowManager;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.JythonUtil.Param;
 import static org.virbo.jythonsupport.ui.Util.getParams;
@@ -419,7 +420,7 @@ public class ParametersFormPanel {
                         public void actionPerformed(ActionEvent e) {
                             TimeRangeTool tt= new TimeRangeTool();
                             tt.setSelectedRange(tf.getText());
-                            int r= JOptionPane.showConfirmDialog( paramsPanel, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
+                            int r= WindowManager.showConfirmDialog( paramsPanel, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
                             if ( r==JOptionPane.OK_OPTION) {
                                 tf.setText(tt.getSelectedRange());
                             }
