@@ -214,8 +214,9 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 return false;
             } else {
                 if ( params.get("column")!=null ) {
-                    return false;
+                    return false; 
                 } else {
+                    //TODO bug1490: there's a bug here, because not all the rich ascii fields appear in the completions list.
                     for (CompletionContext cc1 : cc) {
                         if (cc1.completable.equals(arg_0)) {
                             return false;
