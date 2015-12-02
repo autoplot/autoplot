@@ -1318,7 +1318,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                     params.put("column", getColumn());
                 }
             } else {
-                if ( isRichHeader ) {
+                if ( false && isRichHeader ) { // This doesn't work because reject expects column https://sourceforge.net/p/autoplot/bugs/1490/
                     params.put( URISplit.PARAM_ARG_0, getColumn());
                 } else {
                     params.put("column", getColumn());
