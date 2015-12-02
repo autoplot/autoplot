@@ -32,6 +32,7 @@ import org.das2.util.LoggerManager;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
+import org.virbo.datasource.WindowManager;
 import org.virbo.filters.FiltersChainPanel;
 
 /**
@@ -224,7 +225,7 @@ public class NamedURIListTool extends JPanel {
         } catch ( IllegalArgumentException ex ) {
             logger.log(Level.SEVERE, "can''t get editor for #{0}", fi);
         }
-        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( scrollPane, p, "Rename parameter and dataset editor", JOptionPane.OK_CANCEL_OPTION ) ) {
+        if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( scrollPane, p, "Rename parameter and dataset editor", JOptionPane.OK_CANCEL_OPTION ) ) {
             ids.set( fi,tf.getText() );
             if ( edit!=null ) {
                 uris.set( fi, edit.getURI() );
@@ -324,7 +325,7 @@ public class NamedURIListTool extends JPanel {
         }
         dsSelector.add( literalTF, c );
         bg.add(cb);
-        if ( JOptionPane.showConfirmDialog( this, dsSelector, "Select Variable", JOptionPane.OK_CANCEL_OPTION ) ==JOptionPane.OK_OPTION ) {
+        if ( JOptionPane.OK_OPTION == WindowManager.showConfirmDialog( this, dsSelector, "Select Variable", JOptionPane.OK_CANCEL_OPTION )  ) {
             for ( i=0; i<this.uris.size(); i++ ) {
                 if ( butts[i].isSelected() ) {
                     return this.ids.get(i);
