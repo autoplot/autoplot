@@ -122,6 +122,7 @@ import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.LoggerManager;
+import org.das2.util.OsUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.das2.util.filesystem.KeyChain;
@@ -2110,15 +2111,31 @@ APSplash.checkTime("init 52.9");
         }
         Dimension dout= parentToAdjust.getSize();
         Dimension din= this.applicationModel.getCanvas().getSize();
-
-        if ( this.applicationModel.dom.getCanvases(0).isFitted() ) {
-            dout.width= dout.width + (  w - din.width );
-            dout.height= dout.height + ( h - din.height );
-        }
+        Dimension desiredAppSize= new Dimension();
 
         //GraphicsConfiguration gc= getGraphicsConfiguration();
         //Dimension screenSize = gc.getBounds().getSize();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        boolean maximize= false;
+        
+        if ( this.applicationModel.dom.getCanvases(0).isFitted() ) {
+            int maximizedPixelGain= 0; // the number of pixels gained by maximizing.  Windows doesn't draw borders when window is maximized.
+            String osName= System.getProperty("os.name");
+            if ( osName.startsWith("Windows") ) {
+                maximizedPixelGain= 8;
+            }
+            desiredAppSize.width= w + ( dout.width - din.width );
+            desiredAppSize.height= h + ( dout.height - din.height );
+            
+            if ( desiredAppSize.width > screenSize.getWidth() ) {
+                
+            } else if ( desiredAppSize.width > screenSize.getWidth()-maximizedPixelGain  ) {
+                maximize= true;
+            }
+        } else {
+            desiredAppSize.width= dout.width;
+            desiredAppSize.height= dout.height;
+        }
 
         double scale= 1.0;
 
@@ -2128,8 +2145,17 @@ APSplash.checkTime("init 52.9");
             this.applicationModel.dom.getCanvases(0).setFitted(false);
             this.applicationModel.dom.getCanvases(0).setHeight(h);
             this.applicationModel.dom.getCanvases(0).setWidth(w);
+        } else if ( maximize ) {
+            if ( parentToAdjust instanceof JFrame ) {
+                ((JFrame)parentToAdjust).setExtendedState( JFrame.MAXIMIZED_BOTH );
+                setStatus("Window maximized to approximate original size");
+            } else {
+                this.applicationModel.dom.getCanvases(0).setFitted(false);
+                this.applicationModel.dom.getCanvases(0).setHeight(h);
+                this.applicationModel.dom.getCanvases(0).setWidth(w);
+            }
             
-        } else if ( dout.width>screenSize.getWidth() || dout.height>screenSize.getHeight() ) {
+        } else if ( desiredAppSize.width>screenSize.getWidth() || desiredAppSize.height>screenSize.getHeight() ) {
 
             String[] options= new String[] { "Scale to fit display", "Use scrollbars" };
             int i= JOptionPane.showOptionDialog( this, "Canvas size doesn't fit well on this display.", "Incompatible Canvas Size", 
@@ -2160,8 +2186,8 @@ APSplash.checkTime("init 52.9");
             }
         } else {
             // there's actually a new bug here, at least on Linux you can't resize to > one screen...
-            parentToAdjust.setSize( dout.width, dout.height );
-            if ( parentToAdjust.getSize().getWidth()!=dout.width ) {
+            parentToAdjust.setSize( desiredAppSize.width, desiredAppSize.height );
+            if ( parentToAdjust.getSize().getWidth()!=desiredAppSize.width ) {
                 this.applicationModel.dom.getCanvases(0).setFitted(false);
                 setStatus("warning: unable to resize to requested size, using scrollbars.");
             }
