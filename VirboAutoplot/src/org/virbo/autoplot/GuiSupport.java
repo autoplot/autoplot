@@ -1661,11 +1661,21 @@ public class GuiSupport {
         addPlotMenu.add(item);
 
         item = new JMenuItem( new  AbstractAction("Paste Plot From Clipboard") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 try {
                     Clipboard clpbrd= Toolkit.getDefaultToolkit().getSystemClipboard();
-                    String s= (String) clpbrd.getData(DataFlavor.stringFlavor);
-                    System.err.println(s);
+                    String s;
+                    if ( clpbrd.isDataFlavorAvailable(DataFlavor.stringFlavor) ) {
+                        s= (String) clpbrd.getData(DataFlavor.stringFlavor);
+                        if ( !s.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<vap") ) {
+                            JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
+                            return;
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
+                        return;
+                    }
                     Application state= (Application)StatePersistence.restoreState(new ByteArrayInputStream(s.getBytes()));
                     Plot p= state.getPlots(0);
                     Plot newP= controller.addPlot( domPlot, LayoutConstants.BELOW );
@@ -1683,15 +1693,18 @@ public class GuiSupport {
                         DataSourceFilter dsf1= 
                                 (DataSourceFilter) DomUtil.getElementById( theApp,nameMap.get(pe1.getDataSourceFilterId()) );
                         Plot plot1= (Plot) DomUtil.getElementById( theApp, nameMap.get(pe1.getPlotId()) );
-                        
                         PlotElement pe= controller.addPlotElement( plot1, dsf1 );
                         pe.syncTo( pe1, Arrays.asList( "id", "plotId", "dataSourceFilterId") );
+                        if ( i==0 ) {
+                            plot1.setAutoBinding(true); // kludge
+                            plot1.getController().setAutoBinding(true); // TODO: check on why there are two autoBinding properties
+                        }
+                        pe.setPlotDefaults( pe1.getPlotDefaults() );
                         
-                    }                            
+                    }
+                    
                             
-                } catch (UnsupportedFlavorException ex) {
-                    Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
+                } catch (UnsupportedFlavorException | IOException ex) {
                     Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
