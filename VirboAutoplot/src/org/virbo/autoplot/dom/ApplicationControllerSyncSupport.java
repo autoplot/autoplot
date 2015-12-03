@@ -219,10 +219,15 @@ public class ApplicationControllerSyncSupport {
             controller.addDataSourceFilter();
         }
         while (application.dataSourceFilters.size() > dataSourceFilters.length) {
-            DataSourceFilter dsf = application.dataSourceFilters.get(application.dataSourceFilters.size() - 1);
+            int n= application.dataSourceFilters.size();
+            DataSourceFilter dsf = application.dataSourceFilters.get(n - 1);
             List<PlotElement> elements = controller.getPlotElementsFor(dsf);
             for (PlotElement element : elements) {
                 element.setDataSourceFilterId(""); // make it an orphan -- it should get deleted
+            }
+            if ( application.dataSourceFilters.size()==n ) { // TODO: check where this is not deleted. hang observed 2015-12-03 because it wasn't removed after paste plot.
+                DataSourceFilter[] dsfs= application.getDataSourceFilters(); // paste plot, then use undo to revert to the old state.
+                application.setDataSourceFilters(Arrays.copyOf(dsfs,n-1));
             }
         }
         for (int i = 0; i < dataSourceFilters.length; i++) {
