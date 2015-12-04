@@ -457,7 +457,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         } else {
                             logger.fine("bug1098 switch turned off, otherwise we would reset the timerange");
                         }
-                        setMessage("resolving uri to data set as " + DataSourceRegistry.getInstance().getExtensionFor(f));
+                        setMessage("busy: resolving uri to data set with plugin \"" + DataSourceRegistry.getInstance().describe(f,surl)+"\"");
                         firePlotDataSetURL();
                     }
                 } catch (DataSetURI.NonResourceException ex) { // see if it's a folder.
