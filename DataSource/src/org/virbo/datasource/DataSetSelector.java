@@ -418,12 +418,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                         firePlotDataSetURL();
                                         return;    
                                     }
-                                } catch ( ParseException ex ) {
-                                    JOptionPane.showMessageDialog( plotItButton, ex.getMessage() );
-                                    setMessage(ex.getMessage());  // $y$J would throw runtime exception.
-                                    logger.log( Level.SEVERE, ex.getMessage(), ex );
-                                    return;
-                                } catch ( IllegalArgumentException ex ) {
+                                } catch ( ParseException | IllegalArgumentException ex ) {
                                     JOptionPane.showMessageDialog( plotItButton, ex.getMessage() );
                                     setMessage(ex.getMessage());  // $y$J would throw runtime exception.
                                     logger.log( Level.SEVERE, ex.getMessage(), ex );
@@ -469,11 +464,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     int carotpos = surl.length();
                     setMessage("no extension or mime type, try filesystem completions");
                     showCompletions(surl, carotpos);
-                } catch (IllegalArgumentException ex) {
-                    setMessage(ex.getMessage());
-                    logger.log( Level.SEVERE, ex.getMessage(), ex );
-                    firePlotDataSetURL();
-                } catch (URISyntaxException ex) {
+                } catch (IllegalArgumentException | URISyntaxException ex) {
                     setMessage(ex.getMessage());
                     logger.log( Level.SEVERE, ex.getMessage(), ex );
                     firePlotDataSetURL();
@@ -562,7 +553,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      */
     private void firePlotDataSetURL() {
         pendingChanges.put( PENDING_PLOT, this );
-        List<String> r = new ArrayList<String>(getRecent());
+        List<String> r = new ArrayList<>(getRecent());
         String value = getValue();
         lastValue= value;
         if (r.contains(value)) {
@@ -790,13 +781,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                     surl= tsb.getURI();
                                 }
                             }
-                        } catch (ParseException ex ){
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        } catch (IOException ex) {
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        } catch (IllegalArgumentException ex) {
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        } catch (URISyntaxException ex) {
+                        } catch (ParseException | IOException | IllegalArgumentException | URISyntaxException ex ){
                             logger.log( Level.SEVERE, ex.getMessage(), ex );
                         }
                     }
@@ -894,13 +879,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                 logger.log(Level.FINE, "resetting timerange to {0}", timeRangeNew);
                                 timeRange= timeRangeNew;
                             }
-                        } catch (ParseException ex) {
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        } catch (IOException ex) {
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        } catch (IllegalArgumentException ex) {
-                            logger.log( Level.SEVERE, ex.getMessage(), ex );
-                        } catch (URISyntaxException ex) {
+                        } catch (ParseException | IOException | IllegalArgumentException | URISyntaxException ex) {
                             logger.log( Level.SEVERE, ex.getMessage(), ex );
                         }
                     }
@@ -978,7 +957,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         
         } else if ( carotpos<6 && !shortFsCompletion  ) {
             String[] types= new String[] { "ftp://", "http://", "https://", "file:/", "sftp://" };
-            List<CompletionResult> result= new ArrayList<CompletionResult>();
+            List<CompletionResult> result= new ArrayList<>();
             for (String type : types) {
                 if (type.length() >= carotpos && surl.substring(0, carotpos).equals(type.substring(0, carotpos))) {
                     result.add(new CompletionResult(type, ""));
@@ -992,7 +971,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             String[] sp= surl.substring(0,carotpos).split("\\:",-2);
             String test= sp[1];
             int testCarotpos= carotpos - ( sp[0].length() + 1 );
-            List<CompletionResult> result= new ArrayList<CompletionResult>();
+            List<CompletionResult> result= new ArrayList<>();
             for (String type : types) {
                 if (type.length() >= testCarotpos && test.substring(0, testCarotpos).equals(type.substring(0, testCarotpos))) {
                     result.add(new CompletionResult(sp[0]+":" + type, ""));
@@ -1480,30 +1459,32 @@ public class DataSetSelector extends javax.swing.JPanel {
                     throw new IllegalArgumentException("huh?");
                 }
                 String arg = m.group(1);
-                if (arg.equals("plugins")) {
-                    ABOUT_PLUGINS_ACTION.actionPerformed(e);
-                } else if ( arg.equals("classpath") ) {
-                    try {
-                        org.das2.util.LoggerManager.logGuiEvent(e);
-                        StringBuilder result= new StringBuilder("<html>");
-                        ClassLoader cl = ClassLoader.getSystemClassLoader();
-                        if ( cl instanceof URLClassLoader ) {
-                            URL[] urls = ((URLClassLoader)cl).getURLs();
-                            for(URL url: urls){
-                                result.append(url.toString()).append("<br>");
+                switch (arg) {
+                    case "plugins":
+                        ABOUT_PLUGINS_ACTION.actionPerformed(e);
+                        break;
+                    case "classpath":
+                        try {
+                            org.das2.util.LoggerManager.logGuiEvent(e);
+                            StringBuilder result= new StringBuilder("<html>");
+                            ClassLoader cl = ClassLoader.getSystemClassLoader();
+                            if ( cl instanceof URLClassLoader ) {
+                                URL[] urls = ((URLClassLoader)cl).getURLs();
+                                for(URL url: urls){
+                                    result.append(url.toString()).append("<br>");
+                                }
                             }
-                        }
-                        JTextPane jtp= new JTextPane();
-                        jtp.setContentType("text/html");
-                        jtp.read( new StringReader(result.toString()), null);
-                        jtp.setEditable(false);
-                        JScrollPane pane= new JScrollPane(jtp);
-                        pane.setPreferredSize( new Dimension(640,480) );
-                        pane.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS );
-                        JOptionPane.showMessageDialog(DataSetSelector.this, pane );
-                    } catch (IOException ex) {
-                        Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                            JTextPane jtp= new JTextPane();
+                            jtp.setContentType("text/html");
+                            jtp.read( new StringReader(result.toString()), null);
+                            jtp.setEditable(false);
+                            JScrollPane pane= new JScrollPane(jtp);
+                            pane.setPreferredSize( new Dimension(640,480) );
+                            pane.setVerticalScrollBarPolicy( JScrollPane.VERTICAL_SCROLLBAR_ALWAYS );
+                            JOptionPane.showMessageDialog(DataSetSelector.this, pane );
+                        } catch (IOException ex) {
+                            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                        }   break;
                 }
             }
         });
@@ -1663,9 +1644,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                         "downloading "+split.file.substring(split.path.length()) );
                                     try {
                                         FileSystemUtil.doDownload(fcontext, mon);
-                                    } catch (IOException ex) {
-                                        FileSystem.getExceptionHandler().handle(ex);
-                                    } catch (URISyntaxException ex) {
+                                    } catch (IOException | URISyntaxException ex) {
                                         FileSystem.getExceptionHandler().handle(ex);
                                     }
                                     browseSourceType();
@@ -1700,9 +1679,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     } else {
                         showCompletions();
                     }
-                } catch (IOException ex) {
-                    FileSystem.getExceptionHandler().handle(ex);
-                } catch (URISyntaxException ex) {
+                } catch (IOException | URISyntaxException ex) {
                     FileSystem.getExceptionHandler().handle(ex);
                 }
             } else {
@@ -1893,7 +1870,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      */
     public List<String> getRecent() {
         if (this.recent == null) {
-            recent = new ArrayList<String>();
+            recent = new ArrayList<>();
         }
         return this.recent;
     }
@@ -1909,7 +1886,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         List<String> oldRecent = this.recent;
         this.recent = recent;
         String value = editor.getText();
-        ArrayList<String> r = new ArrayList<String>(recent);
+        ArrayList<String> r = new ArrayList<>(recent);
         Collections.reverse(r);
         dataSetSelector.setModel(new DefaultComboBoxModel(r.toArray()));
         editor.setText(value); // don't show most recent one.
@@ -1958,11 +1935,11 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         this.message = message;
         firePropertyChange(PROPERTY_MESSAGE, oldMessage, message);
     }
-    Map<String, Action> actionTriggers = new LinkedHashMap<String, Action>();
+    Map<String, Action> actionTriggers = new LinkedHashMap<>();
     protected boolean plotItButtonVisible = true;
     public static final String PROP_PLOTITBUTTONVISIBLE = "plotItButtonVisible";
 
-    Map<String,Action> browseTriggers = new LinkedHashMap<String,Action>();
+    Map<String,Action> browseTriggers = new LinkedHashMap<>();
 
     public boolean isPlotItButtonVisible() {
         return plotItButtonVisible;
@@ -2272,8 +2249,8 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      * @return the time range selected.
      */
     public static DatumRange pickTimeRange( Component parent, List<DatumRange> timeRange, List<String> labels ) {
-        timeRange= new ArrayList<DatumRange>(timeRange); // make mutable.
-        labels= new ArrayList<String>(labels);
+        timeRange= new ArrayList<>(timeRange); // make mutable.
+        labels= new ArrayList<>(labels);
         for ( int i=timeRange.size()-1; i>=0; i-- ) {
             if ( timeRange.get(i)==null ) {
                 timeRange.remove(i);
@@ -2285,7 +2262,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         p.setLayout( new BoxLayout( p, BoxLayout.Y_AXIS ) );
         p.add( new JLabel("<html>The URI contains a time different than the current<br>application time range.  Which should be used?</html>") );
         ButtonGroup bg= new ButtonGroup();
-        List<JRadioButton> buttons= new ArrayList<JRadioButton>();
+        List<JRadioButton> buttons= new ArrayList<>();
         for ( int i=0; i<timeRange.size(); i++ ) {
             String s1= "<html>" + timeRange.get(i).toString() + " <i>("+labels.get(i)+")";
             JRadioButton b1= new JRadioButton( s1 );
