@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.virbo.aggregator.AggregatingDataSourceFactory;
 
 /**
  *
@@ -797,6 +798,26 @@ public class DataSourceRegistry {
         if ( i>0 ) vapScheme= vapScheme.substring(0,i);
         boolean noUri= vapScheme.endsWith("cdaweb") || vapScheme.endsWith("inline" ) || vapScheme.endsWith("pdsppi");
         return !noUri;
+    }
+
+    /**
+     * return a description of the data source.
+     * @param f the factory
+     * @param uri the uri
+     * @return "aggregation" or "cdf" etc.
+     */
+    String describe(DataSourceFactory f,String uri) {
+        if ( f instanceof AggregatingDataSourceFactory ) {
+            return "aggregation";
+        } else {
+            String ext= getExtension(uri);
+            String s= extToDescription.get( ext );
+            if ( s!=null ) {
+                return s;
+            } else {
+                return ext;
+            }
+        }
     }
 
 }
