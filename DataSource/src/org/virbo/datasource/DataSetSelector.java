@@ -1750,9 +1750,6 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         if (value == null) {
             value="";
         }
-        if ( value.isEmpty() ) {
-            return; // we get these from when Autoplot is resetting.
-        }
         value= URISplit.makeColloquial( value );
         this.dataSetSelector.setSelectedItem(value);
         this.dataSetSelector.repaint();
