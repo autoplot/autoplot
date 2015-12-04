@@ -81,7 +81,7 @@ public class DataSetSelectorSupport {
         trPanel.setPreferredSize( new Dimension(230,200) );
         ButtonGroup bg= new ButtonGroup();
         JCheckBox b1= new JCheckBox("Use timerange in .vap file");
-        b1.setAlignmentX(Component.LEFT_ALIGNMENT);
+        //b1.setAlignmentX(Component.LEFT_ALIGNMENT);
         bg.add(b1);
         final TimeRangeEditor t= new TimeRangeEditor();
         if ( parent!=null && parent instanceof DataSetSelector ) {
@@ -89,23 +89,22 @@ public class DataSetSelectorSupport {
             if ( tr!=null ) t.setRange(tr);
         }
         t.makeThinner();
-        JPanel customTRPanel= new JPanel();
-        customTRPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        customTRPanel.setLayout( new BoxLayout(customTRPanel,BoxLayout.X_AXIS)) ;
-        final JCheckBox b2= new JCheckBox("");
+        final JCheckBox b2= new JCheckBox("Reset the .vap timerange:");
         bg.add(b2);
-        customTRPanel.add(b2);
-        customTRPanel.add(t);
-        customTRPanel.setMaximumSize( new Dimension( 230, t.getPreferredSize().height ) );
+        //b2.setAlignmentX(Component.LEFT_ALIGNMENT);
         
         boolean notimerange= ( initialSelection==null || !initialSelection.contains("?timerange=") );
         b1.setSelected( notimerange );
         b2.setSelected( !notimerange );
         
+        b1.setAlignmentX( 0.f );
+        b2.setAlignmentX( 0.f );
+        t.setAlignmentX( 0.f );
+        
         trPanel.add(b1);
         trPanel.add( Box.createVerticalStrut(14) );
-        trPanel.add( new JLabel("Reset the .vap timerange:"));
-        trPanel.add(customTRPanel);
+        trPanel.add(b2);
+        trPanel.add(t);
         
         ActionListener enableTR= new ActionListener() {
             @Override
