@@ -88,8 +88,15 @@ public class UriTcaSource extends AbstractQFunction {
         
         if ( ds==null ) {
             logger.log(Level.FINE, "doRead getDataSet got null ");
+            
         } else {
             logger.log(Level.FINE, "doRead got: {0}", ds);
+
+            QDataSet dep0= SemanticOps.xtagsDataSet(ds);
+            if ( !DataSetUtil.isMonotonicAndIncreasing(dep0) ) {
+                ds= Ops.ensureMonotonicAndIncreasingWithFill(ds);
+            }
+
             tlim= DataSetUtil.guessCadenceNew( SemanticOps.xtagsDataSet(ds), ds );
 
             if ( this.tsb!=null ) {
@@ -246,10 +253,6 @@ public class UriTcaSource extends AbstractQFunction {
             QDataSet dep0= SemanticOps.xtagsDataSet(ds);
             QDataSet d0= parm.slice(0);
 
-            if ( !SemanticOps.isMonotonic(dep0 ) ) {
-                logger.fine("dataset dependence is not monotonic");
-                return new BundleDataSet( nonMonoDs );
-            }
             QDataSet findex;
             if ( dep0.length()==1 ) {
                 findex= Ops.dataset(0);
