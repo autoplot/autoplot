@@ -30,6 +30,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.EventQueue;
+import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -2113,17 +2114,20 @@ APSplash.checkTime("init 52.9");
         Dimension din= this.applicationModel.getCanvas().getSize();
         Dimension desiredAppSize= new Dimension();
 
-        //GraphicsConfiguration gc= getGraphicsConfiguration();
-        //Dimension screenSize = gc.getBounds().getSize();
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        GraphicsConfiguration gc= getGraphicsConfiguration();
+        Dimension screenSize = gc.getBounds().getSize(); // support multiple displays
+        //Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        
         boolean maximize= false;
         
         if ( this.applicationModel.dom.getCanvases(0).isFitted() ) {
             int maximizedPixelGain= 0; // the number of pixels gained by maximizing.  Windows doesn't draw borders when window is maximized.
             String osName= System.getProperty("os.name");
-            if ( osName.startsWith("Windows") ) {
+            if ( osName.startsWith("Windows") ) { // TODO: figure out how to measure this.
                 maximizedPixelGain= 8;
-            }
+            } else if ( osName.startsWith("Linux") ) {
+                maximizedPixelGain= 10;
+            } 
             desiredAppSize.width= w + ( dout.width - din.width );
             desiredAppSize.height= h + ( dout.height - din.height );
             
