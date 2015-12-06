@@ -2127,11 +2127,13 @@ APSplash.checkTime("init 52.9");
             desiredAppSize.width= w + ( dout.width - din.width );
             desiredAppSize.height= h + ( dout.height - din.height );
             
-            if ( desiredAppSize.width > screenSize.getWidth() ) {
-                
-            } else if ( desiredAppSize.width > screenSize.getWidth()-maximizedPixelGain  ) {
+            if ( w > screenSize.getWidth() - maximizedPixelGain && 
+                    w < screenSize.getWidth() ) {
                 maximize= true;
+            } else if ( desiredAppSize.width > screenSize.getWidth() ) { 
+                
             }
+            
         } else {
             desiredAppSize.width= dout.width;
             desiredAppSize.height= dout.height;
