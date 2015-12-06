@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot.dom;
 
 import java.awt.Color;
@@ -33,7 +30,6 @@ import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
-import org.virbo.autoplot.state.SerializeUtil;
 import org.virbo.autoplot.state.StatePersistence;
 
 /**
@@ -46,8 +42,9 @@ public class DomUtil {
     
     /**
      * trim the string on the left, leaving the right visible.
-     * @param s
-     * @return "..."+s.substring()
+     * @param s the string
+     * @param len the number of characters
+     * @return "..."+s.substring(s.length() - len)
      */
     public static String abbreviateRight(String s, int len) {
         if (s == null) return "<null>";
@@ -58,7 +55,7 @@ public class DomUtil {
     }
 
     static List<String> childProperties(List<String> exclude, String string) {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         int n = string.length() + 1;
         for (String e : exclude) {
             if (e.startsWith(string + ".")) {
@@ -70,12 +67,12 @@ public class DomUtil {
 
     /**
      * return a list of nodes (plotElements and dataSourceFilters) that use the DataSourceFilter.
-     * @param app
-     * @param plotId
+     * @param app the dom
+     * @param id the node identifier
      * @return
      */
     static List<DomNode> dataSourceUsages(Application app, String id) {
-        List<DomNode> result = new ArrayList<DomNode>();
+        List<DomNode> result = new ArrayList<>();
         for (PlotElement p : app.getPlotElements()) {
             if (p.getDataSourceFilterId().equals(id)) {
                 result.add(p);
@@ -344,7 +341,7 @@ public class DomUtil {
      * @return ArrayList that can have elements inserted
      */
     public static <T> ArrayList<T> asArrayList(T... a) {
-        return new ArrayList<T>(Arrays.asList(a));
+        return new ArrayList<>(Arrays.asList(a));
     }
 
     /**
@@ -374,7 +371,7 @@ public class DomUtil {
      * @return
      */
     public static List<Diff> childDiffs(String childName, List<Diff> diffs) {
-        ArrayList<Diff> result = new ArrayList<Diff>();
+        ArrayList<Diff> result = new ArrayList<>();
         for (Diff diff : diffs) {
             Diff r1 = childDiff(childName, diff);
             if (r1 != null) result.add(r1);
@@ -417,12 +414,12 @@ public class DomUtil {
      * @return list of Diffs between the lists.
      */
     public static List<Diff> getArrayDiffs(String property, Object[] nodes1, Object[] nodes2) {
-        List<Diff> result = new LinkedList<Diff>();
+        List<Diff> result = new LinkedList<>();
 
-        List<Object> node1List = new ArrayList<Object>(Arrays.asList(nodes1));
-        List<Object> node2List = new ArrayList<Object>(Arrays.asList(nodes2));
+        List<Object> node1List = new ArrayList<>(Arrays.asList(nodes1));
+        List<Object> node2List = new ArrayList<>(Arrays.asList(nodes2));
 
-        List<Object> deleteList = new ArrayList<Object>();
+        List<Object> deleteList = new ArrayList<>();
         int i2=0;
         for ( Object o: nodes2 ) {
             if ( indexOf( node2List, o )!=i2 ) {
@@ -437,20 +434,20 @@ public class DomUtil {
 
         boolean isDomNode = DomNode.class.isAssignableFrom(nodes1.getClass().getComponentType());
 
-        for (int i = 0; i < deleteList.size(); i++) {
-            int idx = indexOf(node2List, deleteList.get(i));
+        for ( Object deleteList1 : deleteList ) {
+            int idx = indexOf(node2List, deleteList1);
             result.add(new ArrayNodeDiff(property, ArrayNodeDiff.Action.Delete, node2List.get(idx), idx));
             node2List.remove(idx);
         }
 
-        List<Object> addList = new ArrayList<Object>();
+        List<Object> addList = new ArrayList<>();
         for ( Object o: nodes1 ) {
             if ( indexOf( node2List, o )==-1 ) addList.add( o );
         }
 
-        for (int i = 0; i < addList.size(); i++) {
+        for (Object addList1 : addList) {
             int idx;
-            idx = indexOf(node1List, addList.get(i));
+            idx = indexOf(node1List, addList1);
             if (nodes1[idx] instanceof DomNode) {
                 result.add(new ArrayNodeDiff(property, ArrayNodeDiff.Action.Insert, ((DomNode) nodes1[idx]).copy(), idx));
             } else {
@@ -493,7 +490,7 @@ public class DomUtil {
         String[] props = BeansUtil.getPropertyNames(node1.getClass());
         PropertyDescriptor[] pds = BeansUtil.getPropertyDescriptors(node1.getClass());
 
-        List<Diff> diffs = new ArrayList<Diff>();
+        List<Diff> diffs = new ArrayList<>();
         for (int i = 0; i < props.length; i++) {
             if (props[i].equals("controller")) continue;
             if (exclude != null && exclude.contains(props[i])) continue;
@@ -509,7 +506,7 @@ public class DomUtil {
                         diffs.add(new PropertyChangeDiff(props[i], val2, val1));
                     }
                 }
-            } catch (Exception ex) {
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 logger.log(Level.WARNING,ex.getMessage(),ex);
             }
 
@@ -605,7 +602,7 @@ public class DomUtil {
         elements.remove(pe);
         elements.removeAll( pe.getController().getChildPlotElements() );
 
-        if ( elements.isEmpty() ) return true; else return false;
+        return elements.isEmpty();
 
     }
     
@@ -620,16 +617,17 @@ public class DomUtil {
         if ( parents.trim().length()==0 ) return Collections.emptyList();
         String[] dep= parents.split(",");
         List<DataSourceFilter> result= new ArrayList();
-        for ( int j=0; j<dep.length; j++ ) {
-            result.add( (DataSourceFilter)getElementById( dom,dep[j]) );
+        for (String dep1 : dep) {
+            result.add((DataSourceFilter) getElementById(dom, dep1));
         }
         return result;
     }
 
     /**
      * returns true if the dom is valid, throws a runtime exception otherwise
-     * @param dom
-     * @return
+     * @param application the dom
+     * @param problems descriptions of the problems will be inserted here
+     * @return true if the dom is valid, throws a runtime exception otherwise
      */
     public static boolean validateDom( Application application, List<String> problems ) {
 
@@ -657,9 +655,10 @@ public class DomUtil {
                 if ( uri==null ) continue;
                 if ( uri.startsWith("vap+internal:") && uri.length()>13 ) {
                     String[] dep= uri.substring(13).split(",");
-                    for ( int j=0; j<dep.length; j++ ) {
-                        if ( getElementById( application,dep[j])==null )
-                            problems.add("unable to find dsf "+dep[j]+" for dsf "+dsf.getId() );
+                    for (String dep1 : dep) {
+                        if (getElementById(application, dep1) == null) {
+                            problems.add("unable to find dsf " + dep1 + " for dsf " + dsf.getId());
+                        }
                     }
                 }
             }
@@ -723,7 +722,7 @@ public class DomUtil {
      */
     public static List<PlotElement> getPlotElementsFor( Application application, Plot plot ) {
         String id = plot.getId();
-        List<PlotElement> result = new ArrayList<PlotElement>();
+        List<PlotElement> result = new ArrayList<>();
         for (PlotElement p : application.getPlotElements()) {
             if (p.getPlotId().equals(id)) {
                 result.add(p);
@@ -742,8 +741,10 @@ public class DomUtil {
      */
     public static boolean nodeHasProperty(DomNode node1, String property) {
         String[] props = BeansUtil.getPropertyNames(node1.getClass());
-        for ( int i=0; i<props.length; i++ ) {
-            if ( props[i].equals(property) ) return true;
+        for (String prop : props) {
+            if (prop.equals(property)) {
+                return true;
+            }
         }
         return false;
     }
@@ -896,7 +897,7 @@ public class DomUtil {
                         }
                     }
                 }
-            } catch (Exception ex) {
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | ArrayIndexOutOfBoundsException ex) {
                 logger.log( Level.WARNING, ex.getMessage(), ex );
             }
 
