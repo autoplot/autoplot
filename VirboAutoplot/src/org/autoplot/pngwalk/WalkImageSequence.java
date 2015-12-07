@@ -211,6 +211,32 @@ public class WalkImageSequence implements PropertyChangeListener  {
     }
 
     /**
+     * return the index of the datumRange completely containing this
+     * interval.
+     * @param dr 
+     * @return -1 if no range contains the subrange, the index of the DatumRange otherwise.
+     */
+    protected int indexOfSubrange( DatumRange dr ) {
+        int idx= -1;
+        for ( int i=datumRanges.size()-1; i>=0; i-- ) {
+            if ( datumRanges.get(i)==null ) {
+                logger.info("ranges are not available");
+                return -1;
+            }
+            if ( dr.contains( datumRanges.get(i).min() ) ) {
+                idx= i;
+                break;
+            }
+            if ( datumRanges.get(i).contains(dr) ) {
+                idx= i;
+                break;
+            }
+        }
+        return idx;
+        
+    }
+    
+    /**
      * show the datumRange requested by selecting it.  The range that intersects is selected.
      * If the datum range is within a gap in time, then select the time range immediately following.
      * 
