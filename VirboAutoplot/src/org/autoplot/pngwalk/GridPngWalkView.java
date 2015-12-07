@@ -395,7 +395,11 @@ public class GridPngWalkView extends PngWalkView {
                             }
                         }
                     } else {
-                        thumb = loadingImage;
+                        if ( wimage.getStatus()==WalkImage.Status.MISSING ) {
+                            thumb= wimage.getImage();
+                        } else {
+                            thumb = loadingImage;
+                        }
                     }
 
                     int imgX= col * thumbSize + (thumbSize - thumb.getWidth()) / 2;
@@ -410,28 +414,28 @@ public class GridPngWalkView extends PngWalkView {
                     if ( dr!=null ) {
                         try {
                         int ds=6;
-                        if ( drs!=null && i<seq.size()-1 && seq.imageAt(i+1).getDatumRange().min().subtract(wimage.getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
-                            g2.setColor(Color.GRAY);
-                            int cx = col*thumbSize + (thumbSize ) - ds;
-                            int cy = row*thumbSize + (thumbSize ) - fm.getHeight() - 3;
-                            Shape oldClip = g2.getClip();
-                            g2.clip(new Rectangle(cx, row*thumbSize, thumbSize, thumbSize));
-                            g2.fillPolygon( new int[] { cx, cx+ds, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
-                            g2.setClip(oldClip);
+                        if ( drs!=null && ( !seq.isShowMissing() && ( i<seq.size()-1 && seq.imageAt(i+1).getDatumRange().min().subtract(wimage.getDatumRange().max()).doubleValue(Units.seconds)>0 ) ) ) {
+                                    g2.setColor(Color.GRAY);
+                                    int cx = col*thumbSize + (thumbSize ) - ds;
+                                    int cy = row*thumbSize + (thumbSize ) - fm.getHeight() - 3;
+                                    Shape oldClip = g2.getClip();
+                                    g2.clip(new Rectangle(cx, row*thumbSize, thumbSize, thumbSize));
+                                    g2.fillPolygon( new int[] { cx, cx+ds, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
+                                    g2.setClip(oldClip);
+                                }
+                        if ( drs!=null && i>0 && ( !seq.isShowMissing() && ( seq.imageAt(i).getDatumRange().min().subtract(seq.imageAt(i-1).getDatumRange().max()).doubleValue(Units.seconds)>0 ) ) ) {
+                                    g2.setColor(Color.GRAY);
+                                    int cx = col*thumbSize;
+                                    int cy = row*thumbSize + (thumbSize ) - fm.getHeight() - 3;
+                                    Shape oldClip = g2.getClip();
+                                    g2.clip(new Rectangle(cx, row*thumbSize, thumbSize, thumbSize));
+                                    g2.fillPolygon( new int[] { cx, cx, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
+                                    g2.setClip(oldClip);
+                                }
+                            } catch ( NullPointerException ex ) {
+                                logger.log(Level.SEVERE, ex.getMessage(), ex);
+                            }
                         }
-                        if ( drs!=null && i>0 && seq.imageAt(i).getDatumRange().min().subtract(seq.imageAt(i-1).getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
-                            g2.setColor(Color.GRAY);
-                            int cx = col*thumbSize;
-                            int cy = row*thumbSize + (thumbSize ) - fm.getHeight() - 3;
-                            Shape oldClip = g2.getClip();
-                            g2.clip(new Rectangle(cx, row*thumbSize, thumbSize, thumbSize));
-                            g2.fillPolygon( new int[] { cx, cx, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
-                            g2.setClip(oldClip);
-                        }
-                        } catch ( NullPointerException ex ) {
-                            logger.log(Level.SEVERE, ex.getMessage(), ex);
-                        }
-                    }
 
                     if (showCaptions && wimage.getCaption()!=null) {
                         //These 2 lines center caption below image

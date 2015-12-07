@@ -28,6 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import static org.autoplot.pngwalk.PngWalkView.loadingImage;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 
@@ -298,7 +299,8 @@ public class RowPngWalkView extends PngWalkView {
                 //g2.draw(new Ellipse2D.Double(i*cellSize+2, 2, cellSize-4, cellSize-4));
                 WalkImage wimage= seq.imageAt(i);
                 BufferedImage thumb = wimage.getThumbnail(!scrollPane.getHorizontalScrollBar().getValueIsAdjusting());
-                if (thumb != null) {
+                Dimension d= wimage.getThumbnailDimension(false);
+                if ( d != null) {
                     double s = Math.min((double) (cellSize - 4) / thumb.getWidth(), (double) (cellSize - 4 - fm.getHeight()) / thumb.getHeight());
                     if (s < 1.0) {
                         int w = (int) (s * thumb.getWidth());
@@ -312,7 +314,11 @@ public class RowPngWalkView extends PngWalkView {
                         //thumb = resizeOp.filter(thumb, null);
                     }
                 } else {
-                    thumb = loadingImage;
+                    if ( wimage.getStatus()==WalkImage.Status.MISSING ) {
+                        thumb= wimage.getImage();
+                    } else {
+                        thumb = loadingImage;
+                    }
                 }
                 int imgX = i * cellSize + (cellSize - thumb.getWidth()) / 2;
                 int imgY = (cellSize - thumb.getHeight() - fm.getHeight()) / 2;
@@ -331,9 +337,9 @@ public class RowPngWalkView extends PngWalkView {
                     //g2.clip(new Rectangle(cx, cellSize, cellSize, cellSize));
                     g2.fillPolygon( new int[] { cx, cx+ds, cx+ds, cx }, new int[] { cy, cy-ds, cy, cy }, 4 );
                     g2.setClip(oldClip);
-                }
+                }       
                 if ( drs!=null && i>0 && i<seq.size()-2
-                        && wimage.getDatumRange()!=null  && seq.imageAt(i+1).getDatumRange()!=null
+                        && wimage.getDatumRange()!=null  && seq.imageAt(i+1).getDatumRange()!=null && seq.imageAt(i-1).getDatumRange()!=null
                         && seq.imageAt(i).getDatumRange().min().subtract(seq.imageAt(i-1).getDatumRange().max()).doubleValue(Units.seconds)>0 ) {
                     g2.setColor(Color.GRAY);
                     int cx = i*cellSize;
