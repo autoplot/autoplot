@@ -70,6 +70,7 @@ import org.das2.util.ByteBufferInputStream;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.python.core.FileUtil;
 import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyInteger;
@@ -337,6 +338,22 @@ public class ScriptPanelSupport {
                             Path name = ev.context();
                             logger.log(Level.FINER, "watch event {0} {1}", new Object[]{ev.kind(), ev.context()});
                             if ( parent.resolve(name).equals(fpath) ) {
+                                
+                                String newContents;
+                                
+                                try ( InputStream in = new FileInputStream( ScriptPanelSupport.this.file ) ) {
+                                    newContents= new String( FileUtil.readBytes( in ) );
+                                    String currentf= panel.getEditorPanel().getText();
+                                    
+                                    if ( currentf.equals(newContents) ) {
+                                        logger.fine("timestamp changed but contents are the same.");
+                                        break;
+                                    }
+                                    
+                                } catch ( IOException ex ) {
+                                    break;
+                                }
+                                
                                 if ( JOptionPane.OK_OPTION== 
                                     JOptionPane.showConfirmDialog( panel, 
                                     "File Changed On Disk.  Do you want to reload?", 
