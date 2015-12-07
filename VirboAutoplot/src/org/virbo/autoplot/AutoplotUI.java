@@ -2182,7 +2182,7 @@ APSplash.checkTime("init 52.9");
                     scale= (double)nw/w;
                     //Font newFont= f.deriveFont( f.getSize2D() * scale );
                     //this.applicationModel.dom.getCanvases(0).setFont(newFont.toString());
-                    parentToAdjust.setSize( nw + (  w - din.width ) , nh + ( h - din.height ) );
+                    parentToAdjust.setSize( nw + ( dout.width - din.width ), nh + ( dout.height - din.height ) );
 
                 } else if ( i==1 ) { // scrollbars option.
                     this.applicationModel.dom.getCanvases(0).setFitted(false);
