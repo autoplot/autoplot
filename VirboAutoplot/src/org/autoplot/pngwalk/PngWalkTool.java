@@ -1423,7 +1423,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 public void dataPointSelected(DataPointSelectionEvent e) {
                     Datum x= e.getX();
                     if ( UnitsUtil.isTimeLocation( x.getUnits() ) ) {
-                        seq.gotoSubrange( new DatumRange( x,x ) );
+                        DatumRange dr= new DatumRange( x,x );
+                        if ( seq.indexOfSubrange(dr)>-1 ) {
+                            seq.gotoSubrange( dr );
+                        }
                     }
                 }
             });
