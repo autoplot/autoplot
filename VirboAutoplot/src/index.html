@@ -21,8 +21,10 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-12-06 r18133):</p>
+        <p>Bugfixes (2015-12-09 r18136):</p>
         <ul>
+            <li>time unit t2000 works in das2stream again.</li>
+            <li>clean up DataPointRecorder's use of threads, to avoid RTE.</li>
             <li>1500: two autoplot script editors, pointing at same file, detect changes incorrectly</li>
             <li>1498: pngwalk digitizer jumps ahead when delta=15 should have been used </li>
             <li>add typographicPoints unit, and correct meters to inches conversion, which was using inverse.</li>            
