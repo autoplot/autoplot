@@ -60,6 +60,7 @@ public class Test_034_TimeSeriesBrowse implements Scenario {
                 }
             });
             
+            System.err.println("TODO: There should be a way to make sure the app has recieved the update.");
             Thread.sleep(1500);
             
             ScriptContext.waitUntilIdle();
