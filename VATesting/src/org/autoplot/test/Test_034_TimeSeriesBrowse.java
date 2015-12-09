@@ -60,7 +60,7 @@ public class Test_034_TimeSeriesBrowse implements Scenario {
                 }
             });
             
-            Thread.sleep(500);
+            Thread.sleep(1500);
             
             ScriptContext.waitUntilIdle();
 
