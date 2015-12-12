@@ -510,8 +510,12 @@ public class ScreenshotsTool extends EventQueue {
             screenshot = new BufferedImage( gs[i].getDisplayMode().getWidth(), gs[i].getDisplayMode().getHeight(), BufferedImage.TYPE_INT_ARGB );
         }
 
+        filterBackground( (Graphics2D)screenshot.getGraphics(), b );
+        
+        boolean screenHasPointer= MouseInfo.getPointerInfo().getDevice()==gs[i];
+        
         if ( includePointer ) {
-            if ( MouseInfo.getPointerInfo().getDevice()==gs[i] ) {
+            if ( screenHasPointer ) {
                 // get the mouse info before grabbing the screenshot, which takes several hundred millis.
                 BufferedImage pointer;
                 if ( ( button & MouseEvent.BUTTON1_DOWN_MASK ) == MouseEvent.BUTTON1_DOWN_MASK ) {
@@ -533,8 +537,6 @@ public class ScreenshotsTool extends EventQueue {
             }
         }
         
-        filterBackground( (Graphics2D)screenshot.getGraphics(), b );
-
         return screenshot;
     }
 
