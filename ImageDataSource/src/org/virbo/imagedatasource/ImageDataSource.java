@@ -29,8 +29,10 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.DatumUtil;
 import org.das2.datum.Units;
 import org.das2.util.ImageUtil;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -250,24 +252,28 @@ class ImageDataSource extends AbstractDataSource {
         
         String xaxis= getParam( "xaxis", null );
         if ( xaxis!=null ) {
-            double[] xform= tryParseArray( xaxis );
+            Datum[] transform= tryParseArray( xaxis );
+            if ( transform[1].getUnits()!=Units.dimensionless ) throw new IllegalArgumentException("xaxis second and last components must be dimensionless.");
+            Units xunits= transform[0].getUnits();
             QDataSet xx= Ops.findgen(result.length());
-            xx= Ops.subtract( xx, xform[1] );
-            xx= Ops.multiply( xx, (xform[2]-xform[0])/(xform[3]-xform[1]) );
-            xx= Ops.add( xx, xform[0] );
-            ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,xform[0]);
-            ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,xform[2]);
+            xx= Ops.subtract( xx, transform[1] );
+            xx= Ops.multiply( xx, (transform[2].subtract(transform[0]).doubleValue(xunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() ) );
+            xx= Ops.add( Ops.putProperty( xx, QDataSet.UNITS, xunits.getOffsetUnits() ), transform[0] );
+            ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,transform[0]);
+            ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,transform[2]);
             result.putProperty( QDataSet.DEPEND_0, xx );
         }
         String yaxis= getParam( "yaxis", null );
         if ( yaxis!=null ) {
-            double[] xform= tryParseArray( yaxis );
+            Datum[] transform= tryParseArray( yaxis );
+            if ( transform[1].getUnits()!=Units.dimensionless ) throw new IllegalArgumentException("xaxis second and last components must be dimensionless.");
+            Units yunits= transform[1].getUnits();
             QDataSet yy= Ops.findgen(result.length(0));
-            yy= Ops.subtract( yy, xform[1] );
-            yy= Ops.multiply( yy, (xform[2]-xform[0])/(xform[3]-xform[1]) );
-            yy= Ops.add( yy, xform[0] );
-            ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,xform[0]);
-            ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,xform[2]);
+            yy= Ops.subtract( yy, transform[1] );
+            yy= Ops.multiply( yy, (transform[2].subtract(transform[0]).doubleValue(yunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() ) );
+            yy= Ops.add( Ops.putProperty( yy, QDataSet.UNITS, yunits.getOffsetUnits() ), transform[0] );
+            ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,transform[0]);
+            ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,transform[2]);
             result.putProperty( QDataSet.DEPEND_1, yy );
         }
         
@@ -350,16 +356,21 @@ class ImageDataSource extends AbstractDataSource {
                 
     }
 
-    public double[] tryParseArray( String s ) {
+    private static Datum[] tryParseArray( String s ) {
         s= s.trim();
         if ( s.startsWith("[") && s.endsWith("]") ) s= s.substring(1,s.length()-1);
         String[] ss= s.split(",");
-        double[] result= new double[ss.length];
+        Datum[] result= new Datum[ss.length];
         for ( int i=0; i<result.length; i++ ) {
-            result[i]= Double.parseDouble(ss[i]);
+            try {
+                result[i]= DatumUtil.parse(ss[i]);
+            } catch ( ParseException ex ) {
+                throw new IllegalArgumentException("unable to parse: "+ss[i]);
+            }
         }
         return result;
     }
+    
     /**
      * read useful JPG metadata, such as the Orientation.  This also looks to see if GPS
      * metadata is available.
