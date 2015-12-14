@@ -123,7 +123,6 @@ import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.LoggerManager;
-import org.das2.util.OsUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.das2.util.filesystem.KeyChain;
@@ -167,7 +166,6 @@ import org.virbo.filters.FiltersChainPanel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-import sun.awt.SunToolkit;
 
 /**
  * The Autoplot application GUI.  This is the entry point for the application, wrapping the internal
@@ -4469,14 +4467,14 @@ private void updateFrameTitle() {
             logger.fine("nativeLAF");
             try {
                 String s= javax.swing.UIManager.getSystemLookAndFeelClassName();
-                if ( System.getProperty("swing.defaultlaf").equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel") ) {
-                    if ( s.endsWith("MetalLookAndFeel") && System.getProperty("os.name").equals("Linux") ) { // Linux Mint, for one...
-                        Toolkit toolkit = Toolkit.getDefaultToolkit();
-                        if (((SunToolkit) toolkit).isNativeGTKAvailable()) {
-                            s= "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
-                        }
-                    }
-                }
+//                if ( System.getProperty("swing.defaultlaf").equals("com.sun.java.swing.plaf.gtk.GTKLookAndFeel") ) {
+//                    if ( s.endsWith("MetalLookAndFeel") && System.getProperty("os.name").equals("Linux") ) { // Linux Mint, for one...
+//                        Toolkit toolkit = Toolkit.getDefaultToolkit();
+//                        if (((SunToolkit) toolkit).isNativeGTKAvailable()) {
+//                            s= "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+//                        }
+//                    }
+//                }
                 javax.swing.UIManager.setLookAndFeel(s);
             } catch ( ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e ) {
                 logger.log( Level.SEVERE, e.getMessage(), e );
