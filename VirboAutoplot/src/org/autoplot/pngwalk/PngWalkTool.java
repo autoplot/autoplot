@@ -423,7 +423,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     try {
                         File file = DataSetURI.getFile( s, new AlertNullProgressMonitor("get image file") ); // assume it's local.
                         String json= ImageUtil.getJSONMetadata( file );
-                        jsonTimeRange= RichPngUtil.getXRange(json);
+                        if ( json!=null ) { 
+                            jsonTimeRange= RichPngUtil.getXRange(json);
+                        }
                     } catch ( IOException ex ) {
                         logger.log( Level.WARNING, null, ex );
                     }
