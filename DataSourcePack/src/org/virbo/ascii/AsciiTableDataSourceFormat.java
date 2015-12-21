@@ -166,7 +166,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
      * @param ds dataset which can be a bundle
      * @param prop the property name
      * @param i  -1 or the index of the bundled dataset.
-     * @return
+     * @return true if the property was found.
      * @throws JSONException 
      */
     private boolean jsonProp( JSONObject jo1, QDataSet ds, String prop, int i ) throws JSONException {
@@ -212,6 +212,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         jsonProp( jo1, ds, QDataSet.VALID_MIN, -1 );
         jsonProp( jo1, ds, QDataSet.VALID_MAX, -1 );
         jsonProp( jo1, ds, QDataSet.FILL_VALUE, -1 );
+        jsonProp( jo1, ds, QDataSet.TITLE, -1 );
         jo1.put( "VALUES", DataSetUtil.asArrayOfDoubles(ds) );
         jo1.put( "DIMENSION", new int[] { ds.length() } );
         return jo1;
@@ -274,6 +275,15 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             for ( int i=0; i<bundleDesc.value(0,0); i++ ) {
                 elementNames[i]= "ch_"+i;
             }
+//            //TODO: how to unpack the TITLE and LABEL???
+//            QDataSet theOne= data;
+//            jsonProp( jo1, data, QDataSet.LABEL, -1 );
+//                
+//            jsonProp( jo1, data, QDataSet.VALID_MIN, -1 );
+//            jsonProp( jo1, data, QDataSet.VALID_MAX, -1 );
+//            jsonProp( jo1, data, QDataSet.FILL_VALUE, -1 );
+//            jsonProp( jo1, bundleDesc, QDataSet.DEPEND_0, 0 );
+//            jsonProp( jo1, data, QDataSet.START_INDEX, -1 );
             elementLabels= null;
         } else {
             for ( int i=0; i<bundleDesc.length(); i++ ) {
