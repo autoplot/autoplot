@@ -13,6 +13,8 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +63,19 @@ public class DataMashUp extends javax.swing.JPanel {
      */
     public DataMashUp() {
         initComponents();
+        namedURIListTool1.addPropertyChangeListener( new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( evt.getPropertyName().startsWith("idName_") ) {
+                    if ( !evt.getNewValue().equals(evt.getOldValue()) ) {
+                        String s= getAsJythonInline();
+                        //TODO: this will replace "ds" in "ds1" and "ds2", and needs to detect non-alpha on either side.
+                        s= s.replaceAll( evt.getOldValue().toString(), evt.getNewValue().toString() );
+                        setAsJythonInline(s);
+                    }
+                }
+            }
+        });
 
         DragSource dragSource = DragSource.getDefaultDragSource();
         DropTarget dropTarget = new DropTarget();
@@ -487,7 +502,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jSplitPane1.setTopComponent(jScrollPane1);
 
-        jLabel1.setText("Dashup is the data mash up tool, for combining data from different sources.");
+        jLabel1.setText("Dashup is the data mash up tool, for combining data from different sources.  TODO: rename is not implemented");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

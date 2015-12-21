@@ -80,9 +80,24 @@ public class NamedURIListTool extends JPanel {
      * @return the uris.
      */
     public String[] getUris() {
+        assert ids.size()==uris.size();
         return uris.toArray( new String[uris.size()] );
     }
     
+    /**
+     * return the id for each URI.
+     * @return the ids
+     */
+    public String[] getIds() {
+        assert ids.size()==uris.size();
+        return ids.toArray( new String[ids.size()] );
+    }
+    
+    /** make up a name that does not exist in the list of names.
+     * 
+     * @param names names that must be unique with the new name
+     * @return the new name
+     */
     public String makeupName( List<String> names ) {
         int max= 0;
         for (String n : names) {
@@ -114,11 +129,14 @@ public class NamedURIListTool extends JPanel {
             name.setMaximumSize( limit );
             name.setPreferredSize( limit );
             name.setToolTipText( "press to rename " );
-            name.addActionListener( new ActionListener() {
+            name.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     org.das2.util.LoggerManager.logGuiEvent(e);                    
+                    String oldName= ids.get(fi);
                     rename(fi);
+                    String newName= ids.get(fi);
+                    firePropertyChange( "idName_"+fi, oldName, newName );
                 }
             } );
             sub.add( name, BorderLayout.WEST );
@@ -129,7 +147,7 @@ public class NamedURIListTool extends JPanel {
            subAdd.setMaximumSize( limit );
            subAdd.setPreferredSize( limit );            
            subAdd.setToolTipText( "add new URI" );        
-           subAdd.addActionListener( new ActionListener() {
+           subAdd.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     org.das2.util.LoggerManager.logGuiEvent(e);
@@ -154,7 +172,7 @@ public class NamedURIListTool extends JPanel {
             
             subDelete.setToolTipText( "remove uri " );
             final int ffi= fi;
-            subDelete.addActionListener( new ActionListener() {
+            subDelete.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     //TODO: delete URI
@@ -178,13 +196,13 @@ public class NamedURIListTool extends JPanel {
             } catch ( IllegalArgumentException ex ) {
                 
             }
-            dss.addActionListener( new ActionListener() {
+            dss.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     uris.set( fi,dss.getValue());
                 }
             });
-            dss.getEditor().addFocusListener( new FocusAdapter() {
+            dss.getEditor().addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
                     uris.set( fi,dss.getValue());
@@ -230,7 +248,7 @@ public class NamedURIListTool extends JPanel {
             if ( edit!=null ) {
                 uris.set( fi, edit.getURI() );
             }
-            SwingUtilities.invokeLater( new Runnable() {
+            SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     refresh();
