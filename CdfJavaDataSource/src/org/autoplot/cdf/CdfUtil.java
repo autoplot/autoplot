@@ -998,9 +998,9 @@ public class CdfUtil {
             StringBuilder vdescr=null;
             int rank=-1;
             int[] dims=new int[0];
+            int varType=0;
             try {
                 svar = v1;
-                int varType;
                 try {
                     varType= cdf.getType(svar);
                 } catch ( CDFException ex ) {
@@ -1160,9 +1160,11 @@ public class CdfUtil {
                 if (scatDesc != null)
                     descbuf.append("").append(scatDesc).append("<br>");
                 if (svarNotes !=null ) {
-                    descbuf.append("<br><p><small>").append(svarNotes).append("<small></p>");
+                    descbuf.append("<br><p><small>").append(svarNotes).append("</small></p>");
                 }
-
+                
+                descbuf.append("<br><br><small>CDF data type is ").append(CdfUtil.getStringDataType(varType)).append("</small>");
+                        
                 for ( String s: warn ) {
                     if ( s.startsWith("NOTE") ) {
                         descbuf.append("<br>").append(s);
