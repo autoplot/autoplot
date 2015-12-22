@@ -288,8 +288,9 @@ public class ScreenshotsTool extends EventQueue {
      *  mask out parts of the desktop that are not Autoplot, for the user's privacy.
      *  @param g the graphics to paint on.
      *  @param b the rectangle showing the display translation.
+     *  @return true if the mouse pointer is within a rectangle boundary.
      */
-    static void filterBackground( Graphics2D g, Rectangle b ) {
+    private static boolean filterBackground( Graphics2D g, Rectangle b, Point p ) {
         Color c= new Color( 255,255,255,255 );
         g.setColor(c);
 
@@ -298,13 +299,17 @@ public class ScreenshotsTool extends EventQueue {
 
         Area s= new Area(r);
 
+        boolean containsPointer= false;
+        
         Frame[] frames = Frame.getFrames();
         for (Frame frame : frames) {
             if ( frame.isVisible() ) {
                 if( frame.getExtendedState() != Frame.ICONIFIED ) {
                     Rectangle rect= frame.getBounds();
+                    if ( rect.contains(p) ) containsPointer=true;
                     rect.translate( -b.x, -b.y );
                     s.subtract( new Area( rect ) );
+                    
                 }
             }
         }
@@ -314,6 +319,7 @@ public class ScreenshotsTool extends EventQueue {
             if ( window.isVisible() ) {
                 if ( window.isShowing() ) {
                     Rectangle rect= window.getBounds();
+                    if ( rect.contains(p) ) containsPointer=true;
                     rect.translate( -b.x, -b.y );
                     s.subtract( new Area( rect ) );
                 }
@@ -321,6 +327,8 @@ public class ScreenshotsTool extends EventQueue {
         }
 
         g.fill(s);
+        
+        return containsPointer;
         
     }
 
@@ -500,7 +508,7 @@ public class ScreenshotsTool extends EventQueue {
         int i = active;
 
         PointerInfo info= MouseInfo.getPointerInfo();
-        Point p= info.getLocation();
+        Point mousePointerLocation= info.getLocation();
         bounds= gs[i].getDefaultConfiguration().getBounds();
         Rectangle b= bounds;
         try {
@@ -510,12 +518,12 @@ public class ScreenshotsTool extends EventQueue {
             screenshot = new BufferedImage( gs[i].getDisplayMode().getWidth(), gs[i].getDisplayMode().getHeight(), BufferedImage.TYPE_INT_ARGB );
         }
 
-        filterBackground( (Graphics2D)screenshot.getGraphics(), b );
+        boolean appContainsPointer= filterBackground( (Graphics2D)screenshot.getGraphics(), b, mousePointerLocation );
         
-        boolean screenHasPointer= MouseInfo.getPointerInfo().getDevice()==gs[i];
+        boolean screenHasPointer= info.getDevice()==gs[i];
         
         if ( includePointer ) {
-            if ( screenHasPointer ) {
+            if ( screenHasPointer && appContainsPointer ) {
                 // get the mouse info before grabbing the screenshot, which takes several hundred millis.
                 BufferedImage pointer;
                 if ( ( button & MouseEvent.BUTTON1_DOWN_MASK ) == MouseEvent.BUTTON1_DOWN_MASK ) {
@@ -533,7 +541,8 @@ public class ScreenshotsTool extends EventQueue {
                 } else {
                     pointer= pnt;
                 }
-                screenshot.getGraphics().drawImage( pointer, p.x - b.x - ptrXOffset, p.y - b.y - ptrYOffset, null );
+                
+                screenshot.getGraphics().drawImage( pointer, mousePointerLocation.x - b.x - ptrXOffset, mousePointerLocation.y - b.y - ptrYOffset, null );
             }
         }
         
