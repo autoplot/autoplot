@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The open vap file dialog now has a control to reset the timerange.
+        <p><small>A digiziter script is modified to count cookies.  Happy holidays!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -21,8 +21,12 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-12-09 r18136):</p>
+        <p>Bugfixes (2015-12-21 r18149):</p>
         <ul>
+            <li>1437: export to rich ascii must preserve as much metadata as possible</li>
+            <li>check for missing/problem with Rich PNG JSON, Where Dan's pngwalk contained bad metadata that showed in demo at AGU.</li>
+            <li>dashup tool gets quick-n-dirty rename variable code</li>
+            <li>screenshots tool would clip the pointer when it was on the edge of window</li>
             <li>time unit t2000 works in das2stream again.</li>
             <li>clean up DataPointRecorder's use of threads, to avoid RTE.</li>
             <li>1500: two autoplot script editors, pointing at same file, detect changes incorrectly</li>
@@ -33,7 +37,7 @@
             <li>set the bounds properly when fontSize is used to enlarge font.  Thanks Rich!</li>
             <li>add code to ensure that ephemeris data is monotonic and non-repeating.</li>
             <li>1495: detect when maximized state should be used when restoring .vap files</li>
-            <li>minor improvments to status bar messages</li>
+            <li>minor improvements to status bar messages</li>
             <li>466: copy-n-paste plots.  Feature now does error checking</li>
             <li>Updates to Rich ASCII parser to support Firebird files.</li>
             <li>"getParam (" wasn't parsed properly when generating GUI.  Thanks Rich!</li>
@@ -85,6 +89,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>StackedHistogramRenderer name fixes</li>
+            <li>CDF editor dialog indicates internal type to improve transparency and support creating new files.</li>
+            <li>468: unplot can use iso8601 times.</li>
             <li>Canvas size GUI supports "7 inch" or "30 centimeters" for dimensions, not just pixels.</li>
             <li>add LSpec rebin that uses bundle of buckshot (T,L,Z) for the input.</li>
             <li>467: add accessory to allow override timerange when loading vap files.</li>
