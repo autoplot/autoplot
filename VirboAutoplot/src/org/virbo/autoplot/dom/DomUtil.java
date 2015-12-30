@@ -291,7 +291,7 @@ public class DomUtil {
      * return the node with this id, or null if the id is not found.
      * @param root the root, such as the dom or the canvas.
      * @param id the id of the node.
-     * @return the node with this id, or null id the id is not found.
+     * @return the node with this id, or null if the id is not found.
      */
     public static DomNode getElementById(DomNode root, String id) {
         if (id == null ) {
@@ -917,6 +917,7 @@ public class DomUtil {
         }
         newApp.setDataSourceFilters( dsfs.toArray(new DataSourceFilter[dsfs.size()]) );
         newApp.setCanvases(application.getCanvases());
+        newApp.setId( application.id+"_"+domPlot.id );
         
         ByteArrayOutputStream baos= new ByteArrayOutputStream(1000);
         try {
