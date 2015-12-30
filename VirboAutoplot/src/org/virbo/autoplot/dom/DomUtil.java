@@ -298,7 +298,7 @@ public class DomUtil {
             throw new IllegalArgumentException("id cannot be null");
         }
         if ( id.equals("") ) {
-            throw new IllegalArgumentException("id be zero-length string");
+            throw new IllegalArgumentException("id cannot be zero-length string");
         }
         if (root.getId().equals(id)) return root;
         for (DomNode n : root.childNodes()) {
