@@ -37,10 +37,12 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
 
     protected static final Logger logger= LoggerManager.getLogger("apdss.cdaweb");
 
+    @Override
     public DataSource getDataSource(URI uri) throws Exception {
         return new CDAWebDataSource(uri);
     }
 
+    @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         CDAWebDB.getInstance().maybeRefresh(mon);
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
@@ -121,6 +123,7 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
         return new ArrayList<CompletionContext>() {};
     }
 
+    @Override
     public <T> T getCapability(Class<T> clazz) {
         if ( clazz==TimeSeriesBrowse.class ) {
            return (T) new DefaultTimeSeriesBrowse();
@@ -129,6 +132,7 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
     }
 
 
+    @Override
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         URISplit split= URISplit.parse(surl);
         Map<String,String> params= URISplit.parseParams(split.params);
@@ -163,6 +167,7 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
         return false;
     }
 
+    @Override
     public boolean supportsDiscovery() {
         return true;
     }
