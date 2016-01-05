@@ -237,12 +237,11 @@ public class CdfDataSource extends AbstractDataSource {
             }
         } catch (Exception ex) {
             logger.log( Level.SEVERE, "An exception was caught in CdfJava openFiles caching", ex );
-            ex.printStackTrace();
             throw new RuntimeException(ex);
         }
         timer.tickle("unload cdf soon");
         return cdf;
-
+ 
     }
 
     @Override
@@ -581,20 +580,19 @@ public class CdfDataSource extends AbstractDataSource {
             }
 
             for ( int ipass=0; ipass<2; ipass++ ) { // first pass is for subtrees, second pass is for items
-                for (int i = 0; i < vv.length; i++) {
-                    Object attrv = cdf.getAttribute( var, vv[i]);
-                    boolean isDep= p.matcher(vv[i]).matches() & depth == 0;
-                    if ( ipass==0 && isDep ) {
+                for (String vv1 : vv) {
+                    Object attrv = cdf.getAttribute(var, vv1);
+                    boolean isDep = p.matcher(vv1).matches() & depth == 0;
+                    if (ipass==0 && isDep) {
                         String name = (String) ((List)attrv).get(0); //TODO: still vector?
-                        if ( hasVariable(cdf, name) ) {
+                        if (hasVariable(cdf, name)) {
                             Map<String, Object> newVal = readAttributes(cdf, name, depth + 1);
                             newVal.put("NAME", name); // tuck it away, we'll need it later.
-                            props.put(vv[i], newVal);
+                            props.put(vv1, newVal);
                         } else {
                             logger.log( Level.FINE, "No such variable: {0} in CDF ", name);
                         }
-
-                    } else if ( ipass==1 && !isDep ) {
+                    } else if (ipass==1 && !isDep) {
                         Object val= ((List)attrv).get(0);
                         if ( val==null ) {
                             continue; // v0.9 version of CDF-Java returns null in Test032_016.
@@ -602,7 +600,7 @@ public class CdfDataSource extends AbstractDataSource {
                         if ( val.getClass().isArray() && Array.getLength(val)==1 ) {
                             val= Array.get(val, 0);
                         }
-                        props.put(vv[i], val);
+                        props.put(vv1, val);
                     }
                 }
             }
@@ -614,18 +612,18 @@ public class CdfDataSource extends AbstractDataSource {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                     throw ex;
                 }        
-                for (int i = 0; i < vv.length; i++) {
-                    Object attr= cdf.getAttribute(vv[i]);
-                    if ( attr!=null && attr.getClass().isArray() && Array.getLength(attr)>0 ) {
+                for (String vv1 : vv) {
+                    Object attr = cdf.getAttribute(vv1);
+                    if (attr!=null && attr.getClass().isArray() && Array.getLength(attr)>0) {
                         int n= Array.getLength(attr);
-                        if ( n>1 ) {
+                        if (n>1) {
                             Object[] oo= new Object[n];
                             for ( int ii=0; ii<n; ii++ ) {
                                 oo[ii]= Array.get(attr,ii);
                             }
-                            gattrs.put( vv[i], oo );
+                            gattrs.put(vv1, oo);
                         } else {
-                            gattrs.put( vv[i], Array.get(attr,0) );
+                            gattrs.put(vv1, Array.get(attr,0));
                         }
                     }
                 }
