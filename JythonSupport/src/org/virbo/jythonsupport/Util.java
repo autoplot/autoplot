@@ -520,7 +520,7 @@ public class Util {
      * at the end of the string.  Only completions where maybePlot indicates the URI is now 
      * valid are returned, so for example http://autoplot.org/data/somedata.cdf?noDep is not
      * returned and http://autoplot.org/data/somedata.cdf?Magnitude is.
-     * @param file, for example http://autoplot.org/data/somedata.cdf?
+     * @param file for example http://autoplot.org/data/somedata.cdf?
      * @return list of completions, containing the entire URI.
      * @throws java.lang.Exception any exception thrown by the data source.
      */
@@ -531,6 +531,31 @@ public class Util {
             if (cc1.maybePlot == true) {
                 resultList.add(cc1);
             }
+        }
+
+        String[] result= new String[resultList.size()];
+        for ( int i=0; i<resultList.size(); i++ ) {
+            result[i]= resultList.get(i).completion;
+        }
+
+        return result;
+    }
+
+    /**
+     * return a list of completions.  This is useful in the IDL context
+     * as well as Jython scripts.  This will perform the completion for where the carot is
+     * at the end of the string.  All completions are returned, so for example 
+     * http://autoplot.org/data/somedata.cdf?noDep is returned as well as
+     * http://autoplot.org/data/somedata.cdf?Magnitude.
+     * @param file for example http://autoplot.org/data/somedata.cdf?
+     * @return list of completions, containing the entire URI.
+     * @throws java.lang.Exception any exception thrown by the data source.
+     */
+    public static String[] getAllCompletions( String file ) throws Exception {
+        List<DataSetURI.CompletionResult> cc= DataSetURI.getCompletions( file, file.length(), new NullProgressMonitor() );
+        List<DataSetURI.CompletionResult> resultList= new ArrayList<DataSetURI.CompletionResult>();
+        for (DataSetURI.CompletionResult cc1 : cc) {
+            resultList.add(cc1);
         }
 
         String[] result= new String[resultList.size()];
