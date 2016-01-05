@@ -542,7 +542,8 @@ public class Util {
     }
 
     /**
-     * return a list of completions.  This is useful in the IDL context
+     * return a list of all completions, even if they are not complete.  
+     * This is useful in the IDL context
      * as well as Jython scripts.  This will perform the completion for where the carot is
      * at the end of the string.  All completions are returned, so for example 
      * http://autoplot.org/data/somedata.cdf?noDep is returned as well as
