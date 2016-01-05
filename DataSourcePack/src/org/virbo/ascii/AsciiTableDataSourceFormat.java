@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.das2.datum.Datum;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.UnitsUtil;
@@ -218,6 +220,19 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         return jo1;
     }
     
+    private final Map<QDataSet,String> namesFor= new HashMap();
+    
+    private String getNameFor( QDataSet ds ) {
+        String s;
+        synchronized (namesFor) {
+            s= namesFor.get(ds);
+            if ( s!=null ) return s;
+            s= (String) Ops.guessName(ds,"data"+namesFor.size());
+            namesFor.put(ds,s);
+        }
+        return s;
+    }
+    
     /**
      * format the data, using column descriptions in bundleDesc.  Note
      * that when data is Data[Dep0], that bundleDesc will have two columns.
@@ -251,7 +266,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         
         if ( dep0!=null ) {
             JSONObject dep0jo= new JSONObject();
-            name= (String) Ops.guessName(dep0);
+            name= getNameFor( dep0 );
             jsonProp( dep0jo, dep0, QDataSet.LABEL, -1 );
             if ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(dep0) ) ) {
                 dep0jo.put("UNITS", getTimeUnitLabel() );
@@ -467,13 +482,15 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             }
             if ( l1.trim().length()==0 ) {
                 Units u1=  (Units) bundleDesc.property(QDataSet.UNITS,i);
+                if ( u1==null ) u1= Units.dimensionless;
                 if ( i==0 && UnitsUtil.isTimeLocation(u1) && bundleDesc.length()>1 ) {
                     Units u2= (Units) bundleDesc.property(QDataSet.UNITS,1);
+                    if ( u2==null ) u2= Units.dimensionless;
                     if ( UnitsUtil.isTimeLocation(u2)) {
                         startStopTime= true;
                     }
                 }
-                if ( u1!=null && Units.t2000.isConvertibleTo( u1 ) ) {
+                if ( Units.t2000.isConvertibleTo( u1 ) ) {
                     if ( startStopTime ) {
                         l1= "time"+i;                            
                     } else {
