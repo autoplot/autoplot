@@ -251,7 +251,7 @@ public class CDAWebDB {
             XPathFactory xpf= getXPathFactory();
             XPath xp = xpf.newXPath();
             
-            logger.log( Level.FINE, "getting node for {0}", spid );
+            logger.log( Level.FINER, "getting node for {0}", spid );
             Node node = (Node) xp.evaluate( String.format( "/sites/datasite/dataset[@serviceprovider_ID='%s']/access", spid), document, XPathConstants.NODE );
             if ( node==null ) {
                 throw new IOException("unable to find node for "+spid + " in "+ dbloc );
@@ -260,8 +260,8 @@ public class CDAWebDB {
             String subdividedby=attrs.getNamedItem("subdividedby").getTextContent();
             String filenaming= attrs.getNamedItem("filenaming").getTextContent();
             
-            logger.log( Level.FINE, "subdividedby={0}", subdividedby);
-            logger.log( Level.FINE, "filenamimg={0}", filenaming);
+            logger.log( Level.FINER, "subdividedby={0}", subdividedby);
+            logger.log( Level.FINER, "filenaming={0}", filenaming);
             
             if ( filenaming.contains("%Q") ) {
                 filenaming= filenaming.replaceFirst("%Q.*\\.cdf", "?%(v,sep).cdf"); // templates don't quite match
@@ -500,7 +500,29 @@ public class CDAWebDB {
         }
         return null;
     }
-
+    
+    /**
+     * return the filenames for the dataset, so we can check for .cdf.
+     * @param dataset dataset node, such as &lt;dataset ID="ac_h2_cris_cdaweb" ...&gt;
+     * @return the filename, such as ac_h2_cris_%Y%m%d_%Q.cdf
+     */
+    private String getFilenaming( Node dataset ) {
+        NodeList kids= dataset.getChildNodes();
+        for ( int j=0; j<kids.getLength(); j++ ) {
+            Node childNode= kids.item(j);
+            if ( childNode.getNodeName().equals("access") ) {
+                NamedNodeMap kids2= childNode.getAttributes();
+                Node shortDesc= kids2.getNamedItem("filenaming");
+                if ( shortDesc!=null ) {
+                    return shortDesc.getNodeValue();
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+    
     /**
      * @return Map from serviceproviderId to description
      */
@@ -533,7 +555,7 @@ public class CDAWebDB {
                 try {
                     String st= attrs.getNamedItem("timerange_start").getTextContent();
                     String en= attrs.getNamedItem("timerange_stop").getTextContent();
-                    String nssdc_ID= attrs.getNamedItem("nssdc_ID").getTextContent();
+                    //String nssdc_ID= attrs.getNamedItem("nssdc_ID").getTextContent();                       
                     if ( st.length()>1 && Character.isDigit(st.charAt(0))
                             && en.length()>1 && Character.isDigit(en.charAt(0))
                             //&& nssdc_ID.contains("None") ) {
@@ -543,10 +565,15 @@ public class CDAWebDB {
                                 ( url.startsWith( "http://cdaweb.gsfc.nasa.gov/istp_public/data/" ) ||
                                 url.startsWith( "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" ) ||
                                 url.startsWith("ftp://cdaweb.gsfc.nasa.gov" ) ) && !url.startsWith("/tower3/private" ) ) {
-                            String desc= getDescription(node);
+                            String filenaming= getFilenaming(node);
                             String s=attrs.getNamedItem("serviceprovider_ID").getTextContent();
-                            //String sid=attrs.getNamedItem("ID").getTextContent();
-                            result.put(s,desc);
+                            if ( filenaming.endsWith(".cdf") ) {
+                                String desc= getDescription(node);
+                                //String sid=attrs.getNamedItem("ID").getTextContent();
+                                result.put(s,desc);
+                            } else {
+                                logger.log(Level.FINE, "ignoring {0} because files do not end in .cdf", s);
+                            }
                         }
                     }
                 } catch ( Exception ex2 ) {
