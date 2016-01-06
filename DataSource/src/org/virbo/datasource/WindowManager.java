@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -65,28 +66,42 @@ public class WindowManager {
      * @param window the window.
      */
     public void recallWindowSizePosition( Window window ) {
-        Container c= window.getParent();
+        Container parent= window.getParent();
         String name= window.getName(); 
         logger.log(Level.FINE, "looking up position for {0}", name);
         if ( name==null ) return;
         final Preferences prefs= Preferences.userNodeForPackage(WindowManager.class);
-        if ( prefs.getInt( "window."+name+".screenwidth", 0 )==java.awt.Toolkit.getDefaultToolkit().getScreenSize().width ) {
+        int grab=window.getFont().getSize(); // pixels so mouse operator has something to grab
+        Dimension screenSize= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        if ( prefs.getInt( "window."+name+".screenwidth", 0 )==screenSize.width ) {
             int w= prefs.getInt( "window."+name+".width", -9999 );
             int h= prefs.getInt( "window."+name+".height", -9999 );
-            if ( w>10 && h>10 ) {
+            if ( w>10 && h>10 && w<screenSize.width && h<screenSize.height ) {
                 window.setSize( w, h );
             }   
-            if ( c!=null ) {
+            if ( parent!=null ) {
                 int x= prefs.getInt( "window."+name+".rlocationx", -9999 );
                 int y= prefs.getInt( "window."+name+".rlocationy", -9999 );        
                 if ( x>-9999 && y>-9999 ) {
-                    window.setLocation( c.getX()+x, c.getY()+y );
+                    int newx= parent.getX()+x;
+                    int newy= parent.getY()+y;
+                    if ( newx<0 ) newx= 0;
+                    if ( newy<0 ) newy= 0;
+                    if ( newx>screenSize.width-grab ) newx= screenSize.width-grab;
+                    if ( newy>screenSize.height-grab ) newy= screenSize.height-grab;
+                    window.setLocation( newx, newy );
                 }
             } else {
                 int x= prefs.getInt( "window."+name+".locationx", -9999 );
-                int y= prefs.getInt( "window."+name+".locationy", -9999 );        
+                int y= prefs.getInt( "window."+name+".locationy", -9999 );
                 if ( x>-9999 && y>-9999 ) {
-                    window.setLocation( x, y );
+                    int newx= x;
+                    int newy= y;
+                    if ( newx<0 ) newx= 0;
+                    if ( newy<0 ) newy= 0;
+                    if ( newx>screenSize.width-grab ) newx= screenSize.width-grab;
+                    if ( newy>screenSize.height-grab ) newy= screenSize.height-grab;
+                    window.setLocation( newx, newy );
                 }
             }
         }
