@@ -153,14 +153,13 @@ public class WindowManager {
     
     /**
      * new okay/cancel dialog that is resizable and is made with a simple dialog.
-     * @param parent
+     * @param parent the parent window or dialog.
      * @param omessage String or Component.
-     * @param title
+     * @param title the dialog title.  
      * @param optionType.  This must be OK_CANCEL_OPTION or YES_NO_CANCEL_OPTION
      * @return JOptionPane.OK_OPTION, JOptionPane.CANCEL_OPTION.
      */
     public static int showConfirmDialog( Component parent, Object omessage, final String title, int optionType ) {
-        final String name= title.replaceAll( "\\s","");
         if ( optionType!=JOptionPane.OK_CANCEL_OPTION && optionType!=JOptionPane.YES_NO_CANCEL_OPTION ) {
             throw new IllegalArgumentException("must be OK_CANCEL_OPTION or YES_NO_CANCEL_OPTION");
         }
@@ -172,6 +171,13 @@ public class WindowManager {
         }
         final Window p= ( parent instanceof Window ) ? ((Window)parent) : SwingUtilities.getWindowAncestor(parent);
         final JDialog dia= new JDialog( p, Dialog.ModalityType.APPLICATION_MODAL );
+        final String name;
+        if ( title.startsWith("Run Script ") ) { //small kludge to hide user-created data from injection into user prefs.
+            String hash= String.format( "%09d", title.substring(11).hashCode() );
+            name= "RunScript"+hash;
+        } else {
+            name= title.replaceAll( "\\s","");
+        }
         dia.setName(name);
         dia.setLayout( new BorderLayout() );
         final JPanel pc= new JPanel();
