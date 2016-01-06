@@ -332,7 +332,7 @@ public class CDAWebDB {
     /**
      * return a range of a file that could be plotted.  Right now, this
      * just creates a FSM and gets a file.
-     * @param spid
+     * @param spid the id like "AC_H2_CRIS"
      * @return
      * @throws IOException
      */
@@ -374,6 +374,34 @@ public class CDAWebDB {
         }
     }
 
+    /**
+     * return a sample file from the dataset.
+     * @param spid the id like "AC_H2_CRIS"
+     * @return a downloadable file like http://cdaweb.gsfc.nasa.gov/pub/data/ace/cris/level_2_cdaweb/cris_h2/2015/ac_h2_cris_20151115_v06.cdf
+     * @throws IOException 
+     */
+    public String getSampleFile( String spid ) throws IOException {
+
+        String tmpl= getNaming( spid );
+        String base= getBaseUrl( spid );
+
+        FileSystem fs;
+        try {
+            fs = FileSystem.create(new URI(base));
+            FileStorageModel fsm= FileStorageModel.create( fs, tmpl );
+            String ff= fsm.getRepresentativeFile( new NullProgressMonitor() );
+            if ( ff!=null ) {
+                return base + "/" + ff;
+            } else {
+                throw new IllegalArgumentException("unable to find sample file");
+            }
+
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+
+        }
+    }
+    
     /**
      * return the timerange spanning the availability of the dataset.
      * @param spid service provider id.
