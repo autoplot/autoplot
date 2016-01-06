@@ -83,6 +83,7 @@ import org.autoplot.renderer.ContourStylePanel;
 import org.autoplot.renderer.DigitalStylePanel;
 import org.autoplot.renderer.EventsStylePanel;
 import org.autoplot.renderer.PitchAngleDistributionStylePanel;
+import org.autoplot.renderer.StackedHistogramStylePanel;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.DatumRange;
@@ -239,6 +240,8 @@ public class GuiSupport {
                 editorPanel= new DigitalStylePanel( );
             } else if ( renderType==RenderType.eventsBar ) {
                 editorPanel= new EventsStylePanel( );
+            } else if ( renderType==RenderType.stackedHistogram ) {
+                editorPanel= new StackedHistogramStylePanel( );
             } else {
                 //TODO: consider generic style panel that is based on completions of Renderer control.
                 editorPanel= new SeriesStylePanel( );
@@ -836,6 +839,7 @@ public class GuiSupport {
         tt.put( "Pitch Angle Distribution", RenderType.pitchAngleDistribution);
         tt.put( "Orbit Plot", RenderType.orbitPlot );
         tt.put( "Contour Plot", RenderType.contour);
+        tt.put( "Stacked Histogram", RenderType.stackedHistogram);
         return tt;
     }
 
