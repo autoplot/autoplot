@@ -75,7 +75,8 @@ public class CDAWebDataSource extends AbstractDataSource {
         ds= getParam( "ds","ac_k0_epm" );
         param= getParam( "arg_0", null );
         ws= getParam( PARAM_WS, "T");
-        avail= "T".equals( getParam( PARAM_AVAIL,"F") );
+        
+        savail= getParam( PARAM_AVAIL,"F");
         
         if ( param==null ) param= getParam("id","H_lo");
 
@@ -89,7 +90,7 @@ public class CDAWebDataSource extends AbstractDataSource {
     String ds;
     String param;
     String ws; // web service
-    boolean avail;
+    String savail;
     
     /**
      * return the DataSourceFactory that will read the CDF files.  This was once
@@ -134,7 +135,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             files= db.getFiles( ds.toUpperCase(), tr, ws, mon.getSubtaskMonitor("lookup files") );
 
-            if ( avail ) {
+            if ( "T".equals( savail ) ) {
                 logger.log(Level.FINE, "availablility {0} ", new Object[]{ tr});
                 DataSetBuilder build= new DataSetBuilder(2,files.length,4);
                 Units u= Units.us2000;
@@ -477,12 +478,15 @@ public class CDAWebDataSource extends AbstractDataSource {
                 @Override
                 public String getURI() {
                     return "vap+cdaweb:ds="+ds+"&id="+param+"&timerange="+tr.toString().replace(" ", "+") + 
-                            ( ws!=null ? "&ws=" + ws : "" );
+                            ( ws!=null ? "&ws=" + ws : "" ) +
+                            ( "T".equals(savail) ? "&avail=T" : "" );
                 }
 
                 @Override
                 public String blurURI() {
-                    return "vap+cdaweb:ds="+ds+"&id="+param;
+                    return "vap+cdaweb:ds="+ds+"&id="+param + 
+                            ( ws!=null ? "&ws=" + ws : "" ) +
+                            ( "T".equals(savail) ? "&avail=T" : "" );
                 }
 
                 @Override
