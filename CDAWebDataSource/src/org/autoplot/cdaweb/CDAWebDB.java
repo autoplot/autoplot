@@ -31,6 +31,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import static org.autoplot.cdaweb.CDAWebDataSource.logger;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -93,6 +94,11 @@ public class CDAWebDB {
         }
     }
 
+    /**
+     * Download and parse the all.xml to create a database of available products.
+     * @param mon progress monitor for the task
+     * @throws IOException 
+     */
     public synchronized void refresh( ProgressMonitor mon ) throws IOException {
         try {
 
@@ -100,14 +106,14 @@ public class CDAWebDB {
 
             mon.setProgressMessage("refreshing database");//TODO: is this working
             mon.started();
-            mon.setTaskSize(3);
+            mon.setTaskSize(30);
             mon.setProgressMessage("downloading file "+dbloc );
 
-            String lookfor=  "ftp://cdaweb.gsfc.nasa.gov/pub/istp/";
-            String lookfor2= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb_data";
+            //String lookfor=  "ftp://cdaweb.gsfc.nasa.gov/pub/istp/";
+            //String lookfor2= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb_data";
 
             logger.log( Level.FINE, "downloading file {0}", dbloc);
-            File f= DataSetURI.getFile( new URI(dbloc), SubTaskMonitor.create( mon, 0, 1 ) ) ; // bug 3055130 okay
+            File f= DataSetURI.getFile( new URI(dbloc), SubTaskMonitor.create( mon, 0, 10 ) ) ; // bug 3055130 okay
             FileInputStream fin=null;
             InputStream altin= null;
             try {
@@ -115,14 +121,14 @@ public class CDAWebDB {
 
                 InputSource source = new InputSource( fin );
 
-                mon.setTaskProgress(1);
+                mon.setTaskProgress(10);
                 mon.setProgressMessage("parsing file "+dbloc );
                 document = builder.parse(source);
 
                 //XPath xp = XPathFactory.newInstance().newXPath();
                 //version= xp.evaluate( "/sites/datasite/@version", document );
 
-                mon.setTaskProgress(2);
+                mon.setTaskProgress(20);
                 mon.setProgressMessage("reading IDs");
 
                 altin= CDAWebDB.class.getResourceAsStream("/org/autoplot/cdaweb/filenames_alt.txt") ;
@@ -137,7 +143,9 @@ public class CDAWebDB {
                         if ( i>-1 ) ss= ss.substring(0,i);
                         if ( ss.trim().length()>0 ) {
                             String[] sss= ss.split("\\s+");
-                            tmpls.put( sss[0], sss[2] );
+                            String naming= sss[2];
+                            naming= naming.replaceAll("\\%", "\\$");
+                            tmpls.put( sss[0], naming );
                             if ( sss[1].length()>1 ) bases.put( sss[0], sss[1] );
                         }
                         ss= rr.readLine();
@@ -146,8 +154,8 @@ public class CDAWebDB {
                     rr.close();
                 }
 
-                refreshServiceProviderIds();
-                mon.setTaskProgress(3);
+                refreshServiceProviderIds(mon.getSubtaskMonitor(20,30,"process document"));
+                mon.setTaskProgress(30);
 
             } finally {
                 if ( fin!=null ) fin.close();
@@ -167,12 +175,121 @@ public class CDAWebDB {
     }
 
     /**
-     * get the list of files from the web service
-     * @param toUpperCase
+     * isolate the code that resolves which files need to be accessed, so that
+     * we can use the web service when it is available.
+     * @param spid
      * @param tr
-     * @return  <filename>|<startTime>|<endTime>
+     * @param useWebServiceHint null means no pref, or "T" or "F"
+     * @param mon progress monitor for the download
+     * @return array of strings, with filename|startTime|endTime
+     * @throws java.io.IOException 
      */
-    String[] getFilesAndRangesFromWebService(String spid, DatumRange tr) throws IOException {
+    public String[] getFiles( String spid, DatumRange tr, String useWebServiceHint, ProgressMonitor mon ) throws IOException {
+        boolean useService= !( "F".equals(useWebServiceHint) );
+        String[] result;
+        logger.log(Level.FINE, "getFiles {0} {1} ws={2}", new Object[]{spid, tr, useService});
+        if ( useService ) {
+            String[] ss= getOriginalFilesAndRangesFromWebService(spid, tr);
+            result= ss;
+                    
+        } else {
+            try {
+                String tmpl= getNaming( spid );
+                String base= getBaseUrl( spid );
+                
+                logger.log( Level.FINE, "tmpl={0}", tmpl);
+                logger.log( Level.FINE, "base={0}", base);
+                logger.log(Level.FINE, "{0}/{1}", new Object[]{base, tmpl});
+                
+                FileSystem fs= FileSystem.create( new URI( base ) ); // bug3055130 okay
+                FileStorageModel fsm= FileStorageModel.create( fs, tmpl );
+                
+                String[] ff= fsm.getBestNamesFor(tr,mon);
+                result= new String[ ff.length ];
+                TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$SZ");
+                for ( int i=0; i<ff.length; i++ ) {
+                    DatumRange tr1= fsm.getRangeFor(ff[i]);
+                    result[i]= base + "/" + ff[i] + "|" + tp.format(tr1.min()) + "|" + tp.format(tr1.max());
+                }
+                
+            } catch (URISyntaxException ex) {
+                throw new IOException(ex);
+            }
+        }
+        logger.log(Level.FINER, "found {0} files.", result.length);
+        return result;
+    }
+    
+    /**
+     * get the list of files from the web service
+     * @param spid the id like "AC_H2_CRIS"
+     * @param tr the timerange constraint
+     * @return  filename|startTime|endTime
+     * @throws java.io.IOException
+     */    
+    public String[] getOriginalFilesAndRangesFromWebService(String spid, DatumRange tr ) throws IOException {
+        TimeParser tp= TimeParser.create("$Y$m$dT$H$M$SZ");
+        String tstart= tp.format(tr.min(),tr.min());
+        String tstop= tp.format(tr.max(),tr.max());
+
+        InputStream ins= null;
+
+        try {
+            URL url = new URL(String.format("http://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/%s/orig_data/%s,%s", spid, tstart, tstop));
+            logger.fine(url.toString());
+            Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
+            URLConnection urlc;
+            loggerUrl.log(Level.FINE,"openConnection {0}", url);
+            urlc = url.openConnection();
+            urlc.setConnectTimeout(300);
+
+            loggerUrl.log(Level.FINE,"getInputStream {0}", url);
+            ins= urlc.getInputStream();
+            InputSource source = new InputSource( ins );
+
+            DocumentBuilder builder;
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document doc;
+            doc = builder.parse(source);
+
+            XPath xp = XPathFactory.newInstance().newXPath();
+
+            NodeList set = (NodeList) xp.evaluate( "/DataResult/FileDescription", doc.getDocumentElement(), javax.xml.xpath.XPathConstants.NODESET );
+
+            String[] result= new String[ set.getLength() ];
+            for ( int i=0; i<set.getLength(); i++ ) {
+                Node item= set.item(i);
+                result[i]= xp.evaluate("Name/text()",item) + "|"+ xp.evaluate("StartTime/text()",item)+ "|" + xp.evaluate("EndTime/text()",item );
+            }
+
+            return result;
+
+        } catch (MalformedURLException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw ex;
+        } catch (SAXException ex) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new RuntimeException(ex);
+        } catch (ParserConfigurationException ex) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new RuntimeException(ex);
+        } catch (XPathExpressionException ex) {
+            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new RuntimeException(ex);
+        } finally {
+            if ( ins!=null ) ins.close();
+        }        
+    }
+    
+    /**
+     * get the list of files from the web service
+     * @param spid the id like "AC_H2_CRIS"
+     * @param tr the timerange constraint
+     * @return  filename|startTime|endTime
+     * @throws java.io.IOException
+     */
+    public String[] getFilesAndRangesFromWebService(String spid, DatumRange tr) throws IOException {
         TimeParser tp= TimeParser.create("$Y$m$dT$H$M$SZ");
         String tstart= tp.format(tr.min(),tr.min());
         String tstop= tp.format(tr.max(),tr.max());
@@ -182,9 +299,14 @@ public class CDAWebDB {
         try {
             URL url = new URL(String.format("http://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/%s/data/%s,%s/ALL-VARIABLES?format=cdf", spid, tstart, tstop));
             URLConnection urlc;
+
+            Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
+            loggerUrl.log(Level.FINE,"openConnection {0}", url);
+            
             urlc = url.openConnection();
             urlc.setConnectTimeout(300);
 
+            loggerUrl.log(Level.FINE,"getInputStream {0}", url);
             ins= urlc.getInputStream();
             InputSource source = new InputSource( ins );
 
@@ -266,11 +388,15 @@ public class CDAWebDB {
             if ( filenaming.contains("%Q") ) {
                 filenaming= filenaming.replaceFirst("%Q.*\\.cdf", "?%(v,sep).cdf"); // templates don't quite match
             }
+            
+            String naming;
             if ( subdividedby.equals("None") ) {
-                return filenaming;
+                naming= filenaming;
             } else {
-                return subdividedby + "/" + filenaming;
+                naming= subdividedby + "/" + filenaming;
             }
+            naming= naming.replaceAll("\\%", "\\$");
+            return naming;
 
         } catch (XPathExpressionException ex) {
             throw new IOException("unable to read node "+spid);
@@ -567,7 +693,7 @@ public class CDAWebDB {
      * </ol>
      * @throws IOException
      */
-    public void refreshServiceProviderIds() throws IOException {
+    private void refreshServiceProviderIds( ProgressMonitor mon ) throws IOException {
         if ( document==null ) {
             throw new IllegalArgumentException("document has not been read, refresh must be called first");
         }
@@ -577,7 +703,11 @@ public class CDAWebDB {
 
             Map<String,String> result= new LinkedHashMap<String,String>();
 
+            mon.setTaskSize(nodes.getLength());
+            mon.started();
+            
             for ( int i=0; i<nodes.getLength(); i++ ) {
+                mon.setTaskProgress(i);
                 Node node= nodes.item(i);
                 NamedNodeMap attrs= node.getAttributes();
                 try {
@@ -608,6 +738,7 @@ public class CDAWebDB {
                     logger.log( Level.WARNING, "exception", ex2 );
                 }
             }
+            mon.finished();
 
             ids= result;
 
