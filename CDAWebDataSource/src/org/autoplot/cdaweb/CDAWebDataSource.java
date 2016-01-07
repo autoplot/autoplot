@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.cdaweb;
 
@@ -17,14 +13,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.autoplot.cdf.CdfDataSource;
 import org.das2.dataset.NoDataInIntervalException;
+import org.das2.datum.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
-import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
-import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -32,6 +28,7 @@ import org.das2.util.monitor.SubTaskMonitor;
 //import org.virbo.cdf.CdfJavaDataSource;
 import org.virbo.cdf.CdfVirtualVars;
 import org.virbo.dataset.ArrayDataSet;
+import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -45,6 +42,7 @@ import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
+import org.virbo.dsutil.DataSetBuilder;
 import org.virbo.metatree.IstpMetadataModel;
 
 /**
@@ -62,7 +60,9 @@ public class CDAWebDataSource extends AbstractDataSource {
     public static final String PARAM_ID= "id";
     public static final String PARAM_DS= "ds";
     public static final String PARAM_TIMERANGE= "timerange";
-
+    public static final String PARAM_WS= "ws";
+    public static final String PARAM_AVAIL= "avail";
+    
     public CDAWebDataSource( URI uri ) {
         super(uri);
         String timerange= getParam( "timerange", "2010-01-17" ).replaceAll("\\+", " ");
@@ -74,6 +74,9 @@ public class CDAWebDataSource extends AbstractDataSource {
         }
         ds= getParam( "ds","ac_k0_epm" );
         param= getParam( "arg_0", null );
+        ws= getParam( PARAM_WS, "T");
+        avail= "T".equals( getParam( PARAM_AVAIL,"F") );
+        
         if ( param==null ) param= getParam("id","H_lo");
 
         if ( param==null ) throw new IllegalArgumentException("param not specified");
@@ -85,7 +88,9 @@ public class CDAWebDataSource extends AbstractDataSource {
     DatumRange tr;
     String ds;
     String param;
-
+    String ws; // web service
+    boolean avail;
+    
     /**
      * return the DataSourceFactory that will read the CDF files.  This was once
      * the binary CDF library, and now is the java one.  Either way, it must
@@ -125,26 +130,47 @@ public class CDAWebDataSource extends AbstractDataSource {
                 throw ex;
             }
 
-            boolean webService= getParam("ws", "F").equals("T");
-            
             String[] files;
 
-            String tmpl= db.getNaming(ds.toUpperCase());
-            String base= db.getBaseUrl(ds.toUpperCase());
+            files= db.getFiles( ds.toUpperCase(), tr, ws, mon.getSubtaskMonitor("lookup files") );
 
-            logger.log( Level.FINE, "tmpl={0}", tmpl);
-            logger.log( Level.FINE, "base={0}", base);
-            
-            FileSystem fs= FileSystem.create( new URI( base ) ); // bug3055130 okay
-            FileStorageModel fsm= FileStorageModel.create( fs, tmpl );
+            if ( avail ) {
+                logger.log(Level.FINE, "availablility {0} ", new Object[]{ tr});
+                DataSetBuilder build= new DataSetBuilder(2,files.length,4);
+                Units u= Units.us2000;
+                EnumerationUnits eu= new EnumerationUnits("default");
+                for ( String file: files ) {
+                    String[] ss= file.split("\\|");
+                    file=ss[0];
+                    DatumRange dr= DatumRangeUtil.parseTimeRange( ss[1]+ " to "+ ss[2] );
+                    build.putValues( -1, DDataSet.wrap( new double[] { dr.min().doubleValue(u), dr.max().doubleValue(u), 0x80FF80, eu.createDatum(ss[0]).doubleValue(eu) } ), 4 );
+                    build.nextRecord();
+                }
+                
+                DDataSet tresult= build.getDataSet();
 
-            if ( webService ) {
-                files= db.getFilesAndRangesFromWebService( ds.toUpperCase(), tr );
-            } else {
-                logger.log(Level.FINER, "looking for files matching {0}", fsm.toString());
-                files= fsm.getBestNamesFor( tr, new NullProgressMonitor() );
+                DDataSet bds= DDataSet.createRank2( 4, 0 );
+                bds.putProperty( "NAME__0", "StartTime" );
+                bds.putProperty( "UNITS__0", u );
+                bds.putProperty( "NAME__1", "StopTime" );
+                bds.putProperty( "UNITS__1", u );
+                bds.putProperty( "NAME__2", "Color" );
+                bds.putProperty( "NAME__3", "Filename" );
+                bds.putProperty( "UNITS__3", eu );
+
+                tresult.putProperty( QDataSet.BUNDLE_1, bds );
+
+                tresult.putProperty( QDataSet.RENDER_TYPE, "eventsBar" );
+                tresult.putProperty( QDataSet.LABEL, "Availability");
+
+                tresult.putProperty( QDataSet.TITLE, getURI() );
+
+                mon.finished();
+                
+                return tresult;
+
             }
-
+            
             DataSourceFactory cdfFileDataSourceFactory= getDelegateFactory();
 
             mon.setTaskSize(files.length*10+10);
@@ -164,14 +190,13 @@ public class CDAWebDataSource extends AbstractDataSource {
             for ( int i=0; i<files.length; i++ ) {
                 if ( mon.isCancelled() ) break;
                 
-                DatumRange range1=null;
+                DatumRange range1;
                 
                 String file= files[i];
                 String[] ss= file.split("\\|");
-                if ( webService ) {
-                    file=ss[0];
-                    range1= DatumRangeUtil.parseTimeRange( ss[1]+ " to "+ ss[2] );
-                }
+
+                file=ss[0];
+                range1= DatumRangeUtil.parseTimeRange( ss[1]+ " to "+ ss[2] );
 
                 mon.setTaskProgress((i+1)*10);
                 mon.setProgressMessage( "load "+file );
@@ -195,11 +220,8 @@ public class CDAWebDataSource extends AbstractDataSource {
                                 fileParams.remove( PARAM_DS );
                                 fileParams.put( PARAM_ID, comp );
                                 URI file1;
-                                if ( webService ) {
-                                    file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
-                                } else {
-                                    file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
-                                }
+                                file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
+
                                 DataSource dataSource= cdfFileDataSourceFactory.getDataSource( file1 );
                                 try {
                                     ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1 );
@@ -232,21 +254,11 @@ public class CDAWebDataSource extends AbstractDataSource {
                         fileParams.remove( PARAM_TIMERANGE );
                         fileParams.remove( PARAM_DS );
                         URI file1;
-                        if ( webService ) {
-                            file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
-                        } else {
-                            file1= fs.getRootURI().resolve( file + "?" + URISplit.formatParams(fileParams) );
-                        }
+                        file1= new URI( file + "?" + URISplit.formatParams(fileParams) );
+
                         logger.log( Level.FINE, "loading {0}", file1);
-                        //CdfDataSource dataSource= (CdfDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
-                        //DataSource dss=  cdfFileDataSourceFactory.getDataSource( file1 );
-                        //if ( dss instanceof CdfJavaDataSource ) {
-                        //    CdfJavaDataSource dataSource= (CdfJavaDataSource)cdfFileDataSourceFactory.getDataSource( file1 ); //TODO: bug1286 remove me
-                        //    ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
-                        //} else {
-                            CdfDataSource dataSource= (CdfDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
-                            ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
-                        //}
+                        CdfDataSource dataSource= (CdfDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
+                        ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
                         
                     }
                 } catch ( NoDataInIntervalException ex ) {
@@ -255,7 +267,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
                 if ( ds1!=null ) {
                     if ( result==null && accum==null ) {
-                        range= webService ? range1 : fsm.getRangeFor(files[i]);
+                        range= range1;
                         if ( files.length==1 ) {
                             result= (MutablePropertyDataSet)ds1;
                         } else {
@@ -271,7 +283,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                             accum.grow( accum.length() + ads1.length() * ( files.length-i) );
                             accum.append( ads1 );
                         }
-                        range= DatumRangeUtil.union( range, webService ? range1 : fsm.getRangeFor(files[i]) );
+                        range= DatumRangeUtil.union( range, range1 );
                     }
                 } else {
                     logger.log(Level.FINE, "failed to read data for granule: {0}", files[i]);
@@ -348,15 +360,16 @@ public class CDAWebDataSource extends AbstractDataSource {
                     Units dep0units= (Units) dep0.property(QDataSet.UNITS);
                     dep0= Ops.putProperty( dep0, QDataSet.TYPICAL_MIN, range.min().doubleValue(dep0units) );
                     dep0= Ops.putProperty( dep0, QDataSet.TYPICAL_MAX, range.max().doubleValue(dep0units) );
+                    dep0= Ops.putProperty( dep0, QDataSet.CACHE_TAG, new CacheTag(range,null) );
                     result= Ops.putProperty( result, QDataSet.DEPEND_0, dep0 );
                 }
 
                 Map<String,String> user= new HashMap<String, String>();
                 for ( int i=0; i<Math.min( files.length,10); i++ ) {
-                    user.put( "delegate_"+i, fs.toString() + files[i] );
+                    user.put( "delegate_"+i, files[i] );
                 }
                 if ( files.length>=10 ) {
-                    user.put( "delegate_10", (files.length-10) + " more files from " + base + "/" + tmpl );
+                    user.put( "delegate_10", (files.length-10) + " more files." );
                 }
 
                 if ( !result.isImmutable() ) {
@@ -440,7 +453,7 @@ public class CDAWebDataSource extends AbstractDataSource {
     public <T> T getCapability(Class<T> clazz) {
         if ( clazz==TimeSeriesBrowse.class ) {
             return (T) new TimeSeriesBrowse() {
-
+                
                 @Override
                 public void setTimeRange(DatumRange dr) {
                     tr= dr;
@@ -463,7 +476,8 @@ public class CDAWebDataSource extends AbstractDataSource {
 
                 @Override
                 public String getURI() {
-                    return "vap+cdaweb:ds="+ds+"&id="+param+"&timerange="+tr.toString().replace(" ", "+");
+                    return "vap+cdaweb:ds="+ds+"&id="+param+"&timerange="+tr.toString().replace(" ", "+") + 
+                            ( ws!=null ? "&ws=" + ws : "" );
                 }
 
                 @Override
