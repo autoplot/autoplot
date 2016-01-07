@@ -74,7 +74,7 @@ public class CDAWebDataSource extends AbstractDataSource {
         }
         ds= getParam( "ds","ac_k0_epm" );
         param= getParam( "arg_0", null );
-        ws= getParam( PARAM_WS, "T");
+        ws= getParam( PARAM_WS, null );
         
         savail= getParam( PARAM_AVAIL,"F");
         
@@ -89,7 +89,7 @@ public class CDAWebDataSource extends AbstractDataSource {
     DatumRange tr;
     String ds;
     String param;
-    String ws; // web service
+    String ws; // web service.  Null means "T"
     String savail;
     
     /**
