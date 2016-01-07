@@ -139,7 +139,7 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
         URISplit split= URISplit.parse(surl);
         Map<String,String> params= URISplit.parseParams(split.params);
 
-        if ( !( params.containsKey("ds") && params.containsKey("id" )&& params.containsKey("timerange") ) ) return true;
+        if ( !( params.containsKey("ds") && ( params.containsKey("id" ) || "T".equals( params.get("avail") ) ) && params.containsKey("timerange") ) ) return true;
 
         String tr= params.get("timerange");
         if ( tr==null ) {
