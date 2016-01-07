@@ -408,6 +408,9 @@ public class CDAWebDataSource extends AbstractDataSource {
 
     @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
+        if ( "T".equals(this.savail) ) {
+            return null;
+        }
         if ( metadata==null ) {
 
             CDAWebDB db= CDAWebDB.getInstance();
