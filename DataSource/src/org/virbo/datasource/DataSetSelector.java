@@ -787,7 +787,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     }
                     boolean proceed;
                     try {
-                        proceed = fedit.prepare(surl, window, getMonitor("download file", "downloading file to preparing editor"));
+                        proceed = fedit.prepare(surl, window, getMonitor("download file", "downloading file and preparing editor"));
                         if ( !proceed ) return;
                     } catch ( java.io.InterruptedIOException ex ) {
                         setMessage( "download cancelled" );  //TODO: check FTP
