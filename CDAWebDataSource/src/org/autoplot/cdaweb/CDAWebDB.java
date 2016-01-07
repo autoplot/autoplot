@@ -42,6 +42,7 @@ import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
@@ -183,13 +184,14 @@ public class CDAWebDB {
      * @param mon progress monitor for the download
      * @return array of strings, with filename|startTime|endTime
      * @throws java.io.IOException 
+     * @throws org.das2.util.monitor.CancelledOperationException 
      */
-    public String[] getFiles( String spid, DatumRange tr, String useWebServiceHint, ProgressMonitor mon ) throws IOException {
+    public String[] getFiles( String spid, DatumRange tr, String useWebServiceHint, ProgressMonitor mon ) throws IOException, CancelledOperationException {
         boolean useService= !( "F".equals(useWebServiceHint) );
         String[] result;
         logger.log(Level.FINE, "getFiles {0} {1} ws={2}", new Object[]{spid, tr, useService});
         if ( useService ) {
-            String[] ss= getOriginalFilesAndRangesFromWebService(spid, tr);
+            String[] ss= getOriginalFilesAndRangesFromWebService(spid, tr, mon );
             result= ss;
                     
         } else {
@@ -224,10 +226,11 @@ public class CDAWebDB {
      * get the list of files from the web service
      * @param spid the id like "AC_H2_CRIS"
      * @param tr the timerange constraint
+     * @param mon progress monitor
      * @return  filename|startTime|endTime
      * @throws java.io.IOException
      */    
-    public String[] getOriginalFilesAndRangesFromWebService(String spid, DatumRange tr ) throws IOException {
+    public String[] getOriginalFilesAndRangesFromWebService(String spid, DatumRange tr, ProgressMonitor mon ) throws IOException, CancelledOperationException {
         TimeParser tp= TimeParser.create("$Y$m$dT$H$M$SZ");
         String tstart= tp.format(tr.min(),tr.min());
         String tstop= tp.format(tr.max(),tr.max());
@@ -256,11 +259,18 @@ public class CDAWebDB {
 
             NodeList set = (NodeList) xp.evaluate( "/DataResult/FileDescription", doc.getDocumentElement(), javax.xml.xpath.XPathConstants.NODESET );
 
+            mon.setTaskSize( set.getLength() );
+            mon.started();
+            
             String[] result= new String[ set.getLength() ];
             for ( int i=0; i<set.getLength(); i++ ) {
+                mon.setTaskProgress(i);
+                if ( mon.isCancelled() ) throw new CancelledOperationException("cancel during parse");
                 Node item= set.item(i);
                 result[i]= xp.evaluate("Name/text()",item) + "|"+ xp.evaluate("StartTime/text()",item)+ "|" + xp.evaluate("EndTime/text()",item );
             }
+            
+            mon.finished();
 
             return result;
 
