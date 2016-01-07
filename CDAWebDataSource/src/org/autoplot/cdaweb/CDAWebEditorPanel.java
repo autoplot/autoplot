@@ -144,6 +144,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             final String ftr= tr.toString();
             SwingUtilities.invokeLater( 
                 new Runnable() { 
+                    @Override
                     public void run() { 
                         timeRangeTextField.setText(ftr);
                     }
@@ -181,6 +182,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             availableTextField.setText(avail);
             final DatumRange dr= DatumRangeUtil.roundSections( DatumRangeUtil.parseTimeRange( avail ), 100 );
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     refreshDefaultTime(ds,dr);
                 }
@@ -226,6 +228,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
 
         Runnable run= new Runnable() {
+            @Override
             public synchronized void run() {
                 if ( ds!=null && ds.length()>0 ) {
                     try {
@@ -300,6 +303,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
         
         Timer repaintTimer= new Timer( 333,new ActionListener() {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 String p;
                 if ( getTaskSize()==-1 ) {
@@ -337,6 +341,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         //parameterPanel.validate();
                 
         SwingUtilities.invokeLater( new Runnable() {
+            @Override
             public void run() {
                 if ( paramEditor!=null ) parameterPanel.remove( paramEditor );
                 if ( messageComponent!=null ) parameterPanel.remove( messageComponent );
@@ -371,6 +376,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             ex.printStackTrace();
             final String msg= ex.toString();
             SwingUtilities.invokeLater( new Runnable() {
+                @Override
                 public void run() {
                     if ( paramEditor!=null ) parameterPanel.remove( paramEditor );
                     if ( messageComponent!=null ) parameterPanel.remove( messageComponent );
@@ -447,6 +453,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         timeRangeTextField = new javax.swing.JTextField();
         availableTextField = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        availabilityCB = new javax.swing.JCheckBox();
         descriptionLabel = new javax.swing.JLabel();
 
         setName("cdawebEditorPanel"); // NOI18N
@@ -488,6 +495,14 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             }
         });
 
+        availabilityCB.setText("availability");
+        availabilityCB.setToolTipText("Show data availability instead of loading data.  This simply shows if granule files are found or not, so empty or near-empty granules still are marked as available.\n");
+        availabilityCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                availabilityCBActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout timeRangePanelLayout = new org.jdesktop.layout.GroupLayout(timeRangePanel);
         timeRangePanel.setLayout(timeRangePanelLayout);
         timeRangePanelLayout.setHorizontalGroup(
@@ -496,14 +511,16 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .addContainerGap()
                 .add(timeRangePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(timeRangePanelLayout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(availableTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(timeRangePanelLayout.createSequentialGroup()
                         .add(jLabel3)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(timeRangeTextField)
+                        .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(jButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, timeRangePanelLayout.createSequentialGroup()
+                        .add(0, 0, Short.MAX_VALUE)
+                        .add(availableTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 370, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(availabilityCB)))
                 .addContainerGap())
         );
         timeRangePanelLayout.setVerticalGroup(
@@ -518,7 +535,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                         .add(0, 0, Short.MAX_VALUE))
                     .add(jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(availableTextField)
+                .add(timeRangePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(availableTextField)
+                    .add(availabilityCB))
                 .addContainerGap())
         );
 
@@ -553,7 +572,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(descriptionLabel)
                 .add(4, 4, 4)
-                .add(parameterPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+                .add(parameterPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
@@ -576,6 +595,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         parameterPanel.revalidate();
         parameterPanel.repaint();
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 if ( !initializing ) {
                     refresh(getURI());
@@ -596,8 +616,14 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void availabilityCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_availabilityCBActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_availabilityCBActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox availabilityCB;
     private javax.swing.JLabel availableTextField;
     private javax.swing.JLabel descriptionLabel;
     private javax.swing.JComboBox dsidComboBox;
@@ -610,6 +636,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     private javax.swing.JTextField timeRangeTextField;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
@@ -625,6 +652,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     }
 
+    @Override
     public void setURI(String uri) {
         initialize(uri);
         URISplit split= URISplit.parse(uri);
@@ -637,8 +665,11 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
         this.id= args.get( "id" );
         
+        availabilityCB.setSelected("T".equals(args.get("avail")));
+
         if ( args.get( CDAWebDataSource.PARAM_DS )==null ) {
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     try {
                         while ( !CDAWebEditorPanel.this.isShowing() ) {
@@ -648,6 +679,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                        logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
                     SwingUtilities.invokeLater( new Runnable() {
+                        @Override
                         public void run() {
                             messageComponent= new JLabel(MSG_NO_DATASET);
                             parameterPanel.removeAll();
@@ -665,21 +697,22 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         
     }
 
+    @Override
     public String getURI() {
-        String id=null;
+        String lid=null;
         String slice1= "";
         String where= null;
         if ( paramEditor!=null ) {
-            id= paramEditor.getURI();
-            URISplit split= URISplit.parse(id);
+            lid= paramEditor.getURI();
+            URISplit split= URISplit.parse(lid);
             Map<String,String> args= URISplit.parseParams(split.params);
-            id= args.get("arg_0");
+            lid= args.get("arg_0");
             slice1= args.get("slice1");
             where= args.get("where");
         }
-        if ( id!=null ) this.id= id;
-        if ( id==null && this.id!=null ) id=this.id;
-        if ( id==null ) id="";
+        if ( lid!=null ) this.id= lid;
+        if ( lid==null && this.id!=null ) lid=this.id;
+        if ( lid==null ) lid="";
         
         String timeRange= timeRangeTextField.getText();
         if ( timeRange==null ) { // TODO: I don't think this should ever be null.
@@ -689,7 +722,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         
         timeRange= timeRange.replaceAll(" ", "+");
 
-        String result= "vap+cdaweb:ds="+dsidComboBox.getSelectedItem()+"&id="+id;
+        String result= "vap+cdaweb:ds="+dsidComboBox.getSelectedItem()+"&id="+lid;
         if ( filter.length()>0 ) {
             result+= "&filter="+filter;
         }
@@ -699,9 +732,13 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         if ( where!=null ) {
             result+= "&where="+where;
         }
+        if ( availabilityCB.isSelected() ) {
+            result+= "&avail=T";
+        }
         return result +"&timerange="+timeRange;
     }
 
+    @Override
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
         initialize(uri);
 
@@ -714,6 +751,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         return true;
     }
 
+    @Override
     public boolean reject(String uri) throws Exception {
         return false;
     }
@@ -724,6 +762,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         this.expert= expert;
     }
 
+    @Override
     public void markProblems(List<String> problems) {
 
     }
