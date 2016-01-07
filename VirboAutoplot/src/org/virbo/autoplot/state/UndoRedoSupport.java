@@ -34,13 +34,11 @@ import javax.swing.JMenuItem;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.system.RequestProcessor;
-import org.das2.util.LoggerManager;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.Diff;
-import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.datasource.AutoplotSettings;
@@ -54,11 +52,14 @@ public class UndoRedoSupport {
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.dom.vap");
     ApplicationModel applicationModel;
 
-    /** Creates a new instance of UndoRedoSupport */
+    /** 
+     * Creates a new instance of UndoRedoSupport 
+     * @param applicationModel the model which contains basic information about any Autoplot application.
+     */
     public UndoRedoSupport(ApplicationModel applicationModel) {
         this.applicationModel = applicationModel;
         applicationModel.addPropertyChangeListener(new PropertyChangeListener() {
-
+            @Override
             public void propertyChange(PropertyChangeEvent ev) {
                 if (ev.getPropertyName().equals(ApplicationModel.PROP_VAPFILE)) {
                     resetHistory();
@@ -116,7 +117,9 @@ public class UndoRedoSupport {
             return deltaDesc;
         }
     }
-    LinkedList<StateStackElement> stateStack = new LinkedList<StateStackElement>();
+    
+    LinkedList<StateStackElement> stateStack = new LinkedList<>();
+    
     /**
      * points at the last saved state index + 1;
      */
@@ -152,7 +155,13 @@ public class UndoRedoSupport {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
-                undo();
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        undo();
+                    }
+                };
+                new Thread( run, "undoLaterThread" ).start();
             }
         };
     }
@@ -197,9 +206,16 @@ public class UndoRedoSupport {
      */
     public Action getRedoAction() {
         return new AbstractAction("redo") {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
-                redo();
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        redo();
+                    }
+                };
+                new Thread( run, "redoLaterThread" ).start();
             }
         };
     }
