@@ -162,7 +162,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 tresult.putProperty( QDataSet.BUNDLE_1, bds );
 
                 tresult.putProperty( QDataSet.RENDER_TYPE, "eventsBar" );
-                tresult.putProperty( QDataSet.LABEL, "Availability");
+                tresult.putProperty( QDataSet.LABEL, ds.toUpperCase()+"!cAvailability");
 
                 tresult.putProperty( QDataSet.TITLE, getURI() );
 
