@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A digiziter script is modified to count cookies.  Happy holidays!
+        <p><small>The CDAWeb plug-in now supports availability, showing where files provide data.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -21,8 +21,16 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2015-12-21 r18149):</p>
+        <p>Bugfixes (2016-01-08 r18183):</p>
         <ul>
+            <li>1506: allow subsequent repeat of lsd to reset the multiplier, fixing $Y$(m,delta=4)/$Y$m$d.dat</li>
+            <li>grayPeaks didn't draw in StackedHistogram mode, because the lightGray.brighter() would result in white.</li>
+            <li>undo operation was performed on event thread, which could easily lock the application</li>
+            <li>CDAWeb result was missing CACHE_TAG, so result would be reloaded when it wasn't needed.</li>
+            <li>CDAWeb uses web service to more accurately identify needed files.</li>
+            <li>1509: do sanity check to make sure new dialogs are not positioned outside of screen bounds.</li>
+            <li>export to rich ascii will allocate name when dataset doesn't have name property.</li>
+            <li>Screenshots tool would clip the pointer when it was partially outside of the GUI boundaries.</li>
             <li>1437: export to rich ascii must preserve as much metadata as possible</li>
             <li>check for missing/problem with Rich PNG JSON, Where Dan's pngwalk contained bad metadata that showed in a demo at AGU.</li>
             <li>dashup tool gets quick-n-dirty rename variable code</li>
@@ -89,6 +97,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>470: DasProgressPanel shows the thread name to improve serviceability</li>
+            <li>CDAWeb now shows availability.</li>
+            <li>StackedHistogram gets style panel</li>
             <li>StackedHistogramRenderer name fixes</li>
             <li>CDF editor dialog indicates internal type to improve transparency and support creating new files.</li>
             <li>468: unplot can use iso8601 times.</li>
