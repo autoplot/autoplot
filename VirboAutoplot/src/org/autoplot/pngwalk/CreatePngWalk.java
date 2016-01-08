@@ -449,7 +449,7 @@ public class CreatePngWalk {
             * @author Armond Luthens
             * @date 09/21/15
             */
-           
+            
             pngFilenameArray.add(filename);
              
             
@@ -718,21 +718,24 @@ public class CreatePngWalk {
         //String filePath = "pngImagePage2.html";
         File f= new File(filePath);
         
-        String htmlOpen= "<html>";
-        String htmlHead="<head><title>PNG Gallery</title></head>";
-        String htmlBody="<body style=\"background-color: #6B6B6B; margin=0;\">";
-        String htmlClose= "</div2Close></body></html>";
-        String pageHeaderOpen= "<div style=\"padding:20px; top: 0px; margin-right=0px; background-color:black; color:white;height:30px;\">"
-                    + "<strong>" + params.product + "_"+ params.timeFormat + "</strong>" + "</div>";
+        String htmlOpen= "<html>\n";
+        String htmlHead="\t<head><title>PNG Gallery TEST</title></head>\n";
+        String htmlBody="\t<body style=\"background-color: #6B6B6B; margin=0;\">\n";
+        String htmlClose1= "\t\t</div2Close>\n";
+        String htmlClose2= "\t</body>\n";
+        String htmlClose3= "</html>";
+        
+        String pageHeaderOpen= "\t\t<div style=\"padding:20px; top: 0px; margin-right=0px; background-color:black; color:white;height:30px;\">\n\t\t\t"
+                    + "<strong>" + params.product + "_"+ params.timeFormat + "</strong>\n" + "\t\t</div>\n";
             
         String addImageString;
-        String htmlImageStringOpen = "<img src=\"";
-        String htmlImageStringClose = "\" style=\"width:304px;height:304px;margin-left:10px;margin-bottom:10px;\">";
-        String htmlImageCaptionOpen = "<figcaption style=\"color: white; text-align:center;\">";
-        String htmlImageCaptionClose = "</figcaption>";
-        String htmlImageContainer = "<div style=\"background-color: #6B6B6B;margin-left:100px;\">";
-        String htmlFigureOpen = "<figure style=\"width:350px; float:left;\">";
-        String htmlFigureClose = "</figure>";
+        String htmlImageStringOpen = "\t\t\t\t<img src=\"";
+        String htmlImageStringClose = "\" style=\"width:304px;height:304px;margin-left:10px;margin-bottom:10px;\">\n";
+        String htmlImageCaptionOpen = "\t\t\t\t<figcaption style=\"color: white; text-align:center;\">";
+        String htmlImageCaptionClose = "\t\t\t\t</figcaption>\n";
+        String htmlImageContainer = "\t\t<div style=\"background-color: #6B6B6B;margin-left:100px;\">\n";
+        String htmlFigureOpen = "\t\t\t<figure style=\"width:350px; float:left;\">\n";
+        String htmlFigureClose = "\t\t\t</figure>\n";
         
         String currentPngFilename;
         String fileNameToDisplay;
@@ -753,6 +756,8 @@ public class CreatePngWalk {
             for (String pngFilenameArray1 : pngFilenameArray) {
                 
                 currentPngFilename = pngFilenameArray1;
+                System.out.println("image file path: " + currentPngFilename);
+                
                 fileNameToDisplay= timeLabels.get(count);
                 count++;
                 
@@ -764,7 +769,9 @@ public class CreatePngWalk {
                 bw.write(fullImageCaption);
                 bw.write(htmlFigureClose);
             }
-            bw.write(htmlClose);
+            bw.write(htmlClose1);
+            bw.write(htmlClose2);
+            bw.write(htmlClose3);
         } 
         catch(IOException e){
             System.err.println("IO ERROR.");
