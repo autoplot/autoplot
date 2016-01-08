@@ -18,8 +18,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -98,7 +100,7 @@ public class CDAWebDB {
     /**
      * Download and parse the all.xml to create a database of available products.
      * @param mon progress monitor for the task
-     * @throws IOException 
+     * @throws IOException when reading dbloc file.
      */
     public synchronized void refresh( ProgressMonitor mon ) throws IOException {
         try {
@@ -178,9 +180,9 @@ public class CDAWebDB {
     /**
      * isolate the code that resolves which files need to be accessed, so that
      * we can use the web service when it is available.
-     * @param spid
-     * @param tr
-     * @param useWebServiceHint null means no pref, or "T" or "F"
+     * @param spid the service provider id, like "AC_H2_CRIS"
+     * @param tr the timerange
+     * @param useWebServiceHint null means no preference, or "T", or "F"
      * @param mon progress monitor for the download
      * @return array of strings, with filename|startTime|endTime
      * @throws java.io.IOException 
@@ -191,8 +193,20 @@ public class CDAWebDB {
         String[] result;
         logger.log(Level.FINE, "getFiles {0} {1} ws={2}", new Object[]{spid, tr, useService});
         if ( useService ) {
-            String[] ss= getOriginalFilesAndRangesFromWebService(spid, tr, mon );
-            result= ss;
+            String[] ff= getOriginalFilesAndRangesFromWebService(spid, tr, mon );
+            List<String> resultList= new ArrayList(ff.length);
+            for ( String ff1 : ff ) {
+                try {
+                    String[] ss = ff1.split("\\|");
+                    DatumRange dr= DatumRangeUtil.parseTimeRange( ss[1]+ " to "+ ss[2] );
+                    if (dr.intersects(tr)) {
+                        resultList.add(ff1);
+                    }
+                }catch (ParseException ex) {
+                    Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            result= resultList.toArray(new String[resultList.size()]);
                     
         } else {
             try {
@@ -224,7 +238,7 @@ public class CDAWebDB {
     
     /**
      * get the list of files from the web service
-     * @param spid the id like "AC_H2_CRIS"
+     * @param spid the service provider id, like "AC_H2_CRIS"
      * @param tr the timerange constraint
      * @param mon progress monitor
      * @return  filename|startTime|endTime
