@@ -467,7 +467,7 @@ public class DataSetURI {
             try {
                 URLConnection c = url.openConnection();
                 c.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() );
-                c.setReadTimeout( FileSystem.settings().getConnectTimeoutMs() );
+                c.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
                 String mime = c.getContentType();
                 if (mime == null) {
                     throw new IOException("failed to connect");
@@ -1127,6 +1127,7 @@ public class DataSetURI {
                 URLConnection urlc= url.openConnection();
                 urlc.setRequestProperty("Accept-Encoding", "gzip"); // RFE
                 urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() ); // Reiner describes hang at LANL
+                urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
                 loggerUrl.log(Level.FINE,"getInputStream {0}", url);
                 in= urlc.getInputStream();
                 Map<String, List<String>> headers = urlc.getHeaderFields();
