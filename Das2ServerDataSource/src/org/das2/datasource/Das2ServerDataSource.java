@@ -318,6 +318,7 @@ class Das2ServerDataSource extends AbstractDataSource {
 		  InputStream in = null;
 		  URLConnection conn = url2.openConnection();
                   conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+                  conn.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
 		  if(conn instanceof HttpURLConnection){
 		     HttpURLConnection httpConn = (HttpURLConnection) conn;
 			  int nStatus = httpConn.getResponseCode();
@@ -340,6 +341,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                                 conn = url2.openConnection(); //TODO: stderr should be consumed.
                                 conn.setRequestProperty("Authorization", "Basic " + sHash );
                                 conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
+                                conn.setReadTimeout(FileSystem.settings().getReadTimeoutMs());
                                 httpConn = (HttpURLConnection) conn;
                                 nStatus = httpConn.getResponseCode();
                                 if ( nStatus==401 ){
