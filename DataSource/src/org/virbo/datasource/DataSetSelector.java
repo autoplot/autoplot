@@ -314,6 +314,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     private void maybePlotImmediatelyOffEvent( String surl ) {
+        logger.log(Level.FINE, "maybePlotImmediatelyOffEvent( {0} )", surl);
         Pattern accept= acceptPattern==null ? null : Pattern.compile(acceptPattern);
 
         if ( !enableDataSource && ( accept==null || accept.matcher(surl).matches() ) ) { // just fire off an event, don't validate it or do completions.
