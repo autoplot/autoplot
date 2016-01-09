@@ -4,11 +4,10 @@
  */
 package test.endtoend;
 
-import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetURI;
 
 /**
@@ -19,23 +18,19 @@ public class Test010 {
 
     public static void doTest( String suri ) throws Exception {
         URL url= DataSetURI.getWebURL( DataSetURI.toUri( suri ) );
-
-        URLConnection connect= url.openConnection();
-        connect.setConnectTimeout(3000);
-
-        connect.connect();
+        DataSetURI.downloadResourceAsTempFile( url, 1, new NullProgressMonitor() );
 
     }
     
     public static void main(String[] args)  {
         List<String> tests= new ArrayList();
-        tests.add("http://autoplot.org/data/foo.dat");
+        tests.add("http://autoplot.org/data/autoplot.dat");
         tests.add("http://timeseries.org/get.cgi?StartDate=19980101&EndDate=20090101&ppd=1&ext=bin&out=tsml&param1=NGDC_NOAA15_SEM2-33-v0" );
         tests.add("http://www.rbsp-ect.lanl.gov/");
         tests.add("http://cdaweb.gsfc.nasa.gov/istp_public/data/");
-        tests.add("ftp://cdaweb.gsfc.nasa.gov/pub/istp/");
+        tests.add("ftp://cdaweb.gsfc.nasa.gov/pub/data/");
         //tests.add("ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/");
-        tests.add("http://caa.estec.esa.int/caa/search.xml");
+        //tests.add("http://caa.estec.esa.int/caa/search.xml");
         tests.add("http://papco.org/data");
 
         List<Exception> exceptions= new ArrayList();
