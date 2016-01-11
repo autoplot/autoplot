@@ -257,7 +257,8 @@ public class CreatePngWalk {
      * @throws InterruptedException 
      */
     public static int doBatch( String[] times, Application readOnlyDom, Params params, ProgressMonitor mon ) throws IOException, InterruptedException {
-        final ArrayList<String> pngFilenameArray= new ArrayList();
+        final ArrayList<String> pngFilenameArrayThumbs= new ArrayList();
+        final ArrayList<String> pngFilenameArrayBig= new ArrayList();
         final ArrayList<String> timeLabels= new ArrayList();
     
         int returnCodeAll= 10;
@@ -443,14 +444,16 @@ public class CreatePngWalk {
                 atime= atime.substring(0,ic);
             }
             
-            String filename = getFilename( params, "", atime );
+            String filename = getRelativeFilename( params, "thumbs400", atime );
+            String filenameBig = getRelativeFilename( params, "", atime );
+            
             /**
             * Code for adding images into global arrayList for use in HTML method
             * @author Armond Luthens
             * @date 09/21/15
             */
-            
-            pngFilenameArray.add(filename);
+            pngFilenameArrayThumbs.add(filename);
+            pngFilenameArrayBig.add(filenameBig);
              
             
             count = count + 1;
@@ -567,7 +570,7 @@ public class CreatePngWalk {
             }
         }
         
-        writeHTMLFile( params, pngFilenameArray, timeLabels );
+        writeHTMLFile( params, pngFilenameArrayThumbs, pngFilenameArrayBig, timeLabels );
         
         mon.finished();
         
@@ -602,6 +605,37 @@ public class CreatePngWalk {
         } else {
             String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version.trim();
             filename= String.format("%s%s%s_%s%s.%s", params.outputFolder, thumbdir, params.product, atime, vers, params.outputFormat );
+        }
+        return filename;
+    }
+
+    /**
+     * create the filename for the time.
+     * @param params the parameters
+     * @param thumbdir "" or "thumbs100" or "thumbs400"
+     * @param atime the time "20150822"
+     * @return
+     * @throws IllegalArgumentException 
+     */
+    private static String getRelativeFilename(Params params, String thumbdir, String atime) throws IllegalArgumentException {
+        String filename;
+        if ( thumbdir.length()>0 && !thumbdir.endsWith("/") ) {
+            thumbdir= thumbdir + "/";
+        }
+        if ( params.useBatchUri && params.batchUriName.equals("$o") ) {
+            String name= atime; // really?
+            // sometimes we want capitalized extention.
+            String outputFormat= params.outputFormat;
+            if ( name.toLowerCase().endsWith(params.outputFormat) ) {
+                outputFormat= name.substring(name.length()-outputFormat.length());
+                name= name.substring(0,name.length()-(params.outputFormat.length()+1));
+            }
+            filename= String.format("%s%s.%s", thumbdir, name, outputFormat );
+        } else if ( params.useBatchUri && !params.batchUriName.equals("") ) {
+            throw new IllegalArgumentException("batchUriName must be \"\" or \"$o\"");
+        } else {
+            String vers= ( params.version==null || params.version.trim().length()==0 ) ? "" : "_"+params.version.trim();
+            filename= String.format("%s%s_%s%s.%s", thumbdir, params.product, atime, vers, params.outputFormat );
         }
         return filename;
     }
@@ -713,7 +747,7 @@ public class CreatePngWalk {
      * @author Armond Luthens
      *
      */
-    public static void writeHTMLFile( Params params, ArrayList<String> pngFilenameArray, ArrayList<String> timeLabels ){
+    public static void writeHTMLFile( Params params, ArrayList<String> pngFilenameArrayThumbs, ArrayList<String> pngFilenameArrayBig, ArrayList<String> timeLabels ){
         String filePath= params.outputFolder+""+ params.product + ".html";
         //String filePath = "pngImagePage2.html";
         File f= new File(filePath);
@@ -725,12 +759,16 @@ public class CreatePngWalk {
         String htmlClose2= "\t</body>\n";
         String htmlClose3= "</html>";
         
+        //String pageHeaderOpen= "\t\t<div style=\"padding:20px; top: 0px; margin-right=0px; background-color:black; color:white;height:30px;\">\n\t\t\t"
+        //            + "<strong>" + params.product + "_"+ params.timeFormat + "</strong>\n" + "\t\t</div>\n";
+        
         String pageHeaderOpen= "\t\t<div style=\"padding:20px; top: 0px; margin-right=0px; background-color:black; color:white;height:30px;\">\n\t\t\t"
-                    + "<strong>" + params.product + "_"+ params.timeFormat + "</strong>\n" + "\t\t</div>\n";
-            
+                    + "<strong>" + "PNG WALK" + "</strong>\n" + "\t\t</div>\n";
         String addImageString;
+        String htmlAnchorStringOpen = "\t\t\t\t<a href=\"";
+        String htmlAnchorStringClose = "\">\n";
         String htmlImageStringOpen = "\t\t\t\t<img src=\"";
-        String htmlImageStringClose = "\" style=\"width:304px;height:304px;margin-left:10px;margin-bottom:10px;\">\n";
+        String htmlImageStringClose = "\" style=\"width:304px;height:304px;margin-left:10px;margin-bottom:10px;\"></a>\n";
         String htmlImageCaptionOpen = "\t\t\t\t<figcaption style=\"color: white; text-align:center;\">";
         String htmlImageCaptionClose = "\t\t\t\t</figcaption>\n";
         String htmlImageContainer = "\t\t<div style=\"background-color: #6B6B6B;margin-left:100px;\">\n";
@@ -738,7 +776,9 @@ public class CreatePngWalk {
         String htmlFigureClose = "\t\t\t</figure>\n";
         
         String currentPngFilename;
+        String currentPngFilenameBIG;
         String fileNameToDisplay;
+        String bigImageLink;
         String year;
         String month;
         String day;
@@ -753,18 +793,21 @@ public class CreatePngWalk {
             bw.write(pageHeaderOpen);
             bw.write(htmlImageContainer);
             
-            for (String pngFilenameArray1 : pngFilenameArray) {
+            for (String pngFilenameArray1 : pngFilenameArrayThumbs) {
                 
                 currentPngFilename = pngFilenameArray1;
                 System.out.println("image file path: " + currentPngFilename);
                 
+                currentPngFilenameBIG = pngFilenameArrayBig.get(count);
                 fileNameToDisplay= timeLabels.get(count);
                 count++;
                 
+                bigImageLink= htmlAnchorStringOpen + currentPngFilenameBIG + htmlAnchorStringClose;
                 addImageString= htmlImageStringOpen+currentPngFilename+htmlImageStringClose; //insert image into html code
                 fullImageCaption= htmlImageCaptionOpen + fileNameToDisplay + htmlImageCaptionClose; //insert corresponding date for image into html code
                 
                 bw.write(htmlFigureOpen);
+                bw.write(bigImageLink);
                 bw.write(addImageString);
                 bw.write(fullImageCaption);
                 bw.write(htmlFigureClose);
