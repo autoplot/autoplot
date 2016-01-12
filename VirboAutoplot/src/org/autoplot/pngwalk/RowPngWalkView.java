@@ -300,7 +300,7 @@ public class RowPngWalkView extends PngWalkView {
                 WalkImage wimage= seq.imageAt(i);
                 BufferedImage thumb = wimage.getThumbnail(!scrollPane.getHorizontalScrollBar().getValueIsAdjusting());
                 Dimension d= wimage.getThumbnailDimension(false);
-                if ( d != null) {
+                if ( d != null && thumb!=null ) {
                     double s = Math.min((double) (cellSize - 4) / thumb.getWidth(), (double) (cellSize - 4 - fm.getHeight()) / thumb.getHeight());
                     if (s < 1.0) {
                         int w = (int) (s * thumb.getWidth());
