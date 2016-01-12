@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The CDAWeb plug-in now supports availability, showing where files provide data.
+        <p><small>Image from Flir device shows ground heat.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -21,8 +21,12 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2016-01-08 r18183):</p>
+        <p>Bugfixes (2016-01-12 r18195):</p>
         <ul>
+            <li>1510: pngwalks of aggregations of sparse data, limitation is no longer needed, and we just don't look for gaps when this would be impractical.</li>
+            <li>correction to PNGWalkTool thread sync bug, where check failed to see that thumbnail wasn't ready.</li>
+            <li>keep track of separate control for HTTP read timeout, before there was just timeout for connection.</li>
+            <li>pngwalk write to html corrected to make pngwalk more portable.</li>
             <li>1506: allow subsequent repeat of lsd to reset the multiplier, fixing $Y$(m,delta=4)/$Y$m$d.dat</li>
             <li>grayPeaks didn't draw in StackedHistogram mode, because the lightGray.brighter() would result in white.</li>
             <li>undo operation was performed on event thread, which could easily lock the application</li>
