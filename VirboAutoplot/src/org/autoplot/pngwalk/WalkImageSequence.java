@@ -50,7 +50,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
     /**
      * template used to create list.  This may be null.
      */
-    private String template;
+    private final String template;
 
     private final PropertyChangeSupport pcs = new DebugPropertyChangeSupport(this);
 
@@ -121,19 +121,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 } else {
                     setStatus( "warning: no files found in "+template );
                 }
-            } catch ( IOException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                setStatus("error: Error listing " + template+", "+ex.getMessage() );
-                throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
-            } catch ( URISyntaxException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                setStatus("error: Error listing " + template+", "+ex.getMessage() );
-                throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
-            } catch ( ParseException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                setStatus("error: Error listing " + template+", "+ex.getMessage() );
-                throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
-            } catch ( IllegalArgumentException ex) {
+            } catch ( IOException | URISyntaxException | ParseException | IllegalArgumentException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
                 setStatus("error: Error listing " + template+", "+ex.getMessage() );
                 throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
@@ -169,7 +157,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
         //if ( uris.size()>20 ) {uris= uris.subList(0,30); }
 
-        existingImages = new ArrayList<WalkImage>();
+        existingImages = new ArrayList<>();
         for (int i=0; i < uris.size(); i++) {
             existingImages.add(new WalkImage(uris.get(i),haveThumbs400));
             //System.err.println(i + ": " + datumRanges.get(i));
@@ -301,7 +289,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
             }
         } else {
             displayImages.clear();
-            displayImages = new ArrayList<WalkImage>( existingImages );
+            displayImages = new ArrayList<>( existingImages );
         }
         if (displayImages.contains(currentImage)) {
             index = displayImages.indexOf(currentImage);
@@ -355,6 +343,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
     /**
      * return the WalkImage object for the given URI.
+     * @param image the location
+     * @return the object modeling this image.
      */
     public WalkImage getImage( URI image ) {
         for ( WalkImage i: displayImages ) {
@@ -613,7 +603,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
     }
 
     /**
-     * set the current status
+     * set the current status, which is echoed back to the scientist.
+     * @param status the status
      */
     protected void setStatus(String status) {
         String oldStatus = this.status;
@@ -623,6 +614,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
 
     // Get status changes from the images in the list
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
         if (e.getNewValue() instanceof WalkImage.Status) {
             if ((WalkImage.Status) e.getNewValue() == WalkImage.Status.IMAGE_LOADED ||
