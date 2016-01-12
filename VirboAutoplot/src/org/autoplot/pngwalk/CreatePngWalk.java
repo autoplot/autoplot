@@ -444,7 +444,8 @@ public class CreatePngWalk {
                 atime= atime.substring(0,ic);
             }
             
-            String filename = getRelativeFilename( params, "thumbs400", atime );
+            String filename= getFilename( params, "", atime );
+            String filenameThumb = getRelativeFilename( params, "thumbs400", atime );
             String filenameBig = getRelativeFilename( params, "", atime );
             
             /**
@@ -452,9 +453,8 @@ public class CreatePngWalk {
             * @author Armond Luthens
             * @date 09/21/15
             */
-            pngFilenameArrayThumbs.add(filename);
+            pngFilenameArrayThumbs.add(filenameThumb);
             pngFilenameArrayBig.add(filenameBig);
-             
             
             count = count + 1;
             if (mon.isCancelled()) {
