@@ -184,10 +184,11 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
         if (timeSpan != null) {
             if ( timeSpan.width().divide(datumRanges.get(0).width() ).doubleValue(Units.dimensionless) > 100000 ) {
-                System.err.println("way too many possible timespans, limiting to 20000.");
-                timeSpan= new DatumRange( timeSpan.min(), timeSpan.min().add( datumRanges.get(0).width().multiply(20000) ) );
+                logger.warning("too many spans to indicate gaps.");
+                possibleRanges = datumRanges;
+            } else {
+                possibleRanges = DatumRangeUtil.generateList(timeSpan, datumRanges.get(0));
             }
-            possibleRanges = DatumRangeUtil.generateList(timeSpan, datumRanges.get(0));
         }
 
         for (WalkImage i : existingImages) {
