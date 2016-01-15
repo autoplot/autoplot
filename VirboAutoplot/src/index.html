@@ -21,8 +21,9 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2016-01-12 r18195):</p>
+        <p>Bugfixes (2016-01-14 r18196):</p>
         <ul>
+            <li>relax timeout on read to 60 seconds, because sometimes the das2server would take more 10 seconds before sending out data.</li>
             <li>1510: pngwalks of aggregations of sparse data, limitation is no longer needed, and we just don't look for gaps when this would be impractical.</li>
             <li>correction to PNGWalkTool thread sync bug, where check failed to see that thumbnail wasn't ready.</li>
             <li>keep track of separate control for HTTP read timeout, before there was just timeout for connection.</li>
@@ -101,6 +102,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>html version of pngwalk uses precalculated thumbnails.</li>
             <li>470: DasProgressPanel shows the thread name to improve serviceability</li>
             <li>CDAWeb now shows availability.</li>
             <li>StackedHistogram gets style panel</li>
