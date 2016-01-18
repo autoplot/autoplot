@@ -15,9 +15,13 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 
 /**
- * formatter assumes data is (m,n,3) or (3,m,n) RGB.
- * or [m,n,4] where ds[:,:,3] is the alpha channel.
- * When data is (m,n,4) then [:,:,0] should be the alpha channel,
+ * Format data to RGB images, or ARGB images.
+ * Formatter presumes data is:<ul>
+ * <li>(m,n,4) for ARGB 
+ * <li>(3,m,n) RGB.
+ * <li>(m,n,3) RGB.
+ * </ul>
+ * When data is (m,n,4) then ds[:,:,0] should be the alpha channel,
  * [:,:,1] should be the red channel, and so on.
  * @author jbf
  */
@@ -92,8 +96,6 @@ public class ImageDataSourceFormat implements DataSourceFormat {
             }
 
         }
-
-
 
         int i= split.file.lastIndexOf(".");
         String ext= split.file.substring(i+1);
