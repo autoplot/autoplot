@@ -39,6 +39,7 @@ public class ImageDataSourceFactory implements DataSourceFactory {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "red" ) );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "green" ) );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "blue" ) );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "alpha" ) );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "greyscale" ) );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "hue" ) );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "saturation" ) );
