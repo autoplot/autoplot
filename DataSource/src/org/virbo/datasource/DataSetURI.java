@@ -1790,7 +1790,9 @@ public class DataSetURI {
                 scomp= scomp.substring(surlDir.length());
                 if ( scomp.startsWith(prefix) ) {
                     String doc= "Use aggregation ("+tr+" available)";
-                    completions.add( new DataSetURI.CompletionResult( sagg, null, doc, prefix, true ) );
+                    int splitIndex= FileStorageModel.splitIndex(sagg);
+                    String label= ".../"+sagg.substring(splitIndex);
+                    completions.add( new DataSetURI.CompletionResult( sagg, label, doc, prefix, true ) );
                 }
             }
         }
