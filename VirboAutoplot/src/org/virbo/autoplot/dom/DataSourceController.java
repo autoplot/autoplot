@@ -376,9 +376,9 @@ public class DataSourceController extends DomNodeController {
                     } else {
                         List<PlotElement> pele = dom.controller.getPlotElementsFor(dsf);
                         pe = null;
-                        for (int i = 0; i < pele.size(); i++) {
-                            if (doesPlotElementSupportTsb(pele.get(i))) {
-                                pe = pele.get(i);
+                        for (PlotElement pele1 : pele) {
+                            if (doesPlotElementSupportTsb(pele1)) {
+                                pe = pele1;
                             }
                         }
                         if (pe != null) {
@@ -523,7 +523,7 @@ public class DataSourceController extends DomNodeController {
      */
     public void setDataSetInternal(QDataSet ds, Map<String, Object> rawProperties, boolean immediately) {
 
-        List<String> problems = new ArrayList<String>();
+        List<String> problems = new ArrayList<>();
 
         if (ds != null && !DataSetUtil.validate(ds, problems)) {
             String uri;
@@ -726,7 +726,7 @@ public class DataSourceController extends DomNodeController {
             this.uri = uri; // "vap+internal:data_1,data_2"
         }
 
-        List<TimeSeriesBrowse> parentTsbs = new ArrayList<TimeSeriesBrowse>();
+        List<TimeSeriesBrowse> parentTsbs = new ArrayList<>();
 
         public void addTimeSeriesBrowse(TimeSeriesBrowse tsb) {
             parentTsbs.add(tsb);
@@ -986,9 +986,9 @@ public class DataSourceController extends DomNodeController {
     private boolean doInternal(String path) {
         synchronized (internalLock) {
             if (parentSources != null) {
-                for (int i = 0; i < parentSources.length; i++) {
-                    if (parentSources[i] != null) {
-                        parentSources[i].controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, parentListener);
+                for (DataSourceFilter parentSource : parentSources) {
+                    if (parentSource != null) {
+                        parentSource.controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, parentListener);
                     }
                 }
             }
@@ -1721,14 +1721,7 @@ public class DataSourceController extends DomNodeController {
                 if (dsf.getUri().length() > 0) {
                     this.model.addException(dsf.getUri(), ex);
                 }
-            } catch (org.das2.util.monitor.CancelledOperationException ex) {
-                setException(ex);
-                setDataSet(null);
-                setStatus("operation cancelled");
-                if (dsf.getUri().length() > 0) {
-                    this.model.addException(dsf.getUri(), ex);
-                }
-            } catch (CancelledOperationException ex) {
+            } catch (org.das2.util.monitor.CancelledOperationException | CancelledOperationException ex) {
                 setException(ex);
                 setDataSet(null);
                 setStatus("operation cancelled");
@@ -1753,7 +1746,6 @@ public class DataSourceController extends DomNodeController {
                 final HtmlResponseIOException htmlEx = (HtmlResponseIOException) ex;
                 if ( dom.controller.isHeadless() ) {
                     logger.log(Level.WARNING, ex.getMessage(), ex);
-                    ex.printStackTrace();
                     
                 } else {
                     if (htmlEx.getURL() != null) {
