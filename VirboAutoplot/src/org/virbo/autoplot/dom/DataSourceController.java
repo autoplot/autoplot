@@ -281,7 +281,6 @@ public class DataSourceController extends DomNodeController {
 
         logger.log(Level.FINE, "dep names: {0}", Arrays.asList(depNames));
 
-        setDepnames(Arrays.asList(depNames));
 
 //        if ( isResetDimensions() ) {
 //
@@ -587,7 +586,6 @@ public class DataSourceController extends DomNodeController {
                 setProperties(null);
                 setFillProperties(null);
                 setFillDataSet(null);
-                setDepnames(Arrays.asList("first", "second", "third"));
                 return;
             }
 
@@ -1571,20 +1569,7 @@ public class DataSourceController extends DomNodeController {
         this.histogram = histogram;
         propertyChangeSupport.firePropertyChange(PROP_HISTOGRAM, oldHistogram, histogram);
     }
-    private List<String> depnames = Arrays.asList(new String[]{"first", "second", "last"});
-    public static final String PROP_DEPNAMES = "depnames";
 
-    public List<String> getDepnames() {
-        return this.depnames;
-    }
-
-    public void setDepnames(List<String> newdepnames) {
-        List<String> olddepnames = depnames;
-        this.depnames = newdepnames;
-        if (!newdepnames.equals(olddepnames)) {
-            propertyChangeSupport.firePropertyChange(PROP_DEPNAMES, olddepnames, newdepnames);
-        }
-    }
     protected Map<String, Object> properties = null;
     public static final String PROP_PROPERTIES = "properties";
 
