@@ -285,12 +285,16 @@ public class ScreenshotsTool extends EventQueue {
     }
 
     /**
-     *  mask out parts of the desktop that are not Autoplot, for the user's privacy.
-     *  @param g the graphics to paint on.
-     *  @param b the rectangle showing the display translation.
-     *  @return true if the mouse pointer is within a rectangle boundary.
+     * mask out parts of the desktop that are not Autoplot, for the user's privacy.
+     * It's been shown that this takes just a few milliseconds.
+     * @param g the graphics to paint on.
+     * @param b the rectangle showing the display translation.
+     * @return true if the mouse pointer is within a rectangle boundary.
      */
     private static boolean filterBackground( Graphics2D g, Rectangle b, Point p ) {
+        
+        long t0= System.currentTimeMillis();
+        
         Color c= new Color( 255,255,255,255 );
         g.setColor(c);
 
@@ -328,6 +332,7 @@ public class ScreenshotsTool extends EventQueue {
 
         g.fill(s);
         
+        logger.log(Level.FINE, "filterBackground in {0}ms", (System.currentTimeMillis()-t0));
         return containsPointer;
         
     }
