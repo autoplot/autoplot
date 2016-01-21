@@ -796,7 +796,7 @@ public class CreatePngWalk {
             for (String pngFilenameArray1 : pngFilenameArrayThumbs) {
                 
                 currentPngFilename = pngFilenameArray1;
-                System.out.println("image file path: " + currentPngFilename);
+                //System.out.println("image file path: " + currentPngFilename);
                 
                 currentPngFilenameBIG = pngFilenameArrayBig.get(count);
                 fileNameToDisplay= timeLabels.get(count);
