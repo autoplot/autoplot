@@ -1594,11 +1594,12 @@ public class ApplicationController extends DomNodeController implements RunLater
             } else {
                 bind(application, Application.PROP_TIMERANGE, that.getXaxis(), Axis.PROP_RANGE);
             }
-
+            that.xaxis.setAutoRange( false );
         }
 
         if (bindy) {
             bind(srcPlot.getYaxis(), Axis.PROP_RANGE, that.getYaxis(), Axis.PROP_RANGE);
+            that.yaxis.setAutoRange( false );
         }
 
         return that;
