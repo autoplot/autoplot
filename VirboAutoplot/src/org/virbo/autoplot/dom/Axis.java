@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot.dom;
 
 import java.util.ArrayList;
@@ -9,7 +6,6 @@ import java.util.List;
 import java.util.logging.Level;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
-import static org.virbo.autoplot.dom.Plot.PROP_FONTSIZE;
 
 /**
  * The state of an axis, X, Y, or a Z axis colorbar, such as range and the
