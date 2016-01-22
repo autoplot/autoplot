@@ -1571,7 +1571,7 @@ public class PlotController extends DomNodeController {
             needToAutorangeAfterAll= !shouldBindX;
         }
 
-        if ( newSettings.getXaxis().isLog()==false && plot.getXaxis().isAutoRange() ) {
+        if ( newSettings.getXaxis().isLog()==false && ( needToAutorangeAfterAll || plot.getXaxis().isAutoRange() ) ) {
             if ( bms.isEmpty() && UnitsUtil.isTimeLocation( newSettings.getXaxis().getRange().getUnits() ) ) {
                 logger.finer("binding axis to timeRange because no one is using it");
                 DatumRange tr= plot.getXaxis().getRange(); // it's already been set for TimeSeriesBrowse    
