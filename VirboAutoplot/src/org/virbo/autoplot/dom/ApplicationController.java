@@ -585,10 +585,14 @@ public class ApplicationController extends DomNodeController implements RunLater
      */
     public void waitUntilIdle() {
         int checkCount=0;
+        Logger domLogger= org.das2.util.LoggerManager.getLogger( "autoplot.dom" );
         while (this.isPendingChanges()) {
             checkCount++;
 //            Thread.yield(); // this is not a good idea.
             try {
+                if ( domLogger.isLoggable(Level.FINE) ) { // otherwise the logging channel will be saturated.
+                    Thread.sleep(470);
+                }
                 Thread.sleep(30);    
             } catch (InterruptedException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
