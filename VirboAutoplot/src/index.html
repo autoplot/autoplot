@@ -7,7 +7,8 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The screenshots tool is used to document use of the screenshots tool.  Here's the result: <a href="http://autoplot.org/data/tutorials/20160116meta/20160116_1426.html">Making a tutorial</a> and the <a href="http://autoplot.org/data/tutorials/20160116/20160116_1330.html">tutorial</a> made.
+        <p><small>Crosshair digitizer shows RGB values properly now when 
+                images are displayed.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -21,8 +22,10 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2016-01-14 r18196):</p>
+        <p>Bugfixes (2016-01-22 r18215):</p>
         <ul>
+            <li>RGB indication on crosshair renderer corrected for images without DEPEND_1 tags.</li>
+            <li>1511: resetting the data set URI in a stack of plots would reset the timerange.  Thanks, Bill for pointing this out!</li>
             <li>relax timeout on read to 60 seconds, because sometimes the das2server would take more 10 seconds before sending out data.</li>
             <li>1510: pngwalks of aggregations of sparse data, limitation is no longer needed, and we just don't look for gaps when this would be impractical.</li>
             <li>correction to PNGWalkTool thread sync bug, where check failed to see that thumbnail wasn't ready.</li>
