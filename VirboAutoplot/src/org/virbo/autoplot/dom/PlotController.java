@@ -1564,6 +1564,8 @@ public class PlotController extends DomNodeController {
             return;
         }
 
+        boolean needToAutorangeAfterAll= false;
+        
         // if we aren't autoranging, then only change the bindings if there will be a conflict.
         if ( plot.getXaxis().isAutoRange()==false ) {
             shouldBindX= bm!=null;
@@ -1571,7 +1573,8 @@ public class PlotController extends DomNodeController {
                 shouldBindX= false;
                 logger.finer("remove timerange binding that would cause inconvertable units");
             }
-             plot.getXaxis().setAutoRange(!shouldBindX);
+            
+            needToAutorangeAfterAll= !shouldBindX;
         }
 
         if ( newSettings.getXaxis().isLog()==false && plot.getXaxis().isAutoRange() ) {
@@ -1645,7 +1648,11 @@ public class PlotController extends DomNodeController {
             plot.setContext( dom.getTimeRange() );
             dom.getController().deleteBinding(bm);
         }
-
+        
+        if ( needToAutorangeAfterAll ) {
+            plot.getXaxis().setAutoRange(true); // the order matters now, because this will cause the setting to change.
+        }
+        
         if ( !shouldBindX ) {
             List<BindingModel> b= dom.getController().findBindings( dom, Application.PROP_TIMERANGE );
             if ( b.isEmpty() && UnitsUtil.isTimeLocation( plot.getContext().getUnits() ) ) {
