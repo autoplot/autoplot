@@ -1559,6 +1559,24 @@ public class PlotElementController extends DomNodeController {
             }
         }
     };
+    
+     /**
+     * to experiment with http://sourceforge.net/p/autoplot/bugs/1511/,
+     * see if the xaxis is bound to other xaxes already.
+     * @param p the plot.
+     * @return true if the xaxis is bound to other xaxes.
+     */
+    private boolean xaxisFreeFromBindings( Plot p ) {
+        boolean isNotBound= true;
+        List<BindingModel> l = DomUtil.findBindings( dom, p.xaxis, Axis.PROP_RANGE );
+        for ( BindingModel bm : l ) {
+            if ( bm.getSrcId().equals(dom.getId() ) ) {
+                List<BindingModel> l2 = DomUtil.findBindings( dom, dom, Application.PROP_TIMERANGE );
+                if ( l2.size()>1 ) isNotBound= false;  // first one is the one we already found.
+            }
+        }
+        return isNotBound;
+    }
 
     /**
      * we'd like the plot to autorange, so check to see if we are the only
@@ -1569,7 +1587,7 @@ public class PlotElementController extends DomNodeController {
         if ( p==null ) return;
         List<PlotElement> eles= dom.controller.getPlotElementsFor(p);
         if ( DomUtil.oneFamily(eles) ) {
-            p.getXaxis().setAutoRange(true);
+            p.getXaxis().setAutoRange( xaxisFreeFromBindings(p) );
             p.getYaxis().setAutoRange(true);
             p.getZaxis().setAutoRange(true);
             p.getXaxis().setAutoLabel(true);
