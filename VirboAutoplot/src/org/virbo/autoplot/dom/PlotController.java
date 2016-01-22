@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot.dom;
 
 import java.awt.dnd.DropTarget;
@@ -54,8 +51,8 @@ import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
 
 /**
- * Manages a Plot node, for example listening for autoRange updates and layout
- * changes.
+ * Manages a Plot node, for example listening for autoRange updates 
+ * and layout changes.
  * @author jbf
  */
 public class PlotController extends DomNodeController {
@@ -292,11 +289,7 @@ public class PlotController extends DomNodeController {
      */
     private static boolean validBounds( QDataSet bounds ) {
         QDataSet wds= DataSetUtil.weightsDataSet(bounds);
-        if ( wds.value(0)==0 || wds.value(1)==0 ) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(wds.value(0)==0 || wds.value(1)==0);
     }
     
     /**
@@ -1068,7 +1061,7 @@ public class PlotController extends DomNodeController {
         }
     }
     
-    PropertyChangeListener plotDefaultsListener= new PropertyChangeListener() {
+    private final PropertyChangeListener plotDefaultsListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt,"plotDefaultsListener");
@@ -1088,7 +1081,7 @@ public class PlotController extends DomNodeController {
         }
     };
 
-    PropertyChangeListener renderTypeListener= new PropertyChangeListener() {
+    private final PropertyChangeListener renderTypeListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt,"renderTypeListener");
@@ -1098,7 +1091,7 @@ public class PlotController extends DomNodeController {
 
     PlotElement plotElement;
 
-    private PropertyChangeListener plotElementDataSetListener= new PropertyChangeListener() {
+    private final PropertyChangeListener plotElementDataSetListener= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt,"plotElementDataSetListener");
@@ -1136,7 +1129,7 @@ public class PlotController extends DomNodeController {
     }
 
     synchronized List<Integer> indecesOfPlotElements( ) {
-        List<Integer> indeces= new ArrayList<Integer>(dom.plotElements.size());
+        List<Integer> indeces= new ArrayList<>(dom.plotElements.size());
         for ( int i=0; i<dom.plotElements.size(); i++ ) {
             if ( dom.getPlotElements(i).getPlotId().equals(this.plot.getId()) ) {
                 indeces.add(i);
@@ -1554,6 +1547,7 @@ public class PlotController extends DomNodeController {
      * @param newSettings the new plot settings from autoranging.
      */
     private void doCheckBindings( Plot plot, Plot newSettings ) {
+        logger.entering( "org.virbo.autoplot.PlotController", "doCheckBindings" );
         boolean shouldBindX= false;
         boolean shouldSetAxisRange= false; // true indicates that the dom.timeRange already contains the range
         List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, null, Axis.PROP_RANGE );
