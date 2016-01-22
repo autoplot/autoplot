@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -128,6 +129,14 @@ public class DomNodeController {
                     //for ( Object o:  k.changesSupport.changesPending.keySet() ) {
                     //    System.err.println( "pending change "+o );
                     //}
+                    if ( logger.isLoggable(Level.FINER) ) {
+                        logger.log(Level.FINER, "Node is pending changes: {0}", k);
+                        Map<Object,Object> changesPending= new LinkedHashMap<>();
+                        k.pendingChanges(changesPending);
+                        for ( Entry<Object,Object> e : changesPending.entrySet() ) {
+                            logger.log(Level.FINER, "{0} -> {1}", new Object[]{e.getKey(), e.getValue()});
+                        }
+                    }
                     return true;
                 }
             }
