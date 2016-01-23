@@ -191,7 +191,11 @@ public class CdfDataSource extends AbstractDataSource {
                             try {
                                 cdf= ReaderFactory.getReader(fileName);
                             } catch ( Exception e ) {
-                                throw e;
+                                try {
+                                    cdf= new CDFReader(fileName);
+                                } catch ( Exception e2 ) {
+                                    throw e;
+                                }
                             }
                         } else {
                             cdf= new CDFReader(fileName);
