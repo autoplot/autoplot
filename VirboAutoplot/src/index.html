@@ -7,8 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Crosshair digitizer shows RGB values properly now when 
-                images are displayed.
+        <p><small>Crosshair digitizer shows RGB values properly now when images are displayed.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -22,8 +21,9 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2016-01-22 r18215):</p>
+        <p>Bugfixes (2016-01-22 r18219):</p>
         <ul>
+            <li>1512: I/O Error reading CDF files on 32 bit machines.  Fall back to alternate method for opening files.</li>
             <li>RGB indication on crosshair renderer corrected for images without DEPEND_1 tags.</li>
             <li>1511: resetting the data set URI in a stack of plots would reset the timerange.  Thanks, Bill for pointing this out!</li>
             <li>relax timeout on read to 60 seconds, because sometimes the das2server would take more 10 seconds before sending out data.</li>
