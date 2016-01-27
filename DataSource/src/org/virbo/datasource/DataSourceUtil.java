@@ -848,6 +848,8 @@ public class DataSourceUtil {
             
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
+        } catch ( UnsupportedOperationException ex ) {
+            logger.log(Level.SEVERE, null, ex); // Linux, for example.
         }
         
         final String errMsg = "Error attempting to launch web browser";
