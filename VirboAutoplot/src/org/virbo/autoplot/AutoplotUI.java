@@ -3389,6 +3389,9 @@ APSplash.checkTime("init 52.9");
             String pwd= new File("foo.txt").getAbsoluteFile().getParent();
             String pid= getProcessId("???");
             String host= InetAddress.getLocalHost().getHostName();
+            String bits= is32bit ? "32" : "64";
+            String bitsWarning;
+            bitsWarning= is32bit ? "(<a href=\"http://autoplot.org/32bit\">severely limiting capabilities</a>)" : "(recommended)";
             String aboutContent = "<ul>" +
                 "<li>Java version: " + javaVersion +
                 "<li>max memory (MB): " + mem + " (memory available to process)" +
@@ -3396,6 +3399,7 @@ APSplash.checkTime("init 52.9");
                 "<li>free memory (MB): " + fmem + " (amount available before more must be allocated)" + 
                 "<li>native memory limit (MB): " + nmem + " (amount of native memory available to the process)" +
                 "<li>arch: " + arch +
+                "<li>" + bits + " bit Java " + bitsWarning  +
                 "<li>hostname: "+ host +
                 "<li>pid: " + pid +
                 "<li>pwd: " + pwd +
@@ -4019,11 +4023,11 @@ private void updateFrameTitle() {
         boolean dirty= undoRedoSupport.getDepth()>1;
         if ( split.path!=null && split.file!=null ) {
             String titleStr= split.file.substring( split.path.length() ) + ( dirty ? "*" : "" );
-            theTitle= apname + titleStr + " - " + title0 + isoffline + server;
+            theTitle= apname + titleStr + " - " + title0 + isoffline + server+ s32bit;
         } else {
             //I was seeing null pointer exceptions here--see rte_1590234331_20110328_153705_wsk.xml.  I suspect this is Windows.
             logger.log(Level.WARNING, "Unable to get path from: {0}", suri);
-            theTitle= apname + "???" + " - " + title0 + isoffline + server;
+            theTitle= apname + "???" + " - " + title0 + isoffline + server+ s32bit;
         }
     }    
     Runnable run= new Runnable() {
