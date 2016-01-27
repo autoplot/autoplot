@@ -21,8 +21,9 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2016-01-22 r18219):</p>
+        <p>Bugfixes (2016-01-22 r18225):</p>
         <ul>
+            <li>openBrowser code assumed that the Java 6 system could be used, but it isn't supported on Linux (Mint).</li>
             <li>1512: I/O Error reading CDF files on 32 bit machines.  Fall back to alternate method for opening files.</li>
             <li>RGB indication on crosshair renderer corrected for images without DEPEND_1 tags.</li>
             <li>1511: resetting the data set URI in a stack of plots would reset the timerange.  Thanks, Bill for pointing this out!</li>
@@ -105,6 +106,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>About screen includes a bullet explicitly identifying 32bit Java and provides a link to fix this.</li>
             <li>html version of pngwalk uses precalculated thumbnails.</li>
             <li>470: DasProgressPanel shows the thread name to improve serviceability</li>
             <li>CDAWeb now shows availability.</li>
