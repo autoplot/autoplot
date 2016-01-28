@@ -639,7 +639,7 @@ public class SimpleServlet extends HttpServlet {
             }
             
             if ( e!=null ) {
-                response.setHeader( "Autoplot-Exception", e.getLocalizedMessage() ); 
+                response.setHeader( "X-Autoplot-Exception", e.getLocalizedMessage() ); 
                 //response.setStatus( 400 );
             }
             
