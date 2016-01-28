@@ -73,37 +73,17 @@ public class Test_101_Bug1511 implements Scenario {
             
             JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
             //menuBar.pushMenu("Tools|Manage and Browse Tools...", "|");
-            menuBar.pushMenu("Tools|Additional Operations...", "|");
+            menuBar.pushMenuNoBlock("Tools|Additional Operations...", "|");
             
             
             //Thread.sleep(100);
             //RegexComponentChooser addOppComp = new RegexComponentChooser("Tools Manager");
-            RegexComponentChooser addOppComp = new RegexComponentChooser("Add Operation ");
-            JComponentFinder findAddOp = new JComponentFinder(addOppComp);
-            DialogOperator addOp = new DialogOperator(mainFrame, findAddOp) ;
+            //RegexComponentChooser addOppComp = new RegexComponentChooser("Add Operation ");
+            //JComponentFinder findAddOp = new JComponentFinder(addOppComp);
+            
+            DialogOperator addOp = new DialogOperator(new RegexComponentChooser("Add Operation")) ;
             
             
-            /*****************************************************
-            DialogOperator addOp = new DialogOperator(mainFrame, new ComponentChooser() {
-                @Override
-                public String getDescription() {
-                    return "new button";
-                }
-				
-            // Pick the right button based on its name. The names and other identifying characteristics of the buttons can be found out by placing a breakpoint in this method and running the tests in debug mode. When execution suspends, go to the Debug perspective (Window -> Open Perspective -> Debug) and find the component in the Variables view.
-                @Override
-		public boolean checkComponent(Component comp) {
-                    if (comp instanceof Window) {
-			Window button = (Window)comp;
-			if (button.getName().equals("new-file")) {
-                            return true;
-			}
-                    }
-					
-                    return false;
-		}
-            });
-            ************************/
             
             Thread.sleep(10);
             JButtonOperator OKbutton = new JButtonOperator(addOp, "Okay");
