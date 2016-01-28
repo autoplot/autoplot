@@ -6,6 +6,7 @@
 package org.autoplot.test;
 
 
+import java.awt.AWTException;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -34,7 +35,9 @@ import org.virbo.autoplot.dom.Application;
 import util.RegexComponentChooser;
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Robot;
 import java.awt.Window;
+import org.netbeans.jemmy.operators.JListOperator;
 import org.netbeans.jemmy.operators.WindowOperator;
 
 /**
@@ -68,7 +71,8 @@ public class Test_101_Bug1511 implements Scenario {
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("vap+cdfj:http://emfisis.physics.uiowa.edu/Flight/RBSP-B/Quick-Look/2013/10/09/rbsp-b_WFR-waveform-continuous-burst_emfisis-Quick-Look_20131009T19_v1.4.1.cdf?BuSamples[0:20]");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
-            Thread.sleep(1000);
+            
+            Thread.sleep(5000);
             ScriptContext.waitUntilIdle();
             
             JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
@@ -83,9 +87,14 @@ public class Test_101_Bug1511 implements Scenario {
             
             DialogOperator addOp = new DialogOperator(new RegexComponentChooser("Add Operation")) ;
             
+            new JTabbedPaneOperator( addOp ).selectPage("Alphabetical");
             
+            JListOperator opList = new JListOperator( addOp);
             
-            Thread.sleep(10);
+            int index = opList.findItemIndex("FFT");
+            opList.clickOnItem( index, 1);
+
+            Thread.sleep(500);
             JButtonOperator OKbutton = new JButtonOperator(addOp, "Okay");
             //JButtonOperator OKbutton = new JButtonOperator(addOp, "OK");
             OKbutton.clickMouse();
@@ -93,11 +102,31 @@ public class Test_101_Bug1511 implements Scenario {
             //JTableOperator opTable = new JTableOperator( addOp);
             //opTable.selectCell(opTable.findCellRow("Filters"), 0);
             
-            Thread.sleep(10);
+            Thread.sleep(1000);
             
             
+            DialogOperator editOp = new DialogOperator(new RegexComponentChooser("Edit Operations")) ;
+            JButtonOperator OKbutton2 = new JButtonOperator(editOp, "Okay");
+            OKbutton2.clickMouse();
+            Thread.sleep(1000);
+            //mainFrame.moveMouse(mainFrame.getCenterXForClick(), mainFrame.getCenterYForClick());
             
+            Robot robot;
+            try {
+                robot = new Robot();
+                robot.mouseMove(mainFrame.getCenterX(), mainFrame.getCenterY());
+                Thread.sleep(100);
+                robot.mouseWheel(-5);
+                Thread.sleep(1000);
+            } catch (AWTException ex) {
+                Logger.getLogger(Test_101_Bug1511.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
+            mainFrame.clickForPopup(mainFrame.getCenterX(), mainFrame.getCenterY());
+            
+            JPopupMenuOperator popup = new JPopupMenuOperator();
+            popup.pushMenuNoBlock("Add Plot|Copy Plot Elements Down", "|"); // I think because this is a "modal" dialog.
+            Thread.sleep(5000);
             
             
             return(0);
