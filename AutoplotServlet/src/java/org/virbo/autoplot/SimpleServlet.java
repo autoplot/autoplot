@@ -52,6 +52,7 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Plot;
+import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelectorSupport;
@@ -80,7 +81,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20150930.1654";
+    public static final String version= "v20160128.0735";
 
     static FileHandler handler;
 
@@ -237,8 +238,6 @@ public class SimpleServlet extends HttpServlet {
             if ( vap!=null ) logger.log(Level.FINE, "vap={0}", vap);
             if ( id!=null ) logger.log(Level.FINE, "id={0}", id);
             
-            OutputStream out = response.getOutputStream();
-
             // allow URI=vapfile
             if ( vap==null && suri!=null ) {
                 if ( suri.contains(".vap") || suri.contains(".vap?") ) {
@@ -315,17 +314,20 @@ public class SimpleServlet extends HttpServlet {
             if (vap != null) {
                 response.setContentType(format);
             } else if ( suri==null ) {
+                OutputStream out = response.getOutputStream();
                 response.setContentType("text/html");
                 response.setStatus(400);
                 out.write(("Either vap= or url= needs to be specified:<br>"+request.getRequestURI()+"?"+request.getQueryString()).getBytes());
                 out.close();
                 return;
             } else if (suri.equals("about:plugins")) {
+                OutputStream out = response.getOutputStream();
                 response.setContentType("text/html");
                 out.write(DataSetSelectorSupport.getPluginsText().getBytes());
                 out.close();
                 return;
             } else if (suri.equals("about:autoplot")) {
+                OutputStream out = response.getOutputStream();
                 response.setContentType("text/html");
                 String s = AboutUtil.getAboutHtml();
                 s = s.substring(0, s.length() - 7);
@@ -627,6 +629,22 @@ public class SimpleServlet extends HttpServlet {
             logger.log( Level.FINER, "getDataSet: {0}", dom.getPlotElements(0).getController().getRenderer().getDataSet());
             logger.log( Level.FINER, "bounds: {0}", dom.getPlots(0).getXaxis().getController().getDasAxis().getBounds());
 
+            // look for errors on the canvas.
+            Exception e= null;
+            for ( PlotElement pe: dom.getPlotElements() ) {
+                Exception lastException= pe.getController().getRenderer().getLastException();
+                if ( lastException!=null ) {
+                    e= lastException;
+                }
+            }
+            
+            if ( e!=null ) {
+                response.setHeader( "Autoplot-Exception", e.getLocalizedMessage() ); 
+                //response.setStatus( 400 );
+            }
+            
+            OutputStream out = response.getOutputStream();
+            
             if (format.equals("image/png")) {
                 
                 logger.log(Level.FINE, "time to create image: {0} ms", ( System.currentTimeMillis()-t0 ));
