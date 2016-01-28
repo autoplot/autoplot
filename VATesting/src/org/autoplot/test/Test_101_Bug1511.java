@@ -70,20 +70,16 @@ public class Test_101_Bug1511 implements Scenario {
             
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("vap+cdfj:http://emfisis.physics.uiowa.edu/Flight/RBSP-B/Quick-Look/2013/10/09/rbsp-b_WFR-waveform-continuous-burst_emfisis-Quick-Look_20131009T19_v1.4.1.cdf?BuSamples[0:20]");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
-            
+           
             
             Thread.sleep(5000);
             ScriptContext.waitUntilIdle();
             
             JMenuBarOperator menuBar = new JMenuBarOperator( mainFrame );
-            //menuBar.pushMenu("Tools|Manage and Browse Tools...", "|");
+
             menuBar.pushMenuNoBlock("Tools|Additional Operations...", "|");
             
             
-            //Thread.sleep(100);
-            //RegexComponentChooser addOppComp = new RegexComponentChooser("Tools Manager");
-            //RegexComponentChooser addOppComp = new RegexComponentChooser("Add Operation ");
-            //JComponentFinder findAddOp = new JComponentFinder(addOppComp);
             
             DialogOperator addOp = new DialogOperator(new RegexComponentChooser("Add Operation")) ;
             
@@ -91,32 +87,30 @@ public class Test_101_Bug1511 implements Scenario {
             
             JListOperator opList = new JListOperator( addOp);
             
-            int index = opList.findItemIndex("FFT");
+            int index = opList.findItemIndex("FFT Power Spectrum with sliding window");
             opList.clickOnItem( index, 1);
 
             Thread.sleep(500);
             JButtonOperator OKbutton = new JButtonOperator(addOp, "Okay");
-            //JButtonOperator OKbutton = new JButtonOperator(addOp, "OK");
+
             OKbutton.clickMouse();
             
-            //JTableOperator opTable = new JTableOperator( addOp);
-            //opTable.selectCell(opTable.findCellRow("Filters"), 0);
             
-            Thread.sleep(1000);
+            Thread.sleep(3000);
             
             
             DialogOperator editOp = new DialogOperator(new RegexComponentChooser("Edit Operations")) ;
             JButtonOperator OKbutton2 = new JButtonOperator(editOp, "Okay");
             OKbutton2.clickMouse();
-            Thread.sleep(1000);
-            //mainFrame.moveMouse(mainFrame.getCenterXForClick(), mainFrame.getCenterYForClick());
+            Thread.sleep(6000);
+
             
             Robot robot;
             try {
                 robot = new Robot();
                 robot.mouseMove(mainFrame.getCenterX(), mainFrame.getCenterY());
                 Thread.sleep(100);
-                robot.mouseWheel(-5);
+                robot.mouseWheel(-2);
                 Thread.sleep(1000);
             } catch (AWTException ex) {
                 Logger.getLogger(Test_101_Bug1511.class.getName()).log(Level.SEVERE, null, ex);
@@ -125,10 +119,19 @@ public class Test_101_Bug1511 implements Scenario {
             mainFrame.clickForPopup(mainFrame.getCenterX(), mainFrame.getCenterY());
             
             JPopupMenuOperator popup = new JPopupMenuOperator();
-            popup.pushMenuNoBlock("Add Plot|Copy Plot Elements Down", "|"); // I think because this is a "modal" dialog.
-            Thread.sleep(5000);
+            popup.pushMenuNoBlock("Add Plot|Copy Plot Elements Down", "|"); 
+            Thread.sleep(6000);
             
+            new JButtonOperator(app.getDataSetSelector().getBrowseButton()).pushNoBlock();
+            DialogOperator editor = new DialogOperator() ;
             
+            JListOperator editorList = new JListOperator(editor);
+            
+            index = editorList.findItemIndex("BvSamples");
+            
+            editorList.selectItem(index);
+            
+            Thread.sleep(10);
             return(0);
             
         } catch (InterruptedException ex) {
