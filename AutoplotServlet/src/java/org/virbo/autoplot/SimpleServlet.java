@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -639,7 +640,9 @@ public class SimpleServlet extends HttpServlet {
             }
             
             if ( e!=null ) {
-                response.setHeader( "X-Autoplot-Exception", e.getLocalizedMessage() ); 
+                String message= e.getLocalizedMessage();
+                if ( message==null ) message=  e.toString();
+                response.setHeader( "X-Autoplot-Exception", URLEncoder.encode( message, "US-ASCII" ) ); 
                 //response.setStatus( 400 );
             }
             
