@@ -122,6 +122,11 @@ public class DataSetSelector extends javax.swing.JPanel {
     private final Object PENDING_GO="gobutton"; 
     
     /**
+     * we are downloading resources so we can check reject.
+     */
+    private final Object PENDING_CHECKING_REJECT="checkingReject";
+    
+    /**
      * a plotDataSetURL is going to be fired off.
      */
     private final Object PENDING_PLOT="plot";
@@ -345,7 +350,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 int carotpos = editor.getCaretPosition();
                 setMessage("busy: getting filesystem completions.");
                 showCompletions(surl, carotpos);
-
+                
             } else if (file.endsWith("/..")) { // pop up one directory
                 int carotpos = surl.lastIndexOf("/..");
                 carotpos = surl.lastIndexOf("/", carotpos - 1);
@@ -508,10 +513,15 @@ public class DataSetSelector extends javax.swing.JPanel {
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                maybePlotImmediatelyOffEvent( surl );
+                try {
+                    maybePlotImmediatelyOffEvent( surl );
+                } finally {
+                    pendingChanges.remove( PENDING_CHECKING_REJECT );
+                }
             }
         };
         
+        pendingChanges.put( PENDING_CHECKING_REJECT, this );
         RequestProcessor.invokeLater(run);
         
     }
