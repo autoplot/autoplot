@@ -517,32 +517,26 @@ public class CdfUtil {
         if ( recCount==-1 && recStart>0 && varRecCount==1 ) { // another kludge for Rockets, where depend was assigned variance
             recStart= 0;
         }
-
-        // check for length limit
-        int bytesPerRecord= DataSetUtil.product(dimSizes) * sizeOf(varType);
-        int limit= (int)( Integer.MAX_VALUE / bytesPerRecord );
-        
-        if ( limit<(recCount/recInterval) ) {
-            int newRecCount= (int)( limit * recInterval );
-            String suggest;
-            if ( recInterval>1 ) {
-                suggest= "[0:"+newRecCount+":"+recInterval+"]";
-            } else {
-                suggest= "[0:"+newRecCount+"]";
+    
+        if ( recCount>1 ) {    // check for length limit
+            int bytesPerRecord= DataSetUtil.product(dimSizes) * sizeOf(varType);
+            int limit= (int)(Integer.MAX_VALUE)/1000; // KB
+            if ( limit<(recCount/1000/recInterval*bytesPerRecord) ) {
+                int newRecCount= (int)( limit * recInterval * 1000 / bytesPerRecord );
+                String suggest;
+                if ( recInterval>1 ) {
+                    suggest= "[0:"+newRecCount+":"+recInterval+"]";
+                } else {
+                    suggest= "[0:"+newRecCount+"]";
+                }
+                throw new IllegalArgumentException("data read would result in more than 2GB read, which is not yet supported.  Use "+svariable+suggest+" to read first records.");
             }
-            throw new IllegalArgumentException("data read would result in more than 2GB read, which is not yet supported.  Use "+svariable+suggest+" to read every other record.");
         }
         
-        ByteBuffer[] buf;
-
         long rc= recCount;
         if ( rc==-1 ) rc= 1;  // -1 is used as a flag for a slice, we still really read one record.
 
         logger.log( Level.FINEST, "size of {0}: {1}MB  type: {2}", new Object[]{svariable, sizeOf(dims, dimSizes, varType, rc) / 1024. / 1024., varType});
-        
-        Object bbType= byteBufferType( cdf.getType(svariable) );
-        int recLenBytes= BufferDataSet.byteCount(bbType);
-        if ( dimSizes.length>0 ) recLenBytes= recLenBytes * DataSetUtil.product( dimSizes );            
         
         String stype = getTargetType( cdf.getType(svariable) );
         ByteBuffer buff2;
@@ -567,9 +561,16 @@ public class CdfUtil {
         
         logger.exiting("gov.nasa.gsfc.spdf.cdfj.CDFReader", "getBuffer" );
         logger.log(Level.FINE, "read variable {0} in (ms): {1}", new Object[]{svariable, System.currentTimeMillis()-t0});
-                
+
+        ByteBuffer[] buf;
+        
         buf= new ByteBuffer[] { buff2 };
 
+        Object bbType= byteBufferType( cdf.getType(svariable) );
+        
+        int recLenBytes= BufferDataSet.byteCount(bbType);
+        if ( dimSizes.length>0 ) recLenBytes= recLenBytes * DataSetUtil.product( dimSizes );            
+        
         MutablePropertyDataSet result;
         
         int[] qube;
