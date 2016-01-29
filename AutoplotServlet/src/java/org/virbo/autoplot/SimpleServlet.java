@@ -82,7 +82,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20160128.0735";
+    public static final String version= "v20160129.1139";
 
     static FileHandler handler;
 
@@ -642,7 +642,7 @@ public class SimpleServlet extends HttpServlet {
             if ( e!=null ) {
                 String message= e.getLocalizedMessage();
                 if ( message==null ) message=  e.toString();
-                response.setHeader( "X-Autoplot-Exception", URLEncoder.encode( message, "US-ASCII" ) ); 
+                response.setHeader( "X-Autoplot-Exception", message ); 
                 //response.setStatus( 400 );
             }
             
