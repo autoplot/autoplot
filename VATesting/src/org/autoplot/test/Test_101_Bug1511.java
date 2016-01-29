@@ -37,7 +37,12 @@ import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Robot;
 import java.awt.Window;
+import org.netbeans.jemmy.operators.ComponentOperator;
+import org.netbeans.jemmy.operators.JComboBoxOperator;
+import org.netbeans.jemmy.operators.JInternalFrameOperator;
 import org.netbeans.jemmy.operators.JListOperator;
+import org.netbeans.jemmy.operators.JTreeOperator;
+import org.netbeans.jemmy.operators.ScrollPaneOperator;
 import org.netbeans.jemmy.operators.WindowOperator;
 
 /**
@@ -122,16 +127,24 @@ public class Test_101_Bug1511 implements Scenario {
             popup.pushMenuNoBlock("Add Plot|Copy Plot Elements Down", "|"); 
             Thread.sleep(6000);
             
+            mainFrame.clickMouse(mainFrame.getCenterX(), mainFrame.getCenterY()-200, 2);
+            
             new JButtonOperator(app.getDataSetSelector().getBrowseButton()).pushNoBlock();
-            DialogOperator editor = new DialogOperator() ;
+            DialogOperator editor = new DialogOperator(mainFrame, 0) ;
+
+            JTreeOperator tree = new JTreeOperator(editor);
             
-            JListOperator editorList = new JListOperator(editor);
+            Thread.sleep(1000);
             
-            index = editorList.findItemIndex("BvSamples");
+            System.out.print(tree.getRowCount());
+            tree.selectRow(tree.findRow("BvSamples"));
             
-            editorList.selectItem(index);
+            Thread.sleep(500);
             
-            Thread.sleep(10);
+            new JButtonOperator(editor, "Plot").push();
+
+            Thread.sleep(5000);
+
             return(0);
             
         } catch (InterruptedException ex) {
