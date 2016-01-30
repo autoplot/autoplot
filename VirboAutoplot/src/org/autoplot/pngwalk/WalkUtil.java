@@ -103,7 +103,8 @@ public class WalkUtil {
         String sansArgs = i == -1 ? surl : surl.substring(0, i);
 
         i = splitIndex(sansArgs);
-        FileSystem fs = FileSystem.create( DataSetURI.getResourceURI(sansArgs.substring(0, i+1)) );
+        URI surls= DataSetURI.getResourceURI(sansArgs.substring(0, i+1));
+        FileSystem fs = FileSystem.create( surls );
         String spec= sansArgs.substring(i+1);
 
         spec= spec.replaceAll("\\*", ".*"); //GRR.  What if I put .* in there knowing it was a regex.
@@ -124,7 +125,7 @@ public class WalkUtil {
         List<URI> result= new ArrayList(ss.length);
         timeRanges.clear();
 
-        String dirsuri= DataSetURI.fromUri(fs.getRootURI());
+        String dirsuri= DataSetURI.fromUri(surls);
 
         for ( i = 0; i < ss.length; i++) {
             DatumRange dr2=null;
