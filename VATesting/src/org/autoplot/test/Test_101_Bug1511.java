@@ -7,43 +7,24 @@ package org.autoplot.test;
 
 
 import java.awt.AWTException;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
-import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.Scenario;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
-import org.netbeans.jemmy.operators.JCheckBoxOperator;
-import org.netbeans.jemmy.operators.JComponentOperator.JComponentFinder;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JTabbedPaneOperator;
-import org.netbeans.jemmy.operators.JTableOperator;
-import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ScriptContext;
-import static org.virbo.autoplot.ScriptContext.save;
-import static org.virbo.autoplot.ScriptContext.writeToPng;
-import org.virbo.autoplot.dom.Application;
 import util.RegexComponentChooser;
-import java.awt.Component;
-import java.awt.Dialog;
 import java.awt.Robot;
-import java.awt.Window;
-import org.netbeans.jemmy.operators.ComponentOperator;
-import org.netbeans.jemmy.operators.JComboBoxOperator;
-import org.netbeans.jemmy.operators.JInternalFrameOperator;
 import org.netbeans.jemmy.operators.JListOperator;
 import org.netbeans.jemmy.operators.JTreeOperator;
-import org.netbeans.jemmy.operators.ScrollPaneOperator;
-import org.netbeans.jemmy.operators.WindowOperator;
+
 
 /**
  * Jemmy test that tests for the bugs caused in Bug1511 (http://sourceforge.net/p/autoplot/bugs/1511/)
