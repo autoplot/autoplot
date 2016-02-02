@@ -4103,12 +4103,14 @@ private void updateFrameTitle() {
                 String suri;
                 if (alm.getValue("URI") != null) {
                     suri = alm.getValue("URI").trim();
-                    logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", suri );
                 } else if ( alm.getValue("open") !=null ) {
                     suri = alm.getValue("open").trim();
-                    logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", suri );
                 } else {
                     suri = null;
+                }
+                
+                if ( suri!=null && suri.length()>1 ) {
+                    logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", suri );
                 }
 
                 String pos= alm.getValue("position");
@@ -4362,7 +4364,13 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument( "nop", null, "nop", "no operation, to be a place holder for jnlp script.");
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
            if ( args[i].equals("-print") ) args[i]="--print";
-           if ( args[i].equals("-open") ) args[i]="--open";
+           if ( args[i].equals("-open") ) {
+               args[i]="--open";
+               if ( args.length>i+1 && args[i+1].length()<3 ) { // Linux/Mint launcher passes in %U when there is no file argument.
+                   logger.fine("ignoring -open argument with less than three character URI.");
+                   args[i+1]= "";
+               }
+           }
         }
 
         final List<String> scriptArgs= new ArrayList();
@@ -4420,14 +4428,12 @@ private void updateFrameTitle() {
 
         if (alm.getValue("URI") != null) {
             initialURL = alm.getValue("URI").trim();
-            logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", initialURL);
         } else if ( alm.getValue("open") !=null ) {
             initialURL = alm.getValue("open").trim();
-            logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", initialURL);
         } else {
             initialURL = null;
         }
-
+        
         // it's easy to forget the -- in --open=. Check for this and give a nice error.
         if ( initialURL!=null ) {
             if ( initialURL.startsWith("open=") ) {
@@ -4437,6 +4443,7 @@ private void updateFrameTitle() {
         
         if ( initialURL!=null && initialURL.length()>1 ) { // check for relative filenames 
             int i= initialURL.indexOf(":");
+            logger.log(Level.FINE, "setting initial URI to >>>{0}<<<", initialURL);
             if ( i==-1 ) { // it's a file.
                 boolean isAbsolute= initialURL.startsWith("/");
                 if ( !isAbsolute ) {
