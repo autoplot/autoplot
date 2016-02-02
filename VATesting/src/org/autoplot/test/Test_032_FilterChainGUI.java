@@ -26,8 +26,14 @@ import static org.virbo.autoplot.ScriptContext.save;
 import static org.virbo.autoplot.ScriptContext.writeToPng;
 import util.RegexComponentChooser;
 
-/**
- * Test 032
+/** 
+ *   1) Plot vap+inline:ripples(100,100)+randn(100)/50+outerProduct(ones(100),randn(110)/50)
+ *   2) Enter data tab
+ *   3) Add a filter by clicking (+) button
+ *   4) Add slice0 filter and set operations test field to "10"
+ *   5) Add "add filter" and set parameter to 10.
+ *   6) After each filter is added, go to canvas view to show changes to canvas.
+ * 
  * @author kenziemclouth
  */
 public class Test_032_FilterChainGUI implements Scenario {
@@ -67,13 +73,20 @@ public class Test_032_FilterChainGUI implements Scenario {
             Thread.sleep(1000);
             
             //add the "slice0()" filter      
-            DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser( "Add Filter") );           
-            new JTabbedPaneOperator( addFilterFrame ).selectPage("Alpha");
+            DialogOperator addFilterFrame = new DialogOperator( new RegexComponentChooser( "Add Operation") );           
+            new JTabbedPaneOperator( addFilterFrame ).selectPage("Alphabetical");
             JListOperator filterList = new JListOperator(addFilterFrame);
             filterList.selectItem(filterList.findItemIndex("Slice0", true, false));
-            new JButtonOperator(addFilterFrame,"OK").clickMouse();           
-            new JSpinnerOperator(scrollPane).getIncreaseOperator().clickMouse(10);
-            //new JButtonOperator(scrollPane, "OK").clickMouse();
+            Thread.sleep(500);
+            new JButtonOperator(addFilterFrame,"OK").clickMouse();         
+            
+            for( int i = 0; i<10 ; i = i + 1)
+            {
+                new JSpinnerOperator(scrollPane).getIncreaseOperator().clickMouse(1);
+                Thread.sleep(100);
+            }
+            
+            Thread.sleep(500);
             
             //Display canvas to show changes made my filter
             tabsPane.selectPage("canvas");
@@ -83,11 +96,14 @@ public class Test_032_FilterChainGUI implements Scenario {
             new JButtonOperator(scrollPane).pushNoBlock();
             
             //add the "add" filter
-            addFilterFrame = new DialogOperator( new RegexComponentChooser( "Add Filter") );
-            new JTabbedPaneOperator( addFilterFrame ).selectPage("Alpha");
+            addFilterFrame = new DialogOperator( new RegexComponentChooser( "Add Operation") );
+            new JTabbedPaneOperator( addFilterFrame ).selectPage("Alphabetical");
             filterList = new JListOperator(addFilterFrame);
+            Thread.sleep(500);
             filterList.selectItem(filterList.findItemIndex("Add", true, false)); //select Add
+            Thread.sleep(1000);
             new JButtonOperator(addFilterFrame,"OK").clickMouse();
+            Thread.sleep(500);
             new JTextFieldOperator(scrollPane, "1.").setText("10");
             Thread.sleep(500);
             
@@ -95,7 +111,7 @@ public class Test_032_FilterChainGUI implements Scenario {
             tabsPane.selectPage("canvas");
             Thread.sleep(5000);
             tabsPane.selectPage("data");
-            Thread.sleep(5000);
+            Thread.sleep(2000);
             
             System.err.println("Done!");
             
@@ -114,7 +130,7 @@ public class Test_032_FilterChainGUI implements Scenario {
         
     }
     public static void main(String[] argv) {
-	String[] params = {"org.autoplot.test.Test_033_FilterChainGUI"};
+	String[] params = {"org.autoplot.test.Test_032_FilterChainGUI"};
 	org.netbeans.jemmy.Test.main(params);
     }
     
