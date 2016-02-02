@@ -8,11 +8,6 @@ import static org.virbo.autoplot.ScriptContext.*;
 import org.das2.util.ArgumentList;
 import org.virbo.autoplot.dom.Application;
 
-//import org.das2.util.LoggerManager;
-//import java.util.logging.ConsoleHandler;
-//import java.util.logging.Level;
-//import java.util.logging.Logger;
-
 /**
  * Server for producing images from Autoplot URIs, first requested by U. Michigan.
  * @author jbf
@@ -23,23 +18,16 @@ public class AutoplotServer {
     }
         
     public static void main(String[] args) throws Exception {
-
-//        if ( false ) {
-//            Logger l= LoggerManager.getLogger("apdss.agg");
-//            l.setLevel(Level.ALL);
-//            l.addHandler( new ConsoleHandler() );  // I'm not sure when we need this.  This morning I was getting double messages.
-//            l.log(Level.FINE, "Logging at {0}", l.getLevel());
-//        }
           
-        System.err.println("org.virbo.autoplot.AutoplotServer 20150210");
+        System.err.println("org.virbo.autoplot.AutoplotServer 20160202");
 
         ArgumentList alm= new ArgumentList("AutoplotServer");
         alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot");
         alm.addOptionalSwitchArgument("vap", "v", "vap", "", "VAP to plot");
-        alm.addOptionalSwitchArgument("width", "w", "width", "-1", "width of result (dflt=700)");
-        alm.addOptionalSwitchArgument("height", "h", "height", "-1", "height of result (dflt=400)");
+        alm.addOptionalSwitchArgument("width", "w", "width", "-1", "width of result (default=700)");
+        alm.addOptionalSwitchArgument("height", "h", "height", "-1", "height of result (default=400)");
         alm.addOptionalSwitchArgument("canvas.aspect", "a", "canvas.aspect", "", "aspect ratio" );
-        alm.addOptionalSwitchArgument("format", "f", "format", "png", "output format png or pdf (dflt=png)");
+        alm.addOptionalSwitchArgument("format", "f", "format", "png", "output format png or pdf (default=png)");
         alm.addOptionalSwitchArgument("outfile", "o", "outfile", "-", "output filename or -");
         alm.addBooleanSwitchArgument( "noexit", "z", "noexit", "don't exit after running, for use with scripts." );
         alm.requireOneOf( new String[] { "uri", "vap" } );
@@ -72,10 +60,12 @@ public class AutoplotServer {
             }
         } else {
             double aspect = Units.dimensionless.parse(scanvasAspect).doubleValue(Units.dimensionless);
-            if (width == -1 && height != -1)
+            if (width == -1 && height != -1) {
                 width = (int) (height * aspect);
-            if (height == -1 && width != -1)
+            }
+            if (height == -1 && width != -1) {
                 height = (int) (width / aspect);
+            }
         }
         
         if ( !vap.equals("") ) {
@@ -97,24 +87,25 @@ public class AutoplotServer {
 
         Application model= getDocumentModel();
 
-        if ( format.equals("png") ) {
-            if ( outfile.equals("-") ) {
-                model.getCanvases(0).setWidth(width);
-                model.getCanvases(0).setHeight(height);
-                writeToPng( System.out );
-            } else {
-                writeToPng( outfile, width, height );
-            }
-        } else if ( format.equals("pdf") ) {
-            if ( outfile.equals("-") ) {
-                model.getCanvases(0).setWidth(width);
-                model.getCanvases(0).setHeight(height);
-                writeToPdf( System.out );
-            } else {
-                model.getCanvases(0).setWidth(width);
-                model.getCanvases(0).setHeight(height);
-                writeToPdf( outfile );
-            }
+        switch (format) {
+            case "png":
+                if ( outfile.equals("-") ) {
+                    model.getCanvases(0).setWidth(width);
+                    model.getCanvases(0).setHeight(height);
+                    writeToPng( System.out );
+                } else {
+                    writeToPng( outfile, width, height );
+                }   break;
+            case "pdf":
+                if ( outfile.equals("-") ) {
+                    model.getCanvases(0).setWidth(width);
+                    model.getCanvases(0).setHeight(height);
+                    writeToPdf( System.out );
+                } else {
+                    model.getCanvases(0).setWidth(width);
+                    model.getCanvases(0).setHeight(height);
+                    writeToPdf( outfile );
+            }   break;
         }
 
         if ( !alm.getBooleanValue("noexit") ) {
