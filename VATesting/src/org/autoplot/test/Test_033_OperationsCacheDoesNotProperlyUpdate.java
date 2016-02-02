@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 import org.das2.datum.LoggerManager;
 import org.virbo.autoplot.AutoplotUI;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.operators.JButtonOperator;
+import org.netbeans.jemmy.operators.JTextFieldOperator;
 import static org.virbo.autoplot.ScriptContext.*;
 
 /**
@@ -32,7 +34,11 @@ public class Test_033_OperationsCacheDoesNotProperlyUpdate implements Scenario  
             
             waitUntilIdle();
 
-            plot( "vap+das2server:http://www-pw.physics.uiowa.edu/das/das2Server?dataset=juno/waves/flight/survey.dsdf&start_time=2012-07-21T12:00:00.000Z&end_time=2012-07-21T24:00:00.000Z" );
+            
+            // plot test dataset
+            new JTextFieldOperator(app.getDataSetSelector().getEditor()).setText("vap+inline:ripples(100,110)+randn(100)/50+outerProduct(ones(100),randn(110)/50)");
+            new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
+
             waitUntilIdle();
 
             dom.getPlotElements(0).setComponent("|dbAboveBackgroundDim1(10)");
@@ -48,7 +54,11 @@ public class Test_033_OperationsCacheDoesNotProperlyUpdate implements Scenario  
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             return 1;
-        }
+        } 
+        //catch (InterruptedException ex) {
+        //    Logger.getLogger(Test_033_OperationsCacheDoesNotProperlyUpdate.class.getName()).log(Level.SEVERE, null, ex);
+        //    return(2);
+        //}
     }
 
 
