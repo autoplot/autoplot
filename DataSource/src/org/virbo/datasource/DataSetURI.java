@@ -206,7 +206,13 @@ public class DataSetURI {
 
     /**
      * check that the string uri is aggregating by looking for %Y's (etc) in the
-     * file part of the URI.
+     * file part of the URI.  This also looks for:<ul>
+     * <li>$y -- two digit year
+     * <li>$(o -- orbit number
+     * <li>$(periodic -- interval number
+     * <li>$v -- version
+     * </ul>
+     * 
      * @param surl
      * @return
      */
@@ -227,6 +233,8 @@ public class DataSetURI {
         if (ipercy == -1) ipercy = surl.lastIndexOf("%{periodic");
         if (ipercy == -1) ipercy = surl.lastIndexOf("$v");
         if (ipercy == -1) ipercy = surl.lastIndexOf("$(v");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$x");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("*");
         
         return ipercy != -1;
     }
