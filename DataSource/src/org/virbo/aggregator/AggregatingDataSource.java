@@ -105,8 +105,11 @@ public final class AggregatingDataSource extends AbstractDataSource {
     public AggregatingDataSource(URI uri,DataSourceFactory delegateFactory) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
         super(uri);
         this.delegateDataSourceFactory = delegateFactory;
-        tsb= createTimeSeriesBrowse();
-        addCapability(TimeSeriesBrowse.class, tsb );
+        if ( AggregatingDataSourceFactory.hasTimeFields( uri.toString() ) ) {
+            tsb= new AggTimeSeriesBrowse();
+            addCapability(TimeSeriesBrowse.class, tsb );
+        }
+        
         String stimeRange= super.params.get( URISplit.PARAM_TIME_RANGE );
         if ( stimeRange!=null ) {
             if ( super.params.get("timeRange")!=null ) {
@@ -129,11 +132,6 @@ public final class AggregatingDataSource extends AbstractDataSource {
         }
     }
 
-
-    private TimeSeriesBrowse createTimeSeriesBrowse() {
-        return new AggTimeSeriesBrowse();
-    }
-    
     /**
      * It's easy for programs to mess up and contain timetags that are 24 hours off, so check that the
      * tags are not more than 50% outside the bounds.
@@ -339,9 +337,12 @@ public final class AggregatingDataSource extends AbstractDataSource {
         
         boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
         
+        String theUri= this.tsb!=null ? this.tsb.getURI() : this.uri.toASCIIString();
+        
         ReferenceCache.ReferenceCacheEntry cacheEntry=null;
         if ( useReferenceCache ) {
-            cacheEntry= ReferenceCache.getInstance().getDataSetOrLock( this.tsb.getURI(), mon);
+            
+            cacheEntry= ReferenceCache.getInstance().getDataSetOrLock( theUri, mon);
             if ( !cacheEntry.shouldILoad( Thread.currentThread() ) ) {
                 try {
                     logger.log(Level.FINE, "wait for other thread {0}", uri);
@@ -496,7 +497,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
                     logger.log(Level.FINER, "delegate URI: {0}", new Object[]{ delegateDataSource.getURI() } );
                     
-                    QDataSet ds1 = delegateDataSource.getDataSet(mon1);
+                   QDataSet ds1 = delegateDataSource.getDataSet(mon1);
                     logger.log(Level.FINER, "  read: {0}", new Object[]{ ds1 } );
                     
                     if ( ds1==null ) {
