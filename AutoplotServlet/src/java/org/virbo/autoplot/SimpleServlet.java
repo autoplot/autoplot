@@ -42,6 +42,7 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.Painter;
+import org.das2.graph.Renderer;
 import org.das2.system.DasLogger;
 import org.das2.util.AboutUtil;
 import org.das2.util.FileUtil;
@@ -82,7 +83,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20160201.1139";
+    public static final String version= "v20160203.1109";
 
     static FileHandler handler;
 
@@ -633,9 +634,12 @@ public class SimpleServlet extends HttpServlet {
             // look for errors on the canvas.
             Exception e= null;
             for ( PlotElement pe: dom.getPlotElements() ) {
-                Exception lastException= pe.getController().getRenderer().getLastException();
-                if ( lastException!=null ) {
-                    e= lastException;
+                Renderer r= pe.getController().getRenderer();
+                if ( r.isActive() ) {
+                    Exception lastException= r.getLastException();
+                    if (  lastException!=null  ) {
+                        e= lastException;
+                    }
                 }
             }
             
