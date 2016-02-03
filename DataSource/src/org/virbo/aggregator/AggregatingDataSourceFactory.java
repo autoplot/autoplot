@@ -295,13 +295,22 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return result;
     }
 
+    protected static boolean hasTimeFields( String surl ) {
+        int ipercy = surl.lastIndexOf("%Y");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$Y");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$y");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$(o");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$(periodic");
+        return ipercy != -1;
+    }
+    
     @Override
     public boolean reject( String surl, List<String> problems, ProgressMonitor mon) {
         URISplit split = URISplit.parse(surl);
         Map map = URISplit.parseParams(split.params);
 
         try {
-            if ( DefaultTimeSeriesBrowse.reject( map, problems ) ) {
+            if ( hasTimeFields(surl) && DefaultTimeSeriesBrowse.reject( map, problems ) ) {
                 return true;
             }
 
