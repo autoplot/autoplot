@@ -65,6 +65,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     boolean updatingDropLists = false;  // avoid re-entry in droplists.
     boolean droplistIsDirty= false;
 
+    boolean hasTimeFields= true;
+    
     public void setDelegateEditorPanel(DataSourceEditorPanel edit) {
         delegateEditorPanel = edit;
     }
@@ -397,8 +399,13 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             outerRangeTextField.setText(ex.toString());
             return;
         }
-        outerRangeTextField.setText("found files for " + dr);
-        outerRangeTextField.setIcon(null);
+        if ( AggregatingDataSourceFactory.hasTimeFields(uri) ) {
+            outerRangeTextField.setText("found files for " + dr);
+            outerRangeTextField.setIcon(null);
+        } else {
+            outerRangeTextField.setText("aggregation doesn't have time fields");
+            outerRangeTextField.setIcon(null);
+        }
     }
 
     private void updateDropLists(boolean updateYear, boolean updateMonth) {
@@ -563,25 +570,41 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         split = URISplit.parse(url);
         params = URISplit.parseParams(split.params);
         this.uri = url;
+        
+        hasTimeFields= AggregatingDataSourceFactory.hasTimeFields(url);
+        
         try {
 
-            String timeRange = params.get("timerange");
-            if (timeRange != null && timeRange.trim().length() > 0) {
-                timeRange= timeRange.replaceAll("\\+", " ");
-                try {
-                    DatumRange dr = DatumRangeUtil.parseTimeRange(timeRange);
-                } catch (ParseException ex) {
+            if ( hasTimeFields ) {
+                String timeRange = params.get("timerange");
+                if (timeRange != null && timeRange.trim().length() > 0) {
+                    timeRange= timeRange.replaceAll("\\+", " ");
+                    try {
+                        DatumRange dr = DatumRangeUtil.parseTimeRange(timeRange);
+                    } catch (ParseException ex) {
 
+                    }
                 }
+                timeRangeTextField.setText(timeRange);
+
+                String reduce= params.get("reduce");
+                reduceCB.setSelected( "T".equals(reduce) );
+
+                String avail= params.get("avail");
+                availabilityCB.setSelected( "T".equals(avail) );
+
+            } else {
+                jPanel1.setEnabled( false );
+                timeRangeTextField.setText("");
+                timeRangeTextField.setEnabled(false);
+                reduceCB.setEnabled(false);
+                availabilityCB.setEnabled(false);
+                yearsComboBox.setEnabled(false);
+                monthsComboBox.setEnabled(false);
+                daysComboBox.setEnabled(false);
+                timeRangeToolButton.setEnabled(false);
             }
-            timeRangeTextField.setText(timeRange);
-
-            String reduce= params.get("reduce");
-            reduceCB.setSelected( "T".equals(reduce) );
             
-            String avail= params.get("avail");
-            availabilityCB.setSelected( "T".equals(avail) );
-
             String delegateUrl = null;
             delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri(url, null);
 
@@ -638,7 +661,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             vapScheme= null;
         }
         URISplit dsplit = URISplit.parse(delegateUrl);
-        Map<String, String> allParams = new LinkedHashMap<String, String>();
+        Map<String, String> allParams = new LinkedHashMap<>();
         
         if ( droplistIsDirty ) {
             copyTimes(0);
@@ -646,26 +669,30 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         
         //allParams.putAll(params);
         allParams.putAll(URISplit.parseParams(dsplit.params));
-        String tr = timeRangeTextField.getText();
-        tr= tr.replaceAll(" ","+");
-        String tr0= allParams.get("timerange"); // check that the delegate didn't insert a timerange
-        if ( tr0!=null && tr0.length()>0 ) {
-            if ( tr.trim().length()==0 ) {
-                logger.log( Level.FINE, "I didn't get timerange but delegate did");
-                tr= tr0;
+        
+        if ( hasTimeFields ) {
+            String tr = timeRangeTextField.getText();
+            tr= tr.replaceAll(" ","+");
+            String tr0= allParams.get("timerange"); // check that the delegate didn't insert a timerange
+            if ( tr0!=null && tr0.length()>0 ) {
+                if ( tr.trim().length()==0 ) {
+                    logger.log( Level.FINE, "I didn't get timerange but delegate did");
+                    tr= tr0;
+                }
+            }
+            allParams.put("timerange", tr);
+            if ( reduceCB.isSelected() ) {
+                allParams.put("reduce","T"); // warning--this is going to become the default.
+            } else {
+                allParams.remove("reduce");
+            }
+            if ( availabilityCB.isSelected() ) {
+                allParams.put("avail","T"); // warning--this is going to become the default.
+            } else {
+                allParams.remove("avail");
             }
         }
-        allParams.put("timerange", tr);
-        if ( reduceCB.isSelected() ) {
-            allParams.put("reduce","T"); // warning--this is going to become the default.
-        } else {
-            allParams.remove("reduce");
-        }
-        if ( availabilityCB.isSelected() ) {
-            allParams.put("avail","T"); // warning--this is going to become the default.
-        } else {
-            allParams.remove("avail");
-        }
+        
         split.params = URISplit.formatParams(allParams);
         if ( vapScheme==null ) {
             split.vapScheme= dsplit.vapScheme;
