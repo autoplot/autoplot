@@ -69,7 +69,9 @@ public class AutoplotServer {
         }
         
         if ( !vap.equals("") ) {
+            System.err.println("here 72");
             load(vap);
+            System.err.println("here 74");
             if ( width==-1 || height==-1) {
                 width= dom.getController().getCanvas().getWidth();
                 height= dom.getController().getCanvas().getHeight();
@@ -85,6 +87,8 @@ public class AutoplotServer {
             plot(suri);
         }
 
+        System.err.println("here 88");
+        
         Application model= getDocumentModel();
 
         switch (format) {
@@ -108,6 +112,8 @@ public class AutoplotServer {
             }   break;
         }
 
+        System.err.println("here 113");
+        
         if ( !alm.getBooleanValue("noexit") ) {
             System.exit(0);
         }
