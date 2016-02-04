@@ -573,7 +573,7 @@ public class ScreenshotsTool extends EventQueue {
 
         Rectangle b= getScreenBounds(active);
         Rectangle myBounds= getMyBounds(b);
-        System.err.println("myBounds="+myBounds);
+        //System.err.println("myBounds="+myBounds);
 
         //System.err.println(""+file+" screenshot aquired in "+ ( System.currentTimeMillis() - processTime0 ) +"ms.");
 
