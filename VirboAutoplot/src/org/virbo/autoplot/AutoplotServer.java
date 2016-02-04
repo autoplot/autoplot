@@ -1,6 +1,8 @@
 
 package org.virbo.autoplot;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.Units;
 import org.das2.graph.DasCanvas;
 import static org.virbo.autoplot.ScriptContext.*;
@@ -13,6 +15,8 @@ import org.virbo.autoplot.dom.Application;
  * @author jbf
  */
 public class AutoplotServer {
+    
+    private static final Logger logger= Logger.getLogger("autoplot.server");
     
     public AutoplotServer() {
     }
@@ -69,9 +73,12 @@ public class AutoplotServer {
         }
         
         if ( !vap.equals("") ) {
-            System.err.println("here 72");
+            logger.log(Level.FINE, "about to load the vap {0}", vap);
+            
             load(vap);
-            System.err.println("here 74");
+            
+            logger.log(Level.FINE, "vap is loaded");
+            
             if ( width==-1 || height==-1) {
                 width= dom.getController().getCanvas().getWidth();
                 height= dom.getController().getCanvas().getHeight();
@@ -84,10 +91,15 @@ public class AutoplotServer {
             dom.getController().getCanvas().setHeight(height);
             DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
             c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
+            
+            logger.log(Level.FINE, "plot uri {0}", suri);
+            
             plot(suri);
+            
+            logger.log(Level.FINE, "done plot {0}", suri);
         }
 
-        System.err.println("here 88");
+        logger.fine("get the model which provides the canvas");
         
         Application model= getDocumentModel();
 
@@ -112,7 +124,7 @@ public class AutoplotServer {
             }   break;
         }
 
-        System.err.println("here 113");
+        logger.fine("about to exit");
         
         if ( !alm.getBooleanValue("noexit") ) {
             System.exit(0);
