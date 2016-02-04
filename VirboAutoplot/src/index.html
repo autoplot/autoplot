@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>32 bit JVMs are still the biggest source of confusion, so new warnings are added.
+        <p><small>$v (version) and $x (wildcard) can be used in a URI without $Y (or other time fields) now.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -23,6 +23,12 @@
 
         <p>Bugfixes (2016-01-27 r18225):</p>
         <ul>
+            <li>webstart on Linux/Mint creates a launcher that likes pass in %U when there is no file argument.  -open xx (with any two characters) is now ignored.</li>
+            <li>1517: Sebastian's script hangs when calling DataPointRecorder.save</li>
+            <li>1515: remove extraneous user permissions dialogs caused when user@ added to it automatically.</li>
+            <li>add PENDING_CHECK_REJECT so that the waitUntilIdle function properly detects that the application is not idle.  Thanks Kenzie!</li>
+            <li>improve feedback while reading CDF file data, MMS has large datasets that take non-trivial time to extract</li>
+            <li>update the crosshair digitizer when we install RBGImageRenderer, so that R,G,B values are reported.</li>
             <li>treat http://user@... the same as http://... when credentials are needed either way.  PNGWalkTool had a bug where user@ was added automatically, causing a second login dialog.</li>
             <li>openBrowser code assumed that the Java 6 system could be used, but it isn't supported on Linux (Mint).</li>
             <li>1512: I/O Error reading CDF files on 32 bit machines.  Fall back to alternate method for opening files.</li>
@@ -107,6 +113,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Autoplot servlet experiment with checking for exceptions in the plot and putting them in the response headers.</li>
+            <li>472: allow $x to be used in aggregation without time fields.</li>
             <li>About screen includes a bullet explicitly identifying 32bit Java and provides a link to fix this.</li>
             <li>html version of pngwalk uses precalculated thumbnails.</li>
             <li>470: DasProgressPanel shows the thread name to improve serviceability</li>
