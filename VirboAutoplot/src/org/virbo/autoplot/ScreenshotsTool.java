@@ -1,14 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot;
 
 import java.awt.AWTEvent;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.DisplayMode;
 import java.awt.Event;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -64,8 +60,13 @@ import org.virbo.autoplot.util.TickleTimer;
 
 /**
  * Jeremy's experiment that will create automatic documentation.
- * This is intended to provide a means for users to more easily communicate and to make it easier
- * to create documentation.
+ * This is intended to provide a means for users to more easily communicate and 
+ * to make it easier to create documentation.
+ * 
+ * This is being modified a bit, namely to delay work such as screening
+ * private regions, to improve responsiveness and to allow the user the option
+ * of screening or not.
+ * 
  * @author jbf
  */
 public class ScreenshotsTool extends EventQueue {
@@ -160,13 +161,13 @@ public class ScreenshotsTool extends EventQueue {
                 AWTEvent update= peekEvent(1200);
                 if ( update==null ) {
                     long t1= System.currentTimeMillis();
-                    Rectangle r= doit( t1, t1-tb, 99999 );
+                    Rectangle r= doTakePicture( t1, t1-tb, 99999 );
                     if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
 
                 } else {
                     if ( canReject(update) ) {
                         long t1= System.currentTimeMillis();
-                        Rectangle r= doit( t1, t1-tb, 99999 );
+                        Rectangle r= doTakePicture( t1, t1-tb, 99999 );
                         if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
                     }
                     //System.err.println("update coming anyway");
@@ -250,7 +251,8 @@ public class ScreenshotsTool extends EventQueue {
     TickleTimer tickleTimer;
 
     /**
-     * calculate the bounds we are going to keep, which will be typically by significantly smaller than the display.
+     * calculate the bounds we are going to keep, which will be typically by 
+     * significantly smaller than the display.
      * @param b the bounds concerning this process.
      * @return the bounds relative to the input rectangle b.
      */
@@ -274,7 +276,7 @@ public class ScreenshotsTool extends EventQueue {
         }
 
         if ( r==null ) {
-            throw new IllegalArgumentException("unable to find rectange");
+            throw new IllegalArgumentException("unable to find rectangle");
         }
         r= r.intersection(b);
         r.width= Math.max(0,r.width);
@@ -462,7 +464,7 @@ public class ScreenshotsTool extends EventQueue {
         monitor.finished();
         
     }
-
+    
     /**
      * get a screenshot of the display Autoplot's main UI is running within.
      * @return
@@ -502,7 +504,10 @@ public class ScreenshotsTool extends EventQueue {
      * @param includePointer include the pointer (enlarged and indicates button presses)
      * @return image of the screen.
      */
-    public static BufferedImage getScreenShot( int active, int buttons, boolean includePointer ) {
+    private static BufferedImage getScreenShot( int active, int buttons, boolean includePointer ) {
+        
+        long t0= System.currentTimeMillis();
+        
         //http://www.javalobby.org/forums/thread.jspa?threadID=16400&tstart=0
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] gs = ge.getScreenDevices();
@@ -526,7 +531,7 @@ public class ScreenshotsTool extends EventQueue {
         boolean appContainsPointer= filterBackground( (Graphics2D)screenshot.getGraphics(), b, mousePointerLocation );
         
         boolean screenHasPointer= info.getDevice()==gs[i];
-        
+
         if ( includePointer ) {
             if ( screenHasPointer && appContainsPointer ) {
                 // get the mouse info before grabbing the screenshot, which takes several hundred millis.
@@ -551,6 +556,7 @@ public class ScreenshotsTool extends EventQueue {
             }
         }
         
+        logger.log(Level.FINE, "got screenshot in {0} ms", (System.currentTimeMillis()-t0));
         return screenshot;
     }
 
@@ -562,10 +568,15 @@ public class ScreenshotsTool extends EventQueue {
      */
     Rectangle bounds= null;
 
-    private Rectangle doit( long t1, long dt, int id ) {
+    /**
+     * take a screenshot and write it to a png file.
+     * @param t1 the time in millis.
+     * @param dt elased time.
+     * @param id the event id number.
+     * @return 
+     */
+    private Rectangle doTakePicture( long t1, long dt, int id ) {
         t0= t1;
-
-        //long processTime0= System.currentTimeMillis();
 
         final File file = new File( outLocationFolder, tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + "_" + String.format("%05d", id ) + ".png" );
 
@@ -573,17 +584,12 @@ public class ScreenshotsTool extends EventQueue {
 
         Rectangle b= getScreenBounds(active);
         Rectangle myBounds= getMyBounds(b);
-        //System.err.println("myBounds="+myBounds);
-
-        //System.err.println(""+file+" screenshot aquired in "+ ( System.currentTimeMillis() - processTime0 ) +"ms.");
 
         try {
             if ( !file.createNewFile() ) {
                 logger.log(Level.WARNING, "failed to create new file {0}", file);
             } else {
                 ImageIO.write(im, "png", file);
-                //long processTime= ( System.currentTimeMillis() - processTime0 );
-                //System.err.println(""+file+" created in "+processTime+"ms.");
             }
 
         } catch ( Exception ex ) {
@@ -631,7 +637,10 @@ public class ScreenshotsTool extends EventQueue {
         //List keep= Arrays.asList( PaintEvent.PAINT, PaintEvent.UPDATE, 204, 205, 46288 );
         // 507=MouseWheelEvent
         // 46288=DasUpdateEvent
-        List skip= Arrays.asList( 1200, Event.MOUSE_MOVE, Event.MOUSE_DRAG, Event.MOUSE_DOWN, Event.MOUSE_UP, Event.MOUSE_ENTER, Event.MOUSE_EXIT, 507, 101, 1005, 400, 401, 402 );
+        List skip= Arrays.asList( 1200, Event.MOUSE_MOVE, Event.MOUSE_DRAG, 
+                Event.MOUSE_DOWN, Event.MOUSE_UP, 
+                Event.MOUSE_ENTER, Event.MOUSE_EXIT, 
+                507, 101, 1005, 400, 401, 402 );
 
         if ( skip.contains( theEvent.getID() ) ) {
             reject= true;
@@ -645,7 +654,9 @@ public class ScreenshotsTool extends EventQueue {
         reject= reject || ( (t1 - t0) < 200);
 
         try {
-            logFile.write(String.format("%08.1f %1d %5d %s\n", dt / 100., reject ? 0 : 1, theEvent.getID(), theEvent.getClass().getName()));
+            logFile.write(String.format("%09.3f %1d %5d %s\n", 
+                    dt / 1000., reject ? 0 : 1, theEvent.getID(), 
+                    theEvent.getClass().getName()));
             logFile.flush();
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -675,12 +686,13 @@ public class ScreenshotsTool extends EventQueue {
         } 
 
         if (  !reject ) {
-            Rectangle r= doit( t1, dt, theEvent.getID() );   // Take a picture here
+            Rectangle r= doTakePicture( t1, dt, theEvent.getID() );   // Take a picture here
             if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
         }
 
         // 400 401 402 are Key events.
-        if ( theEvent.getID()==Event.MOUSE_MOVE || theEvent.getID()==400 || theEvent.getID()==401 || theEvent.getID()==402 ) {
+        if ( theEvent.getID()==Event.MOUSE_MOVE || theEvent.getID()==400 
+                || theEvent.getID()==401 || theEvent.getID()==402 ) {
             tickleTimer.tickle( String.valueOf(theEvent.getID()) );
         }
 
