@@ -52,6 +52,7 @@ public class WalkUtil {
 
     /**
      * returns the last index of slash, splitting the FileSystem part from the template part.
+     * See also FileStorageModel.splitIndex and AggregatingDataSource.splitIndex
      * @param surl
      * @return
      */
