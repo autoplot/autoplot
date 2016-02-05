@@ -391,7 +391,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                     }
                     
-                    TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class );
+                    TimeSeriesBrowse tsb= f.getCapability( TimeSeriesBrowse.class ); // https://sourceforge.net/p/autoplot/bugs/1518/
                     if ( false ) { // TODO: experiment more with this code
                     if ( tsb!=null ) {
                         if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) && !timeRange.equals(DataSourceUtil.DEFAULT_TIME_RANGE) ) {
