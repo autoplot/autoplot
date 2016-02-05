@@ -81,12 +81,14 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
     
     /**
-     * return the index of the agg part of the uri.  
+     * return the index of the agg part of the uri.  Like 
+     * FileStorageModel.splitIndex(surl), but also treats * as $x.
      * @param surl the URI as a string.
      * @return the index of the first part of the aggregation, which will
      * be one more than the position of the static part's last slash.
      */
-    protected static int splitIndex(String surl) { // See also org/autoplot/pngwalk/WalkUtil.java splitIndex...
+    public static int splitIndex(String surl) { // See also org/autoplot/pngwalk/WalkUtil.java splitIndex...
+        surl= surl.replaceAll("\\*","\\$x");
         return FileStorageModel.splitIndex(surl);
     }
 
