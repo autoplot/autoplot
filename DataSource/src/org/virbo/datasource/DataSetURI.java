@@ -249,7 +249,7 @@ public class DataSetURI {
      */
     public static String[] unaggregate( String resourceURI, DatumRange timerange ) throws FileSystem.FileSystemOfflineException, UnknownHostException, IOException {
         
-        int i= FileStorageModel.splitIndex( resourceURI );
+        int i= AggregatingDataSourceFactory.splitIndex( resourceURI );
 
         String root= resourceURI.substring(0,i);     // the static part of the name
         String template= resourceURI.substring(i);   // the templated part of the name
@@ -1798,7 +1798,7 @@ public class DataSetURI {
                 scomp= scomp.substring(surlDir.length());
                 if ( scomp.startsWith(prefix) ) {
                     String doc= "Use aggregation ("+tr+" available)";
-                    int splitIndex= FileStorageModel.splitIndex(sagg);
+                    int splitIndex= AggregatingDataSourceFactory.splitIndex(sagg);
                     String label= ".../"+sagg.substring(splitIndex);
                     completions.add( new DataSetURI.CompletionResult( sagg, label, doc, prefix, true ) );
                 }
