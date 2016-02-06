@@ -1,6 +1,12 @@
+# This contains a bunch of code that might be useful, though the application
+# is not.  This would look at a pile of images, plotting the timetag of each 
+# image, and allow the operator to drag a box and play the images as a movie.
+# This was came from trying to use the Linux motion software to take a picture
+# of the bat which was somewhere in the house.
+
 ## create the data set of image timetags #########################
-dir= "file:/media/mini/data.backup/batpics/"
-files= list( dir+'*.jpg' )
+dir= "file:/home/jbf/fun/batpics/"
+files= listDirectory( dir+'*.jpg' )
 
 timeparser= TimeParser.create("%Y%m%d%H%M%S");
 timeparser.format( Units.us2000.createDatum(0), None )
