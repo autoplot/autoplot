@@ -5,7 +5,7 @@
 
 import org.das2.graph
 
-ds= getDataSet( 'vap+wav:file:///home/jbf/heartBeats.15weeks.wav' )
+ds= getDataSet( 'http://autoplot.org/data/wav/chickadeesong.wav' )
 #ds= getDataSet( 'vap+jyds:file:///home/jbf/project/autoplot/jyds/auralizeHfwr.jyds' )
 #ds= getDataSet('vap:file:/media/mini/eg/content/wav/20090818 204141.wav')
 
