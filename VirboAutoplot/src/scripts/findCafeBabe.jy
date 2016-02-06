@@ -1,6 +1,7 @@
 # find beginning of java class, save out shell script and java class separately.
+# The Java classes file starts with "CAFEBABE"
 
-ds= getDataSet('bin.file:///net/spot3/home/jbf/incoming/netbeans-6.5rc2-ml-linux.sh?byteLength=1000000' )
+ds= getDataSet('vap+bin:file:///net/spot3/home/jbf/incoming/netbeans-6.5rc2-ml-linux.sh?byteLength=1000000' )
 
 r= where( ds == 0xCA )
 
