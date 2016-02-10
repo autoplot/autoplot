@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -248,6 +249,19 @@ public class NamedURIListTool extends JPanel {
         if ( dmu!=null ) dmu.rename( oldName, newName );
     }
     
+    /**
+     * returns true if the string is a valid Java (and Python) identifier.
+     * @param n
+     * @return 
+     */
+    private boolean isValidIdentifier( String n ) {
+        boolean s= n.length()>0 && Character.isJavaIdentifierStart(n.charAt(0) );
+        for ( int i=1; s && i<n.length(); i++ ) {
+            s= s && Character.isJavaIdentifierPart(n.charAt(i) );
+        }
+        return s;
+    }
+    
     private void rename( int fi ) {
         String currentName= ids.get(fi);
         JPanel p= new JPanel();
@@ -271,18 +285,21 @@ public class NamedURIListTool extends JPanel {
         } catch ( IllegalArgumentException ex ) {
             logger.log(Level.SEVERE, "can''t get editor for #{0}", fi);
         }
-        if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( scrollPane, p, "Rename parameter and dataset editor", JOptionPane.OK_CANCEL_OPTION ) ) {
-            doVariableRename( fi, currentName, tf.getText() );
-            if ( edit!=null ) {
-                uris.set( fi, edit.getURI() );
-            }
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    refresh();
+        while ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( scrollPane, p, "Rename parameter and dataset editor", JOptionPane.OK_CANCEL_OPTION ) ) {
+            String newName= tf.getText();
+            if ( isValidIdentifier(newName) ) {
+                doVariableRename( fi, currentName, newName );
+                if ( edit!=null ) {
+                    uris.set( fi, edit.getURI() );
                 }
-            });
-            
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        refresh();
+                    }
+                });
+                break;
+            }
         }
     }
 
