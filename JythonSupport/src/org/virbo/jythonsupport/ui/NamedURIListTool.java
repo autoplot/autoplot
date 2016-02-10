@@ -381,7 +381,10 @@ public class NamedURIListTool extends JPanel {
         c.weightx= 0.0;
         dsSelector.add( cb, c );
         
-        final JTextField literalTF= new JTextField("      0.0");
+        final JTextField literalTF= new JTextField("0.0");
+        literalTF.setMinimumSize( new Dimension(100,literalTF.getFont().getSize()*2) );
+        literalTF.setPreferredSize( new Dimension(100,literalTF.getFont().getSize()*2) );
+        
         c.gridx= 2;
         c.weightx= 1.0;
         literalTF.addFocusListener( new FocusListener() {
