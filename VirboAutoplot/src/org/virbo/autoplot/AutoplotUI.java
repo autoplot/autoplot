@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -64,6 +65,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -163,6 +165,7 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.WindowManager;
 import org.virbo.filters.AddFilterDialog;
 import org.virbo.filters.FiltersChainPanel;
+import org.virbo.jythonsupport.ui.DataMashUp;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -2507,6 +2510,7 @@ APSplash.checkTime("init 52.9");
         createPngWalkSeparator = new javax.swing.JSeparator();
         aggregateMenuItem = new javax.swing.JMenuItem();
         replaceFileMenuItem = new javax.swing.JMenuItem();
+        mashDataMenuItem = new javax.swing.JMenuItem();
         filtersMenuItem = new javax.swing.JMenuItem();
         aggSeparator = new javax.swing.JSeparator();
         decodeURLItem = new javax.swing.JMenuItem();
@@ -3059,6 +3063,15 @@ APSplash.checkTime("init 52.9");
             }
         });
         toolsMenu.add(replaceFileMenuItem);
+
+        mashDataMenuItem.setText("Mash Data...");
+        mashDataMenuItem.setToolTipText("Combine data from several sources.");
+        mashDataMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mashDataMenuItemActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(mashDataMenuItem);
 
         filtersMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/resources/pipeMag2.png"))); // NOI18N
         filtersMenuItem.setText("Additional Operations...");
@@ -3913,6 +3926,20 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         org.das2.util.LoggerManager.logGuiEvent(evt);
         applicationModel.resetFontSize();
     }//GEN-LAST:event_resetFontMIActionPerformed
+
+    private void mashDataMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mashDataMenuItemActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+        String uri= dom.getController().getFocusUri();
+        URISplit split= URISplit.parse(uri);
+        if ( !split.vapScheme.equals("vap+inline") ) {
+            uri= "vap+inline:ds=getDataSet('"+uri+"')";
+        }
+        DataMashUp dm= new DataMashUp();
+        dm.setAsJythonInline(uri);
+        if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, dm, "Data Mash Up", JOptionPane.OK_CANCEL_OPTION ) ) {
+            dom.getController().getDataSourceFilter().setUri( dm.getAsJythonInline() );
+        }
+    }//GEN-LAST:event_mashDataMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     @Override
@@ -5007,6 +5034,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JCheckBoxMenuItem layoutPanelCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
     private javax.swing.JMenuItem manageFilesystemsMI;
+    private javax.swing.JMenuItem mashDataMenuItem;
     private javax.swing.JCheckBoxMenuItem nnCb;
     private javax.swing.JMenu optionsMenu;
     private javax.swing.JCheckBoxMenuItem overRenderingMenuItem;
