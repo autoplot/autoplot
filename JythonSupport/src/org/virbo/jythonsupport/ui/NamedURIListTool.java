@@ -11,6 +11,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,10 +46,20 @@ public class NamedURIListTool extends JPanel {
     private static final String CLASS_NAME = NamedURIListTool.class.getName();    
     
     JScrollPane scrollPane;
+    
+    /**
+     * list of URIs.
+     */
     List<String> uris=null;
+    
+    /**
+     * list of Java identifiers, one for each URI.
+     */
     List<String> ids=null;
     
-    public NamedURIListTool() {
+    DataMashUp dmu;
+    
+    public NamedURIListTool( ) {
         scrollPane = new javax.swing.JScrollPane();
         
         ids= Collections.emptyList();
@@ -91,6 +102,14 @@ public class NamedURIListTool extends JPanel {
     public String[] getIds() {
         assert ids.size()==uris.size();
         return ids.toArray( new String[ids.size()] );
+    }
+    
+    /**
+     * set the DataMashUp tool so we can handle variable rename.
+     * @param dmu 
+     */
+    public void setDataMashUp( DataMashUp dmu ) {
+        this.dmu= dmu;
     }
     
     /** make up a name that does not exist in the list of names.
@@ -224,6 +243,11 @@ public class NamedURIListTool extends JPanel {
         return sub;
     }
     
+    private void doVariableRename( int fi, String oldName, String newName ) {
+        ids.set( fi, newName );        
+        if ( dmu!=null ) dmu.rename( oldName, newName );
+    }
+    
     private void rename( int fi ) {
         String currentName= ids.get(fi);
         JPanel p= new JPanel();
@@ -233,9 +257,13 @@ public class NamedURIListTool extends JPanel {
         c.setAlignmentX( Component.LEFT_ALIGNMENT );
         p.add(  c );
         JTextField tf= new JTextField(currentName);
+        tf.setMaximumSize( new Dimension( 1000, c.getFont().getSize()*2 ) );
+        tf.setPreferredSize( new Dimension( 1000, c.getFont().getSize()*2 ) );
         tf.setAlignmentX( Component.LEFT_ALIGNMENT );
         p.add( tf );
         p.add( Box.createVerticalStrut( p.getFont().getSize() ) );
+        p.add( Box.createGlue() );
+        
         DataSourceEditorPanel edit=null;
         try {
             String uri= uris.get(fi);
@@ -244,7 +272,7 @@ public class NamedURIListTool extends JPanel {
             logger.log(Level.SEVERE, "can''t get editor for #{0}", fi);
         }
         if ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( scrollPane, p, "Rename parameter and dataset editor", JOptionPane.OK_CANCEL_OPTION ) ) {
-            ids.set( fi,tf.getText() );
+            doVariableRename( fi, currentName, tf.getText() );
             if ( edit!=null ) {
                 uris.set( fi, edit.getURI() );
             }
@@ -311,6 +339,7 @@ public class NamedURIListTool extends JPanel {
         dsSelector.setLayout(layout);
         GridBagConstraints c= new GridBagConstraints();
         c.anchor= GridBagConstraints.WEST;
+        c.weighty= 0.0;
         int i;
         for ( i=0; i<this.uris.size(); i++ ) {
             JCheckBox cb= new JCheckBox( this.ids.get(i) );
@@ -318,19 +347,40 @@ public class NamedURIListTool extends JPanel {
             butts[i]= cb;
             c.gridy= i;
             c.gridx= 1;
+            c.weightx= 0.0;
             dsSelector.add( cb, c );
-            c.gridx= 2;
-            dsSelector.add( new JLabel( this.uris.get(i) ), c );
+            
+            JLabel label=  new JLabel( this.uris.get(i) );
+            c.gridx= 2;            
+            c.weightx= 1.0;
+            dsSelector.add( label, c );
             bg.add(cb);
         }
-        JCheckBox cb= new JCheckBox( "Literal: " );
+        final JCheckBox cb= new JCheckBox( "Literal: " );
         butts[i]= cb;
         cb.setToolTipText("enter a literal like 0.0");
         c.gridy= this.uris.size();
         c.gridx= 1;
+        c.weightx= 0.0;
         dsSelector.add( cb, c );
+        
+        final JTextField literalTF= new JTextField("      0.0");
         c.gridx= 2;
-        JTextField literalTF= new JTextField("      0.0");
+        c.weightx= 1.0;
+        literalTF.addFocusListener( new FocusListener() {
+            String orig=null;
+            @Override
+            public void focusGained(FocusEvent e) {
+                orig= literalTF.getText();
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                if ( !literalTF.getText().equals(orig) ) {
+                    cb.setSelected(true);
+                }
+            }
+        } );
+        
         try {
             Double.parseDouble(id);
             if ( id.length()<20 ) {
@@ -342,6 +392,12 @@ public class NamedURIListTool extends JPanel {
             // do nothing
         }
         dsSelector.add( literalTF, c );
+        
+        c.weighty= 1.0;
+        c.gridy= this.uris.size()+1;
+        JPanel p= new JPanel();
+        dsSelector.add( p, c );
+        
         bg.add(cb);
         if ( JOptionPane.OK_OPTION == WindowManager.showConfirmDialog( this, dsSelector, "Select Variable", JOptionPane.OK_CANCEL_OPTION )  ) {
             for ( i=0; i<this.uris.size(); i++ ) {
