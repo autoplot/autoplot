@@ -50,32 +50,55 @@ public class DataMashUp extends javax.swing.JPanel {
 
     private static final Logger logger = LoggerManager.getLogger("jython.dashup");
     
+    /**
+     * set the list of URIs.  
+     * @param uris a list of URIs.
+     */
     public void setUris( List<String> uris ) {
         this.namedURIListTool1.setUris( uris );
     }
     
+    /**
+     * set the ids for each of the URIs.
+     * @param ids list of Java identifiers.
+     */
     public void setIds( List<String> ids ) {
         this.namedURIListTool1.setIds( ids );
     }
     
     /**
+     * rename the parameter and all usages within the tree.
+     * @param oldName
+     * @param newName 
+     */
+    public void rename( String oldName, String newName ) {
+        DefaultTreeModel tm= (DefaultTreeModel) jTree1.getModel();
+        renameImpl( tm, tm.getRoot(), oldName, newName );
+        jTree1.treeDidChange();
+        jTree1.revalidate();
+        jTree1.repaint();
+    }
+            
+    private void renameImpl( DefaultTreeModel tm, Object parent, String oldName, String newName ) {
+        int n= tm.getChildCount(parent);
+        for ( int i=0; i<n; i++ ) {
+            DefaultMutableTreeNode dmtn= (DefaultMutableTreeNode)tm.getChild(parent, i);
+            if ( dmtn.isLeaf() ) {  
+                if ( dmtn.getUserObject().equals(oldName) ) {
+                    dmtn.setUserObject(newName);
+                }
+            } else {
+                renameImpl( tm, parent, oldName, newName );
+            }
+        }
+    }
+
+    /**
      * Creates new form DataMashUp
      */
     public DataMashUp() {
         initComponents();
-        namedURIListTool1.addPropertyChangeListener( new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ( evt.getPropertyName().startsWith("idName_") ) {
-                    if ( !evt.getNewValue().equals(evt.getOldValue()) ) {
-                        String s= getAsJythonInline();
-                        //TODO: this will replace "ds" in "ds1" and "ds2", and needs to detect non-alpha on either side.
-                        s= s.replaceAll( evt.getOldValue().toString(), evt.getNewValue().toString() );
-                        setAsJythonInline(s);
-                    }
-                }
-            }
-        });
+        namedURIListTool1.setDataMashUp(this);
 
         DragSource dragSource = DragSource.getDefaultDragSource();
         DropTarget dropTarget = new DropTarget();
@@ -285,6 +308,10 @@ public class DataMashUp extends javax.swing.JPanel {
         return ss;
     }
     
+    /**
+     * configure the mashup tool using the "vap+inline" URI.
+     * @param script 
+     */
     public void setAsJythonInline( String script ) {
         if ( script.startsWith("vap+inline:") ) {
             script= script.substring(11);
