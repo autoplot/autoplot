@@ -213,7 +213,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             .addComponent(dataMashUp1, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
         );
 
-        jTabbedPane1.addTab("dashup", jPanel3);
+        jTabbedPane1.addTab("mash up", jPanel3);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -576,7 +576,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         TableModel ltm= tm;
         initComponents();
 
-        if ( !"true".equals( System.getProperty("enableDashup") ) ) {
+        if ( false && !"true".equals( System.getProperty("enableDashup") ) ) {
             jTabbedPane1.remove(2); // remove dashup tab
             mashupUri= null;
         }
