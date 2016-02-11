@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -30,6 +31,7 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.ListModel;
 import org.das2.util.LoggerManager;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
@@ -103,19 +105,28 @@ public class DataMashUp extends javax.swing.JPanel {
         DragSource dragSource = DragSource.getDefaultDragSource();
         DropTarget dropTarget = new DropTarget();
         try {
-            dropTarget.addDropTargetListener(createDropTargetListener());
+            dropTarget.addDropTargetListener(createTreeDropTargetListener());
         } catch (TooManyListenersException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
         
         jTree1.setDropTarget(dropTarget);
-                
+        
+        DropTarget listDropTarget= new DropTarget();
+        try {
+            listDropTarget.addDropTargetListener( createListDropTargetListener() );
+        } catch (TooManyListenersException ex ) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        scratchList.setDropTarget(listDropTarget);
+
         dragSource.createDefaultDragGestureRecognizer( jTree1, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
         
         // add all jLists
         dragSource.createDefaultDragGestureRecognizer( jList1, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
         dragSource.createDefaultDragGestureRecognizer( jList2, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
         dragSource.createDefaultDragGestureRecognizer( jList3, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
+        dragSource.createDefaultDragGestureRecognizer( scratchList, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
         
         dragSource.createDefaultDragGestureRecognizer( namedURIListTool1, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
 
@@ -413,6 +424,9 @@ public class DataMashUp extends javax.swing.JPanel {
         jPanel5 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList3 = new javax.swing.JList();
+        jPanel6 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        scratchList = new javax.swing.JList();
         jPanel4 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jTree1 = new javax.swing.JTree();
@@ -490,6 +504,22 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jTabbedPane1.addTab("filters", jPanel5);
 
+        scratchList.setToolTipText("scratch is a list for storing expressions");
+        jScrollPane5.setViewportView(scratchList);
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("scratch", jPanel6);
+
         jSplitPane2.setLeftComponent(jTabbedPane1);
 
         jLabel2.setText("Double-click on the name to set the data set.");
@@ -529,7 +559,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jSplitPane1.setTopComponent(jScrollPane1);
 
-        jLabel1.setText("Dashup is the data mash up tool, for combining data from different sources.");
+        jLabel1.setText("Load Data Sets:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -562,7 +592,7 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jTree1MouseClicked
 
-    final DropTargetListener createDropTargetListener() {
+    final DropTargetListener createTreeDropTargetListener() {
         return new DropTargetListener() {
 
             @Override
@@ -602,6 +632,57 @@ public class DataMashUp extends javax.swing.JPanel {
                 }
 
             }
+        };
+    }
+    
+    final DropTargetListener createListDropTargetListener() {
+        return new DropTargetListener() {
+
+            @Override
+            public void dragEnter(DropTargetDragEvent dtde) {
+                if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                    dtde.acceptDrag(DnDConstants.ACTION_COPY);
+                }
+            }
+
+            @Override
+            public void dragOver(DropTargetDragEvent dtde) {
+
+            }
+
+            @Override
+            public void dropActionChanged(DropTargetDragEvent dtde) {
+            }
+
+            @Override
+            public void dragExit(DropTargetEvent dte) {
+            }
+
+            @Override
+            public void drop(DropTargetDropEvent dtde) {
+                try {
+                    String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
+
+                    ListModel lm= scratchList.getModel();
+                    DefaultListModel dlm;
+                    if ( lm instanceof DefaultListModel ) {
+                        dlm= (DefaultListModel)lm;
+                    } else {
+                        dlm= new DefaultListModel();
+                        for ( int i=0; i<lm.getSize(); i++ ) {
+                            dlm.add(i,lm.getElementAt(i));
+                        }
+                    }
+                    dlm.add( dlm.getSize(), data );
+                    scratchList.setModel(dlm);
+                    
+                } catch (UnsupportedFlavorException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+            }
+            
         };
     }
 
@@ -651,14 +732,17 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTree jTree1;
     private org.virbo.jythonsupport.ui.NamedURIListTool namedURIListTool1;
+    private javax.swing.JList scratchList;
     // End of variables declaration//GEN-END:variables
 }
