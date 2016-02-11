@@ -285,7 +285,8 @@ public class NamedURIListTool extends JPanel {
         } catch ( IllegalArgumentException ex ) {
             logger.log(Level.SEVERE, "can''t get editor for #{0}", fi);
         }
-        while ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( scrollPane, p, "Rename parameter and dataset editor", JOptionPane.OK_CANCEL_OPTION ) ) {
+        String title= edit!=null ? "Rename parameter and dataset editor" : "Rename parameter"; // this is so the position and size are remembered separately.
+        while ( JOptionPane.OK_OPTION==WindowManager.showConfirmDialog( scrollPane, p, title, JOptionPane.OK_CANCEL_OPTION ) ) {
             String newName= tf.getText();
             if ( isValidIdentifier(newName) ) {
                 doVariableRename( fi, currentName, newName );
