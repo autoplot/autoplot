@@ -56,7 +56,7 @@ public class InlineDataSource extends AbstractDataSource {
         QDataSet res;
 
         if (result instanceof PyList) {
-            res = JythonOps.coerceToDs((PyList) result);
+            res = JythonOps.dataset((PyList) result);
         } else if ( result instanceof PyTuple && ((PyTuple)result).size()<3 ) {
             //JythonOps.coerce(result);  too bad coerce doesn't do this already.
             PyTuple tres= (PyTuple)result;
