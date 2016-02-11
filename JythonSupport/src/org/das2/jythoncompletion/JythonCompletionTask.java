@@ -231,7 +231,10 @@ public class JythonCompletionTask implements CompletionTask {
                 String signature = null;
                 String args = "";
                 if (lcontext instanceof PyJavaClass) {
-                    if (po instanceof PyReflectedFunction) {
+                    if (po.getClass().toString().equals( "class org.python.core.PyReflectedConstructor" ) ) {
+                        args= "()";
+                        signature= "";
+                    } else if (po instanceof PyReflectedFunction) {
                         Method m = new PyReflectedFunctionPeeker((PyReflectedFunction) po).getMethod(0);
                         signature = methodSignature(m);
                         args = methodArgs(m);
