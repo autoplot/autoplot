@@ -280,7 +280,7 @@
     </Container>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Dashup is the data mash up tool, for combining data from different sources.  TODO: rename is not implemented"/>
+        <Property name="text" type="java.lang.String" value="Dashup is the data mash up tool, for combining data from different sources."/>
       </Properties>
     </Component>
   </SubComponents>

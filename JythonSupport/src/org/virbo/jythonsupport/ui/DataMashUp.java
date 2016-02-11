@@ -529,7 +529,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jSplitPane1.setTopComponent(jScrollPane1);
 
-        jLabel1.setText("Dashup is the data mash up tool, for combining data from different sources.  TODO: rename is not implemented");
+        jLabel1.setText("Dashup is the data mash up tool, for combining data from different sources.");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -550,6 +550,9 @@ public class DataMashUp extends javax.swing.JPanel {
     private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
         if ( evt.getClickCount()==2 ) {
             TreePath tp= jTree1.getClosestPathForLocation( evt.getX(), evt.getY() );
+            if ( !jTree1.getModel().isLeaf(tp.getLastPathComponent()) ) {
+                return;
+            }
             jTree1.setSelectionPath(tp);
             String currentId= tp.getLastPathComponent().toString();
             String s= namedURIListTool1.selectDataId(currentId);
