@@ -322,7 +322,7 @@ public class DataMashUp extends javax.swing.JPanel {
         for ( String s: ss ) {
             int i= s.indexOf("=");
             if ( i>-1 ) {
-                Pattern p= Pattern.compile("(.*)=getDataSet\\('(.+)'\\)");
+                Pattern p= Pattern.compile("(.+)=getDataSet\\('(.*)'\\)");
                 Matcher m= p.matcher(s);
                 if ( m.matches() ) {
                     ids.add(m.group(1));
