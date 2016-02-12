@@ -375,6 +375,20 @@ public class DataSetURI {
         
     }    
 
+    /**
+     * return a human-readable abbreviation of the URI, limiting to len characters.
+     * @param ssuri
+     * @param len
+     * @return a string of length no more than len characters
+     */
+    public static String abbreviateForHumanComsumption(String ssuri, int len) {
+        if ( ssuri.length()>len ) {
+            return "..." + ssuri.substring(ssuri.length()-len-3);
+        } else {
+            return ssuri;
+        }
+    }
+
     // mark the special case where a resource is actually a folder.
     public static class NonResourceException extends IllegalArgumentException {
 
