@@ -4194,18 +4194,22 @@ private void updateFrameTitle() {
                 }
             } else {
                 String msg;
+                String ssuri= suri;
+                if ( ssuri.length()>80 ) {
+                    ssuri= DataSetURI.abbreviateForHumanComsumption( ssuri, 80 );
+                }
                 if ( app.isExpertMode() ) {
                         msg= String.format(
                         "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
                         + "or replace the current plot with the new URI, possibly entering the editor, <br>"
                         + "or always enter the editor to inspect and insert the plot below.<br>"
-                        + "View in new window, replace, or add plot, using<br>%s?", suri );
+                        + "View in new window, replace, or add plot, using<br>%s?", ssuri );
                 } else {
                         msg= String.format(
                         "<html>Autoplot is already running. Autoplot can use this address in a new window, <br>"
                         + "or replace the current plot with the new URI, possibly entering the editor <br>"
                         + "or always enter the editor to inspect before plotting.<br>"
-                        + "View in new window, replace, or add plot, using<br>%s?", suri );
+                        + "View in new window, replace, or add plot, using<br>%s?", ssuri );
                 }
                 String action = (String) JOptionPane.showInputDialog( ScriptContext.getViewWindow(),
                         msg,
