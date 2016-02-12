@@ -35,12 +35,14 @@ import javax.swing.ListModel;
 import org.das2.util.LoggerManager;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
+import org.python.parser.ast.BinOp;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.Module;
 import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
 import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.exprType;
+import org.virbo.dsops.Ops;
 
 /**
  * GUI for specifying mashups, where a number of 
@@ -202,7 +204,8 @@ public class DataMashUp extends javax.swing.JPanel {
             parent.insert( new DefaultMutableTreeNode(((Name)et).id), i );
         } else if ( et instanceof Num ) {
             parent.insert( new DefaultMutableTreeNode( String.valueOf(((Num)et).n) ),i );
-        } else if ( et instanceof UnaryOp ) {  
+        
+        } else if ( et instanceof UnaryOp ) { // a negative number appears as a unary minus op and positive number.
             exprType et1= ((UnaryOp)et).operand;
             if ( ((UnaryOp)et).op==4 ) {
                 fillTreeExprType( et1, m, parent, i );
@@ -212,7 +215,7 @@ public class DataMashUp extends javax.swing.JPanel {
                 ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject( "+"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
             } else {
                 fillTreeExprType( et1, m, parent, i );
-            }
+            }            
         } else {
             Call call= (Call)et;
             DefaultMutableTreeNode child= new DefaultMutableTreeNode( funcCallName( call ) );
@@ -592,6 +595,25 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jTree1MouseClicked
 
+    /**
+     * add the expression to the scratch list.
+     * @param expression 
+     */
+    private void addToScratch(String expression) {
+        ListModel lm= scratchList.getModel();
+        DefaultListModel dlm;
+        if ( lm instanceof DefaultListModel ) {
+            dlm= (DefaultListModel)lm;
+        } else {
+            dlm= new DefaultListModel();
+            for ( int i=0; i<lm.getSize(); i++ ) {
+                dlm.add(i,lm.getElementAt(i));
+            }
+        }
+        dlm.add( dlm.getSize(), expression );
+        scratchList.setModel(dlm);
+    }
+    
     final DropTargetListener createTreeDropTargetListener() {
         return new DropTargetListener() {
 
@@ -623,6 +645,10 @@ public class DataMashUp extends javax.swing.JPanel {
 
                     TreePath tp= jTree1.getClosestPathForLocation( dtde.getLocation().x, dtde.getLocation().y );
 
+                    DefaultMutableTreeNode n= (DefaultMutableTreeNode)tp.getLastPathComponent();
+                    String old= getJython( (DefaultTreeModel)jTree1.getModel(), n );
+                    addToScratch( old );
+                        
                     doDrop(data,tp);
                     
                 } catch (UnsupportedFlavorException ex) {
@@ -663,18 +689,7 @@ public class DataMashUp extends javax.swing.JPanel {
                 try {
                     String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
 
-                    ListModel lm= scratchList.getModel();
-                    DefaultListModel dlm;
-                    if ( lm instanceof DefaultListModel ) {
-                        dlm= (DefaultListModel)lm;
-                    } else {
-                        dlm= new DefaultListModel();
-                        for ( int i=0; i<lm.getSize(); i++ ) {
-                            dlm.add(i,lm.getElementAt(i));
-                        }
-                    }
-                    dlm.add( dlm.getSize(), data );
-                    scratchList.setModel(dlm);
+                    addToScratch( data );
                     
                 } catch (UnsupportedFlavorException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
