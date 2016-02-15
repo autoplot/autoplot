@@ -8,9 +8,11 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.logging.Logger;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -83,7 +85,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20160203.1109";
+    public static final String version= "v20160215.1043";
 
     static FileHandler handler;
 
@@ -621,7 +623,7 @@ public class SimpleServlet extends HttpServlet {
                     public void paint(Graphics2D g) {
                         g.setFont( ffont );
                         g.setColor( Color.BLUE );
-                        g.drawString( ""+fstamp+" "+ fhost + " " + TimeUtil.now().toString(), 0, 10 );
+                        g.drawString( ""+fstamp+" "+ fhost + " " + TimeUtil.now().toString() + " version: "+version, 0, 10 );
                     }
                 });
             }
@@ -669,6 +671,15 @@ public class SimpleServlet extends HttpServlet {
                         throw new RuntimeException(ioe);
                     }
                 }
+                
+                if ( debug.equals("true") ) {
+                    try (PrintWriter print = new PrintWriter( new File("/tmp/apserver674.txt") )) {
+                        print.print("hi there\n");
+                        print.print("color: "+ dom.getPlotElements(0).getStyle().getColor()+"\n");
+                    }
+                    StatePersistence.saveState( new File( "/tmp/apserver.vap" ), dom );
+                }
+                
             } else if (format.equals("application/pdf")) {
                 logit("do prepareForOutput", t0, uniq, debug);
                 appmodel.canvas.prepareForOutput(width, height);
