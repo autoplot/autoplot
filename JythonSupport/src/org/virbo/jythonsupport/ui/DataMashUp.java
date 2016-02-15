@@ -1,6 +1,7 @@
 
 package org.virbo.jythonsupport.ui;
 
+import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -13,6 +14,7 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -24,6 +26,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -31,7 +34,9 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JTree;
 import javax.swing.ListModel;
+import javax.swing.tree.TreeCellRenderer;
 import org.das2.util.LoggerManager;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
@@ -42,6 +47,7 @@ import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
 import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.exprType;
+import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 
 /**
@@ -256,6 +262,17 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }
     
+    public interface Resolver {
+        QDataSet getDataSet( String uri );
+        BufferedImage getImage( QDataSet qds );
+    }
+    
+    private Resolver resolver;
+    
+    public void setResolver( Resolver r ) {
+        this.resolver= r;
+    }
+    
     private void fillTree( String expr ) {
         Module n= (Module)org.python.core.parser.parse( "x="+expr, "exec" );
         
@@ -276,6 +293,18 @@ public class DataMashUp extends javax.swing.JPanel {
                     fillTreeCall( c, model, root );
                 }
             }
+            jTree1.setCellRenderer( new TreeCellRenderer() {
+                @Override
+                public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                    String s= value.toString();
+                    if ( resolver!=null ) {
+                        QDataSet ds= resolver.getDataSet( getAsJythonInline() );
+                        if ( ds!=null ) s= s + " " +ds.toString();
+                    }
+                    return new JLabel( s );
+                }
+            });
+            
             jTree1.setModel(model);
             for (int i = 0; i < jTree1.getRowCount(); i++) {
                 jTree1.expandRow(i);
