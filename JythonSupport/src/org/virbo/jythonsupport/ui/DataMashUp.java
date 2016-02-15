@@ -273,6 +273,20 @@ public class DataMashUp extends javax.swing.JPanel {
         this.resolver= r;
     }
     
+    private TreeCellRenderer getCellRenderer( ) {
+        return new TreeCellRenderer() {
+            @Override
+            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                String s= value.toString();
+                if ( resolver!=null ) {
+                    //QDataSet ds= resolver.getDataSet( getAsJythonInline() );
+                    //if ( ds!=null ) s= s + " " +ds.toString();
+                }
+                return new JLabel( s );
+            }
+        };     
+    }
+    
     private void fillTree( String expr ) {
         Module n= (Module)org.python.core.parser.parse( "x="+expr, "exec" );
         
@@ -280,6 +294,7 @@ public class DataMashUp extends javax.swing.JPanel {
         if ( assign.value instanceof Name ) {
             DefaultMutableTreeNode root= new DefaultMutableTreeNode( ((Name)assign.value).id );
             DefaultTreeModel model= new DefaultTreeModel( root );
+            jTree1.setCellRenderer( getCellRenderer() );
             jTree1.setModel(model);
         } else {
             DefaultMutableTreeNode root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
@@ -293,17 +308,7 @@ public class DataMashUp extends javax.swing.JPanel {
                     fillTreeCall( c, model, root );
                 }
             }
-            jTree1.setCellRenderer( new TreeCellRenderer() {
-                @Override
-                public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                    String s= value.toString();
-                    if ( resolver!=null ) {
-                        QDataSet ds= resolver.getDataSet( getAsJythonInline() );
-                        if ( ds!=null ) s= s + " " +ds.toString();
-                    }
-                    return new JLabel( s );
-                }
-            });
+            jTree1.setCellRenderer( getCellRenderer() );
             
             jTree1.setModel(model);
             for (int i = 0; i < jTree1.getRowCount(); i++) {
