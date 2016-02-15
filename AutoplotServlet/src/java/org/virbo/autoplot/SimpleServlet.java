@@ -85,7 +85,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20160215.1043";
+    public static final String version= "v20160215.1118";
 
     static FileHandler handler;
 
@@ -593,6 +593,9 @@ public class SimpleServlet extends HttpServlet {
 
             if (!scolor.equals("")) {
                 dom.getController().getPlotElement().getStyle().setColor(Color.decode(scolor));
+                for ( PlotElement pe: dom.getPlotElements() ) { // bug where Bob saw red
+                    pe.getStyle().setColor(Color.decode(scolor));
+                }
             }
 
             if (!sfillColor.equals("")) {
