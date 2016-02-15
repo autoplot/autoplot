@@ -85,7 +85,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20160215.1118";
+    public static final String version= "v20160215.1130";
 
     static FileHandler handler;
 
@@ -675,11 +675,8 @@ public class SimpleServlet extends HttpServlet {
                     }
                 }
                 
-                if ( debug.equals("true") ) {
-                    try (PrintWriter print = new PrintWriter( new File("/tmp/apserver674.txt") )) {
-                        print.print("hi there\n");
-                        print.print("color: "+ dom.getPlotElements(0).getStyle().getColor()+"\n");
-                    }
+                if ( !"false".equals(debug) ) {
+                    logit("vap file written to /tmp/apserver.vap", t0, uniq, debug);
                     StatePersistence.saveState( new File( "/tmp/apserver.vap" ), dom );
                 }
                 
