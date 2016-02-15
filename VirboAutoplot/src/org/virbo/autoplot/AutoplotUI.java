@@ -43,6 +43,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -153,6 +154,7 @@ import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.DataSetAnnotations;
+import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
@@ -3935,6 +3937,23 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
             uri= "vap+inline:ds=getDataSet('"+uri+"')";
         }
         DataMashUp dm= new DataMashUp();
+        dm.setResolver( new DataMashUp.Resolver() {
+            @Override
+            public QDataSet getDataSet(String uri) {
+                try {
+                    return DataSetURI.getDataSource(uri).getDataSet( new NullProgressMonitor() );
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            public BufferedImage getImage(QDataSet qds) {
+                return AutoplotUtil.createImage( qds, 60, 30 );
+            }
+        });
+        
         dm.setAsJythonInline(uri);
         if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, dm, "Data Mash Up", JOptionPane.OK_CANCEL_OPTION ) ) {
             dom.getController().getDataSourceFilter().setUri( dm.getAsJythonInline() );
