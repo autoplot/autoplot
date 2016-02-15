@@ -291,6 +291,20 @@ public class AutoplotUtil {
         return result;
     }
         
+    /**
+     * experiment to see if we can get an image of a dataset.
+     * @param ds
+     * @param width
+     * @param height
+     * @return the image
+     * TODO: test me!
+     */
+    public static BufferedImage createImage( QDataSet ds, int width, int height ) {
+        DasCanvas c= new DasCanvas( width, height );
+        createPlot( c, ds, null, null );
+        BufferedImage im= c.getImage( width, height );
+        return im;
+    }
         
     /**
      * Create a dasPlot that can be useful to scripts.
