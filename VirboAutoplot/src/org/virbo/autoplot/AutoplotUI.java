@@ -3950,7 +3950,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
 
             @Override
             public BufferedImage getImage(QDataSet qds) {
-                return AutoplotUtil.createImage( qds, 60, 30 );
+                return AutoplotUtil.createImage( qds, 120, 60 );
             }
         });
         
