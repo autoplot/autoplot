@@ -1,7 +1,11 @@
 
 package org.virbo.jythonsupport.ui;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -19,13 +23,18 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TooManyListenersException;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -37,6 +46,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
+import org.das2.datum.EnumerationUnits;
 import org.das2.util.LoggerManager;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
@@ -47,6 +58,7 @@ import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
 import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.exprType;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 
@@ -205,6 +217,22 @@ public class DataMashUp extends javax.swing.JPanel {
         
     }
     
+    /**
+     * return the jython for just the node.
+     * @param tn
+     * @return 
+     */
+    public String getAsJythonInline( TreeNode tn ) {
+        StringBuilder b= new StringBuilder("vap+inline:");
+        b.append( namedURIListTool1.getAsJythonInline() );
+        
+        DefaultTreeModel m= (DefaultTreeModel) jTree1.getModel();
+        
+        b.append( getJython( m, tn ) );
+        
+        return b.toString();
+    }
+    
     private void fillTreeExprType( exprType et, DefaultTreeModel m, MutableTreeNode parent, int i ) {
         if ( et instanceof Name ) {
             parent.insert( new DefaultMutableTreeNode(((Name)et).id), i );
@@ -273,16 +301,122 @@ public class DataMashUp extends javax.swing.JPanel {
         this.resolver= r;
     }
     
+    final Map<TreeNode,QDataSet> resolved= new HashMap();
+    final Map<QDataSet,BufferedImage> imaged= new HashMap();
+    
+    /**
+     * implement a cache to get the dataset from the node.
+     * @param value the node
+     * @return the dataset at this node.
+     */
+    private QDataSet getDataSet( final TreeNode value ) {
+        
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            QDataSet have= resolved.get(value);
+            if ( have==null ) {
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        QDataSet have= getDataSet( value );
+                        resolved.put( value, have );
+                        jTree1.treeDidChange();
+                    }
+                };
+                new Thread(run).start();
+            }
+            return have;
+            
+        } else {
+            synchronized ( resolved ) {
+                QDataSet have= resolved.get(value);
+                if ( have==null ) {
+                    have= resolver.getDataSet( getAsJythonInline( value ) );
+                    resolved.put( value, have );
+                    jTree1.treeDidChange();
+                }
+                return have;
+            }
+        }
+        
+    }
+    
+    private BufferedImage getImage( final QDataSet qds  ) {
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            BufferedImage have= imaged.get(qds);
+            if ( have==null ) {
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        BufferedImage im= imaged.get(qds);
+                        if ( im==null ) {
+                            if ( qds!=null ) {
+                                im= resolver.getImage( qds );
+                                Graphics g= im.getGraphics();
+                                g.setColor(Color.lightGray);
+                                g.drawRect(0,0,im.getWidth()-1,im.getHeight()-1);
+                                imaged.put( qds, im );
+                                jTree1.treeDidChange();
+                            }
+                        }
+                    }
+                };
+                new Thread(run).start();
+            }
+            return imaged.get(qds);
+            
+        } else {
+            synchronized ( imaged ) {
+                BufferedImage im= imaged.get(qds);
+                if ( im==null ) {
+                    if ( qds!=null ) {
+                        im= resolver.getImage( qds );
+                        Graphics g= im.getGraphics();
+                        g.setColor(Color.lightGray);
+                        g.drawRect(0,0,im.getWidth()-1,im.getHeight()-1);
+                        imaged.put( qds, im );
+                        jTree1.treeDidChange();
+                    }
+                }
+                return im;
+            }
+        }
+    }
+    
     private TreeCellRenderer getCellRenderer( ) {
         return new TreeCellRenderer() {
             @Override
             public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 String s= value.toString();
+                Icon icon=null;
                 if ( resolver!=null ) {
-                    //QDataSet ds= resolver.getDataSet( getAsJythonInline() );
-                    //if ( ds!=null ) s= s + " " +ds.toString();
+                    QDataSet ds= getDataSet( (TreeNode)value );
+                    if ( ds!=null ) {
+                        s= s + " " +ds.toString();
+                        BufferedImage im= getImage( ds );
+                        if ( im!=null ) {
+                            icon= new ImageIcon(im);
+                        }
+                    }
+                    
                 }
-                return new JLabel( s );
+                JLabel result= new JLabel( s );
+                if ( icon!=null ) {
+                    result.setIcon(icon);
+                    Dimension d= new Dimension( icon.getIconWidth(), icon.getIconHeight() );
+                    result.setMinimumSize(d);
+                    result.setPreferredSize( new Dimension( 300, icon.getIconHeight() ) );
+                } else {
+                    BufferedImage im= new BufferedImage(60,60,BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D g= (Graphics2D)im.getGraphics();
+                    g.setColor(Color.lightGray);
+                    g.drawRect( 0,0, im.getWidth()-1, im.getHeight()-1 );
+                    result.setIcon( new ImageIcon(im) );
+                    Dimension d= new Dimension( 60, 60 );
+                    result.setMinimumSize(d);
+                    result.setPreferredSize( new Dimension( 300, 60 ) );
+                }
+                
+                return result;
             }
         };     
     }
@@ -466,6 +600,7 @@ public class DataMashUp extends javax.swing.JPanel {
         scratchList = new javax.swing.JList();
         jPanel4 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
+        jScrollPane6 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
@@ -566,21 +701,21 @@ public class DataMashUp extends javax.swing.JPanel {
                 jTree1MouseClicked(evt);
             }
         });
+        jScrollPane6.setViewportView(jTree1);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
-            .addComponent(jTree1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane6)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTree1, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
-                .addGap(0, 0, 0))
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE))
         );
 
         jSplitPane2.setRightComponent(jPanel4);
@@ -682,7 +817,7 @@ public class DataMashUp extends javax.swing.JPanel {
                     DefaultMutableTreeNode n= (DefaultMutableTreeNode)tp.getLastPathComponent();
                     String old= getJython( (DefaultTreeModel)jTree1.getModel(), n );
                     addToScratch( old );
-                        
+
                     doDrop(data,tp);
                     
                 } catch (UnsupportedFlavorException ex) {
@@ -765,6 +900,19 @@ public class DataMashUp extends javax.swing.JPanel {
     
     public static void main( String[] args ) {
         DataMashUp dmu= new DataMashUp();
+        dmu.setResolver( new Resolver() {
+            EnumerationUnits eu= new EnumerationUnits("foo");
+            @Override
+            public QDataSet getDataSet(String uri) {
+                return DataSetUtil.asDataSet( eu.createDatum(uri) );
+            }
+            @Override
+            public BufferedImage getImage(QDataSet qds) {
+                BufferedImage result= new BufferedImage(64,64,BufferedImage.TYPE_4BYTE_ABGR);
+                result.getGraphics().drawString( eu.createDatum(qds.value()).toString(), 2, 40 );
+                return result;
+            }
+        });
         dmu.fillTree("add(a,b)");
         JOptionPane.showConfirmDialog( null, dmu );
         System.err.println( dmu.getAsJythonInline() );
@@ -787,6 +935,7 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
