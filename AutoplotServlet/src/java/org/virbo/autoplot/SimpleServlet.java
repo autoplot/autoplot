@@ -8,14 +8,11 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.logging.Logger;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,7 +48,6 @@ import org.das2.util.FileUtil;
 import org.das2.util.TimerConsoleFormatter;
 import org.das2.util.awt.GraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
-import static org.virbo.autoplot.ServletUtil.getServletHome;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.DataSourceFilter;
@@ -99,9 +95,7 @@ public class SimpleServlet extends HttpServlet {
             DasLogger.addHandlerToAll(h);
             if (handler != null) handler.close();
             handler = h;
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (SecurityException ex) {
+        } catch (IOException | SecurityException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
@@ -130,9 +124,7 @@ public class SimpleServlet extends HttpServlet {
                                 return true;
                             }
                         }
-                    } catch (IllegalArgumentException ex) {
-                        Logger.getLogger(SimpleServlet.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (URISyntaxException ex) {
+                    } catch (IllegalArgumentException | URISyntaxException ex) {
                         Logger.getLogger(SimpleServlet.class.getName()).log(Level.SEVERE, null, ex);
                     }                    
                 }
@@ -318,26 +310,26 @@ public class SimpleServlet extends HttpServlet {
             if (vap != null) {
                 response.setContentType(format);
             } else if ( suri==null ) {
-                OutputStream out = response.getOutputStream();
-                response.setContentType("text/html");
-                response.setStatus(400);
-                out.write(("Either vap= or url= needs to be specified:<br>"+request.getRequestURI()+"?"+request.getQueryString()).getBytes());
-                out.close();
+                try (OutputStream out = response.getOutputStream()) {
+                    response.setContentType("text/html");
+                    response.setStatus(400);
+                    out.write(("Either vap= or url= needs to be specified:<br>"+request.getRequestURI()+"?"+request.getQueryString()).getBytes());
+                }
                 return;
             } else if (suri.equals("about:plugins")) {
-                OutputStream out = response.getOutputStream();
-                response.setContentType("text/html");
-                out.write(DataSetSelectorSupport.getPluginsText().getBytes());
-                out.close();
+                try (OutputStream out = response.getOutputStream()) {
+                    response.setContentType("text/html");
+                    out.write(DataSetSelectorSupport.getPluginsText().getBytes());
+                }
                 return;
             } else if (suri.equals("about:autoplot")) {
-                OutputStream out = response.getOutputStream();
-                response.setContentType("text/html");
-                String s = AboutUtil.getAboutHtml();
-                s = s.substring(0, s.length() - 7);
-                s = s + "<br><br>servlet version="+version+"<br></html>";
-                out.write(s.getBytes());
-                out.close();
+                try (OutputStream out = response.getOutputStream()) {
+                    response.setContentType("text/html");
+                    String s = AboutUtil.getAboutHtml();
+                    s = s.substring(0, s.length() - 7);
+                    s = s + "<br><br>servlet version="+version+"<br></html>";
+                    out.write(s.getBytes());
+                }
                 return;
             } else {
                 response.setContentType(format);
@@ -488,7 +480,7 @@ public class SimpleServlet extends HttpServlet {
                 try {
                     dsource = DataSetURI.getDataSource(suri);
                     DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.getURI(suri),new NullProgressMonitor());
-                    List<String> problems= new ArrayList<String>(1);
+                    List<String> problems= new ArrayList<>(1);
                     if ( dsf.reject(suri, problems, new NullProgressMonitor() )) {
                         if ( problems.isEmpty() ) {
                             // no explanation provided.
@@ -519,13 +511,17 @@ public class SimpleServlet extends HttpServlet {
                 if (!process.equals("")) {
                     QDataSet r = dsource.getDataSet(new NullProgressMonitor());
                     logit("done with read", t0, uniq, debug);
-                    if (process.equals("histogram")) {
-                        appmodel.setDataSet(Ops.histogram(r, 100));
-                    } else if (process.equals("magnitude(fft)")) {
-                        r = Ops.magnitude(Ops.fft(r));
-                        appmodel.setDataSet(r);
-                    } else if (process.equals("nop")) {
-                        appmodel.setDataSet(r);
+                    switch (process) {
+                        case "histogram":
+                            appmodel.setDataSet(Ops.histogram(r, 100));
+                            break;
+                        case "magnitude(fft)":
+                            r = Ops.magnitude(Ops.fft(r));
+                            appmodel.setDataSet(r);
+                            break;
+                        case "nop":
+                            appmodel.setDataSet(r);
+                            break;
                     }
                     logit("done with process", t0, uniq, debug);
                 } else {
@@ -650,6 +646,7 @@ public class SimpleServlet extends HttpServlet {
                 final Font ffont= Font.decode("sans-4-italic");
                 final String fhost= host;
                 dom.getController().getCanvas().getController().getDasCanvas().addTopDecorator( new Painter() {
+                    @Override
                     public void paint(Graphics2D g) {
                         g.setFont( ffont );
                         g.setColor( Color.BLUE );
@@ -682,52 +679,50 @@ public class SimpleServlet extends HttpServlet {
                 //response.setStatus( 400 );
             }
             
-            OutputStream out = response.getOutputStream();
-            
-            if (format.equals("image/png")) {
-                
-                logger.log(Level.FINE, "time to create image: {0} ms", ( System.currentTimeMillis()-t0 ));
-                
-                try {
-                    appmodel.canvas.writeToPng( out, width, height );
+            try (OutputStream out = response.getOutputStream()) {
+                if (format.equals("image/png")) {
                     
-                } catch (IOException ioe) {
-                    logger.log( Level.SEVERE, ioe.toString(), ioe );
+                    logger.log(Level.FINE, "time to create image: {0} ms", ( System.currentTimeMillis()-t0 ));
                     
-                } finally {
                     try {
-                        out.close();
+                        appmodel.canvas.writeToPng( out, width, height );
+                        
                     } catch (IOException ioe) {
-                        throw new RuntimeException(ioe);
+                        logger.log( Level.SEVERE, ioe.toString(), ioe );
+                        
+                    } finally {
+                        try {
+                            out.close();
+                        } catch (IOException ioe) {
+                            throw new RuntimeException(ioe);
+                        }
                     }
+                    
+                    if ( !"false".equals(debug) ) {
+                        logit("vap file written to /tmp/apserver.vap", t0, uniq, debug);
+                        StatePersistence.saveState( new File( "/tmp/apserver.vap" ), dom );
+                    }
+                    
+                } else if (format.equals("application/pdf")) {
+                    logit("do prepareForOutput", t0, uniq, debug);
+                    appmodel.canvas.prepareForOutput(width, height);
+                    logit("done with prepareForOutput", t0, uniq, debug);
+                    GraphicsOutput go = new org.das2.util.awt.PdfGraphicsOutput();
+                    
+                    appmodel.canvas.writeToGraphicsOutput(out, go);
+                    logit("done with write to output", t0, uniq, debug);
+                } else if (format.equals("image/svg+xml")) {
+                    logit("do prepareForOutput...", t0, uniq, debug);
+                    appmodel.canvas.prepareForOutput(width, height);
+                    logit("done with prepareForOutput", t0, uniq, debug);
+                    GraphicsOutput go = new org.das2.util.awt.SvgGraphicsOutput();
+                    
+                    appmodel.canvas.writeToGraphicsOutput(out, go);
+                    logit("done with write to output", t0, uniq, debug);
+                } else {
+                    throw new ServletException("format must be image/png, application/pdf, or image/svg+xml");
                 }
-                
-                if ( !"false".equals(debug) ) {
-                    logit("vap file written to /tmp/apserver.vap", t0, uniq, debug);
-                    StatePersistence.saveState( new File( "/tmp/apserver.vap" ), dom );
-                }
-                
-            } else if (format.equals("application/pdf")) {
-                logit("do prepareForOutput", t0, uniq, debug);
-                appmodel.canvas.prepareForOutput(width, height);
-                logit("done with prepareForOutput", t0, uniq, debug);
-                GraphicsOutput go = new org.das2.util.awt.PdfGraphicsOutput();
-
-                appmodel.canvas.writeToGraphicsOutput(out, go);
-                logit("done with write to output", t0, uniq, debug);
-            } else if (format.equals("image/svg+xml")) {
-                logit("do prepareForOutput...", t0, uniq, debug);
-                appmodel.canvas.prepareForOutput(width, height);
-                logit("done with prepareForOutput", t0, uniq, debug);
-                GraphicsOutput go = new org.das2.util.awt.SvgGraphicsOutput();
-
-                appmodel.canvas.writeToGraphicsOutput(out, go);
-                logit("done with write to output", t0, uniq, debug);
-            } else {
-                throw new ServletException("format must be image/png, application/pdf, or image/svg+xml");
             }
-
-            out.close();
             logit("done with request", t0, uniq, debug);
 
         } catch (Exception e) {
