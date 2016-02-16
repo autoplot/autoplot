@@ -58,7 +58,7 @@ public class NamedURIListTool extends JPanel {
      */
     List<String> ids=null;
     
-    DataMashUp dmu;
+    DataMashUp dataMashUp;
     
     public NamedURIListTool( ) {
         scrollPane = new javax.swing.JScrollPane();
@@ -110,7 +110,7 @@ public class NamedURIListTool extends JPanel {
      * @param dmu 
      */
     public void setDataMashUp( DataMashUp dmu ) {
-        this.dmu= dmu;
+        this.dataMashUp= dmu;
     }
     
     /** make up a name that does not exist in the list of names.
@@ -246,7 +246,7 @@ public class NamedURIListTool extends JPanel {
     
     private void doVariableRename( int fi, String oldName, String newName ) {
         ids.set( fi, newName );        
-        if ( dmu!=null ) dmu.rename( oldName, newName );
+        if ( dataMashUp!=null ) dataMashUp.rename( oldName, newName );
     }
     
     /**
