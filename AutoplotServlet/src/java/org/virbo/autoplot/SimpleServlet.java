@@ -680,47 +680,48 @@ public class SimpleServlet extends HttpServlet {
             }
             
             try (OutputStream out = response.getOutputStream()) {
-                if (format.equals("image/png")) {
-                    
-                    logger.log(Level.FINE, "time to create image: {0} ms", ( System.currentTimeMillis()-t0 ));
-                    
-                    try {
-                        appmodel.canvas.writeToPng( out, width, height );
-                        
-                    } catch (IOException ioe) {
-                        logger.log( Level.SEVERE, ioe.toString(), ioe );
-                        
-                    } finally {
+                switch (format) {
+                    case "image/png":
+                        logger.log(Level.FINE, "time to create image: {0} ms", ( System.currentTimeMillis()-t0 ));
                         try {
-                            out.close();
+                            appmodel.canvas.writeToPng( out, width, height );
+                            
                         } catch (IOException ioe) {
-                            throw new RuntimeException(ioe);
+                            logger.log( Level.SEVERE, ioe.toString(), ioe );
+                            
+                        } finally {
+                            try {
+                                out.close();
+                            } catch (IOException ioe) {
+                                throw new RuntimeException(ioe);
+                            }
+                        }   
+                        if ( !"false".equals(debug) ) {
+                            logit("vap file written to /tmp/apserver.vap", t0, uniq, debug);
+                            StatePersistence.saveState( new File( "/tmp/apserver.vap" ), dom );
                         }
-                    }
-                    
-                    if ( !"false".equals(debug) ) {
-                        logit("vap file written to /tmp/apserver.vap", t0, uniq, debug);
-                        StatePersistence.saveState( new File( "/tmp/apserver.vap" ), dom );
-                    }
-                    
-                } else if (format.equals("application/pdf")) {
-                    logit("do prepareForOutput", t0, uniq, debug);
-                    appmodel.canvas.prepareForOutput(width, height);
-                    logit("done with prepareForOutput", t0, uniq, debug);
-                    GraphicsOutput go = new org.das2.util.awt.PdfGraphicsOutput();
-                    
-                    appmodel.canvas.writeToGraphicsOutput(out, go);
-                    logit("done with write to output", t0, uniq, debug);
-                } else if (format.equals("image/svg+xml")) {
-                    logit("do prepareForOutput...", t0, uniq, debug);
-                    appmodel.canvas.prepareForOutput(width, height);
-                    logit("done with prepareForOutput", t0, uniq, debug);
-                    GraphicsOutput go = new org.das2.util.awt.SvgGraphicsOutput();
-                    
-                    appmodel.canvas.writeToGraphicsOutput(out, go);
-                    logit("done with write to output", t0, uniq, debug);
-                } else {
-                    throw new ServletException("format must be image/png, application/pdf, or image/svg+xml");
+                        break;
+                        
+                    case "application/pdf":  
+                        logit("do prepareForOutput", t0, uniq, debug);
+                        appmodel.canvas.prepareForOutput(width, height);
+                        logit("done with prepareForOutput", t0, uniq, debug);
+                        GraphicsOutput go = new org.das2.util.awt.PdfGraphicsOutput();
+                        appmodel.canvas.writeToGraphicsOutput(out, go);
+                        logit("done with write to output", t0, uniq, debug);
+                        break;
+                        
+                    case "image/svg+xml":
+                        logit("do prepareForOutput...", t0, uniq, debug);
+                        appmodel.canvas.prepareForOutput(width, height);
+                        logit("done with prepareForOutput", t0, uniq, debug);
+                        GraphicsOutput gos = new org.das2.util.awt.SvgGraphicsOutput();
+                        appmodel.canvas.writeToGraphicsOutput(out, gos);
+                        logit("done with write to output", t0, uniq, debug);
+                        break;
+                        
+                    default:
+                        throw new ServletException("format must be image/png, application/pdf, or image/svg+xml");
                 }
             }
             logit("done with request", t0, uniq, debug);
