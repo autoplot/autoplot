@@ -391,7 +391,7 @@ public class DataMashUp extends javax.swing.JPanel {
                 if ( resolver!=null ) {
                     QDataSet ds= getDataSet( (TreeNode)value );
                     if ( ds!=null ) {
-                        s= s + " " +ds.toString();
+                        s= "<html>" + s + " <span color='gray'>" +ds.toString() + "</span>";
                         BufferedImage im= getImage( ds );
                         if ( im!=null ) {
                             icon= new ImageIcon(im);
@@ -404,16 +404,18 @@ public class DataMashUp extends javax.swing.JPanel {
                     result.setIcon(icon);
                     Dimension d= new Dimension( icon.getIconWidth(), icon.getIconHeight() );
                     result.setMinimumSize(d);
-                    result.setPreferredSize( new Dimension( 300, icon.getIconHeight() ) );
+                    result.setPreferredSize( new Dimension( 600, icon.getIconHeight() ) );
                 } else {
-                    BufferedImage im= new BufferedImage(60,60,BufferedImage.TYPE_INT_ARGB);
-                    Graphics2D g= (Graphics2D)im.getGraphics();
-                    g.setColor(Color.lightGray);
-                    g.drawRect( 0,0, im.getWidth()-1, im.getHeight()-1 );
-                    result.setIcon( new ImageIcon(im) );
-                    Dimension d= new Dimension( 60, 60 );
-                    result.setMinimumSize(d);
-                    result.setPreferredSize( new Dimension( 300, 60 ) );
+                    if ( resolver!=null ) {
+                        BufferedImage im= new BufferedImage(60,60,BufferedImage.TYPE_INT_ARGB);
+                        Graphics2D g= (Graphics2D)im.getGraphics();
+                        g.setColor(Color.lightGray);
+                        g.drawRect( 0,0, im.getWidth()-1, im.getHeight()-1 );
+                        result.setIcon( new ImageIcon(im) );
+                        Dimension d= new Dimension( 60, 60 );
+                        result.setMinimumSize(d);
+                        result.setPreferredSize( new Dimension( 600, 60 ) );
+                    }
                 }
                 
                 return result;
