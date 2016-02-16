@@ -39,6 +39,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -292,7 +293,8 @@ public class AutoplotUtil {
     }
         
     /**
-     * experiment to see if we can get an image of a dataset.
+     * experiment to see if we can get an image of a dataset.  
+     * This must be called from off of the event thread.
      * @param ds
      * @param width
      * @param height
@@ -351,7 +353,16 @@ public class AutoplotUtil {
             rend1= new SeriesRenderer();
         }
         
-        if ( cb!=null && RenderTypeUtil.needsColorbar(type) ) cb.setVisible( true );  //okay, only since this is not used.
+        if ( RenderTypeUtil.needsColorbar(type) ) {
+            if ( cb==null ) {
+                cb= new DasColorBar( Datum.create(0), Datum.create(1), false );
+                c.add( cb, row, col.createAttachedColumn( 1.03, 1.07 ) );
+                rend1.setColorBar(cb);
+
+            } else {
+                cb.setVisible( true );  //okay, only since this is not used.
+            }
+        }
 
         try {
             if ( ds!=null ) {
@@ -359,7 +370,9 @@ public class AutoplotUtil {
                 result.getXAxis().setDatumRange( DataSetUtil.asDatumRange( bounds.slice(0) ) );
                 result.getYAxis().setDatumRange( DataSetUtil.asDatumRange( bounds.slice(1) ) );
                 if ( cb!=null ) {
-                    cb.setDatumRange( DataSetUtil.asDatumRange( bounds.slice(2) ) );
+                    QDataSet ss= bounds.slice(2) ;
+                    cb.setDatumRange( DataSetUtil.asDatumRange( ss ) );
+                    cb.setLog( "log".equals( ss.property(QDataSet.SCALE_TYPE) ) );
                 }
             }
         } catch ( Exception ex ) {
@@ -367,6 +380,7 @@ public class AutoplotUtil {
         }
         
         if ( oldRend!=rend1 ) {
+            result.removeRenderer(oldRend);
             result.addRenderer(rend1);
         }
 
