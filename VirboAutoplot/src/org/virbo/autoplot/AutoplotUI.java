@@ -3954,7 +3954,14 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
             }
         });
         
-        dm.setAsJythonInline(uri);
+        try {
+            dm.setAsJythonInline(uri);
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
+            AutoplotUtil.showConfirmDialog( autoMenu, "Mash-ups cannot contain vap+inline data", "Mashup Problem", JOptionPane.OK_OPTION );
+            return;
+        }
+        
         if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, dm, "Data Mash Up", JOptionPane.OK_CANCEL_OPTION ) ) {
             dom.getController().getDataSourceFilter().setUri( dm.getAsJythonInline() );
         }
