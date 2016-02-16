@@ -611,7 +611,22 @@ public class SimpleServlet extends HttpServlet {
             }
 
             if (!sfillColor.equals("")) {
-                dom.getController().getPlotElement().getStyle().setFillColor(Color.decode(sfillColor));
+                String[] sfillColors= sfillColor.split("[,;]"); // allow for comma-delimited list.
+                if ( sfillColors.length==1 ) {
+                    dom.getController().getPlotElement().getStyle().setFillColor(Color.decode(scolor));
+                    for ( PlotElement pe: dom.getPlotElements() ) { // bug where Bob saw red
+                        pe.getStyle().setFillColor(Color.decode(scolor));
+                    }
+                } else {
+                    dom.getController().getPlotElement().getStyle().setFillColor(Color.decode(sfillColors[0]));
+                    int i=0;
+                    for ( PlotElement pe: dom.getPlotElements() ) { 
+                        if ( pe.isActive() ) {
+                            pe.getStyle().setFillColor(Color.decode(sfillColors[i]));
+                            if ( i<sfillColors.length-1 ) i+=1;
+                        }
+                    }
+                }
             }
             if (!sforegroundColor.equals("")) {
                 dom.getOptions().setForeground(Color.decode(sforegroundColor));
