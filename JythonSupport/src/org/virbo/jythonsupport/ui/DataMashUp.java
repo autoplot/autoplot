@@ -150,7 +150,7 @@ public class DataMashUp extends javax.swing.JPanel {
         
         dragSource.createDefaultDragGestureRecognizer( namedURIListTool1, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
 
-        String data = "add(x,y)";
+        String data = "ds";
         TreePath tp= new TreePath( ( (DefaultMutableTreeNode) jTree1.getModel().getRoot() ).getPath() );
         doDrop(data,tp);
     }
