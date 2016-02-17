@@ -904,6 +904,13 @@ public class DomUtil {
         }
     }
 
+    /**
+     * this was made public for but 1520.  This returns a 1-plot dom, but 
+     * this may change.
+     * @param application
+     * @param domPlot
+     * @return 
+     */
     static String getPlotAsString(Application application, Plot domPlot) {
         Application newApp= new Application();
         newApp.setPlots( new Plot[] { domPlot } );
