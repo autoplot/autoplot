@@ -81,7 +81,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20160216.1959";
+    public static final String version= "v20160216.2017";
 
     static FileHandler handler;
 
@@ -609,9 +609,9 @@ public class SimpleServlet extends HttpServlet {
             if (!sfillColor.equals("")) {
                 String[] sfillColors= sfillColor.split("[,;]"); // allow for comma-delimited list.
                 if ( sfillColors.length==1 ) {
-                    dom.getController().getPlotElement().getStyle().setFillColor(Color.decode(scolor));
+                    dom.getController().getPlotElement().getStyle().setFillColor(Color.decode(sfillColor));
                     for ( PlotElement pe: dom.getPlotElements() ) { // bug where Bob saw red
-                        pe.getStyle().setFillColor(Color.decode(scolor));
+                        pe.getStyle().setFillColor(Color.decode(sfillColor));
                     }
                 } else {
                     dom.getController().getPlotElement().getStyle().setFillColor(Color.decode(sfillColors[0]));
