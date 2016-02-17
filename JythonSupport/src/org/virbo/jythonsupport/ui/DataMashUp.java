@@ -558,6 +558,9 @@ public class DataMashUp extends javax.swing.JPanel {
             @Override
             public void run() {
                 jTree1.expandPath(tp);
+                imaged.clear();
+                resolved.clear();
+                jTree1.treeDidChange();
             }
         });        
     }
