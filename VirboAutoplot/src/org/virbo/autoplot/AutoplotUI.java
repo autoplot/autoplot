@@ -5608,5 +5608,20 @@ APSplash.checkTime("init 240");
             new Thread( run ).start();
        }
     }
-
+//
+//    /**
+//     * temporary to debug https://sourceforge.net/p/autoplot/bugs/1520/
+//     * @return 
+//     */
+//    public JLabel getStatusLabel() {
+//        return statusLabel;
+//    }
+//    
+//    /**
+//     * temporary to debug https://sourceforge.net/p/autoplot/bugs/1520/
+//     * @return 
+//     */
+//    public javax.swing.JTextField getStatusTextField() {
+//        return statusTextField;
+//    }
 }
