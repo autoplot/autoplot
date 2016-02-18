@@ -298,6 +298,7 @@ public class DataMashUp extends javax.swing.JPanel {
     private Resolver resolver;
     
     public void setResolver( Resolver r ) {
+        this.jTree1.setRowHeight(0);
         this.resolver= r;
     }
     
@@ -330,9 +331,13 @@ public class DataMashUp extends javax.swing.JPanel {
             synchronized ( resolved ) {
                 QDataSet have= resolved.get(value);
                 if ( have==null ) {
-                    have= resolver.getDataSet( getAsJythonInline( value ) );
+                    String jythonSrc= getAsJythonInline( value );
+                    logger.log(Level.FINE, "resolving {0}", jythonSrc );
+                    long t0= System.currentTimeMillis();
+                    have= resolver.getDataSet( jythonSrc );
                     resolved.put( value, have );
                     jTree1.treeDidChange();
+                    logger.log(Level.FINE, "resolved in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, jythonSrc });
                 }
                 return have;
             }
@@ -350,11 +355,14 @@ public class DataMashUp extends javax.swing.JPanel {
                         BufferedImage im= imaged.get(qds);
                         if ( im==null ) {
                             if ( qds!=null ) {
+                                logger.log(Level.FINE, "resolving image {0}", qds.toString() );
+                                long t0= System.currentTimeMillis();
                                 im= resolver.getImage( qds );
                                 Graphics g= im.getGraphics();
                                 g.setColor(Color.lightGray);
                                 g.drawRect(0,0,im.getWidth()-1,im.getHeight()-1);
                                 imaged.put( qds, im );
+                                logger.log(Level.FINE, "resolved image in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, qds.toString() } );
                                 jTree1.treeDidChange();
                             }
                         }
