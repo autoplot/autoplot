@@ -1073,6 +1073,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         annotationImpls.remove(c);
         c.getController().removeBindings();
+        c.controller.node= null;
+        c.controller=null;
         
         application.setAnnotations(annotations.toArray(new Annotation[annotations.size()]));
     }
