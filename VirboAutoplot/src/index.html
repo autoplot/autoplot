@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>$v (version) and $x (wildcard) can be used in a URI without $Y (or other time fields) now.
+        <p><small>A bug in the RGB indication is fixed.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -21,8 +21,9 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2016-02-04 r18258):</p>
+        <p>Bugfixes (2016-02-18 r18315):</p>
         <ul>
+            <li>rte 1695465728: single-tab tear off on Mac would result in RTE.</li>
             <li>setDepend0Cadence would not properly set the units</li>
             <li>webstart on Linux/Mint creates a launcher that likes pass in %U when there is no file argument.  -open xx (with any two characters) is now ignored.</li>
             <li>1517: Sebastian's script hangs when calling DataPointRecorder.save</li>
@@ -114,6 +115,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add Units.nT.</li>
+            <li>Autoplot servlet allows multiple colors to be specified for stack of traces.</li>
+            <li>Data Mash up is now accessible from menus.  Improvements to mashup including thumbnails.</li>
             <li>Autoplot servlet experiment with checking for exceptions in the plot and putting them in the response headers.</li>
             <li>472: allow $x to be used in aggregation without time fields.</li>
             <li>About screen includes a bullet explicitly identifying 32bit Java and provides a link to fix this.</li>
