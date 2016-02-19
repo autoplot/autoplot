@@ -315,39 +315,38 @@ public class DataMashUp extends javax.swing.JPanel {
     private QDataSet getDataSet( final TreeNode value ) {
         String jyCommand= getAsJythonInline( value );
         if ( SwingUtilities.isEventDispatchThread() ) {
-            QDataSet have= resolved.get(jyCommand);
-            if ( have==null ) {
-                synchronized ( resolved ) {
-                    if ( resolvePending.containsKey(jyCommand) ) {
-                        return null;
-                    }
-                    Runnable run= new Runnable() {
-                        @Override
-                        public void run() {
-                            getDataSet( value ); // call back on a different thread.
-                            jTree1.treeDidChange();
-                        }
-                    };
+            QDataSet qds= resolved.get(jyCommand);
+            if ( qds==null ) {
+                if ( resolvePending.containsKey(jyCommand) ) { // TODO: locking
+                    return null;
+                } else {
                     resolvePending.put( jyCommand, "" );
-                    new Thread(run).start(); 
                 }
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        getDataSet( value ); // call back on a different thread.
+                        jTree1.treeDidChange();
+                    }
+                };
+                new Thread(run).start(); 
             }
-            return have;
+            return qds;
             
         } else {
             synchronized ( resolved ) {
-                QDataSet have= resolved.get(jyCommand);
-                if ( have==null ) {
+                QDataSet qds= resolved.get(jyCommand);
+                if ( qds==null ) {
                     String jythonSrc= getAsJythonInline( value );
                     logger.log(Level.FINE, "resolving URI {0}", jythonSrc );
                     long t0= System.currentTimeMillis();
-                    have= resolver.getDataSet( jythonSrc );
-                    resolved.put( jyCommand, have );
+                    qds= resolver.getDataSet( jythonSrc );
+                    resolved.put( jyCommand, qds );
                     resolvePending.remove( jyCommand );
                     jTree1.treeDidChange();
-                    logger.log(Level.FINE, "resolved URI in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, jythonSrc });
+                    logger.log(Level.FINE, "done resolving URI in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, jythonSrc });
                 }
-                return have;
+                return qds;
             }
         }
         
@@ -355,37 +354,25 @@ public class DataMashUp extends javax.swing.JPanel {
     
     private BufferedImage getImage( final QDataSet qds  ) {
         if ( SwingUtilities.isEventDispatchThread() ) {
-            BufferedImage have= imaged.get(qds);
-            if ( have==null ) {
-                synchronized ( imaged ) {
-                    if ( imagePending.containsKey(qds) ) {
-                        return null;
-                    }
-                    Runnable run= new Runnable() {
-                        @Override
-                        public void run() {
-                            BufferedImage im= imaged.get(qds);
-                            if ( im==null ) {
-                                if ( qds!=null ) {
-                                    logger.log(Level.FINE, "rendering dataset {0}", qds.toString() );
-                                    long t0= System.currentTimeMillis();
-                                    im= resolver.getImage( qds );
-                                    Graphics g= im.getGraphics();
-                                    g.setColor(Color.lightGray);
-                                    g.drawRect(0,0,im.getWidth()-1,im.getHeight()-1);
-                                    imaged.put( qds, im );
-                                    logger.log(Level.FINE, "done rendering dataset in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, qds.toString() } );
-                                    jTree1.treeDidChange();
-
-                                }
-                            }
-                        }
-                    };
-                    imagePending.put( qds, "" );
-                    new Thread(run).start();
+            BufferedImage im= imaged.get(qds);
+            if ( im==null ) {
+                if ( imagePending.containsKey(qds) ) { // TODO: locking
+                    return null;
+                } else {
+                    imagePending.put( qds, "" );                    
                 }
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        if ( qds!=null ) {
+                            getImage( qds );
+                            jTree1.treeDidChange();
+                        }
+                    }
+                };
+                new Thread(run).start();
             }
-            return imaged.get(qds);
+            return im;
             
         } else {
             synchronized ( imaged ) {
