@@ -282,9 +282,9 @@ public class AutoplotUtil {
            Units u= (Units) result.property(QDataSet.UNITS,i);
            if ( u!=null ) {
                DatumRange dr= DatumRange.newDatumRange( result.value(i,0), result.value(i,1), u );
-               System.err.println( ""+i+": "+ dr );
+               logger.log(Level.FINER, "{0}: {1}", new Object[]{i, dr});
            } else {
-               System.err.println( ""+i+": "+ result.value(i,0) + "," + result.value(i,1) );
+               logger.log(Level.FINER, "{0}: {1},{2}", new Object[]{i, result.value(i,0), result.value(i,1)});
            }
            
         }
