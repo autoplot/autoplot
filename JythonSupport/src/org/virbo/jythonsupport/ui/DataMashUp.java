@@ -19,15 +19,12 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TooManyListenersException;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -51,7 +48,6 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.util.LoggerManager;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
-import org.python.parser.ast.BinOp;
 import org.python.parser.ast.Call;
 import org.python.parser.ast.Module;
 import org.python.parser.ast.Name;
@@ -60,7 +56,6 @@ import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.exprType;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
 
 /**
  * GUI for specifying mashups, where a number of 
@@ -71,6 +66,8 @@ import org.virbo.dsops.Ops;
 public class DataMashUp extends javax.swing.JPanel {
 
     private static final Logger logger = LoggerManager.getLogger("jython.dashup");
+
+    private static final String LABEL_DIRECTIONS = "Double-click on the name to set the data set.  Triple click for popup plot.";
     
     /**
      * set the list of URIs.  
@@ -304,11 +301,13 @@ public class DataMashUp extends javax.swing.JPanel {
     public interface Resolver {
         QDataSet getDataSet( String uri );
         BufferedImage getImage( QDataSet qds );
+        void interactivePlot( QDataSet qds );
     }
     
     private Resolver resolver;
     
     public void setResolver( Resolver r ) {
+        this.directionsLabel.setText(LABEL_DIRECTIONS);
         this.jTree1.setRowHeight(0);
         this.resolver= r;
     }
@@ -636,7 +635,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jScrollPane5 = new javax.swing.JScrollPane();
         scratchList = new javax.swing.JList();
         jPanel4 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        directionsLabel = new javax.swing.JLabel();
         jScrollPane6 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -731,7 +730,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jSplitPane2.setLeftComponent(jTabbedPane1);
 
-        jLabel2.setText("Double-click on the name to set the data set.");
+        directionsLabel.setText("Double-click on the name to set the data set.");
 
         jTree1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -744,13 +743,13 @@ public class DataMashUp extends javax.swing.JPanel {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+            .addComponent(directionsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
             .addComponent(jScrollPane6)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addComponent(jLabel2)
+                .addComponent(directionsLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE))
         );
@@ -787,7 +786,16 @@ public class DataMashUp extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
-        if ( evt.getClickCount()==2 ) {
+        if ( evt.getClickCount()==3 ) {
+            TreePath tp= jTree1.getClosestPathForLocation( evt.getX(), evt.getY() );
+            jTree1.setSelectionPath(tp);
+            String currentId= tp.getLastPathComponent().toString();
+            QDataSet showMe= resolved.get( getAsJythonInline( (TreeNode)jTree1.getSelectionPath().getLastPathComponent() ));
+            if ( showMe!=null ) {
+                resolver.interactivePlot( showMe );
+            }
+
+        } else if ( evt.getClickCount()==2 ) {
             TreePath tp= jTree1.getClosestPathForLocation( evt.getX(), evt.getY() );
             if ( !jTree1.getModel().isLeaf(tp.getLastPathComponent()) ) {
                 return;
@@ -949,6 +957,11 @@ public class DataMashUp extends javax.swing.JPanel {
                 result.getGraphics().drawString( eu.createDatum(qds.value()).toString(), 2, 40 );
                 return result;
             }
+            @Override
+            public void interactivePlot(QDataSet qds) {
+                System.err.println( qds );
+            }
+
         });
         dmu.fillTree("add(a,b)");
         JOptionPane.showConfirmDialog( null, dmu );
@@ -956,8 +969,8 @@ public class DataMashUp extends javax.swing.JPanel {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel directionsLabel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JList jList1;
     private javax.swing.JList jList2;
     private javax.swing.JList jList3;
