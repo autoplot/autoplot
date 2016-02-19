@@ -3943,7 +3943,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
             }
         }
         
-        DataMashUp dm= new DataMashUp();
+        final DataMashUp dm= new DataMashUp();
         dm.setResolver( new DataMashUp.Resolver() {
             @Override
             public QDataSet getDataSet(String uri) {
@@ -3958,6 +3958,13 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
             @Override
             public BufferedImage getImage(QDataSet qds) {
                 return AutoplotUtil.createImage( qds, 120, 60 );
+            }
+            
+            @Override
+            public void interactivePlot( QDataSet qds ) {
+                Window w= SwingUtilities.getWindowAncestor(dm);
+                ApplicationModel model= ScriptContext.newDialogWindow( w, qds.toString() );
+                model.setDataSet( qds );
             }
         });
         
