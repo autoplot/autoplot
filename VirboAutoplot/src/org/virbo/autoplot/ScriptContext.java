@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -250,6 +251,36 @@ public class ScriptContext extends PyJavaInstance {
             window.setLocation( x, y );
         } else {
         }
+    }
+    
+    /**
+     * return a new Autoplot.
+     * @param parent
+     * @param title
+     * @return 
+     */
+    public static synchronized ApplicationModel newDialogWindow( Window parent, final String title ) {
+        final JDialog p= new JDialog(parent,title);
+        ApplicationModel result= new ApplicationModel();
+        result.addDasPeersToApp();
+        if ( !DasApplication.getDefaultApplication().isHeadless() ) {
+            p.getContentPane().add(result.canvas);
+            p.pack();
+            p.setVisible(true);
+        }
+        result.setResizeRequestListener( new ResizeRequestListener() {
+            @Override
+            public double resize(int width, int height) {
+                if ( p!=null ) {
+                    Dimension windowDimension= p.getSize();
+                    Dimension canvasDimension= model.canvas.getSize();        
+                    p.setSize( width + ( windowDimension.width - canvasDimension.width ), height +  ( windowDimension.height - canvasDimension.height ) ); 
+                }
+                model.canvas.setSize(width,height);
+                return 1.;
+            }                
+        } );
+        return result;
     }
     
     /**
