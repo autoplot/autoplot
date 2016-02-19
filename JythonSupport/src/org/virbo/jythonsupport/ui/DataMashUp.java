@@ -317,10 +317,12 @@ public class DataMashUp extends javax.swing.JPanel {
         if ( SwingUtilities.isEventDispatchThread() ) {
             QDataSet qds= resolved.get(jyCommand);
             if ( qds==null ) {
-                if ( resolvePending.containsKey(jyCommand) ) { // TODO: locking
-                    return null;
-                } else {
-                    resolvePending.put( jyCommand, "" );
+                synchronized ( resolvePending ) {
+                    if ( resolvePending.containsKey(jyCommand) ) { // TODO: locking
+                        return null;
+                    } else {
+                        resolvePending.put( jyCommand, "" );
+                    }
                 }
                 Runnable run= new Runnable() {
                     @Override
@@ -356,10 +358,12 @@ public class DataMashUp extends javax.swing.JPanel {
         if ( SwingUtilities.isEventDispatchThread() ) {
             BufferedImage im= imaged.get(qds);
             if ( im==null ) {
-                if ( imagePending.containsKey(qds) ) { // TODO: locking
-                    return null;
-                } else {
-                    imagePending.put( qds, "" );                    
+                synchronized ( imagePending ) {
+                    if ( imagePending.containsKey(qds) ) { // TODO: locking
+                        return null;
+                    } else {
+                        imagePending.put( qds, "" );                    
+                    }
                 }
                 Runnable run= new Runnable() {
                     @Override
