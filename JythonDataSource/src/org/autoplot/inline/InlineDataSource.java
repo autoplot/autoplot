@@ -48,6 +48,13 @@ public class InlineDataSource extends AbstractDataSource {
         super(uri);
     }
     
+    /**
+     * execute the expression.  This can be a command, presumably, or an variable
+     * name.
+     * @param c expression or variable name.
+     * @return the dataset resolved.
+     * @throws Exception 
+     */
     private MutablePropertyDataSet jyCommand( String c ) throws Exception {
         logger.finest(c);
         
