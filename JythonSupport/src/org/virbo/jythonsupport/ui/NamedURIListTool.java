@@ -245,7 +245,8 @@ public class NamedURIListTool extends JPanel {
     }
     
     private void doVariableRename( int fi, String oldName, String newName ) {
-        ids.set( fi, newName );        
+        ids.set( fi, newName );     
+        refresh();
         if ( dataMashUp!=null ) dataMashUp.rename( oldName, newName );
     }
     
