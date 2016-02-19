@@ -302,8 +302,10 @@ public class DataMashUp extends javax.swing.JPanel {
         this.resolver= r;
     }
     
-    final Map<TreeNode,QDataSet> resolved= new HashMap();
+    final Map<String,QDataSet> resolved= new HashMap();
+    final Map<String,String> resolvePending= new HashMap();
     final Map<QDataSet,BufferedImage> imaged= new HashMap();
+    final Map<QDataSet,String> imagePending= new HashMap();
     
     /**
      * implement a cache to get the dataset from the node.
@@ -311,33 +313,39 @@ public class DataMashUp extends javax.swing.JPanel {
      * @return the dataset at this node.
      */
     private QDataSet getDataSet( final TreeNode value ) {
-        
+        String jyCommand= getAsJythonInline( value );
         if ( SwingUtilities.isEventDispatchThread() ) {
-            QDataSet have= resolved.get(value);
+            QDataSet have= resolved.get(jyCommand);
             if ( have==null ) {
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        QDataSet have= getDataSet( value );
-                        resolved.put( value, have );
-                        jTree1.treeDidChange();
+                synchronized ( resolved ) {
+                    if ( resolvePending.containsKey(jyCommand) ) {
+                        return null;
                     }
-                };
-                new Thread(run).start();
+                    Runnable run= new Runnable() {
+                        @Override
+                        public void run() {
+                            getDataSet( value ); // call back on a different thread.
+                            jTree1.treeDidChange();
+                        }
+                    };
+                    resolvePending.put( jyCommand, "" );
+                    new Thread(run).start(); 
+                }
             }
             return have;
             
         } else {
             synchronized ( resolved ) {
-                QDataSet have= resolved.get(value);
+                QDataSet have= resolved.get(jyCommand);
                 if ( have==null ) {
                     String jythonSrc= getAsJythonInline( value );
-                    logger.log(Level.FINE, "resolving {0}", jythonSrc );
+                    logger.log(Level.FINE, "resolving URI {0}", jythonSrc );
                     long t0= System.currentTimeMillis();
                     have= resolver.getDataSet( jythonSrc );
-                    resolved.put( value, have );
+                    resolved.put( jyCommand, have );
+                    resolvePending.remove( jyCommand );
                     jTree1.treeDidChange();
-                    logger.log(Level.FINE, "resolved in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, jythonSrc });
+                    logger.log(Level.FINE, "resolved URI in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, jythonSrc });
                 }
                 return have;
             }
@@ -349,26 +357,33 @@ public class DataMashUp extends javax.swing.JPanel {
         if ( SwingUtilities.isEventDispatchThread() ) {
             BufferedImage have= imaged.get(qds);
             if ( have==null ) {
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
-                        BufferedImage im= imaged.get(qds);
-                        if ( im==null ) {
-                            if ( qds!=null ) {
-                                logger.log(Level.FINE, "resolving image {0}", qds.toString() );
-                                long t0= System.currentTimeMillis();
-                                im= resolver.getImage( qds );
-                                Graphics g= im.getGraphics();
-                                g.setColor(Color.lightGray);
-                                g.drawRect(0,0,im.getWidth()-1,im.getHeight()-1);
-                                imaged.put( qds, im );
-                                logger.log(Level.FINE, "resolved image in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, qds.toString() } );
-                                jTree1.treeDidChange();
+                synchronized ( imaged ) {
+                    if ( imagePending.containsKey(qds) ) {
+                        return null;
+                    }
+                    Runnable run= new Runnable() {
+                        @Override
+                        public void run() {
+                            BufferedImage im= imaged.get(qds);
+                            if ( im==null ) {
+                                if ( qds!=null ) {
+                                    logger.log(Level.FINE, "rendering dataset {0}", qds.toString() );
+                                    long t0= System.currentTimeMillis();
+                                    im= resolver.getImage( qds );
+                                    Graphics g= im.getGraphics();
+                                    g.setColor(Color.lightGray);
+                                    g.drawRect(0,0,im.getWidth()-1,im.getHeight()-1);
+                                    imaged.put( qds, im );
+                                    logger.log(Level.FINE, "done rendering dataset in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, qds.toString() } );
+                                    jTree1.treeDidChange();
+
+                                }
                             }
                         }
-                    }
-                };
-                new Thread(run).start();
+                    };
+                    imagePending.put( qds, "" );
+                    new Thread(run).start();
+                }
             }
             return imaged.get(qds);
             
@@ -377,12 +392,16 @@ public class DataMashUp extends javax.swing.JPanel {
                 BufferedImage im= imaged.get(qds);
                 if ( im==null ) {
                     if ( qds!=null ) {
+                        logger.log(Level.FINE, "rendering dataset {0}", qds.toString() );
+                        long t0= System.currentTimeMillis();
                         im= resolver.getImage( qds );
                         Graphics g= im.getGraphics();
                         g.setColor(Color.lightGray);
                         g.drawRect(0,0,im.getWidth()-1,im.getHeight()-1);
                         imaged.put( qds, im );
+                        imagePending.remove( qds );
                         jTree1.treeDidChange();
+                        logger.log(Level.FINE, "done rendering dataset in {0} ms: {1}",  new Object[]{System.currentTimeMillis()-t0,qds.toString()} );
                     }
                 }
                 return im;
@@ -438,8 +457,8 @@ public class DataMashUp extends javax.swing.JPanel {
         if ( assign.value instanceof Name ) {
             DefaultMutableTreeNode root= new DefaultMutableTreeNode( ((Name)assign.value).id );
             DefaultTreeModel model= new DefaultTreeModel( root );
-            jTree1.setCellRenderer( getCellRenderer() );
             jTree1.setModel(model);
+            jTree1.setCellRenderer( getCellRenderer() );
         } else {
             DefaultMutableTreeNode root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
             DefaultTreeModel model= new DefaultTreeModel( root );
@@ -451,13 +470,12 @@ public class DataMashUp extends javax.swing.JPanel {
                 } else {
                     fillTreeCall( c, model, root );
                 }
-            }
-            jTree1.setCellRenderer( getCellRenderer() );
-            
+            }            
             jTree1.setModel(model);
             for (int i = 0; i < jTree1.getRowCount(); i++) {
                 jTree1.expandRow(i);
             }
+            jTree1.setCellRenderer( getCellRenderer() );            
         }
     }
     
@@ -511,6 +529,7 @@ public class DataMashUp extends javax.swing.JPanel {
         String[] ss= guardedSplit( script, '&', '\'', '\"' );
         List<String> ids= new ArrayList<String>();
         List<String> uris= new ArrayList<String>();
+        boolean haveAllIds= false;
         for ( String s: ss ) {
             int i= s.indexOf("=");
             if ( i>-1 ) {
@@ -523,11 +542,14 @@ public class DataMashUp extends javax.swing.JPanel {
                     throw new IllegalArgumentException("script is not jython mashup");
                 }
             } else {
+                if ( haveAllIds==false ) {
+                    haveAllIds= true;
+                    setIds(ids);
+                    setUris(uris);
+                }
                 fillTree( s );
             }
         }
-        setIds(ids);
-        setUris(uris);
     }
     
     private void doDrop( String data, final TreePath tp ) {
