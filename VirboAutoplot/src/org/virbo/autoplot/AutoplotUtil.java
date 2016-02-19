@@ -572,6 +572,10 @@ public class AutoplotUtil {
         }
     }
     
+    /**
+     * the problem is how do you present the result?
+     * @param aThis 
+     */
     static void doSearchToolTips( final Container aThis ) {
         JPanel panel= new JPanel( new BorderLayout() );
         javax.swing.JTextField tf= new JTextField();
