@@ -110,9 +110,20 @@ public class DataMashUp extends javax.swing.JPanel {
                     dmtn.setUserObject(newName);
                 }
             } else {
-                renameImpl( tm, parent, oldName, newName );
+                renameImpl( tm, dmtn, oldName, newName );
             }
         }
+    }
+    
+    /**
+     * recalculate the images
+     */
+    protected void refresh() {
+        resolved.clear();
+        imaged.clear();
+        jTree1.treeDidChange();
+        jTree1.revalidate();
+        jTree1.repaint();
     }
 
     /**

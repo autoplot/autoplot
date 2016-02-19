@@ -46,6 +46,13 @@ public class NamedURIListTool extends JPanel {
     private static final Logger logger= LoggerManager.getLogger("jython.dashup");
     private static final String CLASS_NAME = NamedURIListTool.class.getName();    
     
+    protected static final String PROP_URIS= "uris";
+    
+    /**
+     * see code use, use is not typical.
+     */
+    protected static final String PROP_ID="id";
+        
     JScrollPane scrollPane;
     
     /**
@@ -156,7 +163,7 @@ public class NamedURIListTool extends JPanel {
                     String oldName= ids.get(fi);
                     rename(fi);
                     String newName= ids.get(fi);
-                    firePropertyChange( "idName_"+fi, oldName, newName );
+                    firePropertyChange( PROP_ID + "Name_"+fi, oldName, newName );
                 }
             } );
             sub.add( name, BorderLayout.WEST );
@@ -220,12 +227,14 @@ public class NamedURIListTool extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     uris.set( fi,dss.getValue());
+                    if (dataMashUp!=null ) dataMashUp.refresh();
                 }
             });
             dss.getEditor().addFocusListener(new FocusAdapter() {
                 @Override
                 public void focusLost(FocusEvent e) {
                     uris.set( fi,dss.getValue());
+                    if (dataMashUp!=null ) dataMashUp.refresh();
                 }
             }) ;
             sub.add( dss, BorderLayout.CENTER );
