@@ -3931,11 +3931,18 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
 
     private void mashDataMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mashDataMenuItemActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
-        String uri= dom.getController().getFocusUri();
-        URISplit split= URISplit.parse(uri);
-        if ( !split.vapScheme.equals("vap+inline") ) {
-            uri= "vap+inline:ds=getDataSet('"+uri+"')";
+        
+        DataSourceFilter focus= dom.getController().getDataSourceFilter();
+        
+        String uri= focus.getUri();
+        
+        if ( uri.trim().length()>0 ) {
+            URISplit split= URISplit.parse(uri);
+            if ( !split.vapScheme.equals("vap+inline") ) {
+                uri= "vap+inline:ds=getDataSet('"+uri+"')";
+            }
         }
+        
         DataMashUp dm= new DataMashUp();
         dm.setResolver( new DataMashUp.Resolver() {
             @Override
@@ -3955,7 +3962,8 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         });
         
         try {
-            dm.setAsJythonInline(uri);
+            if ( uri.length()>0 ) dm.setAsJythonInline(uri);
+            
         } catch ( Exception ex ) {
             ex.printStackTrace();
             AutoplotUtil.showConfirmDialog( autoMenu, "Mash-ups cannot contain vap+inline data", "Mashup Problem", JOptionPane.OK_OPTION );
@@ -3963,7 +3971,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         }
         
         if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, dm, "Data Mash Up", JOptionPane.OK_CANCEL_OPTION ) ) {
-            dom.getController().getDataSourceFilter().setUri( dm.getAsJythonInline() );
+            focus.setUri( dm.getAsJythonInline() );
         }
     }//GEN-LAST:event_mashDataMenuItemActionPerformed
 
