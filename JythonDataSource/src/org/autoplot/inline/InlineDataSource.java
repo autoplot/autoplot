@@ -134,7 +134,11 @@ public class InlineDataSource extends AbstractDataSource {
             throw new RuntimeException(ex);
         }
 
-        return result;
+        if ( ss2.length==1 ) {
+            return Ops.copy(result.slice(0));
+        } else {
+            return result;
+        }
     }
 
     private MutablePropertyDataSet parseInlineDs( String s ) throws Exception {
