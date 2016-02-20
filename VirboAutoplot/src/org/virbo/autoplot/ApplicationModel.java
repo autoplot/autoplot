@@ -1096,94 +1096,6 @@ public class ApplicationModel {
     }
 
     /**
-     * fix the state to make it valid, to the extent that this is possible.
-     * For example, old vap files didn't specify rows, so we add rows to make
-     * it.  Note the mechanism used to save old states doesn't allow for importing,
-     * since it's tied to classes in the running JRE.  It would be non-trivial
-     * to implement this.  So we do this for now.
-     * 
-     * @param state
-     */
-    private static void makeValid( Application state ) {
-        if ( state.getController()!=null ) throw new IllegalArgumentException("state must not have controller");
-        // check to see if rows need to be made
-
-        Canvas c= state.getCanvases(0);
-        if ( c.getMarginRow().getId().equals("") ) c.getMarginRow().setId("marginRow_0");
-        if ( c.getMarginColumn().getId().equals("") ) c.getMarginColumn().setId("marginColumn_0");
-
-        if ( state.getPlots(0).getRowId().equals("") ) {
-            int n= state.getPlots().length;
-            Row[] rows= new Row[n];
-            for ( int i=0; i<n; i++ ) {
-                Row r= new Row();
-                r.setBottom( ""+((i+1)*10000/100./n)+"%-2.0em" );
-                r.setTop( ""+((i)*10000/100./n)+"%+2.0em" );
-                r.setParent( c.getMarginRow().getId() );
-                r.setId("row_"+i);
-                state.getPlots(i).setRowId(r.getId());
-                state.getPlots(i).setColumnId(c.getMarginColumn().getId());
-                rows[i]= r;
-            }
-            c.setRows(rows);
-        }
-
-        for ( BindingModel m: state.getBindings() ) {
-            Object src= DomUtil.getElementById( state, m.getSrcId() );
-            if ( src==null ) {
-                System.err.println("invalid binding:" + m + ", unable to find source node: "+ m.getSrcId() );
-                continue;
-            }
-            Object dst= DomUtil.getElementById( state, m.getDstId() );
-            if ( dst==null ) {
-                System.err.println("invalid binding:" + m + ", unable to find destination node: "+ m.getDstId() );
-                continue;
-            }
-            BeanProperty srcProp= BeanProperty.create(m.getSrcProperty());
-            BeanProperty dstProp= BeanProperty.create(m.getDstProperty());
-            Object srcVal= srcProp.getValue(src);
-            Object dstVal= dstProp.getValue(dst);
-            if ( srcVal==null && dstVal==null ) {
-                continue; // not sure what to make of this state, shouldn't happen.
-            }
-            if ( srcVal==null || dstVal==null ) {
-                continue; // findbugs NP_NULL_ON_SOME_PATH
-            }
-            if ( !srcVal.equals(dstVal) ) {
-                if ( dst instanceof Axis && m.getDstProperty().equals("range") && ((Axis)dst).isAutoRange() ) {
-                    logger.log( Level.FINE, "fixing inconsistent vap where bound values were not equal: {0}.{1}!={2}.{3}", 
-                            new Object[]{m.getSrcId(), m.getSrcProperty(), m.getDstId(), m.getDstProperty()});
-                } else {
-                    logger.log( Level.WARNING, "fixing inconsistent vap where bound values were not equal: {0}.{1}!={2}.{3}", 
-                            new Object[]{m.getSrcId(), m.getSrcProperty(), m.getDstId(), m.getDstProperty()});
-                }
-                BeanProperty.create(m.getDstProperty()).setValue(dst,srcVal);
-            }
-        }
-    }
-
-    /**
-     * we need to way to implement bindings, since we may mutate the state
-     * before syncing to it.  This makes the state more valid and avoids
-     * bugs like 
-     * https://sourceforge.net/tracker/?func=detail&aid=3017554&group_id=199733&atid=970682
-     * @param state
-     */
-    private static void doBindings( Application state ) {
-        for ( BindingModel m: state.getBindings() ) {
-            Object src= DomUtil.getElementById( state, m.getSrcId() );
-            Object dst= DomUtil.getElementById( state, m.getDstId() );
-            Binding binding = Bindings.createAutoBinding(
-                    UpdateStrategy.READ_WRITE,
-                    src,
-                    BeanProperty.create(m.getSrcProperty()),
-                    dst,
-                    BeanProperty.create(m.getDstProperty() ) );
-            binding.bind();
-        }
-    }
-
-    /**
      * Load the vap file at f, apply additional modifications to the DOM, then
      * sync the application to this.  Deltas with names in all caps (e.g. PWD or FILE) 
      * will be applied to the vap, looking for %{PWD} or %{FILE}:
@@ -1276,7 +1188,7 @@ public class ApplicationModel {
      */
     public void doOpenVap( InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
 
-        Application state = restoreState(in, deltas);
+        Application state = StatePersistence.restoreState(in, deltas);
 
         // for now, we reset when loading to make things more robust.  This
         // should be removed eventually and we can go back to only applying 
@@ -1306,80 +1218,6 @@ public class ApplicationModel {
 
     }
 
-    /**
-     * restore the .vap file into an Application (dom) object, applying the deltas if any.
-     * @param in input stream, which is not closed.
-     * @param deltas null or a list of property_name -> property_value pairs to apply to the
-     *   DOM after it's loaded.  
-     * @return the DOM.
-     * @throws IOException 
-     */
-    public static Application restoreState(InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
-        
-        Application state = (Application) StatePersistence.restoreState(in);
-        makeValid( state );
-        
-        if (deltas != null) {
-            doBindings( state );
-
-            for (Entry<String, String> e : deltas.entrySet()) {
-                logger.log(Level.FINEST, "applying to vap {0}={1}", new Object[]{e.getKey(), e.getValue()});
-                String node = e.getKey();
-                String sval = e.getValue();
-
-//                BeanProperty prop = BeanProperty.create(node);
-//                if (!prop.isWriteable(state)) {
-//                    logger.warning("the node " + node + " of " + state + " is not writable");
-//                    continue;
-//                }
-//                Class c = prop.getWriteType(state);
-                if ( Character.isUpperCase( node.charAt(0) ) ) {
-                    DomUtil.applyMacro( state, "%{"+node+"}", sval );
-                    
-                } else {
-                    Class c;
-                    try {
-                        c = DomUtil.getPropertyType(state, node);
-                    } catch (IllegalAccessException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                        continue;
-                    } catch (IllegalArgumentException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                        continue;
-                    } catch (InvocationTargetException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                        continue;
-                    }
-                    SerializeDelegate sd = SerializeRegistry.getDelegate(c);
-                    if (sd == null) {
-                        System.err.println("unable to find serialize delegate for " + c.getCanonicalName());
-                        continue;
-                    }
-                    Object val;
-                    try {
-                        // pop off any single-quotes used to delimit strings in URLs.
-                        if ( c==String.class && sval.length()>1 && sval.startsWith("'") && sval.endsWith("'") ) {
-                            sval= sval.substring(1,sval.length()-1);
-                        }
-                        val = sd.parse(sd.typeId(c), sval);
-                        //                    prop.setValue(state, val);
-                        DomUtil.setPropertyValue(state, node, val);
-                    } catch (IllegalAccessException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    } catch (IllegalArgumentException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    } catch (InvocationTargetException ex) {
-                        logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    } catch (ParseException ex) {
-                        IOException ioex= new IOException( ex.getMessage() );
-                        throw ioex;
-                        //logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    }
-                }
-            }
-        }
-        return state;
-    }
 
     void doOpen(File f) throws IOException {
         doOpenVap(f,null);
