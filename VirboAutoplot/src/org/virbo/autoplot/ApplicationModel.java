@@ -1104,7 +1104,7 @@ public class ApplicationModel {
      * 
      * @param state
      */
-    private void makeValid( Application state ) {
+    private static void makeValid( Application state ) {
         if ( state.getController()!=null ) throw new IllegalArgumentException("state must not have controller");
         // check to see if rows need to be made
 
@@ -1169,7 +1169,7 @@ public class ApplicationModel {
      * https://sourceforge.net/tracker/?func=detail&aid=3017554&group_id=199733&atid=970682
      * @param state
      */
-    private void doBindings( Application state ) {
+    private static void doBindings( Application state ) {
         for ( BindingModel m: state.getBindings() ) {
             Object src= DomUtil.getElementById( state, m.getSrcId() );
             Object dst= DomUtil.getElementById( state, m.getDstId() );
@@ -1276,9 +1276,49 @@ public class ApplicationModel {
      */
     public void doOpenVap( InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
 
+        Application state = restoreState(in, deltas);
+
+        // for now, we reset when loading to make things more robust.  This
+        // should be removed eventually and we can go back to only applying 
+        // deltas.
+        if ( DomUtil.structureChanges( this.dom, state ) ) {
+            this.dom.getController().reset();
+        }
+
+        if ( this.resizeRequestListener!=null ) {
+            double scale= resizeRequestListener.resize( state.getCanvases(0).getWidth(), state.getCanvases(0).getHeight() );
+            Font f= Font.decode( state.getCanvases(0).getFont() );
+            Font newFont= f.deriveFont( f.getSize2D() * (float)scale );
+            logger.log(Level.FINE, "shrinking font to {0}", newFont.toString());
+            // GuiSupport.setFont( this, newFont );  // this is in-lined to support AutoplotApplet.
+            getCanvas().setBaseFont(newFont);
+            Font f2 = getCanvas().getFont();
+            getDocumentModel().getOptions().setCanvasFont( DomUtil.encodeFont(f2) );
+            state.getCanvases(0).setFont( DomUtil.encodeFont(newFont) );
+            state.getCanvases(0).setFitted(dom.getCanvases(0).isFitted());
+            state.getCanvases(0).setWidth( dom.getCanvases(0).getWidth());
+            state.getCanvases(0).setHeight( dom.getCanvases(0).getHeight());
+        }
+        
+        //logger.fine("" + state.diffs(this.dom));
+        restoreState(state);
+        setUseEmbeddedDataSet(false);
+
+    }
+
+    /**
+     * restore the .vap file into an Application (dom) object, applying the deltas if any.
+     * @param in input stream, which is not closed.
+     * @param deltas null or a list of property_name -> property_value pairs to apply to the
+     *   DOM after it's loaded.  
+     * @return the DOM.
+     * @throws IOException 
+     */
+    public static Application restoreState(InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
+        
         Application state = (Application) StatePersistence.restoreState(in);
         makeValid( state );
-
+        
         if (deltas != null) {
             doBindings( state );
 
@@ -1322,7 +1362,7 @@ public class ApplicationModel {
                             sval= sval.substring(1,sval.length()-1);
                         }
                         val = sd.parse(sd.typeId(c), sval);
-    //                    prop.setValue(state, val);
+                        //                    prop.setValue(state, val);
                         DomUtil.setPropertyValue(state, node, val);
                     } catch (IllegalAccessException ex) {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -1338,33 +1378,7 @@ public class ApplicationModel {
                 }
             }
         }
-
-        // for now, we reset when loading to make things more robust.  This
-        // should be removed eventually and we can go back to only applying 
-        // deltas.
-        if ( DomUtil.structureChanges( this.dom, state ) ) {
-            this.dom.getController().reset();
-        }
-
-        if ( this.resizeRequestListener!=null ) {
-            double scale= resizeRequestListener.resize( state.getCanvases(0).getWidth(), state.getCanvases(0).getHeight() );
-            Font f= Font.decode( state.getCanvases(0).getFont() );
-            Font newFont= f.deriveFont( f.getSize2D() * (float)scale );
-            logger.log(Level.FINE, "shrinking font to {0}", newFont.toString());
-            // GuiSupport.setFont( this, newFont );  // this is in-lined to support AutoplotApplet.
-            getCanvas().setBaseFont(newFont);
-            Font f2 = getCanvas().getFont();
-            getDocumentModel().getOptions().setCanvasFont( DomUtil.encodeFont(f2) );
-            state.getCanvases(0).setFont( DomUtil.encodeFont(newFont) );
-            state.getCanvases(0).setFitted(dom.getCanvases(0).isFitted());
-            state.getCanvases(0).setWidth( dom.getCanvases(0).getWidth());
-            state.getCanvases(0).setHeight( dom.getCanvases(0).getHeight());
-        }
-        
-        //logger.fine("" + state.diffs(this.dom));
-        restoreState(state);
-        setUseEmbeddedDataSet(false);
-
+        return state;
     }
 
     void doOpen(File f) throws IOException {
