@@ -716,14 +716,13 @@ public class URISplit {
     }
 
     /**
-     *
-     * split the parameters into name,value pairs. URLEncoded parameters are decoded, but the string may be decoded 
-     * already.
-     *
-     * items without equals (=) are inserted as "arg_N"=name.
+     * Split the parameters (if any) into name,value pairs. URLEncoded parameters are decoded, but the string may be decoded 
+     * already.  Items without equals (=) are inserted as "arg_N"=name.
+     * @param params null or String containing the list of ampersand-delimited parameters.
+     * @return null or the map.
      */
     public static LinkedHashMap<String, String> parseParams(String params) {
-        LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
+        LinkedHashMap<String, String> result = new LinkedHashMap<>();
         if (params == null) {
             return result;
         }
@@ -746,17 +745,17 @@ public class URISplit {
 
         int argc = 0;
 
-        for (int i = 0; i < ss.length; i++) {
-            int j = indexOf(ss[i], '=', '(', ')');
+        for (String s : ss) {
+            int j = indexOf(s, '=', '(', ')');
             String name, value;
             if (j == -1) {
-                name = ss[i];
+                name = s;
                 value = "";
                 name = name.replaceAll("%3D", "=" ); // https://sourceforge.net/tracker/?func=detail&aid=3049295&group_id=199733&atid=970682
                 result.put("arg_" + (argc++), name);
             } else {
-                name = ss[i].substring(0, j);
-                value = ss[i].substring(j + 1);
+                name = s.substring(0, j);
+                value = s.substring(j + 1);
                 if ( name.equals( URISplit.PARAM_TIME_RANGE ) ) {
                     value= value.replaceAll("\\+", " ");
                 }
