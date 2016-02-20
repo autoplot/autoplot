@@ -173,10 +173,20 @@ public class AutoplotDataServer {
         logger.log( Level.INFO, "time to read (ms): {0}", System.currentTimeMillis()-t0 );
 
         if ( !someValid ) {
-             if ( format.equals(FORM_D2S) ) {
-                 String s= String.format( "<exception message='%s'/>\n", "no data found" );
-                 out.printf( String.format( "[00]%06d%s", s.length(), s ) );
-             }
+            switch (format) {
+                case FORM_D2S:
+                    {
+                        String s= String.format( "<exception message='%s'/>\n", "no data found" );
+                        out.printf( String.format( "[00]%06d%s", s.length(), s ) );
+                        break;
+                    }
+                case FORM_QDS:
+                    {
+                        String s= String.format( "<exception message='%s'/>\n", "no data found" );
+                        out.printf( String.format( "[00]%06d%s", s.length(), s ) );
+                        break;
+                    }
+            }
         }
     }
 
