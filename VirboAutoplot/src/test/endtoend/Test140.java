@@ -29,7 +29,11 @@ import org.virbo.dsops.Ops;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksException;
+import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.URISplit;
 import org.xml.sax.SAXException;
 
 /**
@@ -84,6 +88,15 @@ public class Test140 {
         
         QDataSet ds=null;
         if ( uri.endsWith(".vap") || uri.contains(".vap?timerange=") ) {
+            URISplit split= URISplit.parse(uri);
+            try ( InputStream in = DataSetURI.getInputStream( split.resourceUri, new NullProgressMonitor() ) ) {
+                Application dom= StatePersistence.restoreState( in, URISplit.parseParams( split.params ) );
+                for ( DataSourceFilter dsf : dom.getDataSourceFilters() ) {
+                    System.err.printf( "  %s: %s\n", dsf.getId(), dsf.getUri() );
+                }
+                System.err.println( "  timerange: "+ dom.getTimeRange() );
+            }
+                    
             // for vap files, load the vap and grab the first dataset.
             ScriptContext.load(uri);
             ds= getDocumentModel().getDataSourceFilters(0).getController().getDataSet();
@@ -313,7 +326,8 @@ public class Test140 {
             //args= new String[] { "146", "http://sarahandjeremy.net/jeremy/autoplot/tests/test140/html/RBSP%20ECT%20Data%20Products.html" };
             //args= new String[] { "142", "http://jfaden.net/~jbf/autoplot/test142.txt" };
             //args= new String[] { "147", "http://autoplot.org//developer.listOfUris" };
-            args= new String[] { "148", "http://www-pw.physics.uiowa.edu/~jbf/pdsppi/examples/pdsppi.xml" };
+            //args= new String[] { "148", "http://www-pw.physics.uiowa.edu/~jbf/pdsppi/examples/pdsppi.xml" };
+            args= new String[] { "149", "http://sarahandjeremy.net/~jbf/" };
         }
         testid= Integer.parseInt( args[0] );
         int iid= 0;
