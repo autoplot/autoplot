@@ -176,13 +176,13 @@ public class AutoplotDataServer {
             switch (format) {
                 case FORM_D2S:
                     {
-                        String s= String.format( "<exception message='%s'/>\n", "no data found in "+timeRange );
+                        String s= String.format( "<exception type=\"NoDataInInterval\" message='%s'/>\n", "no data found in "+timeRange );
                         out.printf( String.format( "[00]%06d%s", s.length(), s ) );
                         break;
                     }
                 case FORM_QDS:
                     {
-                        String s= String.format( "<exception message='%s'/>\n", "no data found in "+timeRange );
+                        String s= String.format( "<exception type=\"NoDataInInterval\" message='%s'/>\n", "no data found in "+timeRange );
                         out.printf( String.format( "[00]%06d%s", s.length(), s ) );
                         break;
                     }
