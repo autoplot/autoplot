@@ -5,10 +5,8 @@
 package test.endtoend;
 
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.List;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.URISplit;
@@ -31,22 +29,21 @@ public class Test027 {
         
         int cp= uri.length()/2;
 
-        PrintWriter out = new PrintWriter( String.format( "test027_%03d.txt",id) );
-        out.println("===");
-        out.println(uri);
-        out.println( spaces.substring(0,cp) + "^" );
-
-        split= URISplit.parse( uri, cp, true );
-
-        out.println( URISplit.format(split) );
-
-        out.println( spaces.substring(0,split.formatCarotPos) + "^" );
-        out.println( URISplit.implicitVapScheme(split) );
-        out.println("===");
-        
-        out.println(split);
-
-        out.close();
+        try (PrintWriter out = new PrintWriter( String.format( "test027_%03d.txt",id) )) {
+            out.println("===");
+            out.println(uri);
+            out.println( spaces.substring(0,cp) + "^" );
+            
+            split= URISplit.parse( uri, cp, true );
+            
+            out.println( URISplit.format(split) );
+            
+            out.println( spaces.substring(0,split.formatCarotPos) + "^" );
+            out.println( URISplit.implicitVapScheme(split) );
+            out.println("===");
+            
+            out.println(split);
+        }
 
     }
 
@@ -67,11 +64,7 @@ public class Test027 {
 
     public static void main(String[] args)  {
         try {
-
-            URISplit split;
             
-            doTest( 20, "http://autoplot.org/data/autoplot.cdf?Magnitude#trim(0,12)" );
-            doTest( 21, "http://autoplot.org/data/autoplot.cdf?Magnitude#putProperty(TITLE,'My%20Data')" );
             doTest( 0, "vap+cdaweb:ds=ac_k0_epm&H_lo&timerange=2010-01" );
             doTest( 1, "vap+inline:rand(200)" );
             doTest( 2, "vap+inline:accum(randomn(0,1000))&DEPEND_0=accum(randomn(1,1000))" );
@@ -97,6 +90,9 @@ public class Test027 {
 
             doTest( 18, "file:///home/jbf/rbspa_ect-mageis-L2_20121107_v2.2.0.cdf" );
             doTest( 19, "file:///home/jbf/rbspa_ect-mageis-L2_20121107_v2.2.0[1].cdf" );
+
+            doTest( 20, "http://autoplot.org/data/autoplot.cdf?Magnitude#trim(0,12)" );
+            doTest( 21, "http://autoplot.org/data/autoplot.cdf?Magnitude#putProperty(TITLE,'My%20Data')" );
             
             doTestComp( 100, "vap+cdaweb:ds=ac_k0_epm&H_lo&timerange=2010-01" );
             doTestComp( 101, "Enter Data Set" );
