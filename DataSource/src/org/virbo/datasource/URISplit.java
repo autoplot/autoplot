@@ -198,7 +198,7 @@ public class URISplit {
     /**
      * additional processes to be applied to the URI.  For example, slice0(0) means slice the dataset at this point.
      */
-    public String sprocess;
+    public String filters;
 
     /**
      * position of the caret after modifications to the surl are made.  This
@@ -542,6 +542,7 @@ public class URISplit {
      *   <li>file, the file, http://www.example.com/data/myfile.nc
      *   <li>ext, the extension, .nc or null.
      *   <li>params, myVariable or null.
+     *   <li>filters, the fragment of the URI following hash character.
      * </ul>
      * @param surl  the string to parse
      * @param caretPos the position of the caret, the relative position will be preserved through normalization in formatCaretPos
@@ -648,22 +649,37 @@ public class URISplit {
             //} else {
             //    result.process= "";
             //}
+        
+        int ihash;
+        if ( iquery==-1 ) {
+            ihash= rsurl.indexOf("#");
+        } else {
+            ihash= rsurl.indexOf("#",iquery);
+        }
+        if ( ihash==-1 ) ihash= rsurl.length();
+        
         if (file != null && iquery != -1) {
             fileEnd = iquery;
-            params = rsurl.substring(iquery + 1);
+            params = rsurl.substring(iquery + 1,ihash);
         } else {
             if ( ieq>-1 && ( file==null || file.contains("=") && !( file.contains("(") || file.contains("{") ) ) ) { //TODO: this surely needs more attention.
                 // file:///home/jbf/fun/camE_spot5/2012/05/$(d,Y=2012,m=04)/$H$M$S.jpg
                 iquery = 0;
                 if ( rsurl.startsWith("file:///") ) { // old code used to insert file://, so we check for it here in case of old URIs.
-                    params= rsurl.substring(8);
+                    params= rsurl.substring(8,ihash);
                 } else {
-                    params= rsurl;
+                    params= rsurl.substring(0,ihash);
                 }
             } else {
                 iquery = rsurl.length();
                 fileEnd = rsurl.length();
             }
+        }
+        
+        if ( ihash<rsurl.length() ) {
+            result.filters= "|" + rsurl.substring(ihash+1).replaceAll("#","|");
+        } else {
+            result.filters= null;
         }
 
         if ( rsurl.substring(0,iquery ).contains("\\") ){
@@ -966,6 +982,6 @@ public class URISplit {
 
     @Override
     public String toString() {
-        return "\nvapScheme: " + vapScheme + "\nscheme: " + scheme + "\nresourceUri: " + resourceUri + "\npath: " + path + "\nfile: " + file + "\next: " + ext + "\nparams: " + params + "\nsurl: " + surl + "\ncaretPos: " + resourceUriCarotPos + "\nformatCarotPos: " + formatCarotPos;
+        return "\nvapScheme: " + vapScheme + "\nscheme: " + scheme + "\nresourceUri: " + resourceUri + "\npath: " + path + "\nfile: " + file + "\next: " + ext + "\nparams: " + params + "\nfilters: "+filters + "\nsurl: " + surl + "\ncaretPos: " + resourceUriCarotPos + "\nformatCarotPos: " + formatCarotPos;
     }
 }
