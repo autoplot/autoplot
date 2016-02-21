@@ -20,7 +20,7 @@ import org.virbo.datasource.URISplit;
  */
 public class Test027 {
 
-    private static String spaces= "         "
+    private static final String spaces= "         "
             + "                             "
             + "                             "
             + "                             ";
@@ -70,9 +70,8 @@ public class Test027 {
 
             URISplit split;
             
-            doTest( 14, "file:///home/jbf/rbspa_ect-mageis-L2_20121107_v2.2.0.cdf" );
-            doTest( 15, "file:///home/jbf/rbspa_ect-mageis-L2_20121107_v2.2.0[1].cdf" );
-            doTest( 13, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_hyd/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09" );
+            doTest( 20, "http://autoplot.org/data/autoplot.cdf?Magnitude#trim(0,12)" );
+            doTest( 21, "http://autoplot.org/data/autoplot.cdf?Magnitude#putProperty(TITLE,'My%20Data')" );
             doTest( 0, "vap+cdaweb:ds=ac_k0_epm&H_lo&timerange=2010-01" );
             doTest( 1, "vap+inline:rand(200)" );
             doTest( 2, "vap+inline:accum(randomn(0,1000))&DEPEND_0=accum(randomn(1,1000))" );
@@ -95,6 +94,9 @@ public class Test027 {
 
             // this parses to file:///, and it should probably be left alone.
             doTest( 17, "" );
+
+            doTest( 18, "file:///home/jbf/rbspa_ect-mageis-L2_20121107_v2.2.0.cdf" );
+            doTest( 19, "file:///home/jbf/rbspa_ect-mageis-L2_20121107_v2.2.0[1].cdf" );
             
             doTestComp( 100, "vap+cdaweb:ds=ac_k0_epm&H_lo&timerange=2010-01" );
             doTestComp( 101, "Enter Data Set" );
