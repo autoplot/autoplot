@@ -107,9 +107,11 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
         
         StringBuilder scriptBuilder= new StringBuilder();
         for ( String s: ss ) {
-            if ( s.contains("getDataSet(") ) {
-                int i= s.lastIndexOf(")");
-                s= s.substring(0,i) + ","+timerange+")";
+            if ( timerange!=null ) {
+                if ( s.contains("getDataSet(") ) {
+                    int i= s.lastIndexOf(")");
+                    s= s.substring(0,i) + ","+timerange+")";
+                }
             }
             scriptBuilder.append(s).append("\n");
         }
