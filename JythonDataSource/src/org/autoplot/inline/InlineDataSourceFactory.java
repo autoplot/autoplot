@@ -99,7 +99,7 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
      * @param script the script, mangled to handle the timerange.
      * @return the timerange or null.
      */
-    protected String getScript( String suri, List<String> script ) {
+    protected static String getScript( String suri, List<String> script ) {
         String scriptInline= suri.substring( "vap+inline:".length() );
                 
         String[] ss= InlineDataSource.guardedSplit( scriptInline, '&', '\'', '\"' );
@@ -127,7 +127,7 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
         return timerange;
     };
     
-    private boolean checkRejectGetDataSet( String suri, List<String> problems, ProgressMonitor mon ) {
+    private static boolean checkRejectGetDataSet( String suri, List<String> problems, ProgressMonitor mon ) {
          
         List<String> script= new ArrayList();
         
