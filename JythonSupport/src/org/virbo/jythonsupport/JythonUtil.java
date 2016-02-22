@@ -18,6 +18,7 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -35,6 +36,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.FileUtil;
 import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.core.PyException;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
@@ -1161,6 +1163,61 @@ public class JythonUtil {
         return result;
     }
 
+    /**
+     * return a list of the getDataSet calls, from index to simplified getDataSet call.
+     * Experimental--interface may change
+     * @param env
+     * @param script
+     * @param params
+     * @return
+     * @throws PyException 
+     */ 
+    public static Map<String,String> getGetDataSet( Map<String,Object> env, String script, Map<String,String>params ) throws PyException {   
+        
+        String prog= script;
+
+        logger.log(Level.FINER, "Simplified script: {0}", prog);
+        
+        PythonInterpreter interp;
+        try {
+            interp= createInterpreter(true);         
+        } catch ( IOException ex ) {
+            return Collections.emptyMap();
+        }
+        
+        if ( env!=null ) {
+            for ( Entry<String,Object> ent: env.entrySet() ) {
+                if ( ent.getKey()==null ) {
+                    logger.log( Level.WARNING, "parameter name was null" );
+                } else if ( ent.getValue()==null ) {
+                    logger.log( Level.WARNING, "parameter value was null" );
+                } else {
+                    interp.set( ent.getKey(), ent.getValue() );
+                }
+            }
+        }
+        
+        if ( params!=null ) setParams( interp, params );
+        
+        interp.set( "timerange", "timerange" );
+        
+        interp.exec( "gds={}\nngds=0\ndef getDataSet( uri, timerange='', map=0 ):\n  global ngds\n  global gdsi\n  gds[ngds]=uri+' '+timerange\n  ngds=ngds+1\n" );
+        interp.exec(prog);
+        
+        Map<String,String> result= new LinkedHashMap<String, String>();
+        PyDictionary r= (PyDictionary)interp.get("gds");
+        
+        for ( Object k : r.keys() ) {
+            result.put( k.toString(), r.get(Py.java2py(k)).toString() );
+        }
+        
+        //for ( Entry e : r.entrySet() ) {
+        //    result.put( e.getKey().toString(), e.getValue().toString() );
+        //}
+
+        return result;
+    }
+     
     /**
      * scrape script for local variables, looking for assignments.  The reader is closed
      * after reading.
