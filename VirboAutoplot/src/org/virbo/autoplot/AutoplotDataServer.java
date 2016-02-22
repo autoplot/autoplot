@@ -132,7 +132,7 @@ public class AutoplotDataServer {
                         logger.log( Level.FINE, "  --> {0} )", ds1 );
                         writeData( format, out, ds1, ascii );
                         someValid= true;
-                        break;
+                        continue;
                     }
                     if ( ds1.rank()==1 ) {
                         QDataSet xrange= Ops.extent( SemanticOps.xtagsDataSet(ds1) );
