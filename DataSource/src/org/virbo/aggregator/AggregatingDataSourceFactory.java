@@ -299,7 +299,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
     protected static boolean hasTimeFields( String surl ) {
         if ( surl.contains("%Y") || surl.contains("%25Y" ) ) {
-            logger.warning("URIs should no longer contain %s.");
+            logger.warning("URIs should no longer contain percents (%s).");
             return true;
         }
         int ipercy = surl.lastIndexOf("%Y");
