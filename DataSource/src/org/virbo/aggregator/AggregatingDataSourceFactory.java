@@ -298,6 +298,10 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     protected static boolean hasTimeFields( String surl ) {
+        if ( surl.contains("%Y") || surl.contains("%25Y" ) ) {
+            logger.warning("URIs should no longer contain %s.");
+            return true;
+        }
         int ipercy = surl.lastIndexOf("%Y");
         if (ipercy == -1) ipercy = surl.lastIndexOf("$Y");
         if (ipercy == -1) ipercy = surl.lastIndexOf("$y");
