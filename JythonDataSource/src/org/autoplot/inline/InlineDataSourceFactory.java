@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -92,8 +93,13 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
         return result;
     }
 
-    private boolean checkRejectGetDataSet( String suri, List<String> problems, ProgressMonitor mon ) {
-        
+    /**
+     * do the magic with the timerange.
+     * @param suri the URI.
+     * @param script the script, mangled to handle the timerange.
+     * @return the timerange or null.
+     */
+    protected String getScript( String suri, List<String> script ) {
         String scriptInline= suri.substring( "vap+inline:".length() );
                 
         String[] ss= InlineDataSource.guardedSplit( scriptInline, '&', '\'', '\"' );
@@ -105,17 +111,33 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
             }
         }
         
-        StringBuilder scriptBuilder= new StringBuilder();
-        for ( String s: ss ) {
+        for ( int i=0; i<ss.length; i++ ) {
+            String s= ss[i];
             if ( timerange!=null ) {
                 if ( s.contains("getDataSet(") ) {
-                    int i= s.lastIndexOf(")");
-                    s= s.substring(0,i) + ","+timerange+")";
+                    int k= s.lastIndexOf(")");
+                    s= s.substring(0,k) + ","+timerange+")";
                 }
             }
-            scriptBuilder.append(s).append("\n");
+            ss[i]= s;
         }
         
+        script.addAll(Arrays.asList(ss));
+        
+        return timerange;
+    };
+    
+    private boolean checkRejectGetDataSet( String suri, List<String> problems, ProgressMonitor mon ) {
+         
+        List<String> script= new ArrayList();
+        
+        String timerange= getScript( suri, script );
+        
+        StringBuilder scriptBuilder= new StringBuilder();
+        for ( String s: script ) {
+            scriptBuilder.append(s).append("\n");
+        }
+                    
         Map<String,String> pp= JythonUtil.getGetDataSet( null, scriptBuilder.toString(), null );
         
         for ( Entry<String,String> e: pp.entrySet() ) {
