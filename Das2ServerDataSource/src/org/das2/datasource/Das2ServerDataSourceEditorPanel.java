@@ -408,13 +408,21 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         }                        
                     }
                     if ( examples.size()>0 ) {
-                        for ( int i=0; i<examples.size(); i++ ) {
+                        for ( int i=0; i<examples.size(); i++ ) {    // remove the human comments following the delimiter
                             String s= examples.get(i);
                             int j= s.indexOf( EXAMPLE_TIMERANGE_LABEL_DELIM );
+                            String anExample;
                             if ( j>-1 ) {
-                                s= "<html>" + s.substring(0,j) + " <i><nbsp>"+s.substring(j+1).trim() + "</i>";
+                                anExample= s.substring(0,j);
+                                s= "<html>" + anExample + " <i><nbsp>"+s.substring(j+1).trim() + "</i>";
+                            } else {
+                                anExample= s;
                             }
-                            examples.set(i,s);
+                            examples.set(i, s );
+                            if ( example==null && i==examples.size()-1 ) {
+                                Das2ServerDataSourceEditorPanel.this.timeRangeTextField.setText( anExample );
+                            }
+                            
                         }
                         examples.add( 0, String.format( "<html><i>Example Time Ranges (%d)</i>", examples.size() ) );
                         DefaultComboBoxModel model= new DefaultComboBoxModel( examples.toArray( new String[examples.size()] ) );
