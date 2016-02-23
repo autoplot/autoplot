@@ -28,7 +28,6 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
@@ -103,15 +102,17 @@ public class InlineDataSource extends AbstractDataSource {
 
         boolean isTime= false;
         boolean isEnum= false;
-        for ( int j=0; j<ss2.length; j++ ) {
+        for (String ss21 : ss2) {
             try {
-                if ( !isTime && !isEnum ) u.parse(ss2[j]);
-            } catch ( ParseException e ) {
+                if (!isTime && !isEnum) {
+                    u.parse(ss21);
+                }
+            } catch (ParseException e) {
                 isTime= true;
-                if ( !isEnum ) {
+                if (!isEnum) {
                     try {
-                        tu.parse(ss2[j]);
-                    } catch (ParseException ex) {
+                        tu.parse(ss21);
+                    }catch (ParseException ex) {
                         isEnum= true;
                     }
                 }
@@ -266,9 +267,9 @@ public class InlineDataSource extends AbstractDataSource {
         interp= JythonUtil.createInterpreter(true);
         if ( ! org.virbo.jythonsupport.Util.isLegacyImports() ) { // we need to always bring this in to support legacy URIs.
             logger.log( Level.FINER, "import the stuff we don't import automatically anymore");
-            InputStream in=  org.virbo.jythonsupport.Util.class.getResource("imports.py").openStream();
-            interp.execfile( in, "imports.py");
-            in.close();
+            try (InputStream in = org.virbo.jythonsupport.Util.class.getResource("imports.py").openStream()) {
+                interp.execfile( in, "imports.py");
+            }
         }
                 
         String s= getURI();
@@ -307,7 +308,7 @@ public class InlineDataSource extends AbstractDataSource {
         MutablePropertyDataSet[] depn= new MutablePropertyDataSet[4];
         Map<String,String>[] deppropn= new Map[4];
 
-        Map<String,String> p= new LinkedHashMap<String,String>();
+        Map<String,String> p= new LinkedHashMap<>();
 
         mon.setTaskSize(ss.length);
         mon.started();
@@ -387,15 +388,24 @@ public class InlineDataSource extends AbstractDataSource {
                     throw new IllegalArgumentException( "DEPEND_"+idep+"."+prop+" specified, but no DEPEND_"+idep+" ds");
                 }
                 String propValue= ent.getValue();
-                if ( prop.equals("UNITS") ) {
-                    dep0.putProperty( prop,SemanticOps.lookupUnits(propValue));
-                } else if ( prop.equals("FILL_VALUE" )  || prop.equals("VALID_MIN") || prop.equals("VALID_MAX") || prop.equals("TYPICAL_MIN") || prop.equals("TYPICAL_MAX") ) {
-                    dep0.putProperty( prop,Double.parseDouble(propValue));
-                } else if ( prop.equals("MONOTONIC") ) {
-                    dep0.putProperty( prop, Boolean.parseBoolean(propValue) ); // True or TRUE
-                } else {
-                    // it would be nice if the same code handled DEPEND_0 and the dataset.
-                    dep0.putProperty(prop,propValue);
+                switch (prop) {
+                    case "UNITS":
+                        dep0.putProperty( prop,Units.lookupUnits(propValue));
+                        break;
+                    case "FILL_VALUE":
+                    case "VALID_MIN":
+                    case "VALID_MAX":
+                    case "TYPICAL_MIN":
+                    case "TYPICAL_MAX":
+                        dep0.putProperty( prop,Double.parseDouble(propValue));
+                        break;
+                    case "MONOTONIC":
+                        dep0.putProperty( prop, Boolean.parseBoolean(propValue) ); // True or TRUE
+                        break;
+                    default:
+                        // it would be nice if the same code handled DEPEND_0 and the dataset.
+                        dep0.putProperty(prop,propValue);
+                        break;
                 }
             }
         }
