@@ -53,6 +53,9 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
         Map<String,String> params= URISplit.parseParams(split.params);
         String sdr= params.get( URISplit.PARAM_TIME_RANGE );
         if ( sdr!=null && sdr.trim().length()>0 ) {
+            if ( sdr.startsWith("'") && sdr.endsWith("'") && sdr.length()>1 ) {
+                sdr= sdr.substring(1,sdr.length()-1);
+            }
             timeRange= DatumRangeUtil.parseTimeRange(sdr.replaceAll("\\+", " "));
         }
     }
