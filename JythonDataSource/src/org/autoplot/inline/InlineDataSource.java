@@ -29,7 +29,9 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.DefaultTimeSeriesBrowse;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
 import org.virbo.jythonsupport.JythonOps;
@@ -45,8 +47,20 @@ public class InlineDataSource extends AbstractDataSource {
     private static final Logger logger= LoggerManager.getLogger("jython.inline");
     
     PythonInterpreter interp;
+    TimeSeriesBrowse tsb=null;
+    
     public InlineDataSource(URI uri) {
         super(uri);
+        List<String> script= new ArrayList<>();
+        String timerange= InlineDataSourceFactory.getScript( uri.toString(), script );
+        if ( timerange!=null ) {
+            try {
+                tsb= DefaultTimeSeriesBrowse.create( uri.toString(),timerange );
+                addCapability( TimeSeriesBrowse.class, tsb );
+            } catch (ParseException ex) {
+                logger.warning(ex.toString());
+            }
+        }
     }
     
     /**
@@ -261,7 +275,9 @@ public class InlineDataSource extends AbstractDataSource {
     @Override
     public QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
 
-        logger.log(Level.FINE, "getDataSet {0}", getURI() );
+        String s= tsb==null ? getURI() : tsb.getURI();
+
+        logger.log(Level.FINE, "getDataSet {0}", s );
 
         logger.log( Level.FINER, "create interpreter");
         interp= JythonUtil.createInterpreter(true);
@@ -271,9 +287,7 @@ public class InlineDataSource extends AbstractDataSource {
                 interp.execfile( in, "imports.py");
             }
         }
-                
-        String s= getURI();
-        
+                        
         List<String> script= new ArrayList<>();
         String timerange= InlineDataSourceFactory.getScript( s, script );
 
@@ -297,10 +311,8 @@ public class InlineDataSource extends AbstractDataSource {
         String[] ss= script.toArray(new String[script.size()]);
         
         // make sure timerange is set before any other calls.
-        for ( String line: ss ) {
-            if ( line.startsWith("timerange=") ) {
-                interp.exec(line);
-            }
+        if ( timerange!=null ) {
+            interp.set("timerange",timerange);
         }
         
         MutablePropertyDataSet ds= null;
