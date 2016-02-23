@@ -28,6 +28,23 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
     
     private static final Logger logger= LoggerManager.getLogger("apdss.util");
     
+    /**
+     * create the TimeSeriesBrowse with the initial URI which may contain the
+     * parameter "timerange."  The timerange may also be specified using the 
+     * second parameter.
+     * @param uri the URI
+     * @param timerange if non-null, then reset with this timerange.
+     * @return TimeSeriesBrowse implementation.
+     * @throws ParseException 
+     * @see org.das2.datum.DatumRangeUtil#parseTimeRange(java.lang.String) 
+     */
+    public static TimeSeriesBrowse create( String uri, String timerange ) throws ParseException {
+        TimeSeriesBrowse tsb= new DefaultTimeSeriesBrowse();
+        tsb.setURI(uri);
+        if ( timerange!=null ) tsb.setTimeRange( DatumRangeUtil.parseTimeRange(timerange) );
+        return tsb;
+    }
+    
     @Override
     public void setURI(String suri) throws ParseException {
         logger.log(Level.FINE, "setURI {0}", suri );
