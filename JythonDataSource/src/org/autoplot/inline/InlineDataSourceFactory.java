@@ -107,7 +107,7 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
         String timerange=null;
         for ( String s: ss ) {
             if ( s.startsWith("timerange=" ) ) {
-                timerange= JythonUtil.maybeQuoteString( s.substring( 10 ) );
+                timerange= JythonUtil.maybeUnquoteString( JythonUtil.maybeQuoteString( s.substring( 10 ) ) );
             }
         }
         
@@ -116,7 +116,7 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
             if ( timerange!=null ) {
                 if ( s.contains("getDataSet(") ) {
                     int k= s.lastIndexOf(")");
-                    s= s.substring(0,k) + ","+timerange+")";
+                    s= s.substring(0,k) + ",'"+timerange+"')";
                 }
             }
             ss[i]= s;
@@ -124,7 +124,11 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
         
         script.addAll(Arrays.asList(ss));
         
-        return timerange;
+        if ( timerange==null ) {
+            return null;
+        } else {
+            return timerange;
+        }
     };
     
     private static boolean checkRejectGetDataSet( String suri, List<String> problems, ProgressMonitor mon ) {
@@ -154,9 +158,8 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
                     TimeSeriesBrowse tsb= dsf.getCapability(TimeSeriesBrowse.class);
                     if ( tsb!=null ) {
                         try {
-                            String trNoQuotes= timerange.substring(1,timerange.length()-1);
                             tsb.setURI( surl1 );
-                            tsb.setTimeRange( DatumRangeUtil.parseTimeRange(trNoQuotes) );
+                            tsb.setTimeRange( DatumRangeUtil.parseTimeRange(timerange) );
                             surl1= tsb.getURI();
                         } catch (ParseException ex) {
                             logger.log(Level.SEVERE, null, ex);
