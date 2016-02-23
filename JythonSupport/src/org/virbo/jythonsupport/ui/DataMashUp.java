@@ -683,7 +683,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jTabbedPane1.addTab("mathematics", jPanel1);
 
         jList2.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "link(x,y)", "link(x,y,z)" };
+            String[] strings = { "link(x,y)", "link(x,y,z)", "slice1(ds,0)" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
