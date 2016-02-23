@@ -374,6 +374,7 @@ public class InlineDataSource extends AbstractDataSource {
                     logger.log( Level.FINER, "assignment {0}", arg);
                     interp.set( "monitor", mon.getSubtaskMonitor(arg));
                     arg= URISplit.uriDecode(arg);
+                    if ( arg.startsWith("timerange=") ) continue;
                     interp.exec(arg);
 
                 } else { 
