@@ -629,8 +629,8 @@ public class JythonUtil {
 
      /**
       * put quotes around values that appear to be strings.  We see if it's parsable as a double or the keyword True or False.
-      * @param sval
-      * @return 
+      * @param sval the string, for example "2015" "'2015'" or "2015-01-01"
+      * @return 2015, "'2015'", "'2015-01-01'"
       */
      public static String maybeQuoteString(String sval) {
         boolean isNumber= false;
@@ -648,6 +648,20 @@ public class JythonUtil {
         return sval;
 
     }
+     
+     /**
+      * pop off the quotes to get the text inside.
+      * @param sval "'2015-01-01'"
+      * @return  "2015-01-01"
+      */
+     public static String maybeUnquoteString( String sval ) {
+         if ( ( sval.startsWith("'") && sval.endsWith("'") ) 
+                 || ( sval.startsWith("\"") && sval.endsWith("\"") ) ) {
+             return sval.substring(1,sval.length()-1);
+         } else {
+             return sval;
+         }
+     }
 
     /**
      * put each parameter into the dictionary autoplot.params.
@@ -1174,9 +1188,24 @@ public class JythonUtil {
      */ 
     public static Map<String,String> getGetDataSet( Map<String,Object> env, String script, Map<String,String>params ) throws PyException {   
         
-        String prog= script;
-
+        String[] ss= script.split("\n");
+        for ( int i=ss.length-1; i>=0; i-- ) {
+            if ( !ss[i].contains("getDataSet") ) {
+                ss[i]= "";
+            } else {
+                break;
+            }
+        }
+        
+        StringBuilder prog1= new StringBuilder(ss[0]);
+        prog1.append("\n");
+        for ( int i=1; i<ss.length; i++ ) {
+            prog1.append(ss[i]).append("\n");
+        }
+        String prog= prog1.toString();
+        
         logger.log(Level.FINER, "Simplified script: {0}", prog);
+
         
         PythonInterpreter interp;
         try {
@@ -1201,8 +1230,18 @@ public class JythonUtil {
         
         interp.set( "timerange", "timerange" );
         
-        interp.exec( "gds={}\nngds=0\ndef getDataSet( uri, timerange='', map=0 ):\n  global ngds\n  global gdsi\n  gds[ngds]=uri+' '+timerange\n  ngds=ngds+1\n" );
-        interp.exec(prog);
+        String redefineGDS= "gds={}\nngds=0\ndef getDataSet( uri, timerange='', map=0 ):\n  global ngds\n  global gdsi\n  gds[ngds]=uri+' '+timerange\n  ngds=ngds+1\n";
+        System.err.println(redefineGDS);
+        
+        interp.exec( redefineGDS );
+        System.err.println(prog);
+        
+        try {
+            interp.exec(prog);
+        } catch ( PyException ex ) {
+            ex.printStackTrace();
+            throw ex;
+        }
         
         Map<String,String> result= new LinkedHashMap<String, String>();
         PyDictionary r= (PyDictionary)interp.get("gds");
