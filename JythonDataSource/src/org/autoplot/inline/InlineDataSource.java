@@ -272,6 +272,9 @@ public class InlineDataSource extends AbstractDataSource {
         }
                 
         String s= getURI();
+        
+        List<String> script= new ArrayList<>();
+        String timerange= InlineDataSourceFactory.getScript( s, script );
 
         s= s.replaceAll("%20"," ");
         //s= s.replaceAll("\\+"," ");
@@ -290,12 +293,15 @@ public class InlineDataSource extends AbstractDataSource {
             
         }
         
-        //List<String> script= new ArrayList();
+        String[] ss= script.toArray(new String[script.size()]);
         
-        //InlineDataSourceFactory.getScript( noFile, script );
-        String[] ss= guardedSplit( noFile, '&', '\'', '\"' );
+        // make sure timerange is set before any other calls.
+        for ( String line: ss ) {
+            if ( line.startsWith("timerange=") ) {
+                interp.exec(line);
+            }
+        }
         
-
         MutablePropertyDataSet ds= null;
         MutablePropertyDataSet bundle1= null;
         MutablePropertyDataSet[] depn= new MutablePropertyDataSet[4];
