@@ -220,6 +220,11 @@ public class DataMashUp extends javax.swing.JPanel {
         DefaultTreeModel m= (DefaultTreeModel) jTree1.getModel();
         
         b.append( getJython( m, m.getRoot() ) );
+
+        String timerange= timeRangeTextField.getText();
+        if ( timerange.trim().length()>0 ) {
+            b.append("&timerange=").append(timerange.trim().replaceAll(" ","+") );
+        }
         
         return b.toString();
         
@@ -540,7 +545,12 @@ public class DataMashUp extends javax.swing.JPanel {
                     ids.add(m.group(1));
                     uris.add(m.group(2));
                 } else {
-                    throw new IllegalArgumentException("script is not jython mashup");
+                     if ( s.substring(0,i).trim().equals("timerange") ) {
+                        String timerange= s.substring(i+1).trim();
+                        timeRangeTextField.setText( timerange.replaceAll("\\+", " " ) );
+                    } else {
+                        throw new IllegalArgumentException("script is not jython mashup");
+                    }
                 }
             } else {
                 if ( haveAllIds==false ) {
@@ -642,6 +652,8 @@ public class DataMashUp extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         namedURIListTool1 = new org.virbo.jythonsupport.ui.NamedURIListTool();
         jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        timeRangeTextField = new javax.swing.JTextField();
 
         jSplitPane1.setDividerLocation(100);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -665,7 +677,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("mathematics", jPanel1);
@@ -686,7 +698,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("dataset", jPanel3);
@@ -707,7 +719,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("filters", jPanel5);
@@ -723,7 +735,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("scratch", jPanel6);
@@ -751,7 +763,7 @@ public class DataMashUp extends javax.swing.JPanel {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addComponent(directionsLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE))
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE))
         );
 
         jSplitPane2.setRightComponent(jPanel4);
@@ -769,19 +781,32 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jLabel1.setText("Load Data Sets:");
 
+        jLabel2.setText("Time Range:");
+
+        timeRangeTextField.setText("jTextField1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSplitPane1)
-            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 498, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(timeRangeTextField)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jLabel1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2)
+                    .addComponent(timeRangeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 375, Short.MAX_VALUE))
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -971,6 +996,7 @@ public class DataMashUp extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel directionsLabel;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JList jList1;
     private javax.swing.JList jList2;
     private javax.swing.JList jList3;
@@ -992,5 +1018,6 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JTree jTree1;
     private org.virbo.jythonsupport.ui.NamedURIListTool namedURIListTool1;
     private javax.swing.JList scratchList;
+    private javax.swing.JTextField timeRangeTextField;
     // End of variables declaration//GEN-END:variables
 }
