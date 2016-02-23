@@ -304,7 +304,7 @@ public class AutoplotDataServer {
 
     public static void main(String[] args) throws Exception {
 
-        System.err.println("org.virbo.autoplot.AutoplotDataServer 20130110 (Autoplot version " + APSplash.getVersion() + ")" );
+        System.err.println("org.virbo.autoplot.AutoplotDataServer 20160222 (Autoplot version " + APSplash.getVersion() + ")" );
 
         ArgumentList alm = new ArgumentList("AutoplotDataServer");
         alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot");
