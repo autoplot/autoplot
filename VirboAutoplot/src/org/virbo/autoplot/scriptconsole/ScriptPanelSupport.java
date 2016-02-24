@@ -716,6 +716,14 @@ public class ScriptPanelSupport {
                                     }
                                     String code= panel.getEditorPanel().getText();
                                     if ( file!=null ) {
+                                        char[] cc= code.toCharArray();
+                                        boolean warning= false;
+                                        for ( char c: cc ) {
+                                            if ( c>128 ) warning= true;
+                                        }
+                                        if ( warning ) {
+                                            System.err.println("code contains data that will not be represented properly!");
+                                        }
                                         InputStream in= new ByteArrayInputStream( code.getBytes() );
                                         interp.execfile(in,file.getName());
                                         in.close();
