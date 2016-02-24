@@ -1231,11 +1231,8 @@ public class JythonUtil {
         interp.set( "timerange", "timerange" );
         
         String redefineGDS= "gds={}\nngds=0\ndef getDataSet( uri, timerange='', map=0 ):\n  global ngds\n  global gdsi\n  gds[ngds]=uri+' '+timerange\n  ngds=ngds+1\n";
-        System.err.println(redefineGDS);
-        
         interp.exec( redefineGDS );
-        System.err.println(prog);
-        
+
         try {
             interp.exec(prog);
         } catch ( PyException ex ) {
