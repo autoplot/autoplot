@@ -65,11 +65,7 @@ public class BookmarksManagerModel {
                 JOptionPane.showMessageDialog( c, ex.getMessage(), "Error when reading bookmarks", JOptionPane.ERROR_MESSAGE );
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
 
-            } catch (ParserConfigurationException ex) {
-                JOptionPane.showMessageDialog( c, ex.getMessage(), "Error when reading bookmarks", JOptionPane.ERROR_MESSAGE );
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-
-            } catch (BookmarksException ex) {
+            } catch (ParserConfigurationException | BookmarksException ex) {
                 JOptionPane.showMessageDialog( c, ex.getMessage(), "Error when reading bookmarks", JOptionPane.ERROR_MESSAGE );
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
 
@@ -135,14 +131,15 @@ public class BookmarksManagerModel {
 
     /**
      * set the bookmarks list.  This is used as the internal list, without making a copy.
-     * @param the list of bookmarks.
+     * @param list list of bookmarks.
      */
     public void setList(List<Bookmark> list) {
         logger.log(Level.FINE, "setting list to {0}", list);
         this.list = list;
         propertyChangeSupport.firePropertyChange(PROP_LIST, null, list);  //always fire event, since the objects within are mutable.
     }
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
@@ -179,8 +176,7 @@ public class BookmarksManagerModel {
      * @return
      */
     Bookmark.Folder getFolder( List<Bookmark>newList, Bookmark context ) {
-        for ( int i=0; i<newList.size(); i++ ) {
-            Bookmark item= newList.get(i);
+        for (Bookmark item : newList) {
             if ( item.equals( context ) ) {
                 return (Bookmark.Folder) item; // old logic.
             } else if ( item instanceof Bookmark.Folder ) {
@@ -211,7 +207,7 @@ public class BookmarksManagerModel {
     }
     
     void addBookmarks(List<Bookmark> bookmarks, Bookmark context, boolean insert) {
-        ArrayList<Bookmark> newList = new ArrayList<Bookmark>(this.list.size());
+        ArrayList<Bookmark> newList = new ArrayList<>(this.list.size());
         for (Bookmark b : this.list) {
             newList.add((Bookmark) b.copy());
         }
@@ -272,10 +268,9 @@ public class BookmarksManagerModel {
      * @return
      */
     private Bookmark findItem( List<Bookmark> oldList, String title, boolean findFolder ) {
-        for ( int i=0; i<oldList.size(); i++ ) {
-            final Bookmark item = oldList.get(i);
+        for (Bookmark item : oldList) {
             boolean isFolder=  item instanceof Bookmark.Folder;
-            if ( ( findFolder == isFolder ) && oldList.get(i).getTitle().equals(title) ) {
+            if (( findFolder == isFolder ) && item.getTitle().equals(title)) {
                 return item;
             }
         }
@@ -292,8 +287,7 @@ public class BookmarksManagerModel {
      public void mergeList( List<Bookmark> src, List<Bookmark> dest ) {
         if ( src.isEmpty() ) return;
 
-        for ( int i=0; i<src.size(); i++ ) {
-            Bookmark item= src.get(i);
+        for (Bookmark item : src) {
             if ( item instanceof Bookmark.Folder ) {
                 String folderName= item.getTitle();
                 Bookmark.Folder old= (Bookmark.Folder)findItem( dest, folderName, true );
@@ -359,7 +353,7 @@ public class BookmarksManagerModel {
     }
 
     Bookmark.Folder removeBookmarks( Bookmark.Folder folder, Bookmark book ) {
-        ArrayList<Bookmark> newList = new ArrayList<Bookmark>( folder.getBookmarks().size() );
+        ArrayList<Bookmark> newList = new ArrayList<>( folder.getBookmarks().size() );
         for (Bookmark b : folder.getBookmarks() ) {
             newList.add( (Bookmark) b.copy() );
         }
@@ -392,7 +386,7 @@ public class BookmarksManagerModel {
      * @param bookmarks
      */
     void removeBookmarks(List<Bookmark> bookmarks) {
-        ArrayList<Bookmark> newList = new ArrayList<Bookmark>(this.list.size());
+        ArrayList<Bookmark> newList = new ArrayList<>(this.list.size());
         for (Bookmark b : this.list) {
             newList.add((Bookmark) b.copy());
         }
@@ -472,7 +466,7 @@ public class BookmarksManagerModel {
      * @return
      */
     protected List<Bookmark> getSelectedBookmarks(TreeModel model, TreePath[] paths) {
-        List<Bookmark> result= new ArrayList<Bookmark>();
+        List<Bookmark> result= new ArrayList<>();
         if ( paths==null ) return result;
         for ( TreePath path: paths ) {
             if (path == null ) return null;
@@ -519,7 +513,7 @@ public class BookmarksManagerModel {
      * 
      * @param surl
      * @param selectedBookmark location to add the bookmark, can be null.
-     * @throws MalformedURLException
+     * @throws MalformedRemoteBookmarksException
      */
     public void addRemoteBookmarks(String surl, Bookmark selectedBookmark) throws MalformedRemoteBookmarksException {
         List<Bookmark> importBook= new ArrayList(100);
@@ -537,8 +531,7 @@ public class BookmarksManagerModel {
         }
 
         List<Bookmark> copy= new ArrayList();
-        for ( int i=0;i<importBook.size(); i++ ) {
-            Bookmark m=  importBook.get(i);
+        for (Bookmark m : importBook) {
             if ( m instanceof Bookmark.Folder ) {
                 Bookmark.Folder bf= (Bookmark.Folder)m;
                 if ( bf.getRemoteUrl()==null ) {
