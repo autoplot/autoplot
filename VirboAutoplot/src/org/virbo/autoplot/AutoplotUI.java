@@ -531,28 +531,35 @@ public final class AutoplotUI extends javax.swing.JFrame {
 
         dataSetSelector.registerActionTrigger( "bookmarks:(.*)", new AbstractAction( "bookmarks") {
             @Override
-            public void actionPerformed( ActionEvent ev ) {
+            public void actionPerformed( final ActionEvent ev ) {
                 org.das2.util.LoggerManager.logGuiEvent(ev);
-                String bookmarksFile= dataSetSelector.getValue().substring("bookmarks:".length());
-                if ( bookmarksFile.endsWith("/") || bookmarksFile.endsWith(".")) { // normally reject method would trigger another completion
-                    DataSetSelector source= (DataSetSelector)ev.getSource();
-                    source.showFileSystemCompletions( true, false, "[^\\s]+[^\\s]+(\\.(?i)(xml)|(xml\\.gz))$" );
-                } else {
-                    while ( getBookmarksManager()==null || getBookmarksManager().getModel()==null || getBookmarksManager().getModel().getList()==null ) {
-                        logger.fine("waiting for bookmarks manager to be initialized");
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException ex) {
-                            logger.log(Level.SEVERE, ex.getMessage(), ex);
+                Runnable run = new Runnable() {
+                    @Override
+                    public void run() {
+                        String bookmarksFile= dataSetSelector.getValue().substring("bookmarks:".length());
+                        if ( bookmarksFile.endsWith("/") || bookmarksFile.endsWith(".")) { // normally reject method would trigger another completion
+                            DataSetSelector source= (DataSetSelector)ev.getSource();
+                            source.showFileSystemCompletions( true, false, "[^\\s]+[^\\s]+(\\.(?i)(xml)|(xml\\.gz))$" );
+                        } else {
+                            while ( getBookmarksManager()==null || getBookmarksManager().getModel()==null || getBookmarksManager().getModel().getList()==null ) {
+                                logger.fine("waiting for bookmarks manager to be initialized");
+                                try {
+                                    Thread.sleep(100);
+                                } catch (InterruptedException ex) {
+                                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                                }   
+                            }
+                            if ( ! getBookmarksManager().haveRemoteBookmark(bookmarksFile) ) {
+                                support.importBookmarks( bookmarksFile );
+                                applicationModel.addRecent(dataSetSelector.getValue());
+                            } else {
+                                setStatus( "remote bookmarks file is already imported"  );
+                            }
                         }
+
                     }
-                    if ( ! getBookmarksManager().haveRemoteBookmark(bookmarksFile) ) {
-                        support.importBookmarks( bookmarksFile );
-                        applicationModel.addRecent(dataSetSelector.getValue());
-                    } else {
-                        setStatus( "remote bookmarks file is already imported"  );
-                    }
-                }
+                };
+                new Thread( run, "bookmarksUri" ).start();
             }
         });
         dataSetSelector.registerBrowseTrigger( "bookmarks:(.*)", new AbstractAction( "bookmarks") {
