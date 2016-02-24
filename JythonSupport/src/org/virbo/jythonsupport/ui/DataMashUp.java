@@ -576,10 +576,12 @@ public class DataMashUp extends javax.swing.JPanel {
             timeRangeTextField.setText( "" );
             timeRangeTextField.setEnabled(false);
             timeRangeLabel.setEnabled(false);
+            timeRangeLabel.setToolTipText("In-line code does not support Time Series Browse");
         } else {
             timeRangeTextField.setText( timerange.replaceAll("\\+", " " ) );
             timeRangeTextField.setEnabled(true);
             timeRangeLabel.setEnabled(true);
+            timeRangeLabel.setToolTipText("Current time range for data requests");
         }
     }
     
