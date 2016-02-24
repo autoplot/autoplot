@@ -343,11 +343,18 @@
         <Property name="text" type="java.lang.String" value="Time Range:"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <Events>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="timeRangeTextFieldFocusLost"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="timeRangeTextField">
       <Properties>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <Events>
+        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="timeRangeTextFieldFocusLost"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="timeRangeTextFieldActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

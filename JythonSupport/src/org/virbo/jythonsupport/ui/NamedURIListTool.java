@@ -30,7 +30,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import org.das2.datum.DatumRange;
 import org.das2.util.LoggerManager;
+import org.jdesktop.beansbinding.AutoBinding;
+import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
+import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Bindings;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
@@ -139,6 +144,26 @@ public class NamedURIListTool extends JPanel {
         return "ds"+(max+1);
     }
     
+    private void bindTimeRange( DataSetSelector dss ) {
+        AutoBinding binding;
+        binding = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, this, BeanProperty.create("timeRange"), dss, BeanProperty.create("timeRange"));
+        binding.bind();
+    }
+    
+    private DatumRange timeRange;
+
+    public static final String PROP_TIMERANGE = "timeRange";
+
+    public DatumRange getTimeRange() {
+        return timeRange;
+    }
+
+    public void setTimeRange(DatumRange timeRange) {
+        DatumRange oldTimeRange = this.timeRange;
+        this.timeRange = timeRange;
+        firePropertyChange(PROP_TIMERANGE, oldTimeRange, timeRange);
+    }
+
     /**
      * return the panel with the add and remove icons.
      * @param fi the position 
@@ -218,6 +243,8 @@ public class NamedURIListTool extends JPanel {
             final DataSetSelector dss= new DataSetSelector();
             dss.setPlotItButtonVisible(false);
             dss.setValue( uris.get(fi) );
+            bindTimeRange(dss);
+            
             try{
                 dss.setRecent( DataSetSelector.getDefaultRecent() );
             } catch ( IllegalArgumentException ex ) {
@@ -398,7 +425,7 @@ public class NamedURIListTool extends JPanel {
         
         c.gridx= 2;
         c.weightx= 1.0;
-        literalTF.addFocusListener( new FocusListener() {
+        literalTF.addFocusListener(new FocusListener() {
             String orig=null;
             @Override
             public void focusGained(FocusEvent e) {

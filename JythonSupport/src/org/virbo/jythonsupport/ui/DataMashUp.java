@@ -19,7 +19,10 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +47,7 @@ import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeNode;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.util.LoggerManager;
 import org.python.parser.ast.Assign;
@@ -129,6 +133,12 @@ public class DataMashUp extends javax.swing.JPanel {
     public DataMashUp() {
         initComponents();
         namedURIListTool1.setDataMashUp(this);
+        namedURIListTool1.addPropertyChangeListener( NamedURIListTool.PROP_TIMERANGE, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                timeRangeTextField.setText( namedURIListTool1.getTimeRange().toString() );
+            }
+        });
 
         DragSource dragSource = DragSource.getDefaultDragSource();
         DropTarget dropTarget = new DropTarget();
@@ -229,6 +239,7 @@ public class DataMashUp extends javax.swing.JPanel {
         return b.toString();
         
     }
+    
     
     /**
      * return the jython for just the node.
@@ -792,8 +803,23 @@ public class DataMashUp extends javax.swing.JPanel {
 
         timeRangeLabel.setText("Time Range:");
         timeRangeLabel.setEnabled(false);
+        timeRangeLabel.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                timeRangeTextFieldFocusLost(evt);
+            }
+        });
 
         timeRangeTextField.setEnabled(false);
+        timeRangeTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                timeRangeTextFieldFocusLost(evt);
+            }
+        });
+        timeRangeTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                timeRangeTextFieldActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -843,6 +869,22 @@ public class DataMashUp extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_jTree1MouseClicked
+
+    private void timeRangeTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_timeRangeTextFieldFocusLost
+        try {
+            namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeTextField.getText()));
+        } catch (ParseException ex) {
+            Logger.getLogger(DataMashUp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_timeRangeTextFieldFocusLost
+
+    private void timeRangeTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeTextFieldActionPerformed
+        try {
+            namedURIListTool1.setTimeRange( DatumRangeUtil.parseTimeRange(timeRangeTextField.getText()));
+        } catch (ParseException ex) {
+            Logger.getLogger(DataMashUp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_timeRangeTextFieldActionPerformed
 
     /**
      * add the expression to the scratch list.
