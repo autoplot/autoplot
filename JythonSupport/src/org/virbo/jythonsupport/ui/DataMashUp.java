@@ -222,7 +222,7 @@ public class DataMashUp extends javax.swing.JPanel {
         b.append( getJython( m, m.getRoot() ) );
 
         String timerange= timeRangeTextField.getText();
-        if ( timerange.trim().length()>0 ) {
+        if ( timeRangeTextField.isEnabled() ) {
             b.append("&timerange=").append(timerange.trim().replaceAll(" ","+") );
         }
         
@@ -536,6 +536,7 @@ public class DataMashUp extends javax.swing.JPanel {
         List<String> ids= new ArrayList<String>();
         List<String> uris= new ArrayList<String>();
         boolean haveAllIds= false;
+        String timerange= null;
         for ( String s: ss ) {
             int i= s.indexOf("=");
             if ( i>-1 ) {
@@ -546,8 +547,7 @@ public class DataMashUp extends javax.swing.JPanel {
                     uris.add(m.group(2));
                 } else {
                      if ( s.substring(0,i).trim().equals("timerange") ) {
-                        String timerange= s.substring(i+1).trim();
-                        timeRangeTextField.setText( timerange.replaceAll("\\+", " " ) );
+                        timerange= s.substring(i+1).trim();
                     } else {
                         throw new IllegalArgumentException("script is not jython mashup");
                     }
@@ -560,6 +560,15 @@ public class DataMashUp extends javax.swing.JPanel {
                 }
                 fillTree( s );
             }
+        }
+        if ( timerange==null ) {
+            timeRangeTextField.setText( "" );
+            timeRangeTextField.setEnabled(false);
+            timeRangeLabel.setEnabled(false);
+        } else {
+            timeRangeTextField.setText( timerange.replaceAll("\\+", " " ) );
+            timeRangeTextField.setEnabled(true);
+            timeRangeLabel.setEnabled(true);
         }
     }
     
@@ -652,7 +661,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         namedURIListTool1 = new org.virbo.jythonsupport.ui.NamedURIListTool();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        timeRangeLabel = new javax.swing.JLabel();
         timeRangeTextField = new javax.swing.JTextField();
 
         jSplitPane1.setDividerLocation(100);
@@ -781,9 +790,10 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jLabel1.setText("Load Data Sets:");
 
-        jLabel2.setText("Time Range:");
+        timeRangeLabel.setText("Time Range:");
+        timeRangeLabel.setEnabled(false);
 
-        timeRangeTextField.setText("jTextField1");
+        timeRangeTextField.setEnabled(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -793,7 +803,7 @@ public class DataMashUp extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 498, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
+                .addComponent(timeRangeLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(timeRangeTextField)
                 .addContainerGap())
@@ -803,7 +813,7 @@ public class DataMashUp extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jLabel2)
+                    .addComponent(timeRangeLabel)
                     .addComponent(timeRangeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 365, Short.MAX_VALUE))
@@ -996,7 +1006,6 @@ public class DataMashUp extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel directionsLabel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JList jList1;
     private javax.swing.JList jList2;
     private javax.swing.JList jList3;
@@ -1018,6 +1027,7 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JTree jTree1;
     private org.virbo.jythonsupport.ui.NamedURIListTool namedURIListTool1;
     private javax.swing.JList scratchList;
+    private javax.swing.JLabel timeRangeLabel;
     private javax.swing.JTextField timeRangeTextField;
     // End of variables declaration//GEN-END:variables
 }

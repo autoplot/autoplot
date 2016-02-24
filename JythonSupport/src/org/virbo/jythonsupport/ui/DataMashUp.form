@@ -20,7 +20,7 @@
           <Group type="102" attributes="0">
               <Component id="jLabel1" min="-2" pref="498" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+              <Component id="timeRangeLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="timeRangeTextField" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -32,7 +32,7 @@
           <Group type="102" alignment="1" attributes="0">
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="timeRangeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="timeRangeTextField" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -338,14 +338,15 @@
         <Property name="text" type="java.lang.String" value="Load Data Sets:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel2">
+    <Component class="javax.swing.JLabel" name="timeRangeLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Time Range:"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="timeRangeTextField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="jTextField1"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>
   </SubComponents>
