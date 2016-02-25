@@ -1569,10 +1569,19 @@ public class PlotElementController extends DomNodeController {
     private boolean xaxisFreeFromBindings( Plot p ) {
         boolean isNotBound= true;
         List<BindingModel> l = DomUtil.findBindings( dom, p.xaxis, Axis.PROP_RANGE );
+        String xaxisId= p.getXaxis().getId();
         for ( BindingModel bm : l ) {
             if ( bm.getSrcId().equals(dom.getId() ) ) {
                 List<BindingModel> l2 = DomUtil.findBindings( dom, dom, Application.PROP_TIMERANGE );
                 if ( l2.size()>1 ) isNotBound= false;  // first one is the one we already found.
+            } else if ( bm.getSrcId().equals( xaxisId ) ) {
+                if ( !bm.getDstId().equals(xaxisId) && bm.getDstProperty().equals(Axis.PROP_RANGE) ) {
+                    isNotBound= false;
+                }
+            } else if ( bm.getDstId().equals( xaxisId ) ) {
+                if ( !bm.getSrcId().equals(xaxisId) && bm.getSrcProperty().equals(Axis.PROP_RANGE ) ) {
+                    isNotBound= false;
+                }
             }
         }
         return isNotBound;
