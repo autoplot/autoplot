@@ -982,6 +982,8 @@ public class LayoutPanel extends javax.swing.JPanel {
                 Row row= DomOps.getOrCreateSelectedRow( app, getSelectedPlots(), true );
 
                 Plot p= app.getController().addPlot(row, col);
+                PlotElement pe= app.getController().addPlotElement( p, null );
+                pe.setActive(false);
                 p.setVisible(false);
                 p.getXaxis().setVisible(false);
                 p.getYaxis().setVisible(false);
