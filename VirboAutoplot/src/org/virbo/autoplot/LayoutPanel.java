@@ -52,6 +52,7 @@ import org.das2.graph.Renderer;
 import static org.virbo.autoplot.GuiSupport.getStylePanel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.Column;
 import org.virbo.autoplot.dom.DomOps;
@@ -1009,7 +1010,13 @@ public class LayoutPanel extends javax.swing.JPanel {
                     for ( Plot p1: getSelectedPlots() ) {
                         p.getXaxis().setRange( range );
                         if ( !log ) p1.getXaxis().setLog(log);
-                        app.getController().bind( p.getXaxis(), "range", p1.getXaxis(), "range" );
+                        BindingModel check= 
+                            app.getController().findBinding( app, Application.PROP_TIMERANGE, p1.getXaxis(), Axis.PROP_RANGE );
+                        if ( check!=null ) {
+                            app.getController().bind( app, Application.PROP_TIMERANGE, p.getXaxis(), "range" );
+                        } else {
+                            app.getController().bind( p.getXaxis(), "range", p1.getXaxis(), "range" );
+                        }
                         p.getXaxis().setLog( log );
                         app.getController().bind( p.getXaxis(), "log", p1.getXaxis(), "log" );
                     }
