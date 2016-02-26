@@ -42,10 +42,16 @@ public class Axis extends DomNode {
 //        System.err.println("range="+range);
 //        if ( this.controller!=null 
 //            && this.controller.dasAxis.isHorizontal()
+//            && !org.das2.datum.UnitsUtil.isTimeLocation( range.getUnits() ) 
+//            && range.width().value()==1. ) {
+//            logger.log( Level.WARNING, "breakpoint here in setRange");
+//        }
+//        if ( this.controller!=null 
+//            && this.controller.dasAxis.isHorizontal()
 //            && org.das2.datum.UnitsUtil.isTimeLocation( range.getUnits() ) 
 //            && range.intersects(org.das2.datum.DatumRangeUtil.parseTimeRangeValid("2013-10-09T19:00:00/2013-10-09T19:40:00") ) ) {
 //            logger.log( Level.WARNING, "breakpoint here in setRange");
-//        }
+//        }        
 //        if ( this.id.startsWith("xaxis_0") && !UnitsUtil.isTimeLocation(range.getUnits()) && range.max().value()>=20000 ) {
 //            logger.log( Level.WARNING, "breakpoint here in setRange");
 //        }
