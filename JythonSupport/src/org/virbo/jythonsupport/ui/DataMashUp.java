@@ -585,6 +585,11 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }
     
+    public void enableTimeRange() {
+        timeRangeLabel.setEnabled(true);
+        timeRangeTextField.setEnabled(true);
+    }
+    
     private void doDrop( String data, final TreePath tp ) {
 
         DefaultTreeModel model= (DefaultTreeModel) jTree1.getModel();
