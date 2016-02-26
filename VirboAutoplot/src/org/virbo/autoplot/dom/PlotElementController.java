@@ -367,11 +367,7 @@ public class PlotElementController extends DomNodeController {
             LoggerManager.logPropertyChangeEvent(evt,"parentStyleListener");            
             try {
                 DomUtil.setPropertyValue(plotElement.style, evt.getPropertyName(), evt.getNewValue());
-            } catch (IllegalAccessException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (IllegalArgumentException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (InvocationTargetException ex) {
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
@@ -1425,7 +1421,7 @@ public class PlotElementController extends DomNodeController {
                     Plot domPlot = dom.controller.getPlotFor(plotElement);
 
                     int count= Math.min(QDataSet.MAX_UNIT_BUNDLE_COUNT, fillDs.length(0));
-                    List<PlotElement> cp = new ArrayList<PlotElement>(count);
+                    List<PlotElement> cp = new ArrayList<>(count);
                     int nsubsample= 1 + ( count-1 ) / 12; // 1-12 no subsample, 13-24 1 subsample, 25-36 2 subsample, etc.
 
                     //check for non-unique labels, or labels that are simply numbers.
@@ -1615,6 +1611,10 @@ public class PlotElementController extends DomNodeController {
      * true indicates the controller should autorange next time the fillDataSet is changed.
      */
     public static final String PROP_RESETRANGES = "resetRanges";
+
+    /**
+     * true indicates the controller should autorange next time the fillDataSet is changed.
+     */
     private boolean resetRanges = false;
 
     public boolean isResetRanges() {
@@ -2763,9 +2763,7 @@ public class PlotElementController extends DomNodeController {
             } else {
                 try {
                     SwingUtilities.invokeAndWait(run);
-                } catch (InterruptedException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } catch (InvocationTargetException ex) {
+                } catch (InterruptedException | InvocationTargetException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
