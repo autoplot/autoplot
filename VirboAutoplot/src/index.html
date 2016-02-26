@@ -21,8 +21,12 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2016-02-18 r18315):</p>
+        <p>Bugfixes (2016-02-26 r18380):</p>
         <ul>
+            <li>events bar autoranging of one time datum should expand out to one hour duration</li>
+            <li>the vertical slice "dump data set" now forces the .d2s extension so Autoplot can read this result.</li> 
+            <li>1528: add an invisible plotElement when adding a hidden plot, so it can be turned on and provide overlays.</li>    
+            <li>vap+inline:3 now returns a rank 0 scalar.</li>
             <li>rte 1695465728: single-tab tear off on Mac would result in RTE.</li>
             <li>setDepend0Cadence would not properly set the units</li>
             <li>webstart on Linux/Mint creates a launcher that likes pass in %U when there is no file argument.  -open xx (with any two characters) is now ignored.</li>
