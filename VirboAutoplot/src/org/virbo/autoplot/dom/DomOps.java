@@ -10,8 +10,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.graph.DasRow;
@@ -160,12 +163,12 @@ public class DomOps {
      * @return 
      */
     public static Column getOrCreateSelectedColumn( Application dom, List<Plot> selectedPlots, boolean create ) {
-        List<String> n= new ArrayList<String>();
+        Set<String> n= new HashSet<>();
         for ( Plot p: selectedPlots ) {
             n.add( p.getColumnId() );
         }
         if ( n.size()==1 ) {
-            return (Column) DomUtil.getElementById(dom,n.get(0));
+            return (Column) DomUtil.getElementById(dom,n.iterator().next());
         } else {
             if ( create ) {
                 Canvas c= dom.getCanvases(0); //TODO: do this
@@ -189,19 +192,20 @@ public class DomOps {
      * @return 
      */    
     public static Row getOrCreateSelectedRow( Application dom, List<Plot> selectedPlots, boolean create ) {
-        List<String> n= new ArrayList<String>();
+        Set<String> n= new HashSet<>();
         for ( Plot p: selectedPlots ) {
             if ( !n.contains(p.getRowId()) ) n.add( p.getRowId() );
         }
         if ( n.size()==1 ) {
-            return (Row) DomUtil.getElementById(dom,n.get(0));
+            return (Row) DomUtil.getElementById(dom,n.iterator().next());
         } else {
             if ( create ) {
-                Row r= (Row) DomUtil.getElementById( dom.getCanvases(0), n.get(0) );
+                Iterator<String> iter= n.iterator();
+                Row r= (Row) DomUtil.getElementById( dom.getCanvases(0), iter.next() );
                 Row rmax= r;
                 Row rmin= r;
-                for ( int i=1; i<n.size(); i++ ) {
-                    r= (Row) DomUtil.getElementById( dom.getCanvases(0), n.get(i) );
+                for ( int i=1; iter.hasNext(); i++ ) {
+                    r= (Row) DomUtil.getElementById( dom.getCanvases(0), iter.next() );
                     if ( r.getController().getDasRow().getDMaximum()>rmax.getController().getDasRow().getDMaximum() ) {
                         rmax= r;
                     }
