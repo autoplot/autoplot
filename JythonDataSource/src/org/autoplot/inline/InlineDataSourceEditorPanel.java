@@ -36,6 +36,11 @@ import org.virbo.jythonsupport.ui.DataMashUp;
 public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
     /**
+     * true if the timerange field should be turned on.
+     */
+    private boolean needTimeRange=false;
+
+    /**
      * Creates new form InlineDataSourceEditorPanel
      */
     public InlineDataSourceEditorPanel() {
@@ -568,7 +573,9 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     @Override
     public void markProblems(List<String> problems) {
-        
+        if ( problems.contains("no timerange provided") ) { //TODO: this needs to work in data sources.
+            needTimeRange = true;
+        }
     }
 
     @Override
@@ -601,6 +608,9 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
         } else if ( mashupUri!=null ) {
             dataMashUp1.setAsJythonInline(mashupUri);
+            if ( needTimeRange ) {
+                dataMashUp1.enableTimeRange();
+            }
             this.jTabbedPane1.setSelectedIndex(2);
             
         } else {
