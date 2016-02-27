@@ -21,9 +21,11 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Bugfixes (2016-02-26 r18380):</p>
+        <p>Bugfixes (2016-02-27 r18388):</p>
         <ul>
+            <li>1526: PDS/PPI didn't support quoted ISO8601 times</li>
             <li>annotation "point at" operation doesn't move the annotation, so "point at" and "move" are orthogonal operations.</li>
+            <li>turn on timerange editor when vap+inline: is TimeSeriesBrowse</li>
             <li>events bar autoranging of one time datum should expand out to one hour duration</li>
             <li>the vertical slice "dump data set" now forces the .d2s extension so Autoplot can read this result.</li> 
             <li>1528: add an invisible plotElement when adding a hidden plot, so it can be turned on and provide overlays.</li>    
@@ -120,6 +122,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>vap+inline: automatically supports timeSeriesBrowse</li>
+            <li>events bar autoranging of one time datum should expand out to one hour duration</li>
             <li>add Units.nT.</li>
             <li>Autoplot servlet allows multiple colors to be specified for stack of traces.</li>
             <li>Data Mash up is now accessible from menus.  Improvements to mashup including thumbnails.</li>
