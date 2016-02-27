@@ -283,6 +283,10 @@ public class VOTableReader {
                 if ( localName.equalsIgnoreCase("TD") ) {
                     assert state.equals(STATE_FIELD);
                     String s= valueBuilder.toString();
+                    int slen=s.length();
+                    if ( slen>1 && s.charAt(0)=='"' && s.charAt(slen-1)=='"' ) { // pop off quotes, which were in stream from DITDOS.
+                        s= s.substring(1,slen-1);
+                    }
                     //logger.finest( "index:"+index+ " s:"+s );
 
                     int arraysize= arraysizes.get(index);
