@@ -1376,6 +1376,7 @@ public class AutoplotUtil {
 
         // bad things happen if we have time locations that don't vary, so here's some special code to avoid that.
         if ( UnitsUtil.isTimeLocation(u) && dd[0]==dd[1] ) {  // round out to a day if the times are the same.
+            if ( dd[0]<=-1e29 ) throw new IllegalArgumentException("timetags are all invalid ");
             Units du= u.getOffsetUnits();
             double d= Units.days.convertDoubleTo( du, 1. );
             dd[0]= Math.floor( dd[0] / d ) * d;
