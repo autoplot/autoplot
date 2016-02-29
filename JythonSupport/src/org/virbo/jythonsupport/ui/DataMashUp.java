@@ -71,7 +71,17 @@ public class DataMashUp extends javax.swing.JPanel {
 
     private static final Logger logger = LoggerManager.getLogger("jython.dashup");
 
-    private static final String LABEL_DIRECTIONS = "Double-click on the name to set the data set.  Triple click for popup plot.";
+    private static final String LABEL_DIRECTIONS = "Double-click on the name to set the data set.  Shift-click for popup plot.";
+    
+    /**
+     * when a URI results in an exception
+     */
+    private static final QDataSet ERROR_DS= DataSetUtil.asDataSet( new EnumerationUnits("DataMashUp").createDatum("*Fail*") );
+    
+    /**
+     * when a data source returns null.
+     */
+    private static final QDataSet NULL_DS= DataSetUtil.asDataSet( new EnumerationUnits("DataMashUp").createDatum("*Null*") );
     
     /**
      * set the list of URIs.  
@@ -254,6 +264,11 @@ public class DataMashUp extends javax.swing.JPanel {
         
         b.append( getJython( m, tn ) );
         
+        String timerange= timeRangeTextField.getText();
+        if ( timeRangeTextField.isEnabled() ) {
+            b.append("&timerange=").append(timerange.trim().replaceAll(" ","+") );
+        }
+        
         return b.toString();
     }
     
@@ -368,11 +383,18 @@ public class DataMashUp extends javax.swing.JPanel {
                     String jythonSrc= getAsJythonInline( value );
                     logger.log(Level.FINE, "resolving URI {0}", jythonSrc );
                     long t0= System.currentTimeMillis();
-                    qds= resolver.getDataSet( jythonSrc );
-                    resolved.put( jyCommand, qds );
-                    resolvePending.remove( jyCommand );
-                    jTree1.treeDidChange();
-                    logger.log(Level.FINE, "done resolving URI in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, jythonSrc });
+                    try {
+                        qds= resolver.getDataSet( jythonSrc );
+                        if ( qds==null ) qds= NULL_DS;
+                        resolved.put( jyCommand, qds );
+                        resolvePending.remove( jyCommand );
+                        jTree1.treeDidChange();
+                        logger.log(Level.FINE, "done resolving URI in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, jythonSrc });
+                    } catch ( Exception ex  ) {
+                        resolved.put( jyCommand, ERROR_DS );
+                        resolvePending.remove( jyCommand );
+                        jTree1.treeDidChange();
+                    }
                 }
                 return qds;
             }
@@ -571,6 +593,10 @@ public class DataMashUp extends javax.swing.JPanel {
                 }
                 fillTree( s );
             }
+        }
+        if ( haveAllIds==false ) {
+            setIds(ids);
+            setUris(uris);            
         }
         if ( timerange==null ) {
             timeRangeTextField.setText( "" );
@@ -854,13 +880,23 @@ public class DataMashUp extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
-        if ( evt.getClickCount()==3 ) {
+        if ( evt.isShiftDown() ) {
             TreePath tp= jTree1.getClosestPathForLocation( evt.getX(), evt.getY() );
             jTree1.setSelectionPath(tp);
-            String currentId= tp.getLastPathComponent().toString();
             QDataSet showMe= resolved.get( getAsJythonInline( (TreeNode)jTree1.getSelectionPath().getLastPathComponent() ));
             if ( showMe!=null ) {
                 resolver.interactivePlot( showMe );
+            } else {
+                if ( resolver!=null ) {
+                    Runnable run= new Runnable() {
+                        public void run() {
+                            QDataSet showMe= resolver.getDataSet( getAsJythonInline( (TreeNode)jTree1.getSelectionPath().getLastPathComponent() ) );
+                            resolver.interactivePlot( showMe );
+                        }
+                    };
+                    new Thread(run).start();
+                    JOptionPane.showConfirmDialog(this,"loading data and calculating plot, try again shortly.");
+                }
             }
 
         } else if ( evt.getClickCount()==2 ) {
