@@ -354,15 +354,18 @@ public class DataMashUp extends javax.swing.JPanel {
      * @return the dataset at this node.
      */
     private QDataSet getDataSet( final TreeNode value ) {
-        String jyCommand= getAsJythonInline( value );
+        String uri= namedURIListTool1.getUriForId(value.toString());
+        if ( uri==null ) {
+            uri= getAsJythonInline( value );
+        }
         if ( SwingUtilities.isEventDispatchThread() ) {
-            QDataSet qds= resolved.get(jyCommand);
+            QDataSet qds= resolved.get(uri);
             if ( qds==null ) {
                 synchronized ( resolvePending ) {
-                    if ( resolvePending.containsKey(jyCommand) ) { // TODO: locking
+                    if ( resolvePending.containsKey(uri) ) { // TODO: locking
                         return null;
                     } else {
-                        resolvePending.put( jyCommand, "" );
+                        resolvePending.put( uri, "" );
                     }
                 }
                 Runnable run= new Runnable() {
@@ -378,21 +381,20 @@ public class DataMashUp extends javax.swing.JPanel {
             
         } else {
             synchronized ( resolved ) {
-                QDataSet qds= resolved.get(jyCommand);
+                QDataSet qds= resolved.get(uri);
                 if ( qds==null ) {
-                    String jythonSrc= getAsJythonInline( value );
-                    logger.log(Level.FINE, "resolving URI {0}", jythonSrc );
+                    logger.log(Level.FINE, "resolving URI {0}", uri );
                     long t0= System.currentTimeMillis();
                     try {
-                        qds= resolver.getDataSet( jythonSrc );
+                        qds= resolver.getDataSet( uri );
                         if ( qds==null ) qds= NULL_DS;
-                        resolved.put( jyCommand, qds );
-                        resolvePending.remove( jyCommand );
+                        resolved.put( uri, qds );
+                        resolvePending.remove( uri );
                         jTree1.treeDidChange();
-                        logger.log(Level.FINE, "done resolving URI in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, jythonSrc });
+                        logger.log(Level.FINE, "done resolving URI in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, uri });
                     } catch ( Exception ex  ) {
-                        resolved.put( jyCommand, ERROR_DS );
-                        resolvePending.remove( jyCommand );
+                        resolved.put( uri, ERROR_DS );
+                        resolvePending.remove( uri );
                         jTree1.treeDidChange();
                     }
                 }
