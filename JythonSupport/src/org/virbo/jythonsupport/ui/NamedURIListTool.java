@@ -39,6 +39,7 @@ import org.jdesktop.beansbinding.Bindings;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
+import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.WindowManager;
 import org.virbo.filters.FiltersChainPanel;
 
@@ -115,6 +116,30 @@ public class NamedURIListTool extends JPanel {
     public String[] getIds() {
         assert ids.size()==uris.size();
         return ids.toArray( new String[ids.size()] );
+    }
+    
+    /**
+     * return the URI for the name, something that when resolved will result in
+     * the dataset.
+     * @param name
+     * @return the URI or null if the name is not found.
+     */
+    public String getUriForId( String name ) {
+        String suri=null;
+        for ( int i=0; i<ids.size(); i++ ) {
+            if ( ids.get(i).equals(name) ) {
+                suri= uris.get(i);
+            }
+        }
+        if ( suri!=null ) {
+            if ( this.timeRange!=null ) {
+                String stimeRange= this.timeRange.toString().replaceAll("\\ ","+");
+                suri= "vap+inline:getDataSet(\'"+suri+"\',\'"+stimeRange+"\')";
+            }
+            return suri;
+        } else {
+            return null;
+        }
     }
     
     /**
