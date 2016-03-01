@@ -29,7 +29,7 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel1" min="-2" pref="68" max="-2" attributes="0"/>
+              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel2" max="32767" attributes="0"/>
           </Group>
@@ -98,7 +98,7 @@
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="filtersChainPanel" pref="150" max="32767" attributes="0"/>
+                  <Component id="filtersChainPanel" pref="176" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="sliceAutorangesCB" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -117,7 +117,7 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="sliceAutorangesCB">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Slice Index Change Autoranges"/>
+            <Property name="text" type="java.lang.String" value="Autorange after operations"/>
             <Property name="toolTipText" type="java.lang.String" value="Changing the slice index will re-autorange the data"/>
             <Property name="name" type="java.lang.String" value="sliceAutorangesCB" noResource="true"/>
           </Properties>
@@ -129,7 +129,7 @@
                 <Font component="jLabel1" property="font" relativeSize="true" size="-4"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" value="Apply additional operations to the dataset"/>
+            <Property name="text" type="java.lang.String" value="Apply additional operations to the dataset before plotting"/>
             <Property name="name" type="java.lang.String" value="DataPostProcessingInstructionsLabel" noResource="true"/>
           </Properties>
         </Component>
@@ -200,20 +200,19 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel2" alignment="0" max="32767" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="validRangeLabel" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="validRangeComboBox" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="fillValueLabel" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="fillValueComboBox" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="20" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
+                  <Component id="jLabel2" pref="512" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
+              </Group>
+              <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="operationsLabel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="dataSourceFiltersComboBox" min="-2" pref="395" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="editDataSourceFiltersButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
               </Group>
           </Group>
         </DimensionLayout>
@@ -221,63 +220,25 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="validRangeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="validRangeComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="fillValueLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="fillValueComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="42" max="32767" attributes="0"/>
+              </Group>
+              <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="editDataSourceFiltersButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" alignment="1" groupAlignment="3" attributes="0">
+                              <Component id="operationsLabel1" alignment="3" min="-2" max="-2" attributes="1"/>
+                              <Component id="dataSourceFiltersComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="validRangeLabel">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Valid Range:"/>
-            <Property name="toolTipText" type="java.lang.String" value="Measurements within this range are considered valid.  This field may be changed to exclude outliers or data that has not automatically been detected as fill.&#xa;"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="validRangeComboBox">
-          <Properties>
-            <Property name="editable" type="boolean" value="true"/>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="4">
-                <StringItem index="0" value=""/>
-                <StringItem index="1" value="-1e30 to 1e30"/>
-                <StringItem index="2" value="-1 to 101"/>
-                <StringItem index="3" value="0 to 1e38"/>
-              </StringArray>
-            </Property>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="validRangeComboBoxActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JLabel" name="fillValueLabel">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Fill Value:"/>
-            <Property name="toolTipText" type="java.lang.String" value="This value is used to identify invalid data that should not be plotted."/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="fillValueComboBox">
-          <Properties>
-            <Property name="editable" type="boolean" value="true"/>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="4">
-                <StringItem index="0" value=""/>
-                <StringItem index="1" value="-1e31"/>
-                <StringItem index="2" value="0.0"/>
-                <StringItem index="3" value="-1"/>
-              </StringArray>
-            </Property>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fillValueComboBoxActionPerformed"/>
-          </Events>
-        </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
@@ -285,8 +246,33 @@
                 <Font component="jLabel2" property="font" relativeSize="true" size="-4"/>
               </FontInfo>
             </Property>
-            <Property name="text" type="java.lang.String" value="Specify fill (invalid) values and a valid range when the data source does not do this automatically"/>
+            <Property name="text" type="java.lang.String" value="Apply these operations to the data after loading.  Fill and valid range can be specified with putProperty filter."/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="operationsLabel1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Operations:"/>
+            <Property name="toolTipText" type="java.lang.String" value="Process string that specifies component to plot, or how a data set&apos;s dimensionality should be reduced before display."/>
+          </Properties>
+        </Component>
+        <Component class="org.virbo.datasource.RecentComboBox" name="dataSourceFiltersComboBox">
+          <Properties>
+            <Property name="name" type="java.lang.String" value="operatorsComboBox" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dataSourceFiltersComboBoxActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="editDataSourceFiltersButton">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/org/virbo/autoplot/resources/pipeMag2.png"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Open data source filters editor"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editDataSourceFiltersButtonActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
