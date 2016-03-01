@@ -50,6 +50,7 @@ public class RecentComboBox extends JComboBox {
     public RecentComboBox() {
         setEditable(true);
         addItemListener( new ItemListener() {
+            @Override
             public void itemStateChanged(ItemEvent e) {
                 if ( e.getStateChange()==ItemEvent.SELECTED ) {
 
@@ -91,9 +92,8 @@ public class RecentComboBox extends JComboBox {
     private synchronized void loadRecent() {
         List<String> items= new ArrayList( RECENT_SIZE+2 );
         try {
-            if ( recentFile.exists() ) {
-                BufferedReader r = new BufferedReader(new FileReader(recentFile));
-                try {
+            if ( recentFile!=null && recentFile.exists() ) {
+                try (BufferedReader r = new BufferedReader(new FileReader(recentFile))) {
                     String s= r.readLine();
                     while ( s!=null ) {
                         if ( verifier!=null ) {
@@ -105,8 +105,6 @@ public class RecentComboBox extends JComboBox {
                         items.add(s);
                         s= r.readLine();
                     }
-                } finally {
-                    r.close();
                 }
             }
 
@@ -114,8 +112,7 @@ public class RecentComboBox extends JComboBox {
             
             //remove repeat items
             List nitems= new ArrayList( items.size() );
-            for ( int i=0; i<items.size(); i++ ) {
-                String item= items.get(i);
+            for (String item : items) {
                 if ( !nitems.contains(item) ) nitems.add(item);
             }
             items= nitems;
@@ -125,6 +122,7 @@ public class RecentComboBox extends JComboBox {
             if ( n>RECENT_SIZE ) items= items.subList(0,RECENT_SIZE);
 
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     ComboBoxModel cbm= getModel();
                     if ( cbm instanceof MutableComboBoxModel ) {
@@ -150,7 +148,7 @@ public class RecentComboBox extends JComboBox {
      * @param items
      */
     private synchronized void saveRecent( List<String> items ) {
-        if ( !recentFile.getParentFile().exists() ) {
+        if ( recentFile==null || !recentFile.getParentFile().exists() ) {
             return; //not yet, we're initializing for the first time.
         }
         BufferedWriter w = null;
@@ -182,19 +180,21 @@ public class RecentComboBox extends JComboBox {
         }
 
         Runnable run= new Runnable() {
+            @Override
             public void run() {
-                
                 BufferedWriter w = null;
                 try {
                     synchronized (this) {
-                        if ( recentFile.exists() ) {
-                            w = new BufferedWriter(new FileWriter(recentFile,true));
-                        } else {
-                            w = new BufferedWriter(new FileWriter(recentFile));
+                        if ( recentFile!=null ) {
+                            if ( recentFile.exists() ) {
+                                w = new BufferedWriter(new FileWriter(recentFile,true));
+                            } else {
+                                w = new BufferedWriter(new FileWriter(recentFile));
+                            }
+                            w.append(s, 0, s.length());
+                            w.append("\n");
+                            w.close();
                         }
-                        w.append(s, 0, s.length());
-                        w.append("\n");
-                        w.close();
                     }
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
