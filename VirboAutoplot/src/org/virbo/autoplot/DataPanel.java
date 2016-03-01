@@ -709,7 +709,6 @@ public class DataPanel extends javax.swing.JPanel {
         operationsLabel1 = new javax.swing.JLabel();
         dataSourceFiltersComboBox = new org.virbo.datasource.RecentComboBox();
         editDataSourceFiltersButton = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
         dataSetSelector = new org.virbo.datasource.DataSetSelector();
 
         setName("dataPanel"); // NOI18N
@@ -778,7 +777,7 @@ public class DataPanel extends javax.swing.JPanel {
                         .add(editComponentPanel)
                         .addContainerGap())
                     .add(jPanel2Layout.createSequentialGroup()
-                        .add(sliceAutorangesCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 289, Short.MAX_VALUE)
+                        .add(sliceAutorangesCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .add(235, 235, 235))
                     .add(processDataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(jPanel2Layout.createSequentialGroup()
@@ -798,7 +797,7 @@ public class DataPanel extends javax.swing.JPanel {
                         .add(operationsLabel)
                         .add(operatorsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(filtersChainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                .add(filtersChainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(sliceAutorangesCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -830,83 +829,63 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
 
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)
-                .addContainerGap())
-            .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(jPanel1Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .add(operationsLabel1)
-                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                    .add(dataSourceFiltersComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 395, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                    .add(editDataSourceFiltersButton)
-                    .addContainerGap()))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .add(jLabel2)
-                .addContainerGap(42, Short.MAX_VALUE))
-            .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(jPanel1Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(editDataSourceFiltersButton)
-                        .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(operationsLabel1)
-                            .add(dataSourceFiltersComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                    .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-        );
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Data Address (URI)"));
-        jPanel3.setToolTipText("The Data Address, or URI, identifies the data that is loaded.  Plug-in data sources, resolved from this address, are used to load in the data for the given URI.  (This is not editable, but will be soon.)");
-        jPanel3.setName("uriPanel"); // NOI18N
-
         dataSetSelector.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dataSetSelectorActionPerformed(evt);
             }
         });
 
-        org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel3Layout.createSequentialGroup()
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(407, 407, 407))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(operationsLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(dataSourceFiltersComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 395, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(editDataSourceFiltersButton)
+                        .add(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel3Layout.createSequentialGroup()
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
                 .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(0, 12, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jLabel2)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(operationsLabel1)
+                        .add(dataSourceFiltersComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(editDataSourceFiltersButton))
+                .addContainerGap(37, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        jPanel1.getAccessibleContext().setAccessibleName("Data Source and Initial Processing [?]");
 
         bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
@@ -953,28 +932,24 @@ public class DataPanel extends javax.swing.JPanel {
         app.doPlotGoButton( uri, modifiers );
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
-    private void dataSourceFiltersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSourceFiltersComboBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_dataSourceFiltersComboBoxActionPerformed
-
     private void editDataSourceFiltersButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDataSourceFiltersButtonActionPerformed
-        org.das2.util.LoggerManager.logGuiEvent(evt);  
+        org.das2.util.LoggerManager.logGuiEvent(evt);
 
         JPanel panel= new JPanel(new BorderLayout());
-        
+
         panel.add( new JLabel("<html><em>Add filters to apply to the data after loading.<br> "), BorderLayout.NORTH );
-        
+
         FiltersChainPanel p= new FiltersChainPanel();
-        
+
         Dimension d= new Dimension(480,320);
         panel.setPreferredSize( d );
         panel.setMinimumSize( d );
-        
+
         panel.add( p, BorderLayout.CENTER );
         p.setFilter( dataSourceFiltersTextField.getText());
         if ( this.dsf!=null ) {
             QDataSet inputDs= this.dsf.getController().getDataSet();
-            p.setInput(inputDs); 
+            p.setInput(inputDs);
             p.setFilter(dataSourceFiltersTextField.getText());
         }
         int ret= AutoplotUtil.showConfirmDialog( this, panel, "Edit Data Source Filters", JOptionPane.OK_CANCEL_OPTION  );
@@ -988,6 +963,10 @@ public class DataPanel extends javax.swing.JPanel {
             dataSourceFiltersComboBox.addToRecent( newFilter );
         }
     }//GEN-LAST:event_editDataSourceFiltersButtonActionPerformed
+
+    private void dataSourceFiltersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSourceFiltersComboBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_dataSourceFiltersComboBoxActionPerformed
 
     /**
      * for testing, provide access.
@@ -1008,7 +987,6 @@ public class DataPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JLabel operationsLabel;
     private javax.swing.JLabel operationsLabel1;
     private org.virbo.datasource.RecentComboBox operatorsComboBox;
