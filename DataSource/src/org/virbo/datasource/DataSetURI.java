@@ -1419,7 +1419,7 @@ public class DataSetURI {
      * @param surl 
      * @param carotpos
      * @param mon
-     * @return
+     * @return possibly immutable list.
      * @throws IOException 
      */
     public static List<CompletionResult> getHostCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException {
@@ -1570,7 +1570,7 @@ public class DataSetURI {
      * @param inclFiles include files as well as aggregations.
      * @param acceptPattern  if non-null, files and aggregations much match this.
      * @param mon
-     * @return
+     * @return possibly immutable list.
      * @throws IOException
      * @throws URISyntaxException
      */
