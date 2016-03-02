@@ -1144,6 +1144,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         }
                     }
                     if ( !haveIt ) { 
+                        completions= new ArrayList( completions );
                         completions.add( extra );
                     }
                 }
@@ -1207,6 +1208,9 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     private void mergeLocalIntoRemote( List<CompletionResult> remote, List<CompletionResult> local ) {
         boolean sep= false;
+        
+        remote= new ArrayList( remote );
+        
         List<String> remoteLabels= new ArrayList(remote.size());
         for (CompletionResult remote1 : remote) {
             remoteLabels.add(remote1.completion);
