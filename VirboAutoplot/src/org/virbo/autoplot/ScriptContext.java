@@ -131,6 +131,8 @@ public class ScriptContext extends PyJavaInstance {
      * plot([3,2,1])
      * </pre>
      * @param app the application
+     * @see #setWindow(org.virbo.autoplot.ApplicationModel) 
+     * @see #newApplication(java.lang.String) 
      */
     public static synchronized void setApplication( AutoplotUI app ) {
         setApplicationModel(app.applicationModel);
@@ -147,6 +149,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param appm 
      * @see #newWindow(java.lang.String) 
      * @see #getWindow() which returns the current window.
+     * @see #setApplication(org.virbo.autoplot.AutoplotUI) which creates another application.
      */
     public static synchronized void setWindow( ApplicationModel appm ) {
         AutoplotUI app= appLookup.get(appm);
