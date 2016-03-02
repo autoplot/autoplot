@@ -28,6 +28,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.das2.datum.LoggerManager;
@@ -59,6 +61,11 @@ public class OperationsPanel extends javax.swing.JPanel {
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
                 org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, 
                 operatorsTextField, org.jdesktop.beansbinding.BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST"), 
+                filtersChainPanel, org.jdesktop.beansbinding.BeanProperty.create("filter") );
+        bindingGroup.addBinding(binding);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, 
+                this, org.jdesktop.beansbinding.BeanProperty.create("filter"), 
                 filtersChainPanel, org.jdesktop.beansbinding.BeanProperty.create("filter") );
         bindingGroup.addBinding(binding);
         bindingGroup.bind();
@@ -268,7 +275,7 @@ public class OperationsPanel extends javax.swing.JPanel {
                 if ( !adjusting ) {
                     componentChanged();
                 } else {
-                    logger.info("Unexpected update that cannot be performed because we are adjusting.");
+                    logger.fine("Unexpected update that cannot be performed because we are adjusting.");
                 }
             }
             
@@ -280,6 +287,16 @@ public class OperationsPanel extends javax.swing.JPanel {
             public void changedUpdate(DocumentEvent e) {
             }
         });
+        
+        ((JTextField)operatorsComboBox.getEditor().getEditorComponent()).addCaretListener( new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                System.err.println( "Caret: "+e.getDot() );
+                if ( e.getDot()==0 ) {
+                    System.err.println("who did this?");
+                }
+            }
+        } );
         
         operatorsComboBox.setVerifier( new InputVerifier() {
             @Override
@@ -471,6 +488,13 @@ public class OperationsPanel extends javax.swing.JPanel {
     public static void main( String[] args ) {
         OperationsPanel p= new OperationsPanel();
         p.setDataSet( Schemes.simpleSpectrogramTimeSeries() );
+        p.addPropertyChangeListener( OperationsPanel.PROP_FILTER, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                System.err.println("New Value: "+evt.getNewValue());
+            }
+        });
+        
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( null, p, "Test Panel", JOptionPane.OK_CANCEL_OPTION ) ) {
             System.err.println( p.getFilter() );
         }
