@@ -78,7 +78,6 @@ public class DataPanel extends javax.swing.JPanel {
     PlotElement element;// current focus
 
     final JTextField operatorsTextField;
-    final JTextField dataSourceFiltersTextField;
     
     private final transient PropertyChangeListener compListener; // listen to component property changes
     
@@ -91,7 +90,6 @@ public class DataPanel extends javax.swing.JPanel {
         
         setUpOperationsListeners();
         
-        dataSourceFiltersTextField= ((JTextField)dataSourceFiltersComboBox.getEditor().getEditorComponent());
         operatorsTextField= ((JTextField)operatorsComboBox.getEditor().getEditorComponent());
         operatorsComboBox.setSelectedItem("");
         operatorsTextField.setText("");
@@ -598,10 +596,11 @@ public class DataPanel extends javax.swing.JPanel {
 
         bindingTransitionalState= true;
         BindingGroup bc = new BindingGroup();
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("filters"), this.dataSourceFiltersTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")) );
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("uri"), this.dataSetSelector, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("filters"), this.operationsPanel1, BeanProperty.create("filter")) );
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("uri"), this.dataSetSelector, BeanProperty.create("value")));
         Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("controller.fillDataSet"),this.dataSetLabel, BeanProperty.create("text"));
         b.setConverter( BindingSupport.toStringConverter );
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("controller.fillDataSet"), this.operationsPanel1, BeanProperty.create("dataSet")));
         bc.addBinding(b);
 
         try {
@@ -702,10 +701,8 @@ public class DataPanel extends javax.swing.JPanel {
         filtersChainPanel = new org.virbo.filters.FiltersChainPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        operationsLabel1 = new javax.swing.JLabel();
-        dataSourceFiltersComboBox = new org.virbo.datasource.RecentComboBox();
-        editDataSourceFiltersButton = new javax.swing.JButton();
         dataSetSelector = new org.virbo.datasource.DataSetSelector();
+        operationsPanel1 = new org.virbo.autoplot.OperationsPanel();
 
         setName("dataPanel"); // NOI18N
 
@@ -794,7 +791,7 @@ public class DataPanel extends javax.swing.JPanel {
                         .add(operationsLabel)
                         .add(operatorsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(filtersChainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                .add(filtersChainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(sliceAutorangesCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -807,24 +804,6 @@ public class DataPanel extends javax.swing.JPanel {
 
         jLabel2.setFont(jLabel2.getFont().deriveFont(jLabel2.getFont().getSize()-4f));
         jLabel2.setText("Apply these operations to the data after loading.  Fill and valid range can be specified with putProperty filter.");
-
-        operationsLabel1.setText("Operations:");
-        operationsLabel1.setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
-
-        dataSourceFiltersComboBox.setName("operatorsComboBox"); // NOI18N
-        dataSourceFiltersComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dataSourceFiltersComboBoxActionPerformed(evt);
-            }
-        });
-
-        editDataSourceFiltersButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/resources/pipeMag2.png"))); // NOI18N
-        editDataSourceFiltersButton.setToolTipText("Open data source filters editor");
-        editDataSourceFiltersButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editDataSourceFiltersButtonActionPerformed(evt);
-            }
-        });
 
         dataSetSelector.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -839,14 +818,9 @@ public class DataPanel extends javax.swing.JPanel {
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(operationsLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(dataSourceFiltersComboBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(editDataSourceFiltersButton))
                     .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(operationsPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -855,13 +829,9 @@ public class DataPanel extends javax.swing.JPanel {
                 .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel2)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(operationsLabel1)
-                        .add(dataSourceFiltersComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(editDataSourceFiltersButton))
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(operationsPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 145, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -926,42 +896,6 @@ public class DataPanel extends javax.swing.JPanel {
         app.doPlotGoButton( uri, modifiers );
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
-    private void editDataSourceFiltersButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDataSourceFiltersButtonActionPerformed
-        org.das2.util.LoggerManager.logGuiEvent(evt);
-
-        JPanel panel= new JPanel(new BorderLayout());
-
-        panel.add( new JLabel("<html><em>Add filters to apply to the data after loading.<br> "), BorderLayout.NORTH );
-
-        FiltersChainPanel p= new FiltersChainPanel();
-
-        Dimension d= new Dimension(480,320);
-        panel.setPreferredSize( d );
-        panel.setMinimumSize( d );
-
-        panel.add( p, BorderLayout.CENTER );
-        p.setFilter( dataSourceFiltersTextField.getText());
-        if ( this.dsf!=null ) {
-            QDataSet inputDs= this.dsf.getController().getDataSet();
-            p.setInput(inputDs);
-            p.setFilter(dataSourceFiltersTextField.getText());
-        }
-        int ret= AutoplotUtil.showConfirmDialog( this, panel, "Edit Data Source Filters", JOptionPane.OK_CANCEL_OPTION  );
-        if ( ret==JOptionPane.OK_OPTION ) {
-            String newFilter= p.getFilter();
-            dataSourceFiltersTextField.setText( newFilter );
-            this.dsf.setFilters( newFilter );
-            dataSourceFiltersComboBox.setSelectedItem( newFilter );
-            //recentComboBox.actionPerformed(evt); // kludge to get it to log the new filter
-            componentChanged();
-            dataSourceFiltersComboBox.addToRecent( newFilter );
-        }
-    }//GEN-LAST:event_editDataSourceFiltersButtonActionPerformed
-
-    private void dataSourceFiltersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSourceFiltersComboBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_dataSourceFiltersComboBoxActionPerformed
-
     /**
      * for testing, provide access.
      * @return the FiltersChainPanel
@@ -973,16 +907,14 @@ public class DataPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dataSetLabel;
     private org.virbo.datasource.DataSetSelector dataSetSelector;
-    private org.virbo.datasource.RecentComboBox dataSourceFiltersComboBox;
     private javax.swing.JButton editComponentPanel;
-    private javax.swing.JButton editDataSourceFiltersButton;
     private org.virbo.filters.FiltersChainPanel filtersChainPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel operationsLabel;
-    private javax.swing.JLabel operationsLabel1;
+    private org.virbo.autoplot.OperationsPanel operationsPanel1;
     private org.virbo.datasource.RecentComboBox operatorsComboBox;
     private javax.swing.JLabel processDataSetLabel;
     private javax.swing.JCheckBox sliceAutorangesCB;

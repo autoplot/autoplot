@@ -97,7 +97,7 @@
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="filtersChainPanel" pref="179" max="32767" attributes="0"/>
+                  <Component id="filtersChainPanel" pref="129" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="sliceAutorangesCB" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -203,15 +203,9 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="operationsLabel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="dataSourceFiltersComboBox" max="32767" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="editDataSourceFiltersButton" min="-2" max="-2" attributes="0"/>
-                      </Group>
                       <Component id="dataSetSelector" max="32767" attributes="0"/>
                       <Component id="jLabel2" max="32767" attributes="0"/>
+                      <Component id="operationsPanel1" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -223,15 +217,9 @@
                   <Component id="dataSetSelector" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Component id="operationsPanel1" min="-2" pref="145" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="operationsLabel1" alignment="3" min="-2" max="-2" attributes="1"/>
-                          <Component id="dataSourceFiltersComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Component id="editDataSourceFiltersButton" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace pref="37" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -247,35 +235,12 @@
             <Property name="text" type="java.lang.String" value="Apply these operations to the data after loading.  Fill and valid range can be specified with putProperty filter."/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="operationsLabel1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Operations:"/>
-            <Property name="toolTipText" type="java.lang.String" value="Process string that specifies component to plot, or how a data set&apos;s dimensionality should be reduced before display."/>
-          </Properties>
-        </Component>
-        <Component class="org.virbo.datasource.RecentComboBox" name="dataSourceFiltersComboBox">
-          <Properties>
-            <Property name="name" type="java.lang.String" value="operatorsComboBox" noResource="true"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dataSourceFiltersComboBoxActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JButton" name="editDataSourceFiltersButton">
-          <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="3" name="/org/virbo/autoplot/resources/pipeMag2.png"/>
-            </Property>
-            <Property name="toolTipText" type="java.lang.String" value="Open data source filters editor"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editDataSourceFiltersButtonActionPerformed"/>
-          </Events>
-        </Component>
         <Component class="org.virbo.datasource.DataSetSelector" name="dataSetSelector">
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dataSetSelectorActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="org.virbo.autoplot.OperationsPanel" name="operationsPanel1">
         </Component>
       </SubComponents>
     </Container>
