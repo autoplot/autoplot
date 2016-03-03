@@ -80,6 +80,16 @@ public class OperationsPanel extends javax.swing.JPanel {
         
         setUpOperationsListeners();
         setUpIncr();
+        
+        operatorsComboBox.setPreferenceNode("operations");
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                operatorsComboBox.setSelectedItem("");
+            }
+        };
+        SwingUtilities.invokeLater(run);
+        
     }
     
     transient MouseWheelListener sliceIndexListener=null;
@@ -304,14 +314,6 @@ public class OperationsPanel extends javax.swing.JPanel {
             }
         });
         
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                operatorsComboBox.setPreferenceNode("operations");
-            }
-        };
-        new Thread(run).start();
-        
         operatorsComboBox.getEditor().getEditorComponent().addFocusListener( new FocusAdapter() {
             @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
@@ -458,8 +460,8 @@ public class OperationsPanel extends javax.swing.JPanel {
             int carot= operatorsTextField.getCaretPosition();
             operatorsTextField.setText(filter);
             operatorsTextField.setCaretPosition(carot);
+            firePropertyChange(PROP_FILTER, oldFilter, filter);
         }
-        firePropertyChange(PROP_FILTER, oldFilter, filter);
     }
     
     private QDataSet dataSet = null;
