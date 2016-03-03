@@ -23,8 +23,9 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-03-03 r18420):</p>
+        <p>Bugfixes (2016-03-03 r18434):</p>
         <ul>
+            <li>1531: BufferDataSet append assumed compact data.</li>
             <li>swap needs to turn off TCAs.  Experiment with fixLayout.</li>
             <li>1530: support error bars in X, add control to turn off error bars with drawError=F</li>
             <li>CDF where constraint works when data is rank 4 and filter data is rank 0.</li>
@@ -128,6 +129,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>BinaryDataSet supports "time21," fore where the ascii bytes of an ISO8601 time are found within binary PDS data.</li>
             <li>476: control for data source filter's filter string is provided.</li>
             <li>linspace() supports rank 0 datasets.</li>
             <li>rank 4 random functions</li>
