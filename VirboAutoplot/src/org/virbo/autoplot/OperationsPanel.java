@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot;
 
 import java.awt.BorderLayout;
@@ -29,12 +25,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.das2.datum.LoggerManager;
-import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.QDataSet;
@@ -68,13 +61,17 @@ public class OperationsPanel extends javax.swing.JPanel {
         operatorsTextField.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setFilter( operatorsTextField.getText() );
+                if ( filtersChainPanel.validateFilter( operatorsTextField.getText() ) ) {
+                    filtersChainPanel.setFilter( operatorsTextField.getText() ); // allow filtersChainPanel to do verification
+                }
             }
         });
         operatorsTextField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                setFilter( operatorsTextField.getText() );
+                if ( filtersChainPanel.validateFilter( operatorsTextField.getText() ) ) {
+                    filtersChainPanel.setFilter( operatorsTextField.getText() ); // allow filtersChainPanel to do verification
+                }
             }
         });
         
@@ -198,41 +195,55 @@ public class OperationsPanel extends javax.swing.JPanel {
      * @param amount positive or negative number of steps.
      */
     private void doIncrUpOrDown( int amount ) {
-            String s= operatorsTextField.getText();
-            String olds= s;
-            int cp= operatorsTextField.getCaretPosition();
-            String match= ".*\\|slice\\d\\(\\d*";
-            String match2= ".*\\|slices\\(([\\:\\'\\d]+,)*\\d*";
-            if ( cp<s.length() ) {
-                Matcher m= Pattern.compile(match).matcher( s.substring(0,cp));
-                if ( m.matches() ) {
-                    s= doAdjust( s, cp, amount );
-                } else {
-                    Matcher m2= Pattern.compile(match2).matcher( s.substring(0,cp) );
-                    if ( m2.matches() ) {
-                        s= doAdjust( s, cp, amount );
-                    }
-                }
+        String s= operatorsTextField.getText();
+        final String olds= s;
+        final int cp= operatorsTextField.getCaretPosition();
+        String match= ".*\\|slice\\d\\(\\d*";
+        String match2= ".*\\|slices\\(([\\:\\'\\d]+,)*\\d*";
+        if ( cp<s.length() ) {
+            Matcher m= Pattern.compile(match).matcher( s.substring(0,cp));
+            if ( m.matches() ) {
+                s= doAdjust( s, cp, amount );
             } else {
-                return;
-            }
-            try {
-                if ( !olds.equals(s) ) {
-                    filtersChainPanel.setFilter(s);
-                    if ( dataSet!=null ) {
-                        filtersChainPanel.setInput(null);
-                        filtersChainPanel.setInput(dataSet);
-                        filtersChainPanel.setFilter(s);
-                    }
+                Matcher m2= Pattern.compile(match2).matcher( s.substring(0,cp) );
+                if ( m2.matches() ) {
+                    s= doAdjust( s, cp, amount );
                 }
-                operatorsTextField.setText(s);
-                operatorsTextField.setCaretPosition(cp);
-                componentChanged();
-            } catch ( ArrayIndexOutOfBoundsException ex ) {
-                logger.log( Level.WARNING, ex.getMessage(), ex );
-                operatorsTextField.setText(olds);
-                operatorsTextField.setCaretPosition(cp);
             }
+        } else {
+            return;
+        }
+        final String news= s;
+
+        Runnable run= new Runnable() {
+            public void run() {
+                try {
+                    if ( !olds.equals(news) ) {
+                        if ( filtersChainPanel.validateFilter(news) ) {
+                            filtersChainPanel.setFilter(news);
+                            if ( dataSet!=null ) {
+                                filtersChainPanel.setInput(null);
+                                filtersChainPanel.setInput(dataSet);
+                                filtersChainPanel.setFilter(news);
+                            }
+                            operatorsTextField.setText(news);
+                            operatorsTextField.setCaretPosition(cp);
+                        } else {
+                            String s= filtersChainPanel.getFilter();
+                            operatorsTextField.setText(s);
+                            operatorsTextField.setCaretPosition(cp);
+                        }
+                    }
+                    componentChanged();
+                } catch ( ArrayIndexOutOfBoundsException ex ) {
+                    logger.log( Level.WARNING, ex.getMessage(), ex );
+                    operatorsTextField.setText(olds);
+                    operatorsTextField.setCaretPosition(cp);
+                }
+
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
     
     /**
