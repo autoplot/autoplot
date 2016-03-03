@@ -11,6 +11,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -33,6 +34,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.das2.datum.LoggerManager;
+import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.QDataSet;
@@ -57,18 +59,25 @@ public class OperationsPanel extends javax.swing.JPanel {
     public OperationsPanel() {
         initComponents();
         operatorsTextField= (JTextField)operatorsComboBox.getEditor().getEditorComponent();
-        BindingGroup bindingGroup= new BindingGroup();
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, 
-                operatorsTextField, org.jdesktop.beansbinding.BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST"), 
-                filtersChainPanel, org.jdesktop.beansbinding.BeanProperty.create("filter") );
-        bindingGroup.addBinding(binding);
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
-                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, 
-                this, org.jdesktop.beansbinding.BeanProperty.create("filter"), 
-                filtersChainPanel, org.jdesktop.beansbinding.BeanProperty.create("filter") );
-        bindingGroup.addBinding(binding);
-        bindingGroup.bind();
+        filtersChainPanel.addPropertyChangeListener( FiltersChainPanel.PROP_FILTER, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                setFilter(filtersChainPanel.getFilter());
+            }
+        });
+        operatorsTextField.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setFilter( operatorsTextField.getText() );
+            }
+        });
+        operatorsTextField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                setFilter( operatorsTextField.getText() );
+            }
+        });
+        
         setUpOperationsListeners();
         setUpIncr();
     }
@@ -453,6 +462,13 @@ public class OperationsPanel extends javax.swing.JPanel {
     public void setFilter(String filter) {
         String oldFilter = this.filter;
         this.filter = filter;
+        this.filtersChainPanel.setFilter(filter);
+        this.filtersChainPanel.setInput(dataSet);
+        if ( !oldFilter.equals(filter) ) {           
+            int carot= operatorsTextField.getCaretPosition();
+            operatorsTextField.setText(filter);
+            operatorsTextField.setCaretPosition(carot);
+        }
         firePropertyChange(PROP_FILTER, oldFilter, filter);
     }
     
@@ -468,6 +484,7 @@ public class OperationsPanel extends javax.swing.JPanel {
         QDataSet oldDataSet = this.dataSet;
         this.dataSet = dataSet;
         this.dataSetLabel.setText( String.valueOf( dataSet ) );
+        this.filtersChainPanel.setInput(dataSet);
         firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
     }
 
@@ -485,9 +502,15 @@ public class OperationsPanel extends javax.swing.JPanel {
         firePropertyChange(PROP_ADJUSTING, oldAdjusting, adjusting);
     }
 
-    public static void main( String[] args ) {
+    public static void main( String[] args ) throws Exception {
         OperationsPanel p= new OperationsPanel();
-        p.setDataSet( Schemes.simpleSpectrogramTimeSeries() );
+        QDataSet ds= Schemes.simpleSpectrogramTimeSeries();
+        try {
+            org.virbo.jythonsupport.Util.getDataSet("http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09");
+        } catch ( Exception ex ) {
+            throw ex;
+        }
+        p.setDataSet( ds );
         p.addPropertyChangeListener( OperationsPanel.PROP_FILTER, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -495,7 +518,20 @@ public class OperationsPanel extends javax.swing.JPanel {
             }
         });
         
-        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( null, p, "Test Panel", JOptionPane.OK_CANCEL_OPTION ) ) {
+        JPanel testPanel= new JPanel();
+        testPanel.setLayout( new BorderLayout() );
+        testPanel.add( p, BorderLayout.CENTER );
+        JTextField tf= new JTextField("");
+        testPanel.add( tf, BorderLayout.SOUTH );
+        BindingGroup bg= new BindingGroup();
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+            org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, 
+            tf, org.jdesktop.beansbinding.BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST"), 
+            p, org.jdesktop.beansbinding.BeanProperty.create("filter") );
+        bg.addBinding(binding);
+        bg.bind();
+        
+        if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( null, testPanel, "Test Panel", JOptionPane.OK_CANCEL_OPTION ) ) {
             System.err.println( p.getFilter() );
         }
     }
