@@ -186,6 +186,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                         Plot targetPlot= app.getController().getPlotFor( (Component)s );
                         if ( targetPlot!=null ) {
                             DomOps.swapPosition( draggingPlot, targetPlot );
+                            DomOps.newCanvasLayout(app);
                             app.getController().setStatus("swapped "+draggingPlot+ " and " +targetPlot );
                         }
                     }
@@ -953,6 +954,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         List<Plot> plots= getSelectedPlots();
         if ( plots.size()==2 ) {
             DomOps.swapPosition( plots.get(0), plots.get(1) );
+            DomOps.newCanvasLayout(app);
             this.app.getController().setStatus("swapped "+plots.get(0)+ " and " +plots.get(1) );
         } else {
             this.app.getController().setStatus("warning: select two plots");
