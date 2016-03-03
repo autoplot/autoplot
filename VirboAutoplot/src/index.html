@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Stupid Autoplot tricks.  Fill to zero reference is turned on with buckshot data.
+        <p><small>X Tags can have errors now, and a control can be used to turn off the error bars.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -23,8 +23,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-02-29 r18395):</p>
+        <p>Bugfixes (2016-03-03 r18420):</p>
         <ul>
+            <li>swap needs to turn off TCAs.  Experiment with fixLayout.</li>
+            <li>1530: support error bars in X, add control to turn off error bars.</li>
             <li>CDF where constraint works when data is rank 4 and filter data is rank 0.</li>
             <li>1524: mashup handles when dataset loads fail.  thumbnails are calculated more independently of one another.</li>
             <li>1526: PDS/PPI didn't support quoted ISO8601 times</li>
@@ -126,6 +128,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>476: control for data source filter's filter string is provided.</li>
+            <li>linspace() supports rank 0 datasets.</li>
             <li>rank 4 random functions</li>
             <li>vap+inline: automatically supports timeSeriesBrowse</li>
             <li>events bar autoranging of one time datum should expand out to one hour duration</li>
