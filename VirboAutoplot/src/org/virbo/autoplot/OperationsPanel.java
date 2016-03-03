@@ -297,16 +297,6 @@ public class OperationsPanel extends javax.swing.JPanel {
             }
         });
         
-        ((JTextField)operatorsComboBox.getEditor().getEditorComponent()).addCaretListener( new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                System.err.println( "Caret: "+e.getDot() );
-                if ( e.getDot()==0 ) {
-                    System.err.println("who did this?");
-                }
-            }
-        } );
-        
         operatorsComboBox.setVerifier( new InputVerifier() {
             @Override
             public boolean verify(String value) {
