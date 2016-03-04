@@ -472,7 +472,7 @@ public class OperationsPanel extends javax.swing.JPanel {
         if ( !oldFilter.equals(filter) ) {           
             int carot= operatorsTextField.getCaretPosition();
             operatorsTextField.setText(filter);
-            operatorsTextField.setCaretPosition(carot);
+            operatorsTextField.setCaretPosition(Math.min(filter.length(),carot));
             firePropertyChange(PROP_FILTER, oldFilter, filter);
         }
     }
