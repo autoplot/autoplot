@@ -1826,16 +1826,15 @@ public class PlotElementController extends DomNodeController {
                 doMetadata(peleCopy, props, fillDs );
 
                 String reduceRankString = dsc.getReduceDataSetString();
-                if ( reduceRankString != null && reduceRankString.length()>0 ) { //TODO remove dsf slicing
-                    String title = peleCopy.getPlotDefaults().getTitle();
-                    title += "!c" + reduceRankString;
-                    peleCopy.getPlotDefaults().setTitle(title);
-                }
-                if ( !plotElement.getComponent().equals("") ) {
-                    String title = peleCopy.getPlotDefaults().getTitle();
+                String title = peleCopy.getPlotDefaults().getTitle();
+                if ( fillDs.property(QDataSet.CONTEXT_0)!=null ) { 
                     title += "!c%{CONTEXT}";
-                    peleCopy.getPlotDefaults().setTitle(title);
+                } else if ( !plotElement.getComponent().equals("") ) {
+                    title += "!c%{CONTEXT}";
+                } else if ( reduceRankString != null && reduceRankString.length()>0 ) {
+                    title += "!c"+reduceRankString;
                 }
+                peleCopy.getPlotDefaults().setTitle(title);
             }
 
             if (dom.getOptions().isAutoranging()) { //this is pre-autorange property, but saves time if we know we won't be autoranging.
