@@ -85,7 +85,8 @@ public class DataPanel extends javax.swing.JPanel {
 
     public DataPanel( AutoplotUI app) {
         initComponents();
-        
+        filtersChainPanel.setName("postProcessingFiltersChainPanel");
+        operationsPanel1.setName("operationsPanel");
         this.app= app;
         
         setUpOperationsListeners();
@@ -598,9 +599,9 @@ public class DataPanel extends javax.swing.JPanel {
         BindingGroup bc = new BindingGroup();
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("filters"), this.operationsPanel1, BeanProperty.create("filter")) );
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("uri"), this.dataSetSelector, BeanProperty.create("value")));
-        Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("controller.fillDataSet"),this.dataSetLabel, BeanProperty.create("text"));
+        Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("controller.dataSet"),this.dataSetLabel, BeanProperty.create("text"));
         b.setConverter( BindingSupport.toStringConverter );
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("controller.fillDataSet"), this.operationsPanel1, BeanProperty.create("dataSet")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("controller.dataSet"), this.operationsPanel1, BeanProperty.create("dataSet")));
         bc.addBinding(b);
 
         try {
