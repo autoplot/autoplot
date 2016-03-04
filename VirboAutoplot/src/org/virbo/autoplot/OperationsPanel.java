@@ -51,6 +51,8 @@ public class OperationsPanel extends javax.swing.JPanel {
      */
     public OperationsPanel() {
         initComponents();
+        filtersChainPanel.setAddSubtractButtons(false);
+        
         operatorsTextField= (JTextField)operatorsComboBox.getEditor().getEditorComponent();
         filtersChainPanel.addPropertyChangeListener( FiltersChainPanel.PROP_FILTER, new PropertyChangeListener() {
             @Override
