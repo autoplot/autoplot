@@ -464,15 +464,26 @@ public class OperationsPanel extends javax.swing.JPanel {
         return filter;
     }
 
-    public void setFilter(String filter) {
-        String oldFilter = this.filter;
+    public void setFilter(final String filter) {
+        final String oldFilter = this.filter;
         this.filter = filter;
-        this.filtersChainPanel.setFilter(filter);
-        this.filtersChainPanel.setInput(dataSet);
-        if ( !oldFilter.equals(filter) ) {           
-            int carot= operatorsTextField.getCaretPosition();
-            operatorsTextField.setText(filter);
-            operatorsTextField.setCaretPosition(Math.min(filter.length(),carot));
+        Runnable run= new Runnable() {
+            public void run() {
+                filtersChainPanel.setFilter(filter);
+                filtersChainPanel.setInput(dataSet);
+                if ( !oldFilter.equals(filter) ) {           
+                    int carot= operatorsTextField.getCaretPosition();
+                    operatorsTextField.setText(filter);
+                    operatorsTextField.setCaretPosition(Math.min(filter.length(),carot));
+                }
+            }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            SwingUtilities.invokeLater(run);
+        }
+        if ( !oldFilter.equals(filter) ) {        
             firePropertyChange(PROP_FILTER, oldFilter, filter);
         }
     }
