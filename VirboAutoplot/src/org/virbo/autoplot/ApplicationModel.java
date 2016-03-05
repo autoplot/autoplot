@@ -283,6 +283,7 @@ public class ApplicationModel {
         dom.getController().getPlotElement().getController().setResetRanges(true);
         dom.getController().getDataSourceFilter().getController().setDataSource(null);
         dom.getController().getDataSourceFilter().setUri("vap+internal:");
+        dom.getController().getDataSourceFilter().setFilters("");
         dom.getController().getDataSourceFilter().getController().setDataSetInternal(null); // clear out properties and metadata
         dom.getController().getDataSourceFilter().getController().setDataSetInternal(ds);
     }
@@ -309,6 +310,7 @@ public class ApplicationModel {
         //}
         dsf.getController().setDataSource(null);
         dsf.setUri("vap+internal:");
+        dsf.setFilters("");
         dsf.getController().setDataSetInternal(null); // clear out properties and metadata
         dsf.getController().setDataSetInternal(ds);
         if ( label!=null ) {
