@@ -1515,14 +1515,13 @@ public class DataSourceController extends DomNodeController {
 
     /**
      * see setDataSetInternal, which does autoranging, etc. TODO: fix this and
-     * the fillDataSet stuff... Note this also clears the filters.
+     * the fillDataSet stuff...
      *
      * @param dataSet
      */
     public void setDataSet(QDataSet dataSet) {
         QDataSet oldDataSet = this.dataSet;
         this.dataSet = dataSet;
-        dsf.setFilters("");
         propertyChangeSupport.firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
     }
     /**
@@ -1857,6 +1856,7 @@ public class DataSourceController extends DomNodeController {
             if (old.length() > 0 && old.equals(suri)) { // force reload
                 dsf.setUri("");
             }
+            dsf.setFilters("");
             setSuri(suri, mon);
         }
     }
