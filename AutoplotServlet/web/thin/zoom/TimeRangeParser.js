@@ -26,7 +26,6 @@ function getInt( val, deft ) {
 }
 
 /**
-/**
  * get the double, allowing a letter at the end.
  * @param val string value
  * @param deft double value to return if the string is not valid. -99 will throw exception
@@ -69,6 +68,9 @@ function parseISO8601Duration( stringIn ) {
 /**
  * find the next instance of delim in str, where delim is
  * one of the chars in delims
+ * @param str the string we are parsing
+ * @param index the start index
+ * @param delims string of delims ("-T:.Z")
  */    
 function nextToken( str, index, delims ) {
     index= index+1;
@@ -239,16 +241,16 @@ function parseISO8601Datum( str, result, lsd ) {
             digits0= parseISO8601Duration( parts[0] );
         } else if ( parts[0]==='now' ) {
             dd= new Date();
-            digits0= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]
+            digits0= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ];
         } else if ( parts[0].startsWith('now-') ) {
             dd= new Date();
             delta= parseISO8601Duration(parts[0].substring(4));
-            digits0= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]            
+            digits0= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ];          
             for ( j=0; j<7; j++ ) digits0[j]-= delta[j]; 
         } else if ( parts[0].startsWith('now+') ) {
             dd= new Date();
             delta= parseISO8601Duration(parts[0].substring(4));
-            digits0= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]            
+            digits0= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ];         
             for ( j=0; j<7; j++ ) digits0[j]+= delta[j]; 
         } else {
             digits0= [0,0,0,0,0,0,0];
@@ -260,16 +262,16 @@ function parseISO8601Datum( str, result, lsd ) {
             digits1= parseISO8601Duration(parts[1]);
         } else if ( parts[1]==='now' ) {
             dd= new Date();
-            digits1= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]
+            digits1= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ];
         } else if ( parts[1].startsWith('now-') ) {
             dd= new Date();
             delta= parseISO8601Duration(parts[1].substring(4));
-            digits1= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]            
+            digits1= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ];            
             for ( j=0; j<7; j++ ) digits1[j]-= delta[j]; 
         } else if ( parts[1].startsWith('now+') ) {
             dd= new Date();
             delta= parseISO8601Duration(parts[1].substring(4));
-            digits1= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]            
+            digits1= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ];            
             for ( j=0; j<7; j++ ) digits1[j]+= delta[j]; 
         } else {
             if ( d1 ) {
@@ -303,8 +305,8 @@ function parseISO8601Datum( str, result, lsd ) {
     
     /**
      * javascript doesn't support sprintf style formatting, so support this by hand.
-     * @param int num zero or positive number
-     * @param int size total number of digits, must be less than 10.
+     * @param num zero or positive number
+     * @param size total number of digits, must be less than 10.
      * @returns formatted in with zeroes prefix.
      */
     function zeroPad( num, size ) {
@@ -314,8 +316,8 @@ function parseISO8601Datum( str, result, lsd ) {
     
     /**
      * format the seven digits starting at index.
-     * @param int arr like [ 2014, 1, 5, 0, 0, 3, 300000000, 2014, 1, 5, 0, 0, 3, 600000000 ]
-     * @param int index into array like 7
+     * @param arr like [ 2014, 1, 5, 0, 0, 3, 300000000, 2014, 1, 5, 0, 0, 3, 600000000 ]
+     * @param index into array like 7
      * @returns ISO8601 formatted string like "2014-01-05T00:00:03.600" 
      */
     function formatISO8601( arr, index ) {
@@ -336,7 +338,7 @@ function parseISO8601Datum( str, result, lsd ) {
     
     /**
      * format the 14-element array efficiently (few characters).  
-     * @param int array 14-element array of [Y,M,D,H,M,S,NS,Y,M,D,H,M,S,NS]
+     * @param arr array 14-element array of [Y,M,D,H,M,S,NS,Y,M,D,H,M,S,NS]
      * @returns String
      */
     function formatISO8601Range( arr ) {
