@@ -222,7 +222,7 @@ function parseISO8601Datum( str, result, lsd ) {
      *   2012-100T02:00/03:45
      * http://en.wikipedia.org/wiki/ISO_8601#Time_intervals
      * @param stringIn
-     * @param result, if non-null should be an int[14] to provide storage to routine.
+     * @param result if non-null should be an int[14] to provide storage to routine.
      * @return int[14] with [Y,M,D,H,M,S,NS,Y,M,D,H,M,S,NS]
      */
     function parseISO8601Range( stringIn, result ) {
@@ -240,6 +240,16 @@ function parseISO8601Datum( str, result, lsd ) {
         } else if ( parts[0]==='now' ) {
             dd= new Date();
             digits0= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]
+        } else if ( parts[0].startsWith('now-') ) {
+            dd= new Date();
+            delta= parseISO8601Duration(parts[0].substring(4));
+            digits0= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]            
+            for ( j=0; j<7; j++ ) digits0[j]-= delta[j]; 
+        } else if ( parts[0].startsWith('now+') ) {
+            dd= new Date();
+            delta= parseISO8601Duration(parts[0].substring(4));
+            digits0= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]            
+            for ( j=0; j<7; j++ ) digits0[j]+= delta[j]; 
         } else {
             digits0= [0,0,0,0,0,0,0];
             lsd= parseISO8601Datum( parts[0], digits0, lsd );
@@ -251,6 +261,16 @@ function parseISO8601Datum( str, result, lsd ) {
         } else if ( parts[1]==='now' ) {
             dd= new Date();
             digits1= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]
+        } else if ( parts[1].startsWith('now-') ) {
+            dd= new Date();
+            delta= parseISO8601Duration(parts[1].substring(4));
+            digits1= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]            
+            for ( j=0; j<7; j++ ) digits1[j]-= delta[j]; 
+        } else if ( parts[1].startsWith('now+') ) {
+            dd= new Date();
+            delta= parseISO8601Duration(parts[1].substring(4));
+            digits1= [ dd.getUTCFullYear(), dd.getUTCMonth()+1, dd.getUTCDate(), dd.getUTCHours(), dd.getUTCMinutes(), dd.getUTCSeconds(), dd.getUTCMilliseconds()*1000000 ]            
+            for ( j=0; j<7; j++ ) digits1[j]+= delta[j]; 
         } else {
             if ( d1 ) {
                 digits1= [0,0,0,0,0,0,0];
@@ -282,7 +302,7 @@ function parseISO8601Datum( str, result, lsd ) {
     }
     
     /**
-     * again I am shocked that javascript doesn't support sprintf style formatting.
+     * javascript doesn't support sprintf style formatting, so support this by hand.
      * @param int num zero or positive number
      * @param int size total number of digits, must be less than 10.
      * @returns formatted in with zeroes prefix.
