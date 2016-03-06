@@ -100,6 +100,8 @@ function resetUrl(url) {
     $('#idstatus').text("reset url "+url);
     $('#progress').attr('src', 'spinner.gif');
     imgurl = url;
+    
+    t0= Date.now();
     ImageInfo.loadInfo(imgurl, mycallback, myErrorCallback );
     document.getElementById('idplot').src = imgurl;
 }
@@ -310,7 +312,8 @@ function setTime(startMilliseconds, endMilliseconds) {
     msecperpx = diffmilliseconds / graphwidth;
     
     //echoImgUrl();
-
+    
+    t0= Date.now();
     ImageInfo.loadInfo(imgurl, mycallback, myErrorCallback );
     console.log('--> startdateinmilliseconds=' + startdateinmilliseconds);
 
@@ -351,7 +354,10 @@ function mycallback() {
     graphheight = bottomside - topside;
     msecperpx = diffmilliseconds / graphwidth;
     echoGraphParams();
-    $('#idstatus').text("ready");
+    
+    deltaTime= ( ( Date.now() - t0 ) / 1000 ).toFixed(2);
+    
+    $('#idstatus').text("ready.  image updated in "+deltaTime+" seconds.");
     imgloaded= imgloaded & ( ~2 );
     if ( imgloaded===0 ) {
        $('#progress').attr('src', 'idle-icon.png');
@@ -374,6 +380,7 @@ $(document).ready(function() {
 
     echoImgUrl();
 
+    t0= Date.now();
     ImageInfo.loadInfo(imgurl, mycallback, myErrorCallback );
 
     // **************************************************************************
