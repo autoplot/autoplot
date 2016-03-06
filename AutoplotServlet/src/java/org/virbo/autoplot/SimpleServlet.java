@@ -697,7 +697,7 @@ public class SimpleServlet extends HttpServlet {
                             }
                         }   
                         if ( !"false".equals(debug) ) {
-                            logit("vap file written to /tmp/apserver.vap", t0, uniq, debug);
+                            logit("debug means vap file written to /tmp/apserver.vap", t0, uniq, debug);
                             StatePersistence.saveState( new File( "/tmp/apserver.vap" ), dom );
                         }
                         break;
