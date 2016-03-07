@@ -120,6 +120,8 @@
         </script>
 
         <%
+            File f= new File( new File( ServletUtil.getServletHome(), "users" ), id );
+            out.println( ".vap files in " + f + ":</br>");
             if ( dropList!=null ) {
                 for ( String s: dropList ) {
                     out.println( "<a href=\"#\" onclick=\"resetUrl('../../SimpleServlet?vap="+s+"');\">temps</a>" );
