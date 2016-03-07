@@ -48,9 +48,13 @@
          String ssArg;
          if ( vap==null && uri==null ) {
              if ( dropList!=null && dropList.length>0 ) {
-                 ssArg= "vap="+URLEncoder.encode(dropList[0],"US-ASCII");
+                ssArg= "vap="+URLEncoder.encode(dropList[0],"US-ASCII");
              } else {
-                throw new IllegalArgumentException("vap file or uri not specified.");
+                if ( id!=null ) {
+                    throw new IllegalArgumentException("id specified contains no vap files in "+ ServletUtil.getServletHome().toString()+"/users" );
+                } else {
+                    throw new IllegalArgumentException("vap file or uri not specified.");
+                }
              }
          } else if ( vap!=null ) {
              ssArg= "vap="+URLEncoder.encode(vap,"US-ASCII");
