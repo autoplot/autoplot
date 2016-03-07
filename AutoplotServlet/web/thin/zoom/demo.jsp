@@ -128,7 +128,8 @@
             out.println( ".vap files in " + f + ":</br>");
             if ( dropList!=null ) {
                 for ( String s: dropList ) {
-                    out.println( "<a href=\"#\" onclick=\"resetUrl('../../SimpleServlet?vap="+s+"');\">temps</a>" );
+                    String label= s.substring(f.toString().length()+1);
+                    out.println( "<a href=\"#\" onclick=\"resetUrl('../../SimpleServlet?vap="+s+"');\">"+label+"</a>" );
                 }
             }
         %>
