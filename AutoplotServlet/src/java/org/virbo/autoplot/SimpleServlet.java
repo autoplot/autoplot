@@ -81,7 +81,7 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     private static final Logger logger= Logger.getLogger("autoplot.servlet" );
-    public static final String version= "v20160216.2017";
+    public static final String version= "v20160306.1801";
 
     static FileHandler handler;
 
