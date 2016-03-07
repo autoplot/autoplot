@@ -4,6 +4,9 @@
     Author     : jbf
 --%>
 
+<%@page import="java.io.FilenameFilter"%>
+<%@page import="java.io.File"%>
+<%@page import="org.virbo.autoplot.ServletUtil"%>
 <%@page import="org.virbo.autoplot.SimpleServlet"%>
 <%@page import="java.net.URLEncoder"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -19,9 +22,36 @@
     <%
          String vap= request.getParameter("vap");
          String uri= request.getParameter("uri");
+         String id= request.getParameter("id");
+         
+         String[] dropList= null;
+         
+         if ( id!=null ) {
+             File f= new File( new File( ServletUtil.getServletHome(), "users" ), id );
+             if ( f.exists() ) {
+                 String s= f.getAbsolutePath();
+                 String[] ss= f.list( );
+                 int count=0;
+                 for ( int i=0; i<ss.length; i++ ) {
+                     if ( ss[i].endsWith(".vap") ) {
+                         ss[count]= s + "/" + ss[i];
+                         count=count+1;
+                     }
+                 }
+                 dropList= new String[count];
+                 for ( int i=0; i<count; i++ ) {
+                     dropList[i]= ss[i];
+                 }
+             }
+         }
+         
          String ssArg;
          if ( vap==null && uri==null ) {
-             throw new IllegalArgumentException("vap file or uri not specified.");
+             if ( dropList!=null && dropList.length>0 ) {
+                 ssArg= "vap="+URLEncoder.encode(dropList[0],"US-ASCII");
+             } else {
+                throw new IllegalArgumentException("vap file or uri not specified.");
+             }
          } else if ( vap!=null ) {
              ssArg= "vap="+URLEncoder.encode(vap,"US-ASCII");
          } else {
@@ -89,6 +119,14 @@
      		}) */
         </script>
 
+        <%
+            if ( dropList!=null ) {
+                for ( String s: dropList ) {
+                    out.println( "<a href=\"#\" onclick=\"resetUrl('../../SimpleServlet?vap="+s+"');\">temps</a>" );
+                }
+            }
+        %>
+        
 <br>
     <form>
     <input id='vapta' size="80">
