@@ -305,7 +305,7 @@ public class SimpleServlet extends HttpServlet {
             response.setHeader( "Cache-Control", "public, max-age=10" );  
             DateFormat httpDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
             httpDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-            response.setHeader( "Expires", httpDateFormat.format( new Date( System.currentTimeMillis()+600000 ) ) );
+            response.setHeader( "Expires", httpDateFormat.format( new Date( System.currentTimeMillis()+10000 ) ) );
 
             if (vap != null) {
                 response.setContentType(format);
