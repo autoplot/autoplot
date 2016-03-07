@@ -79,7 +79,7 @@
             <button onclick="scannext();" title="Next interval">NEXT &gt;&gt;</button>
             <button onclick="zoomout();" title="Zoom Out">Zoom Out</button>    
             <button onclick="zoomin();" title="Zoom In">Zoom In</button>    
-
+            <button onclick="refresh();" title="Refresh">Refresh</button>    
             	
             <p><button onclick="centerFocus();" title="Shift center to here">Center</button> at x=<input id="xclick" ></input> 
                 <button onclick="resetWidth();" title="Make this the new width">Width</button>=<input id="xwidth" size="4">hr
