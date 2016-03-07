@@ -103,6 +103,7 @@ public class DataSourceFilter extends DomNode {
         super.syncTo(n);
         DataSourceFilter that= (DataSourceFilter)n;
         this.setFill(that.getFill());
+        this.setFilters(that.getFilters());
         this.setValidRange(that.getValidRange());
         this.setUri(that.getUri());
     }
@@ -113,6 +114,7 @@ public class DataSourceFilter extends DomNode {
         DataSourceFilter that= (DataSourceFilter)n;
         this.setFill(that.getFill());
         this.setValidRange(that.getValidRange());        
+        if ( !exclude.contains("filters") ) this.setFilters(that.getFilters());
         if ( !exclude.contains("uri" ) ) this.setUri(that.getUri());
     }
 
@@ -132,6 +134,9 @@ public class DataSourceFilter extends DomNode {
 
         b = that.fill.equals(this.fill);
         if (!b) result.add(new PropertyChangeDiff( "fill", that.fill , (this.fill)));
+        
+        b = that.filters.equals(this.filters);
+        if (!b) result.add(new PropertyChangeDiff( "filters", that.filters , (this.filters)));
         
         return result;
     }
