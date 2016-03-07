@@ -679,6 +679,8 @@ public class SimpleServlet extends HttpServlet {
                 //response.setStatus( 400 );
             }
             
+            response.setHeader( "X-Autoplot-vaptimer-ms",  String.valueOf( System.currentTimeMillis()-t0 ) );
+            
             try (OutputStream out = response.getOutputStream()) {
                 switch (format) {
                     case "image/png":
