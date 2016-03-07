@@ -66,7 +66,8 @@ public class DomUtil {
     }
 
     /**
-     * return a list of nodes (plotElements and dataSourceFilters) that use the DataSourceFilter.
+     * return a list of nodes (plotElements and dataSourceFilters) that use the 
+     * DataSourceFilter. 
      * @param app the dom
      * @param id the node identifier
      * @return
@@ -79,10 +80,12 @@ public class DomUtil {
             }
         }
         for (DataSourceFilter dsf : app.getDataSourceFilters()) {
-            for (DataSourceFilter dsfp : dsf.getController().getParentSources()) {
-                if ( dsfp==null ) continue;
-                if (dsfp.getId().equals(id)) {
-                    result.add(dsf);
+            if ( dsf.getUri().startsWith("vap+internal:") ) {
+                String[] ss= dsf.getUri().substring(13).split(",",-2);
+                for ( String s: ss ) {
+                    if ( s.equals(id) && !result.contains(dsf) ) {
+                        result.add(dsf);
+                    }
                 }
             }
         }
