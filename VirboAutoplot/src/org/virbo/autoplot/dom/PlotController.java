@@ -269,6 +269,10 @@ public class PlotController extends DomNodeController {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt,"autorangeListener");  
+            if ( dom.getController().isValueAdjusting() ) {
+                logger.fine("autorangeListener cannot work while isValueAdjusting");
+                return;
+            }
             if ( evt.getPropertyName().equals("autoRange") && evt.getNewValue().equals(Boolean.TRUE) ) {
                 resetZoom( getPlot().getXaxis().isAutoRange(),
                         getPlot().getYaxis().isAutoRange(),
