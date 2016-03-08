@@ -826,8 +826,6 @@ public class DataSourceController extends DomNodeController {
      * that are compatible, so a new dataset can be created. If there is a
      * TimeSeriesBrowse on this, then attempt to trim the data to the
      * TimeSeriesBrowse.getTimeRange().
-     * 
-     * This may be redone to implement the new unnamed 
      *
      * @return null if everything is okay, error message otherwise
      */
@@ -885,12 +883,12 @@ public class DataSourceController extends DomNodeController {
             if (DataSetUtil.validate(x, yds, null)) {
                 yds.putProperty(QDataSet.DEPEND_0, x);
                 yprops.put(QDataSet.DEPEND_0, xprops);
-                if (DataSetUtil.validate(yds, null)) {
+                if (DataSetUtil.validate(yds, null)) { //TODO: probably don't have to do check this twice.
                     ds = yds;
                     props = yprops;
                 }
             } else {
-                logger.fine("intermediate state where y and x have different lengths");
+                logger.info("linked data doesn't validate");
             }
         } else if (lparentSources.length == 3) {
             if (x == null || y == null || z == null) {
@@ -908,6 +906,8 @@ public class DataSourceController extends DomNodeController {
                 if (DataSetUtil.validate(yds, null)) { //TODO: link should and probably does work here
                     ds = yds;
                     props = yprops;
+                } else {
+                    logger.info("linked data doesn't validate");
                 }
             } else {
                 ArrayDataSet zds = ArrayDataSet.copy(z);
@@ -918,9 +918,13 @@ public class DataSourceController extends DomNodeController {
                     zprops.put(QDataSet.DEPEND_1, yprops);
                     ds = zds;
                     props = zprops;
+                } else {
+                    logger.info("linked data doesn't validate");
                 }
             }
         }
+
+        logger.log(Level.FINE, "checkParents resolves {0}", ds);
         
         if (ds != null) {
             //TODO: TSB trim dataset.  It's not clear to me that this should be implemented here, but we will for now.
@@ -932,11 +936,12 @@ public class DataSourceController extends DomNodeController {
                         DatumRange dr = this.tsb.getTimeRange();
                         int idx0 = DataSetUtil.getPreviousIndex(xxds, dr.min());
                         int idx1 = DataSetUtil.getNextIndex(xxds, dr.max());
+                        logger.log(Level.FINE, "checkParents trimming parents ds.trim({0},{1})", new Object[]{idx0, idx1});
                         if (idx0 == idx1) {
-                            setDataSetInternal(null);
+                            ds = null;
                         } else if (idx0 > idx1) {
                             logger.warning("non mono error?");
-                            setDataSetInternal(null);
+                            ds = null;
                         } else {
                             QDataSet trim = ds.trim(idx0, idx1);
                             ds = trim;
