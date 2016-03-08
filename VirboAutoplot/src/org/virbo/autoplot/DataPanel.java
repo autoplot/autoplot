@@ -104,13 +104,31 @@ public class DataPanel extends javax.swing.JPanel {
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                doPlotElementBindings();
+                Runnable run= new Runnable() {
+                    public void run() {
+                        doPlotElementBindings();
+                    }
+                };
+                if ( SwingUtilities.isEventDispatchThread() ) {
+                    run.run();
+                } else {
+                    SwingUtilities.invokeLater(run);
+                }
             }
         });
         this.applicationController.addPropertyChangeListener(ApplicationController.PROP_DATASOURCEFILTER, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                doDataSourceFilterBindings();
+                Runnable run= new Runnable() {
+                    public void run() {
+                        doDataSourceFilterBindings();
+                    }
+                };
+                if ( SwingUtilities.isEventDispatchThread() ) {
+                    run.run();
+                } else {
+                    SwingUtilities.invokeLater(run);
+                }
             }
         });
         
