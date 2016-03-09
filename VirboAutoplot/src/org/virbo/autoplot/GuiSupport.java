@@ -749,6 +749,7 @@ public class GuiSupport {
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferencesWithEvents();
                 view.setMessage("ready");
+                AutoplotUI.checkStatusLoop(view);
             }
         };
         try {
@@ -786,6 +787,7 @@ public class GuiSupport {
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferencesWithEvents();
                 view.setMessage("ready");
+                AutoplotUI.checkStatusLoop(view);
                 Canvas size= parent.applicationModel.dom.getCanvases(0);
                 view.resizeForCanvasSize( size.getWidth(), size.getHeight() );
             }
