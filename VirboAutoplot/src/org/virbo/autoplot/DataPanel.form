@@ -59,7 +59,7 @@
                               <Group type="102" attributes="0">
                                   <Component id="operationsLabel" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                                  <Component id="operatorsComboBox" max="32767" attributes="0"/>
+                                  <Component id="postFiltersComboBox" max="32767" attributes="0"/>
                               </Group>
                               <Component id="dataSetLabel" max="32767" attributes="0"/>
                           </Group>
@@ -74,7 +74,7 @@
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="1" attributes="0">
                               <Component id="processDataSetLabel" alignment="0" max="32767" attributes="0"/>
-                              <Component id="filtersChainPanel" pref="562" max="32767" attributes="0"/>
+                              <Component id="postFiltersChainPanel" pref="562" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -93,11 +93,11 @@
                       <Component id="editComponentPanel" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="103" alignment="1" groupAlignment="3" attributes="0">
                           <Component id="operationsLabel" alignment="3" min="-2" max="-2" attributes="1"/>
-                          <Component id="operatorsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="postFiltersComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="filtersChainPanel" pref="129" max="32767" attributes="0"/>
+                  <Component id="postFiltersChainPanel" pref="165" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="sliceAutorangesCB" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -154,15 +154,15 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editComponentPanelActionPerformed"/>
           </Events>
         </Component>
-        <Component class="org.virbo.datasource.RecentComboBox" name="operatorsComboBox">
+        <Component class="org.virbo.datasource.RecentComboBox" name="postFiltersComboBox">
           <Properties>
-            <Property name="name" type="java.lang.String" value="operatorsComboBox" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="postFiltersComboBox" noResource="true"/>
           </Properties>
           <BindingProperties>
-            <BindingProperty name="selectedItem" source="filtersChainPanel" sourcePath="${filter}" target="operatorsComboBox" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
+            <BindingProperty name="selectedItem" source="postFiltersChainPanel" sourcePath="${filter}" target="postFiltersComboBox" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
           </BindingProperties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="operatorsComboBoxActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="postFiltersComboBoxActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="processDataSetLabel">
@@ -175,9 +175,9 @@
             <Property name="text" type="java.lang.String" value="(filtered dataset will go here)"/>
           </Properties>
         </Component>
-        <Container class="org.virbo.filters.FiltersChainPanel" name="filtersChainPanel">
+        <Container class="org.virbo.filters.FiltersChainPanel" name="postFiltersChainPanel">
           <Properties>
-            <Property name="name" type="java.lang.String" value="filtersChainPanel" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="postFiltersChainPanel" noResource="true"/>
           </Properties>
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
@@ -205,7 +205,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="dataSetSelector" max="32767" attributes="0"/>
                       <Component id="jLabel2" max="32767" attributes="0"/>
-                      <Component id="operationsPanel1" alignment="0" max="32767" attributes="0"/>
+                      <Component id="dataSourceFiltersPanel" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -215,10 +215,10 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <Component id="dataSetSelector" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
-                  <Component id="operationsPanel1" min="-2" pref="145" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="dataSourceFiltersPanel" pref="109" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -240,7 +240,7 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dataSetSelectorActionPerformed"/>
           </Events>
         </Component>
-        <Component class="org.virbo.autoplot.OperationsPanel" name="operationsPanel1">
+        <Component class="org.virbo.autoplot.OperationsPanel" name="dataSourceFiltersPanel">
         </Component>
       </SubComponents>
     </Container>

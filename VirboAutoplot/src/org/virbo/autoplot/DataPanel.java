@@ -77,7 +77,7 @@ public class DataPanel extends javax.swing.JPanel {
     
     PlotElement element;// current focus
 
-    final JTextField operatorsTextField;
+    final JTextField postFiltersTextField;
     
     private final transient PropertyChangeListener compListener; // listen to component property changes
     
@@ -85,16 +85,16 @@ public class DataPanel extends javax.swing.JPanel {
 
     public DataPanel( AutoplotUI app) {
         initComponents();
-        filtersChainPanel.setName("postProcessingFiltersChainPanel");
-        operationsPanel1.setName("operationsPanel");
+        postFiltersChainPanel.setName("postProcessingFiltersChainPanel");
+        dataSourceFiltersPanel.setName("operationsPanel");
         this.app= app;
         
         setUpOperationsListeners();
         
-        operatorsTextField= ((JTextField)operatorsComboBox.getEditor().getEditorComponent());
-        operatorsComboBox.setSelectedItem("");
-        operatorsTextField.setText("");
-        filtersChainPanel.setFilter("");
+        postFiltersTextField= ((JTextField)postFiltersComboBox.getEditor().getEditorComponent());
+        postFiltersComboBox.setSelectedItem("");
+        postFiltersTextField.setText("");
+        postFiltersChainPanel.setFilter("");
         
         //dataSetSelector= new DataSetSelector();
         //dataAddressPanel.add( dataSetSelector, BorderLayout.NORTH );
@@ -140,12 +140,12 @@ public class DataPanel extends javax.swing.JPanel {
                     doIncrUpOrDown(-1 * e.getWheelRotation());
                 }
             };
-            operatorsTextField.addMouseWheelListener(sliceIndexListener2);
+            postFiltersTextField.addMouseWheelListener(sliceIndexListener2);
         }
 
-        operatorsTextField.getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_UP,0), "INCREMENT_UP" );
-        operatorsTextField.getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,0), "INCREMENT_DOWN" );
-        ActionMap am= operatorsTextField.getActionMap();
+        postFiltersTextField.getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_UP,0), "INCREMENT_UP" );
+        postFiltersTextField.getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,0), "INCREMENT_DOWN" );
+        ActionMap am= postFiltersTextField.getActionMap();
         am.put( "INCREMENT_UP", new AbstractAction("incr_up") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -186,16 +186,16 @@ public class DataPanel extends javax.swing.JPanel {
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel1, "dataPanel_1");
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel2, "dataPanel_2");
 
-        operatorsTextField.setText(" ");
+        postFiltersTextField.setText(" ");
 
-        operatorsTextField.addActionListener(new java.awt.event.ActionListener() {
+        postFiltersTextField.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 org.das2.util.LoggerManager.logGuiEvent(evt);                
                 componentTextFieldActionPerformed(evt);
             }
         });
-        operatorsTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+        postFiltersTextField.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
                 componentTextFieldFocusGained(evt);
@@ -213,7 +213,7 @@ public class DataPanel extends javax.swing.JPanel {
     private void setUpOperationsListeners( ) {
         // org.virbo.datasource.GuiUtil.addResizeListenerToAll(this);  // On 2015-01-16 it was doing strange things.
         
-        ((JTextField)operatorsComboBox.getEditor().getEditorComponent()).getDocument().addDocumentListener( new DocumentListener() {
+        ((JTextField)postFiltersComboBox.getEditor().getEditorComponent()).getDocument().addDocumentListener( new DocumentListener() {
             
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -233,7 +233,7 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
         
-        operatorsComboBox.setVerifier( new InputVerifier() {
+        postFiltersComboBox.setVerifier( new InputVerifier() {
             @Override
             public boolean verify(String value) {
                 return ( value.trim().length()>0 && value.length()<70 ); // long operations mess up the droplist.
@@ -243,12 +243,12 @@ public class DataPanel extends javax.swing.JPanel {
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                operatorsComboBox.setPreferenceNode("operations");
+                postFiltersComboBox.setPreferenceNode("operations");
             }
         };
         new Thread(run).start();
         
-        operatorsComboBox.getEditor().getEditorComponent().addFocusListener( new FocusAdapter() {
+        postFiltersComboBox.getEditor().getEditorComponent().addFocusListener( new FocusAdapter() {
             @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 LoggerManager.logGuiEvent(evt);
@@ -262,25 +262,25 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
         
-        operatorsComboBox.addActionListener( new ActionListener() {
+        postFiltersComboBox.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
                 if ( applicationController!=null ) {
-                    applicationController.getPlotElement().setComponentAutomatically( (String)operatorsComboBox.getSelectedItem() );
+                    applicationController.getPlotElement().setComponentAutomatically( (String)postFiltersComboBox.getSelectedItem() );
                 }
                 setAdjusting(false);
                 componentChanged();
-                setAdjusting(operatorsComboBox.getEditor().getEditorComponent().hasFocus());
+                setAdjusting(postFiltersComboBox.getEditor().getEditorComponent().hasFocus());
             }
         });
     }
 
     private void componentTextFieldActionPerformed(java.awt.event.ActionEvent evt) {
-        applicationController.getPlotElement().setComponentAutomatically(operatorsTextField.getText() );
+        applicationController.getPlotElement().setComponentAutomatically(postFiltersTextField.getText() );
         setAdjusting(false);
         componentChanged();
-        setAdjusting(operatorsComboBox.getEditor().getEditorComponent().hasFocus());
+        setAdjusting(postFiltersComboBox.getEditor().getEditorComponent().hasFocus());
     }
     
     private void componentTextFieldFocusGained(java.awt.event.FocusEvent evt) {
@@ -295,7 +295,7 @@ public class DataPanel extends javax.swing.JPanel {
     }
 
     protected void setExpertMode( boolean expert ) {
-        operatorsTextField.setVisible(expert);
+        postFiltersTextField.setVisible(expert);
         operationsLabel.setVisible(expert);
     }
 
@@ -304,9 +304,9 @@ public class DataPanel extends javax.swing.JPanel {
      * @param amount positive or negative number of steps.
      */
     private void doIncrUpOrDown( int amount ) {
-            String s= operatorsTextField.getText();
+            String s= postFiltersTextField.getText();
             String olds= s;
-            int cp= operatorsTextField.getCaretPosition();
+            int cp= postFiltersTextField.getCaretPosition();
             String match= ".*\\|slice\\d\\(\\d*";
             String match2= ".*\\|slices\\(([\\:\\'\\d]+,)*\\d*";
             if ( cp<s.length() ) {
@@ -324,22 +324,22 @@ public class DataPanel extends javax.swing.JPanel {
             }
             try {
                 if ( !olds.equals(s) ) {
-                    filtersChainPanel.setFilter(s);
+                    postFiltersChainPanel.setFilter(s);
                     if ( dsf!=null ) {
-                        filtersChainPanel.setInput(null);
-                        filtersChainPanel.setInput(dsf.getController().getFillDataSet());
-                        filtersChainPanel.setFilter(s);
+                        postFiltersChainPanel.setInput(null);
+                        postFiltersChainPanel.setInput(dsf.getController().getFillDataSet());
+                        postFiltersChainPanel.setFilter(s);
                     }
                 }
-                operatorsTextField.setText(s);
-                applicationController.getPlotElement().setComponent(operatorsTextField.getText() );
-                operatorsTextField.setCaretPosition(cp);
+                postFiltersTextField.setText(s);
+                applicationController.getPlotElement().setComponent(postFiltersTextField.getText() );
+                postFiltersTextField.setCaretPosition(cp);
                 componentChanged();
             } catch ( ArrayIndexOutOfBoundsException ex ) {
                 logger.log( Level.WARNING, ex.getMessage(), ex );
-                operatorsTextField.setText(olds);
-                applicationController.getPlotElement().setComponent(operatorsTextField.getText() );
-                operatorsTextField.setCaretPosition(cp);
+                postFiltersTextField.setText(olds);
+                applicationController.getPlotElement().setComponent(postFiltersTextField.getText() );
+                postFiltersTextField.setCaretPosition(cp);
             }
     }
 
@@ -419,16 +419,16 @@ public class DataPanel extends javax.swing.JPanel {
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                String fcpf= filtersChainPanel.getFilter();
-                final String newf= operatorsTextField.getText();
+                String fcpf= postFiltersChainPanel.getFilter();
+                final String newf= postFiltersTextField.getText();
                 if ( !fcpf.equals(newf) ) {
-                    filtersChainPanel.setFilter(newf);
+                    postFiltersChainPanel.setFilter(newf);
                     if ( dsf!=null ) {
-                        filtersChainPanel.setInput(null);
-                        filtersChainPanel.setInput(dsf.getController().getFillDataSet());
-                        filtersChainPanel.setFilter(newf);
+                        postFiltersChainPanel.setInput(null);
+                        postFiltersChainPanel.setInput(dsf.getController().getFillDataSet());
+                        postFiltersChainPanel.setFilter(newf);
                     } else {
-                        filtersChainPanel.setInput(null);
+                        postFiltersChainPanel.setInput(null);
                     }
                 }
             };
@@ -444,11 +444,11 @@ public class DataPanel extends javax.swing.JPanel {
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                String filter= filtersChainPanel.getFilter();
-                filtersChainPanel.setFilter("");
-                filtersChainPanel.setInput(null);
-                filtersChainPanel.setInput(ds);  
-                filtersChainPanel.setFilter(filter);
+                String filter= postFiltersChainPanel.getFilter();
+                postFiltersChainPanel.setFilter("");
+                postFiltersChainPanel.setInput(null);
+                postFiltersChainPanel.setInput(ds);  
+                postFiltersChainPanel.setFilter(filter);
             }
         };
         SwingUtilities.invokeLater(run);        
@@ -488,9 +488,9 @@ public class DataPanel extends javax.swing.JPanel {
                 Runnable run = new Runnable() {
                     @Override
                     public void run() {
-                        DataPanel.this.operatorsTextField.setText("");
-                        DataPanel.this.filtersChainPanel.setFilter("");
-                        DataPanel.this.filtersChainPanel.setInput(null);
+                        DataPanel.this.postFiltersTextField.setText("");
+                        DataPanel.this.postFiltersChainPanel.setFilter("");
+                        DataPanel.this.postFiltersChainPanel.setInput(null);
                     }
                 };
                 if ( SwingUtilities.isEventDispatchThread() ) {
@@ -522,7 +522,7 @@ public class DataPanel extends javax.swing.JPanel {
             Runnable run= new Runnable() {
                 @Override
                 public void run() {
-                    filtersChainPanel.setInput(ds);
+                    postFiltersChainPanel.setInput(ds);
                 }
             };
             if ( SwingUtilities.isEventDispatchThread() ) {
@@ -561,12 +561,12 @@ public class DataPanel extends javax.swing.JPanel {
         PlotElement p = applicationController.getPlotElement();
         element= p;
 
-        operatorsTextField.setText(p.getComponent());
+        postFiltersTextField.setText(p.getComponent());
 
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                filtersChainPanel.setFilter(element.getComponent()); // because adjusting==true.
+                postFiltersChainPanel.setFilter(element.getComponent()); // because adjusting==true.
             }
         };
         if ( SwingUtilities.isEventDispatchThread() ) {
@@ -576,7 +576,7 @@ public class DataPanel extends javax.swing.JPanel {
         }
         
         element.addPropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
-        bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, element, BeanProperty.create("component"), this.operatorsTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")) );
+        bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, element, BeanProperty.create("component"), this.postFiltersTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")) );
         bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, element.getController(), BeanProperty.create("sliceAutoranges"), this.sliceAutorangesCB, BeanProperty.create("selected") ) );
 
         elementBindingGroup = bc;
@@ -611,15 +611,16 @@ public class DataPanel extends javax.swing.JPanel {
         newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_FILLDATASET, fillDataSetListener );
         newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_DATASOURCE, dsfListener );
         
+        postFiltersChainPanel.setFilter( newDsf.getFilters() );
         resetFiltersChainDataSet(ds);
 
         bindingTransitionalState= true;
         BindingGroup bc = new BindingGroup();
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("filters"), this.operationsPanel1, BeanProperty.create("filter")) );
+        bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("filters"), this.dataSourceFiltersPanel, BeanProperty.create("filter")) );
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("uri"), this.dataSetSelector, BeanProperty.create("value")));
         Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("controller.dataSet"),this.dataSetLabel, BeanProperty.create("text"));
         b.setConverter( BindingSupport.toStringConverter );
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("controller.dataSet"), this.operationsPanel1, BeanProperty.create("dataSet")));
+        bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("controller.dataSet"), this.dataSourceFiltersPanel, BeanProperty.create("dataSet")));
         bc.addBinding(b);
 
         try {
@@ -648,9 +649,9 @@ public class DataPanel extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                                
-                String v= operatorsTextField.getText();
-                int i= operatorsTextField.getCaretPosition();
-                operatorsTextField.setText( v.substring(0,i) + insert + v.substring(i) );
+                String v= postFiltersTextField.getText();
+                int i= postFiltersTextField.getCaretPosition();
+                postFiltersTextField.setText( v.substring(0,i) + insert + v.substring(i) );
             }
         });
         result.setToolTipText(doc);
@@ -715,13 +716,13 @@ public class DataPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         dataSetLabel = new javax.swing.JLabel();
         editComponentPanel = new javax.swing.JButton();
-        operatorsComboBox = new org.virbo.datasource.RecentComboBox();
+        postFiltersComboBox = new org.virbo.datasource.RecentComboBox();
         processDataSetLabel = new javax.swing.JLabel();
-        filtersChainPanel = new org.virbo.filters.FiltersChainPanel();
+        postFiltersChainPanel = new org.virbo.filters.FiltersChainPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         dataSetSelector = new org.virbo.datasource.DataSetSelector();
-        operationsPanel1 = new org.virbo.autoplot.OperationsPanel();
+        dataSourceFiltersPanel = new org.virbo.autoplot.OperationsPanel();
 
         setName("dataPanel"); // NOI18N
 
@@ -751,22 +752,22 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
 
-        operatorsComboBox.setName("operatorsComboBox"); // NOI18N
+        postFiltersComboBox.setName("postFiltersComboBox"); // NOI18N
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, filtersChainPanel, org.jdesktop.beansbinding.ELProperty.create("${filter}"), operatorsComboBox, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, postFiltersChainPanel, org.jdesktop.beansbinding.ELProperty.create("${filter}"), postFiltersComboBox, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         bindingGroup.addBinding(binding);
 
-        operatorsComboBox.addActionListener(new java.awt.event.ActionListener() {
+        postFiltersComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                operatorsComboBoxActionPerformed(evt);
+                postFiltersComboBoxActionPerformed(evt);
             }
         });
 
         processDataSetLabel.setFont(processDataSetLabel.getFont().deriveFont(processDataSetLabel.getFont().getSize()-4f));
         processDataSetLabel.setText("(filtered dataset will go here)");
 
-        filtersChainPanel.setName("filtersChainPanel"); // NOI18N
-        filtersChainPanel.setLayout(new javax.swing.BoxLayout(filtersChainPanel, javax.swing.BoxLayout.LINE_AXIS));
+        postFiltersChainPanel.setName("postFiltersChainPanel"); // NOI18N
+        postFiltersChainPanel.setLayout(new javax.swing.BoxLayout(postFiltersChainPanel, javax.swing.BoxLayout.LINE_AXIS));
 
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -783,7 +784,7 @@ public class DataPanel extends javax.swing.JPanel {
                             .add(jPanel2Layout.createSequentialGroup()
                                 .add(operationsLabel)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(operatorsComboBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .add(postFiltersComboBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .add(dataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(editComponentPanel)
@@ -794,7 +795,7 @@ public class DataPanel extends javax.swing.JPanel {
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
                         .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                             .add(org.jdesktop.layout.GroupLayout.LEADING, processDataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(filtersChainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 562, Short.MAX_VALUE))
+                            .add(postFiltersChainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 562, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         jPanel2Layout.setVerticalGroup(
@@ -808,9 +809,9 @@ public class DataPanel extends javax.swing.JPanel {
                     .add(editComponentPanel)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                         .add(operationsLabel)
-                        .add(operatorsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(postFiltersComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(filtersChainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
+                .add(postFiltersChainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(sliceAutorangesCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -839,7 +840,7 @@ public class DataPanel extends javax.swing.JPanel {
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(operationsPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(dataSourceFiltersPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -848,8 +849,8 @@ public class DataPanel extends javax.swing.JPanel {
                 .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel2)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(operationsPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 145, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(dataSourceFiltersPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -887,27 +888,27 @@ public class DataPanel extends javax.swing.JPanel {
         panel.setMinimumSize( d );
         
         panel.add( p, BorderLayout.CENTER );
-        p.setFilter(operatorsTextField.getText());
+        p.setFilter(postFiltersTextField.getText());
         if ( this.dsf!=null ) {
             QDataSet inputDs= this.dsf.getController().getFillDataSet();
             p.setInput(inputDs); 
-            p.setFilter(operatorsTextField.getText());
+            p.setFilter(postFiltersTextField.getText());
         }
         int ret= AutoplotUtil.showConfirmDialog( this, panel, "Edit Filters", JOptionPane.OK_CANCEL_OPTION  );
         if ( ret==JOptionPane.OK_OPTION ) {
             String newFilter= p.getFilter();
-            operatorsTextField.setText( newFilter );
+            postFiltersTextField.setText( newFilter );
             applicationController.getPlotElement().setComponentAutomatically( newFilter );
-            operatorsComboBox.setSelectedItem( newFilter );
+            postFiltersComboBox.setSelectedItem( newFilter );
             //recentComboBox.actionPerformed(evt); // kludge to get it to log the new filter
             componentChanged();
-            operatorsComboBox.addToRecent( newFilter );
+            postFiltersComboBox.addToRecent( newFilter );
         }
     }//GEN-LAST:event_editComponentPanelActionPerformed
 
-    private void operatorsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operatorsComboBoxActionPerformed
-        logger.log(Level.FINE, "operatorsComboBox: {0}", operatorsComboBox.getSelectedItem());
-    }//GEN-LAST:event_operatorsComboBoxActionPerformed
+    private void postFiltersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_postFiltersComboBoxActionPerformed
+        logger.log(Level.FINE, "operatorsComboBox: {0}", postFiltersComboBox.getSelectedItem());
+    }//GEN-LAST:event_postFiltersComboBoxActionPerformed
 
     private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
         String uri= dataSetSelector.getValue();
@@ -920,21 +921,21 @@ public class DataPanel extends javax.swing.JPanel {
      * @return the FiltersChainPanel
      */
     public FiltersChainPanel getFiltersChainPanel() {
-        return this.filtersChainPanel;
+        return this.postFiltersChainPanel;
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dataSetLabel;
     private org.virbo.datasource.DataSetSelector dataSetSelector;
+    private org.virbo.autoplot.OperationsPanel dataSourceFiltersPanel;
     private javax.swing.JButton editComponentPanel;
-    private org.virbo.filters.FiltersChainPanel filtersChainPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel operationsLabel;
-    private org.virbo.autoplot.OperationsPanel operationsPanel1;
-    private org.virbo.datasource.RecentComboBox operatorsComboBox;
+    private org.virbo.filters.FiltersChainPanel postFiltersChainPanel;
+    private org.virbo.datasource.RecentComboBox postFiltersComboBox;
     private javax.swing.JLabel processDataSetLabel;
     private javax.swing.JCheckBox sliceAutorangesCB;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
