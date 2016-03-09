@@ -368,6 +368,7 @@ public class OperationsPanel extends javax.swing.JPanel {
         dataSetLabel = new javax.swing.JLabel();
 
         filtersChainPanel.setName("filtersChainPanel"); // NOI18N
+        filtersChainPanel.setLayout(new javax.swing.BoxLayout(filtersChainPanel, javax.swing.BoxLayout.LINE_AXIS));
 
         operatorsComboBox.setName("operatorsComboBox"); // NOI18N
         operatorsComboBox.addActionListener(new java.awt.event.ActionListener() {
