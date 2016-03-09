@@ -3607,7 +3607,7 @@ private void editDomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//G
 
 private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_statusLabelMouseClicked
     //statusLabel.setText("");
-    statusLabel.setIcon(null);
+    statusLabel.setIcon(IDLE_ICON);
     statusTextField.setText("");
 }//GEN-LAST:event_statusLabelMouseClicked
 
@@ -4817,7 +4817,7 @@ APSplash.checkTime("init 240");
      *
      * @param app
      */
-    private static void checkStatusLoop(final AutoplotUI app) {
+    protected static void checkStatusLoop(final AutoplotUI app) {
         //final long t0 = System.currentTimeMillis();
 
         TimerTask run = new TimerTask() {
