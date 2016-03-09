@@ -76,6 +76,9 @@ public class DataSourceFilter extends DomNode {
     }
 
     public void setFilters(String filters) {
+        //if ( this.id.equals("data_0") && filters.equals("") ) {
+        //    new Exception().printStackTrace(System.err);
+        //}
         String old= this.filters;
         this.filters = filters;
         propertyChangeSupport.firePropertyChange( PROP_FILTERS, old, filters );
