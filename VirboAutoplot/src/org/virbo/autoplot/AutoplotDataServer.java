@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.dataset.TableDataSet;
 import org.das2.dataset.TableDataSetAdapter;
 import org.das2.dataset.TableUtil;
@@ -121,8 +122,11 @@ public class AutoplotDataServer {
                     
                     ds1= org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                     
+                } catch ( NoDataInIntervalException ex ) {
+                    logger.log( Level.INFO, "no data trying to read "+dr, ex ); 
+                    
                 } catch ( Exception ex ) {
-                    logger.log( Level.WARNING, "execption when trying to read "+dr, ex ); 
+                    logger.log( Level.WARNING, "exception when trying to read "+dr, ex ); 
                 }
                 logger.log( Level.FINE, "  --> {0} )", ds1 );
                 if ( ds1!=null ) {
