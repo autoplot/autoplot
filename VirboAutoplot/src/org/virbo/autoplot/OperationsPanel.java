@@ -237,6 +237,7 @@ public class OperationsPanel extends javax.swing.JPanel {
                         }
                     }
                     componentChanged();
+                    setFilter(filtersChainPanel.getFilter());
                 } catch ( ArrayIndexOutOfBoundsException ex ) {
                     logger.log( Level.WARNING, ex.getMessage(), ex );
                     operatorsTextField.setText(olds);
@@ -371,6 +372,11 @@ public class OperationsPanel extends javax.swing.JPanel {
         filtersChainPanel.setLayout(new javax.swing.BoxLayout(filtersChainPanel, javax.swing.BoxLayout.LINE_AXIS));
 
         operatorsComboBox.setName("operatorsComboBox"); // NOI18N
+        operatorsComboBox.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                operatorsComboBoxFocusLost(evt);
+            }
+        });
         operatorsComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 operatorsComboBoxActionPerformed(evt);
@@ -424,8 +430,31 @@ public class OperationsPanel extends javax.swing.JPanel {
 
     private void operatorsComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operatorsComboBoxActionPerformed
         logger.log(Level.FINE, "operatorsComboBox: {0}", operatorsComboBox.getSelectedItem());
+        doEnter();
     }//GEN-LAST:event_operatorsComboBoxActionPerformed
 
+    /**
+     * action and focus lost
+     */
+    private void doEnter() {
+        String news= operatorsTextField.getText();
+        int cp= operatorsTextField.getCaretPosition();
+        if ( filtersChainPanel.validateFilter(news) ) {
+            filtersChainPanel.setFilter(news);
+            if ( dataSet!=null ) {
+                filtersChainPanel.setInput(null);
+                filtersChainPanel.setInput(dataSet);
+                filtersChainPanel.setFilter(news);
+            }
+            operatorsTextField.setText(news);
+            operatorsTextField.setCaretPosition(cp);
+        } else {
+            String s= filtersChainPanel.getFilter();
+            operatorsTextField.setText(s);
+            operatorsTextField.setCaretPosition(cp);
+        }        
+    }
+    
     private void editComponentPanelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editComponentPanelActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
 
@@ -457,6 +486,10 @@ public class OperationsPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_editComponentPanelActionPerformed
 
+    private void operatorsComboBoxFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_operatorsComboBoxFocusLost
+        doEnter();
+    }//GEN-LAST:event_operatorsComboBoxFocusLost
+
     private String filter = "";
 
     public static final String PROP_FILTER = "filter";
@@ -472,7 +505,7 @@ public class OperationsPanel extends javax.swing.JPanel {
             public void run() {
                 filtersChainPanel.setFilter(filter);
                 filtersChainPanel.setInput(dataSet);
-                if ( !oldFilter.equals(filter) ) {           
+                if ( !oldFilter.equals(filter) || !filter.equals(operatorsTextField.getText()) ) {           
                     int carot= operatorsTextField.getCaretPosition();
                     operatorsTextField.setText(filter);
                     operatorsTextField.setCaretPosition(Math.min(filter.length(),carot));
