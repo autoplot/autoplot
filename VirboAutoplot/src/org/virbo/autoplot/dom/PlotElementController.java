@@ -2642,7 +2642,7 @@ public class PlotElementController extends DomNodeController {
      * another type.
      * postconditions: The correct renderer is installed in the plot.
      */
-    protected void maybeCreateDasPeer(){
+    protected synchronized void maybeCreateDasPeer(){
         
         final Renderer oldRenderer = getRenderer();
 
