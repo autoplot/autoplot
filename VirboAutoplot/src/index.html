@@ -23,9 +23,11 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-03-08 r18468):</p>
+        <p>Bugfixes (2016-03-11 r18490):</p>
         <ul>
             <li>rte_1240063716: error: java.lang.String cannot be cast to org.virbo.dataset.QDataSet seen at Juno meeting.</li>
+            <li>corrections to the AutoplotDataServer, where "NoDataInInterval" was not thrown properly in reduce.</li>
+            <li>checkStatusLoop was not started in child applications, so the busy indicator used the old logic.</li>
             <li>bugfix where QStream had references to data that could not be resolved would prevent aggregation of JADE data.</li>
             <li>bugs when loading vap files with time series browse datasets that are not visible with a time axis.</li>
             <li>FilterChainPanel now limits the flashing of intermediate state by allowing 300ms to process before the color is changed.</li>
