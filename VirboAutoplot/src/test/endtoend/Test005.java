@@ -39,7 +39,7 @@ public class Test005 {
             getDocumentModel().getCanvases(0).getMarginColumn().setLeft("+6em");
             getDocumentModel().getCanvases(0).getMarginRow().setTop("2em");
             getDocumentModel().getCanvases(0).getMarginRow().setBottom("100%-3em");
-            
+
             xxx("init");
 
             //plot("http://cdaweb.gsfc.nasa.gov/opendap/hyrax/genesis/gim/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density");
@@ -122,6 +122,14 @@ public class Test005 {
             plot("http://autoplot.org/data/hsi_fsimg_5050612_001.fits");
             writeToPng("test005_demo13.png");
 
+            System.err.println( getDocumentModel().getDataSourceFilters(0).getFilters() );
+            System.err.println( getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
+            System.err.println( getDocumentModel().getDataSourceFilters(0).getController().getFillDataSet() );
+            System.err.println( getDocumentModel().getPlotElements(0).getController().getDataSet() );
+            System.err.println( getDocumentModel().getPlotElements(0).getController().getRenderer().getDataSet() );
+            System.err.println( getDocumentModel().getPlotElements(0).getPlotDefaults().getZaxis().getRange() );
+            System.err.println( getDocumentModel().getPlots(0).getZaxis().getRange() );
+            
             xxx("demo13");
 
             plot("http://satdat.ngdc.noaa.gov/sem/goes/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&validMax=32000&timerange=Dec+2004");
