@@ -87,7 +87,7 @@ public class DataSourceController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt);  
             if (dataSet != null) {
-                updateFill();// this should be done quickly.  Some filters (ffts) are sub-interactive and should not be done here.
+                updateFillSoon(-1);
             }
         }
     };
@@ -102,7 +102,7 @@ public class DataSourceController extends DomNodeController {
             LoggerManager.logPropertyChangeEvent(evt);  
             if (dataSet != null) {
                 logger.fine("change in fill or valid range ->updateFillSoon()");
-                updateFillSoon(0);
+                updateFillSoon(-1);
             }
         }
     };
@@ -1084,9 +1084,10 @@ public class DataSourceController extends DomNodeController {
     }
 
     /**
-     * call updateFill in new thread
+     * call updateFill in new thread, or immediately on this thread when 
+     * delay is 0.
      *
-     * @param delay insert this delay so other threads may complete first.
+     * @param delay insert this delay so other threads may complete first.  
      */
     private void updateFillSoon(final int delay) {
         changesSupport.registerPendingChange(this, PENDING_FILL_DATASET);
