@@ -118,6 +118,9 @@ public class DataSourceController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent evt) {
             LoggerManager.logPropertyChangeEvent(evt);  
             logger.log(Level.FINE, "resetMe: {0} {1}->{2}", new Object[]{evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
+            
+            dsf.setFilters(""); // reset filters
+            
             if (evt.getNewValue() == null && evt.getOldValue() == null) {
                 // do nothing
             } else {
