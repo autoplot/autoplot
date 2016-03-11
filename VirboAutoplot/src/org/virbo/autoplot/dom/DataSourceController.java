@@ -119,8 +119,6 @@ public class DataSourceController extends DomNodeController {
             LoggerManager.logPropertyChangeEvent(evt);  
             logger.log(Level.FINE, "resetMe: {0} {1}->{2}", new Object[]{evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
             
-            dsf.setFilters(""); // reset filters
-            
             if (evt.getNewValue() == null && evt.getOldValue() == null) {
                 // do nothing
             } else {
@@ -137,6 +135,7 @@ public class DataSourceController extends DomNodeController {
                 if (!dom.controller.isValueAdjusting()) {
                     try {
                         DataSourceController.this.changesSupport.performingChange(resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE);
+                        dsf.setFilters(""); // reset filters
                         resolveDataSource(false, getMonitor("resetting data source", "resetting data source"));
                     } finally {
                         DataSourceController.this.changesSupport.changePerformed(resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE);
