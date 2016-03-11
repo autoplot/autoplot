@@ -1825,14 +1825,14 @@ public class PlotElementController extends DomNodeController {
 
                 doMetadata(peleCopy, props, fillDs );
 
-                String reduceRankString = dsc.getReduceDataSetString();
+                String appliedFilters = dsc.getAppliedFiltersString();
                 String title = peleCopy.getPlotDefaults().getTitle();
                 if ( fillDs.property(QDataSet.CONTEXT_0)!=null ) { 
                     title += "!c%{CONTEXT}";
                 } else if ( !plotElement.getComponent().equals("") ) {
                     title += "!c%{CONTEXT}";
-                } else if ( reduceRankString != null && reduceRankString.length()>0 ) {
-                    title += "!c"+reduceRankString;
+                } else if ( appliedFilters != null && appliedFilters.length()>0 ) {
+                    title += "!c"+appliedFilters;
                 }
                 peleCopy.getPlotDefaults().setTitle(title);
             }

@@ -1143,7 +1143,9 @@ public class DataSourceController extends DomNodeController {
      * <p>
      * the fill parameters have changed, so fire an update to notify the
      * listeners. This creates the "fillDataSet" whose name comes from an early
-     * version of Autoplot where fill data would be handled here.</p>
+     * version of Autoplot where fill data would be handled here.
+     * The filters also modify fill.
+     * </p>
      *
      * <p>
      * This should not be run on the AWT event thread!</p>
@@ -1152,7 +1154,7 @@ public class DataSourceController extends DomNodeController {
      * <li>The dataset has been loaded
      * </ul>
      * postconditions: <ul>
-     * <li>the "fill" dataset is created, maybe by making the dataset mutable.
+     * <li>the "fill" dataset is created.
      * <li>internal operations like slice may be applied here if the .vap file
      * has instructed, but rarely are.
      * <li>reduceRankString is set to document any operation.
@@ -1187,13 +1189,13 @@ public class DataSourceController extends DomNodeController {
 
                 if (DataSetOps.isProcessAsync(filters)) {
                     logger.warning("asynchronous processes not supported here");
-                    setReduceDataSetString("");
+                    setAppliedFiltersString("");
                 } else {
                     try {
                         ds = DataSetOps.sprocess(filters, ds, new AlertNullProgressMonitor("sprocess " + filters));
                         //TODO: must we process the props as well?
 
-                        setReduceDataSetString(filters);
+                        setAppliedFiltersString(filters);
                     } catch (Exception ex) {
                         setException(ex);
                         throw new RuntimeException(ex);
@@ -1214,7 +1216,7 @@ public class DataSourceController extends DomNodeController {
 //                } else {
 //                    fillDs= DataSetOps.makePropertiesMutable( ds );
 //                }
-                setReduceDataSetString(null);
+                setAppliedFiltersString(null);
 
             }
 
@@ -1610,7 +1612,7 @@ public class DataSourceController extends DomNodeController {
      * @return reduceDataSetString the string, which may be empty but will not
      * be null.
      */
-    public String getReduceDataSetString() {
+    public String getAppliedFiltersString() {
         return reduceDataSetString;
     }
 
@@ -1619,13 +1621,13 @@ public class DataSourceController extends DomNodeController {
      * DataSourceFilter. This will be an empty string when no processes were
      * applied. See getFilters which specified which should be applied.
      *
-     * @param reduceDataSetString
+     * @param appliedFilters
      */
-    public void setReduceDataSetString(String reduceDataSetString) {
-        assert reduceDataSetString != null;
+    public void setAppliedFiltersString(String appliedFilters) {
+        assert appliedFilters != null;
         String oldReduceDataSetString = this.reduceDataSetString;
-        this.reduceDataSetString = reduceDataSetString;
-        propertyChangeSupport.firePropertyChange(PROP_REDUCEDATASETSTRING, oldReduceDataSetString, reduceDataSetString);
+        this.reduceDataSetString = appliedFilters;
+        propertyChangeSupport.firePropertyChange(PROP_REDUCEDATASETSTRING, oldReduceDataSetString, appliedFilters);
     }
 
     /**
