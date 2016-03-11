@@ -611,7 +611,9 @@ public class DataPanel extends javax.swing.JPanel {
         newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_FILLDATASET, fillDataSetListener );
         newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_DATASOURCE, dsfListener );
         
-        postFiltersChainPanel.setFilter( newDsf.getFilters() );
+        dataSourceFiltersPanel.setFilter( newDsf.getFilters() );
+        dataSourceFiltersPanel.setDataSet( newDsf.getController().getDataSet() );
+        
         resetFiltersChainDataSet(ds);
 
         bindingTransitionalState= true;
