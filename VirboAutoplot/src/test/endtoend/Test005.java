@@ -111,17 +111,6 @@ public class Test005 {
             }
             xxx("demo11");
  
-            plot("http://autoplot.org/data/hsi_qlimg_5050601_001.fits");  // note this is not what happens, but it's still an interesting test.
-            getDocumentModel().getDataSourceFilters(0).setFilters("|slice0(2)");
-            getDocumentModel().getPlotElements(0).setComponent("");
-            Thread.sleep(1000); // it's probably because the app isn't locked properly.
-            writeToPng("test005_demo12.png");
-
-            xxx("demo12");
-
-            //TODO: why does this not reset with the plot command below?  This only occurs in testing server.
-            getDocumentModel().getDataSourceFilters(0).setFilters("");
-            
             plot("http://autoplot.org/data/hsi_fsimg_5050612_001.fits");
             writeToPng("test005_demo13.png");
 
@@ -134,6 +123,17 @@ public class Test005 {
             System.err.println( getDocumentModel().getPlots(0).getZaxis().getRange() );
             
             xxx("demo13");
+            
+            plot("http://autoplot.org/data/hsi_qlimg_5050601_001.fits");  // note this is not what happens, but it's still an interesting test.
+            getDocumentModel().getDataSourceFilters(0).setFilters("|slice0(2)");
+            getDocumentModel().getPlotElements(0).setComponent("");
+            Thread.sleep(1000); // it's probably because the app isn't locked properly.
+            writeToPng("test005_demo12.png");
+
+            xxx("demo12");
+
+            //TODO: why does this not reset with the plot command below?  This only occurs in testing server.
+            getDocumentModel().getDataSourceFilters(0).setFilters("");
 
             plot("http://satdat.ngdc.noaa.gov/sem/goes/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&validMax=32000&timerange=Dec+2004");
             writeToPng("test005_demo14.png");
