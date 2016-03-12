@@ -119,6 +119,9 @@ public class Test005 {
 
             xxx("demo12");
 
+            //TODO: why does this not reset with the plot command below?  This only occurs in testing server.
+            getDocumentModel().getDataSourceFilters(0).setFilters("");
+            
             plot("http://autoplot.org/data/hsi_fsimg_5050612_001.fits");
             writeToPng("test005_demo13.png");
 
