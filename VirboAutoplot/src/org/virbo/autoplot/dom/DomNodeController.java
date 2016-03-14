@@ -79,21 +79,41 @@ public class DomNodeController {
     }
 
     /**
-     * return the controller for the node, if it exists, through introspection.
-     * @param n
+     * return the controller for the node, if it exists.
+     * This appeared to take a significant amount of time using introspection, 
+     * so was recoded.  Note this is much faster, but it's trivial either way
+     * and this runs the risk of a future new node not being handled.
+     * (Test on 2016-03-14 showed 1e6 invocations of with introspection took
+     * ~700ms, while this took 7ms.)
+     * @param n the node
      * @return the controller or null.
      */
     public static DomNodeController getController( DomNode n ) {
-        try {
-            Method m= n.getClass().getMethod( "getController" );
-            return (DomNodeController) m.invoke( n );
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch ( NoSuchMethodException ex ) {
+        DomNodeController result;
+        if ( n instanceof PlotElement ) {
+            result= ((PlotElement)n).getController();
+        } else if ( n instanceof Plot ) {
+            result= ((Plot)n).getController();
+        } else if ( n instanceof DataSourceFilter ) {
+            result= ((DataSourceFilter)n).getController();
+        } else if ( n instanceof Application ) {
+            result= ((Application)n).getController();
+        } else if ( n instanceof Axis ) {
+            result= ((Axis)n).getController();
+        } else if ( n instanceof Row ) {
+            result= ((Row)n).getController();
+        } else if ( n instanceof Column ) {
+            result= ((Column)n).getController();
+        } else if ( n instanceof Canvas ) {
+            result= ((Canvas)n).getController();
+        } else if ( n instanceof Annotation ) {
+            result= ((Annotation)n).getController();
+        } else {
+            result= null;
         }
-        return null;
+        return result;
     }
-
+    
     private List<DomNodeController> getChildControllers() {
         List<DomNodeController> result= new ArrayList();
         List<DomNode> kids= node.childNodes();
