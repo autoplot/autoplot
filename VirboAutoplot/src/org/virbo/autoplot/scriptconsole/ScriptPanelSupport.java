@@ -356,7 +356,7 @@ public class ScriptPanelSupport {
                                 
                                 if ( JOptionPane.OK_OPTION== 
                                     JOptionPane.showConfirmDialog( panel, 
-                                    "File Changed On Disk.  Do you want to reload?", 
+                                    "File changed on disk.  Do you want to reload?", 
                                     "File Changed on Disk",
                                     JOptionPane.OK_CANCEL_OPTION ) ) {
                                     try {
@@ -383,7 +383,7 @@ public class ScriptPanelSupport {
                 }
             }            
         };
-        new Thread(run).start();
+        new Thread(run,"fileWatcherRunnnable").start();
     }
     
     private void restartWatcher( File file ) throws IOException {
