@@ -77,7 +77,9 @@ public class AsciiTableMaker {
     }
     
     void addRecord(List<String> values) {
-        if ( fieldCount==-1 ) return;
+        if ( fieldCount==-1 ) {
+            return;
+        }
         if ( initializedFields==false ) {
             setUnitsAndFormat(values);
             initializedFields= true;
@@ -126,6 +128,14 @@ public class AsciiTableMaker {
 
     }
 
+    /**
+     * return true if the header has been set.
+     * @return true if the header has been set.
+     */
+    public boolean hasHeader() {
+        return this.fieldCount>-1;
+    }
+    
     void addHeader(List<String> values) {
         if (fieldCount == -1) {
             initialize(values);
