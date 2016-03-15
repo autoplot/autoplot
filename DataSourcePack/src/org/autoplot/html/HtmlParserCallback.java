@@ -104,7 +104,26 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
                 if ( isHeader ) {
                     ascii.addHeader( currentRow );
                 } else {
-                    ascii.addRecord( currentRow );
+                    if ( ascii.hasHeader()==false ) {
+                        List<String> values= new ArrayList();
+                        boolean haveNumber= false;
+                        for ( int i=0; i<currentRow.size(); i++ ) {
+                            values.add("field"+i);
+                            try {
+                                Double.parseDouble(currentRow.get(i));
+                                haveNumber= true;
+                            } catch ( NumberFormatException ex ) {
+                                
+                            }
+                        }
+                        if ( haveNumber==false ) { // https://commons.apache.org/proper/commons-math/userguide/optimization.html uses the first row as headers.
+                            ascii.addHeader( currentRow );
+                        } else {
+                            ascii.addHeader( values );
+                        }
+                    } else {
+                        ascii.addRecord( currentRow );
+                    }
                 }
                 
             } else if (t == HTML.Tag.TH) {
