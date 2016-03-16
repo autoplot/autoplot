@@ -324,6 +324,18 @@ class ImageDataSource extends AbstractDataSource {
                 throw new IllegalArgumentException("png contains no rich metadata.");
             }
         }
+        
+        if ( channel!=null ) {
+            if ( channel.equals("greyscale") ) {
+                result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_white");
+            } else if ( channel.equals("red") ) {
+                result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_red");
+            } else if ( channel.equals("green") ) {
+                result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_green");
+            } else if ( channel.equals("blue") ) {
+                result.putProperty( QDataSet.RENDER_TYPE, "spectrogram>colorTable=black_blue");
+            }
+        }
                
         mon.finished();
 
