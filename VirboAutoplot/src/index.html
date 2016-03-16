@@ -23,7 +23,7 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-03-11 r18490):</p>
+        <p>Bugfixes (2016-03-16 r18503):</p>
         <ul>
             <li>rte_1240063716: error: java.lang.String cannot be cast to org.virbo.dataset.QDataSet seen at Juno meeting.</li>
             <li>corrections to the AutoplotDataServer, where "NoDataInInterval" was not thrown properly in reduce.</li>
@@ -52,6 +52,9 @@
             <li>improve feedback while reading CDF file data, MMS has large datasets that take non-trivial time to extract</li>
             <li>update the crosshair digitizer when we install RBGImageRenderer, so that R,G,B values are reported.</li>
             <li>treat http://user@... the same as http://... when credentials are needed either way.  PNGWalkTool had a bug where user@ was added automatically, causing a second login dialog.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>openBrowser code assumed that the Java 6 system could be used, but it isn't supported on Linux (Mint).</li>
             <li>1512: I/O Error reading CDF files on 32 bit machines.  Fall back to alternate method for opening files.</li>
             <li>RGB indication on crosshair renderer corrected for images without DEPEND_1 tags.</li>
@@ -103,39 +106,11 @@
             <li>rfe 457: add hidden plot would intercept mouse events, making the connected plots difficult to work with.</li>
             <li>rfe 464: update the initial colors.txt template so that it is not confusing.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>progress monitor cleaned up when aggregation is used as events list in events list tool.</li>
-            <li>webstart jar files resigned with this year's signature</li>
-            <li>external script editor save detect failed on Windows, this is fixed.</li>
-            <li>1482: vaps with two time-series-browse datasets, each listening to plot.context property</li>
-            <li>pngwalks with images without timeaxes would incorrectly use xaxis ranges instead of filename</li>
-            <li>arrow is included in the annotation bounds.</li>
-            <li>finally name dark green and purple color.</li>
-            <li>huge scatter uses 1-pixel connecting line when zoomed in closely.</li>
-            <li>1479: format then parse in time range event firing could cause very deep stacks.</li>
-            <li>1480: old bug where change in component (|slice) wouldn't properly lock the application is fixed.</li>
-            <li>add TailBundleDataSet, which allows bundle(alpha,red,green,blue) to work with rank 2 datasets.</li>
-            <li>rte_0553700540: index out of bounds exception when "|log10" was missing parens, this is allowed now.</li>
-            <li>rte_2066281934: catch IndexOutOfBoundsException when trying to parse "...+...+...", now throws parse exception.</li>
-            <li>rte_1417924229: transitional state produced NullPointerException</li>
-            <li>1478: slice and unbundle operations properly preserve units, eq and ne operators improve support for nominal data.</li>
-            <li>PNG support corrects problems with alpha channel when reading and formatting PNG files.</li>
-            <li>TimeParser $(subsec) had a bug with rounding.</li>
-            <li>1473: create pngwalk by orbit without rescale fails</li>
-            <li>1472: HTTPFileSystem fails to query for username after typo</li>
-            <li>1470: de-internationalize the three codes that were accidentally internationalized.</li>
-            <li>1468: Chris pointed out the setting for the default browser in the settings, which pointed out that Java handles this now, since Java6.</li>
-            <li>1465: check before closing an editor with changes.</li>
-            <li>invokeScriptSoon dialog would leave progress monitor hanging if there's a exception thrown in the script..</li>
-            <li>remove extra question mark when reporting data was exported.</li>
-            <li>corrections to hrinterval and time format, correctly using the stop time and supporting end modifier.</li>
-            <li>clean up address bar as vap is loaded. </li>
-            <li>"2014-001 to 2015-001 UTC" is supported now.</li> 
-        </ul>
         <p>Features:</p>
         <ul>
-            <li>479: consider if interpolateMod should allow range</li>
+            <li>479: consider if interpolateMod should allow range (e.g. -180 to 180).</li>
+            <li>html table data source no longer requires a header row, first row will be interpretted as headers if no numbers are found.</li>
+            <li>DataSetBuilder nextRecord method accepts array of doubles, as well as array of objects (datums)</li>
             <li>1530: add control switch for error bars.</li>
             <li>support now-P1D/now+PT1H</li>
             <li>plug-in filters can now validate the string, allowing mousewheel on pipes string to be limited.</li>
@@ -150,6 +125,9 @@
             <li>Data Mash up is now accessible from menus.  Improvements to mashup including thumbnails.</li>
             <li>Autoplot servlet experiment with checking for exceptions in the plot and putting them in the response headers.</li>
             <li>472: allow $x to be used in aggregation without time fields.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>           
             <li>About screen includes a bullet explicitly identifying 32bit Java and provides a link to fix this.</li>
             <li>html version of pngwalk uses precalculated thumbnails.</li>
             <li>470: DasProgressPanel shows the thread name to improve serviceability</li>
@@ -170,34 +148,6 @@
             <li>ISO8601 parser now supports time zone offsets.</li>
             <li>Clean-up and logging of OpenDap code so more predicatable failures can be studied.</li>
             <li>nc4 extension is recognized as NetCDF.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>           
-            <li>crosshair digitizer supports meta-C copy, putting the X,Y,Z values into the paste buffer.</li>
-            <li>crosshair digitizer reports R,G,B values for images.</li>
-            <li>hugeScatter zooms in to one-pixel width connector, when connector is used</li>
-            <li>StackedHistogram mode added to support Voyager and ISEE datasets from U. Iowa Plasma Wave Group</li>
-            <li>Color dialog allows colors to be sampled from other applications on the screen.</li>
-            <li>inline jython editor has syntax highliting and completions.</li>
-            <li>purple-yellow colorbar added.  Thanks, Chris!</li>
-            <li>style editor for digital renderer added, controls are now formatted to vap file.</li>
-            <li>contour plot is finally added to list of plot types.</li>
-            <li>AUTOPLOT_DATA/config/colors.txt allows new colors to be added to palette.</li>
-            <li>add experimental caching of intermediate results in process string.</li>
-            <li>introduce histogram2d process</li>
-            <li>dashup removeValues introduced.  Finish off the original list of functions.</li>
-            <li>313: remember dialog size and positions</li>
-            <li>plot visible property no longer hides the data renderers.</li>
-            <li>axes and plots now have fontSize property, which works like the annotation fontSize property, so '2em' is twice the canvas font height.</li>
-            <li>putValues method added to support Dashup and also to match putProperty method.</li>
-            <li>rfe456: jython editor detects external changes</li>
-            <li>dashup can be enabled with environment variable "enableDashup=true" in config/system.properties.</li>
-            <li>rfe453: axis tab has timerange editor for when the timerange isn't an axis.</li>
-            <li>rfe454: support arbitrary rank data with HDF5 plugin.</li>
-            <li>pngwalk allows &amp;timerange= in URI to constrain the image timeranges.</li>
-            <li>451: keep track of running script so buffer doesn't swap</li>
-            <li>345: first go at annotations</li>
-            <li>improvements to $(enum) in timeranges, providing code to read out the enumerated values.</li>
         </ul>
 
         <p>Known issues:</p>
