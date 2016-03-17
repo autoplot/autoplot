@@ -278,6 +278,11 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             }
         });
 
+        currentDataSetSelector.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                currentDataSetSelectorFocusGained(evt);
+            }
+        });
         currentDataSetSelector.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 currentDataSetSelectorActionPerformed(evt);
@@ -313,6 +318,11 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jTable1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTable1FocusLost(evt);
+            }
+        });
         jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jTable1MouseClicked(evt);
@@ -627,6 +637,14 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         
     }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jTable1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTable1FocusLost
+        System.err.println("table focus lost");
+    }//GEN-LAST:event_jTable1FocusLost
+
+    private void currentDataSetSelectorFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_currentDataSetSelectorFocusGained
+        System.err.println("dataSetSelector focus gained");        // TODO add your handling code here:
+    }//GEN-LAST:event_currentDataSetSelectorFocusGained
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.virbo.datasource.DataSetSelector currentDataSetSelector;
