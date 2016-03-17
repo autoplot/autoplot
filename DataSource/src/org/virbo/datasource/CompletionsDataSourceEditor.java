@@ -194,8 +194,8 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         }
         first.removeAll(arg0);
 
-        opsCbs= new ArrayList<JCheckBox>();
-        opsComboBoxes= new ArrayList<JComboBox>();
+        opsCbs= new ArrayList<>();
+        opsComboBoxes= new ArrayList<>();
 
         boolean empty= true;
 
@@ -213,7 +213,8 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
             empty= false;
 
             if ( cc1.doc!=null && cc1.doc.trim().length()>0 ) {
-                jcheckBox.setToolTipText( cc1.doc );
+                optPanel.add( BorderLayout.NORTH, new JLabel( cc1.doc ) );
+                //jcheckBox.setToolTipText( cc1.doc );
             }
             int pos= ss.indexOf(cc1.completable);
             if ( pos>-1 ) pos+=cc1.completable.length(); // carot immediately following "<parmName>="
@@ -252,7 +253,11 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
                         if ( cc3.completable.equals(cc3.label ) ) {
                             options.add( cc3.label );
                         } else {
-                            options.add( cc3.completable + ": " + cc3.label );
+                            if ( cc3.label==null ) {
+                                options.add( cc3.completable );
+                            } else {
+                                options.add( cc3.completable + ": " + cc3.label );
+                            }
                         }
                     }
                     if ( cc3.completable.startsWith("<double")
@@ -480,7 +485,7 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         jScrollPane1 = new javax.swing.JScrollPane();
         optionsPanel = new javax.swing.JPanel();
 
-        jLabel1.setText("<html>Autoplot has attempted to create a GUI editor based on the completions model of the data source.  This a GUI that is not optimal, but is still useful.");
+        jLabel1.setText("<html>Autoplot has attempted to create a GUI editor based on the completions of the data source. ");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         optionsPanel.setAlignmentY(0.0F);
@@ -498,12 +503,12 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 61, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(333, Short.MAX_VALUE))
+                .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(0, 377, Short.MAX_VALUE))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(layout.createSequentialGroup()
-                    .add(68, 68, 68)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)))
+                .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                    .add(0, 38, Short.MAX_VALUE)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 356, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
