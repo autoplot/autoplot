@@ -16,7 +16,11 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -52,6 +56,30 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     public TimeRangeToolEventsList() {
         initComponents();
         fillList();
+        jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent evt) {
+                if (evt.getValueIsAdjusting()) {
+                    logger.finest("value is adjusting");
+                } else {
+                    ListSelectionModel lsm= jTable1.getSelectionModel();                        
+                    if (tsb != null) {
+                        if (lsm.getMinSelectionIndex() == 0) {
+                            loadTsb(-1);
+                        } else if (lsm.getMaxSelectionIndex() == jTable1.getRowCount() - 1) {
+                            loadTsb(1);
+                        }
+                    }
+                    fireTableSelection();
+                    Rectangle r = jTable1.getCellRect( lsm.getMinSelectionIndex(), 0, false );
+                    r= r.union(  jTable1.getCellRect( lsm.getMaxSelectionIndex(), 0, false ) );
+                    if (r != null) {
+                        jTable1.scrollRectToVisible(r);
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -82,28 +110,44 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     /**
      * populate the list.
      */
-    private void fillList() { 
-        DefaultListModel lm= new DefaultListModel();
-        if ( tsb!=null ) {
-            lm.add(lm.getSize(),"Load Previous Set...");
-        }
+    private void fillList() {         
+        final DefaultTableModel tm;
         if ( currentDataSet==null ) {
+            tm= new DefaultTableModel( new String[] { "Range", "Label" }, 3 );        
             if ( tsb==null ) {
-                lm.add(lm.getSize(),"(no intervals loaded)");                
+                tm.setValueAt( "(no intervals loaded)", 0, 0 );                
             } else {
-                lm.add(lm.getSize(),"("+tsb.getTimeRange()+" contains no intervals)");
+                tm.setValueAt( "Load Previous Set...", 0, 0 );
+                tm.setValueAt( "("+tsb.getTimeRange()+" contains no intervals)", 1, 0 );   
+                tm.setValueAt( "Load Next Set...", 2, 0 );
             }
         } else {
+            int offset= tsb==null ? 0 : 1;
+            tm= new DefaultTableModel( new String[] { "Range", "Label" }, currentDataSet.length()+2 );
+            if ( tsb!=null ) {
+                tm.setValueAt( "Load Previous Set...", 0, 0 );
+                tm.setValueAt( "", 0, 1 );
+            }
+            QDataSet bds= (QDataSet) currentDataSet.property(QDataSet.BUNDLE_1);
+            Units eu= (Units) bds.property(QDataSet.UNITS,3);
             for ( int i=0; i<currentDataSet.length(); i++ ) {
-                String ss= getRange(i).toString();
-                lm.add(lm.getSize(),ss);
+                tm.setValueAt( getRange(i).toString(), i+offset, 0 );
+                String s= eu.createDatum( currentDataSet.slice(i).value(3) ).toString();    
+                tm.setValueAt( s, i+offset, 1 );
+            }
+            if ( tsb!=null ) {
+                tm.setValueAt( "Load Next Set...", currentDataSet.length()+1, 0 );
+                tm.setValueAt( "", currentDataSet.length()+1, 1 );
             }
         }
-        if ( tsb!=null ) {
-            lm.add(lm.getSize(),"Load Next Set...");
-        }
-        intervalsList.setModel( lm );
-        intervalsList.setCellRenderer( listCellRenderer );
+        
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                jTable1.setModel(tm);
+            }
+        });
+        
+        
     }
     
     ListCellRenderer listCellRenderer= new ListCellRenderer() {
@@ -197,8 +241,6 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        intervalsList = new javax.swing.JList();
         rescaleComboBox = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
         prevButton = new javax.swing.JButton();
@@ -206,18 +248,8 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         currentDataSetSelector = new org.virbo.datasource.DataSetSelector();
         timeRangeTF = new javax.swing.JTextField();
         timeRangeButton = new javax.swing.JButton();
-
-        intervalsList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
-        intervalsList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                intervalsListValueChanged(evt);
-            }
-        });
-        jScrollPane1.setViewportView(intervalsList);
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
 
         rescaleComboBox.setEditable(true);
         rescaleComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "none", "-5%,105%", "-10%,110%", "-100%,200%", "-300%,400%" }));
@@ -270,11 +302,28 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             }
         });
 
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jTable1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
@@ -290,6 +339,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                 .addComponent(timeRangeButton)
                 .addContainerGap())
             .addComponent(currentDataSetSelector, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE)
+            .addComponent(jScrollPane2)
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {nextButton, prevButton});
@@ -308,7 +358,8 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                         .addComponent(timeRangeTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(timeRangeButton)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {nextButton, prevButton});
@@ -343,31 +394,14 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         }
     }
     
-    private void intervalsListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_intervalsListValueChanged
-        if ( evt.getValueIsAdjusting() ) {
-            logger.finest("value is adjusting");
-        } else {
-            if ( tsb!=null ) {
-                if ( intervalsList.getMinSelectionIndex()==0 ) {
-                    loadTsb(-1);
-                } else if ( intervalsList.getMaxSelectionIndex()==intervalsList.getModel().getSize()-1 ) {
-                    loadTsb(1);   
-                }
-            }
-            fireSelection();
-            Rectangle r= intervalsList.getCellBounds(intervalsList.getMinSelectionIndex(),intervalsList.getMaxSelectionIndex());
-            if ( r!=null ) intervalsList.scrollRectToVisible(r);
-        }
-    } 
-    
-    private void fireSelection() {
-        int i1= intervalsList.getMinSelectionIndex();
-        int i2= intervalsList.getMaxSelectionIndex();
+    private void fireTableSelection() {
+        int i1= jTable1.getSelectionModel().getMinSelectionIndex();
+        int i2= jTable1.getSelectionModel().getMaxSelectionIndex();
         if ( currentDataSet==null ) return;
         DatumRange fire= null;
         String rescale= (String)rescaleComboBox.getSelectedItem();
         for ( int i=i1; i<=i2; i++ ) {
-            if ( intervalsList.isSelectedIndex(i) ) {
+            if ( jTable1.getSelectionModel().isSelectedIndex(i) ) {
                 int isel= (tsb!=null) ? i-1 : i;
                 if ( isel>=0 && ( currentDataSet==null || isel<currentDataSet.length() ) ) {
                     if ( fire==null ) {
@@ -404,11 +438,11 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         }
         fireDataRangeSelectionListenerDataRangeSelected( new DataRangeSelectionEvent(this,fire.min(),fire.max()) );
         
-    }//GEN-LAST:event_intervalsListValueChanged
-
+    }                                          
+    
     private void prevButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevButtonActionPerformed
-        int i0= intervalsList.getMinSelectionIndex();
-        int i1= intervalsList.getMaxSelectionIndex();
+        int i0= jTable1.getSelectionModel().getMinSelectionIndex();
+        int i1= jTable1.getSelectionModel().getMaxSelectionIndex();
         if ( i0==-1 ) {
             i0= 0;
             i1= 0;  
@@ -416,30 +450,28 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         int de= i1-i0+1;
         i0= Math.max(0,i0-1);
         i1= i0 + de-1;
-        int[] indexes= new int[de];
-        for ( int i=i0; i<=i1; i++ ) {
-            indexes[i-i0]= i;
-        }
-        intervalsList.setSelectedIndices(indexes);
+        jTable1.getSelectionModel().setSelectionInterval(i0,i1);
+
     }//GEN-LAST:event_prevButtonActionPerformed
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
-        int i0= intervalsList.getMinSelectionIndex();
-        int i1= intervalsList.getMaxSelectionIndex();
+        int i0= jTable1.getSelectionModel().getMinSelectionIndex();
+        int i1= jTable1.getSelectionModel().getMaxSelectionIndex();
         if ( i0==-1 ) {
             i0= 0;
             i1= 0;  
         }
         int de= i1-i0+1;
-        i1= Math.min(intervalsList.getModel().getSize()-1,i1+1);
+        i1= Math.min( jTable1.getRowCount()-1,i1+1);
         i0= i1-de+1;
         int[] indexes= new int[de];
         for ( int i=i0; i<=i1; i++ ) indexes[i-i0]= i;
-        intervalsList.setSelectedIndices(indexes);
+        jTable1.getSelectionModel().setSelectionInterval(i0,i1);
     }//GEN-LAST:event_nextButtonActionPerformed
 
     private void rescaleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rescaleComboBoxActionPerformed
-        fireSelection();
+        //fireSelection();
+        fireTableSelection();
     }//GEN-LAST:event_rescaleComboBoxActionPerformed
 
     /**
@@ -447,7 +479,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
      * @param dir -1 for previous, +1 for next.
      */
     private void loadTsb(final int dir) {
-        intervalsList.setEnabled(false);
+        jTable1.setEnabled(false);
         Runnable run= new Runnable() {
             @Override
             public void run() {
@@ -460,7 +492,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
                     }
                     loadViaTsb( current, dir );
                 } finally {
-                    intervalsList.setEnabled(true);
+                    jTable1.setEnabled(true);
                 }
             }
         };
@@ -472,7 +504,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
      * @param range range to load
      * @param dir -1 was going back to it, 1 is going ahead
      */
-    private void loadViaTsb( DatumRange range, int dir ) {
+    private void loadViaTsb( final DatumRange range, int dir ) {
         tsb.setTimeRange( range );
         ProgressMonitor mon= DasProgressPanel.createFramed(SwingUtilities.getWindowAncestor(TimeRangeToolEventsList.this),"Loading Events File...");
         try {
@@ -485,15 +517,25 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         } finally {
             if ( !mon.isFinished() ) mon.finished();
             fillList();
+            final int i;
             if ( dir==-1 ) {
-                intervalsList.setSelectedIndex(intervalsList.getModel().getSize()-2);
+                i= jTable1.getRowCount()-2;
             } else if ( dir==1 ) {
-                intervalsList.setSelectedIndex(1);
+                i= 1;
             } else {
+                i= -1;
                 // don't set anything
             }
-            intervalsList.setEnabled(true);
-            timeRangeTF.setText( range.toString() );
+            Runnable run= new Runnable() {
+                public void run() {
+                    if ( i>0 ) {
+                        jTable1.getSelectionModel().setSelectionInterval(i,i);
+                        jTable1.setEnabled(true);
+                    }
+                    timeRangeTF.setText( range.toString() );
+                }
+            };
+            SwingUtilities.invokeLater(run);
         }
     }
     private void currentDataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_currentDataSetSelectorActionPerformed
@@ -582,11 +624,15 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_timeRangeTFActionPerformed
 
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        
+    }//GEN-LAST:event_jTable1MouseClicked
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.virbo.datasource.DataSetSelector currentDataSetSelector;
-    private javax.swing.JList intervalsList;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTable1;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton prevButton;
     private javax.swing.JComboBox rescaleComboBox;
