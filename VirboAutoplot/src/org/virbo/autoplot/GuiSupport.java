@@ -82,6 +82,7 @@ import javax.swing.filechooser.FileFilter;
 import org.autoplot.renderer.ContourStylePanel;
 import org.autoplot.renderer.DigitalStylePanel;
 import org.autoplot.renderer.EventsStylePanel;
+import org.autoplot.renderer.OrbitStylePanel;
 import org.autoplot.renderer.PitchAngleDistributionStylePanel;
 import org.autoplot.renderer.StackedHistogramStylePanel;
 import org.das2.components.DasProgressPanel;
@@ -238,6 +239,8 @@ public class GuiSupport {
                 editorPanel= new ContourStylePanel( );
             } else if ( renderType==RenderType.digital ) {
                 editorPanel= new DigitalStylePanel( );
+            } else if ( renderType==RenderType.orbitPlot ) {
+                editorPanel= new OrbitStylePanel( );
             } else if ( renderType==RenderType.eventsBar ) {
                 editorPanel= new EventsStylePanel( );
             } else if ( renderType==RenderType.stackedHistogram ) {
