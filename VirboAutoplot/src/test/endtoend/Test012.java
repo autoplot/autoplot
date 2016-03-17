@@ -137,6 +137,9 @@ public class Test012 {
             // bug 1409: subsetting with spectrogram and rank 1 DEPEND_1.
             doTest( testid, 24, "file:///home/jbf/ct/hudson/data.backup/cdf/rbsp/rbsp-a_HFR-spectra-burst_emfisis-L2_20140121_v1.3.6.cdf?HFR_Spectra[0:100]" );
             
+            // bug 1536:  Themis virual variables slice1=i doesn't work 
+            doTest( testid, 25, "http://cdaweb.gsfc.nasa.gov/istp_public/data/themis/thc/l2/esa/2015/thc_l2_esa_20151214_v01.cdf?thc_peif_velocity_dslQ&slice1=0" );
+            
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
             ex.printStackTrace();
