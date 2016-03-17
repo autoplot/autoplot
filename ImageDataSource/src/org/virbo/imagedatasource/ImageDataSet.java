@@ -9,7 +9,9 @@ import org.virbo.dsops.Ops;
 
 /**
  * Adapt a BufferedImage to a rank 2 or rank 3 QDataSet, using
- * ColorOp to extract red, green, or blue channels.
+ * ColorOp to extract red, green, or blue channels.  When mask
+ * is null and op is null, then a rank 3 dataset [w,h,3] is returned, 
+ * a bundle of red, green, blue channels.
  * @author jbf
  */
 public class ImageDataSet extends AbstractDataSet {
@@ -40,6 +42,13 @@ public class ImageDataSet extends AbstractDataSet {
         return Math.log(d)/Math.log(2);
     }
     
+    /**
+     * create a dataset from the image.  When mask and op are null,
+     * then a rank 3 dataset ds[w,h,3] is returned.
+     * @param image the image
+     * @param mask the image is ANDed with this color, and shifted by the lowest one bit location.
+     * @param op an operation, such as grayscale, to convert the data to rank 2.
+     */
     public ImageDataSet( BufferedImage image, Color mask, ColorOp op ) {
         this.image= image;
         this.h= image.getHeight();
