@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.imagedatasource;
 
@@ -12,7 +8,8 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 
 /**
- *
+ * Adapt a BufferedImage to a rank 2 or rank 3 QDataSet, using
+ * ColorOp to extract red, green, or blue channels.
  * @author jbf
  */
 public class ImageDataSet extends AbstractDataSet {
@@ -33,8 +30,9 @@ public class ImageDataSet extends AbstractDataSet {
             this.mask= mask;
             this.rot= rot;
         }
+        @Override
         public double value( int rgb ) {
-            return rgb & mask >> rot;
+            return ( rgb & mask ) >> rot;
         }
     }
     
