@@ -404,7 +404,11 @@ public class CdfDataSource extends AbstractDataSource {
             } catch ( IllegalArgumentException ex ) {
                 throw ex;
             }
-
+            String os1= (String)map.get(PARAM_SLICE1);
+            if ( os1!=null && !os1.equals("") && cdf.getDimensions(svariable).length>0 ) {
+                int is= Integer.parseInt(os1);
+                result= (MutablePropertyDataSet)Ops.slice1( result, is );
+            }
         } else { // typical route
             String os1= (String)map.get(PARAM_SLICE1);
             if ( os1!=null && !os1.equals("") && cdf.getDimensions(svariable).length>0 ) {
