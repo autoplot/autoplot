@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>X Tags can have errors now, and a control can be used to turn off the error bars.
+        <p><small>Fun with the pool over spring break.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -23,9 +23,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-03-16 r18503):</p>
+        <p>Bugfixes (2016-03-17 r18515):</p>
         <ul>
-            <li>rte_1240063716: error: java.lang.String cannot be cast to org.virbo.dataset.QDataSet seen at Juno meeting.</li>
+            <li>1536: CDF Themis virtual variables slice1=i doesn't work.  Thanks Cindy!</li>
+            <li>Orbit plot type now has style tab editor.</li>
+            <li>automatic completions-based GUI doesn't show "null" when label is not available for option.  Show documentation.</li>
+            <li>rte_1240063716: error: java.lang.String cannot be cast to org.virbo.dataset.QDataSet seen at Juno meeting.  Thanks Rob!</li>
             <li>corrections to the AutoplotDataServer, where "NoDataInInterval" was not thrown properly in reduce.</li>
             <li>checkStatusLoop was not started in child applications, so the busy indicator used the old logic.</li>
             <li>bugfix where QStream had references to data that could not be resolved would prevent aggregation of JADE data.</li>
@@ -33,7 +36,7 @@
             <li>FilterChainPanel now limits the flashing of intermediate state by allowing 300ms to process before the color is changed.</li>
             <li>1531: BufferDataSet append assumed compact data.</li>
             <li>swap needs to turn off TCAs.  Experiment with fixLayout.</li>
-            <li>1530: support error bars in X, add control to turn off error bars with drawError=F</li>
+            <li>1530: support error bars in X, add control to turn off error bars with drawError=F.  Thanks Larry!</li>
             <li>CDF where constraint works when data is rank 4 and filter data is rank 0.</li>
             <li>1524: mashup handles when dataset loads fail.  thumbnails are calculated more independently of one another.</li>
             <li>1526: PDS/PPI didn't support quoted ISO8601 times</li>
@@ -58,7 +61,7 @@
             <li>openBrowser code assumed that the Java 6 system could be used, but it isn't supported on Linux (Mint).</li>
             <li>1512: I/O Error reading CDF files on 32 bit machines.  Fall back to alternate method for opening files.</li>
             <li>RGB indication on crosshair renderer corrected for images without DEPEND_1 tags.</li>
-            <li>1511: resetting the data set URI in a stack of plots would reset the timerange.  Thanks, Bill for pointing this out!</li>
+            <li>1511: resetting the data set URI in a stack of plots would reset the timerange.  Thanks, Bill, for pointing this out!</li>
             <li>relax timeout on read to 60 seconds, because sometimes the das2server would take more 10 seconds before sending out data.</li>
             <li>1510: pngwalks of aggregations of sparse data, limitation is no longer needed, and we just don't look for gaps when this would be impractical.</li>
             <li>correction to PNGWalkTool thread sync bug, where check failed to see that thumbnail wasn't ready.</li>
@@ -108,6 +111,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Orbit mode allows tick label size to be controlled.</li>
+            <li>Events list GUI is now two-column table.  Thanks Chris for the suggestion!</li>
             <li>479: consider if interpolateMod should allow range (e.g. -180 to 180).</li>
             <li>html table data source no longer requires a header row, first row will be interpretted as headers if no numbers are found.</li>
             <li>DataSetBuilder nextRecord method accepts array of doubles, as well as array of objects (datums)</li>
