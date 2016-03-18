@@ -58,6 +58,8 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
         colorPanel = new javax.swing.JPanel();
         colorCB = new javax.swing.JCheckBox();
 
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Events Bar"));
+
         showLabelsCB.setText("Show Labels");
         showLabelsCB.setToolTipText("Show event labels along with bar.");
         showLabelsCB.addActionListener(new java.awt.event.ActionListener() {
@@ -124,7 +126,7 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
                             .addComponent(jLabel1)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(fontSizeTF, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(225, Short.MAX_VALUE))
+                .addContainerGap(215, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -146,7 +148,7 @@ public class EventsStylePanel extends javax.swing.JPanel implements StylePanel {
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(128, Short.MAX_VALUE))
+                .addContainerGap(106, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

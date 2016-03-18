@@ -134,6 +134,8 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
         jLabel3 = new javax.swing.JLabel();
         tickLengthTextField = new javax.swing.JTextField();
 
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Orbit Plot"));
+
         jLabel1.setText("Font Size:");
 
         jLabel2.setText("Color:");
@@ -225,7 +227,7 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(tickLengthTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(38, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

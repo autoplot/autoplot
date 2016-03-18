@@ -80,6 +80,8 @@ public class StackedHistogramStylePanel extends javax.swing.JPanel implements St
         jLabel1 = new javax.swing.JLabel();
         peaksIndicatorPanel = new javax.swing.JPanel();
 
+        setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder("Stacked Histogram")));
+
         jLabel1.setText("Peaks Indicator:");
 
         peaksIndicatorPanel.setLayout(new java.awt.BorderLayout());
@@ -96,7 +98,7 @@ public class StackedHistogramStylePanel extends javax.swing.JPanel implements St
                         .addComponent(peaksIndicatorPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addGap(0, 275, Short.MAX_VALUE)))
+                        .addGap(0, 265, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -106,7 +108,7 @@ public class StackedHistogramStylePanel extends javax.swing.JPanel implements St
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addComponent(peaksIndicatorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(255, Short.MAX_VALUE))
+                .addContainerGap(233, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
