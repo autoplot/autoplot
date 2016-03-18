@@ -8,6 +8,10 @@
  */
 package org.virbo.autoplot;
 
+import org.autoplot.renderer.ColorScatterStylePanel;
+import org.autoplot.renderer.SpectrogramStylePanel;
+import org.autoplot.renderer.SeriesStylePanel;
+import org.autoplot.renderer.HugeScatterStylePanel;
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.awt.Component;
 import java.awt.Font;

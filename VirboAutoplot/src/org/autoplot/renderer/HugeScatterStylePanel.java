@@ -3,7 +3,7 @@
  *
  * Created on July 27, 2007, 9:41 AM
  */
-package org.virbo.autoplot;
+package org.autoplot.renderer;
 
 import org.das2.components.propertyeditor.ColorEditor;
 import java.awt.BorderLayout;
@@ -13,6 +13,7 @@ import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
+import org.virbo.autoplot.PlotStylePanel;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementStyle;
 
