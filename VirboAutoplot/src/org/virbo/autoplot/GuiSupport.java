@@ -86,6 +86,7 @@ import javax.swing.filechooser.FileFilter;
 import org.autoplot.renderer.ContourStylePanel;
 import org.autoplot.renderer.DigitalStylePanel;
 import org.autoplot.renderer.EventsStylePanel;
+import org.autoplot.renderer.ImageStylePanel;
 import org.autoplot.renderer.OrbitStylePanel;
 import org.autoplot.renderer.PitchAngleDistributionStylePanel;
 import org.autoplot.renderer.StackedHistogramStylePanel;
@@ -249,6 +250,8 @@ public class GuiSupport {
                 editorPanel= new EventsStylePanel( );
             } else if ( renderType==RenderType.stackedHistogram ) {
                 editorPanel= new StackedHistogramStylePanel( );
+            } else if ( renderType==RenderType.image ) {
+                editorPanel= new ImageStylePanel( );
             } else {
                 //TODO: consider generic style panel that is based on completions of Renderer control.
                 editorPanel= new SeriesStylePanel( );
