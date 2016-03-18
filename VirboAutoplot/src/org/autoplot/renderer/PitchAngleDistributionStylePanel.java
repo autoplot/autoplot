@@ -89,6 +89,7 @@ public class PitchAngleDistributionStylePanel extends javax.swing.JPanel impleme
         });
 
         clockwiseCB.setText("Clockwise");
+        clockwiseCB.setToolTipText("Angles increase in clockwise direction");
         clockwiseCB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 clockwiseCBActionPerformed(evt);
@@ -120,7 +121,7 @@ public class PitchAngleDistributionStylePanel extends javax.swing.JPanel impleme
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(originDL, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 162, Short.MAX_VALUE)))
+                        .addGap(0, 107, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
