@@ -29,11 +29,51 @@ public class AnnotationController extends DomNodeController {
         annotation.controller = this;
     }    
     
+    /**
+     * converts forward from relative font spec to point size, used by
+     * the annotation and axis nodes.
+     * @param dcc the canvas component.
+     * @return the converter that converts between strings like "1em" and the font.
+     */
+    public Converter getFontConverter( final DasCanvasComponent dcc ) {
+        return new Converter() {
+            @Override
+            public Object convertForward(Object s) {
+                try {
+                    double[] dd= DasDevicePosition.parseLayoutStr((String)s);
+                    if ( dd[1]==1 && dd[2]==0 ) {
+                        return 0.f;
+                    } else {
+                        double parentSize= dcc.getFont().getSize2D();
+                        double newSize= dd[1]*parentSize + dd[2];
+                        return (float)newSize;
+                    }
+                } catch (ParseException ex) {
+                    ex.printStackTrace();
+                    return 0.f;
+                }
+            }
+
+            @Override
+            public Object convertReverse(Object t) {
+                float size= (float)t;
+                if ( size==0 ) {
+                    return "1em";
+                } else {
+                    double parentSize= dcc.getFont().getSize2D();
+                    double relativeSize= size / parentSize;
+                    return String.format( "%.2fem", relativeSize );
+                }
+            }  
+        };
+    }
+    
 
     private void bindTo( final DasAnnotation p ) {
         ApplicationController ac = dom.controller;
+        p.setFontSize( new Float(0.));
         ac.bind( annotation, "text", p, "text");
-        ac.bind( annotation, "fontSize", p, "fontSize" );
+        ac.bind( annotation, "fontSize", p, "fontSize", getFontConverter(p) );
         ac.bind( annotation, "borderType", p, "borderType" );
         ac.bind( annotation, "anchorPosition", p, "anchorPosition" );
         ac.bind( annotation, Annotation.PROP_ANCHORTYPE, p, DasAnnotation.PROP_ANCHORTYPE );
