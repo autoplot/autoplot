@@ -77,7 +77,7 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
     private void update() {
         String oldValue= this.control;
         Map<String,String> controls= new LinkedHashMap();
-        controls.put( "size", fontSizeTF.getText() );
+        controls.put( "fontSize", fontSizeTF.getText() );
         controls.put( "format", formatTF.getText() );
         controls.put( Renderer.CONTROL_KEY_COLOR, Renderer.encodeColorControl( (Color)colorEditor1.getValue() ) );
         controls.put( "align", ened.getValue().toString() );
@@ -88,7 +88,7 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
     }
     private void updateGUI( Renderer renderer ) {
         this.control= renderer.getControl();
-        fontSizeTF.setText( renderer.getControl( "size", "0" ) );
+        fontSizeTF.setText( renderer.getControl( "fontSize", "" ) );
         colorEditor1.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, Color.BLACK ) );
         formatTF.setText( renderer.getControl( "format", "" ) );
         try {
