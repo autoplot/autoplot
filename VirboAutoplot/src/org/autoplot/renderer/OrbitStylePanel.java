@@ -78,9 +78,9 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
     }
     private void updateGUI( Renderer renderer ) {
         this.control= renderer.getControl();
-        fontSizeTF.setText( renderer.getControl( Renderer.CONTROL_KEY_FONT_SIZE, "0" ) );
-        colorEditor1.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, Color.BLACK ) );
-        thickTextField.setText( renderer.getControl( Renderer.CONTROL_KEY_LINE_THICK, "" ) );
+        fontSizeTF.setText( renderer.getControl( Renderer.CONTROL_KEY_FONT_SIZE, fontSizeTF.getText() ) );
+        colorEditor1.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, (Color)colorEditor1.getValue() ) );
+        thickTextField.setText( renderer.getControl( Renderer.CONTROL_KEY_LINE_THICK, thickTextField.getText() ) );
         tickLengthTextField.setText( renderer.getControl( "tickLength", tickLengthTextField.getText() ) );
     }
     
