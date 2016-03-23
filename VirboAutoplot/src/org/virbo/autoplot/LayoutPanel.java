@@ -280,7 +280,7 @@ public class LayoutPanel extends javax.swing.JPanel {
 
 
     private synchronized void createPopupMenus() {
-        contextMenus = new HashMap<Component, JPopupMenu>();
+        contextMenus = new HashMap<>();
 
         JMenuItem item;
 
@@ -296,14 +296,17 @@ public class LayoutPanel extends javax.swing.JPanel {
                 Object[] os= plotElementListComponent.getSelectedValues();
                 PlotElement p= (PlotElement)plotElementListComponent.getSelectedValue();
                 PropertyEditor edit;
-                if ( os.length==0 ) {
-                    return;
-                } else if ( os.length==1 ) {
-                    edit = new PropertyEditor(p);
-                } else {
-                    PlotElement[] peers= new PlotElement[os.length];
-                    for ( int i=0; i<os.length; i++ ) peers[i]= (PlotElement)os[i];
-                    edit= PropertyEditor.createPeersEditor( p, peers );
+                switch (os.length) {
+                    case 0:
+                        return;
+                    case 1:
+                        edit = new PropertyEditor(p);
+                        break;
+                    default:
+                        PlotElement[] peers= new PlotElement[os.length];
+                        for ( int i=0; i<os.length; i++ ) peers[i]= (PlotElement)os[i];
+                        edit= PropertyEditor.createPeersEditor( p, peers );
+                        break;
                 }
                 edit.showDialog(LayoutPanel.this);
             }
@@ -546,9 +549,12 @@ public class LayoutPanel extends javax.swing.JPanel {
     }
 
     private void updatePlotElementList() {
-        Runnable run= new Runnable() { public void run() {
-            updatePlotElementListImmediately();
-        } };
+        Runnable run= new Runnable() { 
+            @Override
+            public void run() {
+                updatePlotElementListImmediately();
+            } 
+        };
         SwingUtilities.invokeLater(run);
     }
 
@@ -1178,7 +1184,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     
     private void biggerMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_biggerMIActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);                
-        List<Row> rows= new ArrayList<Row>();
+        List<Row> rows= new ArrayList<>();
         for ( Plot p1: getSelectedPlots() ) {
             if ( p1.isVisible() ) {
                 Row row= p1.getController().getRow();
@@ -1201,7 +1207,7 @@ public class LayoutPanel extends javax.swing.JPanel {
 
     private void sameSizeMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sameSizeMIActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);                
-        List<Row> rows= new ArrayList<Row>();
+        List<Row> rows= new ArrayList<>();
         for ( Plot p1: getSelectedPlots() ) {
             if ( p1.isVisible() ) {
                 Row row= p1.getController().getRow();
@@ -1246,7 +1252,7 @@ public class LayoutPanel extends javax.swing.JPanel {
 
     private void smallerMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_smallerMIActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);                
-        List<Row> rows= new ArrayList<Row>();
+        List<Row> rows= new ArrayList<>();
         for ( Plot p1: getSelectedPlots() ) {
             if ( p1.isVisible() ) {
                 Row row= p1.getController().getRow();
