@@ -54,7 +54,7 @@
                       <Component id="sliceAutorangesCB" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="postOperationsPanel" max="32767" attributes="0"/>
+                              <Component id="plotElementFiltersPanel" max="32767" attributes="0"/>
                               <Component id="processDataSetLabel" alignment="1" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -68,7 +68,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="postOperationsPanel" pref="263" max="32767" attributes="0"/>
+                  <Component id="plotElementFiltersPanel" pref="263" max="32767" attributes="0"/>
                   <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                   <Component id="sliceAutorangesCB" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -107,7 +107,7 @@
             <Property name="text" type="java.lang.String" value="(filtered dataset will go here)"/>
           </Properties>
         </Component>
-        <Component class="org.virbo.autoplot.OperationsPanel" name="postOperationsPanel">
+        <Component class="org.virbo.autoplot.OperationsPanel" name="plotElementFiltersPanel">
         </Component>
       </SubComponents>
     </Container>

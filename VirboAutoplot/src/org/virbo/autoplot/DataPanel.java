@@ -83,7 +83,7 @@ public class DataPanel extends javax.swing.JPanel {
 
     public DataPanel( AutoplotUI app) {
         initComponents();
-        postOperationsPanel.setName("postOperationsPanel");
+        plotElementFiltersPanel.setName("postOperationsPanel");
         dataSourceFiltersPanel.setName("operationsPanel");
         this.app= app;
         
@@ -130,7 +130,7 @@ public class DataPanel extends javax.swing.JPanel {
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel1, "dataPanel_1");
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel2, "dataPanel_2");
 
-        postOperationsPanel.setFilter("");
+        plotElementFiltersPanel.setFilter("");
         
         doBindings();
 
@@ -148,7 +148,7 @@ public class DataPanel extends javax.swing.JPanel {
     }
 
     protected void setExpertMode( boolean expert ) {
-        postOperationsPanel.setExpertMode(expert);
+        plotElementFiltersPanel.setExpertMode(expert);
         dataSourceFiltersPanel.setExpertMode(expert);
     }
     
@@ -211,8 +211,8 @@ public class DataPanel extends javax.swing.JPanel {
                 Runnable run = new Runnable() {
                     @Override
                     public void run() {
-                        DataPanel.this.postOperationsPanel.setFilter("");
-                        DataPanel.this.postOperationsPanel.setDataSet(null);
+                        DataPanel.this.plotElementFiltersPanel.setFilter("");
+                        DataPanel.this.plotElementFiltersPanel.setDataSet(null);
                     }
                 };
                 if ( SwingUtilities.isEventDispatchThread() ) {
@@ -244,7 +244,7 @@ public class DataPanel extends javax.swing.JPanel {
             Runnable run= new Runnable() {
                 @Override
                 public void run() {
-                    postOperationsPanel.setDataSet(ds);
+                    plotElementFiltersPanel.setDataSet(ds);
                 }
             };
             if ( SwingUtilities.isEventDispatchThread() ) {
@@ -283,12 +283,12 @@ public class DataPanel extends javax.swing.JPanel {
         PlotElement p = applicationController.getPlotElement();
         element= p;
 
-        postOperationsPanel.setFilter(p.getComponent());
+        plotElementFiltersPanel.setFilter(p.getComponent());
 
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                postOperationsPanel.setFilter(element.getComponent()); // because adjusting==true.
+                plotElementFiltersPanel.setFilter(element.getComponent()); // because adjusting==true.
             }
         };
         if ( SwingUtilities.isEventDispatchThread() ) {
@@ -298,7 +298,7 @@ public class DataPanel extends javax.swing.JPanel {
         }
         
         element.addPropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
-        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, element, BeanProperty.create("component"), this.postOperationsPanel, BeanProperty.create( OperationsPanel.PROP_FILTER ) ) );
+        bc.addBinding( Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, element, BeanProperty.create("component"), this.plotElementFiltersPanel, BeanProperty.create( OperationsPanel.PROP_FILTER ) ) );
         bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, element.getController(), BeanProperty.create("sliceAutoranges"), this.sliceAutorangesCB, BeanProperty.create("selected") ) );
 
         elementBindingGroup = bc;
@@ -336,7 +336,7 @@ public class DataPanel extends javax.swing.JPanel {
         dataSourceFiltersPanel.setFilter( newDsf.getFilters() );
         dataSourceFiltersPanel.setDataSet( newDsf.getController().getDataSet() );
         
-        postOperationsPanel.setDataSet(ds);
+        plotElementFiltersPanel.setDataSet(ds);
 
         bindingTransitionalState= true;
         BindingGroup bc = new BindingGroup();
@@ -377,7 +377,7 @@ public class DataPanel extends javax.swing.JPanel {
         sliceAutorangesCB = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
         processDataSetLabel = new javax.swing.JLabel();
-        postOperationsPanel = new org.virbo.autoplot.OperationsPanel();
+        plotElementFiltersPanel = new org.virbo.autoplot.OperationsPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         dataSetSelector = new org.virbo.datasource.DataSetSelector();
@@ -410,7 +410,7 @@ public class DataPanel extends javax.swing.JPanel {
                     .add(sliceAutorangesCB, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(postOperationsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(plotElementFiltersPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, processDataSetLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
         );
@@ -419,7 +419,7 @@ public class DataPanel extends javax.swing.JPanel {
             .add(jPanel2Layout.createSequentialGroup()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(postOperationsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
+                .add(plotElementFiltersPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(sliceAutorangesCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -491,7 +491,7 @@ public class DataPanel extends javax.swing.JPanel {
      * @return the FiltersChainPanel
      */
     public FiltersChainPanel getFiltersChainPanel() {
-        return postOperationsPanel.getFiltersChainPanel();
+        return plotElementFiltersPanel.getFiltersChainPanel();
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -501,7 +501,7 @@ public class DataPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private org.virbo.autoplot.OperationsPanel postOperationsPanel;
+    private org.virbo.autoplot.OperationsPanel plotElementFiltersPanel;
     private javax.swing.JLabel processDataSetLabel;
     private javax.swing.JCheckBox sliceAutorangesCB;
     // End of variables declaration//GEN-END:variables
