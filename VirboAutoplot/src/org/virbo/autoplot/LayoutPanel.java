@@ -55,6 +55,7 @@ import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.Column;
+import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomOps;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.PlotElement;
@@ -830,10 +831,9 @@ public class LayoutPanel extends javax.swing.JPanel {
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Data Sources"));
 
         dataSourceList.setFont(dataSourceList.getFont().deriveFont(dataSourceList.getFont().getSize()-2f));
-        dataSourceList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        dataSourceList.setModel(new javax.swing.AbstractListModel() {
+            public int getSize() { return 0; }
+            public Object getElementAt(int i) { return null; }
         });
         dataSourceList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -1294,7 +1294,11 @@ public class LayoutPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_fixLayoutButtonActionPerformed
 
     private void dataSourceListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_dataSourceListValueChanged
-        // TODO add your handling code here:
+        Object s= dataSourceList.getSelectedValue();
+        if ( s instanceof DataSourceFilter ) { // transitional state where strings are in there
+            dom.getController().setDataSourceFilter( (DataSourceFilter)s );
+        }
+        
     }//GEN-LAST:event_dataSourceListValueChanged
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -1310,7 +1314,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     private javax.swing.JList bindingListComponent;
     private org.virbo.autoplot.util.CanvasLayoutPanel canvasLayoutPanel1;
     private javax.swing.JPopupMenu dataSourceActionsMenu;
-    private javax.swing.JList<String> dataSourceList;
+    private javax.swing.JList dataSourceList;
     private javax.swing.JMenuItem deleteBindingsMenuItem;
     private javax.swing.JMenuItem deleteMenuItem;
     private javax.swing.JButton deletePlotButton;
