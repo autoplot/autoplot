@@ -137,13 +137,13 @@ public class Test033 {
 
         ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
 
-        t0= System.currentTimeMillis();
-        makePngWalk1();
-        System.err.printf( "test 001: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+        //t0= System.currentTimeMillis();
+        //makePngWalk1();
+        //System.err.printf( "test 001: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
 
-        t0= System.currentTimeMillis();
-        makePngWalk2();
-        System.err.printf( "test 002: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
+        //t0= System.currentTimeMillis();
+        //makePngWalk2();
+        //System.err.printf( "test 002: done in %9.2f sec\n", ( System.currentTimeMillis()-t0 ) / 1000. );
 
         t0= System.currentTimeMillis();
         makePngWalk3();
