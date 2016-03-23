@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Fun with the pool over spring break.
+        <p><small>Image data source properly extracts the red and green components now; and red, green, blue and gray-scale colorbars are used by default.  Happy Spring!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -23,10 +23,13 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-03-17 r18515):</p>
+        <p>Bugfixes (2016-03-23 r18537):</p>
         <ul>
+            <li>vap+inline for Y(X) list was broken since vap_inline:4 now returns rank 0 datum, not rank 1 dataset.</li>
+            <li>rte_0110509791: when rank 1 dataset get into code to autorange spectrogram render type.</li>
+            <li>rte_0123356543: runtime error when no records are returned from das2server Mars_Express/ASPERA/ELS.  Thanks Ed!</li>
+            <li>ImageDataSource now correctly extracts red and green components.</li>
             <li>1536: CDF Themis virtual variables slice1=i doesn't work.  Thanks Cindy!</li>
-            <li>Orbit plot type now has style tab editor.</li>
             <li>automatic completions-based GUI doesn't show "null" when label is not available for option.  Show documentation.</li>
             <li>rte_1240063716: error: java.lang.String cannot be cast to org.virbo.dataset.QDataSet seen at Juno meeting.  Thanks Rob!</li>
             <li>corrections to the AutoplotDataServer, where "NoDataInInterval" was not thrown properly in reduce.</li>
@@ -111,6 +114,12 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DataSource focus can be set on the layout tab, allowing access to composite data components.</li>
+            <li>fontSize property is more uniform for annotation, orbit plot, and digital plot</li>
+            <li>interpolate supports rank 3 data.</li>
+            <li>Image mode type now has control panel, and nearest neighbor rendering is provided.</li>
+            <li>ImageDataSource now hints at the colorbar to use for red, green and blue components.</li>
+            <li>Orbit mode now has control panel.</li>
             <li>Orbit mode allows tick label size to be controlled.</li>
             <li>Events list GUI is now two-column table.  Thanks Chris for the suggestion!</li>
             <li>479: consider if interpolateMod should allow range (e.g. -180 to 180).</li>
