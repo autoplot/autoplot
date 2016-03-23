@@ -533,7 +533,12 @@ public class OperationsPanel extends javax.swing.JPanel {
     public void setDataSet(QDataSet dataSet) {
         QDataSet oldDataSet = this.dataSet;
         this.dataSet = dataSet;
-        this.dataSetLabel.setText( String.valueOf( dataSet ) );
+        this.dataSetLabel.setText( dataSet==null ? "None" : String.valueOf( dataSet ) );
+        if ( dataSet==null ) {
+            this.dataSetLabel.setToolTipText("The data set has not been set");
+        } else {
+            this.dataSetLabel.setToolTipText(null);
+        }
         this.filtersChainPanel.setInput(dataSet);
         firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
     }
@@ -586,6 +591,22 @@ public class OperationsPanel extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * useful for testing, and this may be removed.
+     * @return the filterChainPanel.
+     */
+    public FiltersChainPanel getFiltersChainPanel() {
+        return this.filtersChainPanel;
+    }
+    
+    /**
+     * disable the text field when expert is false.
+     * @param expert 
+     */
+    public void setExpertMode( boolean expert ) {
+        this.operatorsTextField.setEditable(expert);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel dataSetLabel;
     private javax.swing.JButton editComponentPanel;
