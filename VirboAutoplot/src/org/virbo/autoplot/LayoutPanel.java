@@ -6,6 +6,7 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -36,6 +37,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
@@ -64,6 +66,9 @@ import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.autoplot.dom.Row;
 import org.virbo.autoplot.util.CanvasLayoutPanel;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceEditorPanel;
+import org.virbo.datasource.DataSourceEditorPanelUtil;
 
 /**
  * LayoutPanel shows all the plots and plot elements on the canvas.  
@@ -670,7 +675,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         dataSourceActionsMenu = new javax.swing.JPopupMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        editMenuItem = new javax.swing.JMenuItem();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel2 = new javax.swing.JPanel();
         jSplitPane3 = new javax.swing.JSplitPane();
@@ -678,7 +683,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         plotElementListComponent = new javax.swing.JList();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        dataSourceList = new javax.swing.JList<>();
+        dataSourceList = new javax.swing.JList<String>();
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
         canvasLayoutPanel1 = new org.virbo.autoplot.util.CanvasLayoutPanel();
@@ -797,13 +802,13 @@ public class LayoutPanel extends javax.swing.JPanel {
         ));
         jScrollPane3.setViewportView(jTable1);
 
-        jMenuItem1.setText("jMenuItem1");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        editMenuItem.setText("Edit");
+        editMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                editMenuItemActionPerformed(evt);
             }
         });
-        dataSourceActionsMenu.add(jMenuItem1);
+        dataSourceActionsMenu.add(editMenuItem);
 
         jSplitPane1.setDividerLocation(330);
         jSplitPane1.setResizeWeight(0.5);
@@ -832,8 +837,9 @@ public class LayoutPanel extends javax.swing.JPanel {
 
         dataSourceList.setFont(dataSourceList.getFont().deriveFont(dataSourceList.getFont().getSize()-2f));
         dataSourceList.setModel(new javax.swing.AbstractListModel() {
-            public int getSize() { return 0; }
-            public Object getElementAt(int i) { return null; }
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
         });
         dataSourceList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -1301,9 +1307,23 @@ public class LayoutPanel extends javax.swing.JPanel {
         
     }//GEN-LAST:event_dataSourceListValueChanged
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    private void editMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editMenuItemActionPerformed
+        Object s= dataSourceList.getSelectedValue();
+        if ( s instanceof DataSourceFilter ) { // transitional state where strings are in there
+            String uri= ((DataSourceFilter)s).getUri();
+            JPanel parent= new JPanel();
+            parent.setLayout( new BorderLayout() );
+            DataSourceEditorPanel p= DataSourceEditorPanelUtil.getDataSourceEditorPanel( parent, uri );
+            if ( p==null ) {
+                JOptionPane.showMessageDialog( this, "Unable to create editor" );
+            } else {
+                if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, parent, "Edit "+((DataSourceFilter)s).getId(), JOptionPane.OK_CANCEL_OPTION ) ) {
+                    uri= p.getURI();
+                    ((DataSourceFilter)s).setUri(uri);
+                }
+            }
+        }
+    }//GEN-LAST:event_editMenuItemActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addHiddenMenuItem;
@@ -1314,12 +1334,12 @@ public class LayoutPanel extends javax.swing.JPanel {
     private javax.swing.JList bindingListComponent;
     private org.virbo.autoplot.util.CanvasLayoutPanel canvasLayoutPanel1;
     private javax.swing.JPopupMenu dataSourceActionsMenu;
-    private javax.swing.JList dataSourceList;
+    private javax.swing.JList<String> dataSourceList;
     private javax.swing.JMenuItem deleteBindingsMenuItem;
     private javax.swing.JMenuItem deleteMenuItem;
     private javax.swing.JButton deletePlotButton;
+    private javax.swing.JMenuItem editMenuItem;
     private javax.swing.JButton fixLayoutButton;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
