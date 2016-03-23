@@ -2156,7 +2156,7 @@ public class PlotElementController extends DomNodeController {
             }
 
             QDataSet zds;
-            if ( yds.length()==fillDs.length(0) && yds.length()>3 ) { // Dataset might have bundle, we need to ignore at the right time.  If fillDs.length(0)==3 avoid a bug.
+            if ( fillDs.rank()>1 && yds.length()==fillDs.length(0) && yds.length()>3 ) { // Dataset might have bundle, we need to ignore at the right time.  If fillDs.length(0)==3 avoid a bug.
                 zds= fillDs;
             } else {
                 zds= SemanticOps.getDependentDataSet(fillDs);
