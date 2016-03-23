@@ -204,7 +204,7 @@ public class InlineDataSource extends AbstractDataSource {
                         continue;
                     } // check for empty record after semi: "1.23,134;"
                     QDataSet result= parseInlineDsSimple(ss2[j]);
-                    b.putValue(-1,result.value(0));
+                    b.putValue(-1,result.value());
                     b.putProperty( QDataSet.UNITS, result.property(QDataSet.UNITS) );
                     b.nextRecord();
                 }
