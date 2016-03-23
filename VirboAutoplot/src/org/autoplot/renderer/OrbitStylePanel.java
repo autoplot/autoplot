@@ -78,7 +78,7 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
     }
     private void updateGUI( Renderer renderer ) {
         this.control= renderer.getControl();
-        fontSizeTF.setText( renderer.getControl( Renderer.CONTROL_KEY_FONT_SIZE, fontSizeTF.getText() ) );
+        fontSizeTF.setText( renderer.getControl( Renderer.CONTROL_KEY_FONT_SIZE, fontSizeTF.getText() ) ); 
         colorEditor1.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, (Color)colorEditor1.getValue() ) );
         thickTextField.setText( renderer.getControl( Renderer.CONTROL_KEY_LINE_THICK, thickTextField.getText() ) );
         tickLengthTextField.setText( renderer.getControl( "tickLength", tickLengthTextField.getText() ) );
@@ -142,7 +142,7 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
 
         colorPanel.setLayout(new java.awt.BorderLayout());
 
-        fontSizeTF.setToolTipText("Font size, relative to canvas font size");
+        fontSizeTF.setToolTipText("Font size, relative to canvas font size.  For example \"0.5em\" is half of the font size. \"7pt\" is 7 points.");
         fontSizeTF.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 OrbitStylePanel.this.focusLost(evt);
@@ -157,6 +157,7 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
         jLabel6.setText("Thick:");
         jLabel6.setToolTipText("Line thickness");
 
+        thickTextField.setToolTipText("Line thickness in pixels/points");
         thickTextField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 thickTextFieldFocusLost(evt);
@@ -170,6 +171,7 @@ public class OrbitStylePanel extends javax.swing.JPanel implements PlotStylePane
 
         jLabel3.setText("Tick Length:");
 
+        tickLengthTextField.setToolTipText("Tick Length relative to the font size, so .66em is 2/3 of the font size.");
         tickLengthTextField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 tickLengthTextFieldFocusLost(evt);
