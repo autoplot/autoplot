@@ -234,6 +234,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     throw new IllegalArgumentException("bad column parameter: " + column + ", should be field1, or 1, or <name>");
                 }
                 vds = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
+                vds.putProperty( QDataSet.CONTEXT_0, null );
                 vds.putProperty(QDataSet.UNITS, parser.getUnits(icol));
                 if ( column.length()>1 ) vds.putProperty( QDataSet.NAME, column );
                 vds.putProperty( QDataSet.LABEL, parser.getFieldNames()[icol] );
