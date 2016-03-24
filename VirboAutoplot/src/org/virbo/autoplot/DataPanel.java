@@ -13,7 +13,6 @@ import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import org.autoplot.help.AutoplotHelpSystem;
-import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.BindingGroup;
