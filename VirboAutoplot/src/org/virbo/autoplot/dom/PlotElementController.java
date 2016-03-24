@@ -1827,7 +1827,7 @@ public class PlotElementController extends DomNodeController {
 
                 String appliedFilters = dsc.getAppliedFiltersString();
                 String title = peleCopy.getPlotDefaults().getTitle();
-                if ( fillDs.property(QDataSet.CONTEXT_0)!=null ) { 
+                if ( fillDs.property(QDataSet.CONTEXT_0)!=null && dsc.reduceDataSetString!=null ) { 
                     title += "!c%{CONTEXT}";
                 } else if ( !plotElement.getComponent().equals("") ) {
                     title += "!c%{CONTEXT}";
