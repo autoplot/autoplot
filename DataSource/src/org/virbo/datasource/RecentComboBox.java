@@ -44,6 +44,7 @@ public class RecentComboBox extends JComboBox {
 
     File bookmarksFolder= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks" );
     File recentFile;
+    String preferenceNode= "";
 
     private final static Logger logger= LoggerManager.getLogger("apdss.uri");
     
@@ -75,8 +76,18 @@ public class RecentComboBox extends JComboBox {
      * @param pref
      */
     public void setPreferenceNode( String pref ) {
+        this.preferenceNode= pref;
         recentFile= new File( bookmarksFolder, "recent."+pref+".txt" );
-        loadRecent();
+        Runnable run= new Runnable() {
+            public void run() {
+                loadRecent();
+            }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            new Thread(run,"loadRecent-"+preferenceNode).start();
+        } else {
+            run.run();
+        }
     }
     
     InputVerifier verifier= null;
@@ -89,6 +100,11 @@ public class RecentComboBox extends JComboBox {
         this.verifier= v;
     }
 
+    
+    /**
+     * this loads the recent entries file (e.g. autoplot_data/bookmarks/recent.timerange.txt)
+     * and should not be called on the event thread.
+     */
     private synchronized void loadRecent() {
         List<String> items= new ArrayList( RECENT_SIZE+2 );
         try {
@@ -124,20 +140,16 @@ public class RecentComboBox extends JComboBox {
             Runnable run= new Runnable() {
                 @Override
                 public void run() {
-                    ComboBoxModel cbm= getModel();
-                    if ( cbm instanceof MutableComboBoxModel ) {
-                        MutableComboBoxModel mcbm= (MutableComboBoxModel)cbm;
-                        int n= mcbm.getSize();
-                        for ( int i=0; i<n; i++ ) mcbm.removeElementAt(0);
-                        for (String fitem : fitems) mcbm.addElement(fitem);
-                    } else {
-                        setModel( new DefaultComboBoxModel( fitems.toArray() ) );
-                    }
+                    Object s= getModel().getSelectedItem();
+                    ComboBoxModel newModel= new DefaultComboBoxModel( fitems.toArray() );
+                    newModel.setSelectedItem(s);
+                    setModel( newModel );
                 }
             };
             SwingUtilities.invokeLater(run);
             
-            saveRecent(items);
+            saveRecent(items); // possibly removing old items.
+            
         } catch (IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -172,6 +184,10 @@ public class RecentComboBox extends JComboBox {
         }
     }
 
+    /**
+     * add the item to the list of recent entries.  
+     * @param s the item
+     */
     public void addToRecent( final String s ) {
         if ( verifier!=null ) {
             if ( !verifier.verify(s) ) {
@@ -210,7 +226,7 @@ public class RecentComboBox extends JComboBox {
         };
         if ( SwingUtilities.isEventDispatchThread() ) {
             logger.fine("this shouldn't happen on event thread.");
-            run.run();
+            new Thread( run, "addToRecent-"+preferenceNode ).start();
         } else {
             run.run();
         }
