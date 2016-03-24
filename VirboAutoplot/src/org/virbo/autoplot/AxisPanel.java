@@ -161,7 +161,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 Object o= evt.getNewValue();
                 if ( o instanceof DatumRange ) {
                     DatumRange v= (DatumRange) evt.getNewValue();
-                    timeRangeEditor1.setEnabled(v==Application.DEFAULT_TIME_RANGE ); // TODO: kludge
+                    timeRangeEditor1.setEnabled(v!=Application.DEFAULT_TIME_RANGE ); // TODO: kludge
                 }
                 
             }
