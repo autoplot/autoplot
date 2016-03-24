@@ -7,44 +7,19 @@
 
 package org.virbo.autoplot;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
-import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
-import org.virbo.autoplot.dom.BindingSupport;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.PlotElement;
@@ -52,7 +27,6 @@ import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.InputVerifier;
 import org.virbo.filters.FiltersChainPanel;
 
 /**
@@ -93,6 +67,7 @@ public class DataPanel extends javax.swing.JPanel {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         doPlotElementBindings();
                     }
@@ -108,6 +83,7 @@ public class DataPanel extends javax.swing.JPanel {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         doDataSourceFilterBindings();
                     }
@@ -133,18 +109,7 @@ public class DataPanel extends javax.swing.JPanel {
         plotElementFiltersPanel.setFilter("");
         
         doBindings();
-
-    }
-    
-    private void componentTextFieldFocusGained(java.awt.event.FocusEvent evt) {
-        LoggerManager.logGuiEvent(evt);
-        setAdjusting(true);
-    }
-
-    private void componentTextFieldFocusLost(java.awt.event.FocusEvent evt) {
-        LoggerManager.logGuiEvent(evt);
-        setAdjusting(false);
-        componentChanged();
+        
     }
 
     protected void setExpertMode( boolean expert ) {
