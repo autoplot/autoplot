@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.datasource;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -23,7 +18,6 @@ import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.MutableComboBoxModel;
 import javax.swing.SwingUtilities;
 import org.das2.datum.LoggerManager;
 
@@ -33,8 +27,6 @@ import org.das2.datum.LoggerManager;
  * "recent.PREF.txt" where PREF is a string assigned to this object identifying the theme, such as "timerange".
  * Specifically, the event is validated and recorded into the file, then the file is loaded, sorted and saved
  * again.
- * 
- * This needs work.
  * 
  * @author jbf
  */
@@ -79,6 +71,7 @@ public class RecentComboBox extends JComboBox {
         this.preferenceNode= pref;
         recentFile= new File( bookmarksFolder, "recent."+pref+".txt" );
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 loadRecent();
             }
@@ -225,7 +218,6 @@ public class RecentComboBox extends JComboBox {
             }
         };
         if ( SwingUtilities.isEventDispatchThread() ) {
-            logger.fine("this shouldn't happen on event thread.");
             new Thread( run, "addToRecent-"+preferenceNode ).start();
         } else {
             run.run();
