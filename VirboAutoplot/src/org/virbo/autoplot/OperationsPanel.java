@@ -51,6 +51,9 @@ public class OperationsPanel extends javax.swing.JPanel {
      */
     public OperationsPanel() {
         initComponents();
+        
+        operatorsComboBox.setPreferenceNode("operations");
+        
         filtersChainPanel.setAddSubtractButtons(false);
         
         operatorsTextField= (JTextField)operatorsComboBox.getEditor().getEditorComponent();
@@ -79,15 +82,6 @@ public class OperationsPanel extends javax.swing.JPanel {
         
         setUpOperationsListeners();
         setUpIncr();
-        
-        operatorsComboBox.setPreferenceNode("operations");
-        Runnable run= new Runnable() {
-            @Override
-            public void run() {
-                operatorsComboBox.setSelectedItem("");
-            }
-        };
-        SwingUtilities.invokeLater(run);
         
     }
     
@@ -557,7 +551,12 @@ public class OperationsPanel extends javax.swing.JPanel {
         firePropertyChange(PROP_ADJUSTING, oldAdjusting, adjusting);
     }
 
-    public static void main( String[] args ) throws Exception {
+    /**
+     * when testing GUI components, the GUI should be created on the 
+     * event thread to mimic the behavior of Autoplot.
+     * @throws Exception 
+     */
+    private static void mainEvt() throws Exception {
         OperationsPanel p= new OperationsPanel();
         QDataSet ds= Schemes.simpleSpectrogramTimeSeries();
         try {
@@ -589,6 +588,22 @@ public class OperationsPanel extends javax.swing.JPanel {
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( null, testPanel, "Test Panel", JOptionPane.OK_CANCEL_OPTION ) ) {
             System.err.println( p.getFilter() );
         }
+
+    }
+    
+    public static void main( String[] args ) throws Exception {
+        
+        Runnable run= new Runnable() {
+            public void run() {
+                try {
+                    mainEvt();
+                } catch (Exception ex) {
+                    Logger.getLogger(OperationsPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        };
+        SwingUtilities.invokeAndWait(run);
+                
     }
 
     /**
