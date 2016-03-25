@@ -26,6 +26,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,9 +66,26 @@ public class CanvasLayoutPanel extends JLabel {
             }
         });
         timer.setRepeats(false);
+        getCanvasImageTimer= new Timer( 100, new ActionListener() {        
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                itsme= true;
+                BufferedImage img= new BufferedImage( target.getWidth(), target.getHeight(), BufferedImage.TYPE_INT_ARGB );
+                ((DasCanvas)target).writeToImageImmediatelyNonPrint(img);
+                canvasImage= img;
+                itsme= false;
+                repaint();
+            }
+        });
+        getCanvasImageTimer.setRepeats(false);
         addMouseListener(mouseListener);
     }
 
+    BufferedImage canvasImage= null;
+    
+    boolean itsme= false;
+    Timer getCanvasImageTimer;
+    
     private boolean rectEdgeClicked( Rectangle r, int x, int y ) {
         boolean e0= Math.abs( r.getX() - x ) < 10 ;
         boolean e1= Math.abs( r.getY() - y ) < 10 ;
@@ -141,7 +160,7 @@ public class CanvasLayoutPanel extends JLabel {
                 }
             } else {
                 Rectangle m= new Rectangle( (int)( e.getX() / scale ), (int)( e.getY() / scale), 1, 1 );
-                Rectangle select= null;
+                Rectangle select;
                 if ( cursor==null ) {
                     select= m;
                 } else {
@@ -197,7 +216,7 @@ public class CanvasLayoutPanel extends JLabel {
            scale= (double)getHeight() / theight;
         }
         Rectangle m= new Rectangle( (int)( x / scale ), (int)( y / scale), 1, 1 );
-        Rectangle select= null;
+        Rectangle select;
         select= m;
 
         List<Object> newSelect= new ArrayList();
@@ -306,7 +325,7 @@ public class CanvasLayoutPanel extends JLabel {
         setSelectedComponents( getCanvasComponentsWithin( r ) );
     }
     
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     /**
      * get a translucent version of this color.
@@ -338,19 +357,20 @@ public class CanvasLayoutPanel extends JLabel {
         Stroke selectedStroke= new BasicStroke( 3.f );
         Stroke normalStroke= new BasicStroke( 1.f );
 
-        BufferedImage img= new BufferedImage( target.getWidth(), target.getHeight(), BufferedImage.TYPE_INT_ARGB );
-        ((DasCanvas)target).writeToImageImmediatelyNonPrint(img);
-        img= ImageResize.getScaledInstance( img,
-                                            (int)( target.getWidth() * scale ),
-                                            (int)( target.getHeight() * scale ),
-                                            RenderingHints.VALUE_INTERPOLATION_BILINEAR, true );
+        BufferedImage img= canvasImage;
+        if ( img!=null ) {
+            img= ImageResize.getScaledInstance( img,
+                                                (int)( target.getWidth() * scale ),
+                                                (int)( target.getHeight() * scale ),
+                                                RenderingHints.VALUE_INTERPOLATION_BILINEAR, true );
 
-        g.drawImage( img, 0,0, this );
+            g.drawImage( img, 0,0, this );
 
-        // mute colors and lines
-        Color back= target.getBackground();
-        g.setColor( new Color( back.getRed(), back.getGreen(), back.getBlue(), 100 ) );
-        g.fillRect(0,0,img.getWidth(),img.getHeight());
+            // mute colors and lines
+            Color back= target.getBackground();
+            g.setColor( new Color( back.getRed(), back.getGreen(), back.getBlue(), 100 ) );
+            g.fillRect(0,0,img.getWidth(),img.getHeight());
+        }
 
         Graphics2D gs= (Graphics2D)g.create();
         AffineTransform at= g.getTransform();
@@ -422,33 +442,58 @@ public class CanvasLayoutPanel extends JLabel {
     }
     
     transient ComponentListener componentListener = new ComponentListener() {
-
+        @Override
         public void componentResized(ComponentEvent e) {
             timer.restart();
         }
-
+        @Override
         public void componentMoved(ComponentEvent e) {
             timer.restart();
         }
-
+        @Override
         public void componentShown(ComponentEvent e) {
             timer.restart();
         }
-
+        @Override
         public void componentHidden(ComponentEvent e) {
             timer.restart();
         }
     };
-
-    public void setContainer(JComponent c) {
+            
+    private final PropertyChangeListener repaintListener = new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ( itsme ) {
+                logger.finer("its me...");
+            } else {
+                getCanvasImageTimer.restart();
+            }
+        }
+    };
+    
+    /**
+     * this is the JComponent we are monitoring.  If this is a
+     * DasCanvas, then a special listener is added for repaints.
+     * @param c 
+     */
+    public void setContainer( DasCanvas c) {
+        if ( this.target!=null ) {
+            if ( this.target instanceof DasCanvas ) { // this once allowed any JComponent.
+                this.target.removePropertyChangeListener( DasCanvas.PROP_PAINTCOUNT, repaintListener );
+            }
+        }
         this.target = c;
+        if ( c instanceof DasCanvas ) {
+            ((DasCanvas)c).addPropertyChangeListener( DasCanvas.PROP_PAINTCOUNT, repaintListener );
+        }
+        
         c.addContainerListener(new ContainerListener() {
-
+            @Override
             public void componentAdded(ContainerEvent e) {
                 e.getChild().addComponentListener(componentListener);
                 timer.restart();
             }
-
+            @Override
             public void componentRemoved(ContainerEvent e) {
                 e.getChild().removeComponentListener(componentListener);
                 timer.restart();
