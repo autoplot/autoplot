@@ -71,7 +71,7 @@ public class WindowManager {
         logger.log(Level.FINE, "looking up position for {0}", name);
         if ( name==null ) return;
         final Preferences prefs= Preferences.userNodeForPackage(WindowManager.class);
-        int grab=window.getFont().getSize(); // pixels so mouse operator has something to grab
+        int grab= 4 * window.getFont().getSize(); // pixels so mouse operator has something to grab
         Dimension screenSize= java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         if ( prefs.getInt( "window."+name+".screenwidth", 0 )==screenSize.width ) {
             int w= prefs.getInt( "window."+name+".width", -9999 );
@@ -100,7 +100,7 @@ public class WindowManager {
                     if ( newx<0 ) newx= 0;
                     if ( newy<0 ) newy= 0;
                     if ( newx>screenSize.width-grab ) newx= screenSize.width-grab;
-                    if ( newy>screenSize.height-grab ) newy= screenSize.height-grab;
+                    if ( newy>screenSize.height-grab ) newy= screenSize.height-h;
                     window.setLocation( newx, newy );
                 }
             }
