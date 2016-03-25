@@ -23,12 +23,14 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-03-25 r18563):</p>
+        <p>Bugfixes (2016-03-25 r18564):</p>
         <ul>
-            <li>1540: catch RTE from "bookmrks:" typo, when http or other valid protocol is not used.</li>
+            <li>1509: popup windows below screen were not moved up sufficiently.  Thanks Scott!</li>
+            <li>1541: jython code showed where dom.dataSourceFilters could cause a concurrent modification problem.  Thanks Larry!</li>
+            <li>1540: catch RTE from "bookmrks:" typo, when http or other valid protocol is not used.  Thanks Bob!</li>
             <li>layout tab updates to current canvas within ~200 ms.</li>
             <li>axes tab plot timerange is now enabled when the app timerange is *not* the default.</li>
-            <li>Larry pointed out his plots now show "slice1=1", which is because the loaded data set has a CONTEXT_0.</li>
+            <li>Larry pointed out his plots now show "slice1=1", which is because the loaded data set has a CONTEXT_0.  Thanks Larry!</li>
             <li>boolean property types in das2streams are supported.  Thanks Chris!</li>
             <li>vap+inline for Y(X) list was broken since vap+inline:4 now returns rank 0 dataset, not rank 1 dataset.</li>
             <li>rte_0110509791: when rank 1 dataset get into code to autorange spectrogram render type.</li>
@@ -44,7 +46,7 @@
             <li>FilterChainPanel now limits the flashing of intermediate state by allowing 300ms to process before the color is changed.</li>
             <li>1531: BufferDataSet append assumed compact data.</li>
             <li>swap needs to turn off TCAs.  Experiment with fixLayout.</li>
-            <li>1530: support error bars in X, add control to turn off error bars with drawError=F.  Thanks Larry!</li>
+            <li>1530: support error bars in X, add control to turn off error bars with drawError=F.  Thanks Lawrance!</li>
             <li>CDF where constraint works when data is rank 4 and filter data is rank 0.</li>
             <li>1524: mashup handles when dataset loads fail.  thumbnails are calculated more independently of one another.</li>
             <li>1526: PDS/PPI didn't support quoted ISO8601 times</li>
