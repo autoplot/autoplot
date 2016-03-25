@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
@@ -32,7 +33,7 @@ public class Application extends DomNode {
      */
     public static final DatumRange DEFAULT_TIME_RANGE= DataSourceUtil.DEFAULT_TIME_RANGE;
     
-    protected List<DataSourceFilter> dataSourceFilters= Arrays.asList( new DataSourceFilter[0] );
+    protected CopyOnWriteArrayList<DataSourceFilter> dataSourceFilters= new CopyOnWriteArrayList( new DataSourceFilter[0] );
     public static final String PROP_DATASOURCEFILTERS = "dataSourceFilters";
 
     public DataSourceFilter[] getDataSourceFilters() {
@@ -41,7 +42,7 @@ public class Application extends DomNode {
 
     public void setDataSourceFilters(DataSourceFilter[] dataSourceFilters) {
         DataSourceFilter[] oldDataSourceFilters = (DataSourceFilter[]) this.dataSourceFilters.toArray( new DataSourceFilter[this.dataSourceFilters.size()] );
-        this.dataSourceFilters = Arrays.asList(dataSourceFilters);
+        this.dataSourceFilters =  new CopyOnWriteArrayList( dataSourceFilters );
         propertyChangeSupport.firePropertyChange(PROP_DATASOURCEFILTERS, oldDataSourceFilters, dataSourceFilters);
     }
 
@@ -50,8 +51,7 @@ public class Application extends DomNode {
     }
 
     public void setDataSourceFilters(int index, DataSourceFilter newDataSourceFilter) {
-        DataSourceFilter oldDataSourceFilters = this.dataSourceFilters.get(index);
-        this.dataSourceFilters.set(index, newDataSourceFilter );
+        DataSourceFilter oldDataSourceFilters = this.dataSourceFilters.set(index, newDataSourceFilter );
         propertyChangeSupport.fireIndexedPropertyChange(PROP_DATASOURCEFILTERS, index, oldDataSourceFilters, newDataSourceFilter);
     }
 
