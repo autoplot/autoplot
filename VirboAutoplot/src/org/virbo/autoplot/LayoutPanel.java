@@ -655,7 +655,11 @@ public class LayoutPanel extends javax.swing.JPanel {
                     l.setToolTipText( "<html>"+dsf.getUri()+"<br>Data source provides Time Series Browsing");
                 } else {
                     l.setIcon( new ImageIcon( LayoutPanel.class.getResource("/org/virbo/autoplot/resources/idle-icon.png" ) ) );
-                    l.setToolTipText( "<html>"+dsf.getUri() );
+                    if ( dsf.getUri().length()==0 ) {
+                        l.setToolTipText(null);
+                    } else {
+                        l.setToolTipText( "<html>"+dsf.getUri() );
+                    }
                 }
                 return l;
             }
