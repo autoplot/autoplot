@@ -811,7 +811,7 @@ public class ScriptContext extends PyJavaInstance {
     
     /**
      * write out the current canvas to a png file.
-     * TODO: bug 3113441: this has issues with the size.  It's coded to get the size from
+     * TODO: bug 557: this has issues with the size.  It's coded to get the size from
      *  the DOM, but if it is fitted and has a container it must get size from
      *  the container.  Use writeToPng( filename, width, height ) instead for now.
      *  See writeToPdf(String filename), which appears to have a fix for this that
@@ -822,6 +822,7 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.io.IOException
      */
     public static void writeToPng(String filename) throws IOException {
+        setStatus("writing to "+filename);
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
             filename= filename + ".png";
         }
@@ -849,7 +850,7 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * write out the current canvas to a png file.
-     * TODO: bug 3113441: this has issues with the size.  It's coded to get the size from
+     * TODO: bug 557: this has issues with the size.  It's coded to get the size from
      *  the DOM, but if it is fitted and has a container it must get size from
      *  the container.  User writeToPng( filename, width, height ) instead for now.
      *  See writeToPdf(String filename), which appears to have a fix for this that
@@ -944,6 +945,7 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.io.IOException
      */    
     public static void writeToSvg( String filename ) throws IOException {
+        setStatus("writing to "+filename);
         if ( !( filename.endsWith(".svg") || filename.endsWith(".SVG") ) ) {
             filename= filename + ".svg";
         }
@@ -989,6 +991,7 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.io.IOException
      */
     public static void writeToPdf(String filename) throws IOException {
+        setStatus("writing to "+filename);
         if ( !( filename.endsWith(".pdf") || filename.endsWith(".PDF") ) ) {
             filename= filename + ".pdf";
         }
