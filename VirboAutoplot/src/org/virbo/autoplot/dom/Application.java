@@ -33,6 +33,7 @@ public class Application extends DomNode {
      */
     public static final DatumRange DEFAULT_TIME_RANGE= DataSourceUtil.DEFAULT_TIME_RANGE;
     
+    
     protected CopyOnWriteArrayList<DataSourceFilter> dataSourceFilters= new CopyOnWriteArrayList( new DataSourceFilter[0] );
     public static final String PROP_DATASOURCEFILTERS = "dataSourceFilters";
 
@@ -57,15 +58,15 @@ public class Application extends DomNode {
 
     
     public static final String PROP_PLOT_ELEMENTS = "plotElements";
-    protected List<PlotElement> plotElements = new LinkedList();
+    protected CopyOnWriteArrayList<PlotElement> plotElements = new CopyOnWriteArrayList();
 
     public PlotElement[] getPlotElements() {
         return plotElements.toArray(new PlotElement[plotElements.size()]);
     }
 
     public void setPlotElements(PlotElement[] pele) {
-        PlotElement[] old = this.plotElements.toArray(new PlotElement[this.plotElements.size()]);
-        this.plotElements = Arrays.asList(pele);
+        PlotElement[] old = (PlotElement[]) this.plotElements.toArray( new PlotElement[this.plotElements.size()] );
+        this.plotElements = new CopyOnWriteArrayList( pele );
         propertyChangeSupport.firePropertyChange(PROP_PLOT_ELEMENTS, old, pele);
     }
 
@@ -74,12 +75,13 @@ public class Application extends DomNode {
     }
 
     public void setPlotElements(int index, PlotElement pele) {
-        PlotElement old = this.plotElements.get(index);
-        this.plotElements.set(index, pele);
+        PlotElement old = this.plotElements.set(index,pele);
         propertyChangeSupport.fireIndexedPropertyChange(PROP_PLOT_ELEMENTS, index, old, pele);
     }
+    
+    
     public static final String PROP_PLOTS = "plots";
-    protected List<Plot> plots = new LinkedList();
+    protected CopyOnWriteArrayList<Plot> plots = new CopyOnWriteArrayList();
 
     public Plot[] getPlots() {
         return plots.toArray(new Plot[plots.size()]);
@@ -87,7 +89,7 @@ public class Application extends DomNode {
 
     public void setPlots(Plot[] plots) {
         Plot[] oldPlots = this.plots.toArray(new Plot[this.plots.size()]);
-        this.plots = Arrays.asList(plots);
+        this.plots = new CopyOnWriteArrayList(plots);
         propertyChangeSupport.firePropertyChange(PROP_PLOTS, oldPlots, plots);
     }
 
@@ -96,13 +98,13 @@ public class Application extends DomNode {
     }
 
     public void setPlots(int index, Plot newPlots) {
-        Plot oldPlots = this.plots.get(index);
-        this.plots.set(index, newPlots);
+        Plot oldPlots = this.plots.set(index, newPlots);
         propertyChangeSupport.fireIndexedPropertyChange(PROP_PLOTS, index, oldPlots, newPlots);
     }
     
+    
     public static final String PROP_CANVASES = "canvases";
-    protected List<Canvas> canvases = new LinkedList();
+    protected CopyOnWriteArrayList<Canvas> canvases = new CopyOnWriteArrayList();
 
     public Canvas[] getCanvases() {
         return canvases.toArray(new Canvas[canvases.size()]);
@@ -110,7 +112,7 @@ public class Application extends DomNode {
 
     public void setCanvases(Canvas[] canvases) {
         Canvas[] old = this.canvases.toArray(new Canvas[this.canvases.size()]);
-        this.canvases = Arrays.asList(canvases);
+        this.canvases = new CopyOnWriteArrayList(canvases);
         propertyChangeSupport.firePropertyChange(PROP_CANVASES, old, canvases);
     }
 
@@ -119,14 +121,13 @@ public class Application extends DomNode {
     }
 
     public void setCanvases(int index, Canvas newCanvas ) {
-        Canvas old = this.canvases.get(index);
-        this.canvases.set(index, newCanvas );
+        Canvas old = this.canvases.set(index, newCanvas );
         propertyChangeSupport.fireIndexedPropertyChange(PROP_PLOTS, index, old, newCanvas );
     }
     
-    protected List<Annotation> annotations= Collections.emptyList();
-
+    
     public static final String PROP_ANNOTATIONS = "annotations";
+    protected CopyOnWriteArrayList<Annotation> annotations= new CopyOnWriteArrayList();
 
     public Annotation[] getAnnotations() {
         return annotations.toArray(new Annotation[annotations.size()]);
@@ -134,7 +135,7 @@ public class Application extends DomNode {
 
     public void setAnnotations(Annotation[] annotations) {
         Annotation[] oldAnnotations = this.annotations.toArray(new Annotation[this.annotations.size()]);
-        this.annotations =  Arrays.asList(annotations);
+        this.annotations = new CopyOnWriteArrayList(annotations);
         propertyChangeSupport.firePropertyChange(PROP_ANNOTATIONS, oldAnnotations, annotations);
     }
 
@@ -143,11 +144,11 @@ public class Application extends DomNode {
     }
 
     public void setAnnotations(int index, Annotation annotation) {
-        Annotation old = this.annotations.get(index);
-        this.annotations.set(index, annotation );
+        Annotation old = this.annotations.set(index, annotation );
         propertyChangeSupport.fireIndexedPropertyChange(PROP_ANNOTATIONS, index, old, annotation );
     }
 
+    
     ApplicationController controller;
 
     public ApplicationController getController() {
@@ -209,8 +210,9 @@ public class Application extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_EVENTSLISTURI, oldEventsListUri, eventsListUri);
     }
 
-    protected List<BindingModel> bindings= Collections.emptyList();
+    
     public static final String PROP_BINDINGS = "bindings";
+    protected CopyOnWriteArrayList<BindingModel> bindings= new CopyOnWriteArrayList();
 
     public BindingModel[] getBindings() {
         BindingModel[] result= bindings.toArray(new BindingModel[bindings.size()]);
@@ -219,7 +221,7 @@ public class Application extends DomNode {
 
     public void setBindings(BindingModel[] bindings) {
         BindingModel[] oldBindings = getBindings();
-        this.bindings = Arrays.asList(bindings);
+        this.bindings = new CopyOnWriteArrayList(bindings);
         try {
             propertyChangeSupport.firePropertyChange(PROP_BINDINGS, oldBindings, bindings);
         } catch ( NullPointerException ex ) {
@@ -239,13 +241,13 @@ public class Application extends DomNode {
     }
 
     public void setBindings(int index, BindingModel newBinding) {
-        BindingModel oldBinding = this.bindings.get(index);
-        this.bindings.set(index, newBinding);
+        BindingModel oldBinding = this.bindings.set(index, newBinding);
         propertyChangeSupport.fireIndexedPropertyChange(PROP_BINDINGS, index, oldBinding, newBinding);
     }
 
-    protected List<Connector> connectors= Collections.EMPTY_LIST;
+    
     public static final String PROP_CONNECTORS = "connectors";
+    protected CopyOnWriteArrayList<Connector> connectors= new CopyOnWriteArrayList();
 
     public Connector[] getConnectors() {
         Connector[] result= connectors.toArray(new Connector[connectors.size()]);
@@ -254,7 +256,7 @@ public class Application extends DomNode {
 
     public void setConnectors(Connector[] connectors) {
         Connector[] oldConnectors = getConnectors();
-        this.connectors = Arrays.asList(connectors);
+        this.connectors = new CopyOnWriteArrayList(connectors);
         propertyChangeSupport.firePropertyChange(PROP_CONNECTORS, oldConnectors, connectors);
     }
     
@@ -263,8 +265,7 @@ public class Application extends DomNode {
     }
 
     public void setConnectors(int index, Connector newConnector) {
-        Connector oldConnector = this.connectors.get(index);
-        this.connectors.set(index, newConnector);
+        Connector oldConnector = this.connectors.set(index, newConnector);
         propertyChangeSupport.fireIndexedPropertyChange(PROP_CONNECTORS, index, oldConnector, newConnector);
     }
     
