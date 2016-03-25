@@ -615,6 +615,21 @@ public class LayoutPanel extends javax.swing.JPanel {
                 return list.get(index);
             }
         };
+        dataSourceList.setCellRenderer( new DefaultListCellRenderer()  {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel l= (JLabel)super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus );
+                DataSourceFilter dsf= (DataSourceFilter)value;
+                if ( dsf.getController().getTsb()!=null ) {
+                    l.setIcon( new ImageIcon( LayoutPanel.class.getResource("/resources/blue.gif" ) ) );
+                    l.setToolTipText( "<html>"+dsf.getUri()+"<br>Data source provides Time Series Browsing");
+                } else {
+                    l.setIcon( new ImageIcon( LayoutPanel.class.getResource("/org/virbo/autoplot/resources/idle-icon.png" ) ) );
+                    l.setToolTipText( "<html>"+dsf.getUri() );
+                }
+                return l;
+            }
+        });
         dataSourceList.setModel(elementsList);
     }    
     
