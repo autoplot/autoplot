@@ -1220,7 +1220,13 @@ public class GuiSupport {
                     String uri= val;
                     DataSourceFactory factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), new NullProgressMonitor() );
                     if ( factory==null ) {
-                        throw new IllegalArgumentException("unable to resolve URI: "+uri);
+                        if ( uri.startsWith("vap+internal:") ) { // allow testing.
+                            DataSourceFilter dsf= dom.getController().addDataSourceFilter();
+                            dsf.setUri( uri );
+                            dom.getController().addPlotElement( plot, dsf );
+                        } else {
+                            throw new IllegalArgumentException("unable to resolve URI: "+uri);
+                        }
                     }
                     List<String> problems= new ArrayList<>();
                     while ( factory.reject( uri, problems, new NullProgressMonitor() ) ) {
