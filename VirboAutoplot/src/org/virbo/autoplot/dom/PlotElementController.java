@@ -1793,6 +1793,9 @@ public class PlotElementController extends DomNodeController {
         
         try {
             Plot plot = dom.controller.getPlotFor(plotElement);
+            if ( plot==null ) {
+                throw new NullPointerException("unable to find plot for plotElement: "+plotElement );
+            }
 
             PlotElement peleCopy = (PlotElement) plotElement.copy();
             peleCopy.setId("");
