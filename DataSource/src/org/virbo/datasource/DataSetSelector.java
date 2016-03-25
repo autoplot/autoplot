@@ -1271,6 +1271,15 @@ public class DataSetSelector extends javax.swing.JPanel {
                             }
                         }
                     }
+                } catch ( IllegalArgumentException ex ) {
+                    if ( ex.getMessage().startsWith( "unsupported protocol" ) ) {
+                        logger.log( Level.SEVERE, ex.getMessage(), ex );
+                        setMessage("Unknown host: "+ex.getLocalizedMessage());
+                        showUserExceptionDialog( DataSetSelector.this, "<html>Unsupported Protocol:<br>" + surl + "</html>", "Unsupported Protocol", ex, JOptionPane.WARNING_MESSAGE);
+                        return;        
+                    } else {
+                        throw ex;
+                    }
                 } catch (UnknownHostException ex ) {
                     logger.log( Level.SEVERE, ex.getMessage(), ex );
                     setMessage("Unknown host: "+ex.getLocalizedMessage());
