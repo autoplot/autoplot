@@ -57,6 +57,7 @@ import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.Column;
+import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomOps;
 import org.virbo.autoplot.dom.Options;
@@ -81,6 +82,8 @@ public class LayoutPanel extends javax.swing.JPanel {
     Plot draggingPlot=null;
     Point dragInitialClick= null;
     Point dragLocation=null;
+
+    Application dom;
     
     /** Creates new form LayoutPanel */
     public LayoutPanel() {
@@ -382,7 +385,6 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         }
     };
-    Application dom;
     
     transient PropertyChangeListener plotElementsListener = new PropertyChangeListener() {
         @Override
@@ -398,10 +400,33 @@ public class LayoutPanel extends javax.swing.JPanel {
         }
     };
 
+    transient PropertyChangeListener dataSourceListener = new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            dataSourceList.repaint();
+        }
+    };
+            
     transient PropertyChangeListener dataSourcesListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updateDataSourceList();
+            DataSourceFilter[] old= (DataSourceFilter[]) evt.getOldValue();
+            DataSourceFilter[] nww= (DataSourceFilter[]) evt.getNewValue();
+            List<DataSourceFilter> oldList= Arrays.asList(old);
+            for ( DataSourceFilter dsf: nww ) {
+                if ( !oldList.contains(dsf) ) {
+                    dsf.addPropertyChangeListener( DataSourceFilter.PROP_URI, dataSourceListener );
+                    dsf.getController().addPropertyChangeListener( DataSourceController.PROP_TSB, dataSourceListener );
+                }
+            }
+            List<DataSourceFilter> newList= Arrays.asList(nww);
+            for ( DataSourceFilter dsf: old ) {
+                if ( !newList.contains(dsf) ) {
+                    dsf.removePropertyChangeListener( DataSourceFilter.PROP_URI, dataSourceListener );
+                    dsf.getController().removePropertyChangeListener( DataSourceController.PROP_TSB, dataSourceListener );
+                }
+            }
         }
     };
     
@@ -511,6 +536,10 @@ public class LayoutPanel extends javax.swing.JPanel {
         app.addPropertyChangeListener(Application.PROP_DATASOURCEFILTERS, dataSourcesListener );
         app.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT, plotListener);
         app.getController().addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, plotElementListener);
+        for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
+            dsf.addPropertyChangeListener( DataSourceFilter.PROP_URI, dataSourceListener );
+            dsf.getController().addPropertyChangeListener( DataSourceController.PROP_TSB, dataSourceListener );
+        }        
     }
 
     ListCellRenderer myListCellRenderer=  new DefaultListCellRenderer() {
@@ -601,6 +630,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         };
         bindingListComponent.setModel(elementsList);
+        bindingListComponent.repaint();
     }
 
     private void updateDataSourceList() {
@@ -631,6 +661,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         });
         dataSourceList.setModel(elementsList);
+        dataSourceList.repaint();
     }    
     
     /**
