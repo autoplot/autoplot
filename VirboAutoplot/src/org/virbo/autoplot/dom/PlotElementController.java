@@ -1293,7 +1293,7 @@ public class PlotElementController extends DomNodeController {
      * @see Renderer#setControl(java.lang.String) 
      */
     private synchronized void resetPlotElement( QDataSet fillDs, RenderType renderType, String renderControl ) {
-        logger.log(Level.FINEST, "resetPlotElement({0} {1}) ele={2}", new Object[]{fillDs, renderType, plotElement});
+        logger.log(Level.FINE, "resetPlotElement({0} {1}) ele={2}", new Object[]{fillDs, renderType, plotElement});
 
         if (fillDs != null) {
 
