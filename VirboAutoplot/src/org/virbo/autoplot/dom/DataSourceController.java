@@ -938,6 +938,9 @@ public class DataSourceController extends DomNodeController {
                         DatumRange dr = this.tsb.getTimeRange();
                         int idx0 = DataSetUtil.getPreviousIndex(xxds, dr.min());
                         int idx1 = DataSetUtil.getNextIndex(xxds, dr.max());
+                        if ( idx1<xxds.length()+1 ) { // getNextIndex is inclusive...
+                            idx1= idx1+1;
+                        }
                         logger.log(Level.FINE, "checkParents trimming parents ds.trim({0},{1})", new Object[]{idx0, idx1});
                         if (idx0 == idx1) {
                             ds = null;
