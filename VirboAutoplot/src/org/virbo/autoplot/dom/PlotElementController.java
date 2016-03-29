@@ -620,7 +620,7 @@ public class PlotElementController extends DomNodeController {
      * @param fillDs
      * @throws IllegalArgumentException
      */
-    private void setDataSet(QDataSet fillDs, boolean checkUnits) throws IllegalArgumentException {
+    private void setDataSet(QDataSet fillDs ) throws IllegalArgumentException {
 
         // since we might delete sibling plotElements here, make sure each plotElement is still part of the application
         if (!Arrays.asList(dom.getPlotElements()).contains(plotElement)) {
@@ -633,7 +633,7 @@ public class PlotElementController extends DomNodeController {
 
                 if ( comp.length()>0 ) fillDs = processDataSet(comp, fillDs );
 
-                if ( checkUnits && doUnitsCheck( fillDs ) ) { // bug 3104572: slicing would drop units, so old vaps wouldn't work
+                if ( doUnitsCheck( fillDs ) ) { // bug 3104572: slicing would drop units, so old vaps wouldn't work
                     Plot plot= this.dom.getController().getPlotFor(plotElement);
                     PlotController pc= plot.getController();
                     pc.doPlotElementDefaultsUnitsChange(plotElement);
@@ -657,6 +657,9 @@ public class PlotElementController extends DomNodeController {
                 }
 
             }
+
+            logger.log(Level.FINE, "  postOpsDataSet: {0}", String.valueOf(fillDs) );
+
             setDataSetInternal(fillDs);
         } catch ( RuntimeException ex ) {
             if (getRenderer() != null) {
@@ -877,6 +880,7 @@ public class PlotElementController extends DomNodeController {
                 logger.log(Level.FINE, "  resetPlotElement: {0}", resetPlotElement );
                 logger.log(Level.FINE, "  resetRanges: {0}", resetRanges);
                 logger.log(Level.FINE, "  resetRenderType: {0}", resetRenderType );
+                logger.log(Level.FINE, "  dataSet: {0}", String.valueOf(fillDs) );
                 
                 //This was to support the CdawebVapServlet, where partial vaps are handled.  See https://sourceforge.net/p/autoplot/bugs/1304/
                 if ( plotElement.isAutoRenderType() ) {
@@ -938,10 +942,10 @@ public class PlotElementController extends DomNodeController {
                     getRenderer().setDataSet(null);
                     getRenderer().setException(null); // remove leftover message.
                 }
-                setDataSet(null, false);
+                setDataSet(null);
             } else {
                 if ( renderException==null ) {
-                    setDataSet(fillDs, true);
+                    setDataSet(fillDs);
                 }
             }
         } finally {
