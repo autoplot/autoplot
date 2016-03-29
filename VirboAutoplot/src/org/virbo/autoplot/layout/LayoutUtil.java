@@ -87,7 +87,10 @@ public class LayoutUtil {
         int ymin = 90000;
         int ymax = -90000;
 
-        if ( canvas.getWidth()==0 ) return;
+        if ( canvas.getWidth()==0 ) {
+            logger.fine( "exit autolayout because canvas.getWidth()==0" );
+            return;
+        }
 
         count++;
         
@@ -99,12 +102,8 @@ public class LayoutUtil {
                         
             if ( cc.isVisible() && ( cc.getColumn() == c || cc.getColumn().getParentDevicePosition() == c ) ) {
                 
-                logger.log(Level.FINEST, "here cc= {0}", cc);
-            
-                if ( cc instanceof DasColorBar ) {
-                    logger.log(Level.FINEST, "here colorbar" ); // breakpoint
-                }
-                
+                logger.log(Level.FINER, "here cc= {0}", cc);
+                            
                 bounds = cc.getBounds();
                 
                 if ( bounds.width>0 ) {
@@ -136,7 +135,7 @@ public class LayoutUtil {
            // return;
         //}
 
-        logger.fine( String.format( "%d %d %d %s", count, xmin, xmax-xmin, "all_together" ) );
+        logger.finest( String.format( "%d %d %d %s", count, xmin, xmax-xmin, "all_together" ) );
         
         double MARGIN_LEFT_RIGHT_EM = 1;
 
