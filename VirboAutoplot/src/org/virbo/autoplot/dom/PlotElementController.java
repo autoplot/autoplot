@@ -2090,8 +2090,12 @@ public class PlotElementController extends DomNodeController {
         RenderType spec = peleCopy.getRenderType();
 
         if ( fillDs.rank()==0 ) {
-            //logger.fine("rank 0");
-            spec= RenderType.digital;
+            if ( spec==RenderType.eventsBar ) {
+                // do nothing
+            } else {
+                //logger.fine("rank 0");
+                spec= RenderType.digital;
+            }
         }
 
         if (props == null) {
