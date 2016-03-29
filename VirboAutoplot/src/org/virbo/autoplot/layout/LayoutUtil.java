@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot.layout;
 
 import java.util.logging.Level;
@@ -15,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.das2.graph.DasAnnotation;
+import org.das2.graph.DasColorBar;
 
 /**
  * utility methods for adjusting canvas layout.
@@ -24,7 +22,7 @@ public class LayoutUtil {
 
     private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.layout");
 
-    private static boolean ALLOW_EXCESS_SPACE = true;
+    private static final boolean ALLOW_EXCESS_SPACE = true;
 
     private static boolean maybeSetMaximum(DasDevicePosition c, double need, double norm, double em, int pt) {
         em = Math.floor(em);
@@ -78,6 +76,9 @@ public class LayoutUtil {
      * @param r 
      */
     public static void autolayout(DasCanvas canvas, DasRow r, DasColumn c) {
+        
+        logger.fine( "enter autolayout" );
+        
         // horizontal
         double em = c.getEmSize();
 
@@ -90,14 +91,24 @@ public class LayoutUtil {
 
         count++;
         
-        Rectangle bounds;
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
+
+            Rectangle bounds;
+            
             if ( cc instanceof DasAnnotation ) continue; // there's a set of components we want to ignore because it's easy to mess up.
-            if (cc.getColumn() == c && cc.isVisible()) {
+                        
+            if ( cc.isVisible() && ( cc.getColumn() == c || cc.getColumn().getParentDevicePosition() == c ) ) {
+                
+                logger.log(Level.FINEST, "here cc= {0}", cc);
+            
+                if ( cc instanceof DasColorBar ) {
+                    logger.log(Level.FINEST, "here colorbar" ); // breakpoint
+                }
+                
                 bounds = cc.getBounds();
                 
                 if ( bounds.width>0 ) {
-                    logger.fine( String.format( "%d %d %d %s", count, bounds.x, bounds.width, cc.toString() ) );
+                    logger.finest( String.format( "%d %d %d %s", count, bounds.x, bounds.width, cc.toString() ) );
                 
                     xmin = Math.min(xmin, bounds.x);
                     xmax = Math.max(xmax, bounds.x + bounds.width);
@@ -108,7 +119,8 @@ public class LayoutUtil {
                     }
                 }
             }
-            if (cc.getRow() == r && cc.isVisible()) {
+            
+            if ( cc.isVisible() && ( cc.getRow() == r ||  cc.getRow().getParentDevicePosition()==r ) ) {
                 bounds = cc.getBounds();
                 if ( bounds.height>0 ) {
                     ymin = Math.min(ymin, bounds.y);
@@ -123,22 +135,6 @@ public class LayoutUtil {
             //System.err.println("marching axis state?");
            // return;
         //}
-
-        bounds = getChildBounds(c);
-        if (bounds != null) {
-            xmin = Math.min(xmin, bounds.x);
-            xmax = Math.max(xmax, bounds.x + bounds.width);
-            ymin = Math.min(ymin, bounds.y);
-            ymax = Math.max(ymax, bounds.y + bounds.height);
-        }
-
-        bounds = getChildBounds(r);
-        if (bounds != null) {
-            xmin = Math.min(xmin, bounds.x);
-            xmax = Math.max(xmax, bounds.x + bounds.width);
-            ymin = Math.min(ymin, bounds.y);
-            ymax = Math.max(ymax, bounds.y + bounds.height);
-        }
 
         logger.fine( String.format( "%d %d %d %s", count, xmin, xmax-xmin, "all_together" ) );
         
@@ -189,17 +185,19 @@ public class LayoutUtil {
         if (changed) {
             c.getParent().resizeAllComponents();
         }
+        
+        logger.log(Level.FINER, "exit autolayout, changed={0}", changed);
 
     }
 
     /**
-     * 
-     * @param col
-     * @return
+     * Return a list of DasColumns where the parent is the given column.
+     * @param col the column
+     * @return list of columns.
      */
     public static List<DasDevicePosition> getChildColumns(DasDevicePosition col) {
         DasCanvas canvas = col.getParent();
-        List<DasDevicePosition> result = new ArrayList<DasDevicePosition>();
+        List<DasDevicePosition> result = new ArrayList<>();
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
             if (cc.getColumn().getParentDevicePosition() == col) {
                 result.add(cc.getColumn());
@@ -209,7 +207,9 @@ public class LayoutUtil {
     }
 
     /**
-     * look for attached columns, get the bounds of all attachments.
+     * look for attached columns, get the bounds of all attachments.  For 
+     * example, this includes the bounds of a colorbar attached to the plot.
+     *
      * @param col
      * @return the bounds of all children, or null.
      */
