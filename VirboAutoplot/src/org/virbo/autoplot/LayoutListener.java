@@ -16,7 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.swing.Timer;
+import org.das2.graph.DasCanvas;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.Canvas;
 import org.virbo.autoplot.dom.CanvasController;
 import org.virbo.autoplot.layout.LayoutUtil;
 
@@ -48,7 +50,11 @@ public class LayoutListener implements PropertyChangeListener {
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        if (model.dom.getOptions().isAutolayout() ) {
+        final Canvas canvas= model.dom.getController().getCanvas();
+        final CanvasController cc= canvas.getController();
+        final DasCanvas dasCanvas= cc.getDasCanvas();
+        
+        if (model.dom.getOptions().isAutolayout() && dasCanvas.getWidth()>0 ) {
             logger.log(Level.FINE, "property change: {0}", evt.getPropertyName());
             if (evt.getSource() instanceof Component &&
                     ((Component) evt.getSource()).isVisible()) {
@@ -59,17 +65,16 @@ public class LayoutListener implements PropertyChangeListener {
                             if ( model.dom.getOptions().isAutolayout() ) { //bug 3034795
                                 logger.fine("do autolayout");
                                 ApplicationController applicationController= model.getDocumentModel().getController();
-                                CanvasController cc= model.dom.getController().getCanvas().getController();
                                 cc.performingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
-                                model.canvas.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
-                                LayoutUtil.autolayout( applicationController.getDasCanvas(),
+                                dasCanvas.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
+                                LayoutUtil.autolayout( dasCanvas,
                                         applicationController.getRow(), applicationController.getColumn() );
-                                model.canvas.changePerformed(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
+                                dasCanvas.changePerformed(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
                                 cc.changePerformed(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
                             } else {
                                 //TODO: maybe we want a changeCancelled.
-                                model.canvas.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
-                                model.canvas.changePerformed(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
+                                dasCanvas.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
+                                dasCanvas.changePerformed(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
                             }
                         }
                     });
@@ -79,7 +84,8 @@ public class LayoutListener implements PropertyChangeListener {
                 //model.canvas.pendingChanges(map);
                 //boolean causedByAutolayout= map.containsKey( PENDING_CHANGE_AUTOLAYOUT );
                 if ( true ) { // !causedByAutolayout ) {
-                    model.canvas.registerPendingChange(this, PENDING_CHANGE_AUTOLAYOUT);
+                    cc.registerPendingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
+                    dasCanvas.registerPendingChange(this, PENDING_CHANGE_AUTOLAYOUT);
                     t.restart();
                 } else {
                     logger.finest("reenter, no need to redo.");
