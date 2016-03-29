@@ -100,7 +100,8 @@ public class LayoutUtil {
             
             if ( cc instanceof DasAnnotation ) continue; // there's a set of components we want to ignore because it's easy to mess up.
                         
-            if ( cc.isVisible() && ( cc.getColumn() == c || cc.getColumn().getParentDevicePosition() == c ) ) {
+            if ( cc.isVisible() && ( cc.getColumn() == c || cc.getColumn().getParentDevicePosition() == c 
+                    || ( cc.getColumn().getParentDevicePosition()!=null && cc.getColumn().getParentDevicePosition().getParentDevicePosition() == c ) ) ) {
                 
                 logger.log(Level.FINER, "here cc= {0}", cc);
                             
@@ -119,7 +120,8 @@ public class LayoutUtil {
                 }
             }
             
-            if ( cc.isVisible() && ( cc.getRow() == r ||  cc.getRow().getParentDevicePosition()==r ) ) {
+            if ( cc.isVisible() && ( cc.getRow() == r ||  cc.getRow().getParentDevicePosition()==r 
+                    || ( cc.getRow().getParentDevicePosition()!=null && cc.getRow().getParentDevicePosition().getParentDevicePosition() == r ) ) ) {
                 bounds = cc.getBounds();
                 if ( bounds.height>0 ) {
                     ymin = Math.min(ymin, bounds.y);
