@@ -6,6 +6,7 @@
 package org.autoplot.test;
 
 import java.io.IOException;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.LoggerManager;
@@ -32,6 +33,12 @@ public class Test_005_URISwitching implements Scenario {
     @Override
     public int runIt(Object o) {
         try {
+            
+            System.err.println( "handlers: " + logger.getHandlers() );
+            for ( Handler h: logger.getHandlers() ) {
+                System.err.println( "handlers: " + h.getClass().toString() + " " + h.getLevel() + " " + h.getFormatter().getClass().toString() );
+            }
+            
             createGui();
             
             AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
