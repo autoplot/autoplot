@@ -14,7 +14,9 @@ import org.virbo.dataset.QDataSet;
  * Class for containing the logic of how macros are implemented.
  * https://sourceforge.net/p/autoplot/feature-requests/426/
  * 
- * This currently supports just the plotElement and plot.
+ * This currently supports just the plotElement and plot.  When 
+ * multiple plotElements are attached to a plot, then the 
+ * first is used.
  * 
  * @author faden@cottagesystems.com
  */
@@ -22,9 +24,11 @@ public class LabelConverter extends Converter {
     
     private static Logger logger= LoggerManager.getLogger("autoplot.dom.labelConverter");
             
-    PlotElement plotElement;
-    Plot plot;
-    Application dom;
+    PlotElement plotElement=null;
+    Plot plot=null;
+    Application dom=null;
+    Annotation annotation=null;
+    
     boolean multiplePEWarning= false;
     
     private PlotElement getFocusPlotElement() {
@@ -134,7 +138,7 @@ public class LabelConverter extends Converter {
         }
         
         if ( multiplePEWarning && ! title.equals(value) ) {
-            logger.fine("multiple plot elements found, using first");
+            logger.info("multiple plot elements found, using first");
         }
         
         return title;
@@ -145,9 +149,11 @@ public class LabelConverter extends Converter {
         String title= (String)value;
         
         String ptitle;
-        if ( plotElement!=null ) {
+        if ( annotation!=null ) {
+            ptitle= annotation.getText();
+        } else if ( plotElement!=null ) {
             PlotElement pe= getFocusPlotElement();
-            ptitle=  pe.getLegendLabel();
+            ptitle= pe.getLegendLabel();
         } else {
             ptitle= plot.getTitle();
         }
