@@ -72,7 +72,17 @@ public class AnnotationController extends DomNodeController {
     private void bindTo( final DasAnnotation p ) {
         ApplicationController ac = dom.controller;
         p.setFontSize( new Float(0.));
-        ac.bind( annotation, "text", p, "text");
+        
+        String plotId= annotation.getPlotId();
+        if ( plotId!=null && plotId.length()>0 ) {
+            LabelConverter lc= new LabelConverter();
+            lc.dom= dom;
+            lc.plot= (Plot)DomUtil.getElementById( dom, plotId  );
+            lc.annotation= annotation;
+            ac.bind( annotation, "text", p, "text", lc );
+        } else {
+            ac.bind( annotation, "text", p, "text");
+        }
         ac.bind( annotation, "fontSize", p, "fontSize", getFontConverter(p) );
         ac.bind( annotation, "borderType", p, "borderType" );
         ac.bind( annotation, "anchorPosition", p, "anchorPosition" );
