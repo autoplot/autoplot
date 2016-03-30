@@ -15,7 +15,7 @@
            be additionally processed with other operations like smooth and FFT, and Jython scripting provides a capable programming environment.
         </p>
 
-        <p>This is the Autoplot2015a branch.  This is an update to the production version containing bugfixes and minor new features.
+        <p>This is the Autoplot2016a branch.  This is an update to the production version containing bugfixes and minor new features.
             Java 7 is now required.  Java 8 will be required sometime soon.
         </p>
 
@@ -23,9 +23,16 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-03-25 r18572):</p>
+        <p>Bugfixes (2016-03-30 r18585):</p>
         <ul>
+            <li>version is identified as v2016a</li>
+            <li>ISTP-CDF metadata node dataset/METADATA/GlobalAttributes is now shown as a map.</li>
+            <li>When a TSB trims the data to the range because there is no X-axis, an extra point was trimmed from the end.</li>
+            <li>Events bar should allow for units sloppiness when X values are Stevens' ratio scale units.</li>
+            <li>don't assume that rank0 datasets will use digital renderer, they my use eventsBar.</li>
+            <li>1547: path reduction code would fail to connect dataset of two points with same X.</li>
             <li>printing to PDF with a bottomDecorator would result in stderr chatter as it failed to update.</li>
+            <li>1542: after printing with background decorator, the cacheImageBounds would be incorrect but this was not resolved, getting stuck in a loop.</li>
             <li>1509: popup windows below screen were not moved up sufficiently.  Thanks Scott!</li>
             <li>1541: jython code showed where looping over dom.dataSourceFilters could cause a concurrent modification problem.  Thanks Larry!</li>
             <li>1540: catch RTE from "bookmrks:" typo, when http or other valid protocol is not used.  Thanks Bob!</li>
