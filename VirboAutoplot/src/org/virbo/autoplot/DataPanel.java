@@ -169,24 +169,6 @@ public class DataPanel extends javax.swing.JPanel {
 
     private BindingGroup elementBindingGroup;
 
-    transient PropertyChangeListener dsfListener= new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                Runnable run = new Runnable() {
-                    @Override
-                    public void run() {
-                        DataPanel.this.plotElementFiltersPanel.setFilter("");
-                        DataPanel.this.plotElementFiltersPanel.setDataSet(null);
-                    }
-                };
-                if ( SwingUtilities.isEventDispatchThread() ) {
-                    run.run();
-                } else {
-                    SwingUtilities.invokeLater(run);
-                }
-            }
-        };
-
     transient MouseWheelListener sliceIndexListener=null;
     transient MouseWheelListener sliceIndexListener2=null;
     
@@ -279,7 +261,6 @@ public class DataPanel extends javax.swing.JPanel {
         if (dataSourceFilterBindingGroup != null) dataSourceFilterBindingGroup.unbind();
 
         if ( dsf!=null ) {
-            dsf.getController().removePropertyChangeListener(DataSourceController.PROP_DATASOURCE,dsfListener);
             dsf.getController().removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener );
         }
         
@@ -295,7 +276,6 @@ public class DataPanel extends javax.swing.JPanel {
         //dataSetLabel.setText( ds==null ? "(no dataset)" : ds.toString() );
         
         newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_FILLDATASET, fillDataSetListener );
-        newDsf.getController().addPropertyChangeListener( DataSourceController.PROP_DATASOURCE, dsfListener );
         
         dataSourceFiltersPanel.setFilter( newDsf.getFilters() );
         dataSourceFiltersPanel.setDataSet( newDsf.getController().getDataSet() );
@@ -314,17 +294,8 @@ public class DataPanel extends javax.swing.JPanel {
         }
         dataSourceFilterBindingGroup = bc;
         bindingTransitionalState= false;
-                
-        dsfListener= new PropertyChangeListener() {
-
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                
-            }
-        };
 
         dsf= newDsf;
-        newDsf.getController().addPropertyChangeListener(dsfListener);
 
     }
 
