@@ -180,8 +180,29 @@ public class TimeRangeTool extends javax.swing.JPanel {
     }
 
     private String[] getSpacecraft() {
-        return new String[] { "rbspa-pp", "rbspb-pp", "crres", "cassini", "marsx" };
+        String[] ss= new String[] { "rbspa-pp", "rbspb-pp", "crres", "cassini", "marsx" };
+        int n= ss.length;
+        String[] result= new String[ n + extraSpacecraft.length ];
+        System.arraycopy(ss, 0, result, 0, n);
+        System.arraycopy(extraSpacecraft, 0, result, n, extraSpacecraft.length);
+        return result;
     }
+    
+    private static String[] extraSpacecraft= new String[0];
+    
+    /**
+     * Add additional spacecraft and orbit files to the 
+     * this must be called before the GUI is created.
+     * 
+     * These will be the names of local orbit/event files or missions not
+     * hardcoded into Autoplot.
+     * 
+     * @param scs 
+     */
+    public static void setAdditionalSpacecraftForOrbit( String[] scs ) {
+        extraSpacecraft= scs;
+    }
+    
     private void resetSpacecraft( final String sc  ) {
         resetSpacecraft(sc, null);
     }
