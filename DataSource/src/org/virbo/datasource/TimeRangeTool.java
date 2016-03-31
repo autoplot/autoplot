@@ -472,7 +472,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
 
         jLabel5.setText("Orbit:");
 
-        orbitFeedbackLabel.setFont(orbitFeedbackLabel.getFont().deriveFont(orbitFeedbackLabel.getFont().getSize()-4f));
+        orbitFeedbackLabel.setFont(orbitFeedbackLabel.getFont().deriveFont(orbitFeedbackLabel.getFont().getSize()-2f));
         orbitFeedbackLabel.setText("Shows selected timerange for orbit");
 
         jLabel10.setFont(jLabel10.getFont().deriveFont(jLabel10.getFont().getSize()-4f));
