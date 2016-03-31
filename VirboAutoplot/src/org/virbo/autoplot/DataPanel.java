@@ -7,7 +7,6 @@
 
 package org.virbo.autoplot;
 
-import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -36,21 +35,13 @@ import org.virbo.filters.FiltersChainPanel;
  */
 public class DataPanel extends javax.swing.JPanel {
 
-    Application dom;
-    AutoplotUI app;
-    ApplicationController applicationController;
-    DataSourceFilter dsf; // current focus
-    BindingGroup dataSourceFilterBindingGroup;
+    private final Application dom;
+    private final AutoplotUI app;
+    private final ApplicationController applicationController;
+    private DataSourceFilter dsf; // current focus
+    private BindingGroup dataSourceFilterBindingGroup;
     
-    /**
-     * To suppress extraneous GUI events when binding to combo boxes,
-     * this is true while we are binding.
-     */
-    boolean bindingTransitionalState= false; 
-    
-    PlotElement element;// current focus
-
-    private final transient PropertyChangeListener compListener; // listen to component property changes
+    private PlotElement plotElement;// current focus
     
     private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui");
 
@@ -94,14 +85,7 @@ public class DataPanel extends javax.swing.JPanel {
                 }
             }
         });
-        
-        compListener= new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                componentChanged();
-            }
-        };
-        
+                
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel1, "dataPanel_1");
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel2, "dataPanel_2");
 
@@ -115,41 +99,25 @@ public class DataPanel extends javax.swing.JPanel {
         plotElementFiltersPanel.setExpertMode(expert);
         dataSourceFiltersPanel.setExpertMode(expert);
     }
-    
-    TickleTimer operationsHistoryTimer= new TickleTimer( 500, new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            //operatorsComboBox.addToRecent(filtersChainPanel.getFilter());
-        }
-    } );
 
     /**
      * encourage making local copies for thread safety.
      * @return the current plotElement.
      */
     private synchronized PlotElement getElement() {
-        return element;
+        return plotElement;
     }
         
 
     /**
-     * bind to the data source and plot element.
+     * bind to the data source and plot plotElement.
      */
     protected final void doBindings() {
         logger.fine("doBindings");
         doPlotElementBindings();
         doDataSourceFilterBindings();
-        componentChanged(); // force update
     }
     
-    private void componentChanged() {
-        if ( adjusting ) return;
-        PlotElement lelement= getElement();
-        if ( lelement==null ) {
-            return;
-        }
-        this.operationsHistoryTimer.tickle();
-    }
 
     protected boolean adjusting = false;
     /**
@@ -218,20 +186,19 @@ public class DataPanel extends javax.swing.JPanel {
         BindingGroup bc = new BindingGroup();
         if (elementBindingGroup != null) elementBindingGroup.unbind();
         setAdjusting( true ); // suppress events
-        if ( element!=null ) {
-            element.removePropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
-            element.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, contextListener );
+        if ( plotElement!=null ) {
+            plotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, contextListener );
         }
 
         PlotElement p = applicationController.getPlotElement();
-        element= p;
+        plotElement= p;
 
         plotElementFiltersPanel.setFilter(p.getComponent());
 
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                plotElementFiltersPanel.setFilter(element.getComponent()); // because adjusting==true.
+                plotElementFiltersPanel.setFilter(plotElement.getComponent()); // because adjusting==true.
             }
         };
         if ( SwingUtilities.isEventDispatchThread() ) {
@@ -240,9 +207,8 @@ public class DataPanel extends javax.swing.JPanel {
             SwingUtilities.invokeLater(run);
         }
         
-        element.addPropertyChangeListener( PlotElement.PROP_COMPONENT, compListener );
-        bc.addBinding( Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, element, BeanProperty.create("component"), this.plotElementFiltersPanel, BeanProperty.create( OperationsPanel.PROP_FILTER ) ) );
-        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, element.getController(), BeanProperty.create("sliceAutoranges"), this.sliceAutorangesCB, BeanProperty.create("selected") ) );
+        bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, plotElement, BeanProperty.create("component"), this.plotElementFiltersPanel, BeanProperty.create( OperationsPanel.PROP_FILTER ) ) );
+        bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, plotElement.getController(), BeanProperty.create("sliceAutoranges"), this.sliceAutorangesCB, BeanProperty.create("selected") ) );
 
         elementBindingGroup = bc;
         bc.bind();
@@ -279,7 +245,6 @@ public class DataPanel extends javax.swing.JPanel {
         
         plotElementFiltersPanel.setDataSet(ds);
 
-        bindingTransitionalState= true;
         BindingGroup bc = new BindingGroup();
         bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("filters"), this.dataSourceFiltersPanel, BeanProperty.create("filter")) );
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, newDsf, BeanProperty.create("uri"), this.dataSetSelector, BeanProperty.create("value")));
@@ -290,7 +255,6 @@ public class DataPanel extends javax.swing.JPanel {
             throw e;
         }
         dataSourceFilterBindingGroup = bc;
-        bindingTransitionalState= false;
 
         dsf= newDsf;
 
@@ -418,13 +382,13 @@ public class DataPanel extends javax.swing.JPanel {
         app.doPlotGoButton( uri, modifiers );
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
-    /**
-     * for testing, provide access.
-     * @return the FiltersChainPanel
-     */
-    public FiltersChainPanel getFiltersChainPanel() {
-        return plotElementFiltersPanel.getFiltersChainPanel();
-    }
+//    /**
+//     * for testing, provide access.
+//     * @return the FiltersChainPanel
+//     */
+//    public FiltersChainPanel getFiltersChainPanel() {
+//        return plotElementFiltersPanel.getFiltersChainPanel();
+//    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.virbo.datasource.DataSetSelector dataSetSelector;
