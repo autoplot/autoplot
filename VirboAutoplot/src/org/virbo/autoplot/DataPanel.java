@@ -168,9 +168,6 @@ public class DataPanel extends javax.swing.JPanel {
     }
 
     private BindingGroup elementBindingGroup;
-
-    transient MouseWheelListener sliceIndexListener=null;
-    transient MouseWheelListener sliceIndexListener2=null;
     
     /**
      * show the context after the slicing and operations for the user's reference.
