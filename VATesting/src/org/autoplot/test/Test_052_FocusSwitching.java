@@ -102,7 +102,7 @@ public class Test_052_FocusSwitching implements Scenario {
             
             ImageIO.write( image, "png", new File( "Test_052_FocusSwitching_Screen.png" ) );
             
-            System.err.println( "filter: " + app.getDataPanel().getFiltersChainPanel().getFilter() );
+            //System.err.println( "filter: " + app.getDataPanel().getFiltersChainPanel().getFilter() );
             System.err.println("Done!");
             
             writeToPng("Test_052_FocusSwitching.png"); // Leave artifacts for testing.
@@ -112,9 +112,11 @@ public class Test_052_FocusSwitching implements Scenario {
             
         } catch (IOException ex) {
             Logger.getLogger(Test_052_FocusSwitching.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
             return(2);
         } catch (InterruptedException ex) {
             Logger.getLogger(Test_052_FocusSwitching.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
             return(3);
         }
     }
