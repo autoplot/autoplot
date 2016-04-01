@@ -2112,9 +2112,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         BindingModel bindingModel = new BindingModel(srcId, srcId, srcProp, dstId, dstProp);
         
-        List<BindingModel> currentBindings= Arrays.asList( application.getBindings() );
-        
-        if ( currentBindings.contains(bindingModel) ) {
+        if ( application.bindings.contains(bindingModel) ) {
             if ( application.controller.isValueAdjusting() ) {
                 logger.finest("binding already exists, ignoring");
                 // just ignore this for now.
