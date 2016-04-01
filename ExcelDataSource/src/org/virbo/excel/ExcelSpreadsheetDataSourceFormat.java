@@ -274,6 +274,14 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             dsw.putProperty( QDataSet.DEPEND_1, null );
         }
         
+        int irow=0;
+        if ( cellName!=null ) {
+            irow= (short) (Short.parseShort( cellName.substring(1) )- 1 );
+        }
+        if ( data.length() > (65534+irow) ) {
+            throw new IllegalArgumentException("Data contains too many records to format to Excel spreadsheet.");
+        }
+            
         HSSFWorkbook wb;
         if ( append ) {
             FileInputStream in=null;
