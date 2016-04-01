@@ -1961,6 +1961,10 @@ public class DataSetURI {
 
         URISplit split = URISplit.parse(surl1);
 
+        if ( carotPos==0 && surl1.trim().length()>0 ) {
+            return Collections.singletonList( new CompletionResult("No completions", "No completions", "", false));
+        }
+        
         int qpos = surl1.lastIndexOf('?', carotPos);
         if ( qpos==-1 && surl1.contains(":") && ( surl1.endsWith(":") || surl1.contains("&") ) ) {
             qpos= surl1.indexOf(":");
