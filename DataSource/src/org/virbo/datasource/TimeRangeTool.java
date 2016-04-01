@@ -98,7 +98,11 @@ public class TimeRangeTool extends javax.swing.JPanel {
         resetSpacecraft( scComboBox.getSelectedItem().toString(), dr );
         if ( s.startsWith("orbit:") ) {
             String[] ss= s.split(":",2);
-            if ( ss[1].startsWith("http://") || ss[1].startsWith("https://") || ss[1].startsWith("ftp://") ) {
+            if ( ss[1].startsWith("http://") 
+                || ss[1].startsWith("https://") 
+                || ss[1].startsWith("sftp://")
+                || ss[1].startsWith("ftp://")
+                || ss[1].startsWith("file:/") ) {
                 int i= ss[1].indexOf(":",6);
                 if ( i==-1 ) {
                     scComboBox.setSelectedItem(ss[1]);
