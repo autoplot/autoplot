@@ -897,7 +897,6 @@ public class DataMashUp extends javax.swing.JPanel {
                         }
                     };
                     new Thread(run).start();
-                    JOptionPane.showConfirmDialog(this,"loading data and calculating plot, try again shortly.");
                 }
             }
 
