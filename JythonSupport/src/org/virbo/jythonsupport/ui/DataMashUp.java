@@ -211,12 +211,12 @@ public class DataMashUp extends javax.swing.JPanel {
             if ( iparen>-1 ) sn= sn.substring(0,iparen);
             int nchild= m.getChildCount(n);
             if ( isInfix(sn) && nchild==2 ) {
-                String alt= null; //getOverloaded(sn);
-                if ( alt!=null ) {
-                    return getJython( m, m.getChild( n, 0 ) ) + alt + getJython( m, m.getChild(n,1) ) ;
-                } else {
+                //String alt= null; //getOverloaded(sn);
+                //if ( alt!=null ) {
+                //    return getJython( m, m.getChild( n, 0 ) ) + alt + getJython( m, m.getChild(n,1) ) ;
+                //} else {
                     return getJython( m, m.getChild( n, 0 ) ) + "."+sn+"("+ getJython( m, m.getChild(n,1) ) +")" ;
-                }
+                //}
             } else {
                 StringBuilder t= new StringBuilder( sn + "(" );
                 for ( int i=0; i<nchild; i++ ) {
