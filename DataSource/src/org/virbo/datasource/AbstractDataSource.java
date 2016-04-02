@@ -209,8 +209,8 @@ public abstract class AbstractDataSource implements DataSource {
         return f;
     }
     /**
-     * return the parameters from the URL.
-     * @return the parameters from the URL.
+     * return the parameters from the URI (a copy).
+     * @return the parameters from the URI.
      */
     protected Map<String,String> getParams() {
         return new LinkedHashMap(params);
@@ -242,7 +242,7 @@ public abstract class AbstractDataSource implements DataSource {
      */
     @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
-        return new HashMap<String, Object>();
+        return new HashMap<>();
     }
 
     /**
@@ -299,18 +299,24 @@ public abstract class AbstractDataSource implements DataSource {
             parm= operands[1];
         }
         if ( parm.rank()>1 ) {
-            if ( op.equals("gt" ) ){
-                r= Ops.where( Ops.le( parm,d ) );
-            } else if ( op.equals("lt") ) {
-                r= Ops.where( Ops.ge( parm,d ) );
-            } else if ( op.equals("eq") ) {
-                r= Ops.where( Ops.ne( parm,d ) );
-            } else if ( op.equals("ne") ) {
-                r= Ops.where( Ops.eq( parm,d ) );
-            } else if ( op.equals("within") ) {
-                r= Ops.where( Ops.without( parm,d ) );
-            } else {
-                throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");                        
+            switch (op) {
+                case "gt":
+                    r= Ops.where( Ops.le( parm,d ) );
+                    break;
+                case "lt":
+                    r= Ops.where( Ops.ge( parm,d ) );
+                    break;
+                case "eq":
+                    r= Ops.where( Ops.ne( parm,d ) );
+                    break;
+                case "ne":
+                    r= Ops.where( Ops.eq( parm,d ) );                        
+                    break;
+                case "within":
+                    r= Ops.where( Ops.without( parm,d ) );
+                    break;
+                default:
+                    throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
             }
             double fill= Double.NaN;
             result= BufferDataSet.maybeCopy(result);
@@ -326,18 +332,24 @@ public abstract class AbstractDataSource implements DataSource {
                 throw new IllegalArgumentException("where can only apply filter and dataset have same dimensions");  
             }
         } else if ( parm.rank()<2 ) {
-            if ( op.equals("gt" ) ){
-                r= Ops.where( Ops.gt( parm,d ) );
-            } else if ( op.equals("lt") ) {
-                r= Ops.where( Ops.lt( parm,d ) );
-            } else if ( op.equals("eq") ) {
-                r= Ops.where( Ops.eq( parm,d ) );
-            } else if ( op.equals("ne") ) {
-                r= Ops.where( Ops.ne( parm,d ) );
-            } else if ( op.equals("within") ) {
-                r= Ops.where( Ops.within( parm,d ) );
-            } else {
-                throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
+            switch (op) {
+                case "gt":
+                    r= Ops.where( Ops.gt( parm,d ) );
+                    break;
+                case "lt":
+                    r= Ops.where( Ops.lt( parm,d ) );
+                    break;
+                case "eq":
+                    r= Ops.where( Ops.eq( parm,d ) );
+                    break;
+                case "ne":
+                    r= Ops.where( Ops.ne( parm,d ) );
+                    break;
+                case "within":
+                    r= Ops.where( Ops.within( parm,d ) );
+                    break;
+                default:
+                    throw new IllegalArgumentException("where can only contain .eq, .ne, .gt, or .lt");
             }
             if ( r.length()==0 ) {
                 throw new NoDataInIntervalException("'where' argument removes all data");
@@ -404,18 +416,23 @@ public abstract class AbstractDataSource implements DataSource {
                     d= DataSetUtil.asDataSet( du.parse(sval) );
                 }
             } else if ( parm.rank()==1 ) {
-                if ( sval.equals("mode") ) {
-                    QDataSet mode= Ops.mode(parm);
-                    d= mode;
-                } else if ( sval.equals("median") ) {
-                    QDataSet median= Ops.median(parm);
-                    d= median;
-                } else if ( sval.equals("mean") ) {
-                    QDataSet mean= Ops.mean(parm);
-                    d= mean;
-                } else {
-                    Units du= SemanticOps.getUnits(parm);
-                    d= DataSetUtil.asDataSet(du.parse(sval));
+                switch (sval) {
+                    case "mode":
+                        QDataSet mode= Ops.mode(parm);
+                        d= mode;
+                        break;
+                    case "median":
+                        QDataSet median= Ops.median(parm);
+                        d= median;
+                        break;
+                    case "mean":
+                        QDataSet mean= Ops.mean(parm);
+                        d= mean;
+                        break;
+                    default:
+                        Units du= SemanticOps.getUnits(parm);
+                        d= DataSetUtil.asDataSet(du.parse(sval));
+                        break;
                 }
             } else {
                 throw new IllegalArgumentException("param is rank>2");
@@ -434,6 +451,7 @@ public abstract class AbstractDataSource implements DataSource {
     /**
      * attempt to get a capability.  null will be returned if the 
      * capability doesn't exist.
+     * @param <T> the capability 
      * @param clazz the capability class.
      * @return null or an implementation of a capability.
      */
@@ -444,6 +462,7 @@ public abstract class AbstractDataSource implements DataSource {
 
     /**
      * attach a capability
+     * @param <T> the capability 
      * @param clazz the capability class.
      * @param o an implementation.
      * @deprecated use addCapability
@@ -454,6 +473,7 @@ public abstract class AbstractDataSource implements DataSource {
     
     /**
      * attach a capability
+     * @param <T> the capability 
      * @param clazz the capability class.
      * @param o an implementation.
      */
