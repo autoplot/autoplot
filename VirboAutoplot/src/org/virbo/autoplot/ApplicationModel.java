@@ -45,6 +45,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -128,6 +129,10 @@ public class ApplicationModel {
         this.applet= v;
     }
 
+    /**
+     * an early version of Autoplot worked as an applet.
+     * @return 
+     */
     public boolean isApplet() {
         return this.applet;
     }
@@ -136,6 +141,12 @@ public class ApplicationModel {
         return exceptionHandler;
     }
 
+    /**
+     * set the code that will handle uncaught exceptions.  This could be a
+     * GUI that shows the user the problem and submits bug reports.  This could
+     * also simply call exit with a non-zero return code for headless use.
+     * @param eh 
+     */
     public void setExceptionHandler(ExceptionHandler eh) {
         this.exceptionHandler= eh;
         DasApplication.getDefaultApplication().setExceptionHandler(exceptionHandler);
@@ -170,23 +181,31 @@ public class ApplicationModel {
         if (  ! "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false") ) ) {
             Component p= SwingUtilities.getRoot(canvas);
             if ( p==null ) {
-                if ( messageType==JOptionPane.WARNING_MESSAGE ) {
-                    System.err.println( "WARNING: "+ title + ": " + message  );
-                } else if ( messageType==JOptionPane.INFORMATION_MESSAGE ) {
-                    System.err.println( "INFO: "+ title + ": " + message  );
-                } else {
-                    System.err.println( title + ": " + message  );
+                switch (messageType) {
+                    case JOptionPane.WARNING_MESSAGE:
+                        System.err.println( "WARNING: "+ title + ": " + message  );
+                        break;
+                    case JOptionPane.INFORMATION_MESSAGE:
+                        System.err.println( "INFO: "+ title + ": " + message  );
+                        break;
+                    default:
+                        System.err.println( title + ": " + message  );
+                        break;
                 }
             } else {
                 JOptionPane.showMessageDialog( p, message, title, messageType );
             }
         } else {
-            if ( messageType==JOptionPane.WARNING_MESSAGE ) {
-                System.err.println( "WARNING: "+ title + ": " + message  );
-            } else if ( messageType==JOptionPane.INFORMATION_MESSAGE ) {
-                System.err.println( "INFO: "+ title + ": " + message  );
-            } else {
-                System.err.println( title + ": " + message  );
+            switch (messageType) {
+                case JOptionPane.WARNING_MESSAGE:
+                    System.err.println( "WARNING: "+ title + ": " + message  );
+                    break;
+                case JOptionPane.INFORMATION_MESSAGE:
+                    System.err.println( "INFO: "+ title + ": " + message  );
+                    break;
+                default:
+                    System.err.println( title + ": " + message  );
+                    break;
             }
         }
     }
@@ -234,15 +253,14 @@ public class ApplicationModel {
             addDasPeersToApp();
         } else {
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     addDasPeersToApp();
                 }
             };
             try {
                 SwingUtilities.invokeAndWait(run);
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
-            } catch (InvocationTargetException ex) {
+            } catch (InterruptedException | InvocationTargetException ex) {
                 throw new RuntimeException(ex);
             }
         }
@@ -354,7 +372,7 @@ public class ApplicationModel {
     /**
      * just set the focus to the given dataSourceFilter index.  plotElements and dataSourceFilters
      * are added until the index exists.  This is introduced to support code where we reenter
-     * autoplot with the position switch, and we can to then call maybePlot so that completions can
+     * Autoplot with the position switch, and we can to then call maybePlot so that completions can
      * happen.
      * @param chNum the index of the DataSourceFilter to use.
      */
@@ -396,36 +414,34 @@ public class ApplicationModel {
 
     /**
      * Create a dataSource object and set Autoplot to display this datasource.
-     * A dataSource object is created by DataSetURI._getDataSource, which looks
+     * The focus dataSourceFilterController is called and passed the URI, if
+     * it is not a .vap file.
+     * A dataSource object is created by DataSetURI.getDataSource, which looks
      * at registered data sources to get a factory object, then the datasource is
      * created with the factory object.
      *
-     * Preconditions: Any or no datasource is set.
-     * Postconditions: A dataSource object is created and Autoplot is set to
-     *  plot the datasource.  A thread has been started that will load the dataset.
-     *  In headless mode, the dataset has been loaded synchronously.
-     *
-     * @param surl the new data source URL.
+     * @param suri the new data source URI.
      * @param mon progress monitor which is just used to convey messages.
+     * @see org.virbo.autoplot.dom.DataSourceController#resetSuri(java.lang.String, org.das2.util.monitor.ProgressMonitor) 
      */
-    protected void resetDataSetSourceURL(String surl, ProgressMonitor mon) {
+    protected void resetDataSetSourceURL(String suri, ProgressMonitor mon) {
 
-        if (surl == null) {
+        if (suri == null) {
             return;
         }  // not really supported
 
-        URISplit split = URISplit.parse(surl);
-        surl = URISplit.format(split);
+        URISplit split = URISplit.parse(suri);
+        suri = URISplit.format(split);
         //surl = DataSetURI.maybeAddFile(surl);
 
         try {
             if ( split.file!=null && ( split.file.endsWith(".vap") || split.file.endsWith(".vapx" ) ) ) {
                 try {
-                    surl= surl.replaceAll("\\\\", "/");
-                    URI uri = DataSetURI.getURIValid(surl);
+                    suri= suri.replaceAll("\\\\", "/");
+                    URI uri = DataSetURI.getURIValid(suri);
                     mon.started();
                     mon.setProgressMessage("loading vap file");
-                    this.getDocumentModel().getController().setFocusUri(surl);
+                    this.getDocumentModel().getController().setFocusUri(suri);
                     File openable = DataSetURI.getFile(uri, application.getMonitorFactory().getMonitor(canvas, "loading vap", ""));
                     if (split.params != null) {
                         LinkedHashMap<String, String> params = URISplit.parseParams(split.params);
@@ -441,12 +457,12 @@ public class ApplicationModel {
                     }
                     mon.setProgressMessage("done loading vap file");
                     mon.finished();
-                    addRecent( surl );
+                    addRecent( suri );
                 } catch (HtmlResponseIOException ex ) {
                     // we know the URL here, so rethrow it.
                     URL url= ex.getURL();
                     if ( url==null ) {
-                        url= new URL( DataSetURI.getURIValid(surl).getSchemeSpecificPart() );
+                        url= new URL( DataSetURI.getURIValid(suri).getSchemeSpecificPart() );
                     }
                     HtmlResponseIOException neww= new HtmlResponseIOException(ex.getMessage(),url);
                     throw new RuntimeException(neww);
@@ -456,13 +472,13 @@ public class ApplicationModel {
                 }
             } else {
                 dom.getController().setFocusUri(null);
-                dom.getController().setFocusUri(surl);
-                getDataSourceFilterController().resetSuri(surl, mon);
+                dom.getController().setFocusUri(suri);
+                getDataSourceFilterController().resetSuri(suri, mon);
             }
         } catch ( RuntimeException e ) {
             throw e;
             
-        } catch (Exception e) {
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
 
@@ -474,19 +490,20 @@ public class ApplicationModel {
      * When using the AutoplotUI, it is preferable to use AutoplotUI.plotUri, 
      * which will have the effect of typing in the URI and hitting the "go" 
      * arrow button.
+     * @param suri
      * @throws RuntimeException when _getDataSource throws Exception
      */
-    public void setDataSourceURL(String surl) {
+    public void setDataSourceURL(String suri) {
         String oldVal = dom.getController().getDataSourceFilter().getUri();
-        if (surl == null && oldVal == null) {
+        if (suri == null && oldVal == null) {
             return;
         }
 
-        if (surl != null && surl.equals(oldVal)) {
+        if (suri != null && suri.equals(oldVal)) {
             return;
         }
 
-        resetDataSetSourceURL(surl, new NullProgressMonitor());
+        resetDataSetSourceURL(suri, new NullProgressMonitor());
     }
 
     public String getDataSourceURL() {
@@ -495,6 +512,10 @@ public class ApplicationModel {
     protected List<Bookmark> recent = null;
     protected List<Bookmark> bookmarks = null;
 
+    /**
+     * get the recent URIs, from bookmarks/bookmarks.recent.xml
+     * @return the recent URIs
+     */
     public List<Bookmark> getRecent() {
         if (recent != null) return recent;
 
@@ -512,18 +533,9 @@ public class ApplicationModel {
         if ( f.exists() ) {
             try {
                 recent = Bookmark.parseBookmarks( AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement(), 0 );
-            } catch (BookmarksException ex) {
+            } catch (BookmarksException | SAXException | IOException | ParserConfigurationException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
-                return new ArrayList<Bookmark>();
-            } catch (SAXException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                return new ArrayList<Bookmark>();
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                return new ArrayList<Bookmark>();
-            } catch (ParserConfigurationException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-                return new ArrayList<Bookmark>();
+                return new ArrayList<>();
             }
 
         } else {
@@ -543,43 +555,25 @@ public class ApplicationModel {
                         } catch (BackingStoreException ex) {
                             logger.log(Level.SEVERE,ex.getMessage(),ex);
                         }
-                    } catch (BookmarksException e) {
+                    } catch (BookmarksException | SAXException | ParserConfigurationException e) {
                         logger.log(Level.SEVERE,e.getMessage(),e);
-                        return new ArrayList<Bookmark>();
+                        return new ArrayList<>();
                     } catch (MalformedURLException e) {
                         logger.log(Level.SEVERE,e.getMessage(),e);
-                        return new ArrayList<Bookmark>();
+                        return new ArrayList<>();
                     } catch (IOException e) {
                         logger.log(Level.SEVERE,e.getMessage(),e);
-                        return new ArrayList<Bookmark>();
-                    } catch (SAXException e) {
-                        logger.log(Level.SEVERE,e.getMessage(),e);
-                        return new ArrayList<Bookmark>();
-                    } catch (ParserConfigurationException e) {
-                        logger.log(Level.SEVERE,e.getMessage(),e);                        
-                        return new ArrayList<Bookmark>();
+                        return new ArrayList<>();
                     }
                 } else {
-                    return new ArrayList<Bookmark>();
+                    return new ArrayList<>();
                 }
             } else {
                 try {
                     recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new ByteArrayInputStream(srecent.getBytes())).getDocumentElement());
-                } catch (BookmarksException e) {
+                } catch (BookmarksException | SAXException | IOException | ParserConfigurationException e) {
                     logger.log(Level.SEVERE,e.getMessage(),e);
-                    return new ArrayList<Bookmark>();
-
-                } catch (SAXException e) {
-                    logger.log(Level.SEVERE,e.getMessage(),e);
-                    return new ArrayList<Bookmark>();
-
-                } catch (IOException e) {
-                    logger.log(Level.SEVERE,e.getMessage(),e);
-                    return new ArrayList<Bookmark>();
-
-                } catch (ParserConfigurationException e) {
-                    logger.log(Level.SEVERE,e.getMessage(),e);
-                    return new ArrayList<Bookmark>();
+                    return new ArrayList<>();
 
                 }
             }
@@ -603,9 +597,9 @@ public class ApplicationModel {
                 try {
                     URL url = new URL(surl);
                     bookmarks = Bookmark.parseBookmarks(AutoplotUtil.readDoc(url.openStream()).getDocumentElement());
-                } catch (Exception e) {
+                } catch (IOException | SAXException | ParserConfigurationException | BookmarksException e) {
                     logger.log(Level.SEVERE,e.getMessage(),e);
-                    return new ArrayList<Bookmark>();
+                    return new ArrayList<>();
                 }
             }
         } else {
@@ -613,10 +607,10 @@ public class ApplicationModel {
                 bookmarks = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new ByteArrayInputStream(sbookmark.getBytes())).getDocumentElement());
             } catch (SAXException e) {
                 logger.log(Level.SEVERE,e.getMessage(),e);
-                return new ArrayList<Bookmark>();
-            } catch (Exception e) {
+                return new ArrayList<>();
+            } catch (IOException | ParserConfigurationException | BookmarksException e) {
                 logger.log(Level.SEVERE,e.getMessage(),e);
-                return new ArrayList<Bookmark>();
+                return new ArrayList<>();
             }
         }
         return bookmarks;
@@ -685,15 +679,15 @@ public class ApplicationModel {
      * add the URI to the recently used list, and to the user's
      * autoplot_data/bookmarks/history.txt.  No interpretation is done
      * as of June 2011, and pngwalk: and script: uris are acceptable.
-     * @param surl
+     * @param suri
      */
-    public void addRecent(String surl) {
+    public void addRecent(String suri) {
 
         if ( !DasApplication.hasAllPermission() ) {
             return;
         }
 
-        if ( surl.contains("nohistory=true") ) {
+        if ( suri.contains("nohistory=true") ) {
             logger.fine("Not logging URI because it contains nohistory=true");
             return;
         } 
@@ -703,15 +697,15 @@ public class ApplicationModel {
             return;
         }
         
-        if ( recent==null ) recent= new ArrayList<Bookmark>(); // kludge for rpwg TODO: why is this null?
+        if ( recent==null ) recent= new ArrayList<>(); // kludge for rpwg TODO: why is this null?
         List oldValue = Collections.unmodifiableList(recent);
-        ArrayList<Bookmark> newValue = new ArrayList<Bookmark>(recent);
+        ArrayList<Bookmark> newValue = new ArrayList<>(recent);
 
         // check for new timerange in TSB.
-        if ( surl.startsWith("vap+") ) {
-            String lookfor= DataSetURI.blurTsbUri(surl);
+        if ( suri.startsWith("vap+") ) {
+            String lookfor= DataSetURI.blurTsbUri(suri);
             if ( lookfor!=null ) {
-                List<Bookmark> rm= new ArrayList<Bookmark>();
+                List<Bookmark> rm= new ArrayList<>();
                 for ( Bookmark b: newValue ) {
                     if ( b instanceof Bookmark.Item ) {
                         String suri1= ((Bookmark.Item)b).getUri();
@@ -730,8 +724,8 @@ public class ApplicationModel {
             }
         }
 
-        if ( !surl.equals("") ) {
-            Bookmark book = new Bookmark.Item(surl);
+        if ( !suri.equals("") ) {
+            Bookmark book = new Bookmark.Item(suri);
             if (newValue.contains(book)) { // move it to the front of the list
                 newValue.remove(book);
             }
@@ -744,7 +738,7 @@ public class ApplicationModel {
         }
 
 
-        if ( surl.equals(lastRecent) ) { // suppress repeats until the surl changes.
+        if ( suri.equals(lastRecent) ) { // suppress repeats until the surl changes.
             lastRecentTime= System.currentTimeMillis();
             lastRecentCount++;
             
@@ -786,11 +780,11 @@ public class ApplicationModel {
                     Datum then= Units.t1970.createDatum(lastRecentTime/1000.);
                     out3.append( tp.format( then ) + "\t" + lastRecent + "\n" ); 
                 } 
-                lastRecent= surl;
+                lastRecent= suri;
                 lastRecentTime= lnow;
                 lastRecentCount= 1;
                 Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
-                out3.append( tp.format( now, null) + "\t" + surl + "\n" );
+                out3.append( tp.format( now, null) + "\t" + suri + "\n" );
                 out3.close();
             } catch ( IOException ex ) {
                 logger.log(Level.SEVERE,ex.getMessage(),ex);
@@ -865,17 +859,17 @@ public class ApplicationModel {
      * //TODO: this should not be called.
      * @deprecated.  Use BookmarksManager.addBookmark.
      */
-    public Bookmark addBookmark(final String surl) {
+    public Bookmark addBookmark(final String suri) {
 
-        Bookmark.Item item = new Bookmark.Item(surl);
-        URISplit split = URISplit.parse(surl);
-        String autoTitle = split.file==null ? surl : split.file.substring(split.path.length());
-        if (autoTitle.length() == 0) autoTitle = surl;
+        Bookmark.Item item = new Bookmark.Item(suri);
+        URISplit split = URISplit.parse(suri);
+        String autoTitle = split.file==null ? suri : split.file.substring(split.path.length());
+        if (autoTitle.length() == 0) autoTitle = suri;
         item.setTitle(autoTitle);
 
         List<Bookmark> oldValue = Collections.unmodifiableList(new ArrayList<Bookmark>());
-        if ( bookmarks==null ) bookmarks= new ArrayList<Bookmark>();
-        List<Bookmark> newValue = new ArrayList<Bookmark>(bookmarks);
+        if ( bookmarks==null ) bookmarks= new ArrayList<>();
+        List<Bookmark> newValue = new ArrayList<>(bookmarks);
 
         if (newValue.contains(item)) { // move it to the front of the list
             Bookmark.Item old = (Bookmark.Item) newValue.get(newValue.indexOf(item));
@@ -948,13 +942,12 @@ public class ApplicationModel {
 
 
     /**
-     * resizes the image to fit within w,h in several iterations
-     * @param im
-     * @param w
-     * @param h
-     * @return
+     * resizes the image to fit within w,h in several iterations.
+     * @param im the large image
+     * @param hf the height in pixels
+     * @return the image of the given size
      */
-    public static BufferedImage resizeImageTo( BufferedImage im, int hf ) {
+    private static BufferedImage resizeImageTo( BufferedImage im, int hf ) {
         int h0= im.getHeight();
         double aspect= 1. * h0 / im.getWidth();
         int h;
@@ -993,7 +986,7 @@ public class ApplicationModel {
      * quick and dirty method for widening lines.
      * @param im
      */
-    public void thickenLines( BufferedImage im ) {
+    private void thickenLines( BufferedImage im ) {
         // thicken lines
         int bc= im.getRGB(0,0);
         for ( int i=0; i<im.getWidth()-4; i++ ) {
@@ -1040,7 +1033,8 @@ public class ApplicationModel {
 
     /**
      * return a thumbnail for the state.  TODO: multiple steps produces better result.  See http://www.philreeve.com/java_high_quality_thumbnails.php
-     * @return
+     * @param height the height in pixels
+     * @return the thumbnail, or null if one cannot be created
      */
     public BufferedImage getThumbnail( int height ) {
 
@@ -1106,21 +1100,18 @@ public class ApplicationModel {
      * @param deltas list property name, property value pairs to apply to the
      *   vap DOM after it's loaded.  
      * @throws java.io.IOException
+     * @throws IllegalArgumentException if there is no file, or if the file is empty.
      */
     public void doOpenVap( File f, LinkedHashMap<String, String> deltas) throws IOException {
         if ( !f.exists() ) throw new IllegalArgumentException("no such file: "+f);
         if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
 
-        InputStream in=null;
-        try {
-            in= new FileInputStream(f);
+        try (InputStream in = new FileInputStream(f)) {
 
             doOpenVap( in,deltas );
 
             setVapFile( f.toString() );
             
-        } finally {
-            if ( in!=null ) in.close();
         }
 
     }
@@ -1132,7 +1123,7 @@ public class ApplicationModel {
         double resize( int w, int h );
     }
 
-    ResizeRequestListener resizeRequestListener=null;
+    private ResizeRequestListener resizeRequestListener=null;
 
     /**
      * set the code which will handle resize requests, for example if
@@ -1145,8 +1136,8 @@ public class ApplicationModel {
 
     /**
      * set the canvas size, to the extent that this is possible.
-     * @param width
-     * @param height 
+     * @param width width in pixels
+     * @param height height in pixels
      */
     public void setCanvasSize( int width, int height ) {
         if ( this.resizeRequestListener!=null ) {
@@ -1220,8 +1211,12 @@ public class ApplicationModel {
 
     }
 
-
-    void doOpen(File f) throws IOException {
+    /**
+     * AutoplotUI calls this to open a file.
+     * @param f the file
+     * @throws IOException 
+     */
+    protected void doOpen(File f) throws IOException {
         doOpenVap(f,null);
     }
 
@@ -1232,6 +1227,10 @@ public class ApplicationModel {
         return vapFile;
     }
 
+    /**
+     * handy property to contain the current file name.
+     * @param vapFile 
+     */
     public void setVapFile(String vapFile) {
         String old= this.vapFile;
         this.vapFile = vapFile;
@@ -1269,6 +1268,8 @@ public class ApplicationModel {
     public void setRestoringState(boolean b) {
         this.restoringState = b;
     }
+    
+   //BEGIN CLIP EMBED DS which should be removed.
     String embedDs = "";
     boolean embedDsDirty = false;
 
@@ -1353,7 +1354,8 @@ public class ApplicationModel {
         }
 
     }
-
+   //END CLIP EMBED DS
+    
     /**
      * remove all cached downloads.
      * Currently, this is implemented by deleting the das2 fsCache area.
@@ -1428,6 +1430,10 @@ public class ApplicationModel {
         logger.fine("done waiting");
     }
     
+    /**
+     * return the dom containing the state of this application
+     * @return 
+     */
     public Application getDocumentModel() {
         return dom;
     }
