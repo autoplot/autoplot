@@ -33,7 +33,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import static org.autoplot.cdaweb.CDAWebDataSource.logger;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -138,8 +137,7 @@ public class CDAWebDB {
                 if ( altin==null ) {
                     throw new RuntimeException("Unable to locate /org/autoplot/cdaweb/filenames_alt.txt");
                 }
-                BufferedReader rr= new BufferedReader( new InputStreamReader( altin ) );
-                try {
+                try (BufferedReader rr = new BufferedReader( new InputStreamReader( altin ) )) {
                     String ss= rr.readLine();
                     while ( ss!=null ) {
                         int i= ss.indexOf("#");
@@ -153,8 +151,6 @@ public class CDAWebDB {
                         }
                         ss= rr.readLine();
                     }
-                } finally {
-                    rr.close();
                 }
 
                 refreshServiceProviderIds(mon.getSubtaskMonitor(20,30,"process document"));
@@ -169,9 +165,7 @@ public class CDAWebDB {
         //    logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (SAXException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (URISyntaxException ex) {
+        } catch (ParserConfigurationException | URISyntaxException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
@@ -279,8 +273,8 @@ public class CDAWebDB {
             
             String[] result= new String[ set.getLength() ];
             for ( int i=0; i<set.getLength(); i++ ) {
-                mon.setTaskProgress(i);
                 if ( mon.isCancelled() ) throw new CancelledOperationException("cancel during parse");
+                mon.setTaskProgress(i);
                 Node item= set.item(i);
                 result[i]= xp.evaluate("Name/text()",item) + "|"+ xp.evaluate("StartTime/text()",item)+ "|" + xp.evaluate("EndTime/text()",item );
             }
@@ -294,10 +288,7 @@ public class CDAWebDB {
         } catch (SAXException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
-        } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        } catch (XPathExpressionException ex) {
+        } catch (ParserConfigurationException | XPathExpressionException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } finally {
@@ -358,10 +349,7 @@ public class CDAWebDB {
         } catch (SAXException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
-        } catch (ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        } catch (XPathExpressionException ex) {
+        } catch (ParserConfigurationException | XPathExpressionException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } finally {
@@ -725,7 +713,7 @@ public class CDAWebDB {
             XPath xp = getXPathFactory().newXPath();
             NodeList nodes = (NodeList) xp.evaluate( "//sites/datasite/dataset", document, XPathConstants.NODESET );
 
-            Map<String,String> result= new LinkedHashMap<String,String>();
+            Map<String,String> result= new LinkedHashMap<>();
 
             mon.setTaskSize(nodes.getLength());
             mon.started();
