@@ -1065,7 +1065,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
      * is just a JLable derived object.  So those are the functions being used to get the
      * display properly rendered
      */
-    private class DataSetItemRenderer extends DefaultTreeCellRenderer {
+    private static class DataSetItemRenderer extends DefaultTreeCellRenderer {
 
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value,
