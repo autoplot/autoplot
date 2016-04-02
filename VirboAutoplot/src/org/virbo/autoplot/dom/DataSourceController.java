@@ -54,6 +54,7 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
+import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AutoHistogram;
 
 /**
@@ -843,6 +844,8 @@ public class DataSourceController extends DomNodeController {
 
         DataSourceFilter[] lparentSources = getParentSources();
         
+        boolean willTrim= this.tsb != null && this.tsb instanceof InternalTimeSeriesBrowse;
+        
         // https://sourceforge.net/p/autoplot/feature-requests/425/ mashing data.  This area needs to be
         // cleaned up.
         if (lparentSources == null || lparentSources.length == 0) {
@@ -882,16 +885,32 @@ public class DataSourceController extends DomNodeController {
             }
             ArrayDataSet yds = ArrayDataSet.copy(y);
             assert yprops != null;
+                                    
             if (DataSetUtil.validate(x, yds, null)) {
-                yds.putProperty(QDataSet.DEPEND_0, x);
-                yprops.put(QDataSet.DEPEND_0, xprops);
-                if (DataSetUtil.validate(yds, null)) { //TODO: probably don't have to do check this twice.
-                    ds = yds;
-                    props = yprops;
+                boolean dep0mismatch= false;
+                if ( willTrim ) {
+                    QDataSet xdep0= (QDataSet) x.property( QDataSet.DEPEND_0 );
+                    QDataSet ydep0= (QDataSet) y.property( QDataSet.DEPEND_0 );        
+                    if ( xdep0!=null && ydep0!=null && xdep0.length()>0 ) {
+                        if ( Ops.eq( xdep0.slice(0), ydep0.slice(0) ).value()==0 ) {
+                            dep0mismatch= true;
+                        }
+                    }
+                }
+                if ( dep0mismatch ) {
+                    logger.fine("dataset DEPEND_0 do not line up");
+                } else {
+                    yds.putProperty(QDataSet.DEPEND_0, x);
+                    yprops.put(QDataSet.DEPEND_0, xprops);
+                    if (DataSetUtil.validate(yds, null)) { //TODO: probably don't have to do check this twice.
+                        ds = yds;
+                        props = yprops;
+                    }
                 }
             } else {
                 logger.info("linked data doesn't validate");
             }
+            
         } else if (lparentSources.length == 3) {
             if (x == null || y == null || z == null) {
                 return "at least one of the three datasets is null";
