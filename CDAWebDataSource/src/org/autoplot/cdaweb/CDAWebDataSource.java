@@ -73,14 +73,14 @@ public class CDAWebDataSource extends AbstractDataSource {
             throw new IllegalArgumentException(ex);
         }
         ds= getParam( "ds","ac_k0_epm" );
-        param= getParam( "arg_0", null );
+        id= getParam( "arg_0", null );
         ws= getParam( PARAM_WS, null );
         
         savail= getParam( PARAM_AVAIL,"F");
         
-        if ( param==null ) param= getParam("id","H_lo");
+        if ( id==null ) id= getParam("id","H_lo");
 
-        if ( param==null ) throw new IllegalArgumentException("param not specified");
+        if ( id==null ) throw new IllegalArgumentException("param not specified");
 
     }
 
@@ -88,7 +88,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
     DatumRange tr;
     String ds;
-    String param;
+    String id;
     String ws; // web service.  Null means "T"
     String savail;
     
@@ -244,11 +244,11 @@ public class CDAWebDataSource extends AbstractDataSource {
                                     Map<String,Object> qmetadata= new IstpMetadataModel().properties( metadata );
                                     ds1= (MutablePropertyDataSet)CdfVirtualVars.execute( qmetadata, function, comps, t1 );
                                 } catch (IllegalArgumentException ex ){
-                                    throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
+                                    throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not supported: "+function );
                                 }
                             }
                         } else {
-                        throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not identified" );
+                        throw new IllegalArgumentException("The virtual variable " + id + " cannot be plotted because the function is not identified" );
                         }
                     } else {
                         Map<String,String> fileParams= new HashMap(getParams());
@@ -416,7 +416,7 @@ public class CDAWebDataSource extends AbstractDataSource {
             CDAWebDB db= CDAWebDB.getInstance();
 
             String master= db.getMasterFile( ds.toLowerCase(), mon );
-            master= master+"?"+param;
+            master= master+"?"+id;
             
             DataSource cdf= getDelegateFactory().getDataSource( DataSetURI.getURI(master) );
 
@@ -480,14 +480,15 @@ public class CDAWebDataSource extends AbstractDataSource {
 
                 @Override
                 public String getURI() {
-                    return "vap+cdaweb:ds="+ds+"&id="+param+"&timerange="+tr.toString().replace(" ", "+") + 
+                    //getParams();
+                    return "vap+cdaweb:ds="+ds+"&id="+id+"&timerange="+tr.toString().replace(" ", "+") + 
                             ( ws!=null ? "&ws=" + ws : "" ) +
                             ( "T".equals(savail) ? "&avail=T" : "" );
                 }
 
                 @Override
                 public String blurURI() {
-                    return "vap+cdaweb:ds="+ds+"&id="+param + 
+                    return "vap+cdaweb:ds="+ds+"&id="+id + 
                             ( ws!=null ? "&ws=" + ws : "" ) +
                             ( "T".equals(savail) ? "&avail=T" : "" );
                 }
