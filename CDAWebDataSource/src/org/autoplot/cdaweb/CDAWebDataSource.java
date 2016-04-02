@@ -480,17 +480,16 @@ public class CDAWebDataSource extends AbstractDataSource {
 
                 @Override
                 public String getURI() {
-                    //getParams();
-                    return "vap+cdaweb:ds="+ds+"&id="+id+"&timerange="+tr.toString().replace(" ", "+") + 
-                            ( ws!=null ? "&ws=" + ws : "" ) +
-                            ( "T".equals(savail) ? "&avail=T" : "" );
+                    Map<String,String> p= getParams();
+                    p.put(PARAM_TIMERANGE,tr.toString().replace(' ','+'));
+                    return "vap+cdaweb:" + URISplit.formatParams(p);
                 }
 
                 @Override
                 public String blurURI() {
-                    return "vap+cdaweb:ds="+ds+"&id="+id + 
-                            ( ws!=null ? "&ws=" + ws : "" ) +
-                            ( "T".equals(savail) ? "&avail=T" : "" );
+                    Map<String,String> p= getParams();
+                    p.remove("timerange");
+                    return "vap+cdaweb:" + URISplit.formatParams( p );
                 }
 
                 @Override
