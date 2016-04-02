@@ -1,11 +1,4 @@
-/*
- * ApplicationModel.java
- *
- * Created on April 1, 2007, 8:21 AM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot;
 
 import java.awt.AWTEvent;
@@ -13,7 +6,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import org.virbo.datasource.AutoplotSettings;
 import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import java.util.logging.Level;
 import org.das2.DasApplication;
@@ -51,7 +43,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -80,14 +71,12 @@ import org.das2.util.FileUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
-import org.virbo.autoplot.dom.Canvas;
 import org.virbo.autoplot.dom.CanvasUtil;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
-import org.virbo.autoplot.dom.Row;
 import org.virbo.autoplot.layout.LayoutUtil;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
@@ -96,17 +85,9 @@ import org.virbo.datasource.DataSource;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.qstream.QDataSetStreamHandler;
-import org.virbo.qstream.SerializeDelegate;
-import org.virbo.qstream.SerializeRegistry;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.xml.sax.SAXException;
-import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
-import org.jdesktop.beansbinding.BeanProperty;
-import org.jdesktop.beansbinding.Binding;
-import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.bookmarks.BookmarksException;
-import org.virbo.autoplot.dom.Axis;
-import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.CanvasController;
 import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.Version;
@@ -157,15 +138,7 @@ public class ApplicationModel {
                 Method m= eh.getClass().getMethod("setApplicationModel", ApplicationModel.class);
                 m.invoke(eh, this);
                 //((GuiExceptionHandler)eh).setApplicationModel(this);
-            } catch (IllegalAccessException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (IllegalArgumentException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (InvocationTargetException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (NoSuchMethodException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (SecurityException ex) {
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
@@ -210,7 +183,7 @@ public class ApplicationModel {
         }
     }
 
-    static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot");
+    private static final Logger logger = org.das2.util.LoggerManager.getLogger("autoplot");
 
     public static final String PREF_RECENT = "recent";
     public static final String PROPERTY_RECENT = PREF_RECENT;
@@ -855,36 +828,6 @@ public class ApplicationModel {
         
     }
     
-    /**
-     * //TODO: this should not be called.
-     * @deprecated.  Use BookmarksManager.addBookmark.
-     */
-    public Bookmark addBookmark(final String suri) {
-
-        Bookmark.Item item = new Bookmark.Item(suri);
-        URISplit split = URISplit.parse(suri);
-        String autoTitle = split.file==null ? suri : split.file.substring(split.path.length());
-        if (autoTitle.length() == 0) autoTitle = suri;
-        item.setTitle(autoTitle);
-
-        List<Bookmark> oldValue = Collections.unmodifiableList(new ArrayList<Bookmark>());
-        if ( bookmarks==null ) bookmarks= new ArrayList<>();
-        List<Bookmark> newValue = new ArrayList<>(bookmarks);
-
-        if (newValue.contains(item)) { // move it to the front of the list
-            Bookmark.Item old = (Bookmark.Item) newValue.get(newValue.indexOf(item));
-            item = old;  // preserve titles and other future metadata.
-            newValue.remove(old);
-        }
-
-        newValue.add(item);
-
-        ApplicationModel.this.bookmarks = newValue;
-        propertyChangeSupport.firePropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
-
-        return item;
-    }
-
     public void exit() {
     }
 
@@ -892,6 +835,11 @@ public class ApplicationModel {
         dom.getController().getPlot().getController().resetZoom(true, true, true);
     }
 
+    /**
+     * amount to step for the given font size.
+     * @param size
+     * @return 
+     */
     private int stepForSize( int size ) {
         int step;
         if ( size<20 ) {
