@@ -1224,6 +1224,7 @@ public class GuiSupport {
                             DataSourceFilter dsf= dom.getController().addDataSourceFilter();
                             dsf.setUri( uri );
                             dom.getController().addPlotElement( plot, dsf );
+                            return;
                         } else {
                             throw new IllegalArgumentException("unable to resolve URI: "+uri);
                         }
