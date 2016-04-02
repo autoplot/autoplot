@@ -1025,16 +1025,12 @@ public class ApplicationModel {
 
     void doSave(File f) throws IOException {
         StatePersistence.saveState(f, createState(true), "");
-        setUseEmbeddedDataSet(false);
-
         setVapFile( DataSetURI.fromFile(f) );
         addRecent( DataSetURI.fromFile(f) );
     }
 
     void doSave(File f, String scheme ) throws IOException {
         StatePersistence.saveState(f, createState(true), scheme);
-        setUseEmbeddedDataSet(false);
-
         setVapFile( DataSetURI.fromFile(f) );
         addRecent( DataSetURI.fromFile(f) );
     }
@@ -1155,7 +1151,6 @@ public class ApplicationModel {
         
         //logger.fine("" + state.diffs(this.dom));
         restoreState(state);
-        setUseEmbeddedDataSet(false);
 
     }
 
@@ -1217,92 +1212,7 @@ public class ApplicationModel {
         this.restoringState = b;
     }
     
-   //BEGIN CLIP EMBED DS which should be removed.
-    String embedDs = "";
-    boolean embedDsDirty = false;
-
-    public String getEmbeddedDataSet() {
-        if (isUseEmbeddedDataSet() && embedDsDirty) {
-            packEmbeddedDataSet();
-        }
-
-        return embedDs;
-    }
-
-    private void packEmbeddedDataSet() {
-
-        try {
-            if (dom.getController().getDataSourceFilter().getController().getDataSet() == null) {
-                embedDs = "";
-                return;
-            }
-
-            org.das2.dataset.DataSet ds;
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream(10000);
-            //DeflaterOutputStream dos= new DeflaterOutputStream(out);
-            OutputStream dos = out;
-
-            SimpleStreamFormatter format = new SimpleStreamFormatter();
-            format.format(dom.getController().getDataSourceFilter().getController().getDataSet(), dos, false);
-
-            dos.close();
-
-            byte[] data = Base64.encodeBytes(out.toByteArray()).getBytes();
-
-            embedDs = new String(data);
-            embedDsDirty = false;
-        } catch (StreamException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-    }
-
-    public void setEmbeddedDataSet(String dataset) {
-        this.embedDs = dataset;
-
-        if (useEmbeddedDataSet && !embedDsDirty) {
-            unpackEmbeddedDataSet();
-        }
-
-    }
-
-    private void unpackEmbeddedDataSet() {
-        if (embedDs == null || embedDs.equals("")) {
-            return;
-        }
-
-        byte[] data = Base64.decode(embedDs);
-        InputStream in = new ByteArrayInputStream(data);
-        //InflaterChannel ich= new InflaterChannel( Channels.newChannel(in) );
-        ReadableByteChannel ich = Channels.newChannel(in);
-
-        QDataSetStreamHandler handler = new QDataSetStreamHandler();
-        try {
-            org.virbo.qstream.StreamTool.readStream(ich, handler);
-            getDataSourceFilterController().setDataSetInternal(handler.getDataSet());
-
-        } catch (org.virbo.qstream.StreamException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-
-    }
-    boolean useEmbeddedDataSet = false;
-
-    public boolean isUseEmbeddedDataSet() {
-        return useEmbeddedDataSet;
-    }
-
-    public void setUseEmbeddedDataSet(boolean use) {
-        this.useEmbeddedDataSet = use;
-        if (use && !embedDsDirty) { // don't overwrite the dataset we loaded since then
-
-            unpackEmbeddedDataSet();
-        }
-
-    }
-   //END CLIP EMBED DS
+    // embed dataset stuff removed, since this is done with a zip file vap now.
     
     /**
      * remove all cached downloads.
