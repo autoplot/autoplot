@@ -368,7 +368,7 @@ public class ScriptContext extends PyJavaInstance {
     
     private static AutoplotUI view = null;
     
-    public static AutoplotUI defaultApp= null; // kludge to get the first.
+    protected static AutoplotUI defaultApp= null; // kludge to get the first.
 
     protected static void _setDefaultApp( AutoplotUI app ) {
         defaultApp= app;
