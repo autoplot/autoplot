@@ -360,13 +360,11 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         PngWalkTool.ActionEnabler enabler= new PngWalkTool.ActionEnabler() {
             public boolean isActionEnabled(String filename) {
-                String s = filename;
                 String template = tool.getTemplate();
                 int i0 = -1;
                 if ( i0==-1 ) i0= template.indexOf("_$Y");
                 if ( i0==-1 ) i0= template.indexOf("_$o");
                 if ( i0==-1 ) i0= template.indexOf("_$(o,");
-                int i1 = s.indexOf(".png");
                 
                 String productFile=null;
                 
