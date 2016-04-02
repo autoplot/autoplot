@@ -94,16 +94,22 @@ public class EventsListToolUtil {
         dialog.setVisible(true);
     }
     
+    /**
+     * set the location of the events list we should use.  <code>show(t)</code> 
+     * should be called to show the GUI.
+     * @param t the app
+     * @param uri the location of the events list.
+     */
     public static void setEventsListURI( final AutoplotUI t, String uri ) {
         
         if ( !EventQueue.isDispatchThread() ) {
             throw new IllegalArgumentException("must be called from the event thread");
         }
+        
         JDialog dialog= instances.get(t);
-
         if ( dialog==null ) {
-            getEventsList( t );
-            dialog= instances.get(t);
+            getEventsList( t ); // create events list GUI.
+            //dialog= instances.get(t);
         }
         //dialog.setVisible(true);
         
@@ -112,6 +118,11 @@ public class EventsListToolUtil {
         
     }
     
+    /**
+     * find the GUI for this application, creating one if necessary.
+     * @param t the app.
+     * @return the single TimeRangeToolEventsList for the app.
+     */
     public static TimeRangeToolEventsList getEventsList( final AutoplotUI t ) {
         JDialog dialog= instances.get(t);
         if ( dialog==null ) {
@@ -120,21 +131,6 @@ public class EventsListToolUtil {
             d.setModal(false);
             
             final TimeRangeToolEventsList ll= new TimeRangeToolEventsList();
-//            Icon bookmarkIcon= new javax.swing.ImageIcon(EventsListToolUtil.class.getResource("/resources/purplebookmark.png") );
-//
-//            ll.getDataSetSelector().replacePlayButton( bookmarkIcon, new AbstractAction("bookmarks") {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(t), true );
-//                    man.setHidePlotButtons(true);
-//                    man.setPrefNode( "bookmarks", "autoplot.default.events",  "http://autoplot.org/data/events.xml" );
-//                    man.setVisible(true);
-//                    Bookmark book= man.getSelectedBookmark();
-//                    if ( book!=null ) {
-//                        ll.getDataSetSelector().setValue( ((Bookmark.Item)book).getUri() );
-//                    }
-//                }
-            //});
             
             ll.addDataRangeSelectionListener( new DataRangeSelectionListener() {
                 @Override
@@ -165,6 +161,7 @@ public class EventsListToolUtil {
             instances2.put( t, ll);
   
         }
+        
         return instances2.get(t);
     }
 }
