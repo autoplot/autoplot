@@ -243,6 +243,7 @@ public class CDAWebDB {
      * @param mon progress monitor
      * @return  filename|startTime|endTime
      * @throws java.io.IOException
+     * @throws org.das2.util.monitor.CancelledOperationException
      */    
     public String[] getOriginalFilesAndRangesFromWebService(String spid, DatumRange tr, ProgressMonitor mon ) throws IOException, CancelledOperationException {
         TimeParser tp= TimeParser.create("$Y$m$dT$H$M$SZ");
@@ -284,8 +285,6 @@ public class CDAWebDB {
                 result[i]= xp.evaluate("Name/text()",item) + "|"+ xp.evaluate("StartTime/text()",item)+ "|" + xp.evaluate("EndTime/text()",item );
             }
             
-            mon.finished();
-
             return result;
 
         } catch (MalformedURLException ex) {
@@ -302,6 +301,7 @@ public class CDAWebDB {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             throw new RuntimeException(ex);
         } finally {
+            mon.finished();
             if ( ins!=null ) ins.close();
         }        
     }
