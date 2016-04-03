@@ -1211,19 +1211,14 @@ public class DataSourceController extends DomNodeController {
 
             if (doSlice) { // plot element now does slicing, but we can do it here as well.
 
-                if (DataSetOps.isProcessAsync(filters)) {
-                    logger.warning("asynchronous processes not supported here");
-                    setAppliedFiltersString("");
-                } else {
-                    try {
-                        ds = DataSetOps.sprocess(filters, ds, new AlertNullProgressMonitor("sprocess " + filters));
-                        //TODO: must we process the props as well?
+                try {
+                    ds = DataSetOps.sprocess(filters, ds, new AlertNullProgressMonitor("sprocess " + filters));
+                    //TODO: must we process the props as well?
 
-                        setAppliedFiltersString(filters);
-                    } catch (Exception ex) {
-                        setException(ex);
-                        throw new RuntimeException(ex);
-                    }
+                    setAppliedFiltersString(filters);
+                } catch (Exception ex) {
+                    setException(ex);
+                    throw new RuntimeException(ex);
                 }
 
                 fillDs = DataSetOps.makePropertiesMutable(ds);
