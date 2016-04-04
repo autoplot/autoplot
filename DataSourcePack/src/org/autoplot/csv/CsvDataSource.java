@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.csv;
 
@@ -101,12 +97,9 @@ public class CsvDataSource extends AbstractDataSource {
 
         CsvReader reader= new CsvReader( breader );
 
-        int ncol=-1;
-
         String[] headers= null;
 
         if ( reader.readHeaders() ) {
-            ncol= reader.getHeaderCount();
             headers= reader.getHeaders();
         }
 
@@ -250,7 +243,7 @@ public class CsvDataSource extends AbstractDataSource {
 
 
             } catch ( ParseException ex ) {
-                logger.fine("skipping line: "+reader.getRawRecord() );
+                logger.log(Level.FINE, "skipping line: {0}", reader.getRawRecord());
                 continue;
             }
 
@@ -275,10 +268,10 @@ public class CsvDataSource extends AbstractDataSource {
         mon.finished();
 
         DDataSet ds= builder.getDataSet();
-        if ( idep0column>=0 ) {
+        if ( idep0column>=0 && dep0ds!=null ) {
             DDataSet tds= tbuilder.getDataSet();
             tds.putProperty(QDataSet.UNITS,dep0u);
-            tds.putProperty(QDataSet.NAME,dep0ds.property(QDataSet.NAME));
+            tds.putProperty(QDataSet.NAME, dep0ds.property(QDataSet.NAME));
             tds.putProperty(QDataSet.LABEL,dep0ds.property(QDataSet.LABEL));
             ds.putProperty(QDataSet.DEPEND_0, tds);
         }
@@ -291,6 +284,7 @@ public class CsvDataSource extends AbstractDataSource {
             }
             ds.putProperty( QDataSet.BUNDLE_1, bds );
         } else {
+            assert icolumnDs!=null;
             ds.putProperty(QDataSet.UNITS,u);
             ds.putProperty(QDataSet.NAME,icolumnDs.property(QDataSet.NAME));
             ds.putProperty(QDataSet.LABEL,icolumnDs.property(QDataSet.LABEL));
