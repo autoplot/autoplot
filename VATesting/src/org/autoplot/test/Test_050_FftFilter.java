@@ -41,7 +41,7 @@ public class Test_050_FftFilter implements Scenario {
             JFrameOperator mainFrame = new JFrameOperator(app);
 
             
-            new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/2012/12/01/rbsp-a_magnetometer_1sec-gei_emfisis-L3_20121201_v1.3.2.cdf?Magnitude");
+            new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/2012/12/01/rbsp-a_magnetometer_1sec-gei_emfisis-L3_20121201_v1.3.3.cdf?Magnitude");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
             
             ScriptContext.waitUntilIdle();
