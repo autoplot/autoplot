@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
@@ -423,19 +424,13 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             headers.addAll( Arrays.asList(reader.getHeaders()) );
 
             for ( int i=0; i<headers.size(); i++ ) {
-                try {
-                    Integer.parseInt(headers.get(i));
-                    headers.set( i, "field"+i );
-                } catch (NumberFormatException ex ) {
-                    if ( headers.get(i).trim().length()==0 ) {
-                        headers.set( i, "field"+i );
-                    }
-                }
+                headers.set( i, "field"+i );
             }
 
             columns= new HashMap<Integer, String>();
             for ( int i=0; i<ncol; i++ ) {
                 columns.put( i, headers.get(i) );
+                jTable1.getColumnModel().getColumn(i).setHeaderValue( headers.get(i) );
             }
 
             reader.close();
