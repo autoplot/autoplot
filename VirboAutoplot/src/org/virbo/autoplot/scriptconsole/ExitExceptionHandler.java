@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot.scriptconsole;
 
 import java.util.logging.Level;
@@ -10,7 +7,7 @@ import org.das2.util.ExceptionHandler;
 import org.das2.util.LoggerManager;
 
 /**
- * Exception handler introduced for Hudson.  (TODO: huh? Hudson?  I thought we never want to call System.exit in Hudson.)  
+ * Exception handler introduced for Hudson/Jenkins tests.  
  * Prints the exception and exits.
  * @author jbf
  */
@@ -20,13 +17,15 @@ public class ExitExceptionHandler implements ExceptionHandler {
     
     @Override
     public void handle(Throwable t) {
-        logger.log( Level.WARNING, "exception occurred.", t );
+        logger.log( Level.WARNING, "exception occurred: "+t.getMessage(), t );
+        t.printStackTrace(System.err);
         System.exit(1);  // findbugs OKAY
     }
 
     @Override
     public void handleUncaught(Throwable t) {
-        logger.log( Level.WARNING, "uncaught exception occurred.", t );
+        logger.log( Level.WARNING, "uncaught exception occurred: "+t.getMessage(), t );
+        t.printStackTrace(System.err);
         System.exit(1);  // findbugs OKAY
     }
 }
