@@ -55,12 +55,14 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.ApplicationModel.ResizeRequestListener;
 import org.virbo.autoplot.dom.DomNode;
+import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.URISplit;
+import org.virbo.dsops.Ops;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
 
@@ -693,6 +695,36 @@ public class ScriptContext extends PyJavaInstance {
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
 
+    /**
+     * "overplot" by adding another PlotElement to the plot and setting the data to this PlotElement.
+     * @param chNum the focus 
+     * @return the channel number for the new plot element.
+     */
+    public static int addPlotElement( int chNum ) {
+        maybeInitModel();
+        
+        DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
+        List<PlotElement> pes= dom.getController().getPlotElementsFor(dsf);
+        if ( pes.isEmpty() ) throw new IllegalArgumentException("nothing plotted that is listening to this channel number.");
+        String plotId= pes.get(0).getPlotId();
+        Plot plot= (Plot)DomUtil.getElementById( dom, plotId );
+                
+        PlotElement pe= dom.getController().addPlotElement( plot, null, null );
+
+        // we've added a new DataSourceFilter (and channel number), so identify this.
+        dsf= dom.getController().getDataSourceFilterFor(pe);
+        // figure out the channel number.
+        int newChNum=-1;
+        DataSourceFilter[] dsfs= dom.getDataSourceFilters();
+        for ( int i=0; i<dsfs.length; i++ ) {
+            if ( dsfs[i]==dsf ) {
+                newChNum= i;
+                break;
+            }
+        }
+        return newChNum;
+    }
+    
     /**
      * set the Autoplot status bar string.  Use the prefixes "busy:", "warning:"
      * and "error:" to set icons.
