@@ -707,6 +707,38 @@ public class JythonCompletionTask implements CompletionTask {
         return argsList( javaMethod.getParameterTypes());
     }
     
+    /**
+     * Javadocs don't have the path on the constructor internal links.
+     * @param c
+     * @return 
+     */
+    private static String constructorSignatureNew( Constructor c ) {
+        String n= c.getName();
+        String[] ss= n.split("\\.");
+        String javadocPath = join( n.split("\\."), "/") + ".html";
+
+        StringBuilder sig = new StringBuilder(javadocPath);
+        //String LPAREN="%28";
+        String LPAREN = "(";
+        //String RPAREN="%29";
+        String RPAREN = ")";
+
+        String name= c.getName();
+        int i= name.lastIndexOf(".");
+        if ( i>-1 ) name= name.substring(i+1);
+        sig.append("#").append( name ).append(LPAREN);
+        List<String> sargs = new ArrayList<>();
+
+
+        for (Class arg : c.getParameterTypes()) {
+            sargs.add(arg.getCanonicalName());
+        }
+        sig.append(join(sargs, "," ));
+        sig.append(RPAREN);
+        return sig.toString();
+        
+    }
+    
     private static String methodSignature(Method javaMethod) {
         String n= javaMethod.getDeclaringClass().getCanonicalName();
         if ( n==null ) {
@@ -1013,6 +1045,23 @@ public class JythonCompletionTask implements CompletionTask {
         }                    
     }
     
+    private static void doConstructors( Constructor[] constructors, List<String> labels, List<String> signatures, String ss, List<String> argss ) {
+        for ( int jj=0; jj<constructors.length; jj++ ) {
+            String signature = constructorSignatureNew(constructors[jj]);
+            int j= signature.indexOf("#");
+            String label= ss + "() JAVA";
+            if ( j>-1 ) {
+                label= signature.substring(j+1);
+                label= hideJavaPaths( label );
+                Class ret= constructors[jj].getDeclaringClass();
+                label= label + "->" + hideJavaPaths( ret.getCanonicalName() );
+            }
+            signatures.add(signature);
+            labels.add(label);
+            argss.add( argsList( constructors[jj].getParameterTypes() ) );
+        }  
+    }
+    
     public static List<DefaultCompletionItem> getLocalsCompletions(PythonInterpreter interp, CompletionContext cc) {
         
         List<DefaultCompletionItem> result= new ArrayList();
@@ -1048,7 +1097,8 @@ public class JythonCompletionTask implements CompletionTask {
                         PyJavaClassPeeker peek= new PyJavaClassPeeker((PyJavaClass)po);
                         Class jclass= peek.getProxyClass();
                         String n= jclass.getCanonicalName();
-                        signature=  join( n.split("\\."), "/") + ".html#"+ jclass.getSimpleName() + "()";
+                        doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
+                        //signature=  join( n.split("\\."), "/") + ".html#"+ jclass.getSimpleName() + "()";
                     } else if ( po.getType().getFullName().equals("javapackage")  ) {
                         label = ss;
                     } else { //TODO: check for PyFloat, etc.
