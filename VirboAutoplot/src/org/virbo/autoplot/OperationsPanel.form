@@ -54,6 +54,9 @@
       <Properties>
         <Property name="name" type="java.lang.String" value="filtersChainPanel" noResource="true"/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="enabled" source="Form" sourcePath="${enabled}" target="filtersChainPanel" targetPath="enabled" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
     </Container>
@@ -61,6 +64,9 @@
       <Properties>
         <Property name="name" type="java.lang.String" value="operatorsComboBox" noResource="true"/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="enabled" source="Form" sourcePath="${enabled}" target="operatorsComboBox" targetPath="enabled" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
       <Events>
         <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="operatorsComboBoxFocusLost"/>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="operatorsComboBoxActionPerformed"/>
@@ -73,6 +79,9 @@
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="Open filters editor"/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="enabled" source="Form" sourcePath="${enabled}" target="editComponentPanel" targetPath="enabled" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editComponentPanelActionPerformed"/>
       </Events>
@@ -82,6 +91,9 @@
         <Property name="text" type="java.lang.String" value="Operations:"/>
         <Property name="toolTipText" type="java.lang.String" value="Process string that specifies component to plot, or how a data set&apos;s dimensionality should be reduced before display."/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="enabled" source="Form" sourcePath="${enabled}" target="operationsLabel" targetPath="enabled" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
     </Component>
     <Component class="javax.swing.JLabel" name="dataSetLabel">
       <Properties>
@@ -93,6 +105,9 @@
         <Property name="text" type="java.lang.String" value="(dataset will go here)"/>
         <Property name="name" type="java.lang.String" value="inputDataSetLabel" noResource="true"/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="enabled" source="Form" sourcePath="${enabled}" target="dataSetLabel" targetPath="enabled" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
     </Component>
   </SubComponents>
 </Form>
