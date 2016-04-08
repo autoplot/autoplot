@@ -84,6 +84,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     Point dragLocation=null;
 
     Application dom;
+    ApplicationModel applicationModel; // used for history.
     
     /** Creates new form LayoutPanel */
     public LayoutPanel() {
@@ -213,6 +214,14 @@ public class LayoutPanel extends javax.swing.JPanel {
                 
             }
         };
+    }
+    
+    /**
+     * set the applicationModel for access to history.
+     * @param applicationModel 
+     */
+    public void setApplicationModel( ApplicationModel applicationModel ) {
+        this.applicationModel= applicationModel;
     }
     
     Map<Component, JPopupMenu> contextMenus = null;
@@ -1355,6 +1364,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         Object s= dataSourceList.getSelectedValue();
         if ( s instanceof DataSourceFilter ) { // transitional state where strings are in there
             dom.getController().setDataSourceFilter( (DataSourceFilter)s );
+            dom.getController().setFocusUri(((DataSourceFilter)s).getUri());
         }
         
     }//GEN-LAST:event_dataSourceListValueChanged
@@ -1362,16 +1372,22 @@ public class LayoutPanel extends javax.swing.JPanel {
     private void editMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editMenuItemActionPerformed
         Object s= dataSourceList.getSelectedValue();
         if ( s instanceof DataSourceFilter ) { // transitional state where strings are in there
+            dom.getController().setDataSourceFilter((DataSourceFilter)s);
+            dom.getController().setFocusUri(((DataSourceFilter)s).getUri());
             String uri= ((DataSourceFilter)s).getUri();
-            JPanel parent= new JPanel();
-            parent.setLayout( new BorderLayout() );
-            DataSourceEditorPanel p= DataSourceEditorPanelUtil.getDataSourceEditorPanel( parent, uri );
-            if ( p==null ) {
-                JOptionPane.showMessageDialog( this, "Unable to create editor" );
+            if ( uri.startsWith("vap+internal:") ) {
+                GuiSupport.editPlotElement( applicationModel, this );
             } else {
-                if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, parent, "Edit "+((DataSourceFilter)s).getId(), JOptionPane.OK_CANCEL_OPTION ) ) {
-                    uri= p.getURI();
-                    ((DataSourceFilter)s).setUri(uri);
+                JPanel parent= new JPanel();
+                parent.setLayout( new BorderLayout() );
+                DataSourceEditorPanel p= DataSourceEditorPanelUtil.getDataSourceEditorPanel( parent, uri );
+                if ( p==null ) {
+                    JOptionPane.showMessageDialog( this, "Unable to create editor" );
+                } else {
+                    if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, parent, "Edit "+((DataSourceFilter)s).getId(), JOptionPane.OK_CANCEL_OPTION ) ) {
+                        uri= p.getURI();
+                        ((DataSourceFilter)s).setUri(uri);
+                    }
                 }
             }
         }
