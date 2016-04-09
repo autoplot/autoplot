@@ -318,6 +318,7 @@ public class GuiSupport {
                     selectors[i].setValue( m.group(groups[i]) ); //TODO: does this work, multiple levels?
                 } else {
                     selectors[i].setValue(dsf.getUri());
+                    dia.setFilter(i,dsf.getFilters());                               
                 }
             }
         } else {
@@ -1192,7 +1193,7 @@ public class GuiSupport {
     }
 
 
-    private static void handleAddElementDialog(AddPlotElementDialog dia, Application dom, ApplicationModel applicationModel) {
+    private static void handleAddElementDialog(AddPlotElementDialog dia, final Application dom, ApplicationModel applicationModel) {
         Plot plot = null;
         PlotElement pelement = null;
         int modifiers = dia.getModifiers();
@@ -1211,53 +1212,119 @@ public class GuiSupport {
         } else {
             pelement = dom.getController().getPlotElement();
         }
-        try {
-            if (dia.getDepCount() == 0) {
-                String val= dia.getPrimaryDataSetSelector().getValue();
-                if ( val.endsWith(".vap") ) {
-                    mergeVap(dom,plot, pelement, val);
-                } else {
-                    String uri= val;
-                    DataSourceFactory factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), new NullProgressMonitor() );
-                    if ( factory==null ) {
-                        if ( uri.startsWith("vap+internal:") ) { // allow testing.
-                            DataSourceFilter dsf= dom.getController().addDataSourceFilter();
-                            dsf.setUri( uri );
-                            dom.getController().addPlotElement( plot, dsf );
-                            return;
-                        } else {
-                            throw new IllegalArgumentException("unable to resolve URI: "+uri);
-                        }
-                    }
-                    List<String> problems= new ArrayList<>();
-                    while ( factory.reject( uri, problems, new NullProgressMonitor() ) ) {
-                        dia.setTitle("Add Plot, URI was rejected...");
-                        
-                        WindowManager.getInstance().showModalDialog(dia);
+        final Plot lplot= plot;
+        final PlotElement lpelement= pelement;
 
-                        if ( dia.isCancelled() ) {
-                            return;
+        final String[] uris;
+        final String[] filters;
+        switch (dia.getDepCount()) {
+            case 0:
+                uris= new String[] {  dia.getSecondaryDataSetSelector().getValue() };
+                filters= new String[] { dia.getSecondaryFilters() };
+            break;  
+            case 1:
+                uris= new String[] {  dia.getSecondaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue() };
+                filters= new String[] { dia.getSecondaryFilters(), dia.getPrimaryFilters() };
+            break;  
+            case 2:
+                uris= new String[] {  dia.getSecondaryDataSetSelector().getValue(), dia.getTertiaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue() };
+                filters= new String[] { dia.getSecondaryFilters(), dia.getTertiaryFilters(), dia.getPrimaryFilters() };
+            break;  
+            default:
+                throw new IllegalArgumentException("this can't happen");
+        }                        
+        
+        int depCount= dia.getDepCount();
+        
+        final String lock= "plotWithSlice";
+        dom.getController().registerPendingChange( dom, lock );
+        
+        try {
+            Runnable run;
+            switch (depCount) {
+                case 0:
+                    String val= uris[0];
+                    if ( val.endsWith(".vap") ) {
+                        mergeVap(dom,plot, pelement, val);
+                    } else {
+                        String uri= val;
+                        DataSourceFactory factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), new NullProgressMonitor() );
+                        if ( factory==null ) {
+                            if ( uri.startsWith("vap+internal:") ) { // allow testing.
+                                DataSourceFilter dsf= dom.getController().addDataSourceFilter();
+                                dsf.setUri( uri );
+                                dom.getController().addPlotElement( plot, dsf );
+                                return;
+                            } else {
+                                throw new IllegalArgumentException("unable to resolve URI: "+uri);
+                            }
                         }
-                        val= dia.getPrimaryDataSetSelector().getValue();
-                        uri= val;
-                    }
-                    dom.getController().doplot(plot, pelement, val );
-                }
-            } else if (dia.getDepCount() == 1) {
-                applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
-                applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
-                dom.getController().doplot(plot, pelement, dia.getSecondaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
-                dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(pelement).getUri());
-            } else if (dia.getDepCount() == 2) {
-                applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
-                applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
-                applicationModel.addRecent(dia.getTertiaryDataSetSelector().getValue());
-                dom.getController().doplot(plot, pelement, dia.getSecondaryDataSetSelector().getValue(), dia.getTertiaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
-                dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(pelement).getUri());
-            } else if (dia.getDepCount() == -1) {
-                //if (pelement == null) {
-                //    pelement = dom.getController().addPlotElement(plot, null);
-                //}
+                        List<String> problems= new ArrayList<>();
+                        while ( factory.reject( uri, problems, new NullProgressMonitor() ) ) {
+                            dia.setTitle("Add Plot, URI was rejected...");
+                            
+                            WindowManager.getInstance().showModalDialog(dia);
+                            
+                            if ( dia.isCancelled() ) {
+                                return;
+                            }
+                            val= dia.getPrimaryDataSetSelector().getValue();
+                            uri= val;
+                        }
+                        dom.getController().doplot(plot, pelement, val );
+                        DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, pelement.getDataSourceFilterId() );
+                        if ( dia.getPrimaryFilters().length()>0 ) dsf.setFilters(dia.getPrimaryFilters());
+                    }   
+                    break;
+                case 1:
+                    applicationModel.addRecent(uris[0]);
+                    applicationModel.addRecent(uris[1]);
+                    run= new Runnable() {
+                        @Override
+                        public void run() {
+                            dom.getController().performingChange( dom, lock );
+                            dom.getController().doplot(lplot, lpelement, uris[0], uris[1] );
+                            DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, lpelement.getDataSourceFilterId() );
+                            List<DataSourceFilter> dsfs= DomUtil.getParentsFor( dom, dsf.getUri() );
+                            if ( dsfs.size()==2 && dsfs.get(0)!=null && dsfs.get(1)!=null ) {
+                                if ( filters[0].length()>0 ) dsfs.get(0).setFilters( filters[0] );
+                                if ( filters[1].length()>0 ) dsfs.get(1).setFilters( filters[1] );
+                            }                    
+                            dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(lpelement).getUri());
+                            dom.getController().changePerformed( dom, lock );
+                        }
+                    };
+                    new Thread(run).start();
+                    break;
+                case 2:
+                    applicationModel.addRecent(uris[0]);
+                    applicationModel.addRecent(uris[1]);
+                    applicationModel.addRecent(uris[2]);
+                    run= new Runnable() {
+                        @Override
+                        public void run() {            
+                            dom.getController().performingChange( dom, lock );
+                            dom.getController().doplot(lplot, lpelement, uris[0], uris[1], uris[2] );
+                            DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, lpelement.getDataSourceFilterId() );
+                            List<DataSourceFilter> dsfs= DomUtil.getParentsFor( dom, dsf.getUri() );
+                            if ( dsfs.size()==3 && dsfs.get(0)!=null && dsfs.get(1)!=null && dsfs.get(2)!=null ) {
+                                if ( filters[0].length()>0 ) dsfs.get(0).setFilters( filters[0] );
+                                if ( filters[1].length()>0 ) dsfs.get(1).setFilters( filters[1] );
+                                if ( filters[2].length()>0 ) dsfs.get(2).setFilters( filters[2] );
+                            } 
+                            dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(lpelement).getUri());
+                            dom.getController().changePerformed( dom, lock );
+                        }
+                    };
+                    new Thread(run).start();
+                    break;
+            //if (pelement == null) {
+            //    pelement = dom.getController().addPlotElement(plot, null);
+            //}
+                case -1:
+                    break;
+                default:
+                    break;
             }
         } catch ( URISyntaxException | IOException | IllegalArgumentException ex ) { // TODO: the IllegalArgumentException is wrapped in a RuntimeException, I don't know why.  I should have MalformedURIException
             applicationModel.showMessage( ex.getMessage(), "Illegal Argument", JOptionPane.ERROR_MESSAGE );
