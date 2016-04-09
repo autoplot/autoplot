@@ -217,6 +217,9 @@ public class DomNodeController {
      * @param client the object that will perform the change.  This allows the
      *   canvas (and developers) identify who has registered the change.
      * @param lockObject object identifying the change.
+     * @see #performingChange(java.lang.Object, java.lang.Object) 
+     * @see #changePerformed(java.lang.Object, java.lang.Object) 
+     * 
      */
     public void registerPendingChange(Object client, Object lockObject) {
         changesSupport.registerPendingChange(client, lockObject);
@@ -228,6 +231,8 @@ public class DomNodeController {
      * nothing.  If the change has not been registered, it will be registered implicitly.
      * @param client the object that is mutating the bean.
      * @param lockObject an object identifying the change.  
+     * @see #registerPendingChange(java.lang.Object, java.lang.Object) 
+     * @see #changePerformed(java.lang.Object, java.lang.Object) 
      */
     public void performingChange(Object client, Object lockObject) {
         changesSupport.performingChange(client, lockObject);
@@ -238,6 +243,8 @@ public class DomNodeController {
      * is valid.
      * @param client the object that is mutating the bean.
      * @param lockObject an object identifying the change.  
+     * @see #registerPendingChange(java.lang.Object, java.lang.Object) 
+     * @see #performingChange(java.lang.Object, java.lang.Object) 
      */    
     public void changePerformed(Object client, Object lockObject) {
         changesSupport.changePerformed(client, lockObject);
