@@ -198,7 +198,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="primaryFiltersCB">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Additional Process: "/>
+        <Property name="text" type="java.lang.String" value="Additional Operations: "/>
       </Properties>
     </Component>
     <Component class="javax.swing.JComboBox" name="primaryFiltersComboBox">
@@ -235,7 +235,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="secondaryFiltersCB">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Additional Process: "/>
+        <Property name="text" type="java.lang.String" value="Additional Operations: "/>
       </Properties>
       <BindingProperties>
         <BindingProperty name="enabled" source="secondaryCheckBox" sourcePath="${selected}" target="secondaryFiltersCB" targetPath="enabled" updateStrategy="0" immediately="false"/>
@@ -259,7 +259,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="tertiaryFiltersCB">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Additional Process: "/>
+        <Property name="text" type="java.lang.String" value="Additional Operations: "/>
       </Properties>
       <BindingProperties>
         <BindingProperty name="enabled" source="tertiaryCheckBox" sourcePath="${selected}" target="tertiaryFiltersCB" targetPath="enabled" updateStrategy="0" immediately="false"/>
@@ -267,7 +267,7 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="doShowAdditionalFiltersCB">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Show &quot;Additional Process&quot; fields, where filters can be applied immediately after loading."/>
+        <Property name="text" type="java.lang.String" value="Show &quot;Additional Operations&quot; fields, where filters can be applied immediately after loading."/>
       </Properties>
     </Component>
   </SubComponents>

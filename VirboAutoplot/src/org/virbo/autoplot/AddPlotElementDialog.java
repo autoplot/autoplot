@@ -207,7 +207,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
 
         jLabel1.setText("Plot the Data Set URI:");
 
-        primaryFiltersCB.setText("Additional Process: ");
+        primaryFiltersCB.setText("Additional Operations: ");
 
         primaryFiltersComboBox.setEditable(true);
         primaryFiltersComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
@@ -221,7 +221,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, secondaryFiltersCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), secondaryFiltersComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        secondaryFiltersCB.setText("Additional Process: ");
+        secondaryFiltersCB.setText("Additional Operations: ");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, secondaryCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), secondaryFiltersCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -232,12 +232,12 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, tertiaryFiltersCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), tertiaryFiltersComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        tertiaryFiltersCB.setText("Additional Process: ");
+        tertiaryFiltersCB.setText("Additional Operations: ");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, tertiaryCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), tertiaryFiltersCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
-        doShowAdditionalFiltersCB.setText("Show \"Additional Process\" fields, where filters can be applied immediately after loading.");
+        doShowAdditionalFiltersCB.setText("Show \"Additional Operations\" fields, where filters can be applied immediately after loading.");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
