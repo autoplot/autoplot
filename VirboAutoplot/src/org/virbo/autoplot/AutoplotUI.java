@@ -1192,6 +1192,7 @@ APSplash.checkTime("init 249");
                         } 
                     } );
                     lui.setApplication(dom);
+                    lui.setApplicationModel(applicationModel);
 APSplash.checkTime("init 250");
                 }
             }
@@ -3998,6 +3999,7 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
                     if ( layoutPanel == null ) {
                         layoutPanel = new LayoutPanel();
                         layoutPanel.setApplication(dom);
+                        layoutPanel.setApplicationModel(applicationModel);                        
                     }
                     int idx= tabs.indexOfTab("style");
                     if ( idx==-1 ) idx=  tabs.getTabCount();
