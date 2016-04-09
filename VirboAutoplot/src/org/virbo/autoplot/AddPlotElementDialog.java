@@ -13,9 +13,12 @@ package org.virbo.autoplot;
 
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.SwingUtilities;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
@@ -39,6 +42,13 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         secondaryDataSetSelector.setVisible(secondaryCheckBox.isSelected());
         tertiaryCheckBox.setVisible(secondaryCheckBox.isSelected());
         tertiaryDataSetSelector.setVisible(secondaryCheckBox.isSelected()&&tertiaryCheckBox.isSelected());
+        
+        addAdditionalVisibleListener( null, primaryFiltersCB, primaryFiltersComboBox );
+        addAdditionalVisibleListener( secondaryCheckBox, secondaryFiltersCB, secondaryFiltersComboBox );
+        addAdditionalVisibleListener( tertiaryCheckBox, tertiaryFiltersCB, tertiaryFiltersComboBox );
+        
+        secondaryFiltersCB.setVisible(secondaryDataSetSelector.isVisible());
+        
         if ( parent instanceof AutoplotUI ) {
             DataSetSelector source= null;
             source= ((AutoplotUI)parent).getDataSetSelector();
@@ -70,7 +80,31 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
             }
         });
     }
-
+    
+    /**
+     * show and hide the filters/process fields, which are not normally used.
+     * @param enabled
+     * @param useFilters
+     * @param filtersCB 
+     */
+    private void addAdditionalVisibleListener( final JCheckBox enabled, final JCheckBox useFilters, final JComboBox filtersCB ) {
+        ActionListener al= new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doUpdateAdditionalVisible( enabled, useFilters, filtersCB );
+            }
+        };
+        if ( enabled!=null ) enabled.addActionListener(al);
+        doShowAdditionalFiltersCB.addActionListener(al);
+        doUpdateAdditionalVisible( enabled, useFilters, filtersCB );
+    }
+    
+    private void doUpdateAdditionalVisible( final JCheckBox enabled, final JCheckBox useFilters, final JComboBox filtersCB ) {
+        boolean v= ( enabled==null || enabled.isSelected() ) && doShowAdditionalFiltersCB.isSelected();
+        useFilters.setVisible( v );
+        filtersCB.setVisible( v );
+    }
+    
     private void doBookmarks( DataSetSelector sel ) {
         BookmarksManager man= new BookmarksManager( (Frame)SwingUtilities.getWindowAncestor(this), true, "Bookmarks" );
         man.setHidePlotButtons(true);
@@ -92,6 +126,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         primaryDataSetSelector = new org.virbo.datasource.DataSetSelector();
         secondaryCheckBox = new javax.swing.JCheckBox();
@@ -103,6 +138,13 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         plotButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        primaryFiltersCB = new javax.swing.JCheckBox();
+        primaryFiltersComboBox = new javax.swing.JComboBox<>();
+        secondaryFiltersComboBox = new javax.swing.JComboBox<>();
+        secondaryFiltersCB = new javax.swing.JCheckBox();
+        tertiaryFiltersComboBox = new javax.swing.JComboBox<>();
+        tertiaryFiltersCB = new javax.swing.JCheckBox();
+        doShowAdditionalFiltersCB = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("addPlotElementDialog"); // NOI18N
@@ -114,12 +156,22 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
             }
         });
 
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, secondaryCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), secondaryDataSetSelector, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
         tertiaryCheckBox.setText("And Against (Y):");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, secondaryCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), tertiaryCheckBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
         tertiaryCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tertiaryCheckBoxActionPerformed(evt);
             }
         });
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, tertiaryCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), tertiaryDataSetSelector, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
 
         overplotButton.setText("Overplot");
         overplotButton.setToolTipText("Add this to the current plot as an overplot");
@@ -155,6 +207,38 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
 
         jLabel1.setText("Plot the Data Set URI:");
 
+        primaryFiltersCB.setText("Additional Process: ");
+
+        primaryFiltersComboBox.setEditable(true);
+        primaryFiltersComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, primaryFiltersCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), primaryFiltersComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        secondaryFiltersComboBox.setEditable(true);
+        secondaryFiltersComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, secondaryFiltersCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), secondaryFiltersComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        secondaryFiltersCB.setText("Additional Process: ");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, secondaryCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), secondaryFiltersCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        tertiaryFiltersComboBox.setEditable(true);
+        tertiaryFiltersComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, tertiaryFiltersCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), tertiaryFiltersComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        tertiaryFiltersCB.setText("Additional Process: ");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, tertiaryCheckBox, org.jdesktop.beansbinding.ELProperty.create("${selected}"), tertiaryFiltersCB, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        doShowAdditionalFiltersCB.setText("Show \"Additional Process\" fields, where filters can be applied immediately after loading.");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -162,7 +246,13 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(primaryDataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
+                    .add(secondaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
+                        .add(175, 175, 175))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(0, 0, Short.MAX_VALUE)
                         .add(cancelButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(overplotButton)
@@ -170,14 +260,28 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
                         .add(plotBelowButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(plotButton))
-                    .add(primaryDataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 678, Short.MAX_VALUE)
-                    .add(secondaryCheckBox)
-                    .add(secondaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .add(tertiaryCheckBox)
                     .add(tertiaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
-                        .add(175, 175, 175)))
+                    .add(layout.createSequentialGroup()
+                        .add(12, 12, 12)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(layout.createSequentialGroup()
+                                .add(secondaryFiltersCB)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(secondaryFiltersComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(primaryFiltersCB)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(primaryFiltersComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .add(layout.createSequentialGroup()
+                                .add(tertiaryFiltersCB)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(tertiaryFiltersComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(secondaryCheckBox)
+                            .add(tertiaryCheckBox)
+                            .add(doShowAdditionalFiltersCB))
+                        .add(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -187,15 +291,29 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(primaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(1, 1, 1)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(primaryFiltersCB)
+                    .add(primaryFiltersComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(secondaryCheckBox)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(secondaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(secondaryFiltersCB)
+                    .add(secondaryFiltersComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(tertiaryCheckBox)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(tertiaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 70, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(tertiaryFiltersCB)
+                    .add(tertiaryFiltersComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(18, 18, 18)
+                .add(doShowAdditionalFiltersCB)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(plotButton)
                     .add(plotBelowButton)
@@ -203,6 +321,8 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
                     .add(cancelButton))
                 .addContainerGap())
         );
+
+        bindingGroup.bind();
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -269,11 +389,9 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
             return 2;
         } else if (  secondaryCheckBox.isSelected() ) {
             return 1;
-        } else if ( true ) {
-            return 0;
         } else {
-            return -1;
-        }
+            return 0;
+        } 
     }
 
     public void setDepCount(int i) {
@@ -315,25 +433,67 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         return tertiaryDataSetSelector;
     }
 
+    public String getPrimaryFilters() {
+        return (String)primaryFiltersComboBox.getSelectedItem();
+    }
+        
+    public String getSecondaryFilters() {
+        return (String)secondaryFiltersComboBox.getSelectedItem();
+    }
 
-
+    public String getTertiaryFilters() {
+        return (String)tertiaryFiltersComboBox.getSelectedItem();
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
+    private javax.swing.JCheckBox doShowAdditionalFiltersCB;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton overplotButton;
     private javax.swing.JButton plotBelowButton;
     private javax.swing.JButton plotButton;
     private org.virbo.datasource.DataSetSelector primaryDataSetSelector;
+    private javax.swing.JCheckBox primaryFiltersCB;
+    private javax.swing.JComboBox<String> primaryFiltersComboBox;
     private javax.swing.JCheckBox secondaryCheckBox;
     private org.virbo.datasource.DataSetSelector secondaryDataSetSelector;
+    private javax.swing.JCheckBox secondaryFiltersCB;
+    private javax.swing.JComboBox<String> secondaryFiltersComboBox;
     private javax.swing.JCheckBox tertiaryCheckBox;
     private org.virbo.datasource.DataSetSelector tertiaryDataSetSelector;
+    private javax.swing.JCheckBox tertiaryFiltersCB;
+    private javax.swing.JComboBox<String> tertiaryFiltersComboBox;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
-    private boolean maybeEnterEditor= false;
-    
-    void maybeEnterEditor() {
-        maybeEnterEditor= true;
+
+    /**
+     * set the filter (process string) 
+     * @param i
+     * @param filters the process string, like "|slice1(1)"
+     */
+    void setFilter(int i, String filters) {
+        if ( filters.trim().length()==0 ) return;
+        this.doShowAdditionalFiltersCB.setSelected(true);
+        switch (i) {
+            case 0:
+                primaryFiltersComboBox.setSelectedItem(filters);
+                primaryFiltersCB.setSelected(true);
+                doUpdateAdditionalVisible( null, primaryFiltersCB, primaryFiltersComboBox );
+                break;
+            case 1:
+                secondaryFiltersComboBox.setSelectedItem(filters);
+                secondaryFiltersCB.setSelected(true);
+                doUpdateAdditionalVisible( secondaryCheckBox, secondaryFiltersCB, secondaryFiltersComboBox );
+                break;
+            case 2:
+                tertiaryFiltersComboBox.setSelectedItem(filters);
+                tertiaryFiltersCB.setSelected(true);
+                doUpdateAdditionalVisible( tertiaryCheckBox, tertiaryFiltersCB, tertiaryFiltersComboBox );
+                break;
+            default:
+                break;
+        }
     }
 
 }
