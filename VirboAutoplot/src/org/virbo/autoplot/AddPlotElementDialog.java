@@ -210,13 +210,13 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         primaryFiltersCB.setText("Additional Process: ");
 
         primaryFiltersComboBox.setEditable(true);
-        primaryFiltersComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        primaryFiltersComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, primaryFiltersCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), primaryFiltersComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
 
         secondaryFiltersComboBox.setEditable(true);
-        secondaryFiltersComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        secondaryFiltersComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, secondaryFiltersCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), secondaryFiltersComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -227,7 +227,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         bindingGroup.addBinding(binding);
 
         tertiaryFiltersComboBox.setEditable(true);
-        tertiaryFiltersComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        tertiaryFiltersComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, tertiaryFiltersCB, org.jdesktop.beansbinding.ELProperty.create("${selected}"), tertiaryFiltersComboBox, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -259,7 +259,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(plotBelowButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(plotButton))
+                        .add(plotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 73, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(tertiaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
                         .add(12, 12, 12)
