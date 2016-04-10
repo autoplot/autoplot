@@ -76,33 +76,33 @@ public class WavDataSource2 extends AbstractDataSource {
         String byteOrder= audioFormat.isBigEndian() ? "big" : "little";
         String type=null;
 
-        if ( audioFormat.getEncoding()== Encoding.PCM_SIGNED ) {
-            if ( bits==32 ) {
+        switch (bits) {
+            case 32:
                 type= "int";
-            } else if ( bits==16 ) {
+                break;
+            case 16:
                 type= "short";
-            } else if ( bits==8 ) {
+                break;
+            case 8:
                 type= "byte";
-            }
-        } else {
-            if ( bits==32 ) {
-                type= "uint";
-            } else if ( bits==16 ) {
-                type= "ushort";
-            } else if ( bits==8 ) {
-                type= "ubyte";
-            }
+                break;
+            default:
+                throw new IllegalArgumentException("number of bits not supported: "+bits );
         }
 
-        Map<String,String> params= new HashMap<String,String>();
-        params.put( "byteOffset", ""+byteOffset );
-        params.put( "byteLength", ""+byteLength );
-        params.put( "recLength", ""+ frameSize );
-        params.put( "recOffset", ""+ ( channel*bits/8) );
-        params.put( "type", type );
-        params.put( "byteOrder", byteOrder );
+        if ( audioFormat.getEncoding()==Encoding.PCM_UNSIGNED ) {
+            type = "u" + type;
+        }
 
-        URL lurl= new URL( ""+wavFile.toURI().toURL() + "?" + URISplit.formatParams(params) );
+        Map<String,String> lparams= new HashMap<>();
+        lparams.put( "byteOffset", ""+byteOffset );
+        lparams.put( "byteLength", ""+byteLength );
+        lparams.put( "recLength", ""+ frameSize );
+        lparams.put( "recOffset", ""+ ( channel*bits/8) );
+        lparams.put( "type", type );
+        lparams.put( "byteOrder", byteOrder );
+
+        URL lurl= new URL( ""+wavFile.toURI().toURL() + "?" + URISplit.formatParams(lparams) );
 
         BinaryDataSource bds= new BinaryDataSource( lurl.toURI() );
         MutablePropertyDataSet result= (BufferDataSet) bds.getDataSet( new NullProgressMonitor() );
