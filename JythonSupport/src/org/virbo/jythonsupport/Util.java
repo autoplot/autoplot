@@ -98,7 +98,7 @@ public class Util {
      *
      * @param suri the URI of the dataset, such as "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
      * @param timeRange the timerange to load, if the data supports time series browsing.
-     * @param monitor progress monitor object.
+     * @param monitor progress monitor object, or null (None in Jython).
      * @return dataset or null.
      * @throws java.lang.Exception plug-in readers can throw exception.
      */
@@ -152,7 +152,7 @@ public class Util {
      * block until the load is complete, and a ProgressMonitor object can be used to
      * monitor the load.
      * @param suri the data address to load.
-     * @param mon null or a progress monitor to monitor the load
+     * @param mon a progress monitor to monitor the load, or null (None in Jython)
      * @return the dataset, or null.
      * @throws java.lang.Exception plug-in readers can throw exception.
      */
@@ -202,7 +202,7 @@ public class Util {
      * at once, returning all data or throwing one of the exceptions.
      *
      * @param uris a list of URI strings.
-     * @param mon monitor for the aggregate load.  Each uri is given equal shares of the task.
+     * @param mon monitor for the aggregate load.  TODO: Each uri should given equal shares of the task.
      * @return list of loaded data
      * @throws Exception if any of the loads reports an exception
      */
@@ -287,7 +287,7 @@ public class Util {
      * used when a particular metadata model is expects.
      * 
      * @param suri the data address to load.
-     * @param mon monitor 
+     * @param mon monitor, or null (None in Jython) for no feedback.
      * @return metadata tree created by the data source.
      * @throws java.lang.Exception
      */
