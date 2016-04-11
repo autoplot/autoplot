@@ -80,6 +80,9 @@ public class WavDataSource2 extends AbstractDataSource {
             case 32:
                 type= "int";
                 break;
+            case 24:
+                type= "int24";
+                break;
             case 16:
                 type= "short";
                 break;
@@ -106,7 +109,7 @@ public class WavDataSource2 extends AbstractDataSource {
 
         BinaryDataSource bds= new BinaryDataSource( lurl.toURI() );
         MutablePropertyDataSet result= (BufferDataSet) bds.getDataSet( new NullProgressMonitor() );
-
+        
         MutablePropertyDataSet timeTags= new TagGenDataSet( frameCount, 1./audioFormat.getSampleRate(), 0., Units.seconds );
         result.putProperty( QDataSet.DEPEND_0, timeTags );
 
