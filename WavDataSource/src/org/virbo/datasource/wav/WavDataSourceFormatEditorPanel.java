@@ -39,8 +39,14 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
     private void initComponents() {
 
         scaleCB = new javax.swing.JCheckBox();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jLabel1 = new javax.swing.JLabel();
 
         scaleCB.setText("Scale data to utilize full dynamic range");
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "short: 16 bit signed numbers", "ushort: 16 bit usigned numbers", "int: 32 bit signed numbers", "int24: 24 bit signed numbers" }));
+
+        jLabel1.setText("Data Type:");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -48,23 +54,35 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(scaleCB)
-                .addContainerGap(119, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(scaleCB)
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 264, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(scaleCB)
-                .addContainerGap(268, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel1))
+                .addContainerGap(235, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JCheckBox scaleCB;
     // End of variables declaration//GEN-END:variables
 
+    @Override
     public JPanel getPanel() {
         return this;
     }
@@ -77,6 +95,7 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
             return s;
         }
     }
+    @Override
     public void setURI(String uri) {
         URISplit split= URISplit.parse(uri);
         Map<String,String> args= URISplit.parseParams(split.params);
@@ -85,6 +104,17 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         s= getParam( args,"scale","F");
         scaleCB.setSelected( s.equals("T") );
 
+        s= getParam( args,"type","short");
+        if ( s.equals("short") ) {
+            jComboBox1.setSelectedIndex(0);
+        } else if ( s.equals("ushort") ){
+            jComboBox1.setSelectedIndex(1);
+        } else if ( s.equals("int") ){
+            jComboBox1.setSelectedIndex(2);
+        } else if ( s.equals("int32") ){
+            jComboBox1.setSelectedIndex(3);
+        }
+
         file= split.file;
     }
 
@@ -92,11 +122,18 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         String result= file;
         Map<String,String> args= new HashMap();
 
-        String s;
         if ( scaleCB.isSelected() ) {
             args.put( "scale", "T" );
         }
 
+        String s;
+        if ( jComboBox1.getSelectedIndex()>0 ) {
+            s= (String)jComboBox1.getSelectedItem();
+            int i= s.indexOf(":");
+            s= s.substring(0,i);
+            args.put( "type",s );
+        }
+        
         String params= URISplit.formatParams(args);
         if ( result==null ) result= "file:///";
         URISplit ss= URISplit.parse(result);
