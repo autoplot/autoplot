@@ -9,8 +9,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioFileFormat;
@@ -62,11 +66,13 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 result, type);
 
         double shift= 0;
-        int limit= type.equals("short") ? 32768 : 65536;
+        boolean unsigned= type.startsWith("u");
+        long typeOrdinals= (int)Math.pow(2,8*typeSize);
+        int limit= (int)( typeOrdinals / ( unsigned ? 1 : 2 ) );
         if ( extent.value(1)>limit ) {
-            if ( ( extent.value(1)-extent.value(0) ) < 65536 ) {
+            if ( ( extent.value(1)-extent.value(0) ) < typeOrdinals ) {
                 if ( extent.value(0)>0 ) {
-                    shift= 32768;
+                    shift= typeOrdinals / 2;
                 } else {
                     shift= ( extent.value(1)+extent.value(0) ) / 2;
                 }
@@ -78,7 +84,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
         double scale= 1.0;
         if ( "T".equals( params.get("scale") ) ) {
             shift= ( extent.value(1)+extent.value(0) ) / 2;
-            scale= 65536 / ( extent.value(1)-extent.value(0) );
+            scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
         }
 
         QubeDataSetIterator it = new QubeDataSetIterator(data);
@@ -141,11 +147,13 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 result, type);
 
         double shift= 0; // shift is essentially the D/C part.
-        int limit= type.equals("short") ? 32768 : 65536;
+        boolean unsigned= type.startsWith("u");
+        long typeOrdinals= (int)Math.pow(2,8*typeSize);
+        int limit= (int)( typeOrdinals / ( unsigned ? 1 : 2 ) );
         if ( extent.value(1)>limit ) {
-            if ( ( extent.value(1)-extent.value(0) ) < 65536 ) {
+            if ( ( extent.value(1)-extent.value(0) ) < typeOrdinals ) {
                 if ( extent.value(0)>0 ) {
-                    shift= 32768;
+                    shift= typeOrdinals / 2;
                 } else {
                     shift= ( extent.value(1)+extent.value(0) ) / 2;
                 }
@@ -157,7 +165,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
         double scale= 1.0;
         if ( "T".equals( params.get("scale") ) ) {
             shift= ( extent.value(1)+extent.value(0) ) / 2;
-            scale= 65536 / ( extent.value(1)-extent.value(0) );
+            scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
         }
 
         QubeDataSetIterator it = new QubeDataSetIterator(data);
@@ -165,7 +173,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
         while (it.hasNext()) {
             it.next();
             it2.next();
-            it2.putValue(ddata, scale * ( it.getValue(data)-shift ) );
+            it2.putValue( ddata, scale * ( it.getValue(data)-shift ) );
         }
 
         return result;
@@ -199,16 +207,31 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
         QubeDataSetIterator it = new QubeDataSetIterator(data);
 
+        double shift= 0; // shift is essentially the D/C part.
+        boolean unsigned= type.startsWith("u");
+        long typeOrdinals= (int)Math.pow(2,8*typeSize);
+        int limit= (int)( typeOrdinals / ( unsigned ? 1 : 2 ) );
+        if ( extent.value(1)>limit ) {
+            if ( ( extent.value(1)-extent.value(0) ) < typeOrdinals ) {
+                if ( extent.value(0)>0 ) {
+                    shift= typeOrdinals / 2;
+                } else {
+                    shift= ( extent.value(1)+extent.value(0) ) / 2;
+                }
+            } else {
+                throw new IllegalArgumentException("data extent is too great: "+extent);
+            }
+        }
+        
         double scale= 1.0;
-        double shift= 0;
         if ( "T".equals( params.get("scale") ) ) {
             shift= 0;
-            scale= 65536 / ( extent.value(1)-extent.value(0) );
+            scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
         }
-
+        
         while (it.hasNext()) {
             it.next();
-            it.putValue(ddata,  scale * ( it.getValue(data)-shift ) );
+            it.putValue( ddata,  scale * ( it.getValue(data)-shift ) );
         }
 
         return result;
@@ -282,47 +305,68 @@ public class WavDataSourceFormat implements DataSourceFormat {
             }
         }
 
-        Map<String, String> params2 = new HashMap<String, String>();
-        params2.put("type", "short"); // only short and ushort.
+        int channels= 1;
+
+        switch (data.rank()) {
+            case 1:
+                break;
+            case 2:
+                if ( SemanticOps.isRank2Waveform(data) ) {
+                    // rank 2 waveforms cannot be used to produce stereo.
+                } else {
+                    channels= (int) data.length(0);
+                }   break;
+            default:
+                throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
+        }
+
+        Map<String, String> params2 = new HashMap<>();
+        params2.put("type", "short"); // only short and ushort.  short is default.
         params2.put("byteOrder","little");
 
-        if ( !( params2.get("type").equals("short") || params2.get("type").equals("ushort") ) ) {
-            throw new IllegalArgumentException("type must be short or ushort");
-        }
+        int bytesPerField;
         
-        int bytesPerField= 2;
-        int fieldsPerFrame= 1;
-
         params2.putAll( URISplit.parseParams( split.params ) );
 
-        AudioFormat outDataFormat;
-        if ( data.rank()==1 ) {
-        } else if ( data.rank()==2 ) {
-            if ( SemanticOps.isRank2Waveform(data) ) {
-            } else {
-                fieldsPerFrame= (int) data.length(0);
-            }
-        } else {
-            throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
+        Set<String> allowedTypes= new HashSet<>();    
+        allowedTypes.add("ushort");
+        allowedTypes.add("short");
+        allowedTypes.add("int");
+        allowedTypes.add("int24");
+        
+        String type= params2.get("type");
+        
+        if ( !allowedTypes.contains(type) ) {
+            throw new IllegalArgumentException("type must be one of: "+allowedTypes );
         }
         
-        outDataFormat= new AudioFormat((float) samplesPerSecond, (int) bytesPerField*8, fieldsPerFrame, params2.get("type").equals("short"), params2.get("byteOrder").equals("big") );
+        bytesPerField= BufferDataSet.byteCount(type);
+        
+        boolean signed;
+        signed = !type.startsWith("u");
+        
+        boolean bigEndian= params2.get("byteOrder").equals("big");
+
+        AudioFormat outDataFormat;
+        outDataFormat= new AudioFormat((float) samplesPerSecond, (int) bytesPerField*8, channels, signed, bigEndian );
 
 
         ByteBuffer buf;
-        if ( data.rank()==1 ) {
-            buf= formatRank1(data, new NullProgressMonitor(), params2);
-        } else if ( data.rank()==2 ) {
-            if ( SemanticOps.isRank2Waveform(data) ) {
-                buf= formatRank2Waveform( data, new NullProgressMonitor(), params2 );
-            } else {
-                buf= formatRank2(data, new NullProgressMonitor(), params2);
-            }
-        } else {
-            throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
+        switch (data.rank()) {
+            case 1:
+                buf= formatRank1(data, new NullProgressMonitor(), params2);
+                break;
+            case 2:
+                if ( SemanticOps.isRank2Waveform(data) ) {
+                    buf= formatRank2Waveform( data, new NullProgressMonitor(), params2 );
+                } else {
+                    buf= formatRank2(data, new NullProgressMonitor(), params2);
+                }   break;
+            default:
+                throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
         }
 
-        AudioInputStream inFileAIS = new AudioInputStream( newInputStream(buf), outDataFormat, buf.capacity()/(bytesPerField*fieldsPerFrame) );
+        AudioInputStream inFileAIS = new AudioInputStream( newInputStream(buf), outDataFormat, buf.capacity()/(bytesPerField*channels) );
 
         File outFile=  new File( split.resourceUri );
         
