@@ -4,7 +4,11 @@ package org.virbo.autoplot.dom;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.OrbitDatumRange;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.dataset.DataSetUtil;
@@ -115,11 +119,23 @@ public class LabelConverter extends Converter {
 
             if ( title.contains("TIMERANGE") ) {
                 DatumRange tr= PlotElementControllerUtil.getTimeRange( dom, pe );
-                if ( tr==null ) {
-                    title= insertString( title, "TIMERANGE", "(no timerange)" );
-                } else {
-                    title= insertString( title, "TIMERANGE",tr.toString() );
+                Pattern pop= Pattern.compile("(.*)\\%\\{TIMERANGE(.*)\\}(.*)");
+                String insert= ( tr==null ? "(no timerange)" : tr.toString() );
+                Matcher m= pop.matcher(title);
+                if ( m.matches() ) {
+                    String control= m.group(2);
+                    if ( control.equals(",NOORBIT") ) {
+                        if ( tr!=null ) {
+                            if ( tr instanceof OrbitDatumRange ) {
+                                insert= DatumRangeUtil.formatTimeRange(tr,false) + " (Orbit "+((OrbitDatumRange)tr).getOrbit()+")";
+                            } else {
+                                insert= DatumRangeUtil.formatTimeRange(tr,false);
+                            }
+                        }                        
+                    }
                 }
+                title= insertString( title, "TIMERANGE", insert );
+
             }
             //logger.fine("<--"+value + "-->"+title );
             //see convertReverse, which must be done as well.
@@ -188,14 +204,16 @@ public class LabelConverter extends Converter {
      * @return the new string with the value inserted.
      */
     protected static String insertString( String title, String label, String value ) {
-        String search;
-        search= "%{"+label+"}";
-        if ( title.contains( search ) ) {
-            title= title.replace( search, value );
-        }
-        search= "$("+label+")";
-        if ( title.contains( search ) ) {
-            title= title.replace( search, value );
+        Pattern p= Pattern.compile("(\\%\\{"+label+"(,.*)?\\})");
+        Matcher m= p.matcher(title);
+        if ( m.find() ) {
+            return title.substring(0,m.start()) + value + title.substring(m.end());
+        } else {
+            p= Pattern.compile("(\\$\\("+label+"(,.*)?\\))");
+            m= p.matcher(title);
+            if ( m.find() ) {
+                return title.substring(0,m.start()) + value + title.substring(m.end());
+            }
         }
         return title;
     }
