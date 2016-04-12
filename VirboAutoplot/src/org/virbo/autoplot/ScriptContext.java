@@ -699,6 +699,7 @@ public class ScriptContext extends PyJavaInstance {
      * "overplot" by adding another PlotElement to the plot and setting the data to this PlotElement.
      * @param chNum the focus 
      * @return the channel number for the new plot element.
+     * @see #setLayout(int, int) 
      */
     public static int addPlotElement( int chNum ) {
         maybeInitModel();
@@ -1581,6 +1582,8 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * make a single plot with so many plot elements.
      * @param nplotElement the number of plotElements on the one plot.
+     * @see #setLayout(int, int) 
+     * @see #addPlotElement(int) which will an another plotElement (an overplot) to the ith position.
      */
     public static void setLayoutOverplot( int nplotElement ) {
         if ( nplotElement<1 ) throw new IllegalArgumentException("must be one or more plots");
