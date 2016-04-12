@@ -517,23 +517,28 @@ public class OperationsPanel extends javax.swing.JPanel {
         final String oldFilter = this.filter;
         this.filter = filter;
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 filtersChainPanel.setFilter(filter);
                 filtersChainPanel.setInput(dataSet);
                 if ( !oldFilter.equals(filter) || !filter.equals(operatorsTextField.getText()) ) {           
-                    int carot= operatorsTextField.getCaretPosition();
-                    operatorsTextField.setText(filter);
-                    operatorsTextField.setCaretPosition(Math.min(filter.length(),carot));
+                    try {
+                        int carot= operatorsTextField.getCaretPosition();
+                        operatorsTextField.setText(filter);
+                        operatorsTextField.setCaretPosition(Math.min(filter.length(),carot));
+                    } catch ( IllegalStateException ex ) {
+                        System.err.println("looks like someone else is doing this already.");
+                    }
                 }
             }
         };
+        if ( !oldFilter.equals(filter) ) {        
+            firePropertyChange(PROP_FILTER, oldFilter, filter);
+        }
         if ( SwingUtilities.isEventDispatchThread() ) {
             run.run();
         } else {
             SwingUtilities.invokeLater(run);
-        }
-        if ( !oldFilter.equals(filter) ) {        
-            firePropertyChange(PROP_FILTER, oldFilter, filter);
         }
     }
     
