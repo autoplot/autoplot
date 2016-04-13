@@ -23,8 +23,11 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-04-04 r18652):</p>
+        <p>Bugfixes (2016-04-13 r18652):</p>
         <ul>
+            <li>bugfix 1562: the trailing DD was mistaken for a unit.  Thanks, Chris!</li>
+            <li>bundle(ds1,ds2) never supported rank 0 bundled to rank 1 dataset.</li>
+            <li>rte_0990623712: set the focus URI and support edit function on vap+internal dsf<li>
             <li>an orbits file with a comment would result in an unterminated loop.  Thanks, Ivar!</li>
             <li>1557: corrections to the SAMP listener.  Thanks, Babtiste!</li>
             <li>csv reader properly sets column headings to field0..fieldN</li>
@@ -141,6 +144,13 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>kludge in controls like %{TIMERANGE,NOORBIT} for Ivar's study.</li>
+            <li>FileUtil.find added which allows regular expressions to be used when looking for files.</li>
+            <li>buckshotInterpolate introduced, adding support for 2-D and 3-D interpolations of buckshot data.</li>
+            <li>ProGAL library added, which supports 2-D and 3-D tesselations.</li>
+            <li>24-bit wav files can now be read.  24-bit and 32-bit wav files can be exported.  Thanks, Sarah!</li>
+            <li>circle command now allows x and y positions</li>
+            <li>update to SAMP 1.3.5, which is able to initialize a hub so javascript can talk to Autoplot.</li>
             <li>org.das2.util.FileUtil supports find file with regular expressions.</li>
             <li>Add setFillValue and setValidRange filters and GUIs</li>
             <li>Add flattenWaveform to the filters, which was needed for testing.</li>
@@ -173,7 +183,7 @@
             <li>472: allow $x to be used in aggregation without time fields.</li>
        </ul>
         <p>Less recent features:</p>
-        <ul>           
+        <ul>
             <li>About screen includes a bullet explicitly identifying 32bit Java and provides a link to fix this.</li>
             <li>html version of pngwalk uses precalculated thumbnails.</li>
             <li>470: DasProgressPanel shows the thread name to improve serviceability</li>
