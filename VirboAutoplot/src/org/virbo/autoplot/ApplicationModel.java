@@ -10,7 +10,6 @@ import org.virbo.autoplot.bookmarks.Bookmark;
 import java.util.logging.Level;
 import org.das2.DasApplication;
 import org.das2.graph.DasCanvas;
-import org.virbo.qstream.StreamException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.awt.Font;
@@ -23,7 +22,6 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -39,8 +37,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -66,7 +62,6 @@ import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
 import org.das2.event.DasUpdateEvent;
 import org.das2.util.ExceptionHandler;
-import org.das2.util.Base64;
 import org.das2.util.FileUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.dom.Application;
@@ -84,11 +79,10 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
-import org.virbo.qstream.QDataSetStreamHandler;
-import org.virbo.qstream.SimpleStreamFormatter;
 import org.xml.sax.SAXException;
 import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.CanvasController;
+import org.virbo.datasource.DataSetSelectorSupport;
 import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.Version;
 /**
@@ -1050,6 +1044,10 @@ public class ApplicationModel {
         if ( !f.exists() ) throw new IllegalArgumentException("no such file: "+f);
         if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
 
+        Preferences prefs= Preferences.userNodeForPackage( AutoplotSettings.class);
+        prefs.put( DataSetSelectorSupport.PREF_LAST_OPEN_VAP_FILE, f.getAbsolutePath() );
+        prefs.put( DataSetSelectorSupport.PREF_LAST_OPEN_VAP_FOLDER, f.getParent() );        
+        
         try (InputStream in = new FileInputStream(f)) {
 
             doOpenVap( in,deltas );
