@@ -908,7 +908,7 @@ public class DomUtil {
     }
 
     /**
-     * this was made public for but 1520.  This returns a 1-plot dom, but 
+     * this was made public for bug 1520.  This returns a 1-plot dom, but 
      * this may change.
      * @param application
      * @param domPlot
@@ -932,7 +932,7 @@ public class DomUtil {
         ByteArrayOutputStream baos= new ByteArrayOutputStream(1000);
         try {
             StatePersistence.saveState( baos, newApp, "" );
-            return baos.toString();
+            return baos.toString("UTF-8");
             
         } catch (IOException ex) {
             throw new RuntimeException(ex);
