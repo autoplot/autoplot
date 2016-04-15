@@ -527,14 +527,6 @@ public class StatePersistence {
         Application state;
         String domVersion;
 
-        // add a direct reference to these guys for compile-all script.
-        new DatumRangePersistenceDelegate();
-        new UnitsPersistenceDelegate();
-        new DatumPersistenceDelegate() ;
-        new TypeSafeEnumPersistenceDelegate() ;
-        new BindingPersistenceDelegate() ;
-        new ConnectorPersistenceDelegate();
-        
         try {
             DocumentBuilder builder;
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
