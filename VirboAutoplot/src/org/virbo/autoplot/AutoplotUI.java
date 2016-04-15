@@ -4440,7 +4440,7 @@ private void updateFrameTitle() {
         //alm.addOptionalSwitchArgument("exit", null, "exit", "0", "exit after running script" );
         alm.addBooleanSwitchArgument( "eventThreadMonitor", null, "eventThreadMonitor", "monitor the event thread for long unresponsive pauses");
 
-        alm.addBooleanSwitchArgument( "samp", null, "samp", "enable SAMP connection for use with the Cluster Final Archive");
+        alm.addBooleanSwitchArgument( "samp", null, "samp", "enable SAMP connection for use with European Space Agency applications and websites");
         alm.addOptionalSwitchArgument( "server", null, "server", "-1", "start server at the given port listening to commands. (Replaces port)");
         alm.addBooleanSwitchArgument( "nop", null, "nop", "no operation, to be a place holder for jnlp script.");
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
@@ -4636,8 +4636,7 @@ APSplash.checkTime("init 200");
                         addSingleInstanceListener( alm, app );
                     }
                     if ( alm.getBooleanValue("samp") ) {
-                        //JythonUtil.invokeScriptSoon( AutoplotUI.class.getResource("/scripts/addCfaListener.jy") );
-                        external.AddCfaSampListener.addCfaSampListener( app.dataSetSelector );
+                        org.autoplot.AddSampListener.addSampListener( app.dataSetSelector );
                     }
 
                 }
