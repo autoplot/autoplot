@@ -738,9 +738,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                             this.setValue(result);
                             this.maybePlot(false);
                         }
+                        setCursor( Cursor.getDefaultCursor() );
                         return;
                     } else {
                         JOptionPane.showMessageDialog( DataSetSelector.this, "Unable to inspect .vap files" );
+                        setCursor( Cursor.getDefaultCursor() );
                         return;
                     }
                 }
@@ -762,6 +764,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
             if ( surl!=null && surl.startsWith("vap+internal:") ) {
                 JOptionPane.showMessageDialog( window, "Internal URI cannot be edited" );
+                setCursor( Cursor.getDefaultCursor() );
                 return;
             }
             
