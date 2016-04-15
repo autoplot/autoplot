@@ -1244,37 +1244,42 @@ public class GuiSupport {
             switch (depCount) {
                 case 0:
                     String val= uris[0];
-                    if ( val.endsWith(".vap") ) {
-                        mergeVap(dom,plot, pelement, val);
-                    } else {
-                        String uri= val;
-                        DataSourceFactory factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), new NullProgressMonitor() );
-                        if ( factory==null ) {
-                            if ( uri.startsWith("vap+internal:") ) { // allow testing.
-                                DataSourceFilter dsf= dom.getController().addDataSourceFilter();
-                                dsf.setUri( uri );
-                                dom.getController().addPlotElement( plot, dsf );
-                                return;
-                            } else {
-                                throw new IllegalArgumentException("unable to resolve URI: "+uri);
+                    try {
+                        if ( val.endsWith(".vap") ) {
+                            mergeVap(dom,plot, pelement, val);
+                        } else {
+                            //TODO: this is still on event thread!!!
+                            String uri= val;
+                            DataSourceFactory factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), new NullProgressMonitor() );
+                            if ( factory==null ) {
+                                if ( uri.startsWith("vap+internal:") ) { // allow testing.
+                                    DataSourceFilter dsf= dom.getController().addDataSourceFilter();
+                                    dsf.setUri( uri );
+                                    dom.getController().addPlotElement( plot, dsf );
+                                    return;
+                                } else {
+                                    throw new IllegalArgumentException("unable to resolve URI: "+uri);
+                                }
                             }
-                        }
-                        List<String> problems= new ArrayList<>();
-                        while ( factory.reject( uri, problems, new NullProgressMonitor() ) ) {
-                            dia.setTitle("Add Plot, URI was rejected...");
-                            
-                            WindowManager.getInstance().showModalDialog(dia);
-                            
-                            if ( dia.isCancelled() ) {
-                                return;
+                            List<String> problems= new ArrayList<>();
+                            while ( factory.reject( uri, problems, new NullProgressMonitor() ) ) {
+                                dia.setTitle("Add Plot, URI was rejected...");
+
+                                WindowManager.getInstance().showModalDialog(dia);
+
+                                if ( dia.isCancelled() ) {
+                                    return;
+                                }
+                                val= dia.getPrimaryDataSetSelector().getValue();
+                                uri= val;
                             }
-                            val= dia.getPrimaryDataSetSelector().getValue();
-                            uri= val;
-                        }
-                        dom.getController().doplot(plot, pelement, val );
-                        DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, pelement.getDataSourceFilterId() );
-                        if ( dia.getPrimaryFilters().length()>0 ) dsf.setFilters(dia.getPrimaryFilters());
-                    }   
+                            dom.getController().doplot(plot, pelement, val );
+                            DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, pelement.getDataSourceFilterId() );
+                            if ( dia.getPrimaryFilters().length()>0 ) dsf.setFilters(dia.getPrimaryFilters());
+                        }   
+                    } finally {
+                        dom.getController().changePerformed( dom, lock );
+                    }
                     break;
                 case 1:
                     applicationModel.addRecent(uris[0]);
@@ -1282,16 +1287,19 @@ public class GuiSupport {
                     run= new Runnable() {
                         @Override
                         public void run() {
-                            dom.getController().performingChange( dom, lock );
-                            dom.getController().doplot(lplot, lpelement, uris[0], uris[1] );
-                            DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, lpelement.getDataSourceFilterId() );
-                            List<DataSourceFilter> dsfs= DomUtil.getParentsFor( dom, dsf.getUri() );
-                            if ( dsfs.size()==2 && dsfs.get(0)!=null && dsfs.get(1)!=null ) {
-                                if ( filters[0].length()>0 ) dsfs.get(0).setFilters( filters[0] );
-                                if ( filters[1].length()>0 ) dsfs.get(1).setFilters( filters[1] );
-                            }                    
-                            dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(lpelement).getUri());
-                            dom.getController().changePerformed( dom, lock );
+                            try {
+                                dom.getController().performingChange( dom, lock );
+                                dom.getController().doplot(lplot, lpelement, uris[0], uris[1] );
+                                DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, lpelement.getDataSourceFilterId() );
+                                List<DataSourceFilter> dsfs= DomUtil.getParentsFor( dom, dsf.getUri() );
+                                if ( dsfs.size()==2 && dsfs.get(0)!=null && dsfs.get(1)!=null ) {
+                                    if ( filters[0].length()>0 ) dsfs.get(0).setFilters( filters[0] );
+                                    if ( filters[1].length()>0 ) dsfs.get(1).setFilters( filters[1] );
+                                }                    
+                                dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(lpelement).getUri());
+                            } finally {
+                                dom.getController().changePerformed( dom, lock );
+                            }
                         }
                     };
                     new Thread(run).start();
@@ -1303,17 +1311,21 @@ public class GuiSupport {
                     run= new Runnable() {
                         @Override
                         public void run() {            
-                            dom.getController().performingChange( dom, lock );
-                            dom.getController().doplot(lplot, lpelement, uris[0], uris[1], uris[2] );
-                            DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, lpelement.getDataSourceFilterId() );
-                            List<DataSourceFilter> dsfs= DomUtil.getParentsFor( dom, dsf.getUri() );
-                            if ( dsfs.size()==3 && dsfs.get(0)!=null && dsfs.get(1)!=null && dsfs.get(2)!=null ) {
-                                if ( filters[0].length()>0 ) dsfs.get(0).setFilters( filters[0] );
-                                if ( filters[1].length()>0 ) dsfs.get(1).setFilters( filters[1] );
-                                if ( filters[2].length()>0 ) dsfs.get(2).setFilters( filters[2] );
-                            } 
-                            dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(lpelement).getUri());
-                            dom.getController().changePerformed( dom, lock );
+                            try {
+                                dom.getController().performingChange( dom, lock );
+                                dom.getController().doplot(lplot, lpelement, uris[0], uris[1], uris[2] );
+                                DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, lpelement.getDataSourceFilterId() );
+                                List<DataSourceFilter> dsfs= DomUtil.getParentsFor( dom, dsf.getUri() );
+                                if ( dsfs.size()==3 && dsfs.get(0)!=null && dsfs.get(1)!=null && dsfs.get(2)!=null ) {
+                                    if ( filters[0].length()>0 ) dsfs.get(0).setFilters( filters[0] );
+                                    if ( filters[1].length()>0 ) dsfs.get(1).setFilters( filters[1] );
+                                    if ( filters[2].length()>0 ) dsfs.get(2).setFilters( filters[2] );
+                                } 
+                                dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(lpelement).getUri());
+                            } finally {
+                                dom.getController().changePerformed( dom, lock );
+                            }
+                                
                         }
                     };
                     new Thread(run).start();
