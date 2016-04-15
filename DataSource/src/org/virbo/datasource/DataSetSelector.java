@@ -304,6 +304,26 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
     
     /**
+     * set the JTextField text on the event thread, and make sure that getText
+     * calls would return the value.
+     * @param text 
+     */
+    private void setTextInternal( final String text ) {
+        Runnable run= new Runnable() {
+            public void run() {
+                dataSetSelector.setSelectedItem( text );
+                editor.setText( text );
+            }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            SwingUtilities.invokeLater(run);
+        }
+        this.lastValue= text;
+    }
+    
+    /**
      * return true if the action trigger would be handled.
      * @param suri the URI.
      * @return true if the action trigger would be handled.
@@ -380,7 +400,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         int r= JOptionPane.showConfirmDialog(this, browser,"Select Data Source Type",JOptionPane.OK_CANCEL_OPTION);
                         if ( r==JOptionPane.OK_OPTION ) {
                             surl= browser.getUri();
-                            getEditor().setText(surl);
+                            setTextInternal(surl);
                             setValue(surl);
                             maybePlot(true);
                             return;
@@ -454,7 +474,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                         String suri= tsb.getURI();
                                         //String suri= tsb.blurURI(); // this causes 1970-01-01 to pop up again...
                                         logger.log( Level.FINE, "resetting timerange to {0}", timeRange);
-                                        editor.setText(suri); // don't fire off event.
+                                        setTextInternal(suri); // don't fire off event.
                                     } catch ( ParseException ex ) {
                                         logger.log( Level.SEVERE, ex.getMessage(), ex );
                                     }
@@ -1778,10 +1798,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
             value="";
         }
         value= URISplit.makeColloquial( value );
-        this.dataSetSelector.setSelectedItem(value);
-        this.dataSetSelector.repaint();
-        this.editor.setText(value);
-        //we can't fire because of overflow...  firePropertyChange( "value", oldvalue, value );
+        setTextInternal(value);
     }
     /**
      * Holds value of property browseTypeExt.
@@ -1909,11 +1926,11 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     public void setRecent(List<String> recent) {
         List<String> oldRecent = this.recent;
         this.recent = recent;
-        String value = editor.getText();
+        //String value = editor.getText();
         ArrayList<String> r = new ArrayList<>(recent);
         Collections.reverse(r);
         dataSetSelector.setModel(new DefaultComboBoxModel(r.toArray()));
-        editor.setText(value); // don't show most recent one.
+        //editor.setText(value); // don't show most recent one.
         support.refreshRecentFilesMenu();
         firePropertyChange( PROP_RECENT, oldRecent, recent);
         defaultRecent= recent;
