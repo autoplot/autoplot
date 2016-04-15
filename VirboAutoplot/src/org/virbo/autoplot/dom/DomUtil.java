@@ -118,7 +118,7 @@ public class DomUtil {
             PropertyDescriptor[] pds= BeansUtil.getPropertyDescriptors(thisNode.getClass());
             if ( m.matches() ) {
                 String name= m.group(1);
-                int idx= Integer.valueOf(m.group(2));
+                int idx= Integer.parseInt(m.group(2));
                 for (PropertyDescriptor pd : pds) {
                     if (pd.getName().equals(name)) {
                         Object thisValue = ((IndexedPropertyDescriptor) pd).getIndexedReadMethod().invoke(thisNode, idx);
