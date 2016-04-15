@@ -171,6 +171,7 @@ cd temp-volatile-src
 echo `pwd`
 echo ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java
 if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then hasErrors=1; fi
+if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/state/*.java; then echo "****"; hasErrors=1; fi
 if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
 if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then hasErrors=1; fi
 if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then hasErrors=1; fi

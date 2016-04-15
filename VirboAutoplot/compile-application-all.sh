@@ -187,6 +187,7 @@ if [ $hasErrors -eq 1 ]; then
   echo "Error somewhere in compile, see above"
   exit 1 
 fi
+if ! $JAVAC $JAVAARGS org/virbo/autoplot/state/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/virbo/autoplot/scriptconsole/DumpRteExceptionHandler.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/virbo/autoplot/JythonMain.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/help/AutoplotHelpViewer.java; then echo "****"; hasErrors=1; fi
