@@ -96,7 +96,7 @@ public class PlotCommand extends PyObject {
         PyObject False= Py.newBoolean(false);
 
         FunctionSupport fs= new FunctionSupport( "plot", 
-            new String[] { "x", "y", "z",
+            new String[] { "pos", "x", "y", "z",
             "xtitle", "xrange",
             "ytitle", "yrange",
             "ztitle", "zrange",
@@ -112,7 +112,7 @@ public class PlotCommand extends PyObject {
             "xdrawTickLabels", "ydrawTickLabels",
             "index"
         },
-        new PyObject[] { Py.None, Py.None,
+        new PyObject[] { Py.None, Py.None, Py.None, Py.None,
             Py.None, Py.None,
             Py.None, Py.None,
             Py.None, Py.None,
@@ -122,10 +122,10 @@ public class PlotCommand extends PyObject {
             Py.None,Py.None,
             Py.None,Py.None,Py.None,
             Py.None,Py.None,Py.None,
-            Py.None,Py.None,
             Py.None,
             Py.None,
             Py.None, Py.None, Py.None,
+            Py.None, Py.None,
             Py.None
         } );
         
