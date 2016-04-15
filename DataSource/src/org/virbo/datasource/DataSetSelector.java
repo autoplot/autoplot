@@ -728,7 +728,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 }
             } else {
                 URISplit split= URISplit.parse(surl);
-                if ( !".vap".equals(split.ext) ) {
+                if ( !".vap".equals(split.ext) ) { //TODO: kludge, .vap should be a browseTrigger
                     //experiment with GUI based on completions.
                     edit= new CompletionsDataSourceEditor();
                 } else {
