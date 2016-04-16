@@ -311,7 +311,6 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void setTextInternal( final String text ) {
         Runnable run= new Runnable() {
             public void run() {
-                dataSetSelector.setSelectedItem( text );
                 editor.setText( text );
             }
         };
@@ -1926,8 +1925,13 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     public void setRecent(List<String> recent) {
         List<String> oldRecent = this.recent;
         this.recent = recent;
-        //String value = editor.getText();
+        String value = editor.getText();
         ArrayList<String> r = new ArrayList<>(recent);
+        if ( r.size()>0 ) {
+            if ( !r.get(r.size()-1).equals(value) ) {
+                r.add(value);
+            }
+        }
         Collections.reverse(r);
         dataSetSelector.setModel(new DefaultComboBoxModel(r.toArray()));
         //editor.setText(value); // don't show most recent one.
