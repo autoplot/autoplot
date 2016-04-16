@@ -99,7 +99,7 @@ public class Test_052_FocusSwitching implements Scenario {
             
             BufferedImage image= ScreenshotsTool.getScreenShotNoPointer();
             //BufferedImage image= ScreenshotsTool.getScreenShot();
-            image.getGraphics().clearRect( 150, image.getHeight()-1021, 80, 20 );
+            image.getGraphics().clearRect( 150, image.getHeight()-1021, 100, 20 );
             image.getGraphics().clearRect( 15, image.getHeight()-963, 620, 22 );
             
             ImageIO.write( image, "png", new File( "Test_052_FocusSwitching_Screen.png" ) );
