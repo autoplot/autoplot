@@ -3010,7 +3010,8 @@ public class ApplicationController extends DomNodeController implements RunLater
     public boolean isTimeSeriesBrowse(Plot p) {
         List<DataSourceFilter> dsfs= DomUtil.getDataSourceFiltersFor( application, p );
         for ( DataSourceFilter dsf: dsfs ) {
-            if ( dsf.getController().getTsb()!=null ) {
+            DataSourceController dsfc= dsf.getController();
+            if ( dsfc!=null && dsfc.getTsb()!=null ) {
                 return true;
             }
         }
