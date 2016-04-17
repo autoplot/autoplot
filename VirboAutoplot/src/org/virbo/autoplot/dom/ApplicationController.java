@@ -2999,4 +2999,22 @@ public class ApplicationController extends DomNodeController implements RunLater
         return bms.length>0;
     }
 
+    /**
+     * return true if the plot has the time series browse capability, meaning
+     * something will go off and load more data if the time range is changed.
+     * Note the TSB may be connected to the plot's context property, and 
+     * the x-axis is not a time axis.
+     * @param p the plot.
+     * @return true if the plot has the time series browse.
+     */
+    public boolean isTimeSeriesBrowse(Plot p) {
+        List<DataSourceFilter> dsfs= DomUtil.getDataSourceFiltersFor( application, p );
+        for ( DataSourceFilter dsf: dsfs ) {
+            if ( dsf.getController().getTsb()!=null ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
