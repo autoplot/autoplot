@@ -616,7 +616,7 @@ public class DomUtil {
      * @return the DataSourceFilters
      */
     public static List<DataSourceFilter> getParentsFor( Application dom, String uri ) {
-        String parents= uri.substring(13);
+        String parents= uri.substring(13); // "vap+internal:".length
         if ( parents.trim().length()==0 ) return Collections.emptyList();
         String[] dep= parents.split(",");
         List<DataSourceFilter> result= new ArrayList();
@@ -937,6 +937,25 @@ public class DomUtil {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    /**
+     * return the list of DataSourceFilters for a plot.
+     * @param dom the application
+     * @param p the plot
+     * @return new list of dataSourceFilters
+     */
+    public static List<DataSourceFilter> getDataSourceFiltersFor( Application dom, Plot p) {
+        List<DataSourceFilter> dsfs= new ArrayList<>();
+        List<PlotElement> pes= getPlotElementsFor(dom, p);
+        for ( PlotElement pe: pes ) {
+            DataSourceFilter dsf= (DataSourceFilter)getElementById( dom, pe.getDataSourceFilterId() );
+            dsfs.add( dsf );
+            if ( dsf.getUri().startsWith("vap+internal:") ) {
+                dsfs.addAll( getParentsFor(dom, dsf.getUri() ) );
+            }
+        }
+        return dsfs;
     }
 
 }
