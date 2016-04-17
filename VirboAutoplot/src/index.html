@@ -23,13 +23,17 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-04-15 r18710):</p>
+        <p>Bugfixes (2016-04-15 r18720):</p>
         <ul>
+            <li>1566: improve support for international desktops, with UTF-8 filenames.</li>
+            <li>plot timerange GUI on axis tab goes insensitive when no one is listening.</li>
+            <li>1565: dataset selector use off the event thread.</li>
+            <li>plotCommand with four parameters (index,x,y,z) would cause error</li>
             <li>reset the pointer cursor from BUSY to default when cancel is pressed in inspect-vap path</li>
             <li>reset the current folder for vap files when a vap is loaded. </li>
             <li>bugfix 1562: the trailing DD was mistaken for a unit.  Thanks, Chris!</li>
             <li>bundle(ds1,ds2) never supported rank 0 bundled to rank 1 dataset.</li>
-            <li>rte_0990623712: set the focus URI and support edit function on vap+internal dsf<li>
+            <li>rte_0990623712: set the focus URI and support edit function on vap+internal dsf</li>
             <li>an orbits file with a comment would result in an unterminated loop.  Thanks, Ivar!</li>
             <li>1557: corrections to the SAMP listener.  Thanks, Babtiste!</li>
             <li>csv reader properly sets column headings to field0..fieldN</li>
