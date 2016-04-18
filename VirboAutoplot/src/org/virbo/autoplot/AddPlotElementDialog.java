@@ -259,7 +259,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(plotBelowButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(plotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 73, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(plotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 96, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(tertiaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
                         .add(12, 12, 12)
