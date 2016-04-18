@@ -1,9 +1,7 @@
 
 package org.virbo.datasource;
 
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -17,15 +15,12 @@ import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 import org.das2.datum.DatumRange;
-import org.jdesktop.beansbinding.BindingGroup;
 
 /**
  * Additional actions for the DataSetSelector.
@@ -36,11 +31,7 @@ public class DataSetSelectorSupport {
     private static final Logger logger= Logger.getLogger("apdss.dss");
 
     DataSetSelector ui;
-    public static final String PREF_LAST_OPEN_FOLDER = "last_open_folder";
-    public static final String PREF_RECENTLY_OPENED_FILES = "recently_opened_files";
-    public static final String PREF_LAST_OPEN_VAP_FOLDER= "last_open_vap_folder";
-    public static final String PREF_LAST_OPEN_VAP_FILE= "last_open_vap_file";
-
+    
     private JMenu recentMenu = null;
 
     DataSetSelectorSupport(DataSetSelector ui) {
@@ -61,8 +52,8 @@ public class DataSetSelectorSupport {
     public static String browseLocalVap( java.awt.Component parent, String initialSelection) {
         Preferences prefs = Preferences.userNodeForPackage( AutoplotSettings.class);
 
-        String currentDirectory = prefs.get( PREF_LAST_OPEN_VAP_FOLDER, prefs.get(PREF_LAST_OPEN_FOLDER, userHome().toString() ) );
-        String currentFile=  prefs.get( PREF_LAST_OPEN_VAP_FILE, "" );
+        String currentDirectory = prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString() ) );
+        String currentFile=  prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, "" );
         JFileChooser chooser = new JFileChooser(currentDirectory);
 
         if ( currentFile.length()>0 ) {
@@ -151,7 +142,7 @@ public class DataSetSelectorSupport {
 
         int result = chooser.showOpenDialog(parent);
         if (result == JFileChooser.APPROVE_OPTION) {
-            prefs.put(PREF_LAST_OPEN_VAP_FOLDER, chooser.getSelectedFile().getParent() );
+            prefs.put(AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, chooser.getSelectedFile().getParent() );
             if ( b2.isSelected() ) {
                 return chooser.getSelectedFile().toURI().toString() + "?timerange="+ t.getRange().toString().replaceAll("\\s+", "+");
             } else {
@@ -171,7 +162,7 @@ public class DataSetSelectorSupport {
     public static String browseLocal( java.awt.Component parent ) {
         Preferences prefs = Preferences.userNodeForPackage(DataSetSelectorSupport.class);
 
-        String currentDirectory = prefs.get(PREF_LAST_OPEN_FOLDER, userHome().toString());
+        String currentDirectory = prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, userHome().toString());
         final HashMap exts = DataSourceRegistry.getInstance().dataSourcesByExt;
 
         JFileChooser chooser = new JFileChooser(currentDirectory);
@@ -261,7 +252,7 @@ public class DataSetSelectorSupport {
 
         int result = chooser.showOpenDialog(parent);
         if (result == JFileChooser.APPROVE_OPTION) {
-            prefs.put(PREF_LAST_OPEN_FOLDER, chooser.getSelectedFile().getParent() );
+            prefs.put(AutoplotSettings.PREF_LAST_OPEN_FOLDER, chooser.getSelectedFile().getParent() );
             return chooser.getSelectedFile().toURI().toString();
         } else {
             return null;
