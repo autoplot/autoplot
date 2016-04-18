@@ -156,12 +156,13 @@ public class AxisPanel extends javax.swing.JPanel {
                if ( !zLog.isEnabled() ) zLog.setSelected(false);
            }
         });
-        doPlotBindings();
-        doPlotElementBindings();
-        
+
         timeRangeEditor1.setNoOneListeningRange( Application.DEFAULT_TIME_RANGE );
         timeRangeEditor1.setRange( Application.DEFAULT_TIME_RANGE );
         
+        doPlotBindings();
+        doPlotElementBindings();
+                
         dom.addPropertyChangeListener( Application.PROP_TIMERANGE, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
