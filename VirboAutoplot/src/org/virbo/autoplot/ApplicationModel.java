@@ -82,7 +82,6 @@ import org.virbo.datasource.capability.Caching;
 import org.xml.sax.SAXException;
 import org.virbo.autoplot.bookmarks.BookmarksException;
 import org.virbo.autoplot.dom.CanvasController;
-import org.virbo.datasource.DataSetSelectorSupport;
 import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.Version;
 /**
