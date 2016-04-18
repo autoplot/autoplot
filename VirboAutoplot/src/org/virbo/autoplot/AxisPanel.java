@@ -22,7 +22,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.datum.DatumRange;
-import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
@@ -32,6 +31,7 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
+import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
@@ -260,6 +260,67 @@ public class AxisPanel extends javax.swing.JPanel {
         }
     };
 
+    private static class DontChangePlotUnitsConverter extends Converter {
+        
+        Plot p;
+        
+        private DontChangePlotUnitsConverter( Plot p ) {
+            this.p= p;
+        }
+        
+        @Override
+        public Object convertForward(Object value) {
+            DatumRange r= (DatumRange)value;
+            if ( r.getUnits().isConvertibleTo(p.getContext().getUnits()) ) {
+                return r;
+            } else {
+                return p.getContext();
+            }
+        }
+
+        @Override
+        public Object convertReverse(Object value) {
+            DatumRange r= (DatumRange)value;
+            if ( r.getUnits().isConvertibleTo(p.getContext().getUnits()) ) {
+                return r;
+            } else {
+                return p.getContext();
+            }
+        }
+        
+    }
+
+
+    private static class DontChangeAxisUnitsConverter extends Converter {
+        
+        Axis p;
+        
+        private DontChangeAxisUnitsConverter( Axis p ) {
+            this.p= p;
+        }
+        
+        @Override
+        public Object convertForward(Object value) {
+            DatumRange r= (DatumRange)value;
+            if ( r.getUnits().isConvertibleTo(p.getRange().getUnits()) ) {
+                return r;
+            } else {
+                return p.getRange();
+            }
+        }
+
+        @Override
+        public Object convertReverse(Object value) {
+            DatumRange r= (DatumRange)value;
+            if ( r.getUnits().isConvertibleTo(p.getRange().getUnits()) ) {
+                return r;
+            } else {
+                return p.getRange();
+            }
+        }
+        
+    }
+    
     /**
      * do the somewhat expensive check to see if the timerange controller needs
      * to be bound.
@@ -288,12 +349,15 @@ public class AxisPanel extends javax.swing.JPanel {
                     this.timeRangeEditor1.setToolTipText("controlling "+p.getId()+" xaxis");
                     timeRangeBinding= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p.getXaxis(), BeanProperty.create("range"), timeRangeEditor1, BeanProperty.create( TimeRangeEditor.PROP_RANGE ) );
                     bc.addBinding(timeRangeBinding);
+                    timeRangeBinding.setConverter( new DontChangeAxisUnitsConverter(p.getXaxis()) );
                     timeRangeBindingType= type;
                     break;
                 case "context":
                     this.timeRangeEditor1.setEnabled(true);
                     this.timeRangeEditor1.setToolTipText("controlling "+p.getId()+".context");
-                    timeRangeBinding= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("context"), timeRangeEditor1, BeanProperty.create( TimeRangeEditor.PROP_RANGE ) );
+                    timeRangeBinding= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("context"), 
+                        timeRangeEditor1, BeanProperty.create( TimeRangeEditor.PROP_RANGE ) );
+                    timeRangeBinding.setConverter( new DontChangePlotUnitsConverter(p) );
                     bc.addBinding(timeRangeBinding);
                     timeRangeBindingType= type;
                     break;
