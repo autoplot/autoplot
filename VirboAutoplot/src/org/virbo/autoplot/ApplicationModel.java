@@ -1045,8 +1045,8 @@ public class ApplicationModel {
         if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
 
         Preferences prefs= Preferences.userNodeForPackage( AutoplotSettings.class);
-        prefs.put( DataSetSelectorSupport.PREF_LAST_OPEN_VAP_FILE, f.getAbsolutePath() );
-        prefs.put( DataSetSelectorSupport.PREF_LAST_OPEN_VAP_FOLDER, f.getParent() );        
+        prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, f.getAbsolutePath() );
+        prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, f.getParent() );        
         
         try (InputStream in = new FileInputStream(f)) {
 
