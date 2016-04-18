@@ -1,11 +1,3 @@
-/*
- * PersistentStateSupport.java
- *
- * Created on April 20, 2006, 1:23 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 
 package org.virbo.autoplot;
 
@@ -26,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -38,7 +29,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -49,8 +39,6 @@ import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.state.EmbedDataExperiment;
 import org.virbo.datasource.AutoplotSettings;
-import org.virbo.datasource.DataSetSelectorSupport;
-import org.virbo.datasource.DataSetURI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -99,12 +87,14 @@ public class PersistentStateSupport {
     
     private static SerializationStrategy getCanvasStrategy( final DasCanvas canvas ) {
         return new SerializationStrategy() {
+            @Override
             public Element serialize(Document document, ProgressMonitor monitor) {
                 DOMBuilder builder= new DOMBuilder( canvas );
                 Element element= builder.serialize( document, DasProgressPanel.createFramed("Serializing Canvas") );
                 return element;
             }
             
+            @Override
             public void deserialize(Document document, ProgressMonitor monitor) {
                 Element element= document.getDocumentElement();
                 SerializeUtil.processElement(element,canvas );
@@ -117,6 +107,8 @@ public class PersistentStateSupport {
      *  Provides a means for saving the application persistently, undo/redo support (TODO).
      *  canvas is the canvas to be serialized, extension identifies the application.  Note that
      *  internal changes to das may break saved files.
+     * @param canvas used for dialogs
+     * @param extension
      */
     public PersistentStateSupport( DasCanvas canvas, String extension ) {
         this( canvas, getCanvasStrategy( canvas ), extension );
@@ -129,6 +121,7 @@ public class PersistentStateSupport {
             for ( int i=0; i<recentFiles.size(); i++ ) {
                 final File f= (File) recentFiles.get(i);
                 Action a= new AbstractAction( String.valueOf(f) ) {
+                    @Override
                     public void actionPerformed( ActionEvent e ) {
                         open(f);
                     }
@@ -142,8 +135,8 @@ public class PersistentStateSupport {
         recentFiles= new ArrayList();
         if ( code.equals("") ) return;
         String[] ss= code.split("::");
-        for ( int i=0; i<ss.length; i++ ) {
-            File f= new File( ss[i] );
+        for (String s : ss) {
+            File f = new File(s);
             if ( !recentFiles.contains(f) ) {
                 recentFiles.add( f );
             }
@@ -152,7 +145,7 @@ public class PersistentStateSupport {
     }
     
     private String getRencentFilesString() {
-        if (recentFiles.size()==0 ) {
+        if (recentFiles.isEmpty() ) {
             return "";
         } else {
             StringBuilder result= new StringBuilder( String.valueOf( recentFiles.get(0) ) );
@@ -163,6 +156,12 @@ public class PersistentStateSupport {
         }
     }
     
+    /**
+     * 
+     * @param parent used for dialogs, and if an AutoplotUI, then status messages are returned.
+     * @param strategy plug-in for converting to XML
+     * @param extension the extention without a period (e.g. vap).
+     */
     public PersistentStateSupport( Component parent, SerializationStrategy strategy, String extension ) {
         this.strategy= strategy;
         this.ext= "."+extension;
@@ -176,16 +175,19 @@ public class PersistentStateSupport {
     private FileFilter simpleFilter( final String glob ) {
         final Pattern pattern= Glob.getPattern(glob);
         return new FileFilter() {
+            @Override
             public boolean accept( File pathname ) {
                 if ( pathname.toString()==null ) return false;
                 return pathname.isDirectory() || pattern.matcher(pathname.getName()).matches();
             }
+            @Override
             public String getDescription() { return glob; }
         };
     }
     
     public Action createSaveAsAction() {
         return new AbstractAction("Save As...") {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 saveAs();
             }
@@ -248,13 +250,13 @@ public class PersistentStateSupport {
     }
     
     /**
-     * override me
+     * This is typically overriden, but an implementation is provided.
+     * @param f the file
+     * @param scheme the scheme, as in v1.7
+     * @throws java.lang.Exception
      */
     protected void saveImpl( File f, String scheme ) throws Exception {
-        OutputStream out= null;
-        try {
-            out= new FileOutputStream( f );
-
+        try (OutputStream out = new FileOutputStream( f )) {
 
             Document document= DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 
@@ -281,14 +283,13 @@ public class PersistentStateSupport {
                 e.printStackTrace();
             }
             serializer.write(document, output);
-        } finally {
-            if ( out!=null ) out.close();
         }
     }
     
     private void save( final File file, final String scheme, final boolean embedData ) {
         setSaving(true);
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 try {
                     File f= file;
@@ -337,7 +338,6 @@ public class PersistentStateSupport {
                     String mess;
                     if ( ex.getMessage().equals("") ) mess= ex.toString(); else mess= ex.getMessage();
                     JOptionPane.showMessageDialog( PersistentStateSupport.this.component, mess, "I/O Error", JOptionPane.WARNING_MESSAGE );
-                    return;
                 } catch ( ParserConfigurationException ex ) {
                     throw new RuntimeException(ex);
                 } catch ( Exception ex) {
@@ -350,6 +350,7 @@ public class PersistentStateSupport {
     
     public Action createSaveAction() {
         return new AbstractAction("Save") {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 if ( getCurrentFile()==null ) {
                     saveAs();
@@ -419,6 +420,7 @@ public class PersistentStateSupport {
     
     public Action createOpenAction() {
         return new AbstractAction("Open...") {
+            @Override
             public void actionPerformed( ActionEvent ev ) {
                 try {
                     JFileChooser chooser = new JFileChooser();
@@ -439,7 +441,10 @@ public class PersistentStateSupport {
     }
     
     /**
-     * override me.  If open fails, throw an exception.
+     * Open the file.  This uses a provided strategy to read in the file.  This is
+     * often overriden.  If open fails, throw an exception.
+     * @param file the file to open
+     * @throws java.lang.Exception
      */
     protected void openImpl( File file ) throws Exception {
         Document document= readDocument( file );
@@ -449,6 +454,7 @@ public class PersistentStateSupport {
     private void open( final File file ) {
         setOpening( true );
         Runnable run = new Runnable() {
+            @Override
             public void run() {
                 try {
                     if ( !file.exists() ) {
@@ -498,7 +504,7 @@ public class PersistentStateSupport {
     /**
      * Utility field used by bound properties.
      */
-    private java.beans.PropertyChangeSupport propertyChangeSupport =  new java.beans.PropertyChangeSupport(this);
+    private final java.beans.PropertyChangeSupport propertyChangeSupport =  new java.beans.PropertyChangeSupport(this);
 
     /**
      * Adds a PropertyChangeListener to the listener list.
@@ -537,7 +543,7 @@ public class PersistentStateSupport {
     protected String directory = null;
     public static final String PROP_DIRECTORY = "directory";
 
-    public String getDirectory() {
+    public final String getDirectory() {
         //propertyChangeSupport.firePropertyChange ( PROPERTY_CURRENT_FILE, oldFile, currentFile );
         if ( directory==null || directory.equals("") ) {
             Preferences prefs= Preferences.userNodeForPackage(PersistentStateSupport.class);
@@ -552,7 +558,7 @@ public class PersistentStateSupport {
         return directory;
     }
 
-    public void setDirectory(String directory) {
+    public final void setDirectory(String directory) {
         String oldDirectory = this.directory;
         this.directory = directory;
         propertyChangeSupport.firePropertyChange(PROP_DIRECTORY, oldDirectory, directory);
@@ -576,7 +582,7 @@ public class PersistentStateSupport {
     /**
      * set the current file, which could be file:///home/... or /home/...
      * if null, then no file is currently opened.
-     * @param directory
+     * @param currentFile
      */
     public void setCurrentFile(String currentFile) {
         String oldFile = this.currentFile;
