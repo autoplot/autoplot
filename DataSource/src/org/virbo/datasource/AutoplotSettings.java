@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.datasource;
 
@@ -22,6 +18,11 @@ public final class AutoplotSettings {
     private static final Logger logger= Logger.getLogger("apdss");
     private static AutoplotSettings instance;
 
+    public static final String PREF_LAST_OPEN_FOLDER = "last_open_folder";
+    public static final String PREF_RECENTLY_OPENED_FILES = "recently_opened_files";
+    public static final String PREF_LAST_OPEN_VAP_FOLDER= "last_open_vap_folder";
+    public static final String PREF_LAST_OPEN_VAP_FILE= "last_open_vap_file";
+    
     public synchronized static AutoplotSettings settings() {
         if ( instance==null ) {
             instance= new AutoplotSettings();
