@@ -325,8 +325,8 @@ public class PersistentStateSupport {
                     }
                     
                     Preferences prefs= Preferences.userNodeForPackage( AutoplotSettings.class);
-                    prefs.put( DataSetSelectorSupport.PREF_LAST_OPEN_VAP_FILE, new File( getCurrentFile() ).getAbsolutePath() );
-                    prefs.put( DataSetSelectorSupport.PREF_LAST_OPEN_VAP_FOLDER, new File( getCurrentFile() ).getParent() );
+                    prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, new File( getCurrentFile() ).getAbsolutePath() );
+                    prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, new File( getCurrentFile() ).getParent() );
                     setSaving( false );
                     setDirty( false );
                     if ( component instanceof AutoplotUI ) {
