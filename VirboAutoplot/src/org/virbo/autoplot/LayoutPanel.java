@@ -67,7 +67,6 @@ import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElementController;
 import org.virbo.autoplot.dom.Row;
 import org.virbo.autoplot.util.CanvasLayoutPanel;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
 
@@ -386,10 +385,14 @@ public class LayoutPanel extends javax.swing.JPanel {
                         //Jemmy had this error...
                         return;
                     }
-                    PlotElement p = (PlotElement)o;
-                    Plot plot = dom.getController().getPlotFor(p);
-                    dom.getController().setPlot(plot);
-                    dom.getController().setPlotElement(p);
+                    PlotElement pe = (PlotElement)o;
+                    Plot plot = dom.getController().getPlotFor(pe);
+                    if ( plot!=null ) {
+                        dom.getController().setPlot(plot);
+                        dom.getController().setPlotElement(pe);
+                    } else {
+                        logger.warning("plot not found for plotElement");
+                    }
                 }
             }
         }
