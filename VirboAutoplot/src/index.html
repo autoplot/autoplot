@@ -23,9 +23,13 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-04-15 r18720):</p>
+        <p>Bugfixes (2016-04-18 r18736):</p>
         <ul>
+            <li>rebin(ds,int,int) would fail under test data.</li>
+            <li>rfe #453 underimplementation show both timerange and data set URI.</li>
             <li>1566: improve support for international desktops, with UTF-8 filenames.</li>
+            <li>send a separate graphics object to each renderer, so that sloppy renderers (like the orbit mode) don't affect others.</li>
+            <li>das2stream cache tag was not propagated up to the QDataSet</li>
             <li>plot timerange GUI on axis tab goes insensitive when no one is listening.</li>
             <li>1565: dataset selector use off the event thread.</li>
             <li>plotCommand with four parameters (index,x,y,z) would cause error</li>
