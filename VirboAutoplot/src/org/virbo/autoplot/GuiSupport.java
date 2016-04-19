@@ -1219,8 +1219,8 @@ public class GuiSupport {
         final String[] filters;
         switch (dia.getDepCount()) {
             case 0:
-                uris= new String[] {  dia.getSecondaryDataSetSelector().getValue() };
-                filters= new String[] { dia.getSecondaryFilters() };
+                uris= new String[] {  dia.getPrimaryDataSetSelector().getValue() };
+                filters= new String[] { dia.getPrimaryFilters() };
             break;  
             case 1:
                 uris= new String[] {  dia.getSecondaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue() };
@@ -1273,7 +1273,7 @@ public class GuiSupport {
                                 val= dia.getPrimaryDataSetSelector().getValue();
                                 uri= val;
                             }
-                            dom.getController().doplot(plot, pelement, val );
+                            pelement= dom.getController().doplot(plot, pelement, val );
                             DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, pelement.getDataSourceFilterId() );
                             if ( dia.getPrimaryFilters().length()>0 ) dsf.setFilters(dia.getPrimaryFilters());
                         }   
@@ -1289,14 +1289,14 @@ public class GuiSupport {
                         public void run() {
                             try {
                                 dom.getController().performingChange( dom, lock );
-                                dom.getController().doplot(lplot, lpelement, uris[0], uris[1] );
-                                DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, lpelement.getDataSourceFilterId() );
+                                PlotElement pele= dom.getController().doplot(lplot, lpelement, uris[0], uris[1] );
+                                DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, pele.getDataSourceFilterId() );
                                 List<DataSourceFilter> dsfs= DomUtil.getParentsFor( dom, dsf.getUri() );
                                 if ( dsfs.size()==2 && dsfs.get(0)!=null && dsfs.get(1)!=null ) {
                                     if ( filters[0].length()>0 ) dsfs.get(0).setFilters( filters[0] );
                                     if ( filters[1].length()>0 ) dsfs.get(1).setFilters( filters[1] );
                                 }                    
-                                dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(lpelement).getUri());
+                                dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(pele).getUri());
                             } finally {
                                 dom.getController().changePerformed( dom, lock );
                             }
@@ -1313,15 +1313,15 @@ public class GuiSupport {
                         public void run() {            
                             try {
                                 dom.getController().performingChange( dom, lock );
-                                dom.getController().doplot(lplot, lpelement, uris[0], uris[1], uris[2] );
-                                DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, lpelement.getDataSourceFilterId() );
+                                PlotElement pele= dom.getController().doplot(lplot, lpelement, uris[0], uris[1], uris[2] );
+                                DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, pele.getDataSourceFilterId() );
                                 List<DataSourceFilter> dsfs= DomUtil.getParentsFor( dom, dsf.getUri() );
                                 if ( dsfs.size()==3 && dsfs.get(0)!=null && dsfs.get(1)!=null && dsfs.get(2)!=null ) {
                                     if ( filters[0].length()>0 ) dsfs.get(0).setFilters( filters[0] );
                                     if ( filters[1].length()>0 ) dsfs.get(1).setFilters( filters[1] );
                                     if ( filters[2].length()>0 ) dsfs.get(2).setFilters( filters[2] );
                                 } 
-                                dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(lpelement).getUri());
+                                dom.getController().setFocusUri( dom.getController().getDataSourceFilterFor(pele).getUri());
                             } finally {
                                 dom.getController().changePerformed( dom, lock );
                             }
