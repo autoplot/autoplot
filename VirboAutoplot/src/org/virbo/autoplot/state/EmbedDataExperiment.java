@@ -132,6 +132,17 @@ public class EmbedDataExperiment {
             return uri;
         }
     }
+
+    /**
+     * this is a kludgy, where there is no way to see if a uri has a resource
+     * because das2server URIs have the address of the server as the resource.
+     * TODO: The data source should really be the one who answers the question.
+     * @param split the pre-parsed uri.
+     * @return true if the URI has a resource that needs to be embedded.
+     */
+    private static boolean hasNoResource( URISplit split ) {
+        return split.resourceUri==null || "vap+das2server".equalsIgnoreCase(split.vapScheme);
+    }
     
     /**
      * return a list of all the resources used in the DOM.
@@ -147,6 +158,9 @@ public class EmbedDataExperiment {
             URISplit split= URISplit.parse(suri);
             if ( split.resourceUri!=null ) {
                 URI uri= makeCanonical( split.resourceUri );
+                if ( hasNoResource( split ) ) { 
+                    continue;
+                }
                 if ( DataSetURI.isAggregating( uri.toString() ) ) {
                     try {
                         String [] rr= DataSetURI.unaggregate( uri.toASCIIString(), dom.getTimeRange() );
@@ -226,7 +240,7 @@ public class EmbedDataExperiment {
             for ( DataSourceFilter dsf: dom.getDataSourceFilters() ) {
                 String uri = dsf.getUri();
                 URISplit split= URISplit.parse(uri);
-                if ( uri.trim().length()>0 && split.resourceUri!=null ) {
+                if ( uri.trim().length()>0 && !hasNoResource(split) ) {
                     String name= makeRelativeName(split.resourceUri);
                     split.file= "%{PWD}/"+name;
                     dsf.setUri( URISplit.format(split) );
