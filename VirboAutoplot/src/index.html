@@ -23,8 +23,9 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-04-19 r18740):</p>
+        <p>Bugfixes (2016-04-19 r18750):</p>
         <ul>
+            <li>rebin mishandled NaN data, resulting in weights dataset which was inconsistent with the data.</li>
             <li>1278: das2server URIs fail to embed within .vap.zip file</li>
             <li>rte_0405096901: initialization of TickCurveRenderer caused NullPointerException</li>
             <li>rebin(ds,int,int) would fail under test data.</li>
