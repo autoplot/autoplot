@@ -330,6 +330,7 @@ public class AxisPanel extends javax.swing.JPanel {
         String type;
         
         Plot p= applicationController.getPlot();
+        if ( p==null ) return; // transitional state observed in JNLP release
         if ( UnitsUtil.isTimeLocation( p.getXaxis().getRange().getUnits() ) ) {
             type= "xaxis";    
         } else if ( dom.getController().findBindings( p, "context").size()>0 && dom.getController().isTimeSeriesBrowse(p) ) {
