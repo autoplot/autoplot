@@ -10,7 +10,6 @@ package org.virbo.autoplot;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
-import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
@@ -23,10 +22,8 @@ import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementController;
-import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.filters.FiltersChainPanel;
 
 /**
  * GUI tab for controlling how data is handled, provides feedback for what is
@@ -44,7 +41,7 @@ public class DataPanel extends javax.swing.JPanel {
     
     private PlotElement plotElement;// current focus
     
-    private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui");
+    private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui.data");
 
     public DataPanel( AutoplotUI app) {
         initComponents();

@@ -77,7 +77,7 @@ import org.virbo.datasource.DataSourceEditorPanelUtil;
  */
 public class LayoutPanel extends javax.swing.JPanel {
 
-    private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.layout");
+    private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui.layout");
 
     Plot draggingPlot=null;
     Point dragInitialClick= null;
