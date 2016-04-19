@@ -567,16 +567,16 @@ public class ApplicationController extends DomNodeController implements RunLater
         return plot1;
     }
 
-    public void doplot(Plot plot, PlotElement pele, String secondaryUri, String teriaryUri, String primaryUri) {
-        support.plot(plot, pele, secondaryUri, teriaryUri, primaryUri);
+    public PlotElement doplot(Plot plot, PlotElement pele, String secondaryUri, String teriaryUri, String primaryUri) {
+        return support.plot(plot, pele, secondaryUri, teriaryUri, primaryUri);
     }
 
-    public void doplot(Plot plot, PlotElement pele, String secondaryUri, String primaryUri) {
-        support.plot(plot, pele, secondaryUri, primaryUri);
+    public PlotElement doplot(Plot plot, PlotElement pele, String secondaryUri, String primaryUri) {
+        return support.plot(plot, pele, secondaryUri, primaryUri);
     }
 
-    public void doplot(Plot plot, PlotElement pele, String primaryUri) {
-        support.plot(plot, pele, primaryUri);
+    public PlotElement doplot(Plot plot, PlotElement pele, String primaryUri) {
+        return support.plot(plot, pele, primaryUri);
     }
 
     /**
