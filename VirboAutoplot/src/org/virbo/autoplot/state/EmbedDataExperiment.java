@@ -192,11 +192,16 @@ public class EmbedDataExperiment {
      * @param uri the resource location, like "http://autoplot.org/data/autoplot.cdf"
      * @return the name, like "http/autoplot.org/data/autoplot.cdf"
      */
-    private static String makeRelativeName( URI uri ) {
+    private static String makeRelativeName( String commonPath, URI uri ) {
         String name;
         if ( uri.getScheme().equals("file")) {
-           name= uri.toString().replaceAll(":///","/");
-           name= name.replaceAll(":/", "/" );
+            name= uri.getPath();
+            if ( name.startsWith(commonPath) ) {
+                name= uri.getScheme() + "/"+ name.substring(commonPath.length());
+            } else {
+                name= uri.toString().replaceAll(":///","/");
+                name= name.replaceAll(":/", "/" );
+            }
         } else {
            name= uri.toString().replaceAll("://","/");     
         }   
@@ -225,13 +230,33 @@ public class EmbedDataExperiment {
                 datasets[i]= dom3.getDataSourceFilters(i).getController().getDataSet();
             }
         }
-
+        
+        // try to find common path for local file references, so local references aren't embedded.
+        Set<URI> uris= getResources(dom);
+        String commonPath= null;
+        for ( URI uri: uris ) {
+            if ( uri.getScheme().equals("file") ) {
+                if ( commonPath==null ) {
+                    commonPath= uri.getPath();
+                } else {
+                    String path= uri.getPath();
+                    int i;
+                    for ( i=0; i<Math.min(commonPath.length(),path.length()); i++ ) {
+                        if ( path.charAt(i)!=commonPath.charAt(i) ) {
+                            break;
+                        }
+                    }
+                    commonPath= commonPath.substring(0,i);
+                }
+            }
+        }
+        
         FileOutputStream fout= new FileOutputStream(f);
         ZipOutputStream out=null;
         try {
             out= new ZipOutputStream( fout );
-            for ( URI uri: getResources(dom) ) {
-                String name= makeRelativeName(uri);
+            for ( URI uri: getResources(dom) ) { // resolve aggregations, etc.
+                String name= makeRelativeName(commonPath,uri);
                 File file1= DataSetURI.getFile(uri,new NullProgressMonitor());
                 writeToZip( out, name, file1 );
             }
@@ -241,7 +266,7 @@ public class EmbedDataExperiment {
                 String uri = dsf.getUri();
                 URISplit split= URISplit.parse(uri);
                 if ( uri.trim().length()>0 && !hasNoResource(split) ) {
-                    String name= makeRelativeName(split.resourceUri);
+                    String name= makeRelativeName(commonPath,split.resourceUri);
                     split.file= "%{PWD}/"+name;
                     dsf.setUri( URISplit.format(split) );
                 } else if ( uri.equals("vap+internal:") ) {
