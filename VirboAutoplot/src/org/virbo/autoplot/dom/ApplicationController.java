@@ -2785,6 +2785,9 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param plot 
      */
     public void setPlot(Plot plot) {
+        if ( plot==null ) {
+            logger.warning("setPlot(null)");
+        }
         Plot oldPlot = this.plot;
         if ( SwingUtilities.isEventDispatchThread() && ( oldPlot!=plot ) ) {
             Logger.getLogger("gui").log(Level.FINE, "set plot {0}", plot);
