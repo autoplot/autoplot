@@ -196,7 +196,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
     BindingGroup plotBindingGroup;
 
-    private BindingGroup doPlotBindings() {
+    private void doPlotBindings() {
 
         BindingGroup bc = new BindingGroup();
 
@@ -233,7 +233,6 @@ public class AxisPanel extends javax.swing.JPanel {
         doCheckTimeRangeControllerEnable();
         p.getXaxis().addPropertyChangeListener( Axis.PROP_RANGE, timeRangeAxisControllerEnabler );
         
-        return bc;
     }
 
     private Binding timeRangeBinding= null;
