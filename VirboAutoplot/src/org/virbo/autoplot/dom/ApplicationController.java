@@ -1885,6 +1885,10 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
 
             Plot p0= application.getPlots(0);
+            if ( p0==null ) throw new NullPointerException("p0 is null");
+            if ( p0.getXaxis()==null )  throw new NullPointerException("p0.getXaxis() is null");
+            if ( p0.getXaxis().getController()==null )  throw new NullPointerException("p0.getXaxis().getController() is null");
+            if ( p0.getXaxis().getController().getDasAxis()==null )  throw new NullPointerException("p0.getXaxis().getController().getDasAxis() is null");
             p0.getXaxis().getController().getDasAxis().setTcaFunction(null);
 
             for ( int i=application.getPlotElements().length-1; i>0; i-- ) {
