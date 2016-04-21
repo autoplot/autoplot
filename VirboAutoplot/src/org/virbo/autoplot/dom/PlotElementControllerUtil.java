@@ -13,10 +13,11 @@ public class PlotElementControllerUtil {
 
     /**
      * return the DatumRange for the plot element's data.  When there is a
-     * TimeSeriesBrowse, this is its timerange, otherwise it comes from
+     * TimeSeriesBrowse, this is its timerange (the axis range or the loaded range
+     * when a time axis is not visible), otherwise it comes from
      * the data.  If none is found, then null is returned.
-     * @param dom
-     * @param pe
+     * @param dom the application
+     * @param pe the plot element
      * @return the DatumRange or null.
      */
     public static DatumRange getTimeRange( Application dom, PlotElement pe ) {
@@ -28,7 +29,11 @@ public class PlotElementControllerUtil {
         
         TimeSeriesBrowse tsb= dsf.getController().getTsb();
         if ( tsb!= null ) {
-            return tsb.getTimeRange();
+            if ( dsf.getController().getTimeSeriesBrowseController().isListeningToAxis() ) {
+                return dsf.getController().getTimeSeriesBrowseController().getPlot().getXaxis().getRange();
+            } else {
+                return tsb.getTimeRange();
+            }
         } else {
             DatumRange dr=null;
             if ( pe.getPlotDefaults()!=null && pe.getPlotDefaults().getXaxis()!=null ) {
