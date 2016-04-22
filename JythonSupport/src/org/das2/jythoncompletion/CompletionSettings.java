@@ -101,6 +101,27 @@ public class CompletionSettings {
             logger.log( Level.SEVERE, ex.getMessage(), ex );
         }
     }
+    
+    private String documentationPaneSize = "640x480";
+
+    public static final String PROP_DOCUMENTATIONPANESIZE = "documentationPaneSize";
+
+    public String getDocumentationPaneSize() {
+        return documentationPaneSize;
+    }
+
+    public void setDocumentationPaneSize(String documentationPaneSize) {
+        String oldDocumentationPaneSize = this.documentationPaneSize;
+        this.documentationPaneSize = documentationPaneSize;
+        propertyChangeSupport.firePropertyChange(PROP_DOCUMENTATIONPANESIZE, oldDocumentationPaneSize, documentationPaneSize);
+        prefs.put( PROP_DOCUMENTATIONPANESIZE, documentationPaneSize );
+        try {
+            prefs.flush();
+        } catch ( BackingStoreException ex ) {
+            logger.log( Level.SEVERE, ex.getMessage(), ex );
+        }
+    }
+
 
 
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
