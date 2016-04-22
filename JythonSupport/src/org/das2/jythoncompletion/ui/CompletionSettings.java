@@ -77,11 +77,18 @@ public final class CompletionSettings  {
     }
     
     public Dimension completionPopupMaximumSize() {
-        return new Dimension( 600,600 );
+        String s= org.das2.jythoncompletion.JythonCompletionProvider.getInstance().settings().getDocumentationPaneSize();
+        int i= s.indexOf("x");
+        if ( i==-1 ) return new Dimension(640,480);
+        try {
+            return new Dimension( Integer.parseInt(s.substring(0,i)), Integer.parseInt(s.substring(i+1) ) );
+        } catch ( NumberFormatException ex ) {
+            return new Dimension(640,480);
+        }
     }
     
     public Dimension documentationPopupPreferredSize() {
-        return new Dimension( 600,400 );
+        return completionPopupMaximumSize();
     }
     
     public Color documentationBackgroundColor() {
