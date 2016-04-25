@@ -14,12 +14,12 @@ from org.das2.event import BoxSelectorMouseModule
 
 mm= BoxSelectorMouseModule.create( dasPlot, 'digitizer' )
 
-import java.util.HashMap
+import java.util.LinkedHashMap
 
 def boxSelected(event):
     x= event.getXRange().min()
     y= event.getYRange().max()
-    map= java.util.HashMap()
+    map= java.util.LinkedHashMap()
     map.put( "dx", event.getXRange().width() )
     map.put( "dy", event.getYRange().width() )
     dpr.addDataPoint( x, y, map )
