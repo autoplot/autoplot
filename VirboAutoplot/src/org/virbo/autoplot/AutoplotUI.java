@@ -4856,6 +4856,7 @@ APSplash.checkTime("init 240");
                         app.currentIconTooltip = null;
                     }
                 }
+                app.dom.getController().setPendingChangeCount( changes.size() );
                 boolean update = false;
                 if (app.currentIcon != app.statusLabel.getIcon()) {
                     update = true;
@@ -4865,6 +4866,7 @@ APSplash.checkTime("init 240");
                     update = true;
                 }
                 if (update) {
+                    //app.dom.getController().setPendingChangeCount( changes.size() );
                     try {
                         SwingUtilities.invokeAndWait(app.updateIconRunnable);
                     } catch (InterruptedException | InvocationTargetException ex) {
@@ -4914,6 +4916,7 @@ APSplash.checkTime("init 240");
 
     }
 
+    
     /**
      * provide access to the dropTargetListener.  Presumably this was added for testing.
      * @return the dropListener.
