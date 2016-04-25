@@ -76,6 +76,8 @@ public class ScreenshotsTool extends EventQueue {
 
     private static final Logger logger= LoggerManager.getLogger("autoplot.screenshots");
     
+    private boolean receivedEvents= false;  // so this can be used without automatic screenshots.
+    
     /**
      * start should be called from the event thread.
      * @param parent the device
@@ -569,9 +571,18 @@ public class ScreenshotsTool extends EventQueue {
     Rectangle bounds= null;
 
     /**
+     * manually trigger a screenshot, which is put in the output directory.
+     * @param id user-provided id (&le; 99999) for the image, which is the last part of the filename.
+     */
+    public void takePicture( int id ) {
+        long t1= System.currentTimeMillis();
+        doTakePicture( t1, t1-tb, id );
+    }
+            
+    /**
      * take a screenshot and write it to a png file.
      * @param t1 the time in millis.
-     * @param dt elased time.
+     * @param dt elapsed time.
      * @param id the event id number.
      * @return 
      */
@@ -632,7 +643,7 @@ public class ScreenshotsTool extends EventQueue {
      * @param trimAll 
      */
     public void requestFinish( boolean trimAll ) {
-        pop();
+        if ( receivedEvents ) pop();
         if ( trimAll ) {
             try {
                 trimAll( outLocationFolder, bounds, new NullProgressMonitor() );
@@ -645,6 +656,8 @@ public class ScreenshotsTool extends EventQueue {
     @Override
     public void dispatchEvent(AWTEvent theEvent) {
 
+        this.receivedEvents= true;
+        
         super.dispatchEvent(theEvent);
 
         long t1 = System.currentTimeMillis();
