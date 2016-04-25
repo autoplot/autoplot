@@ -3025,4 +3025,22 @@ public class ApplicationController extends DomNodeController implements RunLater
         return false;
     }
 
+    private int pendingChangeCount = 0;
+
+    public static final String PROP_PENDINGCHANGECOUNT = "pendingChangeCount";
+
+    /**
+     * get the number of pending changes.  0 means the application is idle.
+     * @return get the number of pending changes.
+     */
+    public int getPendingChangeCount() {
+        return pendingChangeCount;
+    }
+
+    public void setPendingChangeCount(int pendingChangeCount) {
+        int oldPendingChangeCount = this.pendingChangeCount;
+        this.pendingChangeCount = pendingChangeCount;
+        propertyChangeSupport.firePropertyChange(PROP_PENDINGCHANGECOUNT, oldPendingChangeCount, pendingChangeCount);
+    }
+    
 }
