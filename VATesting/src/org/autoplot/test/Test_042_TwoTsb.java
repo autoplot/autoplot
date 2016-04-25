@@ -72,6 +72,14 @@ public class Test_042_TwoTsb implements Scenario {
             dom.setTimeRange( dom.getTimeRange().next() );
             writeToPng("Test_042_TwoTsb_2.png"); // Leave artifacts for testing.
             save("Test_042_TwoTsb_2.vap");
+
+            dom.setTimeRange( dom.getTimeRange().rescale(0,0.5) );
+            writeToPng("Test_042_TwoTsb_3.png"); // Leave artifacts for testing.
+            save("Test_042_TwoTsb_3.vap");
+
+            dom.setTimeRange( dom.getTimeRange().rescale(-0.5,0.5) );
+            writeToPng("Test_042_TwoTsb_4.png"); // Leave artifacts for testing.
+            save("Test_042_TwoTsb_4.vap");
             
             return(0);
 
