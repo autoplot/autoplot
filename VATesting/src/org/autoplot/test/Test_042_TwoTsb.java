@@ -48,7 +48,7 @@ public class Test_042_TwoTsb implements Scenario {
             
             Application dom= ScriptContext.getDocumentModel();
             
-            dom.getPlots(0).setDisplayLegend(true);
+            dom.getPlotElements(0).setDisplayLegend(true);
             dom.getPlotElements(0).setLegendLabel("%{PLOT_CONTEXT}");
             
             ScriptContext.waitUntilIdle();
@@ -66,6 +66,12 @@ public class Test_042_TwoTsb implements Scenario {
             
             writeToPng("Test_042_TwoTsb.png"); // Leave artifacts for testing.
             save("Test_042_TwoTsb.vap");
+            
+            Thread.sleep(1000);
+            
+            dom.setTimeRange( dom.getTimeRange().next() );
+            writeToPng("Test_042_TwoTsb_2.png"); // Leave artifacts for testing.
+            save("Test_042_TwoTsb_2.vap");
             
             return(0);
 
