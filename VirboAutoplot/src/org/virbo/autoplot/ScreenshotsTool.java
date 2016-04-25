@@ -624,6 +624,24 @@ public class ScreenshotsTool extends EventQueue {
         button= b;
     }
     
+    /**
+     * This was introduced to provide a method for Jemmy tests to record videos 
+     * (so that videos are tested), but it looks like this won't work.  However
+     * this would probably be useful from scripts, so I will leave it.
+     * 
+     * @param trimAll 
+     */
+    public void requestFinish( boolean trimAll ) {
+        pop();
+        if ( trimAll ) {
+            try {
+                trimAll( outLocationFolder, bounds, new NullProgressMonitor() );
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
     @Override
     public void dispatchEvent(AWTEvent theEvent) {
 
