@@ -9,7 +9,7 @@
             <xsd:sequence>
                 <xsd:element name="currentStatus" type="tns:reviewStatus"></xsd:element>
                 <xsd:element name="modifiedDate" type="xsd:dateTime"></xsd:element>
-                <xsd:element name="imageURI" type="xsd:anyURI" minOccurs="0"></xsd:element>
+                <xsd:element name="imageURI" type="xsd:anyURI" minOccurs="0"></xsd:element>  <!-- name, can be relative to the root -->
                 <xsd:element name="reviewComment" minOccurs="0" maxOccurs="unbounded">
                     <xsd:complexType mixed="true">
                         <xsd:sequence/>
