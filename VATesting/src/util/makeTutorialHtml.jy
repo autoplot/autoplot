@@ -1,0 +1,63 @@
+# Generate HTML demonstrations based on Screenshots Tool and PngWalkTool QC facility.  
+# The screenshots tool is run, creating a sequence of screenshots.  This should be trimmed
+# automatically, so that all images are of the same size, and as small as possible.  
+# The PNGWalk QC tool is turned on, and then "OK/green" images are written to HTML with 
+# the last comment as the caption to each figure.
+
+from javax.xml.parsers import ParserConfigurationException
+from javax.xml.parsers import DocumentBuilderFactory
+from javax.xml.xpath import XPath
+from javax.xml.xpath import XPathExpressionException
+from javax.xml.xpath import XPathFactory
+from javax.xml.xpath import XPathConstants
+from org.xml.sax import InputSource
+from java.io import File
+from java.io import FileInputStream
+
+d= getParam('dir','/home/jbf/pngwalk/', 'the pngwalk home' )
+
+ff= getParam('name', 'product')
+
+def getCaption( qcFile ):
+    'return the last review comment in the xml file'
+    myin= FileInputStream( qcFile )
+    builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+    source = InputSource( myin )
+    initialDocument = builder.parse(source)    
+    factory= XPathFactory.newInstance()
+    xpath= factory.newXPath()
+    caption= xpath.evaluate( '/qualityControlRecord/reviewComment[last()]/text()', initialDocument, XPathConstants.STRING )
+    return caption
+
+ll= listDirectory( d + '/' + ff + '*.ok' )
+
+thedate= TimeParser.create('$Y$m$d_$H$M').format(TimeUtil.now())
+
+if ( ff=='' ): ff= thedate
+
+html= open( d + '/' + ff + '.html', 'w' )
+html.write( '''
+	<head><title>Tutorial %(dat)s</title></head>
+	<body style="background-color: #6B6B6B; margin=0;">
+		<div style="padding:20px; top: 0px; margin-right=0px; background-color:black; color:white;height:30px;">
+			<strong>Tutorial %(dat)s</strong>
+		</div>
+		<div style="background-color: #6B6B6B;margin-left:100px;">
+''' % { 'dat':thedate } )
+
+for l in ll:
+    cap= getCaption( d + '/' + l ) # bug here where line 31 error wasn't highlited.
+    img= l[0:-3] # remove the '.ok'
+    
+    html.write( '''<figure style="width:700px; float:left;">
+				<a href="%(img)s">
+				<img src="%(img)s" style="width:100%%;margin-left:10px;margin-bottom:10px;"></a>
+				<figcaption style="color: white; text-align:center;">%(cap)s</figcaption>
+			</figure>''' % { 'img':img, 'cap':cap } )
+
+html.write( '''</div>
+	</body>
+</html>''' )
+
+html.close()
+
