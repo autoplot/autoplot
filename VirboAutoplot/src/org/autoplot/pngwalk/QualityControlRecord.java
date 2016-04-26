@@ -88,7 +88,7 @@ public class QualityControlRecord {
     private static Validator validator;
     private SimpleDateFormat utcDateFormat;
 
-    private static final String XMLNS = "http://virbo.org/schema/pngwalkQC";
+    private static final String XMLNS = "http://autoplot.org/data/schema/pngwalkQC";
 
     private static Map<URI,QualityControlRecord> cache;
     private static URI cacheURI;
