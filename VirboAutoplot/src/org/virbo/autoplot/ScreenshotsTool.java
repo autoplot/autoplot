@@ -29,6 +29,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
@@ -163,13 +164,13 @@ public class ScreenshotsTool extends EventQueue {
                 AWTEvent update= peekEvent(1200);
                 if ( update==null ) {
                     long t1= System.currentTimeMillis();
-                    Rectangle r= doTakePicture( t1, t1-tb, 99999 );
+                    Rectangle r= doTakePicture(filenameFor(t1-tb, 99999), t1);
                     if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
 
                 } else {
                     if ( canReject(update) ) {
                         long t1= System.currentTimeMillis();
-                        Rectangle r= doTakePicture( t1, t1-tb, 99999 );
+                        Rectangle r= doTakePicture(filenameFor(t1-tb, 99999), t1);
                         if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
                     }
                     //System.err.println("update coming anyway");
@@ -570,26 +571,60 @@ public class ScreenshotsTool extends EventQueue {
      */
     Rectangle bounds= null;
 
+    private String filenameFor( long dt, int id ) {
+        return tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + "_" + String.format("%05d", id ) + ".png";
+    }
+    
     /**
      * manually trigger a screenshot, which is put in the output directory.
      * @param id user-provided id (&le; 99999) for the image, which is the last part of the filename.
      */
     public void takePicture( int id ) {
         long t1= System.currentTimeMillis();
-        doTakePicture( t1, t1-tb, id );
+        doTakePicture(filenameFor(t1-tb, id), t1);
+    }
+    
+    /**
+     * manually trigger a screenshot, which is put in the output directory, and 
+     * write a QC file to contain a caption.
+     * @param id user-provided id (&le; 99999) for the image, which is the last part of the filename.
+     * @param caption string caption.
+     */
+    public void takePicture( int id, String caption ) {
+        long t1= System.currentTimeMillis();
+        long dt= t1-tb;
+        String file= filenameFor(dt, id);
+        doTakePicture(file, t1);
+        String reviewer= System.getProperty("user.name");
+        String time= TimeParser.create("$Y-$m-$dT$H:$M:$SZ").format(TimeUtil.now());
+        String s= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<qualityControlRecord xmlns=\"http://autoplot.org/data/schema/pngwalkQC\">\n" +  // TODO: xmlns is not valid, and has been renamed to hide.
+            "    <currentStatus>OK</currentStatus>\n" +
+            String.format( "    <modifiedDate>%s</modifiedDate>\n", time ) +
+            String.format( "    <imageURI>%s</imageURI>\n", file ) +
+            String.format( "    <reviewComment date=\"%s\" reviewer=\"%s\" status=\"OK\">%s</reviewComment>\n", time, reviewer, caption ) +
+            "</qualityControlRecord>" ;
+        File f= new File( outLocationFolder, file + ".ok" );
+        try ( FileWriter fo= new FileWriter(f) ) {
+            fo.write(s);
+        } catch ( IOException ex ) {
+            logger.log( Level.WARNING, ex.getMessage(), ex );
+        }
+        
     }
             
     /**
      * take a screenshot and write it to a png file.
+     * @param filename the filename for the image, without the root.
      * @param t1 the time in millis.
      * @param dt elapsed time.
      * @param id the event id number.
-     * @return 
+     * @return the rectangle containing the GUI window.
      */
-    private Rectangle doTakePicture( long t1, long dt, int id ) {
+    private Rectangle doTakePicture( String filename, long t1 ) {
         t0= t1;
 
-        final File file = new File( outLocationFolder, tp.format(TimeUtil.now(), null) + "_" + String.format("%06d", dt/100 ) + "_" + String.format("%05d", id ) + ".png" );
+        final File file = new File( outLocationFolder, filename );
 
         final BufferedImage im = getScreenShot( active, button, true );
 
@@ -717,7 +752,7 @@ public class ScreenshotsTool extends EventQueue {
         } 
 
         if (  !reject ) {
-            Rectangle r= doTakePicture( t1, dt, theEvent.getID() );   // Take a picture here
+            Rectangle r= doTakePicture(filenameFor(dt, theEvent.getID()), t1);   // Take a picture here
             if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
         }
 
