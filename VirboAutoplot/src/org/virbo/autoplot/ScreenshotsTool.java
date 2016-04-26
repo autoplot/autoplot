@@ -142,7 +142,33 @@ public class ScreenshotsTool extends EventQueue {
         }
     }
 
+    /**
+     * create a new ScreenshotsTool, which will write screenshots to the location.
+     * @param parent parent to follow.  It and its children are recorded.
+     * @param outLocationFolder local file location, folder relative to Autoplot's PWD.
+     * @throws IOException 
+     * @see #ScreenshotsTool(java.awt.Window, java.lang.String, boolean) 
+     */
     public ScreenshotsTool( Window parent, String outLocationFolder ) throws IOException {
+        this( parent, outLocationFolder, false );
+    }
+    
+    /**
+     * create a new ScreenshotsTool, which will write screenshots to the location.  The
+     * output folder must not exist or be empty, or clearFolder must be set to true.
+     * This is created and then pushed to the event stack, so that screenshots will
+     * be taken when activity occurs (see start which manages this), or will takePicture
+     * is called to manually take screenshots (e.g. from scripts).  When the
+     * session is done, requestFinish is called to clean up.
+     * @param parent parent to follow.  It and its children are recorded.
+     * @param outLocationFolder local file location, folder relative to Autoplot's PWD.
+     * @param clearFolder if true, clear any files from the output folder.
+     * @throws IOException 
+     * @see #takePicture(int) 
+     * @see #takePicture(int, java.lang.String) which writes the caption to a PNGWalk QC file.
+     * @see #requestFinish(boolean) 
+     */
+    public ScreenshotsTool( Window parent, String outLocationFolder, boolean clearFolder ) throws IOException {
         this.outLocationFolder= new File( outLocationFolder );
         boolean fail= false;
         if (!this.outLocationFolder.exists()) {
@@ -150,7 +176,13 @@ public class ScreenshotsTool extends EventQueue {
         }
         if ( fail ) throw new IOException("output folder cannot be created");
         if ( this.outLocationFolder.listFiles().length>1 ) {
-            throw new IOException("output folder must be empty");
+            if ( clearFolder ) {
+                for ( File f:this.outLocationFolder.listFiles() ) {
+                    if ( !f.delete() ) throw new IllegalArgumentException("unable to delete file: "+f );
+                }
+            } else {
+                throw new IOException("output folder must be empty");
+            }
         }
         logFile= new BufferedWriter( new FileWriter( new File( this.outLocationFolder, tp.format( TimeUtil.now(), null ) + ".txt" ) ) );
 
@@ -675,7 +707,7 @@ public class ScreenshotsTool extends EventQueue {
      * (so that videos are tested), but it looks like this won't work.  However
      * this would probably be useful from scripts, so I will leave it.
      * 
-     * @param trimAll 
+     * @param trimAll trim off the portions of all screenshots which are not used.
      */
     public void requestFinish( boolean trimAll ) {
         if ( receivedEvents ) pop();
