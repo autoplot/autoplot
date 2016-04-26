@@ -37,9 +37,13 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -100,7 +104,7 @@ public class ScriptPanelSupport {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.jython");
     
-    private static final int RECENT_FILES_COUNT = 20;
+    private static final int RECENT_FILES_COUNT = 100;
 
     File file;
     final ApplicationModel model;
@@ -1117,17 +1121,24 @@ public class ScriptPanelSupport {
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                Map<String,String> recent= model.getRecent(filter,limit);
+                Map<String,String> recent= model.getRecent(filter,10*limit);
 
                 final DefaultListModel mm= new DefaultListModel();
-                for ( String s:recent.keySet() ){
+                
+                List<String> ss= new ArrayList( recent.keySet() );
+                int count=0;
+                for ( int i=ss.size()-1; i>0; i-- ) {
+                    String s= ss.get(i);
                     if ( s.startsWith("script:") ) s= s.substring(7);
                     if ( s.startsWith("file:") ) {
                         if ( s.startsWith("file://") ) s= s.substring(7);
                         if ( s.startsWith("file:") ) s= s.substring(5);
                         mm.add(0,s);
+                        count++;
+                        if ( count==limit ) break;
                     }
                 }
+                
                 Runnable run= new Runnable() {
                     @Override
                     public void run() {
@@ -1161,7 +1172,7 @@ public class ScriptPanelSupport {
         scrollPane.setMinimumSize( new Dimension(300,100) );
         scrollPane.setMaximumSize( new Dimension(300,200) );       
         
-        recentPanel.add( new JLabel("Recently used local files:"), BorderLayout.NORTH );
+        recentPanel.add( new JLabel("Recently used local ("+filter+") files:"), BorderLayout.NORTH );
         recentPanel.add( scrollPane, BorderLayout.CENTER );
         return recentPanel;
     }
@@ -1198,11 +1209,7 @@ public class ScriptPanelSupport {
                 // I have to hope that it was an NFS problem we were having.  I don't see the problem on Ubuntu or Macs.
             }
             
-            if ( panel.getContext()==JythonScriptPanel.CONTEXT_APPLICATION ) {
-                chooser.setAccessory( getRecentAccessory("*.jy", RECENT_FILES_COUNT,chooser) );
-            } else {
-                chooser.setAccessory( getRecentAccessory("*.jyds", RECENT_FILES_COUNT,chooser) );
-            }
+            chooser.setAccessory( getRecentAccessory("*.jy*", RECENT_FILES_COUNT,chooser) );
             chooser.revalidate();
             
             int r = chooser.showOpenDialog(panel);
