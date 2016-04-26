@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://virbo.org/schema/pngwalkQC"
-    xmlns:tns="http://virbo.org/schema/pngwalkQC"
+    targetNamespace="http://autoplot.org/data/schema/pngwalkQC"
+    xmlns:tns="http://autoplot.org/data/schema/pngwalkQC"
     elementFormDefault="qualified">
     <xsd:element name="qualityControlRecord">
         <xsd:complexType>
