@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
@@ -209,6 +211,7 @@ public class Test_031_MultiPanelPlot implements Scenario {
     }
     
     public static void main(String[] argv) {
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 	String[] params = {"org.autoplot.test.Test_031_MultiPanelPlot"};
 	org.netbeans.jemmy.Test.main(params);
     }
