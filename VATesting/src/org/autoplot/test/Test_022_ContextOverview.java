@@ -14,7 +14,9 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.LoggerManager;
 import org.das2.datum.Units;
 import org.netbeans.jemmy.ComponentChooser;
+import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.*;
 import org.virbo.autoplot.AutoplotUI;
 import static org.virbo.autoplot.ScriptContext.*;
@@ -146,6 +148,7 @@ public class Test_022_ContextOverview implements Scenario {
     }
 
     public static void main(String[] argv) {
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 	String[] params = {"org.autoplot.test.Test_022_ContextOverview"};
 	org.netbeans.jemmy.Test.main(params);
     }
