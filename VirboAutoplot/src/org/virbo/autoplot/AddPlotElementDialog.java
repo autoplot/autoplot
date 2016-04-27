@@ -99,6 +99,12 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         doUpdateAdditionalVisible( enabled, useFilters, filtersCB );
     }
     
+    /**
+     * show/hide the additional operations GUI component
+     * @param enabled is the component enabled, such as Plot Against (X)"
+     * @param useFilters additional operations
+     * @param filtersCB the filter.
+     */
     private void doUpdateAdditionalVisible( final JCheckBox enabled, final JCheckBox useFilters, final JComboBox filtersCB ) {
         boolean v= ( enabled==null || enabled.isSelected() ) && doShowAdditionalFiltersCB.isSelected();
         useFilters.setVisible( v );
@@ -238,6 +244,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         bindingGroup.addBinding(binding);
 
         doShowAdditionalFiltersCB.setText("Show \"Additional Operations\" fields, where filters can be applied immediately after loading.");
+        doShowAdditionalFiltersCB.setName("showAdditionalOperations"); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -403,6 +410,33 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
         tertiaryCheckBox.setVisible(i>0);
         tertiaryCheckBox.setSelected( i>1 );
         tertiaryDataSetSelector.setVisible(i>1);
+    }
+
+    /**
+     * if true, then show the additional operations fields.
+     * @param show if true, then show the additional operations fields.
+     */
+    public void setShowAdditionalOperations( boolean show ) {
+        this.doShowAdditionalFiltersCB.setSelected(show);
+        doUpdateAdditionalVisible( null, primaryFiltersCB, primaryFiltersComboBox );
+        doUpdateAdditionalVisible( secondaryCheckBox, secondaryFiltersCB, secondaryFiltersComboBox );
+        doUpdateAdditionalVisible( tertiaryCheckBox, tertiaryFiltersCB, tertiaryFiltersComboBox );
+    }
+
+    public void setUsePrimaryFilters( boolean show ) {
+        this.primaryFiltersCB.setSelected(show);
+    }
+    
+    public void setPrimaryFilter( String f ) {
+        this.primaryFiltersComboBox.setSelectedItem(f);
+    }
+
+    public void setUseSecondaryFilters( boolean show ) {
+        this.secondaryFiltersCB.setSelected(show);
+    }
+    
+    public void setSecondaryFilter( String f ) {
+        this.secondaryFiltersComboBox.setSelectedItem(f);
     }
 
     protected boolean cancelled = true;

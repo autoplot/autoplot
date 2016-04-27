@@ -268,6 +268,7 @@
     <Component class="javax.swing.JCheckBox" name="doShowAdditionalFiltersCB">
       <Properties>
         <Property name="text" type="java.lang.String" value="Show &quot;Additional Operations&quot; fields, where filters can be applied immediately after loading."/>
+        <Property name="name" type="java.lang.String" value="showAdditionalOperations" noResource="true"/>
       </Properties>
     </Component>
   </SubComponents>
