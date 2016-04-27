@@ -5,6 +5,7 @@
 
 package org.autoplot.test;
 
+import java.util.logging.Logger;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JLabelOperator;
@@ -18,7 +19,12 @@ import org.virbo.autoplot.ScriptContext;
  */
 public class First {
     public static void main( String[] args ) throws Exception {
-
+        
+        // See logging.properties in the root of this project.
+        Logger.getLogger("vatesting").warning("warning");
+        Logger.getLogger("vatesting").info("info");
+        Logger.getLogger("vatesting").fine("fine");
+        
         ScriptContext.createGui();
         
         AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
