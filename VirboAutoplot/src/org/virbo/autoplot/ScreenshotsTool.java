@@ -5,6 +5,7 @@ import java.awt.AWTEvent;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Event;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -626,7 +627,7 @@ public class ScreenshotsTool extends EventQueue {
         long t1= System.currentTimeMillis();
         long dt= t1-tb;
         String file= filenameFor(dt, id);
-        doTakePicture(file, t1);
+        doTakePicture(file, t1,false);
         String reviewer= System.getProperty("user.name");
         String time= TimeParser.create("$Y-$m-$dT$H:$M:$SZ").format(TimeUtil.now());
         String s= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -644,7 +645,96 @@ public class ScreenshotsTool extends EventQueue {
         }
         
     }
-            
+     
+    /**
+     * manually trigger a screenshot, which is put in the output directory, and 
+     * write a QC file to contain a caption, and draw the pointer focused on the
+     * component.
+     * @param id user-provided id (&le; 99999) for the image, which is the last part of the filename.
+     * @param caption string caption.
+     * @param c component for controlling the mouse pointer location.
+     * @param p null or the point relative to the component.
+     * @param buttons MouseEvent.BUTTON1_DOWN_MASK
+     */
+    public void takePicture( int id, String caption, Component c, Point p, int buttons ) {
+
+        long t1= System.currentTimeMillis();
+        long dt= t1-tb;
+        String filename= filenameFor(dt, id);
+
+        if ( p==null ) {
+            p= c.getLocation();
+            p.translate( 6,  2 * c.getHeight() / 3 ); // 6 pixels to the right, 2/3 of the way down.
+        } else {
+            p= p.getLocation(); // let's not mutate the user-provided point.
+        }
+        SwingUtilities.convertPointToScreen( p, c );
+        
+        t0= t1;
+
+        final File file = new File( outLocationFolder, filename );
+
+        final BufferedImage im = getScreenShot( active, 0, false );
+
+        BufferedImage pointer;
+        if ( ( buttons & MouseEvent.BUTTON1_DOWN_MASK ) == MouseEvent.BUTTON1_DOWN_MASK ) {
+            pointer= pnt_b1;
+        } else if ( ( buttons & MouseEvent.BUTTON2_DOWN_MASK ) == MouseEvent.BUTTON2_DOWN_MASK ) {
+            pointer= pnt_b2;
+        } else if ( ( buttons & MouseEvent.BUTTON3_DOWN_MASK ) == MouseEvent.BUTTON3_DOWN_MASK ) {
+            pointer= pnt_b3;
+        } else if ( ( buttons & MOUSE_WHEEL_UP ) == MOUSE_WHEEL_UP ) {
+            pointer= pnt_w1;
+        } else if ( ( buttons & MOUSE_WHEEL_DOWN ) == MOUSE_WHEEL_DOWN ) {
+            pointer= pnt_w2;
+        } else {
+            pointer= pnt;
+        }
+
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice[] gs = ge.getScreenDevices();        
+        
+        Rectangle b= getScreenBounds(active);
+        Rectangle r= getMyBounds(b);
+        if ( bounds==null ) bounds= r; else bounds= bounds.union(r);
+        
+        Rectangle bounds1= gs[active].getDefaultConfiguration().getBounds();
+        
+        im.getGraphics().drawImage( pointer, p.x - bounds1.x - ptrXOffset, p.y - bounds1.y - ptrYOffset, null ); 
+
+        try {
+            if ( !file.createNewFile() ) {
+                logger.log(Level.WARNING, "failed to create new file {0}", file);
+            } else {
+                ImageIO.write(im, "png", file);
+            }
+
+        } catch ( Exception ex ) {
+            logger.log( Level.WARNING, ex.getMessage(), ex );
+        }
+
+        t0= System.currentTimeMillis();
+        
+        
+        
+        String reviewer= System.getProperty("user.name");
+        String time= TimeParser.create("$Y-$m-$dT$H:$M:$SZ").format(TimeUtil.now());
+        String s= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<qualityControlRecord xmlns=\"http://autoplot.org/data/schema/pngwalkQC\">\n" +  // TODO: xmlns is not valid, and has been renamed to hide.
+            "    <currentStatus>OK</currentStatus>\n" +
+            String.format( "    <modifiedDate>%s</modifiedDate>\n", time ) +
+            String.format( "    <imageURI>%s</imageURI>\n", file ) +
+            String.format( "    <reviewComment date=\"%s\" reviewer=\"%s\" status=\"OK\">%s</reviewComment>\n", time, reviewer, caption ) +
+            "</qualityControlRecord>" ;
+        File f= new File( outLocationFolder, file + ".ok" );
+        try ( FileWriter fo= new FileWriter(f) ) {
+            fo.write(s);
+        } catch ( IOException ex ) {
+            logger.log( Level.WARNING, ex.getMessage(), ex );
+        }
+        
+    }
+
     /**
      * take a screenshot and write it to a png file.
      * @param filename the filename for the image, without the root.
@@ -654,11 +744,24 @@ public class ScreenshotsTool extends EventQueue {
      * @return the rectangle containing the GUI window.
      */
     private Rectangle doTakePicture( String filename, long t1 ) {
+        return doTakePicture( filename, t1, true );
+    }
+        
+    /**
+     * take a screenshot and write it to a png file.
+     * @param filename the filename for the image, without the root.
+     * @param t1 the time in millis.
+     * @param dt elapsed time.
+     * @param id the event id number.
+     * @param includePointer true if the pointer should be drawn.
+     * @return the rectangle containing the GUI window.
+     */
+    private Rectangle doTakePicture( String filename, long t1, boolean includePointer ) {
         t0= t1;
 
         final File file = new File( outLocationFolder, filename );
 
-        final BufferedImage im = getScreenShot( active, button, true );
+        final BufferedImage im = getScreenShot( active, button, includePointer );
 
         Rectangle b= getScreenBounds(active);
         Rectangle myBounds= getMyBounds(b);
