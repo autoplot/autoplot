@@ -1130,10 +1130,16 @@ public class ScriptPanelSupport {
                 for ( int i=ss.size()-1; i>0; i-- ) {
                     String s= ss.get(i);
                     if ( s.startsWith("script:") ) s= s.substring(7);
+                    if ( s.startsWith("vap+jyds:") ) s= s.substring(9);
+                    if ( s.startsWith("vap+jy:") ) s= s.substring(7);
                     if ( s.startsWith("file:") ) {
                         if ( s.startsWith("file://") ) s= s.substring(7);
                         if ( s.startsWith("file:") ) s= s.substring(5);
-                        mm.add(0,s);
+                        if ( s.endsWith("?") ) s= s.substring(0,s.length()-1);
+                        if ( mm.contains(s) ) {
+                            mm.removeElement(s);
+                        }
+                        mm.addElement(s);
                         count++;
                         if ( count==limit ) break;
                     }
