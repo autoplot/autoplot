@@ -767,7 +767,9 @@ public class ApplicationModel {
     }
 
     /** 
-     * return a list of items matching filter.
+     * return a list of items matching filter, in a LinkedHashMap.  Note
+     * the map is a LinkedHashMap, which preserves the order, and the
+     * last element is the more recently used.
      * @param filter String like "*.jy"
      * @param limit maximum number of items to return
      * @return 
