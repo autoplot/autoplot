@@ -1135,7 +1135,10 @@ public class ScriptPanelSupport {
                     if ( s.startsWith("file:") ) {
                         if ( s.startsWith("file://") ) s= s.substring(7);
                         if ( s.startsWith("file:") ) s= s.substring(5);
-                        if ( s.endsWith("?") ) s= s.substring(0,s.length()-1);
+                        int iq= s.indexOf("?");
+                        if ( iq>-1 ) {
+                            s= s.substring(0,iq);
+                        }
                         if ( mm.contains(s) ) {
                             mm.removeElement(s);
                         }
