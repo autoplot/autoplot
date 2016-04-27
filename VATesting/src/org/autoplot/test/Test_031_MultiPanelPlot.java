@@ -54,6 +54,8 @@ public class Test_031_MultiPanelPlot implements Scenario {
             
             AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
             
+            JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
+            
             JFrameOperator mainFrame = new JFrameOperator(app);
             
             // wait for the application to be in the "ready" state.
@@ -211,7 +213,6 @@ public class Test_031_MultiPanelPlot implements Scenario {
     }
     
     public static void main(String[] argv) {
-        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 	String[] params = {"org.autoplot.test.Test_031_MultiPanelPlot"};
 	org.netbeans.jemmy.Test.main(params);
     }
