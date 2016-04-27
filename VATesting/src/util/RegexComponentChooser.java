@@ -4,11 +4,15 @@ package util;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Frame;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JToggleButton;
 import javax.swing.text.JTextComponent;
 import org.netbeans.jemmy.ComponentChooser;
 
@@ -18,6 +22,8 @@ import org.netbeans.jemmy.ComponentChooser;
  */
 public class RegexComponentChooser implements ComponentChooser {
 
+    private static final Logger logger= Logger.getLogger("vatesting");
+    
     String regex;
     Pattern pattern;
 
@@ -39,12 +45,15 @@ public class RegexComponentChooser implements ComponentChooser {
             text= ((JLabel)comp).getText();
         } else if ( text==null && comp instanceof JButton ) {
             text= ((JButton)comp).getText();
+        } else if ( text==null && comp instanceof JToggleButton ) {
+            text= ((JButton)comp).getText();
         } else if ( text==null && comp instanceof JMenu ) {
             text= ((JMenu)comp).getText();
         } else if ( text==null && comp instanceof JMenuItem ) {
             text= ((JMenuItem)comp).getText();
         }
         String name = comp.getName();
+        logger.log(Level.FINEST, "checkComponent for text \"{0}\" with regex \"{1}\": {2}", new Object[]{text, regex, comp});
         return ( ( name!=null && pattern.matcher(name).matches() ) || ( text!=null && pattern.matcher(text).matches() ) );
     }
 
