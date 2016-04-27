@@ -5,7 +5,9 @@
  */
 package org.autoplot.test;
 
+import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
@@ -28,6 +30,8 @@ public class Test_054_FftFilter implements Scenario {
     @Override
     public int runIt(Object o) {
 
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
+  
         ScriptContext.createGui();
 
         AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();

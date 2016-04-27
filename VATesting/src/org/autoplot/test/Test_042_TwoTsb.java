@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.jemmy.ComponentChooser;
+import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
@@ -31,6 +33,8 @@ public class Test_042_TwoTsb implements Scenario {
     
     @Override
     public int runIt(Object o) {
+
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
         try {
             ScriptContext.createGui();

@@ -10,7 +10,9 @@ import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.das2.graph.SpectrogramRenderer;
 import org.das2.util.filesystem.FileSystem;
+import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.virbo.autoplot.AutoplotUI;
@@ -26,6 +28,9 @@ public class Test_041_Lanl20140214b implements Scenario {
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
     public int runIt(Object param) {
+
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
+
         try {
             System.err.println( "## v20141212" );
             

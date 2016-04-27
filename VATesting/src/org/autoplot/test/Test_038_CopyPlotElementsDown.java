@@ -14,9 +14,11 @@ import org.virbo.autoplot.dom.Application;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.LoggerManager;
+import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.virbo.autoplot.AutoplotUI;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.TestOut;
 import static org.virbo.autoplot.ScriptContext.*;
 
 /**
@@ -28,6 +30,9 @@ public class Test_038_CopyPlotElementsDown implements Scenario  {
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
     public int runIt(Object param) {
+
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
+        
         try {
             createGui();
             AutoplotUI app = (AutoplotUI) getViewWindow();

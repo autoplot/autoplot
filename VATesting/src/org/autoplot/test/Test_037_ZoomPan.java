@@ -13,6 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.LoggerManager;
 import org.das2.graph.DasPlot;
+import org.netbeans.jemmy.JemmyProperties;
+import org.netbeans.jemmy.TestOut;
 import org.virbo.autoplot.dom.Application;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.virbo.autoplot.AutoplotUI;
@@ -36,6 +38,8 @@ public class Test_037_ZoomPan implements Scenario {
         DatumRange dr0;
         DatumRange dr1;
         DatumRange dr2;
+
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
         try {
             

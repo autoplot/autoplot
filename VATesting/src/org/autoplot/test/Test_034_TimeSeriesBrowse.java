@@ -14,7 +14,9 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.util.LoggerManager;
+import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
@@ -35,6 +37,8 @@ public class Test_034_TimeSeriesBrowse implements Scenario {
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
     public int runIt(Object o) {
+
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
         try {
             ScriptContext.createGui();

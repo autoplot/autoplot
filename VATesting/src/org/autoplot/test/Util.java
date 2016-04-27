@@ -5,7 +5,10 @@
 
 package org.autoplot.test;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -22,6 +25,8 @@ import util.RegexComponentChooser;
  */
 public class Util {
 
+    private static final Logger logger= Logger.getLogger("vatesting");
+    
     /**
      * push the context menu item identified by the items.  This is a
      * list of regular expressions identifying the levels.
@@ -48,14 +53,8 @@ public class Util {
     static void setLAF() {
         try {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 

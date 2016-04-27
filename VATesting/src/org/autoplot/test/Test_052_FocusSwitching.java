@@ -13,7 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
+import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
@@ -40,6 +42,8 @@ public class Test_052_FocusSwitching implements Scenario {
     
     @Override
     public int runIt(Object o) {
+
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
         try {
             

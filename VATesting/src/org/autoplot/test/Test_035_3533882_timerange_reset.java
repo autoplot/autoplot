@@ -14,7 +14,9 @@ import java.util.logging.Logger;
 import org.das2.datum.LoggerManager;
 import org.das2.graph.DasAxis;
 import org.netbeans.jemmy.ComponentChooser;
+import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
@@ -34,6 +36,9 @@ public class Test_035_3533882_timerange_reset implements Scenario {
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
     public int runIt(Object o) {
+
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
+
 
         try {
             createGui();

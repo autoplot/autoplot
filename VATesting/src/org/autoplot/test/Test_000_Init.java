@@ -9,7 +9,9 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.TestOut;
 import org.virbo.autoplot.AutoplotUI;
 import static org.virbo.autoplot.ScriptContext.createGui;
 import static org.virbo.autoplot.ScriptContext.getApplicationModel;
@@ -25,6 +27,9 @@ public class Test_000_Init implements Scenario {
     @Override
     public int runIt(Object param) {
         
+        // hide Jemmy output
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
+            
         getApplicationModel().setExceptionHandler( new DumpRteExceptionHandler() );
             
         createGui();

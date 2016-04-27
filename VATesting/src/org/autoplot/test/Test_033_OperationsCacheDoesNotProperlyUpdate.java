@@ -10,8 +10,10 @@ import org.virbo.autoplot.dom.Application;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.LoggerManager;
+import org.netbeans.jemmy.JemmyProperties;
 import org.virbo.autoplot.AutoplotUI;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import static org.virbo.autoplot.ScriptContext.*;
@@ -25,6 +27,9 @@ public class Test_033_OperationsCacheDoesNotProperlyUpdate implements Scenario  
     private static final Logger logger= LoggerManager.getLogger("vatesting");
     
     public int runIt(Object param) {
+
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
+        
         try {
             createGui();
             AutoplotUI app = (AutoplotUI) getViewWindow();

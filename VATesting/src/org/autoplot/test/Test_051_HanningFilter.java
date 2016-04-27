@@ -8,7 +8,9 @@ package org.autoplot.test;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
+import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JLabelOperator;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
@@ -32,6 +34,8 @@ public class Test_051_HanningFilter implements Scenario {
     
     @Override
     public int runIt(Object o) {
+
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
         try {
             ScriptContext.createGui();

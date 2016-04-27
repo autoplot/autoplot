@@ -6,6 +6,8 @@
 package org.autoplot.test;
 
 import java.io.File;
+import org.netbeans.jemmy.JemmyProperties;
+import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.DialogOperator;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JFrameOperator;
@@ -23,6 +25,8 @@ import util.RegexComponentChooser;
 public class Test_100_Demo1423 {
     public static void main( String[] args ) throws Exception {
 
+        JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
+        
         ScriptContext.createGui();
         
         AutoplotUI app= (AutoplotUI) ScriptContext.getViewWindow();
