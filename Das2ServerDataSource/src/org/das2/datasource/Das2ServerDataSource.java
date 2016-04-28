@@ -41,6 +41,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.stream.MIME;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.KeyChain;
 import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DataSetOps;
@@ -325,6 +326,9 @@ class Das2ServerDataSource extends AbstractDataSource {
 		     HttpURLConnection httpConn = (HttpURLConnection) conn;
 			  int nStatus = httpConn.getResponseCode();
                           while ( nStatus==401 ) {
+                                //URL keyChainUrl= new URL( url2.getProtocol() + "://user@" + url2.getHost() + url2.getPath() + "/" + params2.get("dataset" ) );
+                                //String userInfo= KeyChain.getDefault().getUserInfo(keyChainUrl);
+                                
                                 org.das2.util.CredentialsManager cm= org.das2.util.CredentialsManager.getMannager();
                                 String sLocId= this.resourceURI.toURL().toString() + "|" + dataset;
                                 //String sLocId = "planet.physics.uiowa.edu/das/das2Server|voyager1/pwi/SpecAnalyzer-4s-Efield";
@@ -340,6 +344,9 @@ class Das2ServerDataSource extends AbstractDataSource {
                                     throw new java.io.IOException("User credentials are not available "+
 					  " for URL: " + url2);
                                 }
+                                //String sHashRaw=  cm.getHttpBasicHashRaw(sLocId);
+                                //KeyChain.getDefault().setUserInfo( keyChainUrl, sHashRaw );
+                                
                                 conn = url2.openConnection(); //TODO: stderr should be consumed.
                                 conn.setRequestProperty("Authorization", "Basic " + sHash );
                                 conn.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
