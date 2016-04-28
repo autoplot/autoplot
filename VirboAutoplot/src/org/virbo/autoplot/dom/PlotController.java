@@ -1099,6 +1099,7 @@ public class PlotController extends DomNodeController {
             }
             dasPlot.setTitle( (String)titleConverter.convertForward( plot.getTitle() ) );
             dasPlot.getYAxis().setLabel( (String)plot.getYaxis().getController().labelConverter.convertForward( plot.getYaxis().getLabel() ) );
+            dasPlot.getXAxis().setLabel( (String)plot.getXaxis().getController().labelConverter.convertForward( plot.getXaxis().getLabel() ) );
             QDataSet pds= plotElement.getController().getDataSet();
             logger.log( Level.FINE, "{0} dataSetListener", plot);
             if ( pds!=null && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(pds)) ) {
