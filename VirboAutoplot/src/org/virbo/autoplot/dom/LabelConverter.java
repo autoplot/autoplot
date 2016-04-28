@@ -82,7 +82,7 @@ public class LabelConverter extends Converter {
                 if ( pe!=null ) {
                     QDataSet dataSet= pe.getController().getDataSet();
                     if ( dataSet!=null ) {
-                        if ( plot.getXaxis()==axis ) {  // crazy kludge, sure to cause problems.  This assumes that DEPEND_0 is the dataset causing the variation in X.
+                        if ( plot!=null && plot.getXaxis()==axis ) {  // crazy kludge, sure to cause problems.  This assumes that DEPEND_0 is the dataset causing the variation in X.
                             logger.finer("getting the CONTEXT property from DEPEND_0");
                             QDataSet d= (QDataSet) dataSet.property(QDataSet.DEPEND_0);
                             if ( d!=null && SemanticOps.getUnits(d).isConvertibleTo(axis.getRange().getUnits()) ) {
