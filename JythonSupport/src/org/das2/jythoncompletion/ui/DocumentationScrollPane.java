@@ -70,6 +70,7 @@ import javax.swing.text.Utilities;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import org.das2.jythoncompletion.support.CompletionDocumentation;
+import org.virbo.datasource.DataSourceUtil;
 
 /**
  *
@@ -365,8 +366,10 @@ public class DocumentationScrollPane extends JScrollPane {
 
     private void openInExternalBrowser() {
         URL url = currentDocumentation.getURL();
-        if (url != null)
-          org.das2.jythoncompletion.nbadapt.Utilities.openBrowser(url.toString());
+        if (url != null) {
+            DataSourceUtil.openBrowser(url.toString());
+        }
+        //  org.das2.jythoncompletion.nbadapt.Utilities.openBrowser(url.toString());
     }
 
     private void goToSource() {
