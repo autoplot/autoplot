@@ -878,7 +878,8 @@ public class DataSourceController extends DomNodeController {
             case 1: {
                 if (x == null) {
                     return "parent dataset is null";
-                }   if (DataSetUtil.validate(x, null)) {
+                }   
+                if (DataSetUtil.validate(x, null)) {
                     ds = x;
                     props = xprops;
                 }   
@@ -887,7 +888,8 @@ public class DataSourceController extends DomNodeController {
             case 2: {
                 if (x == null || y == null) {
                     return "first or second dataset is null";
-                }   ArrayDataSet yds = ArrayDataSet.copy(y);
+                }   
+                ArrayDataSet yds = ArrayDataSet.copy(y);
                 assert yprops != null;
                 if (DataSetUtil.validate(x, yds, null)) {
                     boolean dep0mismatch= false;
@@ -918,7 +920,8 @@ public class DataSourceController extends DomNodeController {
             case 3: {
                 if (x == null || y == null || z == null) {
                     return "at least one of the three datasets is null";
-                }   assert yprops != null;
+                }   
+                assert yprops != null;
                 assert zprops != null;
                 if (z.rank() == 1) {
                     ArrayDataSet yds = ArrayDataSet.copy(y);
