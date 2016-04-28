@@ -63,7 +63,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 resetSpacecraft("rbspa-pp");
             }
         };
-        new Thread(run,"loadOrbits");
+        new Thread(run,"loadOrbits").start();
         feedbackLabel.setText("loading orbits for rbspa");
         timeRangeTextField.addPropertyChangeListener( "text", new PropertyChangeListener() {
             @Override
