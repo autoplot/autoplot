@@ -191,6 +191,8 @@ class Das2ServerDataSource extends AbstractDataSource {
 
         if ( resolution!=null ) {
             params2.put("resolution", ""+resolution.doubleValue(Units.seconds) );
+        } else {
+            logger.fine("resolution is not available, loading at intrinsic resolution");
         }
         String dataset= params.get("dataset");
         if ( dataset==null ) {
@@ -221,7 +223,7 @@ class Das2ServerDataSource extends AbstractDataSource {
             params2.put("interval",URLEncoder.encode(String.valueOf( iinterval ), "US-ASCII"));
             params2.remove("resolution");
         } else {
-            logger.finer("dataset is not a TCA");
+            logger.finer("dataset is not a TCA, interval parameter is null");
         }
         
         params2.put("dataset", URLEncoder.encode(dataset, "US-ASCII") );
