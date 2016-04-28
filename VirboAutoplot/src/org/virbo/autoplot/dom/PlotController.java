@@ -1678,46 +1678,6 @@ public class PlotController extends DomNodeController {
         }
     }
 
-
-    protected Converter labelContextConverter( final Axis axis ) {
-        return new Converter() {
-            @Override
-            public Object convertForward(Object value) {
-                String title= (String)value;
-                if ( title.contains("%{CONTEXT}" ) ) {
-                    String contextStr="";
-                    if ( plotElement!=null && plotElement.getController()!=null ) {
-                        QDataSet ds= plotElement.getController().getDataSet();
-                        if ( ds!=null ) {
-                            contextStr= DataSetUtil.contextAsString(ds);
-                            if ( !contextStr.equals("") ) {
-                                String[] ss= contextStr.split("=");
-                                if ( ss.length==2 ) {
-                                    contextStr= ss[1]; // shorten if it is of the form A=B to just B
-                                }
-                            }
-                        }
-                    }
-                    title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
-                }
-                return title;
-            }
-
-            @Override
-            public Object convertReverse(Object value) {
-                String title= (String)value;
-                String ptitle=  axis.getLabel();
-                if (ptitle.contains("%{CONTEXT}") ) {
-                    String[] ss= ptitle.split("%\\{CONTEXT\\}",-2);
-                    if ( title.startsWith(ss[0]) && title.endsWith(ss[1]) ) {
-                        return ptitle;
-                    }
-                }
-                return title;
-            }
-        };
-    }
-
     private synchronized void bindTo(DasPlot p) {
         ApplicationController ac= dom.controller;
         titleConverter= new LabelConverter( dom, plot, null, null, null );
