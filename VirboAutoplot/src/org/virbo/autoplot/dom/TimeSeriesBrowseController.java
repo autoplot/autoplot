@@ -40,6 +40,7 @@ public class TimeSeriesBrowseController {
 
     private PlotElement p;
     private DasAxis xAxis;
+    private boolean released= false; // set to true after release, to make sure it is not used again.
     private DasPlot dasPlot;
     private Plot domPlot;
     private PlotElementController plotElementController;
@@ -86,7 +87,7 @@ public class TimeSeriesBrowseController {
     }
     
     protected TimeSeriesBrowseController( DataSourceController dataSourceController, final PlotElement p ) {
-
+        
         this.changesSupport= new ChangesSupport(this.propertyChangeSupport,this);
         
         updateTsbTimer = new TickleTimer(300, new PropertyChangeListener() {
@@ -133,7 +134,11 @@ public class TimeSeriesBrowseController {
                             changesSupport.performingChange( TimeSeriesBrowseController.this, PENDING_AXIS_OR_TIMERANGE_DIRTY );
                             if ( fpe!=null && ( fdsf==null || ftsb == null ) ) {
                             } else {
-                                updateTsb(false);
+                                if ( released ) {
+                                    logger.fine("leftover update ignored because this is released.");
+                                } else {
+                                    updateTsb(false);
+                                }
                             }
                         //}
                         } finally {
@@ -296,6 +301,10 @@ public class TimeSeriesBrowseController {
 
     }
 
+    /**
+     * load the new dataset, etc.
+     * @param autorange 
+     */
     public void updateTsb(boolean autorange) {
 
         logger.log(Level.FINE, "updateTsb({0})...", autorange);
@@ -408,6 +417,10 @@ public class TimeSeriesBrowseController {
                         logger.log( Level.FINER, "update b/c surl!=tsbSuri:\n  {0}\n  {1}", new Object[]{surl, dataSourceController.getTsbSuri()});
                     }
                     dataSourceController.cancel();
+                    logger.fine("calling update, which will reload data");
+                    if ( this.released ) {
+                        System.err.append("here were shouldn't be");
+                    }
                     dataSourceController.update(false);
                     dataSourceController.setTsbSuri(surl);
                     if ( domPlot!=null ) {
@@ -468,9 +481,11 @@ public class TimeSeriesBrowseController {
      */
     protected void release() {
         if (  isListeningToAxis() ) {
+            logger.fine("releasing TSB controller");
             this.dasPlot.getXAxis().removePropertyChangeListener(DasAxis.PROPERTY_DATUMRANGE,timeSeriesBrowseListener);
             this.domPlot.removePropertyChangeListener( Plot.PROP_CONTEXT, timeSeriesBrowseListener ) ;
             this.xAxis= null;
+            this.released= true;
         } else {
             if ( listenNode!=null ) {
                 if ( timeSeriesBrowseListener==null ) {
