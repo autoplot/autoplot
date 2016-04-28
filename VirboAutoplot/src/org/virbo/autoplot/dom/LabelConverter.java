@@ -13,6 +13,7 @@ import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 
 /**
  * Class for containing the logic of how macros are implemented.
@@ -81,6 +82,13 @@ public class LabelConverter extends Converter {
                 if ( pe!=null ) {
                     QDataSet dataSet= pe.getController().getDataSet();
                     if ( dataSet!=null ) {
+                        if ( plot.getXaxis()==axis ) {  // crazy kludge, sure to cause problems.  This assumes that DEPEND_0 is the dataset causing the variation in X.
+                            logger.finer("getting the CONTEXT property from DEPEND_0");
+                            QDataSet d= (QDataSet) dataSet.property(QDataSet.DEPEND_0);
+                            if ( d!=null && SemanticOps.getUnits(d).isConvertibleTo(axis.getRange().getUnits()) ) {
+                                dataSet= d;
+                            }
+                        }
                         String contextStr= DataSetUtil.contextAsString(dataSet);
                         title= insertString( title, "CONTEXT", contextStr );
                     }
