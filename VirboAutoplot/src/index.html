@@ -1,13 +1,14 @@
 <html>
     <head>
         <title>Autoplot Application (#{tag})</title>
+        <meta charset="UTF-8"> 
     </head>
     <body>
         <H3>Autoplot Application (#{tag})</H3>
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>ProGAL library provides 3-D tessellation, used by new functions for interpolating "buckshot" data to uniform grids.  <a href="http://jfaden.net/~jbf/autoplot/script/demos/demo3dTriangulation.jy">Script here</a>
+        <p><small>Code cleanup of URI handling allows characters like ß to be used.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -23,8 +24,17 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-04-19 r18750):</p>
+        <p>Bugfixes (2016-04-28 r18801):</p>
         <ul>
+            <li>When adapting legacy VectorDataSets to QDataSet, name the default plane "y".</li>
+            <li>1576: Masafumi pointed out extraneous load when undo was pressed.</li>
+            <li>das2stream containing new unit would fail to read, whoops!</li>
+            <li>bundleNames function would fail to add element when it found an unnamed dataset, now returns "ch_i"</li>
+            <li>Jython "recently used files" area shows both .jy and .jyds files, so you don't have to think about the current context.</li>
+            <li>1570: make sure the axis timerange is returned in %{TIMERANGE} macro, not the loaded timerange.</li>
+            <li>corrections to triangulation routines.  Scale data to be around one before tesselation.</li>
+            <li>476: add plot below resulted in NullPointerException.</li>
+            <li>1567:  das2server URIs fail to embed within .vap.zip file, other problems.  Also see if a common file path can be calculated..</li>
             <li>rebin mishandled NaN data, resulting in weights dataset which was inconsistent with the data.</li>
             <li>1278: das2server URIs fail to embed within .vap.zip file</li>
             <li>rte_0405096901: initialization of TickCurveRenderer caused NullPointerException</li>
@@ -157,6 +167,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>X axis with %{CONTEXT} property will show DEPEND_0 context.</li>
+            <li>Y axis with %{CONTEXT} property updates properly.</li>
+            <li>screenshotsTool supports manual calls to get the screenshot, so that scripts can write documentation.</li>
+            <li>jython popup documentation box size can be set.</li>
+            <li>rank 3 flatten and rebinBundle routines added.</li>
             <li>kludge in controls like %{TIMERANGE,NOORBIT} for Ivar's study.</li>
             <li>FileUtil.find added which allows regular expressions to be used when looking for files.</li>
             <li>buckshotInterpolate introduced, adding support for 2-D and 3-D interpolations of buckshot data.</li>
