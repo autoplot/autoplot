@@ -789,6 +789,9 @@ public class DataSourceController extends DomNodeController {
 
     /**
      * vap+internal: -> populate array of parent sources.
+     * <br>preconditions: uri is "" or "data_1,data_2"
+     * <br>postconditions: unbind() is called if the uri doesn't start with vap+internal, or parentSources array is containing references to the other data sources.
+     * @see #unbind() 
      */
     private void resolveParents() {
         synchronized (dscLock) {
@@ -871,78 +874,82 @@ public class DataSourceController extends DomNodeController {
             zprops = maybeCopy(lparentSources[2].controller.getFillProperties());
         }
         
-        if (lparentSources.length == 1) {
-            if (x == null) {
-                return "parent dataset is null";
+        switch (lparentSources.length) {
+            case 1: {
+                if (x == null) {
+                    return "parent dataset is null";
+                }   if (DataSetUtil.validate(x, null)) {
+                    ds = x;
+                    props = xprops;
+                }   
+                break;
             }
-            if (DataSetUtil.validate(x, null)) {
-                ds = x;
-                props = xprops;
-            }
-        } else if (lparentSources.length == 2) {
-            if (x == null || y == null) {
-                return "first or second dataset is null";
-            }
-            ArrayDataSet yds = ArrayDataSet.copy(y);
-            assert yprops != null;
-                                    
-            if (DataSetUtil.validate(x, yds, null)) {
-                boolean dep0mismatch= false;
-                if ( willTrim ) {
-                    QDataSet xdep0= (QDataSet) x.property( QDataSet.DEPEND_0 );
-                    QDataSet ydep0= (QDataSet) y.property( QDataSet.DEPEND_0 );        
-                    if ( xdep0!=null && ydep0!=null && xdep0.length()>0 ) {
-                        if ( Ops.eq( xdep0.slice(0), ydep0.slice(0) ).value()==0 ) {
-                            dep0mismatch= true;
+            case 2: {
+                if (x == null || y == null) {
+                    return "first or second dataset is null";
+                }   ArrayDataSet yds = ArrayDataSet.copy(y);
+                assert yprops != null;
+                if (DataSetUtil.validate(x, yds, null)) {
+                    boolean dep0mismatch= false;
+                    if ( willTrim ) {
+                        QDataSet xdep0= (QDataSet) x.property( QDataSet.DEPEND_0 );
+                        QDataSet ydep0= (QDataSet) y.property( QDataSet.DEPEND_0 );
+                        if ( xdep0!=null && ydep0!=null && xdep0.length()>0 ) {
+                            if ( Ops.eq( xdep0.slice(0), ydep0.slice(0) ).value()==0 ) {
+                                dep0mismatch= true;
+                            }
                         }
                     }
-                }
-                if ( dep0mismatch ) {
-                    logger.fine("dataset DEPEND_0 do not line up");
+                    if ( dep0mismatch ) {
+                        logger.fine("dataset DEPEND_0 do not line up");
+                    } else {
+                        yds.putProperty(QDataSet.DEPEND_0, x);
+                        yprops.put(QDataSet.DEPEND_0, xprops);
+                        if (DataSetUtil.validate(yds, null)) { //TODO: probably don't have to do check this twice.
+                            ds = yds;
+                            props = yprops;
+                        }
+                    }
                 } else {
+                    logger.info("linked data doesn't validate");
+                }   
+                break;
+            }
+            case 3: {
+                if (x == null || y == null || z == null) {
+                    return "at least one of the three datasets is null";
+                }   assert yprops != null;
+                assert zprops != null;
+                if (z.rank() == 1) {
+                    ArrayDataSet yds = ArrayDataSet.copy(y);
+                    yds.putProperty(QDataSet.RENDER_TYPE, null);
                     yds.putProperty(QDataSet.DEPEND_0, x);
+                    yds.putProperty(QDataSet.PLANE_0, z);
                     yprops.put(QDataSet.DEPEND_0, xprops);
-                    if (DataSetUtil.validate(yds, null)) { //TODO: probably don't have to do check this twice.
+                    yprops.put(QDataSet.PLANE_0, zprops);
+                    if (DataSetUtil.validate(yds, null)) { //TODO: link should and probably does work here
                         ds = yds;
                         props = yprops;
+                    } else {
+                        logger.info("linked data doesn't validate");
+                    }
+                } else {
+                    ArrayDataSet zds = ArrayDataSet.copy(z);
+                    zds.putProperty(QDataSet.DEPEND_0, x);
+                    zds.putProperty(QDataSet.DEPEND_1, y);
+                    if (DataSetUtil.validate(x, y, z, null)) {
+                        zprops.put(QDataSet.DEPEND_0, xprops);
+                        zprops.put(QDataSet.DEPEND_1, yprops);
+                        ds = zds;
+                        props = zprops;
+                    } else {
+                        logger.info("linked data doesn't validate");
                     }
                 }
-            } else {
-                logger.info("linked data doesn't validate");
+                break;
             }
-            
-        } else if (lparentSources.length == 3) {
-            if (x == null || y == null || z == null) {
-                return "at least one of the three datasets is null";
-            }
-            assert yprops != null;
-            assert zprops != null;
-            if (z.rank() == 1) {
-                ArrayDataSet yds = ArrayDataSet.copy(y);
-                yds.putProperty(QDataSet.RENDER_TYPE, null);
-                yds.putProperty(QDataSet.DEPEND_0, x);
-                yds.putProperty(QDataSet.PLANE_0, z);
-                yprops.put(QDataSet.DEPEND_0, xprops);
-                yprops.put(QDataSet.PLANE_0, zprops);
-                if (DataSetUtil.validate(yds, null)) { //TODO: link should and probably does work here
-                    ds = yds;
-                    props = yprops;
-                } else {
-                    logger.info("linked data doesn't validate");
-                }
-            } else {
-                ArrayDataSet zds = ArrayDataSet.copy(z);
-                zds.putProperty(QDataSet.DEPEND_0, x);
-                zds.putProperty(QDataSet.DEPEND_1, y);
-                if (DataSetUtil.validate(x, y, z, null)) {
-                    zprops.put(QDataSet.DEPEND_0, xprops);
-                    zprops.put(QDataSet.DEPEND_1, yprops);
-                    ds = zds;
-                    props = zprops;
-                } else {
-                    logger.info("linked data doesn't validate");
-                }
-            }
+            default:
+                break;
         }
 
         logger.log(Level.FINE, "checkParents resolves {0}", ds);
@@ -1002,8 +1009,9 @@ public class DataSourceController extends DomNodeController {
     };
 
     /**
-     * resolve a URI like vap+internal:data_0,data_1. preconditions: a
-     * vap+internal URI was found. postconditions: parentSources array is
+     * resolve a URI like vap+internal:data_0,data_1. 
+     * <br>preconditions: a vap+internal URI was found. 
+     * <br>postconditions: parentSources array is
      * defined with one element per parent. a listener is installed for each
      * parent what will notify when a dataset is loaded.
      *
@@ -1035,6 +1043,9 @@ public class DataSourceController extends DomNodeController {
         return true;
     }
 
+    /**
+     * remove the propertyChangeListener for dom property dataSourceFilters
+     */
     protected void unbind() {
         dom.removePropertyChangeListener(Application.PROP_DATASOURCEFILTERS, dsfListener);
     }
