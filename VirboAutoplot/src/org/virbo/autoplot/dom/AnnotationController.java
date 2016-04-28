@@ -75,10 +75,7 @@ public class AnnotationController extends DomNodeController {
         
         String plotId= annotation.getPlotId();
         if ( plotId!=null && plotId.length()>0 ) {
-            LabelConverter lc= new LabelConverter();
-            lc.dom= dom;
-            lc.plot= (Plot)DomUtil.getElementById( dom, plotId  );
-            lc.annotation= annotation;
+            LabelConverter lc= new LabelConverter( dom, (Plot)DomUtil.getElementById( dom, plotId  ), null, null, annotation );
             ac.bind( annotation, "text", p, "text", lc );
         } else {
             ac.bind( annotation, "text", p, "text");

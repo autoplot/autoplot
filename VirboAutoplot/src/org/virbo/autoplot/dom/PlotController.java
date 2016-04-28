@@ -732,12 +732,6 @@ public class PlotController extends DomNodeController {
                     updateAxisFormatter(axis);
                 }
 
-                //TODO: the following code has no effect, why was it there?
-                //// we can safely ignore these events.
-                //if (((DasAxis) e.getSource()).valueIsAdjusting()) {
-                //    return;
-                //}
-
             } else if ( evt.getPropertyName().equals( DasPlot.PROP_FOCUSRENDERER ) ) {
 
                 List<PlotElement> eles= PlotController.this.dom.controller.getPlotElementsFor(plot);
@@ -1104,6 +1098,7 @@ public class PlotController extends DomNodeController {
                 return;
             }
             dasPlot.setTitle( (String)titleConverter.convertForward( plot.getTitle() ) );
+            dasPlot.getYAxis().setLabel( (String)plot.getYaxis().getController().labelConverter.convertForward( plot.getYaxis().getLabel() ) );
             QDataSet pds= plotElement.getController().getDataSet();
             logger.log( Level.FINE, "{0} dataSetListener", plot);
             if ( pds!=null && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(pds)) ) {
@@ -1684,7 +1679,7 @@ public class PlotController extends DomNodeController {
     }
 
 
-    Converter labelContextConverter( final Axis axis ) {
+    protected Converter labelContextConverter( final Axis axis ) {
         return new Converter() {
             @Override
             public Object convertForward(Object value) {
@@ -1725,11 +1720,9 @@ public class PlotController extends DomNodeController {
 
     private synchronized void bindTo(DasPlot p) {
         ApplicationController ac= dom.controller;
-        titleConverter= new LabelConverter();
-        titleConverter.dom= dom;
-        titleConverter.plot= plot;
+        titleConverter= new LabelConverter( dom, plot, null, null, null );
         ac.bind( this.plot, Plot.PROP_TITLE, p, DasPlot.PROP_TITLE, titleConverter );
-        Converter contextConverter= new Converter() {
+        Converter plotContextConverter= new Converter() {
             @Override
             public Object convertForward(Object s) {
                 if ( s==Application.DEFAULT_TIME_RANGE ) {
@@ -1747,7 +1740,7 @@ public class PlotController extends DomNodeController {
                 }
             }
         };
-        ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT, contextConverter );
+        ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT, plotContextConverter );
         ac.bind( this.plot, Plot.PROP_ISOTROPIC, p, DasPlot.PROP_ISOTROPIC );
         ac.bind( this.plot, Plot.PROP_DISPLAYTITLE, p, DasPlot.PROP_DISPLAYTITLE );
         ac.bind( this.plot, Plot.PROP_DISPLAYLEGEND, p, DasPlot.PROP_DISPLAYLEGEND );

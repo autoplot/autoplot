@@ -2897,10 +2897,7 @@ public class PlotElementController extends DomNodeController {
      * @return JavaBeans property converter.
      */
     private Converter getLabelConverter() {
-        LabelConverter r= new LabelConverter();
-        r.plotElement= this.plotElement;
-        r.plot= null;
-        r.dom= dom;
+        LabelConverter r= new LabelConverter( dom, null, null, plotElement, null );
         return r;
     }
 

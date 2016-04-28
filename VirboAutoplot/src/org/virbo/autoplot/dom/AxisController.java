@@ -163,11 +163,15 @@ public class AxisController extends DomNodeController {
         };
     }
     
+    protected LabelConverter labelConverter;
+    
     public final synchronized void bindTo(DasAxis p) {
         ApplicationController ac = dom.controller;
         ac.bind(axis, "range", p, "datumRange");
         ac.bind(axis, "log", p, "log");
-        ac.bind(axis, "label", p, "label", plot.getController().labelContextConverter(axis) );
+        labelConverter= new LabelConverter( dom, plot, axis, null, null );
+        ac.bind(axis, Axis.PROP_LABEL, p, DasAxis.PROP_LABEL, labelConverter );
+        ///ac.bind(axis, "label", p, "label", plot.getController().labelContextConverter(axis) );
         ac.bind(axis, "fontSize", p, "fontSize" );
         ac.bind(axis, "drawTickLabels", p, "tickLabelsVisible");
         ac.bind(axis, "flipped", p, "flipped");
