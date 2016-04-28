@@ -28,12 +28,25 @@ public class LabelConverter extends Converter {
     
     private static Logger logger= LoggerManager.getLogger("autoplot.dom.labelConverter");
             
+    Application dom=null;
     PlotElement plotElement=null;
     Plot plot=null;
-    Application dom=null;
     Annotation annotation=null;
+    Axis axis= null;
     
     boolean multiplePEWarning= false;
+    
+    private LabelConverter() {   
+    }
+    
+    public LabelConverter( Application dom, Plot plot, Axis axis, PlotElement pe, Annotation an ) {
+        this();
+        this.dom= dom;
+        this.plot= plot;
+        this.axis= axis;
+        this.plotElement= pe;
+        this.annotation= an;
+    }
     
     private PlotElement getFocusPlotElement() {
         PlotElement pe;
@@ -170,6 +183,8 @@ public class LabelConverter extends Converter {
         } else if ( plotElement!=null ) {
             PlotElement pe= getFocusPlotElement();
             ptitle= pe.getLegendLabel();
+        } else if ( axis!=null ) {
+            ptitle= axis.getLabel();
         } else {
             ptitle= plot.getTitle();
         }
