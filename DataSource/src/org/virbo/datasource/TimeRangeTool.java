@@ -58,7 +58,13 @@ public class TimeRangeTool extends javax.swing.JPanel {
         initComponents();
         scComboBox.setModel( new DefaultComboBoxModel(getSpacecraft()) );
         scComboBox.setSelectedItem( "rbspa-pp" );
-        resetSpacecraft("rbspa-pp");
+        Runnable run= new Runnable() {
+            public void run() {
+                resetSpacecraft("rbspa-pp");
+            }
+        };
+        new Thread(run,"loadOrbits");
+        feedbackLabel.setText("loading orbits for rbspa");
         timeRangeTextField.addPropertyChangeListener( "text", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -483,7 +489,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jLabel10.setText("Select from predefined orbits, or spacecraft may be a URL to any three-column text file.");
 
         orbitList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            String[] strings = { "Loading orbits..." };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
