@@ -47,11 +47,11 @@ public abstract class QDataSetBridge {
     boolean debug= false;
     
     QDataSetBridge() {
-        datasets = new LinkedHashMap<String, QDataSet>();
-        names = new LinkedHashMap<QDataSet, String>();
-        sliceDep= new LinkedHashMap<String,String>();
+        datasets = new LinkedHashMap<>();
+        names = new LinkedHashMap<>();
+        sliceDep= new LinkedHashMap<>();
         prefUnits= new ArrayList();
-        System.err.println("QDataSetBridge v1.8.01");
+        System.err.println("QDataSetBridge v1.9.1");
     }
 
     /**
@@ -79,7 +79,7 @@ public abstract class QDataSetBridge {
         }
         boolean add= true;
         for ( int i=0; i<prefUnits.size(); i++ ) {
-            if ( prefUnits.get(i).isConvertableTo(unit) ) {
+            if ( prefUnits.get(i).isConvertibleTo(unit) ) {
                 if ( debug ) {
                     System.err.println("replacing preferred unit "+prefUnits.get(i)+ " with "+unit);
                 }
@@ -160,7 +160,7 @@ public abstract class QDataSetBridge {
             return;
         }
     }
-
+    
     /**
      * This initiates the read on a separate thread, so this does not 
      * block and should be used with caution.  See getProgressMonitor for 

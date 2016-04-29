@@ -57,6 +57,39 @@ public class APDataSet extends QDataSetBridge {
     }
 
     /**
+     * get the dataset in one load.
+     * @param uri the URI to load.
+     * @return 0 if everything went okay, non-zero if there was an error
+     * @see QDataSetBridge#getException()
+     */
+    public int getDataSet( String uri ) {
+        setDataSetURI(uri);
+        doGetDataSet();
+        if ( exception!=null ) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * get the dataset in one load.
+     * @param uri the URI to load.
+     * @param mon a progress monitor
+     * @return 0 if everything went okay, non-zero if there was an error
+     * @see QDataSetBridge#getException()
+     */
+    public int getDataSet( String uri, ProgressMonitor mon ) {
+        setDataSetURI(uri);
+        doGetDataSet(mon);
+        if ( exception!=null ) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    
+    /**
      * this is not called directly by clients in IDL or Matlab.  This is called by doGetDataSet.
      * @param mon
      * @return
