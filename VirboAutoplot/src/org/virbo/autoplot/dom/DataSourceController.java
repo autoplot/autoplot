@@ -535,7 +535,11 @@ public class DataSourceController extends DomNodeController {
             if (this.tsb != null) {
                 uri = this.tsbSuri;
             }
-            if (uri.length() > 80) {
+            if ( uri==null ){
+                uri= "<null>";
+            }
+            
+            if ( uri.length() > 80) {
                 int n = uri.length();
                 uri = uri.substring(0, 48) + " ... " + uri.substring(n - 30, n);
             }
@@ -974,8 +978,12 @@ public class DataSourceController extends DomNodeController {
                             logger.warning("non mono error?");
                             ds = null;
                         } else {
-                            QDataSet trim = ds.trim(idx0, idx1);
-                            ds = trim;
+                            QDataSet trim = ds.trim(idx0, idx1);                            
+                            if ( DataSetUtil.validate( trim, null ) ) {
+                                ds = trim;
+                            } else {
+                                return "data doesn't validate after trimming";
+                            }
                         }
                     }
                 }
