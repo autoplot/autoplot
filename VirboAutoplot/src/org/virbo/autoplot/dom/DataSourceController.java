@@ -900,7 +900,7 @@ public class DataSourceController extends DomNodeController {
                         }
                     }
                     if ( dep0mismatch ) {
-                        logger.fine("dataset DEPEND_0 do not line up");
+                        return "dataset DEPEND_0 do not line up";
                     } else {
                         yds.putProperty(QDataSet.DEPEND_0, x);
                         yprops.put(QDataSet.DEPEND_0, xprops);
@@ -910,7 +910,7 @@ public class DataSourceController extends DomNodeController {
                         }
                     }
                 } else {
-                    logger.log(Level.INFO, "linked data doesn''t validate: {0} and {1}", new Object[]{x, y});
+                    return "linked data doesn''t validate: "+x+" and "+y; 
                 }   
                 break;
             }
@@ -931,7 +931,7 @@ public class DataSourceController extends DomNodeController {
                         ds = yds;
                         props = yprops;
                     } else {
-                        logger.info("linked data doesn't validate");
+                        return "linked data doesn't validate";
                     }
                 } else {
                     ArrayDataSet zds = ArrayDataSet.copy(z);
@@ -943,7 +943,7 @@ public class DataSourceController extends DomNodeController {
                         ds = zds;
                         props = zprops;
                     } else {
-                        logger.info("linked data doesn't validate");
+                        return "linked data doesn't validate";
                     }
                 }
                 break;
