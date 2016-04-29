@@ -40,7 +40,12 @@ public class TimeSeriesBrowseController {
 
     private PlotElement p;
     private DasAxis xAxis;
-    private boolean released= false; // set to true after release, to make sure it is not used again.
+    
+    /**
+     * set to true after release, to make sure it is not used again.  This can 
+     * be reset to false when the TSB is rebound to the context property.
+     */
+    private boolean released= false; // 
     private DasPlot dasPlot;
     private Plot domPlot;
     private PlotElementController plotElementController;
@@ -223,9 +228,15 @@ public class TimeSeriesBrowseController {
         }
         listenNode= node;
         listenProp= property;
+        released= false;
     }
 
+    /**
+     * initialize the TSB to be listening to a time axis.
+     * @param valueWasAdjusting true if we are loading a vap or the application is locked.
+     */
     protected void setup( boolean valueWasAdjusting ) {
+        logger.log(Level.FINE, "setup({0})", valueWasAdjusting);
         if ( p!=null && !valueWasAdjusting ) {
             this.xAxis.setDatumRange( dataSourceController.getTsb().getTimeRange() );
             this.domPlot.getXaxis().setAutoRange(false);
@@ -299,6 +310,7 @@ public class TimeSeriesBrowseController {
         this.dasPlot.getXAxis().addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, timeSeriesBrowseListener);
         this.domPlot.addPropertyChangeListener( Plot.PROP_CONTEXT, timeSeriesBrowseListener ) ;
 
+        released= false;
     }
 
     /**
