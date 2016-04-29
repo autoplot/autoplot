@@ -326,7 +326,7 @@ public class DataSourceController extends DomNodeController {
      * This might also be a good spot to make sure we are not on the event
      * thread, and this is being studied.
      *
-     * @param valueWasAdjusting
+     * @param valueWasAdjusting true if the app was loading a vap, or locked because of changes.
      * @param dataSource
      */
     public void resetDataSource(boolean valueWasAdjusting, DataSource dataSource) {
@@ -1915,6 +1915,7 @@ public class DataSourceController extends DomNodeController {
      * A thread has been started that will load the dataset. Side Effects:
      * update is called to start the download, unless if this is headless, then
      * the dataset has been loaded synchronously.
+     * @param valueWasAdjusting true if the application was busy loading (see dom.controller.isValueAdjusting())
      */
     private void resolveDataSource(boolean valueWasAdjusting, ProgressMonitor mon) {
         Caching cache1 = getCaching();
