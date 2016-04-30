@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Code cleanup of URI handling allows characters like ß to be used.
+        <p><small>2-D triangulation and interpolation verified with script that adds custom renderer.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-04-28 r18801):</p>
+        <p>Bugfixes (2016-04-30 r18831):</p>
         <ul>
+            <li>script shortcut cheatsheet was missing save.</li>
+            <li>butterworth GUI would reject float parameters, which are valid, and would clobber the scientist's input.  Thanks, Kristoff!</li>
+            <li>revalidate after TSB is loaded and trimmed to timerange, since the trim might break some datasets.</li>
+            <li>the timerange editor should load orbits off the event thread.</li>
             <li>When adapting legacy VectorDataSets to QDataSet, name the default plane "y".</li>
             <li>1576: Masafumi pointed out extraneous load when undo was pressed.</li>
             <li>das2stream containing new unit would fail to read, whoops!</li>
@@ -167,6 +171,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Auralizer code supports rank 2 waveform data</li>
+            <li>rfe 486: IDL/Matlab interface loadDataSet(uri) loads the URI with one command, returning status code.</li>
+            <li>rfe 485: run script shortcut key, experiment with F6.</li>
+            <li>addPlotElement code added for scripting, to support overplots.</li>
             <li>X axis with %{CONTEXT} property will show DEPEND_0 context.</li>
             <li>Y axis with %{CONTEXT} property updates properly.</li>
             <li>screenshotsTool supports manual calls to get the screenshot, so that scripts can write documentation.</li>
