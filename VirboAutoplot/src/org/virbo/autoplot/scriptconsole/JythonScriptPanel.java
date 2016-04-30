@@ -157,7 +157,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         });
 
-        this.textArea.getActionMap().put( "save", new AbstractAction( "save" ) {
+        this.textArea.getActionMap().put( ACTIONKEY_SAVE, new AbstractAction( ACTIONKEY_SAVE ) {
             @Override
             public void actionPerformed( ActionEvent e ) {
                 LoggerManager.logGuiEvent(e);                
@@ -171,6 +171,13 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         });
 
+        this.textArea.getActionMap().put( ACTIONKEY_EXECUTE, new AbstractAction( ACTIONKEY_EXECUTE ) {
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                executeButtonActionPerformed(e);
+            }
+        });
+        
         AppManager.getInstance().addCloseCallback( app, "jythonScriptPanel", new AppManager.CloseCallback() {
             @Override
             public boolean checkClose() {
@@ -195,8 +202,9 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         });
 
         
-        this.textArea.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_S,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ), "save" );
-
+        this.textArea.getInputMap().put(KeyStroke.getKeyStroke( KeyEvent.VK_S,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ), ACTIONKEY_SAVE);
+        this.textArea.getInputMap().put(KeyStroke.getKeyStroke( KeyEvent.VK_F6, 0 ), ACTIONKEY_EXECUTE);
+        
         EditorContextMenu menu= new EditorContextMenu( this.textArea );
 
         menu.addExampleAction( new AbstractAction("makePngWalk.jy") {
@@ -286,7 +294,10 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         CompletionImpl impl = CompletionImpl.get();
         impl.startPopup(this.textArea);
     }
-
+    
+    private static final String ACTIONKEY_SAVE = "save";
+    private static final String ACTIONKEY_EXECUTE = "execute";
+    
     /**
      * load in an example, replacing the current editor text.
      * @param resourceFile the name of a file loaded with
