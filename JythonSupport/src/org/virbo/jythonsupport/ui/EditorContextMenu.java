@@ -579,7 +579,7 @@ public class EditorContextMenu {
                             + "<tr><td>SHIFT-F5</td><td> settings </td> <br></tr>"
                             + "<tr><td>CTRL-SHIFT-C</td><td> plot expression via server mode (See [menubar]->Options->Enable Feature->Server)\" </td> <br></tr>"
                             + "<tr><td>CTRL-SHIFT-U</td><td> show usages of a variable<br></td></tr>"
-                            + "<tr><td>META-S</td><td>  Save<br></td></tr>"
+                            + "<tr><td>CTRL-S</td><td>  Save<br></td></tr>"
                             + "<tr><td>F6</td><td> Execute<br></td> </tr>"
                             + "<tr><td>SHIFT-F6</td><td> Execute with Parameters Dialog<br></td> </tr>"
                             + "</table></html>";
