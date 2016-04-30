@@ -62,7 +62,7 @@ public class APDataSet extends QDataSetBridge {
      * @return 0 if everything went okay, non-zero if there was an error
      * @see QDataSetBridge#getException()
      */
-    public int getDataSet( String uri ) {
+    public int loadDataSet( String uri ) {
         setDataSetURI(uri);
         doGetDataSet();
         if ( exception!=null ) {
@@ -79,7 +79,7 @@ public class APDataSet extends QDataSetBridge {
      * @return 0 if everything went okay, non-zero if there was an error
      * @see QDataSetBridge#getException()
      */
-    public int getDataSet( String uri, ProgressMonitor mon ) {
+    public int loadDataSet( String uri, ProgressMonitor mon ) {
         setDataSetURI(uri);
         doGetDataSet(mon);
         if ( exception!=null ) {
