@@ -31,14 +31,14 @@
             <li>revalidate after TSB is loaded and trimmed to timerange, since the trim might break some datasets.</li>
             <li>the timerange editor should load orbits off the event thread.</li>
             <li>When adapting legacy VectorDataSets to QDataSet, name the default plane "y".</li>
-            <li>1576: Masafumi pointed out extraneous load when undo was pressed.</li>
+            <li>1576: pointed out extraneous load when undo was pressed caused by leftover TSB listener.  Thanks Masafumi!</li>
             <li>das2stream containing new unit would fail to read, whoops!</li>
-            <li>bundleNames function would fail to add element when it found an unnamed dataset, now returns "ch_i"</li>
+            <li>bundleNames function would fail to add element when it found an unnamed dataset, now returns "ch_i". Thanks Ivar!</li>
             <li>Jython "recently used files" area shows both .jy and .jyds files, so you don't have to think about the current context.</li>
             <li>1570: make sure the axis timerange is returned in %{TIMERANGE} macro, not the loaded timerange.</li>
             <li>corrections to triangulation routines.  Scale data to be around one before tesselation.</li>
             <li>476: add plot below resulted in NullPointerException.</li>
-            <li>1567:  das2server URIs fail to embed within .vap.zip file, other problems.  Also see if a common file path can be calculated..</li>
+            <li>1567:  das2server URIs fail to embed within .vap.zip file, other problems.  Also see if a common file path can be calculated.</li>
             <li>rebin mishandled NaN data, resulting in weights dataset which was inconsistent with the data.</li>
             <li>1278: das2server URIs fail to embed within .vap.zip file</li>
             <li>rte_0405096901: initialization of TickCurveRenderer caused NullPointerException</li>
