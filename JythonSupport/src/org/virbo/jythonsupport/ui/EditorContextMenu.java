@@ -571,14 +571,19 @@ public class EditorContextMenu {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     LoggerManager.logGuiEvent(e);
-                    String msg = "<html><b>Keyboard Shortcuts:</b><br>"
-                            + "META-Z undo <br>"
-                            + "META-Y redo  <br>"
-                            + "META-EQUALS biggerFont  <br>"
-                            + "META-MINUS smallerFont  <br>"
-                            + "SHIFT-F5 settings  <br>"
-                            + "CTRL-SHIFT-C plot expression via server mode (See [menubar]->Options->Enable Feature->Server)\"  <br>"
-                            + "CTRL-SHIFT-U show usages of a variable<br>";
+                    String msg = "<html><table><tr><td><b>Keyboard Shortcuts:</b></td><td></td><br></tr>"
+                            + "<tr><td>META-Z</td><td> undo </td><br></tr>"
+                            + "<tr><td>META-Y</td><td> redo</td>  <br></tr>"
+                            + "<tr><td>META-EQUALS</td><td> biggerFont </td> <br></tr>"
+                            + "<tr><td>META-MINUS</td><td> smallerFont </td> <br></tr>"
+                            + "<tr><td>SHIFT-F5</td><td> settings </td> <br></tr>"
+                            + "<tr><td>CTRL-SHIFT-C</td><td> plot expression via server mode (See [menubar]->Options->Enable Feature->Server)\" </td> <br></tr>"
+                            + "<tr><td>CTRL-SHIFT-U</td><td> show usages of a variable<br></td></tr>"
+                            + "<tr><td>META-S</td><td>  Save<br></td></tr>"
+                            + "<tr><td>F6</td><td> Execute<br></td> </tr>"
+                            + "<tr><td>SHIFT-F6</td><td> Execute with Parameters Dialog<br></td> </tr>"
+                            + "</table></html>";
+                            
                     JOptionPane.showMessageDialog( actionsMenu, msg );
                 }
             });
