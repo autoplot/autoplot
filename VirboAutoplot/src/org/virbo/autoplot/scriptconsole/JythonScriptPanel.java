@@ -10,6 +10,7 @@ import org.virbo.jythonsupport.ui.EditorContextMenu;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -204,6 +205,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         
         this.textArea.getInputMap().put(KeyStroke.getKeyStroke( KeyEvent.VK_S,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ), ACTIONKEY_SAVE);
         this.textArea.getInputMap().put(KeyStroke.getKeyStroke( KeyEvent.VK_F6, 0 ), ACTIONKEY_EXECUTE);
+        this.textArea.getInputMap().put(KeyStroke.getKeyStroke( KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK ), ACTIONKEY_EXECUTE );
         
         EditorContextMenu menu= new EditorContextMenu( this.textArea );
 
