@@ -441,7 +441,11 @@ public class EditorAnnotationsSupport {
                     return peek;
                 } else {
                     if ( po instanceof PyJavaInstance ) {
-                        return "<html>"+expr+"="+peek+"<br>"+((PyJavaInstance)po).instclass.safeRepr();
+                        try {
+                            return "<html>"+expr+"="+peek+"<br>"+((PyJavaInstance)po).instclass.safeRepr();
+                        } catch ( Exception ex ) {
+                            return "<html>"+expr+"="+peek+"<br>"+po.getType();
+                        }
                     } else {
                         return "<html>"+expr+"="+peek+"<br>"+po.getType();
                     }
