@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.datasource.jython;
 
 import java.beans.ExceptionListener;
@@ -10,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -18,7 +14,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -38,10 +33,8 @@ import org.virbo.datasource.LogNames;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import static org.virbo.datasource.jython.JythonDataSource.PARAM_SCRIPT;
-import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
 import org.virbo.jythonsupport.PyQDataSet;
-import org.virbo.jythonsupport.PyQDataSetAdapter;
 
 /**
  *
@@ -336,6 +329,11 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
     
     ExceptionListener listener;
     
+    /**
+     * provide the script panel with a method for getting errors when they 
+     * occur, so it can mark where they have occurred.
+     * @param listener 
+     */
     public void addExeceptionListener( ExceptionListener listener ) {
         this.listener= listener;
     }
@@ -352,11 +350,12 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
     /**
      * this is a non-trivial problem, and for now we will
      * assume any .jyds has local references and therefore cannot
-     * be run from a remote .vap file.  Further, it's probably better
-     * to look into creating a sandboxed thread on which to run the script.
+     * be run from a remote .vap file from the server.  Further, it's 
+     * probably better to look into creating a sandboxed thread on which 
+     * to run the script.
      * 
-     * @param jyds
-     * @return 
+     * @param uri
+     * @return true if the jyds has local resource references
      */
     public static boolean jydsHasLocalReferences( URI uri ) {
         return true;
