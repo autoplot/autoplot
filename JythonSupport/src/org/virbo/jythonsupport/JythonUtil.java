@@ -137,6 +137,7 @@ public class JythonUtil {
         boolean loadAutoplotStuff= true;
         if ( loadAutoplotStuff ) {
             Py.getAdapter().addPostClass(new PyQDataSetAdapter());
+            Py.getAdapter().addPostClass(new PyDatumAdapter());
             if ( Util.isLegacyImports() ) {
                 URL imports= JythonOps.class.getResource("imports.py");
                 if ( imports==null ) {
