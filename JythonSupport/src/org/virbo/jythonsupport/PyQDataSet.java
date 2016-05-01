@@ -127,6 +127,10 @@ public class PyQDataSet extends PyJavaInstance {
         return new PyQDataSet(Ops.divide(that, rods));
     }
 
+    /**
+     * TODO: this is incorrect.  floordiv is where
+     * be 5/2=2 (integer devision)
+     */    
     @Override
     public PyObject __floordiv__(PyObject arg0) {
         QDataSet that = coerce_ds(arg0);
@@ -138,7 +142,11 @@ public class PyQDataSet extends PyJavaInstance {
         QDataSet that = coerce_ds(arg0);
         return new PyQDataSet(Ops.mod(rods, that));
     }
-
+    
+    /**
+     * TODO: this is incorrect.  rfloordiv is where
+     * be 5/2=2 (integer devision)
+     */ 
     @Override
     public PyObject __rfloordiv__(PyObject arg0) {
         QDataSet that = coerce_ds(arg0);
