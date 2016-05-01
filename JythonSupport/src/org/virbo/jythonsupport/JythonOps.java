@@ -202,6 +202,8 @@ public class JythonOps {
             } else {
                 return DataSetUtil.asDatum(ds);
             }
+        } else if ( arg0 instanceof PyDatum ) {
+            return ((PyDatum)arg0).datum;
         } else if ( arg0 instanceof PyInteger ) {
             return Units.dimensionless.createDatum(((PyInteger)arg0).getValue());
         } else if ( arg0 instanceof PyFloat ) {
