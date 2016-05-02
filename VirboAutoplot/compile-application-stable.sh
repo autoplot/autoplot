@@ -12,6 +12,11 @@ if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.7.0_80/
 fi
 
+# TODO: now that this code makes sure there's a slash, the rest of the code should not add it.
+if [[ $JAVA_HOME != */ ]]; then
+    JAVA_HOME=${JAVA_HOME}/
+fi
+
 if [ "" = "$KEYPASS" ]; then
     echo "KEYPASS NEEDED!"
     KEYPASS=virbo1
