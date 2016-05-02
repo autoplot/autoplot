@@ -337,13 +337,7 @@ public class PyDatum extends PyJavaInstance {
 
     @Override
     public Object __tojava__(Class c) {
-        if ( c.isAssignableFrom( Datum.class ) ) {
-            return datum;
-        } else if ( c.isAssignableFrom( QDataSet.class ) ) {
-            return DataSetUtil.asDataSet(datum);
-        } else {
-            return Py.NoConversion;
-        }
+        return super.__tojava__(c);        
     }
     
     @Override
