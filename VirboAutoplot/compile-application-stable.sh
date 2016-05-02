@@ -43,23 +43,23 @@ mkdir temp-classes
 echo "copy jar file classes..."
 cd temp-classes
 for i in ../../APLibs/lib/*.jar; do
-   echo ${JAVA_HOME}bin/jar xf $i
-   ${JAVA_HOME}bin/jar xf $i
+   echo ${JAVA_HOME}/bin/jar xf $i
+   ${JAVA_HOME}/bin/jar xf $i
 done
 
 # use beta version of cdf library that supports tt2000.
 echo "using tt2000 support"
 rm -rf gsfc/
-${JAVA_HOME}bin/jar xf ../../APLibs/lib/cdfjava.3.3.2.tt2000.jar
+${JAVA_HOME}/bin/jar xf ../../APLibs/lib/cdfjava.3.3.2.tt2000.jar
 
 for i in ../../APLibs/lib/netCDF/*.jar; do
-   echo ${JAVA_HOME}bin/jar xf $i
-   ${JAVA_HOME}bin/jar xf $i
+   echo ${JAVA_HOME}/bin/jar xf $i
+   ${JAVA_HOME}/bin/jar xf $i
 done
 
 for i in ../../APLibs/lib/commons/*.jar; do
-   echo ${JAVA_HOME}bin/jar xf $i
-   ${JAVA_HOME}bin/jar xf $i
+   echo ${JAVA_HOME}/bin/jar xf $i
+   ${JAVA_HOME}/bin/jar xf $i
 done
 
 cd ..
@@ -117,7 +117,7 @@ $JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 echo "sign the jar files..."
 echo "  use set +x to hide private info"
 set +x
-if ! ${JAVA_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotStable.jar "$ALIAS"; then
+if ! ${JAVA_HOME}/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotStable.jar "$ALIAS"; then
    echo "Failed to sign resources! (first call)"
    exit 1
 fi
@@ -126,7 +126,7 @@ echo "repeat normalize/sign (workaround for known bug with large files...)"
 echo $JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 $JAVA_HOME/bin/pack200 --repack dist/AutoplotStable.jar
 
-if ! ${JAVA_HOME}bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotStable.jar "$ALIAS"; then
+if ! ${JAVA_HOME}/bin/jarsigner -keypass "$KEYPASS" -storepass "$STOREPASS" $JARSIGNER_OPTS dist/AutoplotStable.jar "$ALIAS"; then
    echo "Failed to sign resources! (second call)"
    exit 1
 fi
