@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>2-D triangulation and interpolation verified with script that adds custom renderer.
+        <p><small>Jython Script used to draw box-and-whisker plots.  <a href="http://jfaden.net/~jbf/autoplot/script/demos/testBoxAndWhisker.jy">script here</a>
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-04-30 r18831):</p>
+        <p>Bugfixes (2016-05-02 r18845):</p>
         <ul>
+            <li>Feb2013 change of "asOrderOneUnits" to prevent ms->msec conversion also prevented hr->hr, so that the original unit was never used, even if it is the best.</li>
             <li>script shortcut cheatsheet was missing save.</li>
             <li>butterworth GUI would reject float parameters, which are valid, and would clobber the scientist's input.  Thanks, Kristoff!</li>
             <li>revalidate after TSB is loaded and trimmed to timerange, since the trim might break some datasets.</li>
