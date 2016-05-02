@@ -123,6 +123,8 @@ public class JythonOps {
     public static QDataSet dataset( PyObject arg0 ) {
         if ( arg0 instanceof PyQDataSet ) {
             return ((PyQDataSet)arg0).rods;
+        } else if ( arg0 instanceof PyDatum ) {
+            return DataSetUtil.asDataSet( ((PyDatum)arg0).datum );
         } else if ( arg0 instanceof PyList ) {
             return PyQDataSetAdapter.adaptList( (PyList)arg0 ) ;
         } else if ( arg0 instanceof PyArray ) {
