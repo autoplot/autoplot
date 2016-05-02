@@ -1,12 +1,10 @@
 
 package org.virbo.jythonsupport;
 
-import java.math.BigInteger;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
-import org.das2.datum.UnitsUtil;
 import org.python.core.Py;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
@@ -15,12 +13,6 @@ import org.python.core.PyLong;
 import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
-import org.virbo.dsops.Ops;
-import static org.virbo.dsops.Ops.applyBinaryOp;
-import static org.virbo.dsops.Ops.applyUnaryOp;
 
 /**
  * Wrap a das2 Datum, implementing operators.
@@ -33,6 +25,7 @@ public class PyDatum extends PyJavaInstance {
     Datum datum;
     
     public PyDatum( Datum d ) {
+        super(d);
         this.datum= d;
     }
     
