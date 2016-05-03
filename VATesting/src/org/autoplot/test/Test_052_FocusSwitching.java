@@ -100,6 +100,7 @@ public class Test_052_FocusSwitching implements Scenario {
             dom.getController().setPlotElement( dom.getPlotElements(0) );
             
             ScriptContext.waitUntilIdle();
+            Thread.sleep(1000); // so that the data screen settles on one state before the screenshot, I hope.
             
             BufferedImage image= ScreenshotsTool.getScreenShotNoPointer();
             //BufferedImage image= ScreenshotsTool.getScreenShot();
