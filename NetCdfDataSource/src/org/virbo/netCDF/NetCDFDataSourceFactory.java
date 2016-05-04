@@ -74,6 +74,9 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
                         v.getNameAndDimensions(), v.getDescription(), true ) );
             }
             dataset.close();
+            
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units="));
+
         }
         
         return result;

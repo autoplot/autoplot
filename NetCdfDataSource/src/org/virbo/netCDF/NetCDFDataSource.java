@@ -21,13 +21,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.das2.datum.LoggerManager;
+import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.dsops.Ops;
 import org.virbo.dsutil.TransposeRankNDataSet;
 import org.virbo.metatree.IstpMetadataModel;
 import ucar.nc2.Attribute;
@@ -135,6 +138,12 @@ public class NetCDFDataSource extends AbstractDataSource {
 
             QDataSet qresult= checkLatLon(result);
                
+            String unitsString= getParam("units", null );
+            if ( unitsString!=null ) {
+                Units u = Units.lookupTimeUnits(unitsString);
+                result= Ops.putProperty( result, QDataSet.UNITS, u );
+            }
+            
             logger.finer("ncfile.close()");
             ncfile.close();
             
