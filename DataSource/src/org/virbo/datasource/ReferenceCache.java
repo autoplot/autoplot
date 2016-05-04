@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -161,7 +162,7 @@ public class ReferenceCache {
         @Override
         public String toString( ) {
             QDataSet _qds= qds==null ? null : qds.get();
-            return String.format( "loadThread=%s\tmonitor=%s\tstatus=%s\turi=%s\tqds=%s", loadThread.getName(), monitor, status, uri, String.valueOf(_qds) );
+            return String.format( "loadThread=%s \tmonitor=%s \tstatus=%s \turi=%s \tqds=%s", loadThread.getName(), monitor, status, uri, String.valueOf(_qds) );
         }
 
     }
@@ -270,6 +271,7 @@ public class ReferenceCache {
      */
     public synchronized void putDataSet( String uri, QDataSet ds ) {
         ReferenceCacheEntry result= uris.get(uri);
+        if ( result==null ) throw new IllegalStateException("nobody asked for this dataset, use offerDataSet");
         logger.log( Level.FINEST, "putDataSet on thread {0} {1}", new Object[]{Thread.currentThread(), uri});
         if ( ds instanceof MutablePropertyDataSet ) {
             MutablePropertyDataSet mpds= (MutablePropertyDataSet)ds;
@@ -278,10 +280,31 @@ public class ReferenceCache {
                 ((MutablePropertyDataSet)ds).makeImmutable();
             }
         }
-        result.qds= new WeakReference<QDataSet>(ds);
+        result.qds= new WeakReference<>(ds);
         result.status= ReferenceCacheEntryStatus.DONE;
     }
 
+    /**
+     * like putDataSet, but if no one has requested this dataset, then simply add
+     * it to the cache of datasets in case someone else wants it.  Be sure to call
+     * this before the call to putDataSet that will release the lock.
+     * @param uri the URI
+     * @param ds the dataset
+     */
+    public synchronized void offerDataSet( String uri, QDataSet ds ) {
+        logger.log(Level.FINE, "offerDataSet {0} {1}", new Object[]{uri, ds});
+        ReferenceCacheEntry result= uris.get(uri);
+        if ( result==null ) {
+            ProgressMonitor mon= new NullProgressMonitor();
+            mon.finished();
+            result= new ReferenceCacheEntry(uri,mon);
+            result.status= ReferenceCacheEntryStatus.DONE;
+            result.loadThread= Thread.currentThread();
+            uris.put( uri, result );
+        }
+        putDataSet( uri, ds );
+    }
+    
     /**
      * explicitly remove entries from the cache.
      */
