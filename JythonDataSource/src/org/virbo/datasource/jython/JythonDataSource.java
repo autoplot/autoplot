@@ -37,7 +37,9 @@ import org.python.core.PyFloat;
 import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
+import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
+import org.qdataset.ReferenceCache;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -47,8 +49,10 @@ import org.virbo.datasource.LogNames;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
+import org.virbo.jythonsupport.PyQDataSet;
 
 /**
  * Use a jython script to read and process data from a number of sources.
@@ -169,6 +173,27 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
         URISplit split= URISplit.parse(suri);
         Map<String,String> paramsl= URISplit.parseParams(split.params); // abstract datasource params don't update.
+        
+        boolean useReferenceCache= "true".equals( System.getProperty( org.virbo.datasource.ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
+
+        URISplit split1= URISplit.parse(suri);
+        Map<String,String> params1= URISplit.parseParams(split1.params);
+        params1.remove("arg_0");
+        split1.params= URISplit.formatParams(params1);
+        String lockUri= URISplit.format(split1);
+        
+        org.virbo.datasource.ReferenceCache.ReferenceCacheEntry rcent=null;
+        if ( useReferenceCache && split1.params.length()==0 ) {
+            rcent= org.virbo.datasource.ReferenceCache.getInstance().getDataSetOrLock( lockUri, mon);
+            if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
+                QDataSet result= rcent.park( mon );
+                result= org.virbo.datasource.ReferenceCache.getInstance().getDataSet(suri);
+                return result;
+            } else {
+                logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), resourceURI } );
+            }
+        }
+        
 
         if ( split.scheme.equals("inline") ) { // note this is handled elsewhere, in InlineDataSource
             return getInlineDataSet(new URI(uri.getRawSchemeSpecificPart()));
@@ -415,6 +440,35 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 }
             }
 
+            if ( rcent!=null ) {
+                URISplit t= URISplit.parse(suri);
+                Map<String,String> m= URISplit.parseParams( t.params );
+                String s= m.remove("arg_0");
+
+                PyStringMap locals= (PyStringMap) interp.getLocals();
+                PyList keys= locals.keys();
+                PyList values= locals.values();
+                for ( int i=0; i<keys.size(); i++ ) {
+                    String key= (String)keys.get(i);
+                    Object value= values.get(i);
+                    if ( value instanceof PyQDataSet ) {
+                        value= ((PyQDataSet)value).getQDataSet();
+                    } 
+                    if ( value instanceof QDataSet ) {
+                        m.put( "arg_0", String.valueOf( key ) );
+                        t.params= URISplit.formatParams(m);
+                        String uri1= URISplit.format( t );
+                        org.virbo.datasource.ReferenceCache.getInstance().offerDataSet(uri1, (QDataSet)value );
+                        logger.log(Level.FINE, "Also adding to reference cache: {0}->{1}", new Object[]{uri1, value});
+                    }
+                }
+                if ( s==null ) {
+                    rcent.finished(res);
+                } else {
+                    rcent.finished( Ops.dataset( "1971-01-01T00:00" ) );
+                }                
+            }
+            
             if (causedBy != null) {
                 interp = null;
                 cacheUrl = null;
