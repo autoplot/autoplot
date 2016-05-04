@@ -3,6 +3,7 @@ package org.virbo.datasource;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -90,7 +91,8 @@ public class URISplit {
     public static final String PARAM_FILE_POLL_UPDATES= "filePollUpdates";
 
     /**
-     * make the URI canonical, with the vap+&lt;ext&gt;: prefix.
+     * make the URI canonical, with the vap+&lt;ext&gt;: prefix.  This
+     * will also now sort the parameters.
      * @param suri, such as "/tmp/x.cdf"
      * @return "vap+cdf:file:///tmp/x.cdf"
      */
@@ -98,6 +100,16 @@ public class URISplit {
         logger.log(Level.FINEST, "makeCanonical {0}", suri);
         if ( suri==null ) return null;
         URISplit split= URISplit.parse(suri);
+        Map<String,String> paramsLoose= URISplit.parseParams(split.params);
+        LinkedHashMap<String,String> params= new LinkedHashMap<>();
+        String arg_0= paramsLoose.remove("arg_0");
+        if ( arg_0!=null ) params.put( "arg_0", arg_0 );
+        List<String> keys= new ArrayList<>( paramsLoose.keySet() );
+        Collections.sort(keys);
+        for ( String k: keys ) {
+            params.put( k, paramsLoose.get(k) );
+        }
+        split.params= URISplit.formatParams(params);
         suri= URISplit.format(split); // make canonical
         if ( !suri.startsWith("vap+") && split.ext!=null && split.ext.length()>1 ) {
             suri= "vap+"+split.ext.substring(1)+":"+suri;
