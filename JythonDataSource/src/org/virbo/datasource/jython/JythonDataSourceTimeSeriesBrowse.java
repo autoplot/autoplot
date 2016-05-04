@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.datasource.jython;
 
 import java.io.BufferedReader;
@@ -18,9 +15,6 @@ import java.util.regex.Pattern;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.DataSetURI;
-import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.LogNames;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -50,7 +44,10 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
         if ( jds!=null ) {
             if ( this.timeRange==null || !( this.timeRange.equals(dr)) ) {
                 synchronized ( jds ) {
-                    jds.interp= null; // no caching...  TODO: this probably needs work.  For example, if we zoom in.
+                    if ( jds.interp!=null ) {
+                        logger.fine("TSB resetting interpretter and caching");
+                        jds.interp= null; // no caching...  TODO: this probably needs work.  For example, if we zoom in.
+                    }
                 }
             }
         }
@@ -107,7 +104,11 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
 
     /**
      * allow scripts to implement TimeSeriesBrowse if they check for the parameter "timerange"
-     * @param jythonScript
+     * @param uri the URI
+     * @param jythonScript the script corresponding to 
+     * @return the TSB, or null.
+     * @throws java.io.IOException
+     * @throws java.text.ParseException
      */
     protected static JythonDataSourceTimeSeriesBrowse checkForTimeSeriesBrowse( String uri, File jythonScript ) throws IOException, ParseException {
         BufferedReader reader=null;
