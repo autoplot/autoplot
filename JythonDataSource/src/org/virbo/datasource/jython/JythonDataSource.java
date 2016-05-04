@@ -232,7 +232,6 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     try {
                         Thread.sleep(100);
                     } catch ( InterruptedException ex2 ) { }
-                    System.err.println( interp.get("monitor") );
                     interp.set("monitor", mon);
                     logger.warning("done.");
                 }
@@ -478,6 +477,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             }
 
             if ( !allowCaching ) {
+                logger.log(Level.FINE, "reset caching because allowCaching is false" );
                 interp= null;
             }
 
@@ -486,8 +486,11 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         } catch (PyException ex) {
 
             if (causedBy != null) {
+                logger.log(Level.FINE, "rethrow causedBy" );
                 throw causedBy;
             }
+            
+            logger.log(Level.FINE, "resetting caching because of PyException" );
             interp = null;
             cacheUrl = null;
             cacheDate = null;
@@ -567,6 +570,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
      */
     @Override
     public synchronized void reset() {
+        logger.fine("JythonDataSource.reset() clears cache");
         interp= null;
     }
 
