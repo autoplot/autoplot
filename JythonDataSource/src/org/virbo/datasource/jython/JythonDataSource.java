@@ -176,17 +176,23 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         
         boolean useReferenceCache= "true".equals( System.getProperty( org.virbo.datasource.ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
 
+        suri= URISplit.makeCanonical(suri);
+        
         URISplit split1= URISplit.parse(suri);
         Map<String,String> params1= URISplit.parseParams(split1.params);
+        split1.params= URISplit.formatParams(params1);
+        suri= URISplit.format( split1 ); // 
+        
         params1.remove("arg_0");
         split1.params= URISplit.formatParams(params1);
         String lockUri= URISplit.format(split1);
         
         org.virbo.datasource.ReferenceCache.ReferenceCacheEntry rcent=null;
-        if ( useReferenceCache && split1.params.length()==0 ) {
+        if ( useReferenceCache ) {
             rcent= org.virbo.datasource.ReferenceCache.getInstance().getDataSetOrLock( lockUri, mon);
             if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
-                QDataSet result= rcent.park( mon );
+                rcent.park( mon );
+                QDataSet result;
                 result= org.virbo.datasource.ReferenceCache.getInstance().getDataSet(suri);
                 return result;
             } else {
@@ -456,7 +462,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     if ( value instanceof QDataSet ) {
                         m.put( "arg_0", String.valueOf( key ) );
                         t.params= URISplit.formatParams(m);
-                        String uri1= URISplit.format( t );
+                        String uri1= URISplit.makeCanonical( URISplit.format( t ) );
                         org.virbo.datasource.ReferenceCache.getInstance().offerDataSet(uri1, (QDataSet)value );
                         logger.log(Level.FINE, "Also adding to reference cache: {0}->{1}", new Object[]{uri1, value});
                     }
