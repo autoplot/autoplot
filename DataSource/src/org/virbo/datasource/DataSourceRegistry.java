@@ -808,7 +808,7 @@ public class DataSourceRegistry {
      * you cannot do this operation with vap+inline which is essentially a 
      * program where the order matters.
      * 
-     * @param vapScheme
+     * @param vapScheme, like "vap+cdf:" or "vap+internal:", or entire URI.
      * @return true if the order of parameters matters.
      */
     public boolean hasParamOrder( String vapScheme) {
