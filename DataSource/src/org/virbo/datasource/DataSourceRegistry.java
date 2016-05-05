@@ -812,7 +812,9 @@ public class DataSourceRegistry {
      * @return true if the order of parameters matters.
      */
     public boolean hasParamOrder( String vapScheme) {
-        if ( vapScheme.startsWith("vap+inline") ) {
+        if ( vapScheme.startsWith("vap+inline:") ) {
+            return true;
+        } else if ( vapScheme.startsWith("vap+internal:") ) {
             return true;
         } else {
             return false;
