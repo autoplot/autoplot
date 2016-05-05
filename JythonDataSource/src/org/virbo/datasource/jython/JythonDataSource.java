@@ -174,6 +174,10 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         URISplit split= URISplit.parse(suri);
         Map<String,String> paramsl= URISplit.parseParams(split.params); // abstract datasource params don't update.
         
+        if ( split.scheme.equals("inline") ) { // note this is handled elsewhere, in InlineDataSource
+            return getInlineDataSet(new URI(uri.getRawSchemeSpecificPart()));
+        }
+        
         boolean useReferenceCache= "true".equals( System.getProperty( org.virbo.datasource.ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
 
         suri= URISplit.makeCanonical(suri);
@@ -194,17 +198,17 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 rcent.park( mon );
                 QDataSet result;
                 result= org.virbo.datasource.ReferenceCache.getInstance().getDataSet(suri);
-                return result;
+                if ( result==null ) {
+                    logger.fine("garbage collector got the data before a non-weak reference could be made");
+                    rcent= null;
+                } else {
+                    return result;
+                }
             } else {
                 logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), resourceURI } );
             }
         }
         
-
-        if ( split.scheme.equals("inline") ) { // note this is handled elsewhere, in InlineDataSource
-            return getInlineDataSet(new URI(uri.getRawSchemeSpecificPart()));
-        }
-
         if ( params.get( PARAM_SCRIPT )!=null ) {
             jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
             mon.setProgressMessage( "loading "+uri );
@@ -490,7 +494,9 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             return res;
 
         } catch (PyException ex) {
-
+            
+            if ( rcent!=null ) rcent.exception(ex);
+            
             if (causedBy != null) {
                 logger.log(Level.FINE, "rethrow causedBy" );
                 throw causedBy;
@@ -502,6 +508,11 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             cacheDate = null;
 
             throw ex;
+            
+        } catch ( Exception ex ) {
+            if ( rcent!=null ) rcent.exception(ex);
+            throw ex;
+            
         } finally {
             if ( !mon.isFinished() ) mon.finished();
         }
