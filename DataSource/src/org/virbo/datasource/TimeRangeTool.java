@@ -174,8 +174,18 @@ public class TimeRangeTool extends javax.swing.JPanel {
         } else if ( idx==1 ) {
             String sc= (String)scComboBox.getSelectedItem();
             String orb= (String)orbitList.getSelectedValue();
-            int i= orb.indexOf(":");
-            if ( i>-1 ) orb= orb.substring(0,i);
+            List indexes= orbitList.getSelectedValuesList();
+            if ( indexes.size()>1 ) {
+                StringBuilder orbits= new StringBuilder();
+                int i= orb.indexOf(":");
+                if ( i>-1 ) orbits.append(orb.substring(0,i)); else orbits.append(orb);
+                orbits.append("-");
+                orb= String.valueOf( indexes.get(indexes.size()-1) );
+                i= orb.indexOf(":");
+                if ( i>-1 ) orbits.append(orb.substring(0,i)); else orbits.append(orb);
+                orb= orbits.toString();
+            }
+            
             return "orbit:"+sc+":"+orb;
         } else if ( idx==2 ) {
             String s= (String)nrtComboBox.getSelectedItem();
