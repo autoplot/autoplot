@@ -24,8 +24,13 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-05-02 r18845):</p>
+        <p>Bugfixes (2016-05-05 r18870):</p>
         <ul>
+            <li>1579: old caching mechanism with .jyds scripts would fail to coordinate many simultaneous reads.</li>
+            <li>trim operator would fail when second index was past the end of the array with incorrect error message.</li>
+            <li>link(x,y,z) would fail because of incorrect check when Y was rank 1 and Z was rank 2.  Thanks, Masafumi!</li>
+            <li>zFill supported for multiple interleaved tables in das2stream.  Thanks Chris!</li>
+            <li>do early check for unique names in das2stream.  This would misformatted das2stream result in strange error.</li>
             <li>Feb2013 change of "asOrderOneUnits" to prevent ms->msec conversion also prevented hr->hr, so that the original unit was never used, even if it is the best.</li>
             <li>script shortcut cheatsheet was missing save.</li>
             <li>butterworth GUI would reject float parameters, which are valid, and would clobber the scientist's input.  Thanks, Kristoff!</li>
@@ -172,6 +177,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>NetCDF/HDF reader now allows units to be specified in the URI, to support time tags with units=t1970, etc</li>
             <li>Jython supports Datum instances as PyDatums, supporting inline operators (like +)</li>
             <li>Auralizer code supports rank 2 waveform data</li>
             <li>rfe 486: IDL/Matlab interface loadDataSet(uri) loads the URI with one command, returning status code.</li>
