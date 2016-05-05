@@ -1,8 +1,3 @@
-/*
- * TimeRangeTool.java
- *
- * Created on Oct 26, 2012, 3:32:19 AM
- */
 
 package org.virbo.datasource;
 
