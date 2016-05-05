@@ -36,6 +36,7 @@ import org.python.core.PyException;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
 import org.python.core.PyList;
+import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
@@ -200,6 +201,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 result= org.virbo.datasource.ReferenceCache.getInstance().getDataSet(suri);
                 if ( result==null ) {
                     logger.fine("garbage collector got the data before a non-weak reference could be made");
+                    logger.log(Level.FINE, "miss {0}", suri);
                     rcent= null;
                 } else {
                     return result;
@@ -463,7 +465,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     if ( value instanceof PyQDataSet ) {
                         value= ((PyQDataSet)value).getQDataSet();
                     } 
-                    if ( value instanceof QDataSet ) {
+                    if ( value instanceof QDataSet || value==null ) {
                         m.put( "arg_0", String.valueOf( key ) );
                         t.params= URISplit.formatParams(m);
                         String uri1= URISplit.makeCanonical( URISplit.format( t ) );
