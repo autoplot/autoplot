@@ -252,7 +252,7 @@ public class ReferenceCache {
                 monitor.setTaskProgress( ent.monitor.getTaskProgress());
             }
             if ( ent.monitor.isFinished() && ent.status!=ReferenceCacheEntryStatus.DONE ) {
-                if ( warn1095Count>1 ) {
+                if ( warn1095Count>100 ) { // give it 10 seconds to resolve this.
                     logger.warning("bug 1095: there is a monitor that is finished, but the reference cache entry is not marked as done.");
                 }
                 warn1095Count++;
