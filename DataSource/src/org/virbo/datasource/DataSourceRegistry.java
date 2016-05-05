@@ -799,6 +799,25 @@ public class DataSourceRegistry {
         boolean noUri= vapScheme.endsWith("cdaweb") || vapScheme.endsWith("inline" ) || vapScheme.endsWith("pdsppi");
         return !noUri;
     }
+    
+    
+    /**
+     * returns true if the vap scheme is known to require an order to the 
+     * parameters.  This was introduced to support makeCanonical, which would
+     * like to sort the URI parameters so the order does not matter, but then
+     * you cannot do this operation with vap+inline which is essentially a 
+     * program where the order matters.
+     * 
+     * @param vapScheme
+     * @return true if the order of parameters matters.
+     */
+    public boolean hasParamOrder( String vapScheme) {
+        if ( vapScheme.startsWith("vap+inline") ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * return a description of the data source.
