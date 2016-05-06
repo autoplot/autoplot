@@ -169,19 +169,25 @@ public class ReferenceCache {
     }
 
     /**
-     * Query to see if the dataset exists in the cache.  Null is returned if it is not, or a QDataSet is returned if it is.
+     * Query to see if the dataset exists in the cache.  Null is returned if it 
+     * is not, or a QDataSet is returned if it is.
+     * NOTE: the entry might actually be a null, meaning the load resulted in no data.
      * @param uri the URI that can be resolved into a dataset.
      * @return the dataset or null
      */
     public synchronized QDataSet getDataSet( String uri ) {
         ReferenceCacheEntry entry= uris.get(uri);
         if ( entry==null ) {
+            logger.log(Level.FINER, "getDataSet {0} -> no entry", uri);
             return null;
         } else {
             if ( entry.qds==null ) {
+                logger.log(Level.FINER, "getDataSet {0} -> no entry.qds==null", uri);
                 return null;
             } else {
-                return entry.qds.get();
+                QDataSet result= entry.qds.get();
+                logger.log(Level.FINER, "getDataSet {0} -> entry.qds.get()=={1}", new Object[]{uri, result});
+                return result;
             }
         }
     }
