@@ -9,6 +9,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -284,6 +285,9 @@ public class ReferenceCache {
         result.status= ReferenceCacheEntryStatus.DONE;
     }
 
+    //experiments to see if Jython Caching works if the garbage collector is disabled.
+    //Map<String,QDataSet> hardReferences= new HashMap<>();
+    
     /**
      * like putDataSet, but if no one has requested this dataset, then simply add
      * it to the cache of datasets in case someone else wants it.  Be sure to call
@@ -302,6 +306,7 @@ public class ReferenceCache {
             result.loadThread= Thread.currentThread();
             uris.put( uri, result );
         }
+        //hardReferences.put( uri, ds );
         putDataSet( uri, ds );
     }
     
