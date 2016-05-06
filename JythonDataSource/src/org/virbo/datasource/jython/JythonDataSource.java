@@ -202,6 +202,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 if ( result==null ) {
                     logger.fine("garbage collector got the data before a non-weak reference could be made");
                     logger.log(Level.FINE, "miss {0}", suri);
+                    org.virbo.datasource.ReferenceCache.getInstance().getDataSet(suri);
                     rcent= null;
                 } else {
                     return result;
