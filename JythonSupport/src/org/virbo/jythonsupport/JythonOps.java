@@ -139,7 +139,8 @@ public class JythonOps {
             return DataSetUtil.asDataSet( (Datum)((PyJavaInstance)arg0).__tojava__(org.das2.datum.Datum.class) );
         } else if ( arg0 instanceof PyJavaInstance && ( ((PyJavaInstance)arg0).__tojava__(DatumRange.class) instanceof DatumRange ) ) {
             return DataSetUtil.asDataSet( (DatumRange)((PyJavaInstance)arg0).__tojava__(org.das2.datum.DatumRange.class) );
-
+        } else if ( arg0 instanceof PyJavaInstance && ( ((PyJavaInstance)arg0).__tojava__(QDataSet.class) instanceof QDataSet ) ) {
+            return DataSetUtil.asDataSet( ((PyJavaInstance)arg0).__tojava__(QDataSet.class) );
         } else if ( arg0 instanceof PyString ) {
             try {
                return Ops.dataset(arg0.toString());
