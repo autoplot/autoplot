@@ -24,10 +24,16 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-05-05 r18873):</p>
+        <p>Bugfixes (2016-05-07 r18888):</p>
         <ul>
+            <li>1560: copy plot when vap+internal is used.</li>
+            <li>1581: null result of ReferenceCache.getDataSet is ambiguous.</li>
             <li>1580: support multiple orbit selection in the TimeRangeEditor</li>
             <li>1579: old caching mechanism with .jyds scripts would fail to coordinate many simultaneous reads.</li>
+            <li>DasProgressPanel multiple calls to finished warning stack trace correctly prints the two calls.</li>
+            <li>EventsBar renderer Gantt mode supports where column would be less than two pixels.</li>
+            <li>TrimDataSet's trim operator (trim of trim) would fail when the start was greater than 0.</li>
+            <li>Jython dataset(QDataSet) wouldn't work, because there was no test for the PyJavaInstance of TrimDataSet.</li>
             <li>trim operator would fail when second index was past the end of the array with incorrect error message.</li>
             <li>link(x,y,z) would fail because of incorrect check when Y was rank 1 and Z was rank 2.  Thanks, Masafumi!</li>
             <li>zFill supported for multiple interleaved tables in das2stream.  Thanks Chris!</li>
