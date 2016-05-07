@@ -203,6 +203,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                         logger.fine("garbage collector got the data before a non-weak reference could be made");
                         logger.log(Level.FINE, "miss {0}", suri);
                         rcent= null;
+                        mon= new NullProgressMonitor(); // we can't reuse monitor after finished is called.
                     } else if ( result==ReferenceCache.NULL ) {
                         return null;
                     } else {
