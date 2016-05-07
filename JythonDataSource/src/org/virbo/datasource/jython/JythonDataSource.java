@@ -36,17 +36,16 @@ import org.python.core.PyException;
 import org.python.core.PyFloat;
 import org.python.core.PyInteger;
 import org.python.core.PyList;
-import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
-import org.qdataset.ReferenceCache;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.LogNames;
+import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -192,20 +191,28 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         split1.params= URISplit.formatParams(params1);
         String lockUri= URISplit.format(split1);
         
-        org.virbo.datasource.ReferenceCache.ReferenceCacheEntry rcent=null;
+        ReferenceCache.ReferenceCacheEntry rcent=null;
         if ( useReferenceCache ) {
-            rcent= org.virbo.datasource.ReferenceCache.getInstance().getDataSetOrLock( lockUri, mon);
+            rcent= ReferenceCache.getInstance().getDataSetOrLock( lockUri, mon);
             if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
                 rcent.park( mon );
-                QDataSet result;
-                result= org.virbo.datasource.ReferenceCache.getInstance().getDataSet(suri);
-                if ( result==null ) {
-                    logger.fine("garbage collector got the data before a non-weak reference could be made");
-                    logger.log(Level.FINE, "miss {0}", suri);
-                    org.virbo.datasource.ReferenceCache.getInstance().getDataSet(suri);
-                    rcent= null;
+                ReferenceCache.ReferenceCacheEntry entry= ReferenceCache.getInstance().getReferenceCacheEntry(suri);
+                if ( entry!=null ) { 
+                    QDataSet result= ReferenceCache.getInstance().getDataSet(suri); // get a strong reference before a GC
+                    if ( result==null ) {
+                        logger.fine("garbage collector got the data before a non-weak reference could be made");
+                        logger.log(Level.FINE, "miss {0}", suri);
+                        rcent= null;
+                    } else if ( result==ReferenceCache.NULL ) {
+                        return null;
+                    } else {
+                        return result;
+                    }
                 } else {
-                    return result;
+                    logger.log(Level.FINE, "referenceCache doesn''t know the URI: {0}", suri);
+                    //What's to be done here?  It could be the name was wrong, so should
+                    //we just assume this is an error?
+                    rcent= null;  // go through as before.
                 }
             } else {
                 logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), resourceURI } );
@@ -470,7 +477,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                         m.put( "arg_0", String.valueOf( key ) );
                         t.params= URISplit.formatParams(m);
                         String uri1= URISplit.makeCanonical( URISplit.format( t ) );
-                        org.virbo.datasource.ReferenceCache.getInstance().offerDataSet(uri1, (QDataSet)value );
+                        ReferenceCache.getInstance().offerDataSet(uri1, (QDataSet)value );
                         logger.log(Level.FINE, "Also adding to reference cache: {0}->{1}", new Object[]{uri1, value});
                     }
                 }
