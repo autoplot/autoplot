@@ -336,7 +336,7 @@ public class ReferenceCache {
             result.loadThread= Thread.currentThread();
             uris.put( uri, result );
         }
-        strongReferences.put( uri, ds );
+        //strongReferences.put( uri, ds );
         putDataSet( uri, ds );
     }
     
