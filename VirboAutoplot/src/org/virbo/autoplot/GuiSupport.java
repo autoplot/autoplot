@@ -1784,10 +1784,32 @@ public class GuiSupport {
                     newP.syncTo(p,Arrays.asList("id","rowId","columnId") );
                     Map<String,String> nameMap= new HashMap<>();
                     nameMap.put( p.getId(), newP.getId() );
+                    //List<DataSourceFilter> unresolved= new ArrayList<>();
                     for ( int i=0; i<state.getDataSourceFilters().length; i++ ) {
                         DataSourceFilter newDsf= controller.addDataSourceFilter();
-                        newDsf.syncTo(state.getDataSourceFilters(i),Collections.singletonList("id"));
-                        nameMap.put( state.getDataSourceFilters(i).getId(), newDsf.getId() );
+                        DataSourceFilter stateDsf= state.getDataSourceFilters(i);
+                        if ( stateDsf.getUri().startsWith("vap+internal:") ) {
+                            //unresolved.add(stateDsf);
+                        } else {
+                            newDsf.syncTo(state.getDataSourceFilters(i),Collections.singletonList("id"));   
+                            state.setDataSourceFilters(i,null); // mark as done
+                        }
+                        nameMap.put( stateDsf.getId(), newDsf.getId() );
+                    }
+                    for ( int i=0; i<state.getDataSourceFilters().length; i++ ) {
+                        DataSourceFilter stateDsf= state.getDataSourceFilters(i);
+                        if ( stateDsf!=null ) {
+                            String uri= stateDsf.getUri();
+                            String[] children= uri.substring(13).split(",");
+                            StringBuilder sb= new StringBuilder( "vap+internal:" );
+                            for ( int j=0; j<children.length; j++ ) {
+                                if (j>0) sb.append(",");
+                                sb.append( nameMap.get(children[j]) );
+                            }
+                            stateDsf.setUri(sb.toString());
+                            DataSourceFilter newDsf= (DataSourceFilter)DomUtil.getElementById( controller.getApplication(), nameMap.get(stateDsf.getId()) );
+                            newDsf.syncTo( stateDsf,Collections.singletonList("id"));   
+                        }
                     }
                     Application theApp= controller.getApplication();
                     for ( int i=0; i<state.getPlotElements().length; i++ ) {
