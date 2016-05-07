@@ -919,12 +919,7 @@ public class DomUtil {
         newApp.setPlots( new Plot[] { domPlot } );
         List<PlotElement> pes= getPlotElementsFor( application, domPlot );
         newApp.setPlotElements(pes.toArray(new PlotElement[pes.size()] ) );
-        List<DataSourceFilter> dsfs= new ArrayList<>();
-        for ( PlotElement pe: pes ) {
-            DataSourceFilter dsf= (DataSourceFilter) getElementById( application, pe.getDataSourceFilterId() );
-            dsfs.add( dsf );
-            //TODO: check for internal references
-        }
+        List<DataSourceFilter> dsfs= getDataSourceFiltersFor( application, domPlot );
         newApp.setDataSourceFilters( dsfs.toArray(new DataSourceFilter[dsfs.size()]) );
         newApp.setCanvases(application.getCanvases());
         newApp.setId( application.id+"_"+domPlot.id );
