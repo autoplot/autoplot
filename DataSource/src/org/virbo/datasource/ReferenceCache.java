@@ -25,9 +25,10 @@ import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
 
 /**
- * Provide a cache of datasets that are in memory, so that the same data is not loaded twice.  This first implementation
- * uses WeakReferences, so that this cache need not be emptied, but we will avoid the situation where the same data is loaded
- * twice.
+ * Provide a cache of datasets that are in memory, so that the same data is not 
+ * loaded twice.  This first implementation uses WeakReferences, so that this 
+ * cache need not be emptied, but we will avoid the situation where the same 
+ * data is loaded twice.
  *
  * @author jbf
  */
@@ -49,6 +50,12 @@ public class ReferenceCache {
 
     private final Map<String,ProgressMonitor> locks= new LinkedHashMap();
 
+    /**
+     * marker dataset used to indicate null was loaded for the URI.  This
+     * dataset should not be used.
+     */
+    public static final QDataSet NULL= Ops.labelsDataset( new String[] { "NULL-REFCACHE" } ).slice(0);
+            
     // no one can directly instantiate, see getInstance.
     private ReferenceCache() {
         
@@ -123,7 +130,7 @@ public class ReferenceCache {
          * hand the dataset resulting from the completed load off to the reference cache.
          * Threads that are parked will continue.  If the dataset is mutable, then a 
          * copy is made.
-         * @param ds the dataset resolved from the URI.
+         * @param ds null or the dataset resolved from the URI.
          */
         public void finished( QDataSet ds ) {
             logger.log( Level.FINE, "finished {0} {1} {2}", new Object[]{Thread.currentThread(), ds, uri} );
@@ -136,6 +143,8 @@ public class ReferenceCache {
                     wds.makeImmutable();
                     ds= wds;
                 }
+            } else if ( ds==null ) {
+                ds= NULL;
             }
             this.qds= new WeakReference<QDataSet>(ds);
             this.status= ReferenceCacheEntryStatus.DONE;
@@ -169,9 +178,21 @@ public class ReferenceCache {
     }
 
     /**
+     * return the ReferenceCacheEntry, if any, for the URI.  This is to resolve
+     * the ambiguity of the getDataSet call.  Typically the status of the
+     * entry is called.
+     * @param uri the URI that can be resolved into a dataset.
+     * @return null or the ReferenceCacheEntry.
+     */
+    public synchronized ReferenceCacheEntry getReferenceCacheEntry( String uri ) {
+        ReferenceCacheEntry entry= uris.get(uri);
+        return entry;
+    }
+    
+    /**
      * Query to see if the dataset exists in the cache.  Null is returned if it 
      * is not, or a QDataSet is returned if it is.
-     * NOTE: the entry might actually be a null, meaning the load resulted in no data.
+     * NOTE: the entry might be ReferenceCache.NULL, meaning the load resulted in no data.
      * @param uri the URI that can be resolved into a dataset.
      * @return the dataset or null
      */
@@ -216,6 +237,7 @@ public class ReferenceCache {
             if ( result!=null ) {
                 if ( result.wasGarbageCollected() ) { // it was garbage collected.
                     result= new ReferenceCacheEntry(uri,monitor);
+                    result.status= ReferenceCacheEntryStatus.LOADING; // TODO: study Why shouldn't we just set the loading status here?
                     result.loadThread= Thread.currentThread();
                     uris.put( uri, result );
                     logger.log( Level.FINEST, "this thread must reload garbage-collected uri" );
@@ -276,7 +298,7 @@ public class ReferenceCache {
      * @param uri
      * @param ds 
      */
-    public synchronized void putDataSet( String uri, QDataSet ds ) {
+    private synchronized void putDataSet( String uri, QDataSet ds ) {
         ReferenceCacheEntry result= uris.get(uri);
         if ( result==null ) throw new IllegalStateException("nobody asked for this dataset, use offerDataSet");
         logger.log( Level.FINEST, "putDataSet on thread {0} {1}", new Object[]{Thread.currentThread(), uri});
@@ -286,13 +308,15 @@ public class ReferenceCache {
                 ds= Ops.copy(mpds);
                 ((MutablePropertyDataSet)ds).makeImmutable();
             }
+        } else if ( ds==null ) {
+            ds= NULL;
         }
         result.qds= new WeakReference<>(ds);
         result.status= ReferenceCacheEntryStatus.DONE;
     }
 
-    //experiments to see if Jython Caching works if the garbage collector is disabled.
-    //Map<String,QDataSet> hardReferences= new HashMap<>();
+    //experiments to see if Jython Caching works if the garbage collector unable to clean weak references.
+    Map<String,QDataSet> strongReferences= new HashMap<>();
     
     /**
      * like putDataSet, but if no one has requested this dataset, then simply add
@@ -312,7 +336,7 @@ public class ReferenceCache {
             result.loadThread= Thread.currentThread();
             uris.put( uri, result );
         }
-        //hardReferences.put( uri, ds );
+        strongReferences.put( uri, ds );
         putDataSet( uri, ds );
     }
     
