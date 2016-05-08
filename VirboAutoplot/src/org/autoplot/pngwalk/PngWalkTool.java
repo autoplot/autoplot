@@ -468,12 +468,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     }
 
                     String timeRange;
-                    if ( jsonTimeRange==null || !UnitsUtil.isTimeLocation(jsonTimeRange.getUnits()) ) {
+                    if ( jsonTimeRange==null || !UnitsUtil.isTimeLocation(jsonTimeRange.getUnits()) ) { // get the timerange from the filename
                         TimeParser tp= TimeParser.create( template );
                         timeRange = s;
                         try {
                             DatumRange dr= tp.parse(timeRange).getTimeRange();
-                            timeRange= dr.toString().replaceAll(" ", "+");
+                            if ( tp.getValidRange().equals(dr) ) {
+                                // the filename has no time constraint
+                                //TODO: this could probably be resolved by parsing the batch file, if it is available.  The createPngwalk should copy the batch file into the pngwalk anyway.
+                                timeRange= null;
+                            } else {
+                                timeRange= dr.toString().replaceAll(" ", "+");
+                            }
                         } catch ( ParseException ex ) {
                             throw new RuntimeException(ex);
                         }
@@ -488,7 +494,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     } else {
                         productFile = template.substring(0, i0) + ".vap";  
                     }
-                    suri = productFile + "?timeRange=" + timeRange;
+                    if ( timeRange!=null ) {
+                        suri = productFile + "?timeRange=" + timeRange;
+                    } else {
+                        JOptionPane.showMessageDialog(ScriptContext.getViewWindow(), "unable to resolve time range from image metadata or filename.");
+                        return;
+                    }
                 }
 
                 Runnable run = new Runnable() {
