@@ -214,6 +214,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     //What's to be done here?  It could be the name was wrong, so should
                     //we just assume this is an error?
                     rcent= null;  // go through as before.
+                    mon= new NullProgressMonitor(); // we can't reuse monitor after finished is called.
                 }
             } else {
                 logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), resourceURI } );
