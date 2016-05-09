@@ -50,6 +50,7 @@ import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
@@ -95,6 +96,7 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.jython.JythonDataSourceFactory;
 import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import org.virbo.jythonsupport.ui.ParametersFormPanel;
+import sun.security.jca.JCAUtil;
 
 /**
  * Error annotations, saveAs, etc.
@@ -230,6 +232,20 @@ public class ScriptPanelSupport {
     public int getSaveFile() throws IOException {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(getFileFilter());
+        final JCheckBox cb= new JCheckBox("delete old file");
+        cb.setEnabled(false);
+        chooser.addPropertyChangeListener( JFileChooser.SELECTED_FILE_CHANGED_PROPERTY, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                System.err.println("eh?");
+                if ( evt.getOldValue()!=null ) { 
+                    System.err.println("evt name change"+evt.getOldValue()+"-->");
+                    System.err.println("evt name change"+evt.getNewValue());
+                    cb.setEnabled(true);
+                }
+            }
+        });
+        chooser.setAccessory(cb);
         if (file != null && ! FileSystemUtil.isChildOf( FileSystem.settings().getLocalCacheDir(), file ) ) {
             chooser.setSelectedFile(file);
         } else {
@@ -256,6 +272,11 @@ public class ScriptPanelSupport {
         }
         int r = chooser.showSaveDialog(panel);
         if (r == JFileChooser.APPROVE_OPTION) {
+            if ( cb.isSelected() && !file.equals(chooser.getSelectedFile()) ) {
+                if ( ! file.delete() ) {
+                    JOptionPane.showMessageDialog( panel, "unable to delete old file: "+file );
+                }
+            }
             file = chooser.getSelectedFile();
             if (!(file.toString().endsWith(".jy") || file.toString().endsWith(".py") || file.toString().endsWith(".jyds"))) {
                 if (panel.getContext() == JythonScriptPanel.CONTEXT_DATA_SOURCE) {
