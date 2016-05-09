@@ -29,6 +29,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.das2.CancelledOperationException;
 import org.das2.client.Authenticator;
 import org.das2.client.DasServer;
@@ -41,7 +43,6 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.stream.MIME;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.KeyChain;
 import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DataSetOps;
@@ -328,9 +329,21 @@ class Das2ServerDataSource extends AbstractDataSource {
                           while ( nStatus==401 ) {
                                 //URL keyChainUrl= new URL( url2.getProtocol() + "://user@" + url2.getHost() + url2.getPath() + "/" + params2.get("dataset" ) );
                                 //String userInfo= KeyChain.getDefault().getUserInfo(keyChainUrl);
-                                
+
                                 org.das2.util.CredentialsManager cm= org.das2.util.CredentialsManager.getMannager();
-                                String sLocId= this.resourceURI.toURL().toString() + "|" + dataset;
+                                String sLocId;
+
+                                String readAccessGroup;
+                                String auth= httpConn.getHeaderField("WWW-Authenticate");
+                                Pattern p= Pattern.compile("Basic realm=\"(.*)\"");
+                                Matcher m= p.matcher(auth);
+                                if ( m.matches() ) {
+                                    readAccessGroup= m.group(1);
+                                } else {
+                                    readAccessGroup= "das2 server";
+                                }
+                                
+                                sLocId= this.resourceURI.toURL().toString() + "|" + readAccessGroup;
                                 //String sLocId = "planet.physics.uiowa.edu/das/das2Server|voyager1/pwi/SpecAnalyzer-4s-Efield";
                                 if(!cm.hasCredentials(sLocId)){
                                     DasServer svr = DasServer.create(this.resourceURI.toURL());
