@@ -6,6 +6,7 @@
 
 package org.virbo.autoplot;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -24,13 +25,18 @@ public class UriTimeRangeToggleButton extends JPanel {
     public UriTimeRangeToggleButton( ) {
         try {
             img= ImageIO.read( UriTimeRangeToggleButton.class.getResource("/resources/tinyButton2.png") );
+            imgUp=  ImageIO.read( UriTimeRangeToggleButton.class.getResource("/resources/tinyButtonUp.png") );
+            imgDn=  ImageIO.read( UriTimeRangeToggleButton.class.getResource("/resources/tinyButtonDn.png") );
+            setPosition(0);
         } catch (IOException ex) {
             Logger.getLogger(UriTimeRangeToggleButton.class.getName()).log(Level.SEVERE, null, ex);
         }
         setPreferredSize( new Dimension( img.getHeight(), img.getWidth() ) );
         setMaximumSize( new Dimension( img.getHeight(), img.getWidth() ) );
         setMinimumSize( new Dimension( img.getHeight(), img.getWidth() ) );
+        this.setToolTipText("Green Data Set Selector, Blue for Time Range Selector");
     }
+    
     BufferedImage img;
     BufferedImage imgUp; // upper button is selected
     BufferedImage imgDn; // lower button is selected
@@ -39,8 +45,8 @@ public class UriTimeRangeToggleButton extends JPanel {
      * 0 is up 1 is down.
      * @param pos 
      */
-    public void setPosition( int pos ) {
-        if ( pos==0 ) {
+    public final void setPosition( int pos ) {
+        if ( pos==1 ) {
             img= imgUp;
         } else {
             img= imgDn;
@@ -50,7 +56,10 @@ public class UriTimeRangeToggleButton extends JPanel {
     
     @Override
     protected void paintComponent(Graphics g) {
-        g.drawImage( imgUp, 0, 0, this );
+        g.setColor( this.getBackground() );
+        //g.setColor( Color.BLUE );
+        g.fillRect( 0, 0, img.getWidth()+1, img.getHeight()+1 );
+        g.drawImage( img, 0, 0, this );
     }
     
 }
