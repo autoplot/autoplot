@@ -180,6 +180,14 @@ public class PlotElementController extends DomNodeController {
         }
     }
 
+    /** 
+     * return the plot element.
+     * @return  the plot element.
+     */
+    public PlotElement getPlotElement() {
+        return plotElement;
+    }
+    
     /**
      * remove any bindings and listeners
      */
