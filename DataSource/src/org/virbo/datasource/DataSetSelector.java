@@ -2209,6 +2209,8 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
                     Container trp= DataSetSelector.this.getParent();
                     if ( trp.getLayout() instanceof CardLayout ) {
                         ((CardLayout)trp.getLayout()).show( trp, alternatePeerCard );
+                        setCardSelected(false);
+                        
                     }
                 }
             } );
@@ -2218,6 +2220,30 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         return result;
 
     }
+    
+    private boolean cardSelected = false;
+
+    public static final String PROP_CARDSELECTED = "cardSelected";
+
+    /**
+     * added to listen to changes, but this must also be set externally to switch back.
+     * @return 
+     */
+    public boolean isCardSelected() {
+        return cardSelected;
+    }
+
+    public void setCardSelected(boolean cardSelected) {
+        boolean oldCardSelected = this.cardSelected;
+        this.cardSelected = cardSelected;
+        firePropertyChange(PROP_CARDSELECTED, oldCardSelected, cardSelected);
+    }
+     
+    public void setCardSelectedNoEventKludge(boolean cardSelected) {
+        boolean oldCardSelected = this.cardSelected;
+        this.cardSelected = cardSelected;
+    }
+        
     public static void main( String[] args ) {
         DataSetSelectorDemo.main(args);
     }
