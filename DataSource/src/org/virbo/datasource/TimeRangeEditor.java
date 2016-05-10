@@ -523,14 +523,34 @@ public class TimeRangeEditor extends javax.swing.JPanel {
                     Container trp= TimeRangeEditor.this.getParent();
                     if ( trp.getLayout() instanceof CardLayout ) {
                         ((CardLayout)trp.getLayout()).show( trp, alternatePeerCard );
+                        setCardSelected(false);
                     }
+                    
                 }
             } );
         }
 
-
         return result;
 
+    }
+    
+    private boolean cardSelected = false;
+
+    public static final String PROP_CARDSELECTED = "cardSelected";
+
+    public boolean isCardSelected() {
+        return cardSelected;
+    }
+
+    public void setCardSelected(boolean cardSelected) {
+        boolean oldCardSelected = this.cardSelected;
+        this.cardSelected = cardSelected;
+        firePropertyChange(PROP_CARDSELECTED, oldCardSelected, cardSelected);
+    }
+    
+    public void setCardSelectedNoEventKludge(boolean cardSelected) {
+        boolean oldCardSelected = this.cardSelected;
+        this.cardSelected = cardSelected;
     }
 
     /**
