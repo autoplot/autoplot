@@ -511,11 +511,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getNewValue().equals(Boolean.TRUE) ) {
-                    switchToEditorCard( CARD_TIME_RANGE_SELECTOR );
-                    dataSetSelector.setCardSelected(evt.getNewValue().equals(Boolean.FALSE));
+                    setEditorCard( CARD_TIME_RANGE_SELECTOR );
+                    dataSetSelector.setCardSelected( false );
                 } else {
-                    switchToEditorCard( CARD_DATA_SET_SELECTOR );
-                    dataSetSelector.setCardSelected(evt.getNewValue().equals(Boolean.TRUE));                    
+                    setEditorCard( CARD_DATA_SET_SELECTOR );
+                    dataSetSelector.setCardSelected( true );
                 }
             }
         });
@@ -523,11 +523,11 @@ public final class AutoplotUI extends javax.swing.JFrame {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getNewValue().equals(Boolean.TRUE) ) {
-                    switchToEditorCard( CARD_DATA_SET_SELECTOR );
-                    timeRangeEditor.setCardSelected(evt.getNewValue().equals(Boolean.FALSE));
+                    setEditorCard( CARD_DATA_SET_SELECTOR );
+                    timeRangeEditor.setCardSelected( false );
                 } else {
-                    switchToEditorCard( CARD_TIME_RANGE_SELECTOR );
-                    timeRangeEditor.setCardSelected(evt.getNewValue().equals(Boolean.TRUE));                    
+                    setEditorCard( CARD_TIME_RANGE_SELECTOR );
+                    timeRangeEditor.setCardSelected( true );
                 }
             }
         });
@@ -3768,11 +3768,26 @@ private void canvasSizeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     }
 }//GEN-LAST:event_canvasSizeMenuItemActionPerformed
 
-public void switchToEditorCard( String selector ) {
-    String old= timeRangeEditor.isCardSelected() ? CARD_TIME_RANGE_SELECTOR : CARD_DATA_SET_SELECTOR;
-    if ( old.equals(selector) ) {
-        return;
+    private String editorCard = CARD_DATA_SET_SELECTOR;
+
+    public static final String PROP_EDITORCARD = "editorCard";
+
+    public String getEditorCard() {
+        return editorCard;
     }
+
+    public void setEditorCard(String editorCard) {
+        String oldEditorCard = this.editorCard;
+        this.editorCard = editorCard;
+        switchToEditorCard( editorCard );
+        firePropertyChange(PROP_EDITORCARD, oldEditorCard, editorCard);
+    }
+
+public void switchToEditorCard( String selector ) {
+    //String old= timeRangeEditor.isCardSelected() ? CARD_TIME_RANGE_SELECTOR : CARD_DATA_SET_SELECTOR;
+    //if ( old.equals(selector) ) {
+    //    return;
+    //}
     logger.log(Level.FINE, "switch to selector: {0}", selector);
     if ( (CardLayout)timeRangePanel.getLayout() instanceof CardLayout ) {
         ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, selector );
@@ -3795,14 +3810,14 @@ public void switchToEditorCard( String selector ) {
 private void dataSetSelectorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
     if ( dataSetSelectorMenuItem.isSelected() ) {
-        switchToEditorCard( CARD_DATA_SET_SELECTOR);
+        setEditorCard( CARD_DATA_SET_SELECTOR);
     }
 }//GEN-LAST:event_dataSetSelectorMenuItemActionPerformed
 
 private void timeRangeSelectorMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeSelectorMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
     if ( timeRangeSelectorMenuItem.isSelected() ) {
-        switchToEditorCard( CARD_TIME_RANGE_SELECTOR );
+        setEditorCard( CARD_TIME_RANGE_SELECTOR );
     }
 }//GEN-LAST:event_timeRangeSelectorMenuItemActionPerformed
 
@@ -3864,7 +3879,7 @@ private void replaceFileMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 private void reloadAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_reloadAllMenuItemActionPerformed
     org.das2.util.LoggerManager.logGuiEvent(evt);
    // Reload All Data
-    RequestProcessor.invokeLater( new Runnable() {
+    RequestProcessor.invokeLater(new Runnable() {
         @Override
         public void run() {
             AutoplotUtil.reloadAll(dom);
@@ -3876,7 +3891,7 @@ private void workOfflineCheckBoxMenuItemActionPerformed(java.awt.event.ActionEve
     org.das2.util.LoggerManager.logGuiEvent(evt);
     final boolean workOffline= workOfflineCheckBoxMenuItem.isSelected();
     FileSystem.settings().setOffline( workOffline );
-    RequestProcessor.invokeLater( new Runnable() { 
+    RequestProcessor.invokeLater(new Runnable() { 
         @Override
         public void run() {
             FileSystem.reset();
@@ -3945,9 +3960,9 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
                 evt.getY() < dssBounds.y + dssBounds.height ) {
                         
             if ( evt.getY()< dssBounds.y + dssBounds.height/2 ) {
-                switchToEditorCard( CARD_DATA_SET_SELECTOR );
+                setEditorCard( CARD_DATA_SET_SELECTOR );
             } else {
-                switchToEditorCard( CARD_TIME_RANGE_SELECTOR );
+                setEditorCard( CARD_TIME_RANGE_SELECTOR );
             }
         }
     }//GEN-LAST:event_formMouseClicked
@@ -3994,7 +4009,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         }
         
         final DataMashUp dm= new DataMashUp();
-        dm.setResolver( new DataMashUp.Resolver() {
+        dm.setResolver(new DataMashUp.Resolver() {
             @Override
             public QDataSet getDataSet(String uri) {
                 try {
@@ -4068,9 +4083,9 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
                 }   break;
             case Options.PROP_USE_TIME_RANGE_EDITOR:
                 if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
-                    switchToEditorCard( CARD_TIME_RANGE_SELECTOR );
+                    setEditorCard( CARD_TIME_RANGE_SELECTOR );
                 } else {
-                    switchToEditorCard( CARD_DATA_SET_SELECTOR );
+                    setEditorCard( CARD_DATA_SET_SELECTOR );
             }   break;
         }
     }
@@ -4787,7 +4802,7 @@ APSplash.checkTime("init 230");
                 final String script= alm.getValue("script");
                 if ( !script.equals("") ) {
                     if ( headless ) {
-                        model.setExceptionHandler( new ExceptionHandler() {
+                        model.setExceptionHandler(new ExceptionHandler() {
                             @Override
                             public void handle(Throwable t) {
                                 t.printStackTrace();
@@ -5241,10 +5256,10 @@ APSplash.checkTime("init 240");
             @Override
             public void run() {
                 maybeCreateToolsManager();
-                toolsManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
+                toolsManager.getModel().addPropertyChangeListener(BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
                 @Override
                     public void propertyChange(PropertyChangeEvent evt) {
-                        SwingUtilities.invokeLater( new Runnable() { 
+                        SwingUtilities.invokeLater(new Runnable() { 
                             @Override
                             public void run() {
                                 toolsManager.updateBookmarks( toolsMenu, "userSep", AutoplotUI.this, AutoplotUI.this.dataSetSelector );
@@ -5462,13 +5477,13 @@ APSplash.checkTime("init 240");
         dataSetSelector.setExpertMode(expert);
         
         final boolean fexpert= expert;
-        SwingUtilities.invokeLater( new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if ( !fexpert ) {
-                    switchToEditorCard( CARD_TIME_RANGE_SELECTOR);
+                    setEditorCard( CARD_TIME_RANGE_SELECTOR);
                 } else {
-                    switchToEditorCard( CARD_DATA_SET_SELECTOR);
+                    setEditorCard( CARD_DATA_SET_SELECTOR);
                 }
             }
         } );
