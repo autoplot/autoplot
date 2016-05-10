@@ -733,6 +733,39 @@ public class DomUtil {
         }
         return result;
     }
+    
+    /**
+     * Return the plot elements that contained within a plot.
+     * @param application the dom for a plot.
+     * @param dsf the data source filter used by one (or more) plot element.
+     * @return the plot elements using the dataSourceFilter.
+     */
+    public static List<PlotElement> getPlotElementsFor( Application application, DataSourceFilter dsf ) {
+        String id = dsf.getId();
+        return getPlotElementsFor( application, id );
+    } 
+    
+    private static List<PlotElement> getPlotElementsFor( Application application, String id ) {
+        List<PlotElement> result = new ArrayList<>();
+        for (PlotElement p : application.getPlotElements()) {
+            if (p.getDataSourceFilterId().equals(id)) {
+                result.add(p);
+            }
+        }
+        for ( DataSourceFilter dsf: application.getDataSourceFilters() ) {
+            String uri= dsf.getUri();
+            if ( uri.startsWith("vap+internal:") ) {
+                String[] ss=  uri.substring(13).split(",");
+                for (String s : ss) {
+                    if (s.equals(id)) {
+                        List<PlotElement> pes1= getPlotElementsFor(application,dsf.getId());
+                        result.addAll(pes1);
+                    }
+                }
+            }
+        }
+        return result;
+    }
 
     /**
      * allow verification that the node has a property.  I killed an hour with a 
