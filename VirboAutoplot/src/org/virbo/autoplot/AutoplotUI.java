@@ -531,6 +531,18 @@ public final class AutoplotUI extends javax.swing.JFrame {
                 }
             }
         });
+        uriTimeRangeToggleButton1.addPropertyChangeListener( UriTimeRangeToggleButton.PROP_POSITION, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( evt.getNewValue().equals(1) ) {
+                    setEditorCard( CARD_DATA_SET_SELECTOR );
+                    timeRangeEditor.setCardSelected( false );
+                } else {
+                    setEditorCard( CARD_TIME_RANGE_SELECTOR );
+                    timeRangeEditor.setCardSelected( true );                    
+                }
+            }
+        });
 
         timeRangeEditor.setNoOneListeningRange( Application.DEFAULT_TIME_RANGE );
         timeRangeEditor.setRange( Application.DEFAULT_TIME_RANGE );
