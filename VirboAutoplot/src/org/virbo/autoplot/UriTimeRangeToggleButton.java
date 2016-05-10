@@ -6,9 +6,9 @@
 
 package org.virbo.autoplot;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -35,7 +35,11 @@ public class UriTimeRangeToggleButton extends JPanel {
         setMaximumSize( new Dimension( img.getHeight(), img.getWidth() ) );
         setMinimumSize( new Dimension( img.getHeight(), img.getWidth() ) );
         this.setToolTipText("Green Data Set Selector, Blue for Time Range Selector");
+        
+        this.addMouseListener( getMouseAdapter() );
     }
+           
+    public static final String PROP_POSITION= "position";
     
     BufferedImage img;
     BufferedImage imgUp; // upper button is selected
@@ -62,4 +66,16 @@ public class UriTimeRangeToggleButton extends JPanel {
         g.drawImage( img, 0, 0, this );
     }
     
+    private MouseAdapter getMouseAdapter() {
+        return new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if ( evt.getY()< img.getHeight() / 2 ) {
+                    firePropertyChange( PROP_POSITION, -1, 1 );
+                } else {
+                    firePropertyChange( PROP_POSITION, -1, 0 );
+                }
+            }
+        };
+    }
 }
