@@ -2208,9 +2208,8 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
                     org.das2.util.LoggerManager.logGuiEvent(ev);                
                     Container trp= DataSetSelector.this.getParent();
                     if ( trp.getLayout() instanceof CardLayout ) {
-                        ((CardLayout)trp.getLayout()).show( trp, alternatePeerCard );
+                        //((CardLayout)trp.getLayout()).show( trp, alternatePeerCard );
                         setCardSelected(false);
-                        
                     }
                 }
             } );
