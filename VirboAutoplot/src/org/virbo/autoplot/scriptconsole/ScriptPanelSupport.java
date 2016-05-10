@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot.scriptconsole;
 
 import java.awt.BorderLayout;
@@ -13,7 +10,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,9 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.ClosedWatchServiceException;
@@ -38,12 +31,10 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -52,7 +43,6 @@ import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -71,7 +61,6 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import org.das2.components.DasProgressPanel;
-import org.das2.util.ByteBufferInputStream;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -96,7 +85,6 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.jython.JythonDataSourceFactory;
 import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import org.virbo.jythonsupport.ui.ParametersFormPanel;
-import sun.security.jca.JCAUtil;
 
 /**
  * Error annotations, saveAs, etc.
