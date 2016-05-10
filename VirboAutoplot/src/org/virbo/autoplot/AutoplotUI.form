@@ -783,8 +783,8 @@
           </Group>
           <Group type="103" rootIndex="2" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="uriTimeRangeToggleButton1" min="-2" pref="10" max="-2" attributes="0"/>
-                  <EmptySpace min="0" pref="722" max="32767" attributes="0"/>
+                  <Component id="uriTimeRangeToggleButton1" min="-2" pref="11" max="-2" attributes="0"/>
+                  <EmptySpace min="0" pref="721" max="32767" attributes="0"/>
               </Group>
           </Group>
       </Group>
@@ -794,7 +794,7 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="timeRangePanel" min="-2" pref="31" max="-2" attributes="0"/>
-              <EmptySpace pref="693" max="32767" attributes="0"/>
+              <EmptySpace pref="695" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="statusLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="statusTextField" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -886,7 +886,7 @@
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignCardLayout" value="org.netbeans.modules.form.compat2.layouts.DesignCardLayout$CardConstraintsDescription">
-              <CardConstraints cardName="card2"/>
+              <CardConstraints cardName="dataCard"/>
             </Constraint>
           </Constraints>
         </Component>

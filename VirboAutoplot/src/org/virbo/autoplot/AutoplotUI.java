@@ -192,8 +192,8 @@ public final class AutoplotUI extends javax.swing.JFrame {
     final String TAB_TOOLTIP_SCRIPT = "<html>Editor panel for Jython scripts and data sources.<br>%s</html>";
     final String TABS_TOOLTIP = "Right-click or drag to undock.";
 
-    public static final String CARD_DATA_SET_SELECTOR = "card2";
-    public static final String CARD_TIME_RANGE_SELECTOR = "card1";
+    public static final String CARD_DATA_SET_SELECTOR = "dataCard"; // NOTE THIS IS NOT USED IN GUI CODE!
+    public static final String CARD_TIME_RANGE_SELECTOR = "timeCard";
 
     TearoffTabbedPane tabs;
     ApplicationModel applicationModel;
@@ -492,20 +492,45 @@ public final class AutoplotUI extends javax.swing.JFrame {
 //            
 //            this.revalidate();
 //        } else {
-//            timeRangePanel.add( timeRangeEditor, "card1" );
+//            timeRangePanel.add( timeRangeEditor, "card1" );  NONONO
 //            timeRangePanel.setMinimumSize( new Dimension( timeUriPanel.getMinimumSize().width, d.height ) );
 //            timeRangeEditor.setDataSetSelectorPeer(dataSetSelector);
-//            timeRangeEditor.setAlternatePeer("Switch to Data Set Selector","card2");
-//            dataSetSelector.setAlternatePeer("Switch to Time Range Editor","card1");
+//            timeRangeEditor.setAlternatePeer("Switch to Data Set Selector","card2"); NONONO
+//            dataSetSelector.setAlternatePeer("Switch to Time Range Editor","card1"); NONONO
 //        }
         
         Dimension d= timeRangeEditor.getMinimumSize();
-        timeRangePanel.add( timeRangeEditor, "card1" );
+        timeRangePanel.add( timeRangeEditor, CARD_TIME_RANGE_SELECTOR );
         timeRangeEditor.setMinimumSize( d );
         timeRangePanel.setMinimumSize( d );
         timeRangeEditor.setDataSetSelectorPeer(dataSetSelector);
-        timeRangeEditor.setAlternatePeer("Switch to Data Set Selector","card2");
-        dataSetSelector.setAlternatePeer("Switch to Time Range Editor","card1");
+        timeRangeEditor.setAlternatePeer("Switch to Data Set Selector", CARD_DATA_SET_SELECTOR );
+        dataSetSelector.setAlternatePeer("Switch to Time Range Editor", CARD_TIME_RANGE_SELECTOR );
+        dataSetSelector.setCardSelected(true);
+        timeRangeEditor.addPropertyChangeListener( TimeRangeEditor.PROP_CARDSELECTED, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( evt.getNewValue().equals(Boolean.TRUE) ) {
+                    switchToEditorCard( CARD_TIME_RANGE_SELECTOR );
+                    dataSetSelector.setCardSelected(evt.getNewValue().equals(Boolean.FALSE));
+                } else {
+                    switchToEditorCard( CARD_DATA_SET_SELECTOR );
+                    dataSetSelector.setCardSelected(evt.getNewValue().equals(Boolean.TRUE));                    
+                }
+            }
+        });
+        dataSetSelector.addPropertyChangeListener( DataSetSelector.PROP_CARDSELECTED, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( evt.getNewValue().equals(Boolean.TRUE) ) {
+                    switchToEditorCard( CARD_DATA_SET_SELECTOR );
+                    timeRangeEditor.setCardSelected(evt.getNewValue().equals(Boolean.FALSE));
+                } else {
+                    switchToEditorCard( CARD_TIME_RANGE_SELECTOR );
+                    timeRangeEditor.setCardSelected(evt.getNewValue().equals(Boolean.TRUE));                    
+                }
+            }
+        });
 
         timeRangeEditor.setNoOneListeningRange( Application.DEFAULT_TIME_RANGE );
         timeRangeEditor.setRange( Application.DEFAULT_TIME_RANGE );
@@ -2577,7 +2602,7 @@ APSplash.checkTime("init 52.9");
                 dataSetSelectorActionPerformed(evt);
             }
         });
-        timeRangePanel.add(dataSetSelector, "card2");
+        timeRangePanel.add(dataSetSelector, "dataCard");
 
         org.jdesktop.layout.GroupLayout uriTimeRangeToggleButton1Layout = new org.jdesktop.layout.GroupLayout(uriTimeRangeToggleButton1);
         uriTimeRangeToggleButton1.setLayout(uriTimeRangeToggleButton1Layout);
@@ -3222,15 +3247,15 @@ APSplash.checkTime("init 52.9");
                 .add(org.jdesktop.layout.GroupLayout.TRAILING, tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(layout.createSequentialGroup()
-                    .add(uriTimeRangeToggleButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(0, 722, Short.MAX_VALUE)))
+                    .add(uriTimeRangeToggleButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 11, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(0, 721, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 693, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 695, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(statusLabel)
                     .add(statusTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
@@ -3743,10 +3768,27 @@ private void canvasSizeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     }
 }//GEN-LAST:event_canvasSizeMenuItemActionPerformed
 
-private void switchToEditorCard( String selector ) {
+public void switchToEditorCard( String selector ) {
+    String old= timeRangeEditor.isCardSelected() ? CARD_TIME_RANGE_SELECTOR : CARD_DATA_SET_SELECTOR;
+    if ( old.equals(selector) ) {
+        return;
+    }
+    logger.log(Level.FINE, "switch to selector: {0}", selector);
     if ( (CardLayout)timeRangePanel.getLayout() instanceof CardLayout ) {
         ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, selector );
     }
+    if ( CARD_TIME_RANGE_SELECTOR.equals(selector) ) {
+        uriTimeRangeToggleButton1.setPosition( 0 );
+        dataSetSelector.setCardSelectedNoEventKludge(false);
+        timeRangeEditor.setCardSelected(true);
+    } else if ( CARD_DATA_SET_SELECTOR.equals(selector) ) {
+        uriTimeRangeToggleButton1.setPosition( 1 );
+        timeRangeEditor.setCardSelectedNoEventKludge(false);
+        dataSetSelector.setCardSelected(true);
+    } else {
+        throw new IllegalArgumentException("huh card?");
+    }
+    uriTimeRangeToggleButton1.setPosition( CARD_TIME_RANGE_SELECTOR.equals(selector) ? 1 : 0 );
     dom.getOptions().setUseTimeRangeEditor(CARD_TIME_RANGE_SELECTOR.equals(selector));
 }
 
