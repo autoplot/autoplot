@@ -142,6 +142,11 @@ public class Util {
             }
         }
         
+        if ( rds==null && factory instanceof AggregatingDataSourceFactory ) {
+            logger.info("strange condition where occasional null is returned because of reference caching.  This needs to be studied more.");
+            rds= result.getDataSet(monitor);  //TODO nasty kludge, just try reading again...
+        }
+        
         if ( rds==null ) return null;
         rds= ensureWritable(rds);
         return rds;
