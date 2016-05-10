@@ -22,7 +22,7 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="jPanel1" pref="120" max="32767" attributes="0"/>
+              <Component id="recentComboBox" pref="196" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="timeRangeToolButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -40,7 +40,7 @@
           <Component id="nextButton" linkSize="2" alignment="0" max="32767" attributes="1"/>
           <Component id="prevButton" linkSize="2" alignment="0" max="32767" attributes="1"/>
           <Component id="timeRangeToolButton" linkSize="2" alignment="0" min="0" pref="0" max="32767" attributes="1"/>
-          <Component id="jPanel1" alignment="0" min="-2" max="-2" attributes="1"/>
+          <Component id="recentComboBox" linkSize="2" alignment="0" min="-2" max="-2" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -109,30 +109,19 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="browseButtonActionPerformed"/>
       </Events>
     </Component>
-    <Container class="javax.swing.JPanel" name="jPanel1">
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
-      <SubComponents>
-        <Component class="org.virbo.datasource.RecentComboBox" name="recentComboBox">
-          <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="2">
-                <StringItem index="0" value="2010-01-01"/>
-                <StringItem index="1" value="2010-01-02"/>
-              </StringArray>
-            </Property>
-            <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-              <Dimension value="[120, 27]"/>
-            </Property>
-          </Properties>
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
-              <BorderConstraints direction="Center"/>
-            </Constraint>
-          </Constraints>
-        </Component>
-      </SubComponents>
-    </Container>
+    <Component class="org.virbo.datasource.RecentComboBox" name="recentComboBox">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="2">
+            <StringItem index="0" value="2010-01-01"/>
+            <StringItem index="1" value="2010-01-02"/>
+          </StringArray>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[120, 27]"/>
+        </Property>
+      </Properties>
+    </Component>
     <Component class="javax.swing.JButton" name="timeRangeToolButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
