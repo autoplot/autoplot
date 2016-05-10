@@ -375,23 +375,23 @@
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="canvasLayoutPanel1" pref="305" max="32767" attributes="0"/>
+                                  <Component id="canvasLayoutPanel1" max="32767" attributes="0"/>
                                   <EmptySpace min="7" pref="7" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="tallerButton" max="32767" attributes="0"/>
-                                      <Component id="shorterButton" pref="100" max="32767" attributes="0"/>
+                                      <Component id="shorterButton" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="sameHeightButton" pref="100" max="32767" attributes="0"/>
+                                      <Component id="sameHeightButton" pref="0" max="32767" attributes="0"/>
                                       <Component id="fixLayoutButton" max="32767" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="addPlotsButton" max="32767" attributes="0"/>
-                                      <Component id="deletePlotButton" pref="100" max="32767" attributes="0"/>
+                                      <Component id="deletePlotButton" pref="0" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>

@@ -60,6 +60,7 @@ import org.virbo.autoplot.dom.Column;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomOps;
+import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementStyle;
@@ -510,11 +511,15 @@ public class LayoutPanel extends javax.swing.JPanel {
         if ( plot!=null ) {
             dasPlot = plot.getController().getDasPlot();
             selected.add(dasPlot);
-
+            List<DataSourceFilter> dsfs= new ArrayList();
             for ( int i=0; i<iindices.length; i++ ) {
                 try {
                     PlotElementController pec= peles[iindices[i]].getController();
                     selected.add( pec.getRenderer() );
+                    dsfs.add( (DataSourceFilter)DomUtil.getElementById( dom, pec.getPlotElement().getDataSourceFilterId() ) );
+                    if ( dsfs.size()>0 ) {
+                        dataSourceList.setSelectedValue( dsfs.get(0), true);        
+                    }
                 } catch ( IndexOutOfBoundsException ex ) {
                     // this happens because of multiple threads... TODO: fix this sometime...
                     System.err.println("harmless indexOutOfBoundsException needs to be fixed sometime");
@@ -522,6 +527,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         }
 
+        updateDataSourceList();
         canvasLayoutPanel1.setSelectedComponents( selected );
         canvasLayoutPanel1.setComponent(dasPlot);
         
@@ -1368,6 +1374,10 @@ public class LayoutPanel extends javax.swing.JPanel {
         if ( s instanceof DataSourceFilter ) { // transitional state where strings are in there
             dom.getController().setDataSourceFilter( (DataSourceFilter)s );
             dom.getController().setFocusUri(((DataSourceFilter)s).getUri());
+            List<PlotElement> pes= DomUtil.getPlotElementsFor(dom,((DataSourceFilter)s));            
+            if ( pes.size()>0 ) {
+                dom.getController().setPlotElement(pes.get(0));
+            }
         }
         
     }//GEN-LAST:event_dataSourceListValueChanged
