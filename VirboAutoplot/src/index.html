@@ -25,8 +25,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-05-07 r18888):</p>
+        <p>Bugfixes (2016-05-10 r18911):</p>
         <ul>
+            <li>1425: jump back into Autoplot button is enabled, but the timerange cannot be resolved. </li>
+            <li>das2servers allow realms with HTTP access, limiting the number of times authentication is needed.</li>
             <li>1560: copy plot when vap+internal is used.</li>
             <li>1581: null result of ReferenceCache.getDataSet is ambiguous.</li>
             <li>TrimDataSet's trim operator was incorrect when start gt 0, creating error messages.</li>
@@ -186,6 +188,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe 389: buttons indicate the address bar or timerange selection.</li>
+            <li>plot command gets lineWidth alias for lineThick, since this is a more consistent name.</li>
+            <li>482: Jython script save as allows the old name to be deleted, renaming the file.</li>
             <li>NetCDF/HDF reader now allows units to be specified in the URI, to support time tags with units=t1970, etc</li>
             <li>Jython supports Datum instances as PyDatums, supporting inline operators (like +)</li>
             <li>Auralizer code supports rank 2 waveform data</li>
