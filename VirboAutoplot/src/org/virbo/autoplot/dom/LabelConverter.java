@@ -10,6 +10,8 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.OrbitDatumRange;
 import org.das2.datum.TimeParser;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.dataset.DataSetUtil;
@@ -141,7 +143,15 @@ public class LabelConverter extends Converter {
 
             if ( title.contains("TIMERANGE") ) {
                 DatumRange tr= PlotElementControllerUtil.getTimeRange( dom, pe );
-                Pattern pop= Pattern.compile("(.*)\\%\\{TIMERANGE(.*)\\}(.*)");
+                if ( tr==null ) {
+                    if ( plot!=null && UnitsUtil.isTimeLocation( plot.getContext().getUnits() ) ) {
+                        tr= plot.getContext();
+                    } else if ( axis!=null && UnitsUtil.isTimeLocation( axis.getRange().getUnits() ) ) {
+                        tr= axis.getRange();
+                    }
+                }
+                
+                Pattern pop= Pattern.compile("(.*)\\%\\{TIMERANGE(.*?)\\}(.*)");
                 String insert= ( tr==null ? "(no timerange)" : tr.toString() );
                 Matcher m= pop.matcher(title);
                 if ( m.matches() ) {
@@ -242,12 +252,12 @@ public class LabelConverter extends Converter {
      * @return the new string with the value inserted.
      */
     protected static String insertString( String title, String label, String value ) {
-        Pattern p= Pattern.compile("(\\%\\{"+label+"(,.*)?\\})");
+        Pattern p= Pattern.compile("(\\%\\{"+label+"(,.*?)?\\})");
         Matcher m= p.matcher(title);
         if ( m.find() ) {
             return title.substring(0,m.start()) + value + title.substring(m.end());
         } else {
-            p= Pattern.compile("(\\$\\("+label+"(,.*)?\\))");
+            p= Pattern.compile("(\\$\\("+label+"(,.*?)?\\))");
             m= p.matcher(title);
             if ( m.find() ) {
                 return title.substring(0,m.start()) + value + title.substring(m.end());
