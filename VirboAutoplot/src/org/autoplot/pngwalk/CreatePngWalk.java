@@ -582,8 +582,7 @@ public class CreatePngWalk {
         
         writeHTMLFile( params, pngFilenameArrayThumbs, pngFilenameArrayBig, timeLabels );
         
-        mon.finished();
-        
+        if ( !mon.isFinished() ) mon.finished();
         
         return returnCodeAll;
     }
