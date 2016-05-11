@@ -77,7 +77,7 @@ public class CreatePngWalk {
      * the output filename is explicitly specified in the last column.
      * 
      * @param params
-     * @return
+     * @return array of strings: filename: timeRange
      * @throws IllegalArgumentException
      * @throws ParseException 
      */
@@ -111,11 +111,21 @@ public class CreatePngWalk {
                         times[i]= tp.format( DataSetUtil.asDatumRange( timesds.slice(i) ) ) + ": "+DataSetUtil.asDatumRange( timesds.slice(i) ).toString();
                     }
                 } else {
-                    timesds= Ops.createEvents(timesds);                    
+                    timesds= Ops.createEvents(timesds); 
                     Units tu= ((Units)((QDataSet)timesds.property(QDataSet.BUNDLE_1)).property( QDataSet.UNITS, 0 ));
                     Units eu= ((Units)((QDataSet)timesds.property(QDataSet.BUNDLE_1)).property( QDataSet.UNITS, 3 ));
-                    for ( int i=0; i<times.length; i++ ) {
-                        times[i]= eu.createDatum( timesds.slice(i).value(3) ).toString() + ": " + DatumRange.newDatumRange( timesds.slice(i).value(0), timesds.slice(i).value(1), tu ); // TODO: this should be easier to code
+                    if ( uri.endsWith(".txt" ) ) { // hey it's just an orbits file...
+                        logger.fine("reading events file to preserve identity of orbits.");
+                        for ( int i=0; i<times.length; i++ ) {
+                            String s1= eu.createDatum( timesds.slice(i).value(3) ).toString(); // orbit name
+                            String s= s1 + ": " + "orbit:"+uri + ":" + s1;
+                            times[i]= s;
+                        }
+                    } else {
+                        logger.fine("reading events file as start/stop times.");
+                        for ( int i=0; i<times.length; i++ ) {
+                            times[i]= eu.createDatum( timesds.slice(i).value(3) ).toString() + ": " + DatumRange.newDatumRange( timesds.slice(i).value(0), timesds.slice(i).value(1), tu ); // TODO: this should be easier to code
+                        }
                     }
                 }
             } catch (Exception ex) {
