@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.OrbitDatumRange;
+import org.das2.datum.TimeParser;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.dataset.DataSetUtil;
@@ -153,6 +154,12 @@ public class LabelConverter extends Converter {
                                 insert= DatumRangeUtil.formatTimeRange(tr,false);
                             }
                         }                        
+                    } else if ( control.startsWith(",FORMAT=") ) {
+                        String format= control.substring(8);
+                        TimeParser tp= TimeParser.create(format);
+                        if ( tr!=null ) {
+                            insert= tp.format(tr);
+                        }                        
                     }
                 }
                 title= insertString( title, "TIMERANGE", insert );
@@ -242,22 +249,26 @@ public class LabelConverter extends Converter {
     }
 
     /**
-     * return true if %{LABEL} or $(LABEL) is found in ptitle.
-     * @param ptitle the string which contains the macro.
+     * return true if %{LABEL} or $(LABEL) is found in ptitle, or 
+     * %{LABEL,args}.
+     * @param title the string which contains the macro.
      * @param label the macro name to look for in %{macro} or $(macro)
      * @param value the string with the macro inserted.
      * @return true if ptitle is consistent.
      */
-    protected static boolean containsString( String ptitle, String label, String value ) {
+    protected static boolean containsString( String title, String label, String value ) {
         String search;
         String[] ss=null;
-        search= "%{"+label+"}";
-        if ( ptitle.contains( search ) ) {
-            ss= ptitle.split("%\\{"+label+"\\}",-2);
+        Pattern p= Pattern.compile("(\\%\\{"+label+"(,.*)?\\})");
+        Matcher m= p.matcher(title);
+        if ( m.find() ) {
+            ss= new String[2];
+            ss[0]= title.substring(0,m.start());
+            ss[1]= title.substring(m.end());
         } else {
             search= "$("+label+")";
-            if ( ptitle.contains( search ) ) {
-                ss= ptitle.split("\\$\\("+label+"\\)",-2);
+            if ( title.contains( search ) ) {
+                ss= title.split("\\$\\("+label+"\\)",-2);
             }
         }
         if ( ss!=null && value.startsWith(ss[0]) && value.endsWith(ss[1]) ) {
