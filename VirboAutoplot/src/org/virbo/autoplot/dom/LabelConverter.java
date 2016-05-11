@@ -156,10 +156,18 @@ public class LabelConverter extends Converter {
                         }                        
                     } else if ( control.startsWith(",FORMAT=") ) {
                         String format= control.substring(8);
-                        TimeParser tp= TimeParser.create(format);
-                        if ( tr!=null ) {
-                            insert= tp.format(tr);
-                        }                        
+                        if ( format.equals("$o") || format.equals("%o") ) {
+                            if ( tr instanceof OrbitDatumRange ) {
+                                insert= ((OrbitDatumRange)tr).getOrbit();
+                            } else {
+                                insert= "???";
+                            }
+                        } else {
+                            TimeParser tp= TimeParser.create(format);
+                            if ( tr!=null ) {
+                                insert= tp.format(tr);
+                            }                        
+                        }
                     }
                 }
                 title= insertString( title, "TIMERANGE", insert );
