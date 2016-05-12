@@ -2,6 +2,8 @@
 # dataset will be plotted in the top plot, and the fft spectrum timeseries will
 # be plotted below.  Draw a box to hear the waveform within the selected time.
 #
+# Note this would make a fine example for invokeLater, because it blocks the event thread.
+#
 
 import org.das2.graph
 
@@ -14,6 +16,7 @@ plot( 1, fftWindow( ds, 256 ) )
 dom.plots[1].zaxis.log=True
 
 def boxSelected(event):
+    ds= dom.plotElements[0].controller.dataSet
     dep0= ds.property( QDataSet.DEPEND_0 )
     u= dep0.property( QDataSet.UNITS )
     tmin= event.getXRange().min().doubleValue( u )
