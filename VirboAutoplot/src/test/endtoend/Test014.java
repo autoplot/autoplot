@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package test.endtoend;
 
 import java.awt.Graphics2D;
@@ -16,7 +13,6 @@ import org.virbo.dataset.DataSetUtil;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
 
@@ -52,7 +48,7 @@ public class Test014 {
         String type= cadence==null ? null : (String) cadence.property(QDataSet.SCALE_TYPE);
         System.err.printf( "cadence= %s (scale type=%s): \n", String.valueOf(cadence), type  );
 
-        QDataSet diff= Ops.diff(dep0);
+        QDataSet diff;
         if ( ds.rank()==1 && dep0.rank()==1 ) { // ftp://virbo.org/tmp/poes_n17_20041228.cdf?P1_90[0:300] has every other value=fill.
             QDataSet r= Ops.where( Ops.valid(ds) );
             diff=  Ops.diff( DataSetOps.applyIndex( dep0, 0, r, false ) );
@@ -69,8 +65,6 @@ public class Test014 {
         } else {
             hist= (MutablePropertyDataSet) Ops.autoHistogram( diff );
         }
-
-        DasAxis xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
         
         // kludge: since in das2 Units.dimensionless is convertable to logERatio, force the units change to something not dimensionless.
         if ( "log".equals(type) ) {
@@ -81,11 +75,12 @@ public class Test014 {
         setCanvasSize( 600, 600 );
 
         final DasCanvas cc= getDocumentModel().getCanvases(0).getController().getDasCanvas();
-        xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
+        DasAxis xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
 
         xAxis.setLabel("UNITS=%{UNITS}");
 
         Painter p = new Painter() {
+            @Override
             public void paint(Graphics2D g) {
                 DasAxis xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
                 if ( cadence==null ) {
@@ -124,16 +119,21 @@ public class Test014 {
 
             QDataSet ds;
 
-            ds= Util.getDataSet( "vap:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU" );
+            //DataSetUtil.guessCadenceNew(ds, ds)
+                    
+            ds= Util.getDataSet( "file:///home/jbf/ct/hudson/data/qds/cadence.qds" );
+            doTest( 9, "file:///home/jbf/ct/hudson/data/qds/cadence.qds", ds );
+
+            ds= Util.getDataSet( "vap+cdf:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU" );
             ds= (QDataSet) ds.property( QDataSet.DEPEND_1 );
-            doTest( 6, "depend 1 of vap:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU", ds );
+            doTest( 6, "depend 1 of vap+cdf:file:///home/jbf/ct/lanl/hudson/LANL_LANL-97A_H3_SOPA_20060505_V01.cdf?FEDU", ds );
 
             ds= Util.getDataSet( "vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX" );
             ds= DataSetOps.slice0(ds, 10);
             doTest( 4, "slice of Hydra DEF", ds );
 
-            ds= Util.getDataSet( "vap:file:/home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?WBD_Elec[::1090]" );
-            QDataSet ant= Util.getDataSet( "vap:file:/home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?ANTENNA[::1090]" );
+            ds= Util.getDataSet( "vap+cdf:file:/home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?WBD_Elec[::1090]" );
+            QDataSet ant= Util.getDataSet( "vap+cdf:file:/home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?ANTENNA[::1090]" );
             QDataSet r= Ops.where( Ops.eq( ant, DataSetUtil.asDataSet(2) ) );
             ds= DataSetOps.applyIndex( ds, 0, r, true );
             doTest( 0, "file:/home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?WBD_Elec[::1090]", ds );
@@ -146,6 +146,7 @@ public class Test014 {
             doTest( 8, "file:/home/jbf/ct/hudson/data.backup/dat/apl/jon/electron_events_safings_and_peaks.csv?column=peak_rate&depend0=begin_UTC", null );
 
             System.exit(0);  // TODO: something is firing up the event thread
+            
         } catch ( Exception ex) {
             ex.printStackTrace();
             System.exit(1);
