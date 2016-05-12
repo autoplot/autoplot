@@ -41,7 +41,9 @@ public class Test014 {
 
         if ( dep0==null ) dep0= ds;
 
+        
         final QDataSet cadence= DataSetUtil.guessCadenceNew( dep0, ds );
+        
         
         t= (System.currentTimeMillis()-t0)/1000.;
         System.err.printf( "Guess cadence in %9.3f seconds (%s): %s\n", t, label, uri );
