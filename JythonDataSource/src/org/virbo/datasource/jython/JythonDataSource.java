@@ -221,23 +221,24 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             }
         }
         
-        if ( params.get( PARAM_SCRIPT )!=null ) {
-            jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
-            mon.setProgressMessage( "loading "+uri );
-            split.params= null;
-            lresourceURI= DataSetURI.fromUri( DataSetURI.getResourceURI(URISplit.format(split)) );
-
-        } else {
-            lresourceURI= null;
-            jythonScript= getFile(new NullProgressMonitor());
-        }
-
         boolean allowCaching= !( "F".equals( params.get("allowCaching") ) );
 
         if ( !allowCaching ) interp= null;
         
         PyException causedBy = null;
         try {
+
+            if ( params.get( PARAM_SCRIPT )!=null ) {
+                jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
+                mon.setProgressMessage( "loading "+uri );
+                split.params= null;
+                lresourceURI= DataSetURI.fromUri( DataSetURI.getResourceURI(URISplit.format(split)) );
+                
+            } else {
+                lresourceURI= null;
+                jythonScript= getFile(new NullProgressMonitor());
+            }
+
             if ( interp == null ) { // caching might leave the interpretter open.  This needs to be tweaked--the TSB could set interp to null for example.
 
                 logger.log(Level.FINE, "running script {0} {1}", new Object[] { jythonScript, paramsl } );
