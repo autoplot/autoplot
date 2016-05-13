@@ -373,7 +373,8 @@ public class VOTableReader {
     }
     
     /**
-     * Get the dataset.
+     * Get the dataset.  If no records were read, then a zero-length dataset is
+     * returned.
      * @return 
      */
     public QDataSet getDataSet() {
@@ -382,18 +383,24 @@ public class VOTableReader {
         }
                 
         dataSetBuilder.putProperty( QDataSet.BUNDLE_1, formBundleDescriptor() );
-        DDataSet result= dataSetBuilder.getDataSet();
-        
-        for ( int jj=0; jj<ids.size(); jj++ ) {
-            if ( Boolean.TRUE.equals( stopEnumerations.get(jj) ) ) {
-                logger.log(Level.INFO, "clear out enumeration at {0}, too many different values.", jj);
-                for ( int ii=0; ii<result.length(); ii++ ) {
-                    result.putValue( ii, jj, FILL_VALUE );
-                    ((MutablePropertyDataSet)result.property(QDataSet.BUNDLE_1)).putProperty( QDataSet.UNITS, jj, null );
+        if ( dataSetBuilder.getLength()>0 ) {
+            DDataSet result= dataSetBuilder.getDataSet();
+
+            for ( int jj=0; jj<ids.size(); jj++ ) {
+                if ( Boolean.TRUE.equals( stopEnumerations.get(jj) ) ) {
+                    logger.log(Level.INFO, "clear out enumeration at {0}, too many different values.", jj);
+                    for ( int ii=0; ii<result.length(); ii++ ) {
+                        result.putValue( ii, jj, FILL_VALUE );
+                        ((MutablePropertyDataSet)result.property(QDataSet.BUNDLE_1)).putProperty( QDataSet.UNITS, jj, null );
+                    }
                 }
             }
+            return result;
+            
+        } else {
+            return DDataSet.createRank2(0,10);
+            
         }
-        return result;
     }
     
     /**
