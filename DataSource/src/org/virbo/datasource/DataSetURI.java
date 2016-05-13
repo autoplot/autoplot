@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import org.autoplot.wgetfs.WGetFileSystemFactory;
@@ -494,17 +495,19 @@ public class DataSetURI {
                 if (mime == null) {
                     throw new IOException("failed to connect");
                 }
-                String cd = c.getHeaderField("Content-Disposition"); // support VxOWare
+                String cd = c.getHeaderField("Content-Disposition"); // support VxOWare 
                 if (cd != null) {
-                    int i0 = cd.indexOf("filename=\"");
-                    i0 += "filename=\"".length();
-                    int i1 = cd.indexOf("\"", i0);
-                    String filename = cd.substring(i0, i1);
-                    i0 = filename.lastIndexOf(".");
-                    ext = filename.substring(i0);
+                    Pattern p= Pattern.compile(".*filename=\"?(.+)\"?");
+                    Matcher m= p.matcher(cd);
+                    if ( m.matches() ) {
+                        String filename = m.group(1);
+                        int i0 = filename.lastIndexOf(".");
+                        ext = filename.substring(i0);
+                        factory = DataSourceRegistry.getInstance().getSource(ext);
+                    }
                 }
-
-                factory = DataSourceRegistry.getInstance().getSourceByMime(mime);
+                if ( factory==null ) factory = DataSourceRegistry.getInstance().getSourceByMime(mime);
+                
             } finally {
                 mon.finished();
             }
