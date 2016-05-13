@@ -78,6 +78,9 @@ public class PDSPPIDataSource extends AbstractDataSource {
         }
         
         QDataSet ds= read.readTable( f.toString(), mon.getSubtaskMonitor("read table") );
+        if ( ds.length()==0 ) {
+            throw new NoDataInIntervalException("result contains no records");
+        }
         QDataSet result= DataSetOps.unbundle( ds, param );
         
         if ( result.property(QDataSet.DEPEND_0)==null ) {
