@@ -14,13 +14,13 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 
 /**
  * Experimental component for showing the status of the data set selector.
  * @author jbf
  */
-public class UriTimeRangeToggleButton extends JPanel {
+public class UriTimeRangeToggleButton extends JComponent {
 
     public UriTimeRangeToggleButton( ) {
         try {
@@ -62,7 +62,7 @@ public class UriTimeRangeToggleButton extends JPanel {
     protected void paintComponent(Graphics g) {
         g.setColor( this.getBackground() );
         //g.setColor( Color.BLUE );
-        g.fillRect( 0, 0, img.getWidth()+1, img.getHeight()+1 );
+        g.fillRect( 0, 0, img.getWidth()+2, img.getHeight()+2 );
         g.drawImage( img, 0, 0, this );
     }
     
