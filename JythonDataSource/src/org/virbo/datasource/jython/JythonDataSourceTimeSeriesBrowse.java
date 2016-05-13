@@ -41,6 +41,16 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
 
     @Override
     public void setTimeRange(DatumRange dr) {
+        if ( false ) { // see bug https://sourceforge.net/p/autoplot/bugs/1584/
+            try {
+                if ( true || dr.intersects( DatumRangeUtil.parseTimeRange("2010-01-01" ) ) ) {
+                    System.err.println("here");
+                }
+            } catch (ParseException ex) {
+                Logger.getLogger(JythonDataSourceTimeSeriesBrowse.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
         if ( jds!=null ) {
             if ( this.timeRange==null || !( this.timeRange.equals(dr)) ) {
                 synchronized ( jds ) {
