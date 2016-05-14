@@ -530,8 +530,10 @@ public class TimeSeriesBrowseController {
         this.xAxis= null;
         this.dasPlot= null;
         this.dsf= null;
-        listenNode.removePropertyChangeListener( listenProp, timeSeriesBrowseListener );
-        this.listenNode= null;
+        if ( listenNode!=null ) {
+            listenNode.removePropertyChangeListener( listenProp, timeSeriesBrowseListener );
+            this.listenNode= null;
+        }
         this.plotElementController= null;
         this.dataSourceController.releaseTimeSeriesBrowseController();
         this.released= true; // it might have been listening to context.
