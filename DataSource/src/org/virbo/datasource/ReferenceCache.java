@@ -120,7 +120,7 @@ public class ReferenceCache {
             if ( this.exception!=null ) {
                 throw this.exception;
             } else {
-                logger.log( Level.FINE, "park if {0} {1} resulted in {2}", new Object[]{Thread.currentThread(), uri, this.qds.get() } );
+                logger.log( Level.FINE, "park of {0} {1} resulted in {2}", new Object[]{Thread.currentThread(), uri, this.qds.get() } );
                 QDataSet result= this.qds.get();
                 return result;
             }
@@ -230,7 +230,7 @@ public class ReferenceCache {
      */
     public ReferenceCacheEntry getDataSetOrLock( String uri, ProgressMonitor monitor ) {
         tidy();
-        logger.log( Level.FINEST, "getDataSetOrLock on thread {0} {1}", new Object[]{Thread.currentThread(), uri});
+        logger.log( Level.FINE, "getDataSetOrLock on thread {0} {1}", new Object[]{Thread.currentThread(), uri});
         ReferenceCacheEntry result;
         synchronized (this) {
             result= uris.get(uri);
