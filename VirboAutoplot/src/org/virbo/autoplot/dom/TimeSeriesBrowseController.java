@@ -11,10 +11,12 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.virbo.autoplot.util.TickleTimer;
@@ -22,6 +24,7 @@ import org.das2.datum.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
@@ -102,6 +105,10 @@ public class TimeSeriesBrowseController {
                 //TODO: this would work, but the particular axis is not actually adjusting.  We need
                 //to figure out who it's attached to, and see if any are adjusting.  Maybe even
                 //put in new code in dasPlot.getXAxis.valueIsAdjusting to check bindings.
+                
+                if ( dsf==null ) {
+                    return;  // transitional state
+                }
                 
                 Application dom= dsf.getController().getApplication();
                 
@@ -280,7 +287,10 @@ public class TimeSeriesBrowseController {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 LoggerManager.logPropertyChangeEvent(evt,"timeSeriesBrowseListener");                
-                if (dasPlot.getXAxis().valueIsAdjusting()) {
+                if ( dasPlot==null ) {
+                    return; // transition
+                }
+                if ( dasPlot.getXAxis().valueIsAdjusting()) {
                     return;
                 } 
                 //if ( domPlot.getController().getApplication().getController().isValueAdjusting() ) { // This must be commented out because of 1140.  I'm not sure why this was inserted in the first place.
@@ -507,6 +517,24 @@ public class TimeSeriesBrowseController {
             }
         }
         timeSeriesBrowseListener = null;
+    }
+    
+    /**
+     * make sure there are no references causing memory leak.  
+     * There's still a leak as profiling would show (
+     */
+    protected void releaseAll() {
+        release();
+        this.domPlot= null;
+        this.xAxis= null;
+        this.dasPlot= null;
+        this.dsf= null;
+        listenNode.removePropertyChangeListener( listenProp, timeSeriesBrowseListener );
+        this.listenNode= null;
+        this.plotElementController= null;
+        this.dataSourceController.releaseTimeSeriesBrowseController();
+        this.released= true; // it might have been listening to context.
+        
     }
     
     protected DatumRange timeRange = null;
