@@ -1829,10 +1829,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         application.setDataSourceFilters(dsfs.toArray(new DataSourceFilter[dsfs.size()]));
 
         TimeSeriesBrowseController tsbc= dsf.getController().getTimeSeriesBrowseController();
-        if ( tsbc!=null ) tsbc.release();
+        if ( tsbc!=null ) tsbc.releaseAll();
         for (DataSourceFilter alsoRemove1 : alsoRemove) {
             tsbc = alsoRemove1.controller.getTimeSeriesBrowseController();
-            if ( tsbc!=null ) tsbc.release();
+            if ( tsbc!=null ) tsbc.releaseAll();
         }
 
     }
@@ -1911,7 +1911,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                 deleteDataSourceFilter( application.getDataSourceFilters(i) );
             }
             TimeSeriesBrowseController tsbc= application.getDataSourceFilters(0).getController().getTimeSeriesBrowseController(); //TODO: clearing the URI should do this as well...
-            if ( tsbc!=null ) tsbc.release();
+            if ( tsbc!=null ) {
+                tsbc.releaseAll();
+            }
 
             application.getPlotElements(0).setId("plotElement_0");
 
