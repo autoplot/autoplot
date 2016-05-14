@@ -521,7 +521,8 @@ public class TimeSeriesBrowseController {
     
     /**
      * make sure there are no references causing memory leak.  
-     * There's still a leak as profiling would show (
+     * There's still a leak as profiling would show 
+     * See https://sourceforge.net/p/autoplot/bugs/1584/
      */
     protected void releaseAll() {
         release();
