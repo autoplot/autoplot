@@ -2046,6 +2046,13 @@ public class DataSourceController extends DomNodeController {
         return timeSeriesBrowseController;
     }
 
+    /**
+     * try to fix leak.  https://sourceforge.net/p/autoplot/bugs/1584/
+     */
+    protected void releaseTimeSeriesBrowseController() {
+        this.timeSeriesBrowseController= null;
+    }
+    
     @Override
     public boolean isPendingChanges() {
         TimeSeriesBrowseController tsbc = timeSeriesBrowseController;
