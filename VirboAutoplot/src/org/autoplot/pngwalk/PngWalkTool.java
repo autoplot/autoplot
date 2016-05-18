@@ -66,6 +66,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UnsupportedLookAndFeelException;
 import org.das2.components.DataPointRecorder;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.dataset.DataSetUpdateEvent;
@@ -175,16 +176,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
             logger.fine("nativeLAF");
             try {
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
                 logger.log( Level.WARNING, e.getMessage(), e );
             }
         }
 
-        if (alm.getBooleanValue("qualityControl")) {
-            ENABLE_QUALITY_CONTROL = true;
-        } else {
-            ENABLE_QUALITY_CONTROL = false;
-        }
+        ENABLE_QUALITY_CONTROL = alm.getBooleanValue("qualityControl");
 
         String template = alm.getValue("template"); // One Slash!!
         //final String template=  "file:/home/jbf/temp/product_$Y$m$d.png" ; // One Slash!!
@@ -239,9 +236,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
             template= t;
             product= p.getProperty("product");
-        } catch (FileSystemOfflineException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (URISyntaxException ex) {
+        } catch (FileSystemOfflineException | URISyntaxException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (FileNotFoundException ex) {
             throw new IllegalArgumentException("File does not exist: "+template);
@@ -265,6 +260,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
     private static void raiseApWindowSoon( final Window apWindow ) {
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 GuiSupport.raiseApplicationWindow((JFrame)apWindow);
                 apWindow.toFront();
@@ -347,11 +343,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         try {
             deft = Bookmark.parseBookmarks(sdeft);
 
-        } catch (BookmarksException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (SAXException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IOException ex) {
+        } catch (BookmarksException | SAXException | IOException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
@@ -359,6 +351,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
 
         PngWalkTool.ActionEnabler enabler= new PngWalkTool.ActionEnabler() {
+            @Override
             public boolean isActionEnabled(String filename) {
                 String template = tool.getTemplate();
                 int i0 = -1;
@@ -391,10 +384,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 
                 try {
                     return WalkUtil.fileExists(productFile);
-                } catch (FileSystemOfflineException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    return false;
-                } catch (URISyntaxException ex) {
+                } catch (FileSystemOfflineException | URISyntaxException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                     return false;
                 }
@@ -404,6 +394,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         final String lap= "View in Autoplot";
 
         tool.addFileAction( enabler, new AbstractAction(lap) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);                        
                 final String suri;
@@ -552,7 +543,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         File src;
         try {
             src = FileSystemUtil.doDownload(ssrc, new NullProgressMonitor()); // should be local
-        } catch (Exception ex) {
+        } catch (IOException | URISyntaxException ex) {
             JOptionPane.showMessageDialog( parent, "<html>Unexpected error when downloading file<br>" + ssrc+"<br><br>"+ex.toString() );
             return;
         }
@@ -570,6 +561,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
     
     /**
      * save a copy of the current selection to a local disk.
+     * @param parent dialog parent
+     * @param ssrc the file
      */
     protected static void saveLocalCopy( Component parent, String ssrc ) {
         Preferences prefs = Preferences.userNodeForPackage(PngWalkTool.class);
@@ -581,7 +574,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         File src;
         try {
             src = FileSystemUtil.doDownload(ssrc, new NullProgressMonitor()); // should be local
-        } catch (Exception ex) {
+        } catch (IOException | URISyntaxException ex) {
             JOptionPane.showMessageDialog( parent, "<html>Unexpected error when downloading file<br>" + ssrc+"<br><br>"+ex.toString() );
             return;
         }
@@ -696,12 +689,14 @@ public final class PngWalkTool extends javax.swing.JPanel {
         JMenu fileMenu= new JMenu("File");
 
         fileMenu.add( new AbstractAction( "Save Local Copy..." ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 LoggerManager.logGuiEvent(e);        
                 saveLocalCopy(tool,tool.getSelectedFile());
             }
         } );
         fileMenu.add( new AbstractAction( "Show Autoplot" ) {
+            @Override
             public void actionPerformed(ActionEvent ae) {
                LoggerManager.logGuiEvent(ae);        
                AppManager appman= AppManager.getInstance();
@@ -719,6 +714,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             }
         } );
         fileMenu.add( new AbstractAction( "Close" ) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
                 if ( AppManager.getInstance().getApplicationCount()==1 ) {
@@ -736,6 +732,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         } );
 
         fileMenu.add( new AbstractAction( "Quit" ) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
                 if ( AppManager.getInstance().requestQuit() ) {
@@ -751,6 +748,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         JMenu navMenu= new JMenu("Navigate");
         navMenu.add( new AbstractAction( "Go To Date..." ) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
                 DatumRange dr= tool.seq.getTimeSpan();
@@ -772,7 +770,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         } catch (ParseException ex2) {
                             JOptionPane.showMessageDialog( tool, "parse error: "+ex2 );
                         }
-                        return;
                     } catch (RuntimeException ex ) {
                         tool.setStatus( "warning: "+ex.toString() );
                     }
@@ -782,6 +779,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         } );
         
         navMenu.add( new AbstractAction( "First" ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                LoggerManager.logGuiEvent(e);        
                tool.seq.setIndex( 0 );
@@ -790,6 +788,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         
 
         navMenu.add( new AbstractAction( "Previous Page" ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                LoggerManager.logGuiEvent(e);        
                tool.seq.setIndex( tool.prevPage(tool.seq.getIndex()) );
@@ -798,6 +797,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         
 
         navMenu.add( new AbstractAction( "Previous Interval" ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                LoggerManager.logGuiEvent(e);        
                tool.seq.setIndex( tool.prevInterval(tool.seq.getIndex()) );
@@ -805,6 +805,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_UP, 0 ));
 
         navMenu.add( new AbstractAction( "Previous Item" ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                LoggerManager.logGuiEvent(e);        
                tool.seq.skipBy( -1 );
@@ -813,6 +814,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
 
         navMenu.add( new AbstractAction( "Next Item" ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                LoggerManager.logGuiEvent(e);        
                tool.seq.skipBy( 1 );
@@ -820,6 +822,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_RIGHT, 0 ));
 
         navMenu.add( new AbstractAction( "Next Interval" ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                LoggerManager.logGuiEvent(e);        
                tool.seq.setIndex(tool.nextInterval(tool.seq.getIndex()) );
@@ -828,6 +831,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
 
         navMenu.add( new AbstractAction( "Next Page" ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                LoggerManager.logGuiEvent(e);        
                tool.seq.setIndex( tool.nextPage(tool.seq.getIndex()) );
@@ -835,6 +839,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_PAGE_DOWN, 0 ));
 
         navMenu.add( new AbstractAction( "Last" ) {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                LoggerManager.logGuiEvent(e);        
                tool.seq.setIndex( tool.seq.size()-1 );
@@ -861,6 +866,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             final JCheckBoxMenuItem mi;
             mi= new JCheckBoxMenuItem(
                new AbstractAction(""+fsize+" px" ) {
+                  @Override
                   public void actionPerformed( ActionEvent e ) {
                       LoggerManager.logGuiEvent(e);        
                       tool.setThumbnailSize(fsize);
@@ -876,9 +882,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
         optionsMenu.add( thumbsizeMenu );
 
         final JMenuItem qc= new JMenuItem( new AbstractAction( "Start QC" ) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
-                if ( !tool.isQualityControlEnabled() ) {
+                if ( !PngWalkTool.isQualityControlEnabled() ) {
                     tool.startQC();
                 }
             }
@@ -887,6 +894,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         optionsMenu.add( qc );
         
         final JMenuItem dg= new JMenuItem( new AbstractAction( "Start Digitizer" ) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 LoggerManager.logGuiEvent(e);        
                 if ( !tool.isDigitizerEnabled() ) {
@@ -903,6 +911,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         final BookmarksManager man= new BookmarksManager(frame,true,"PNG Bookmarks");
 
         man.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 man.updateBookmarks( bookmarksMenu, tool.getSelector() );
             }
@@ -927,6 +936,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         dataSetSelector1.setSuggestFiles(false); // only aggs.
         dataSetSelector1.addSuggestFile(".*\\.pngwalk");
         dataSetSelector1.registerActionTrigger( ".*\\.pngwalk", new AbstractAction("pngwalk") {
+            @Override
             public void actionPerformed( ActionEvent ev ) {
                 String template= dataSetSelector1.getValue();
                 if ( template.endsWith(".pngwalk") ) {
@@ -957,6 +967,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         //p.setEnabled(false);  //prevents user manipulation
         filmStripSplitPane.setDividerLocation(getThumbnailSize()+ (int)(1.2 *SCROLLBAR_HEIGHT));
         views[1].addPropertyChangeListener( PngWalkView.PROP_THUMBNAILSIZE, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 filmStripSplitPane.setDividerLocation( (Integer)evt.getNewValue() + SCROLLBAR_HEIGHT );
             }
@@ -968,6 +979,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         final JSplitPane coversSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[4], views[5] );
         coversSplitPane.setDividerLocation(getThumbnailSize()+ (int)(1.2 *SCROLLBAR_HEIGHT));
         views[4].addPropertyChangeListener( PngWalkView.PROP_THUMBNAILSIZE, new PropertyChangeListener() {
+            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 coversSplitPane.setDividerLocation( (Integer)evt.getNewValue() + SCROLLBAR_HEIGHT  );
             }
@@ -987,8 +999,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
         tabs.setSelectedIndex(3);
         
         // add listener to jump to and from the single image view.
-        for ( int i=0; i<views.length; i++ ) {
-            views[i].getMouseTarget().addMouseListener( new MouseAdapter() {
+        for (PngWalkView view : views) {
+            view.getMouseTarget().addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if ( e.getClickCount()==2 ) {
@@ -1020,9 +1032,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
         pngsPanel.revalidate();
 
         BindingGroup bc= new BindingGroup();
-        for ( int i=0; i<views.length; i++ ) {
-            Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, views[i],
-                    BeanProperty.create("thumbnailSize"), this, BeanProperty.create("thumbnailSize") );
+        for (PngWalkView view : views) {
+            Binding b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, view, BeanProperty.create("thumbnailSize"), this, BeanProperty.create("thumbnailSize"));
             bc.addBinding( b );
         }
         bc.bind();
@@ -1076,6 +1087,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
      * respond to changes of the current index.
      */
     private transient PropertyChangeListener indexListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( seq==null ) {
                 logger.fine("seq was null");
@@ -1101,6 +1113,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
      * listen for status updates from other agents, relay the status for the view.
      */
     private transient PropertyChangeListener statusListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
            setStatus((String)evt.getNewValue());
         }
@@ -1109,7 +1122,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
     /**
      *
      */
-    private transient PropertyChangeListener qcStatusListener = new PropertyChangeListener() {
+    private final transient PropertyChangeListener qcStatusListener = new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( seq==null ) {
                 logger.fine("seq was null");
@@ -1204,6 +1218,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         }
         
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 try {
                     seq.initialLoad();
@@ -1220,6 +1235,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 }
 
                 SwingUtilities.invokeLater( new Runnable() {
+                    @Override
                     public void run() {
                         updateInitialGui();
                     }
@@ -1237,7 +1253,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
      * initial settings to be performed on the event thread.
      */
     private void updateInitialGui() {
-        List<String> urls = new ArrayList<String>();
+        List<String> urls = new ArrayList<>();
         List<String> recent = dataSetSelector1.getRecent();
         recent.removeAll( Collections.singleton( seq.getTemplate() ) );
         for (String b : recent) {
@@ -1342,6 +1358,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
     }
 
     transient PropertyChangeListener seqTimeRangeListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             setTimeRange((DatumRange)evt.getNewValue());
         }
@@ -1350,6 +1367,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
     boolean setting= false;
 
     transient PropertyChangeListener seqIndexListener= new PropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             boolean setting0= setting;
             setting= true;
@@ -1478,13 +1496,14 @@ public final class PngWalkTool extends javax.swing.JPanel {
      * Enabler that returns true for local files.
      */
     public static final ActionEnabler LOCAL_FILE_ENABLER = new ActionEnabler() {
+        @Override
         public boolean isActionEnabled( String filename ) {
             return DataSetURI.getResourceURI(filename).toString().startsWith("file:" );
         }
     };
 
-    transient List<ActionEnabler> actionEnablers= new ArrayList<ActionEnabler>();
-    List<JButton> actionButtons= new ArrayList<JButton>();
+    transient List<ActionEnabler> actionEnablers= new ArrayList<>();
+    List<JButton> actionButtons= new ArrayList<>();
 
     /**
      * Add a file action button to the GUI.  
