@@ -230,6 +230,9 @@ public class ReferenceCache {
      */
     public ReferenceCacheEntry getDataSetOrLock( String uri, ProgressMonitor monitor ) {
         tidy();
+        if ( monitor.isFinished() ) {
+            throw new IllegalStateException("Finished monitor was sent to reference cache getDataSetOrLock");
+        }
         logger.log( Level.FINE, "getDataSetOrLock on thread {0} {1}", new Object[]{Thread.currentThread(), uri});
         ReferenceCacheEntry result;
         synchronized (this) {
@@ -266,6 +269,9 @@ public class ReferenceCache {
     public void park( ReferenceCacheEntry ent, ProgressMonitor monitor ) {
         if ( ent.loadThread==Thread.currentThread() && ent.status!=ReferenceCacheEntryStatus.DONE ) {
             throw new IllegalStateException("This thread was supposed to load the data");
+        }
+        if ( monitor.isFinished() ) {
+            throw new IllegalStateException("Finished monitor was sent to reference cache park");
         }
         monitor.started();
         monitor.setProgressMessage("waiting for load");
