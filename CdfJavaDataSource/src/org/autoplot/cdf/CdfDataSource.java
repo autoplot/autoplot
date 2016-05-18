@@ -249,7 +249,7 @@ public class CdfDataSource extends AbstractDataSource {
     }
 
     @Override
-    public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
+    public synchronized QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
 
@@ -258,6 +258,8 @@ public class CdfDataSource extends AbstractDataSource {
             rcent= ReferenceCache.getInstance().getDataSetOrLock( getURI(), mon);
             if ( !rcent.shouldILoad( Thread.currentThread() ) ) {
                 QDataSet result= rcent.park( mon );
+                logger.log(Level.FINE, "reference cache used to resolve {0}", new Object[] { String.valueOf(result) } );
+                logger.log(Level.FINE, "ref uri {0}", new Object[] { resourceURI } );
                 return result;
             } else {
                 logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), resourceURI } );
@@ -417,9 +419,14 @@ public class CdfDataSource extends AbstractDataSource {
             } else {
                 result= wrapDataSet(cdf, svariable, constraint, false, doDep, attr1, -1, mon.getSubtaskMonitor("reading "+svariable+" from CDF file") );
             }
-            logger.log(Level.FINE, "got {0}", result);
         }
 
+        if ( logger.isLoggable(Level.FINE) ) {
+            int islash= fileName.lastIndexOf('/');
+            logger.log(Level.FINE, "reading from {0}", fileName.substring(0,islash));
+            logger.log(Level.FINE, "read variable {0}?{1} got {2}", new Object[] { fileName.substring(islash), svariable, String.valueOf(result) } );
+        }
+        
         String w= (String)map.get( PARAM_WHERE );
         if ( w!=null && w.length()>0 ) {
             int ieq= w.indexOf(".");
