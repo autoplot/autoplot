@@ -35,6 +35,7 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
+import org.virbo.jythonsupport.Util;
 
 /**
  * Creates inline data sources.
@@ -102,7 +103,7 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
     protected static String getScript( String suri, List<String> script ) {
         String scriptInline= suri.substring( "vap+inline:".length() );
                 
-        String[] ss= InlineDataSource.guardedSplit( scriptInline, '&', '\'', '\"' );
+        String[] ss= Util.guardedSplit( scriptInline, '&', '\'', '\"' );
         
         String timerange=null;
         for ( String s: ss ) {

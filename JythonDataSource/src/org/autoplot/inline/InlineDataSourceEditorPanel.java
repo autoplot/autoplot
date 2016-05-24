@@ -26,6 +26,7 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.jythonsupport.Util;
 import org.virbo.jythonsupport.ui.DataMashUp;
 
 /**
@@ -559,7 +560,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 this.tm= toTableModel(lit, 1);
             }
         } else {
-            String[] ss= InlineDataSource.guardedSplit( uri, '&', '\'', '\"' );
+            String[] ss= Util.guardedSplit( uri, '&', '\'', '\"' );
             //String[] ss= uri.split("&");
             StringBuilder t= new StringBuilder();
             for ( int i=0; i<ss.length; i++ ) {
