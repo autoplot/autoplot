@@ -18,6 +18,8 @@ import org.das2.datum.DatumRangeUtil;
 import org.virbo.datasource.LogNames;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.jythonsupport.Util;
+import org.virbo.jythonsupport.ui.DataMashUp;
 
 /**
  * container for the state simply manages the timerange argument.
@@ -129,6 +131,8 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
             String line= reader.readLine();
             Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s*\\'([-0-9a-zA-Z:/]+)\\'\\s*(,\\s*\\'.*\\')?\\s*\\).*");  //TODO: default time strings must not contain whitespace.
             while ( line!=null ) {
+                String[] ss= Util.guardedSplit( line, '#', '\'', '\"' );
+                line= ss[0];
                 Matcher m= s.matcher(line);
                 if ( m.matches() ) {
                     tsb1= new JythonDataSourceTimeSeriesBrowse(uri);
