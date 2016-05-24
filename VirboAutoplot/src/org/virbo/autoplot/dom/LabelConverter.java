@@ -3,6 +3,7 @@ package org.virbo.autoplot.dom;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -200,7 +201,7 @@ public class LabelConverter extends Converter {
         }
         
         if ( multiplePEWarning && ! title.equals(value) ) {
-            logger.info("multiple plot elements found, using first");
+            logger.log(Level.INFO, "multiple plot elements found, using first to resolve: {0}", value);
         }
         
         return title;
@@ -239,7 +240,7 @@ public class LabelConverter extends Converter {
         }
         
         if ( multiplePEWarning && !title.equals(value) ) {
-            logger.fine("multiple plot elements found, using first");              
+            logger.log(Level.FINE, "multiple plot elements found, using first to resolve: {0}", value);              
         }
         return title;
     }
