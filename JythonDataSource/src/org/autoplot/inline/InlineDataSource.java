@@ -36,6 +36,7 @@ import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
+import org.virbo.jythonsupport.Util;
 
 /**
  * Data source used mostly for demonstrations and quick modifications
@@ -231,29 +232,7 @@ public class InlineDataSource extends AbstractDataSource {
      * @return the split.
      */
     protected static String[] guardedSplit( String s, char delim, char exclude1, char exclude2 ) {    
-        if ( delim=='_') throw new IllegalArgumentException("_ not allowed for delim");
-        StringBuilder scopyb= new StringBuilder(s.length());
-        char inExclude= (char)0;
-        
-        for ( int i=0; i<s.length(); i++ ) {
-            char c= s.charAt(i);
-            if ( inExclude==0 ) {
-                if ( c==exclude1 || c==exclude2 ) inExclude= c;
-            } else {
-                if ( c==inExclude ) inExclude= 0;
-            }
-            if ( inExclude>(char)0 ) c='_';
-            scopyb.append(c);            
-        }
-        String[] ss= scopyb.toString().split(""+delim);
-        
-        int i1= 0;
-        for ( int i=0; i<ss.length; i++ ) {
-            int i2= i1+ss[i].length();
-            ss[i]= s.substring(i1,i2);
-            i1= i2+1;
-        } 
-        return ss;
+        return Util.guardedSplit(s, delim, exclude1, exclude2);
     }
     
     /**
