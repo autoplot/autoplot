@@ -23,7 +23,8 @@ public class CompletionSettings {
     private static final Logger logger= LoggerManager.getLogger( "jython.editor" );
     Preferences prefs= Preferences.userNodeForPackage( CompletionSettings.class );
 
-    protected String docHome = "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/";
+    private String docHome = "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/"; // // see repeat code in loadPreferences
+    
     public static final String PROP_DOCHOME = "docHome";
 
     public String getDocHome() {
@@ -44,7 +45,7 @@ public class CompletionSettings {
 
     public static final String PROP_TAB_IS_COMPLETION = "tabIsCompletion";
 
-    private boolean tabIsCompletion = true;
+    private boolean tabIsCompletion = true; // // see repeat code in loadPreferences
 
     public boolean isTabIsCompletion() {
         return tabIsCompletion;
@@ -82,7 +83,7 @@ public class CompletionSettings {
         }
     }
     
-    private String editorFont = "sans-12";
+    private String editorFont = "sans-12"; // // see repeat code in loadPreferences
     
     public static final String PROP_EDITORFONT = "editorFont";
 
@@ -102,7 +103,7 @@ public class CompletionSettings {
         }
     }
     
-    private String documentationPaneSize = "640x480";
+    private String documentationPaneSize = "640x480"; // // see repeat code in loadPreferences
 
     public static final String PROP_DOCUMENTATIONPANESIZE = "documentationPaneSize";
 
@@ -138,6 +139,7 @@ public class CompletionSettings {
         docHome= prefs.get( PROP_DOCHOME, "http://apps-pw.physics.uiowa.edu/hudson/job/autoplot-javadoc/ws/doc/" ) ;
         tabIsCompletion= prefs.getBoolean( PROP_TAB_IS_COMPLETION, true );
         editorFont= prefs.get( PROP_EDITORFONT, "sans-12" );
+        documentationPaneSize= prefs.get( PROP_DOCUMENTATIONPANESIZE, "640x480" );
     }
 
 }
