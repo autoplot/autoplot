@@ -596,6 +596,46 @@ public class Util {
         return true;
     }
     
+    /**
+     * only split on the delimiter when we are not within the exclude delimiters.  For example,
+     * <code>
+     * x=getDataSet("http://autoplot.org/data/autoplot.cdf?Magnitude&noDep=T")&y=getDataSet('http://autoplot.org/data/autoplot.cdf?BGSEc&slice1=2')&sqrt(x)
+     * </code>
+     * @param s the string to split.
+     * @param delim the delimiter to split on, for example the ampersand (&).
+     * @param exclude1 for example the single quote (')
+     * @param exclude2 for example the double quote (")  Note URIs don't support these anyway.
+     * @return the split.
+     * 
+     * This is a copy of another code.
+     */
+    public static String[] guardedSplit( String s, char delim, char exclude1, char exclude2 ) {    
+        if ( delim=='_') throw new IllegalArgumentException("_ not allowed for delim");
+        StringBuilder scopyb= new StringBuilder(s.length());
+        char inExclude= (char)0;
+        
+        for ( int i=0; i<s.length(); i++ ) {
+            char c= s.charAt(i);
+            if ( inExclude==0 ) {
+                if ( c==exclude1 || c==exclude2 ) inExclude= c;
+            } else {
+                if ( c==inExclude ) inExclude= 0;
+            }
+            if ( inExclude>(char)0 ) c='_';
+            scopyb.append(c);            
+        }
+        String[] ss= scopyb.toString().split(""+delim);
+        
+        int i1= 0;
+        for ( int i=0; i<ss.length; i++ ) {
+            int i2= i1+ss[i].length();
+            ss[i]= s.substring(i1,i2);
+            i1= i2+1;
+        } 
+        return ss;
+    }
+
+    
     public static void main( String[] args ) throws Exception {
         DataSetURI.init();
         String uri= "file:///Users/jbf/data/rbsp-a_WFR-spectral-matrix_emfisis-Quick-Look_20120911_v1.2.6.cdf?BuBu[::40]";
