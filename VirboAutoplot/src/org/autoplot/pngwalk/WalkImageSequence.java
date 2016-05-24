@@ -36,7 +36,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
 
     private List<WalkImage> existingImages;
+    
+    // list of the visible images.
     private List<WalkImage> displayImages = new ArrayList();
+    
     //private List<URI> locations;
     private boolean showMissing = false;
     private boolean useSubRange = false;
@@ -83,6 +86,12 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
     public static final String PROP_TIMERANGE = "timerange";
 
+    /**
+     * constraint for the limit of the time ranges listed.  Note timespan
+     * is what was found.  This does not appear to be the current image
+     * timerange.
+     * @return 
+     */
     public DatumRange getTimerange() {
         return timerange;
     }
@@ -233,21 +242,32 @@ public class WalkImageSequence implements PropertyChangeListener  {
      */
     void gotoSubrange(DatumRange ds) {
         int idx= -1;
-        for ( int i=datumRanges.size()-1; i>=0; i-- ) {
-            if ( datumRanges.get(i)==null ) {
-                logger.info("ranges are not available");
-                return;
-            }
-            if ( ds.contains( datumRanges.get(i).min() ) ) {
+        
+        if ( datumRanges.isEmpty() || datumRanges.get(0)==null ) {
+            logger.info("ranges are not available");
+            return;
+        }
+
+        for ( int i=0; i<size(); i++ ) {
+            if ( ds.intersects( imageAt(i).getDatumRange() ) ) {
                 idx= i;
                 break;
             }
-            if ( datumRanges.get(i).contains(ds) ) {
-                idx= i;
-                break;
-            }
-            if ( datumRanges.get(i).min().ge( ds.min() ) ) {
-                idx=i;
+        }
+        
+        if ( idx==-1 ) {
+            for ( int i=datumRanges.size()-1; i>=0; i-- ) {
+                if ( ds.contains( datumRanges.get(i).min() ) ) {
+                    idx= i;
+                    break;
+                }
+                if ( datumRanges.get(i).contains(ds) ) {
+                    idx= i;
+                    break;
+                }
+                if ( datumRanges.get(i).min().ge( ds.min() ) ) {
+                    idx=i;
+                }
             }
         }
         if ( idx==-1 ) {
@@ -432,6 +452,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
     /**
      * return the active subrange of the sequence.  This is the portion of the pngwalk being used.
      * @return the subrange of the sequence.
+     * @see https://sourceforge.net/p/autoplot/feature-requests/493/
      */
     public List<DatumRange> getActiveSubrange() {
         return subRange;

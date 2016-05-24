@@ -1103,6 +1103,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 }
             }
             firePropertyChange( PROP_SELECTED_NAME, null, seq.getSelectedName() );
+            firePropertyChange( PROP_TIMERANGE, null, getTimeRange() );
             if (qcPanel != null && seq.getQualityControlSequence()!=null ) {
                 qcPanel.displayRecord( seq.getQualityControlSequence().getQualityControlRecord( seq.getIndex() ));
             }
@@ -1337,8 +1338,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
     transient DatumRange timeRange;
     public static final String PROP_TIMERANGE = "timeRange";
 
+    /**
+     * rfe https://sourceforge.net/p/autoplot/feature-requests/271/
+     * @return the current timerange
+     */
     public DatumRange getTimeRange() {
-        return timeRange;
+        DatumRange tr=null;
+        tr= seq.imageAt( seq.getIndex() ).getDatumRange();
+        if ( tr!=null ) {
+            return tr;
+        } else {
+            return timeRange;
+        }
     }
 
     /**
@@ -1352,8 +1363,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
         setting= true;
         DatumRange old= this.timeRange;
         this.timeRange = timeRange;
-        if ( timeRange!=null ) seq.gotoSubrange(timeRange);
-        if ( setting0 ) firePropertyChange(PROP_TIMERANGE, old, thumbnailSize);
+        if ( seq!=null ) {
+            if ( timeRange!=null ) seq.gotoSubrange(timeRange);
+        }
+        if ( setting0 ) firePropertyChange(PROP_TIMERANGE, old, timeRange );
         setting= false;
     }
 
