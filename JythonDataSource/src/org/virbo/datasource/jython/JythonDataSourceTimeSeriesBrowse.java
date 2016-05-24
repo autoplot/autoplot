@@ -116,6 +116,7 @@ public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
 
     /**
      * allow scripts to implement TimeSeriesBrowse if they check for the parameter "timerange"
+     * TODO: this should be reimplemented with a syntax tree.
      * @param uri the URI
      * @param jythonScript the script corresponding to 
      * @return the TSB, or null.
