@@ -618,16 +618,16 @@ public class ScriptContext extends PyJavaInstance {
      * be called from the event thread.
      * @param chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
      * @param label the label for the plot dependent parameter
-     * @param x QDataSet for the independent parameter for the X values
-     * @param y QDataSet for the independent parameter for the Y values
+     * @param x QDataSet for the independent parameter for the X values, or null.
+     * @param y QDataSet for the independent parameter for the Y values, or null.
      * @param renderType string explicitly controlling the renderType and hints.
      */    
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType ) {
         maybeInitModel();
-        ArrayDataSet yds= ArrayDataSet.copy(y);
-        if ( x!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
-        if ( x!=null || renderType!=null ) yds.putProperty( QDataSet.RENDER_TYPE, renderType ); // plot command calls this with all-null arguments, and we don't when RENDER_TYPE setting to be nulled.
-                    model.setDataSet( chNum, label, yds);
+        ArrayDataSet yds= y==null ? null : ArrayDataSet.copy(y);
+        if ( x!=null && yds!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
+        if ( ( x!=null && yds!=null ) || renderType!=null ) yds.putProperty( QDataSet.RENDER_TYPE, renderType ); // plot command calls this with all-null arguments, and we don't when RENDER_TYPE setting to be nulled.
+        model.setDataSet( chNum, label, yds);
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
     
