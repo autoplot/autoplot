@@ -25,9 +25,19 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-05-12 r18929):</p>
+        <p>Bugfixes (2016-05-25 r18957):</p>
         <ul>
-            <li> spectrogram updatePlotImage would make a local copy of the colorbar for thread safety, but this was not used consistently.</li>
+            <li>Jython datumRange('2015-06-25 11:00 to 13:00') would fail to parse as time range.  Thanks Kristoff!</li>
+            <li>Jython popup documentation box size was not stored on disk between sessions</li>
+            <li>Jython plot command can plot None again, to create a placeholder for data later in script.</li>
+            <li>Jython Data Source Time Series Browse mistaken when commented out.  Thanks Ivar!</li>
+            <li>check that the monitor passed into reference cache park isn't already finished.  Thanks Ivar!</li>
+            <li>1584: jyds scripts get 2010-01-01 for timerange on reset, because the TSB controller was still listening.  Thanks Masafumi!</li>
+            <li>further cleanup of .jyds handling, where exception could occur outside of try/finally block, leaving parked JythonDataSource read hanging.  Thanks Ivar!</li>
+            <li>rte_1270364473: index out of bounds when handling URI because MMS server doesn't quote the filename like VxOWare code would, improve feedback.</li>
+            <li>require that 99% of the data tags be increasing or decreasing to even allow a cadence to be measured.  This was 90%.  Thanks George!</li>
+            <li>improve support for empty VOTable result from PDS/PPI node.  Thanks Jenkins!</li>
+            <li>spectrogram updatePlotImage would make a local copy of the colorbar for thread safety, but this was not used consistently.</li>
             <li>extraneous calls to monitor.finished would cause noise on stderr.</li>
             <li>1583: when creating PNGWalk from list of events, make sure orbit timeranges are used so that the pngs can refer to them</li>
             <li>1582: Juno trajectory segment failed to paint properly because of cadence calculation.</li>
@@ -192,6 +202,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>julianDay units added (days since noon, January 1, 4713 BC) to support Masafumi's data.</li>
             <li>491: allow %{TIMERANGE,FORMAT=$Y$m$d} and %{TIMERANGE,FORMAT=$o}</li>
             <li>389: buttons indicate the address bar or timerange selection.</li>
             <li>plot command gets lineWidth alias for lineThick, since this is a more consistent name.</li>
