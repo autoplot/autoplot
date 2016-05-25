@@ -72,6 +72,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.httpclient.HttpClient;
@@ -85,6 +86,7 @@ import org.das2.datum.LoggerManager;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.AboutUtil;
 import org.das2.util.Base64;
+import org.python.core.PyException;
 import org.virbo.autoplot.AppManager;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUI;
@@ -159,6 +161,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             t.printStackTrace();
         }
         else {
+            checkJythonError(t);
             showExceptionDialog(t, "");
         }
     }
@@ -168,10 +171,31 @@ public final class GuiExceptionHandler implements ExceptionHandler {
             t.printStackTrace();
         }
         else {
+            checkJythonError(t);
             showExceptionDialog(t, UNCAUGHT);
         }
     }
 
+    JythonScriptPanel scriptPanel=null;
+    
+    /**
+     * indicate the script panel where errors can be shown.
+     * @param scriptPanel 
+     */
+    public void setScriptPanel( JythonScriptPanel scriptPanel ) {
+        this.scriptPanel= scriptPanel;
+    }
+    
+    private void checkJythonError( Throwable t ) {
+        if ( t instanceof PyException && scriptPanel!=null ) {
+            try {
+                scriptPanel.getAnnotationsSupport().annotateError( (PyException)t, 0 );
+            } catch (BadLocationException ex) {
+                Logger.getLogger(GuiExceptionHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
     private final Map<Integer,DiaDescriptor> dialogs= Collections.synchronizedMap( new HashMap<Integer, DiaDescriptor>() );
 
     private DiaDescriptor createDialog( final Throwable throwable, final boolean uncaught ) {
