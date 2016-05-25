@@ -1376,7 +1376,9 @@ public class LayoutPanel extends javax.swing.JPanel {
             dom.getController().setFocusUri(((DataSourceFilter)s).getUri());
             List<PlotElement> pes= DomUtil.getPlotElementsFor(dom,((DataSourceFilter)s));            
             if ( pes.size()>0 ) {
-                dom.getController().setPlotElement(pes.get(0));
+                if ( !pes.contains( (PlotElement)plotElementListComponent.getSelectedValue() ) ) {
+                    dom.getController().setPlotElement(pes.get(0));
+                }
             }
         }
         
