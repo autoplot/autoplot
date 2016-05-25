@@ -4,8 +4,10 @@
  */
 package org.virbo.jythonsupport;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -23,6 +25,8 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.TimeParser;
 import org.das2.fsm.FileStorageModel;
@@ -40,6 +44,7 @@ import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.WritableDataSet;
+import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
@@ -55,6 +60,73 @@ public class Util {
 
     private static final Logger logger= LoggerManager.getLogger("jython.script");
 
+    /**
+     * this returns a double indicating the current scripting version, found
+     * at the top of autoplot.py in AUTOPLOT_DATA/jython/autoplot.py.  Do
+     * not parse this number and expect it to work in future versions!
+     * @return the version, such as v1.50.
+     * @throws IOException 
+     */
+    public static String getAutoplotScriptingVersion() throws IOException {
+        File ff2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA ) );
+        File ff3= new File( ff2.toString() + "/jython" );
+        File ff4= new File( ff3, "autoplot.py" );
+        String vers= null;
+        
+        if ( ff4.exists() ) {
+            try (BufferedReader r = new BufferedReader( new FileReader( ff4 ) )) {
+                String line= r.readLine();
+                if ( line!=null ) {
+                    Pattern versPattern= Pattern.compile("# autoplot.py v([\\d\\.]+) .*");  // must be parsable as a double.
+                    Matcher m= versPattern.matcher(line);
+                    if ( m.matches() ) {
+                        vers= m.group(1);
+                    }
+                }
+            }
+        }
+        if ( vers==null ) {
+            throw new IllegalArgumentException("unable to get the scripting version");
+        }
+        return "v"+vers;
+    }
+    
+    /**
+     * throw an exception if the scripting version cannot be supported.  These
+     * versions are numeric--so note that v1.7 is newer than v1.50, and for this
+     * reason versions should always be vNNN.NN.
+     * @param v 
+     * @throws IllegalArgumentException 
+     */
+    public static void requireAutoplotScriptingVersion(String v) {
+        Pattern p= Pattern.compile("v(\\d+)\\.(\\d\\d)");
+        Matcher m= p.matcher(v);
+        if ( m.matches() ) {
+            try {
+                int major= Integer.parseInt( m.group(1) );
+                int minor= Integer.parseInt( m.group(2) );
+                String current= getAutoplotScriptingVersion();
+                Matcher m2= p.matcher(current);
+                if ( m2.matches() ) {
+                    if ( Integer.parseInt(m2.group(1))<major ) {
+                        throw new IllegalArgumentException("Autoplot scripting version not supported: "+v+", current is "+current);
+                    } else {
+                        if ( Integer.parseInt(m2.group(1))<minor ) {
+                            throw new IllegalArgumentException("Autoplot scripting version not supported: "+v+", current is "+current);
+                        }
+                    }
+                } else {
+                    throw new IllegalArgumentException("Autoplot scripting version not supported: "+v+", current is "+current);
+                }
+            } catch (IOException ex) {
+                throw new IllegalArgumentException("unable to resolve scripting version number supported by Autoplot.",ex);
+            }
+        } else {
+            throw new IllegalArgumentException("invalid version number, which must be N.NN");
+        }
+    }
+
+    
     /**
      * load the data specified by URI into Autoplot's internal data model.  This will
      * block until the load is complete, and a ProgressMonitor object can be used to
