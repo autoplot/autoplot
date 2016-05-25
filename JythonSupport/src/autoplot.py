@@ -9,6 +9,8 @@ from org.virbo.dataset import QDataSet
 from org.virbo.dsutil.BinAverage import *
 from org.virbo.dsutil import DataSetBuilder
 
+_autoplot_jython_version= float(getAutoplotScriptingVersion()[1:])
+
 from org.das2.datum import DatumRange, Units, DatumRangeUtil, TimeUtil
 from java.net import URL, URI
 from org.das2.datum import TimeParser
@@ -94,5 +96,3 @@ def invokeLater( functn, *args, **kw ):
    "invoke the function later.  It should be followed by the parameters passed to the function"
    r= InvokeLaterRunnable( functn, args, kw )
    _Thread(r,'invokeLater').start()
-
-_autoplot_jython_version= 1.40
