@@ -1286,6 +1286,10 @@ APSplash.checkTime("init 270");
                     scriptPanel= new JythonScriptPanel( AutoplotUI.this, fdataSetSelector);
                     jythonScriptPanel.add(scriptPanel,BorderLayout.CENTER);
                     scriptPanelMenuItem.setSelected(true);
+                    ExceptionHandler h= model.getExceptionHandler();
+                    if ( h!=null && h instanceof GuiExceptionHandler ) {
+                        ((GuiExceptionHandler)h).setScriptPanel(scriptPanel);
+                    }
                 }
             } );
         }
@@ -3541,6 +3545,10 @@ private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
         jythonScriptPanel.add(scriptPanel, BorderLayout.CENTER );
         tabs.insertTab(TAB_SCRIPT, null, jythonScriptPanel,
                 String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP), 4);
+        ExceptionHandler h= AutoplotUI.this.getApplicationModel().getExceptionHandler();
+        if ( h!=null && h instanceof GuiExceptionHandler ) {
+            ((GuiExceptionHandler)h).setScriptPanel(scriptPanel);
+        }
     } else if ( scriptPanelMenuItem.isSelected() && jythonScriptPanel!=null ) {
         tabs.insertTab(TAB_SCRIPT, null, jythonScriptPanel,
                 String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP), 4);
