@@ -392,7 +392,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                         dom.getController().setPlot(plot);
                         dom.getController().setPlotElement(pe);
                     } else {
-                        logger.warning("plot not found for plotElement");
+                        logger.fine("plot not found for plotElement");
                     }
                 }
             }
