@@ -193,6 +193,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     private void checkJythonError( Throwable t ) {
         if ( t instanceof PyException && scriptPanel!=null ) {
             scriptPanel.support.annotateError( (PyException)t, 0, null );
+        } else if ( scriptPanel!=null ) {
+            scriptPanel.support.annotateError( t );
         }
     }
     
