@@ -696,7 +696,7 @@ public class Util {
             if ( inExclude>(char)0 ) c='_';
             scopyb.append(c);            
         }
-        String[] ss= scopyb.toString().split(""+delim,-2);
+        String[] ss= scopyb.toString().split(String.valueOf(delim),-2);
         
         int i1= 0;
         for ( int i=0; i<ss.length; i++ ) {
