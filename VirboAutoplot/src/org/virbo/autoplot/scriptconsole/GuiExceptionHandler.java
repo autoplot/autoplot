@@ -186,13 +186,13 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         this.scriptPanel= scriptPanel;
     }
     
+    /**
+     * if the error is a Jython exception, then show its location in the editor.
+     * @param t 
+     */
     private void checkJythonError( Throwable t ) {
         if ( t instanceof PyException && scriptPanel!=null ) {
-            try {
-                scriptPanel.getAnnotationsSupport().annotateError( (PyException)t, 0 );
-            } catch (BadLocationException ex) {
-                Logger.getLogger(GuiExceptionHandler.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            scriptPanel.support.annotateError( (PyException)t, 0, null );
         }
     }
     
