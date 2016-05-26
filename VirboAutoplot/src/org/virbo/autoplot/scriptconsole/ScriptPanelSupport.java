@@ -88,6 +88,7 @@ import org.virbo.jythonsupport.ui.ParametersFormPanel;
 
 /**
  * Error annotations, saveAs, etc.
+ * @see EditorAnnotationsSupport
  * @author jbf
  */
 public class ScriptPanelSupport {
@@ -496,12 +497,12 @@ public class ScriptPanelSupport {
     }
 
     /**
-     *
-     * @param ex
+     * Annotate the error.  
+     * @param ex the exception
      * @param offset line offset from beginning of file where execution began.
-     * @throws javax.swing.text.BadLocationException
+     * @param interp null or the interp for further queries.
      */
-    private void annotateError(PyException ex, int offset, final PythonInterpreter interp) {
+    public void annotateError(PyException ex, int offset, final PythonInterpreter interp) {
         if (ex instanceof PySyntaxError) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
@@ -523,16 +524,37 @@ public class ScriptPanelSupport {
 //                        break;
 //                    }
 //                }
-                String fn= traceback.tb_frame.f_code.co_filename;
-                if ( fn!=null && ( fn.equals("<iostream>") || fn.equals("<string>") || fn.equals( file.getName() ) ) ) { 
-                    annotationsSupport.annotateLine(offset + traceback.tb_lineno, "error", ex.toString(),interp);
-                    line=  traceback.tb_lineno-1;
+                if ( traceback.tb_frame==null ) { // this happens with invokeLater and Java exception
+                    PyObject o= ex.value;
+                    if ( o!=null ) {
+                        Exception e= (Exception)o.__tojava__(Exception.class);
+                        if ( e!=null ) {
+                            StackTraceElement[] ses= e.getStackTrace();
+                            for ( StackTraceElement se: ses ) {
+                                if ( se!=null && se.getFileName()!=null && se.getFileName().endsWith(file.getName()) && se.getLineNumber()>-1 ) {
+                                    line= se.getLineNumber();
+                                    annotationsSupport.annotateLine(offset + line, "error", ex.toString(),interp);
+                                }
+                            }
+                            
+                        }
+                    }
                     otraceback= traceback.tb_next;
-                    count++;
-                } else {
-                    otraceback= traceback.tb_next;
+                } else { // typical
+                    String fn= traceback.tb_frame.f_code.co_filename;
+                    if ( fn!=null && ( fn.equals("<iostream>") || fn.equals("<string>") || fn.equals( file.getName() ) ) ) { 
+                        annotationsSupport.annotateLine(offset + traceback.tb_lineno, "error", ex.toString(),interp);
+                        line=  traceback.tb_lineno-1;
+                        otraceback= traceback.tb_next;
+                        count++;
+                    } else {
+                        otraceback= traceback.tb_next;
+                    }
                 }
             }
+            //System.err.println("***");
+            //System.err.println("line="+line);
+            
             if ( line<0 ) {
                 logger.warning("no trace information available for error "+ex.getMessage());
                 line=0;
