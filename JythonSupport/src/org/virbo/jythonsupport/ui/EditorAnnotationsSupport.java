@@ -30,6 +30,7 @@ import org.python.util.PythonInterpreter;
 /**
  * annotations support for the editor, marking program counter position 
  * and errors.
+ * @see ScriptPanelSupport
  * @author jbf
  */
 public class EditorAnnotationsSupport {
@@ -209,7 +210,7 @@ public class EditorAnnotationsSupport {
      * @param lline the line number to highlite.  1 is the first line.
      * @param name the name of the style, including "error" and "programCounter"
      * @param ltext annotation to display when hovering.
-     * @param interp the interpreter to focus on.
+     * @param interp the interpreter (or null) to focus on.
      */
     public void annotateLine( int lline, final String name, String ltext, final PythonInterpreter interp ) {
         if ( lline<1 ) {
@@ -326,7 +327,7 @@ public class EditorAnnotationsSupport {
      * @param i1 char offset for the end.
      * @param name ANNO_WARNING, ANNO_ERROR, ANNO_PROGRAM_COUNTER
      * @param text text to further explain
-     * @param interp allow for further queries by resetting the interpreter.
+     * @param interp the interpreter or null, to allow for further queries by resetting the interpreter.
      */
     public void annotateChars( final int i0, final int i1, final String name, final String text, final PythonInterpreter interp ) {
         SwingUtilities.invokeLater(new Runnable() {
