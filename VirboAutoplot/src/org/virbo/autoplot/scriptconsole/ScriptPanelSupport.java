@@ -497,6 +497,22 @@ public class ScriptPanelSupport {
     }
 
     /**
+     * march through the stack trace looking for any Jython references.
+     * @param ex the exception
+     */
+    public void annotateError( Throwable ex ) {
+        int line; // the line number                    
+        StackTraceElement[] ses= ex.getStackTrace();
+        if ( ses==null ) return;
+        for ( StackTraceElement se: ses ) {
+            if ( se!=null && se.getFileName()!=null && se.getFileName().endsWith(file.getName()) && se.getLineNumber()>-1 ) {
+                line= se.getLineNumber();
+                annotationsSupport.annotateLine( line, "error", ex.toString(), null );
+            }
+        }
+    }
+    
+    /**
      * Annotate the error.  
      * @param ex the exception
      * @param offset line offset from beginning of file where execution began.
@@ -529,14 +545,7 @@ public class ScriptPanelSupport {
                     if ( o!=null ) {
                         Exception e= (Exception)o.__tojava__(Exception.class);
                         if ( e!=null ) {
-                            StackTraceElement[] ses= e.getStackTrace();
-                            for ( StackTraceElement se: ses ) {
-                                if ( se!=null && se.getFileName()!=null && se.getFileName().endsWith(file.getName()) && se.getLineNumber()>-1 ) {
-                                    line= se.getLineNumber();
-                                    annotationsSupport.annotateLine(offset + line, "error", ex.toString(),interp);
-                                }
-                            }
-                            
+                            annotateError(e);
                         }
                     }
                     otraceback= traceback.tb_next;
