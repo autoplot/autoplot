@@ -36,7 +36,7 @@ import org.python.core.PyException;
 import org.virbo.datasource.FileSystemUtil;
 
 /**
- *
+ * @see ScriptPanelSupport in VirboAutoplot project.  TODO: clean this up.
  * @author jbf
  */
 public class ScriptPanelSupport {
