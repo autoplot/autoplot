@@ -379,7 +379,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     PyDictionary dict= (PyDictionary)o;
                     result= dict.get(Py.newString(expr));
                 }
-                if ( result==null ) {
+                if ( result==null || result==Py.None ) {
                     result = interp.eval(expr);
                 }
                 label= expr;
