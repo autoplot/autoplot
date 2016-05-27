@@ -3,6 +3,6 @@
 
 from org.virbo.dsutil.BinAverage import boxcar
 
-ds= getDataSet('http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density')
+ds= getDataSet('http://cdaweb.gsfc.nasa.gov/data/genesis/gim/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf?Proton_Density' )
 plot( boxcar( ds, 51 ) )
 
