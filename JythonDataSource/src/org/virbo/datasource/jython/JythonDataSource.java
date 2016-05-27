@@ -355,7 +355,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
             String expr = params.get("arg_0");
 
-            PyObject result;
+            PyObject result=null;
 
             String label= null;
             
@@ -374,7 +374,14 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     }
                 }
             } else {
-                result = interp.eval(expr);
+                Object o= interp.get("outputParams");
+                if ( o!=null && o instanceof PyDictionary ) {
+                    PyDictionary dict= (PyDictionary)o;
+                    result= dict.get(Py.newString(expr));
+                }
+                if ( result==null ) {
+                    result = interp.eval(expr);
+                }
                 label= expr;
             }
             
@@ -470,18 +477,48 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 PyStringMap locals= (PyStringMap) interp.getLocals();
                 PyList keys= locals.keys();
                 PyList values= locals.values();
-                for ( int i=0; i<keys.size(); i++ ) {
-                    String key= (String)keys.get(i);
-                    Object value= values.get(i);
-                    if ( value instanceof PyQDataSet ) {
-                        value= ((PyQDataSet)value).getQDataSet();
-                    } 
-                    if ( value instanceof QDataSet || value==null ) {
-                        m.put( "arg_0", String.valueOf( key ) );
-                        t.params= URISplit.formatParams(m);
-                        String uri1= URISplit.makeCanonical( URISplit.format( t ) );
-                        ReferenceCache.getInstance().offerDataSet(uri1, (QDataSet)value );
-                        logger.log(Level.FINE, "Also adding to reference cache: {0}->{1}", new Object[]{uri1, value});
+                
+                boolean useOutputParams= false;
+                Object o= interp.get("outputParams");
+                if ( o!=null && o instanceof PyDictionary ) {
+                    if ( ((PyDictionary)o).__len__()>0 ) {
+                        useOutputParams= true;
+                    }
+                }
+                if ( useOutputParams==false ) {
+                    logger.fine("loading local datasets to cache");
+                    for ( int i=0; i<keys.size(); i++ ) {
+                        String key= (String)keys.get(i);
+                        Object value= values.get(i);
+                        if ( value instanceof PyQDataSet ) {
+                            value= ((PyQDataSet)value).getQDataSet();
+                        } 
+                        if ( value instanceof QDataSet || value==null ) {
+                            m.put( "arg_0", String.valueOf( key ) );
+                            t.params= URISplit.formatParams(m);
+                            String uri1= URISplit.makeCanonical( URISplit.format( t ) );
+                            ReferenceCache.getInstance().offerDataSet(uri1, (QDataSet)value );
+                            logger.log(Level.FINE, "Also adding to reference cache: {0}->{1}", new Object[]{uri1, value});
+                        }
+                    }
+                } else {
+                    logger.fine("loading output params to cache");
+                    PyDictionary dict= (PyDictionary)o;
+                    assert dict!=null;
+                    keys= dict.keys();
+                    for ( int i=0; i<keys.size(); i++ ) {
+                        String key= (String)keys.get(i);
+                        Object value= dict.get(Py.newString(key));
+                        if ( value instanceof PyQDataSet ) {
+                            value= ((PyQDataSet)value).getQDataSet();
+                        } 
+                        if ( value instanceof QDataSet || value==null ) {
+                            m.put( "arg_0", String.valueOf( key ) );
+                            t.params= URISplit.formatParams(m);
+                            String uri1= URISplit.makeCanonical( URISplit.format( t ) );
+                            ReferenceCache.getInstance().offerDataSet(uri1, (QDataSet)value );
+                            logger.log(Level.FINE, "Also adding to reference cache: {0}->{1}", new Object[]{uri1, value});
+                        }
                     }
                 }
                 if ( s==null ) {
