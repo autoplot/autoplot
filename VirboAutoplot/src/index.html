@@ -8,8 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The DataSourceFilter is used to slice the data interactively.  Here is the <a href="http://jfaden.net/~jbf/autoplot/script/demos/dsfSlice2.vap">vap</a> file.
-
+        <p><small>Improved error feedback when callbacks are used.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -25,8 +24,11 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-05-25 r18957):</p>
+        <p>Bugfixes (2016-05-26 r18978):</p>
         <ul>
+            <li>1587:  jython error location when callbacks are used</li>
+            <li>new Data Sources area in Layout could prevent selection of a plotElement.  Thanks Chris!</li>
+            <li>rte_0520679223: "####" splits to zero-length array, so input caused index out of bounds.  Thanks Bob!</li>
             <li>Jython datumRange('2015-06-25 11:00 to 13:00') would fail to parse as time range.  Thanks Kristoff!</li>
             <li>Jython popup documentation box size was not stored on disk between sessions</li>
             <li>Jython plot command can plot None again, to create a placeholder for data later in script.</li>
@@ -202,6 +204,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>dataSetBuilder nextRecord with rank 1 data.</li>
+            <li>smoothFit supports rank2 data to match the smooth function</li>
+            <li>Jython scripts have setOutputParam and requireAutoplotScriptingVersion, so that scripts can identify what they need.</li>
             <li>julianDay units added (days since noon, January 1, 4713 BC) to support Masafumi's data.</li>
             <li>491: allow %{TIMERANGE,FORMAT=$Y$m$d} and %{TIMERANGE,FORMAT=$o}</li>
             <li>389: buttons indicate the address bar or timerange selection.</li>
