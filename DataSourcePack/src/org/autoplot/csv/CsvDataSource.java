@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.TimeLocationUnits;
 import org.das2.datum.TimeUtil;
@@ -97,13 +98,21 @@ public class CsvDataSource extends AbstractDataSource {
 
         CsvReader reader= new CsvReader( breader );
 
-        String[] headers= null;
+        String[] headers;
 
         if ( reader.readHeaders() ) {
             headers= reader.getHeaders();
+        } else {
+            headers= new String[reader.getColumnCount()];
+            for ( int i=0; i<headers.length; i++ ) {
+                headers[i]= "field"+i;
+            }
         }
 
         String column= getParam( "column", null );
+        /**
+         * icolumn is the column we are reading, or -1 when reading multiple columns.
+         */
         int icolumn;
         if ( column==null ) {
             icolumn= -1;
@@ -168,13 +177,15 @@ public class CsvDataSource extends AbstractDataSource {
             line++;
             mon.setProgressMessage("read line "+line);
             if ( hline>0 ) {
+                if ( columnUnits==null ) {
+                    columnUnits= new Units[reader.getColumnCount()];
+                    for ( int j=0; j<reader.getColumnCount(); j++ ) {
+                        columnUnits[j]= guessUnits(reader.get(j));
+                    }
+                }
                 if ( icolumn==-1 ) {
                     if ( TimeUtil.isValidTime(reader.get(0)) && TimeUtil.isValidTime(reader.get(1) ) && reader.getColumnCount()>=2 && reader.getColumnCount()<=5 ) {
                         builder= new DataSetBuilder( 2, 100, reader.getColumnCount() );
-                        columnUnits= new Units[reader.getColumnCount()];
-                        for ( int j=0; j<reader.getColumnCount(); j++ ) {
-                            columnUnits[j]= guessUnits(reader.get(j));
-                        }
                         u= AsciiParser.UNIT_UTC;
                         bundleb= new double[reader.getColumnCount()];
                         icolumn= 0;
@@ -221,7 +232,7 @@ public class CsvDataSource extends AbstractDataSource {
                 }
                 if ( bundleb!=null ) {
                     for ( int j=0; j<bundleb.length; j++ ) {
-                        Units u1= columnUnits[j];
+                        Units u1= columnUnits[icolumn+j];
                         if ( u1 instanceof EnumerationUnits ) {
                             bundleb[j]= ((EnumerationUnits)u1).createDatum( reader.get(icolumn+j) ).doubleValue(u1);
                         } else {
@@ -267,6 +278,10 @@ public class CsvDataSource extends AbstractDataSource {
         
         mon.finished();
 
+        if ( line==0 ) {
+            throw new NoDataInIntervalException("file contains no data: "+uri);
+        }
+        
         DDataSet ds= builder.getDataSet();
         if ( idep0column>=0 && dep0ds!=null ) {
             DDataSet tds= tbuilder.getDataSet();
@@ -278,9 +293,9 @@ public class CsvDataSource extends AbstractDataSource {
         if ( bundleb!=null ) {
             SparseDataSet bds= SparseDataSet.createRankLen( 2, bundleb.length );
             for ( int j=0; j<bundleb.length; j++ ) {
-                bds.putProperty(QDataSet.UNITS, j, columnUnits[j]);
-                bds.putProperty(QDataSet.LABEL, j, headers[j] );
-                bds.putProperty(QDataSet.NAME, j, Ops.safeName(headers[j]) );
+                bds.putProperty(QDataSet.UNITS, j, columnUnits[j+icolumn]);
+                bds.putProperty(QDataSet.LABEL, j, headers[j+icolumn] );
+                bds.putProperty(QDataSet.NAME, j, Ops.safeName(headers[j+icolumn]) );
             }
             ds.putProperty( QDataSet.BUNDLE_1, bds );
         } else {
