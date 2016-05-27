@@ -171,7 +171,7 @@ public class Util {
      * @param suri the URI of the dataset, such as "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
      * @param timeRange the timerange to load, if the data supports time series browsing.
      * @param monitor progress monitor object, or null (None in Jython).
-     * @return dataset or null.
+     * @return null or the dataset for the URI.
      * @throws java.lang.Exception plug-in readers can throw exception.
      */
     public static QDataSet getDataSet( String suri, DatumRange timeRange, ProgressMonitor monitor ) throws Exception {
@@ -390,10 +390,10 @@ public class Util {
 
 
     /**
-     * load the data specified by URL into Autoplot's internal data model.  This will
+     * load the data specified by URI into Autoplot's internal data model.  This will
      * block until the load is complete.
      * @param suri the data address to load.
-     * @return data set for the URL.
+     * @return null or dataset for the URI.
      * @throws Exception depending on data source.
      */
     public static QDataSet getDataSet(String suri) throws Exception {
@@ -401,11 +401,11 @@ public class Util {
     }
 
     /**
-     * load the data specified by URL into Autoplot's internal data model.  This will
+     * load the data specified by URI into Autoplot's internal data model.  This will
      * block until the load is complete.
      * @param suri data URI like "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
      * @param stimerange timerange like "2012-02-02/2012-02-03"
-     * @return data set for the URI.
+     * @return null or data set for the URI.
      * @throws Exception depending on data source.
      */
     public static QDataSet getDataSet(String suri, String stimerange ) throws Exception {
@@ -413,11 +413,11 @@ public class Util {
     }
 
     /**
-     * load the data specified by URL into Autoplot's internal data model.  This will
+     * load the data specified by URI into Autoplot's internal data model.  This will
      * block until the load is complete.
      * @param suri data URI like "http://autoplot.org/data/2010_061_17_41_40.txt?column=field8"
      * @param timerange timerange object
-     * @return data set for the URI.
+     * @return null or data set for the URI.
      * @throws Exception depending on data source.
      */    
     public static QDataSet getDataSet(String suri, DatumRange timerange ) throws Exception {
