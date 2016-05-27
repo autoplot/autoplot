@@ -339,7 +339,9 @@ public class Test140 {
 
         for ( int i=1; i<args.length; i++ ) {
             String uri= args[i];
-            System.err.println("\n== from "+uri+" ==");
+            System.err.println("\n=======================");
+            System.err.println("== from "+uri);
+            System.err.println("=======================\n");
             
             if ( uri.endsWith(".xml") ) {
                 File ff= DataSetURI.getFile( uri, new NullProgressMonitor() );
