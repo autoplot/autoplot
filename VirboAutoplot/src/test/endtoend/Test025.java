@@ -5,6 +5,7 @@
 package test.endtoend;
 
 import java.io.PrintWriter;
+import org.das2.util.monitor.NullProgressMonitor;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -22,6 +23,7 @@ public class Test025 {
         QDataSet ds;
         long t0= System.currentTimeMillis();
         ds= Util.getDataSet( uri );
+        if ( ds==null ) throw new NullPointerException("URI results in null: "+uri);
         double t= (System.currentTimeMillis()-t0)/1000.;
         MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
         hist.putProperty( QDataSet.TITLE, uri );
