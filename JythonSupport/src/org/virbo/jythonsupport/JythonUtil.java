@@ -309,7 +309,7 @@ public class JythonUtil {
         String vers= "";
         
         // This is the version that Autoplot would like to find, and should be found within the Java class path.
-        double currentVersion= 1.50;  //rfe320 improved getParam support.
+        double currentVersion= 1.51;  //rfe320 improved getParam support.
                 
         if ( ff4.exists() ) {
             BufferedReader r= new BufferedReader( new FileReader( ff4 ) );
