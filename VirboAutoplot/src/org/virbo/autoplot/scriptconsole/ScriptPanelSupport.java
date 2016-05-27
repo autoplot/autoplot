@@ -504,10 +504,12 @@ public class ScriptPanelSupport {
         int line; // the line number                    
         StackTraceElement[] ses= ex.getStackTrace();
         if ( ses==null ) return;
-        for ( StackTraceElement se: ses ) {
-            if ( se!=null && se.getFileName()!=null && se.getFileName().endsWith(file.getName()) && se.getLineNumber()>-1 ) {
-                line= se.getLineNumber();
-                annotationsSupport.annotateLine( line, "error", ex.toString(), null );
+        if ( file!=null ) {
+            for ( StackTraceElement se: ses ) {
+                if ( se!=null && se.getFileName()!=null && se.getFileName().endsWith(file.getName()) && se.getLineNumber()>-1 ) {
+                    line= se.getLineNumber();
+                    annotationsSupport.annotateLine( line, "error", ex.toString(), null );
+                }
             }
         }
     }
