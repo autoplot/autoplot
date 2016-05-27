@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Improved error feedback when callbacks are used.
+        <p><small>Toggle buttons improve feedback and make it easier to switch between current time range and data URIs.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,13 +24,14 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-05-26 r18978):</p>
+        <p>Bugfixes (2016-05-27 r18984):</p>
         <ul>
-            <li>1587:  jython error location when callbacks are used</li>
+            <li>rte_1262492318: csv reader with bundle=field1-field5 had issues.  Thanks Masafumi!</li>
+            <li>1587: jython error location when callbacks are used.</li>
             <li>new Data Sources area in Layout could prevent selection of a plotElement.  Thanks Chris!</li>
             <li>rte_0520679223: "####" splits to zero-length array, so input caused index out of bounds.  Thanks Bob!</li>
             <li>Jython datumRange('2015-06-25 11:00 to 13:00') would fail to parse as time range.  Thanks Kristoff!</li>
-            <li>Jython popup documentation box size was not stored on disk between sessions</li>
+            <li>Jython popup documentation box size was not stored on disk between sessions.  Thanks Ivar!</li>
             <li>Jython plot command can plot None again, to create a placeholder for data later in script.</li>
             <li>Jython Data Source Time Series Browse mistaken when commented out.  Thanks Ivar!</li>
             <li>check that the monitor passed into reference cache park isn't already finished.  Thanks Ivar!</li>
