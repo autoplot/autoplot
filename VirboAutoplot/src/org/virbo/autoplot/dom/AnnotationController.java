@@ -1,6 +1,7 @@
 
 package org.virbo.autoplot.dom;
 
+import java.awt.Font;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
@@ -44,7 +45,11 @@ public class AnnotationController extends DomNodeController {
                     if ( dd[1]==1 && dd[2]==0 ) {
                         return 0.f;
                     } else {
-                        double parentSize= dcc.getFont().getSize2D();
+                        Font f= dcc.getFont();
+                        if ( f==null ) {
+                            f= Font.decode( dom.getOptions().getCanvasFont() );
+                        }
+                        double parentSize= f.getSize2D();
                         double newSize= dd[1]*parentSize + dd[2];
                         return (float)newSize;
                     }
@@ -60,7 +65,11 @@ public class AnnotationController extends DomNodeController {
                 if ( size==0 ) {
                     return "1em";
                 } else {
-                    double parentSize= dcc.getFont().getSize2D();
+                    Font f= dcc.getFont();
+                    if ( f==null ) {
+                        f= Font.decode( dom.getOptions().getCanvasFont() );
+                    }
+                    double parentSize= f.getSize2D();
                     double relativeSize= size / parentSize;
                     return String.format( "%.2fem", relativeSize );
                 }
