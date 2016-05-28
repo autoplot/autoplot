@@ -24,8 +24,9 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-05-27 r18984):</p>
+        <p>Bugfixes (2016-05-27 r19006):</p>
         <ul>
+            <li>CDF reader never called monitor.finished(), relying on sloppy clean-up code to call finished.</li>
             <li>1590: Autoplot's runtime exception handler is used throughout Das2 code.</li>
             <li>1587: jython error location when callbacks are used.</li>
             <li>1589: javadoc popup window view-in-browser broken with Illegal character in fragment</li>
@@ -208,6 +209,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>APDataSet adapter for IDL and Matlab allows a filter process to be applied.</li>
+            <li>Add ConsoleTextProgressMonitor, for examples and to support IDLMatlabBridge</li>
             <li>whiteBlueBlack colorbar added.  Thanks, Masafumi!</li>
             <li>add convertUnitsTo for DatumRange and Datum.  Thanks, Ivar!</li>
             <li>dataSetBuilder nextRecord with rank 1 data.</li>
