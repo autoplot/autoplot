@@ -843,7 +843,8 @@ public class DataSourceUtil {
      */
     public static void openBrowser(String url) {
         try {
-            Desktop.getDesktop().browse( java.net.URI.create(url) );
+            java.net.URI target= DataSetURI.getResourceURI(url);
+            Desktop.getDesktop().browse( target );
             return;
             
         } catch (IOException ex) {
