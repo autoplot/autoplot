@@ -10,6 +10,8 @@ import java.lang.reflect.Array;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
+import org.das2.util.monitor.ConsoleTextProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.datasource.DataSource;
@@ -297,11 +299,33 @@ public class Test024 {
         DataSourceUtil.guessNameFor("vap+nc:file:///home/jbf/data.backup/examples/h5/19970101_Polar_23802_FluxAssimOut.v2.h5?Flux");
 
     }
+    
+    /**
+     * 
+     * @throws Exception 
+     */    
+    public static void testFilters() throws Exception {
+        System.err.println( "\n= testFilters =\n");
+        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        apds.setDataSetURI("http://emfisis.physics.uiowa.edu/Flight/RBSP-B/Quick-Look/2015/04/04/rbsp-b_WFR-waveform-continuous-burst_emfisis-Quick-Look_20150404T16_v1.4.1.cdf?BuSpec");
+        apds.setFilter("|histogram()");
+        ProgressMonitor mon= new ConsoleTextProgressMonitor();
+        apds.doGetDataSet(mon);
+        while ( !mon.isFinished() ) {
+            Thread.sleep(1000);
+        }
+        if ( apds.getStatus()==0 ) {
+            System.err.println( apds.toString() );
+        }
+    }
+    
     public static void main( String[] args )  {
         try {
             
             LoggerManager.readConfiguration();
 
+            testFilters();
+            
             test9();
             
             test8();
