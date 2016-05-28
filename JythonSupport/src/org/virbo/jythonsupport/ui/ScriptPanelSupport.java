@@ -29,6 +29,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
+import org.das2.DasApplication;
 import org.das2.util.DasExceptionHandler;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
@@ -235,7 +236,7 @@ public class ScriptPanelSupport {
             }
 
         } catch (IOException iOException) {
-            DasExceptionHandler.handle(iOException);  //TODO: service registry
+            DasApplication.getDefaultApplication().getExceptionHandler().handle(iOException);
         } finally {
             try {
                 if (out != null) {
