@@ -26,8 +26,11 @@
         
         <p>Bugfixes (2016-05-27 r18984):</p>
         <ul>
-            <li>rte_1262492318: csv reader with bundle=field1-field5 had issues.  Thanks Masafumi!</li>
+            <li>1590: Autoplot's runtime exception handler is used throughout Das2 code.</li>
             <li>1587: jython error location when callbacks are used.</li>
+            <li>1589: javadoc popup window view-in-browser broken with Illegal character in fragment</li>
+            <li>new autoplot.py would use new function getAutoplotScriptingVersion, preventing old Autoplots from running. (never released)</li>
+            <li>rte_1262492318: csv reader with bundle=field1-field5 had issues.  Thanks Masafumi!</li>
             <li>new Data Sources area in Layout could prevent selection of a plotElement.  Thanks Chris!</li>
             <li>rte_0520679223: "####" splits to zero-length array, so input caused index out of bounds.  Thanks Bob!</li>
             <li>Jython datumRange('2015-06-25 11:00 to 13:00') would fail to parse as time range.  Thanks Kristoff!</li>
@@ -205,6 +208,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>whiteBlueBlack colorbar added.  Thanks, Masafumi!</li>
+            <li>add convertUnitsTo for DatumRange and Datum.  Thanks, Ivar!</li>
             <li>dataSetBuilder nextRecord with rank 1 data.</li>
             <li>smoothFit supports rank2 data to match the smooth function</li>
             <li>360: Jython scripts have setOutputParam and requireAutoplotScriptingVersion, so that scripts can identify what they need.</li>
