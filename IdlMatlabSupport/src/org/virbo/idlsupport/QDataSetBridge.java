@@ -14,6 +14,7 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.FDataSet;
 import org.virbo.dataset.QDataSet;
@@ -51,7 +52,7 @@ public abstract class QDataSetBridge {
         names = new LinkedHashMap<>();
         sliceDep= new LinkedHashMap<>();
         prefUnits= new ArrayList();
-        System.err.println("QDataSetBridge v1.9.1");
+        System.err.println("QDataSetBridge v2.0.0");
     }
 
     /**
@@ -116,6 +117,26 @@ public abstract class QDataSetBridge {
         this.useFill= true;
     }
 
+    protected String filter = "";
+
+    public static final String PROP_FILTER = "filter";
+
+    /**
+     * get the filter that is applied to the data immediately after it is loaded.
+     * @return the filter string, empty string means no filters.
+     */
+    public String getFilter() {
+        return filter;
+    }
+
+    /**
+     * set the filter that is applied to the data immediately after it is loaded.
+     * @param filter filter string like "|histogram()" or "" for no filters.
+     */
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
+
     /**
      * turn on/off debug messages
      * @param debug
@@ -141,6 +162,10 @@ public abstract class QDataSetBridge {
         try {
             this.ds = getDataSet( new NullProgressMonitor() );
 
+            if ( this.filter.length()>0 ) {
+                ds= DataSetOps.sprocess( this.filter, ds, new NullProgressMonitor() );
+            }
+            
             datasets.clear();
             name = nameFor(ds);
 
@@ -183,6 +208,11 @@ public abstract class QDataSetBridge {
                 try {
                     ds = getDataSet(mon);
                     if ( ds==null ) return;
+                    
+                    if ( filter.length()>0 ) {
+                        ds= DataSetOps.sprocess( filter, ds, new NullProgressMonitor() );
+                    }
+                                
                     
                 } catch (Exception ex) {
                     exception= ex;
