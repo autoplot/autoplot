@@ -90,6 +90,7 @@ import org.autoplot.renderer.ImageStylePanel;
 import org.autoplot.renderer.OrbitStylePanel;
 import org.autoplot.renderer.PitchAngleDistributionStylePanel;
 import org.autoplot.renderer.StackedHistogramStylePanel;
+import org.das2.DasApplication;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.DatumRange;
@@ -1099,7 +1100,7 @@ public class GuiSupport {
                                 }
                                 app.getController().setStatus("wrote to " + ffname);
                             } catch (java.io.IOException ioe) {
-                                org.das2.util.DasExceptionHandler.handle(ioe);
+                                DasApplication.getDefaultApplication().getExceptionHandler().handle(ioe);
                             }
                         }
                     };
