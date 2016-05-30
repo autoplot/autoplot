@@ -3453,11 +3453,16 @@ APSplash.checkTime("init 52.9");
             String pwd= new File("foo.txt").getAbsoluteFile().getParent();
             String pid= getProcessId("???");
             String host= InetAddress.getLocalHost().getHostName();
+            String memWarning="";
+            if ( ( Runtime.getRuntime().maxMemory() / 1000000 )<512 ) {
+                memWarning= "<li> Available RAM is low, severely limiting capabilities (<a href=\"http://autoplot.org/lowMem\">info</a>)";
+            }
             String bits= is32bit ? "32" : "64";
             String bitsWarning;
             bitsWarning= is32bit ? "(<a href=\"http://autoplot.org/32bit\">severely limiting capabilities</a>)" : "(recommended)";
             String aboutContent = "<ul>" +
-                "<li>Java version: " + javaVersion +
+                "<li>Java version: " + javaVersion + 
+                memWarning +    
                 "<li>max memory (MB): " + mem + " (memory available to process)" +
                 "<li>total memory (MB): " + tmem + " (amount allocated to the process)" +
                 "<li>free memory (MB): " + fmem + " (amount available before more must be allocated)" + 
