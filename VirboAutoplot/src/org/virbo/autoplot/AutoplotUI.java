@@ -3454,7 +3454,7 @@ APSplash.checkTime("init 52.9");
             String pid= getProcessId("???");
             String host= InetAddress.getLocalHost().getHostName();
             String memWarning="";
-            if ( ( Runtime.getRuntime().maxMemory() / 1000000 )<512 ) {
+            if ( ( Runtime.getRuntime().maxMemory() / 1000000 )<700 ) {
                 memWarning= "<li> Available RAM is low, severely limiting capabilities (<a href=\"http://autoplot.org/lowMem\">info</a>)";
             }
             String bits= is32bit ? "32" : "64";
