@@ -24,7 +24,7 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-05-27 r19006):</p>
+        <p>Bugfixes (2016-05-30 r19012):</p>
         <ul>
             <li>CDF reader never called monitor.finished(), relying on sloppy clean-up code to call finished.</li>
             <li>1590: Autoplot's runtime exception handler is used throughout Das2 code.</li>
@@ -209,6 +209,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>About low memory link on the About Autoplot page, when less than 700Mb of memory is detected.</li>
+            <li>381: pdb should be supported in jython editor.  Loosen requirements for matching lines.</li>
             <li>APDataSet adapter for IDL and Matlab allows a filter process to be applied.</li>
             <li>Add ConsoleTextProgressMonitor, for examples and to support IDLMatlabBridge</li>
             <li>whiteBlueBlack colorbar added.  Thanks, Masafumi!</li>
