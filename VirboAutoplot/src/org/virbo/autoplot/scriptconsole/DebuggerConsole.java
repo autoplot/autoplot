@@ -345,7 +345,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
             PyStringMap psm= (PyStringMap)lo;
             printObj= psm.get(new PyString(expr) );
         }
-        if ( printObj==null ) {
+        if ( printObj==null || printObj==Py.None ) {
             if ( Ops.safeName(expr).equals(expr) ) {
                 printObj= new PyString("Name error: "+expr);
             } else {
