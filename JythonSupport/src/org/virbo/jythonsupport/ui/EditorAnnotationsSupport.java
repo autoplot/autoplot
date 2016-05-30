@@ -435,20 +435,22 @@ public class EditorAnnotationsSupport {
         if ( editorPanel.getSelectionStart()<=offset && offset<=editorPanel.getSelectionEnd() ) {
             String expr= editorPanel.getSelectedText();
             if ( expressionLookup!=null ) {
-                PyObject po= expressionLookup.lookup(expr);
-                String peek;
-                peek= String.valueOf( po.__str__() );
-                if ( peek.startsWith("<html>" ) ) {
-                    return peek;
-                } else {
-                    if ( po instanceof PyJavaInstance ) {
-                        try {
-                            return "<html>"+expr+"="+peek+"<br>"+((PyJavaInstance)po).instclass.safeRepr();
-                        } catch ( Exception ex ) {
+                if ( expr!=null ) {
+                    PyObject po= expressionLookup.lookup(expr);
+                    String peek;
+                    peek= String.valueOf( po.__str__() );
+                    if ( peek.startsWith("<html>" ) ) {
+                        return peek;
+                    } else {
+                        if ( po instanceof PyJavaInstance ) {
+                            try {
+                                return "<html>"+expr+"="+peek+"<br>"+((PyJavaInstance)po).instclass.safeRepr();
+                            } catch ( Exception ex ) {
+                                return "<html>"+expr+"="+peek+"<br>"+po.getType();
+                            }
+                        } else {
                             return "<html>"+expr+"="+peek+"<br>"+po.getType();
                         }
-                    } else {
-                        return "<html>"+expr+"="+peek+"<br>"+po.getType();
                     }
                 }
             } else {
