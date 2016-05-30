@@ -997,8 +997,8 @@ public class ScriptPanelSupport {
                     state= STATE_OPEN;
                 }
             } else if ( state==STATE_PDB ) { // the beginning of the currentLine is (Pdb) and we want a terminator
-                Pattern p= Pattern.compile("\\(Pdb\\) (.*)> <string>\\((\\d+)\\)\\?\\(\\)\\s*");
-                Pattern p2= Pattern.compile("\\(Pdb\\) (.*)--Return--.*>? <string>\\((\\d+)\\)\\?\\(\\)\\s*.*");
+                Pattern p= Pattern.compile("\\(Pdb\\) (.*)> .*\\.jy\\((\\d+)\\)\\?\\(\\)\\s*");
+                Pattern p2= Pattern.compile("\\(Pdb\\) (.*)--Return--.*");
                 
                 int l= currentLine.length();
                 if ( b>=0 && b!=10 && b!=13 ) currentLine.append((char)b);  //TODO: why is my regex not working when newlines get in there?
