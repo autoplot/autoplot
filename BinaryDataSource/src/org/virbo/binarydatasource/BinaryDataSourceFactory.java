@@ -46,7 +46,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "validMin=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "validMax=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "byteOrder=", "endianess of the data" ) );
-            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "reportOffset=yes", "depend0 is offset into file, this is the legacy (2010) behavior"));
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "reportOffset=yes", "depend0 is byte offset into file, this is the legacy (2010) behavior"));
             return result;
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String paramName= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
