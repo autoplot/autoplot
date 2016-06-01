@@ -506,14 +506,18 @@ class Das2ServerDataSource extends AbstractDataSource {
                         }
                         result= bds;
                     } else {
-                        int iitem= Integer.parseInt(item);
-                        if ( iitem==0 ) {
-                            das2ds= ds.getPlanarView( "" );
-                        } else {
-                            das2ds= ds.getPlanarView( "plane_"+iitem );
+                        try {
+                            int iitem= Integer.parseInt(item);
+                            if ( iitem==0 ) {
+                                das2ds= ds.getPlanarView( "" );
+                            } else {
+                                das2ds= ds.getPlanarView( "plane_"+iitem );
+                            }
+                            if ( das2ds==null ) throw new IllegalArgumentException("no such plane, looking for " + item  );
+                            result= DataSetAdapter.create( das2ds ); // fragile                
+                        } catch ( NumberFormatException ex ) {
+                            throw new IllegalArgumentException("unable to find component \""+item+"\"" );
                         }
-                        if ( das2ds==null ) throw new IllegalArgumentException("no such plane, looking for " + item  );
-                        result= DataSetAdapter.create( das2ds ); // fragile                
                     }
                 } else {
                     if ( das2ds==null ) throw new IllegalArgumentException("no such plane, looking for " + item  );
