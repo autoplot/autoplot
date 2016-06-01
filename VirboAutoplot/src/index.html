@@ -24,8 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-05-30 r19012):</p>
+        <p>Bugfixes (2016-06-01 r19012):</p>
         <ul>
+            <li>If the Time Format was not specified, then one png of years 1000-9000 would be run, creating problems for many data servers.  Thanks, Chris!</li>
+            <li>improve feedback for low memory problems, with link to Autoplot.org.</li>
             <li>CDF reader never called monitor.finished(), relying on sloppy clean-up code to call finished.</li>
             <li>1590: Autoplot's runtime exception handler is used throughout Das2 code.</li>
             <li>1587: jython error location when callbacks are used.</li>
@@ -156,6 +158,7 @@
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
+            <li>digital rank 2 renderer supports %x for hex format.</li>
             <li>openBrowser code assumed that the Java 6 system could be used, but it isn't supported on Linux (Mint).</li>
             <li>1512: I/O Error reading CDF files on 32 bit machines.  Fall back to alternate method for opening files.</li>
             <li>RGB indication on crosshair renderer corrected for images without DEPEND_1 tags.</li>
