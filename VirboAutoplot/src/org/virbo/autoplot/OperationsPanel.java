@@ -527,7 +527,7 @@ public class OperationsPanel extends javax.swing.JPanel {
                         operatorsTextField.setText(filter);
                         operatorsTextField.setCaretPosition(Math.min(filter.length(),carot));
                     } catch ( IllegalStateException ex ) {
-                        System.err.println("looks like someone else is doing this already.");
+                        logger.fine("looks like someone else is editing the operators text field already, returning.");
                     }
                 }
             }
