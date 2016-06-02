@@ -97,4 +97,5 @@ class InvokeLaterRunnable( _Runnable ):
 def invokeLater( functn, *args, **kw ):
    "invoke the function later.  It should be followed by the parameters passed to the function"
    r= InvokeLaterRunnable( functn, args, kw )
+   # Ed suggests this use ThreadPoolExecutor
    _Thread(r,'invokeLater').start()
