@@ -718,7 +718,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jSplitPane2.setDividerLocation(300);
 
-        directionsLabel.setText("Double-click on the name to set the data set.");
+        directionsLabel.setText("Double-click on the name to set the variable or constant argument.");
 
         jTree1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -739,7 +739,7 @@ public class DataMashUp extends javax.swing.JPanel {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addComponent(directionsLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE))
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE))
         );
 
         jSplitPane2.setRightComponent(jPanel4);
@@ -762,7 +762,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("mathematics", jPanel1);
@@ -783,13 +783,13 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("dataset", jPanel3);
 
         jList3.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "putValues(ds1,w,v)", "removeValues(ds1,w)", "where(c)", "lt(ds1,ds2)", "le(ds1,ds2)", "gt(ds1,ds2)", "ge(ds1,ds2)", "eq(ds1,ds2)", "ne(ds1,ds2)", "or(ds1,ds2)", "and(ds1,ds2)" };
+            String[] strings = { "putValues(ds,w,v)", "removeValues(ds,w)", "removeValuesGreaterThan(ds,v)", "removeValuesLessThan(ds,v)", "where(c)", "lt(ds1,ds2)", "le(ds1,ds2)", "gt(ds1,ds2)", "ge(ds1,ds2)", "eq(ds1,ds2)", "ne(ds1,ds2)", "or(ds1,ds2)", "and(ds1,ds2)" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
@@ -804,7 +804,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("filters", jPanel5);
@@ -820,7 +820,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("my functions", jPanel6);
@@ -839,7 +839,7 @@ public class DataMashUp extends javax.swing.JPanel {
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addComponent(jLabel2)
-                .addGap(0, 311, Short.MAX_VALUE))
+                .addGap(0, 352, Short.MAX_VALUE))
             .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
                     .addContainerGap()
@@ -859,7 +859,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jSplitPane1.setTopComponent(jScrollPane1);
 
-        jLabel1.setText("Load Data Sets:");
+        jLabel1.setText("Load these Data Sets into variable names:");
 
         timeRangeLabel.setText("Time Range:");
         timeRangeLabel.setEnabled(false);
