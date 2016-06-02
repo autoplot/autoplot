@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Toggle buttons improve feedback and make it easier to switch between current time range and data URIs.
+        <p><small>The Create PNGWalk Tool handles where each day's data spans midnight, using the rescale option.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,9 +24,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-06-01 r19012):</p>
+        <p>Bugfixes (2016-06-02 r19025):</p>
         <ul>
-            <li>If the Time Format was not specified, then one png of years 1000-9000 would be run, creating problems for many data servers.  Thanks, Chris!</li>
+            <li>1596: initial feedback on the mash up GUI.  Thanks, Craig!</li>
+            <li>isSimpleTableDataSet failed with Juno/JADE dataset with rank 2 DEPEND_1.  Thanks, Chris!</li>
+            <li>1595: If the Time Format in PNGWalk was not specified, then one png of years 1000-9000 would be run, creating problems for many data servers.  Thanks, Chris!</li>
+            <li>improve error feedback when a component ("Bx") cannot be found in the das2stream.</li>
             <li>improve feedback for low memory problems, with link to Autoplot.org.</li>
             <li>CDF reader never called monitor.finished(), relying on sloppy clean-up code to call finished.</li>
             <li>1590: Autoplot's runtime exception handler is used throughout Das2 code.</li>
