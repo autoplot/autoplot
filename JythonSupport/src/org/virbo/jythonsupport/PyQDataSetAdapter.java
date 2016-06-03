@@ -6,7 +6,6 @@
 package org.virbo.jythonsupport;
 
 import java.lang.reflect.Array;
-import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.python.core.PyArray;
 import org.python.core.PyList;
@@ -14,7 +13,6 @@ import org.python.core.PyObject;
 import org.python.core.adapter.PyObjectAdapter;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -27,6 +25,7 @@ import org.virbo.dsops.Ops;
  */
 public class PyQDataSetAdapter implements PyObjectAdapter {
 
+    @Override
     public boolean canAdapt(Object arg0) {
         if ( arg0 instanceof QDataSet ) {
             return true;
@@ -35,6 +34,7 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
         }
     }
 
+    @Override
     public PyObject adapt(Object arg0) {
         return new PyQDataSet((QDataSet) arg0);
     }
@@ -63,8 +63,13 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
             } else {
                 d1= Ops.dataset(n);
             }
-            if ( u==null )  u= SemanticOps.getUnits(d1);
+            
+            if ( u==null ) u= SemanticOps.getUnits(d1);
           
+            if ( SemanticOps.getUnits(d1)!=u ) {
+                d1= Ops.convertUnitsTo(d1, u);
+            }
+            
             if ( d1.rank()==0 ) {
                 j[i]= d1.value();
             } else {
@@ -106,7 +111,12 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
             } else {
                 d1= Ops.dataset(n);
             }
-            if ( u==null )  u= SemanticOps.getUnits(d1);
+
+            if ( u==null ) u= SemanticOps.getUnits(d1);
+          
+            if ( SemanticOps.getUnits(d1)!=u ) {
+                d1= Ops.convertUnitsTo(d1, u);
+            }
 
             if ( d1.rank()==0 ) {
                 j[i]= d1.value(); 
