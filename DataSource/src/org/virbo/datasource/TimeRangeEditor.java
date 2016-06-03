@@ -33,6 +33,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
+import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultEditorKit;
 import org.das2.DasApplication;
 import org.das2.datum.DatumRange;
@@ -128,13 +129,17 @@ public class TimeRangeEditor extends javax.swing.JPanel {
      */
     private boolean suppressRecentComboBoxActionEvents= false;
 
-    public void setRange( DatumRange value ) {
+    public void setRange( final DatumRange value ) {
         if ( !UnitsUtil.isTimeLocation(value.getUnits()) ) return;
-        DatumRange oldValue= this.range;
+        final DatumRange oldValue= this.range;
         this.range= value;
         if (oldValue != value && oldValue != null && !oldValue.equals(value)) {
             if ( !suppressRecentComboBoxActionEvents ) {
-                super.firePropertyChange( PROP_RANGE, oldValue, value);
+                SwingUtilities.invokeLater( new Runnable() {
+                    public void run() {
+                        TimeRangeEditor.super.firePropertyChange( PROP_RANGE, oldValue, value);
+                    }
+                } );
             }
         }
         this.suppressRecentComboBoxActionEvents= true;
