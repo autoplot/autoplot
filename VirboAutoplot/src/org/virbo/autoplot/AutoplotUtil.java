@@ -777,6 +777,9 @@ public class AutoplotUtil {
                 w.println("# monitor the event thread for hangs.");
                 w.println("#enableResponseMonitor=true");
                 w.println("");
+                w.println("# turn off certificate checks.");
+                w.println("#noCheckCertificate=true");
+                w.println("");
                 w.close();
             } catch ( IOException ex ) {
                 logger.log(Level.WARNING, "write initial {0} failed.  {1}", new Object[] { propFile, ex } );
