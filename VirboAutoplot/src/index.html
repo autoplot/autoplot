@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The Create PNGWalk Tool handles where each day's data spans midnight, using the rescale option.
+        <p><small>Error location within callback routines are now indicated, supporting more complex script development.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,11 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-06-02 r19025):</p>
+        <p>Bugfixes (2016-06-04 r19032):</p>
         <ul>
+            <li>add noCheckCertificate setting to work around where LANL's certificate is suddenly not working.</li>
+            <li>dataset([d1,d2]) where d1 and d2 are Datums of different but convertible Units created incorrect dataset.  Thanks Ivar!</li>
+            <li>1599: experiment with invokeLater to avoid hang seen with TimeRangeEditor.</li>
             <li>1596: initial feedback on the mash up GUI.  Thanks, Craig!</li>
             <li>isSimpleTableDataSet failed with Juno/JADE dataset with rank 2 DEPEND_1.  Thanks, Chris!</li>
             <li>1595: If the Time Format in PNGWalk was not specified, then one png of years 1000-9000 would be run, creating problems for many data servers.  Thanks, Chris!</li>
