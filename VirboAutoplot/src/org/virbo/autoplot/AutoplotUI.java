@@ -67,6 +67,9 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,6 +90,12 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.help.CSH;
 import javax.jnlp.SingleInstanceListener;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Box;
@@ -328,6 +337,42 @@ public final class AutoplotUI extends javax.swing.JFrame {
         if ( !booksDir.exists() ) {
             if ( !booksDir.mkdirs() ) {
                 logger.log(Level.WARNING, "unable to make directory: {0}", booksDir);
+            }
+        }
+        
+        if ( System.getProperty( "noCheckCertificate","false").equals("true") ) {
+            logger.info("disabling certificate checks.");
+            try {
+                TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+                        
+                        public void checkClientTrusted(X509Certificate[] certs, String authType) {  }
+                        
+                        public void checkServerTrusted(X509Certificate[] certs, String authType) {  }
+                        
+                    }
+                };
+                
+                SSLContext sc = SSLContext.getInstance("SSL");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+                
+                // Create all-trusting host name verifier
+                HostnameVerifier allHostsValid = new HostnameVerifier() {
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                };
+                
+                HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+                
+            } catch (NoSuchAlgorithmException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            } catch ( KeyManagementException ex) {
+                logger.log(Level.SEVERE, null, ex);
             }
         }
 
