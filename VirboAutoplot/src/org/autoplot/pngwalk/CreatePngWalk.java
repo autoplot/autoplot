@@ -827,9 +827,11 @@ public class CreatePngWalk {
         } 
         catch(IOException e){
             System.err.println("IO ERROR.");
+            e.printStackTrace();
         }
         catch(Exception e2){
             System.err.println("UNKNOWN ERROR.");
+            e2.printStackTrace();
         }
     }
 
