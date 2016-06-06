@@ -273,16 +273,16 @@ public class LayoutPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
                 AddPlotsDialog dia= new AddPlotsDialog();
-                dia.getNumberOfColumnsSpinner().setModel( new SpinnerNumberModel(1,1,5,1) );
-                dia.getNumberOfRowsSpinner().setModel( new SpinnerNumberModel(1,1,5,1) );
+                dia.getNumberOfColumnsSpinner().setModel( new SpinnerNumberModel(1,1,6,1) );
+                dia.getNumberOfRowsSpinner().setModel( new SpinnerNumberModel(1,1,6,1) );
                 if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(plotElementListComponent, 
                         dia, "Add Plots", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE, 
                         new ImageIcon( AutoplotUtil.getAutoplotIcon() ) ) ) {
                     int nr= (Integer)dia.getNumberOfRowsSpinner().getValue();
                     int nc= (Integer)dia.getNumberOfColumnsSpinner().getValue();
-                    if ( nr>5 || nc>5 ) {
-                        JOptionPane.showMessageDialog( LayoutPanel.this, "No more than 5 rows or columns can be added at once.");
+                    if ( nr>6 || nc>6 ) {
+                        JOptionPane.showMessageDialog( LayoutPanel.this, "No more than 6 rows or columns can be added at once.");
                     } else {
                         Plot p= dom.getController().getPlot();
                         dom.getController().addPlots( nr,nc, dia.getDirection() );
