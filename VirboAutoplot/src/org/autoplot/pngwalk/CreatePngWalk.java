@@ -580,7 +580,9 @@ public class CreatePngWalk {
             }
         }
         
-        writeHTMLFile( params, pngFilenameArrayThumbs, pngFilenameArrayBig, timeLabels );
+        if ( !mon.isCancelled() ) {
+            writeHTMLFile( params, pngFilenameArrayThumbs, pngFilenameArrayBig, timeLabels );
+        }
         
         if ( !mon.isFinished() ) mon.finished();
         
