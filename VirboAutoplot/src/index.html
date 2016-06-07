@@ -24,8 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-06-04 r19032):</p>
+        <p>Bugfixes (2016-06-07 r19036):</p>
         <ul>
+            <li>Code put in to automatically name the default plane of das2stream didn't consider that there might already be a plane "y", and uses the name property instead for the default value.  Thanks Chris and Bill!</li>
+            <li>"UNKNOWN ERROR" message was printed when CreatePngwalk was cancelled.</li>
             <li>add noCheckCertificate setting to work around where LANL's certificate is suddenly not working.</li>
             <li>dataset([d1,d2]) where d1 and d2 are Datums of different but convertible Units created incorrect dataset.  Thanks Ivar!</li>
             <li>1599: experiment with invokeLater to avoid hang seen with TimeRangeEditor.</li>
@@ -218,6 +220,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add plots dialog allows up to 6 by 6 plots now, useful for things like hourly plots of a day (6x4=24).</li>
             <li>About low memory link on the About Autoplot page, when less than 700Mb of memory is detected.</li>
             <li>381: pdb should be supported in jython editor.  Loosen requirements for matching lines.</li>
             <li>APDataSet adapter for IDL and Matlab allows a filter process to be applied.</li>
