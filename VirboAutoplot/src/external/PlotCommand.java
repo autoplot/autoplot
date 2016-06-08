@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
+import org.das2.graph.DasColorBar;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PlotSymbol;
 import org.das2.graph.PsymConnector;
@@ -56,6 +57,7 @@ public class PlotCommand extends PyObject {
             + " <tr><td> renderType  </td><td> explcitly set the render type, to scatter, series, nnSpectrogram, digital, etc\n</td></tr>"
             + " <tr><td> color      </td><td> the line colors.\n</td></tr>"
             + " <tr><td> fillColor   </td><td>the color when filling volumes.\n</td></tr>"
+            + " <tr><td> colorTable  </td><td>the color table to use, like white_blue_black or black_red.\n</td></tr>"
             + " <tr><td> symbolSize     </td><td>set the point (pixel) size\n</td></tr>"
             + " <tr><td> lineWidth   </td><td>deprecated--the line thickness in points (pixels)\n</td></tr>"
             + " <tr><td> lineThick   </td><td>the line thickness in points (pixels)\n</td></tr>"
@@ -104,7 +106,7 @@ public class PlotCommand extends PyObject {
             "xlog", "ylog", "zlog",
             "title",
             "renderType",
-            "color", "fillColor",
+            "color", "fillColor", "colorTable",
             "symbolSize","lineWidth","lineThick","lineStyle",
             "symsize","linewidth","linethick","linestyle",
             "legendLabel",
@@ -120,7 +122,7 @@ public class PlotCommand extends PyObject {
             False, False, False,
             Py.None,
             Py.None,
-            Py.None,Py.None,
+            Py.None,Py.None,Py.None,
             Py.None,Py.None,Py.None,Py.None,
             Py.None,Py.None,Py.None,Py.None,
             Py.None,
@@ -286,6 +288,9 @@ public class PlotCommand extends PyObject {
                     Color c;
                     c= JythonOps.color(val);
                     elements.get(0).getStyle().setFillColor( c );
+                } else if ( kw.equals("colorTable" ) ) { 
+                    DasColorBar.Type t= org.das2.graph.DasColorBar.Type.parse(sval);
+                    elements.get(0).getStyle().setColortable(t);
                 } else if ( kw.equals("title") ) {
                     plot.setTitle(sval);
                 } else if ( kw.equals("symsize") || kw.equals("symbolSize") ) {
