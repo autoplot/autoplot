@@ -64,6 +64,7 @@ public class Test038 {
      * @throws Exception 
      */
     public static void testGetParams() {
+        doTestGetParams("008","/home/jbf/ct/hudson/script/test038/jedi_l3_valid_tofxe_events.jyds");
         doTestGetParams("000","/home/jbf/ct/hudson/script/test038/trivial.jy");
         doTestGetParams("001","/home/jbf/ct/hudson/script/test038/demoParms0.jy");
         doTestGetParams("002","/home/jbf/ct/hudson/script/test038/demoParms1.jy");
@@ -72,6 +73,7 @@ public class Test038 {
         doTestGetParams("005","/home/jbf/ct/hudson/script/test038/demoParms2.jy");
         doTestGetParams("006","/home/jbf/ct/hudson/script/test038/fce_A.jyds");
         doTestGetParams("007","/home/jbf/ct/hudson/script/test038/fce_A_2.jyds");
+        
     }
     
     public static void main( String[] args ) throws IOException {
