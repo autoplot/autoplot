@@ -64,6 +64,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -262,7 +263,14 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     private ProgressMonitor getMonitor(String label, String desc) {
         if (monitorFactory == null) {
-            return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(label, desc);
+            ProgressMonitor mon= DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(label, desc);
+//            if ( mon instanceof DasProgressPanel ) {  //TODO: make sure the progress bar is in the same window.
+//                Window w= SwingUtilities.getWindowAncestor(((DasProgressPanel)mon).getComponent());
+//                if ( w instanceof JFrame ) {
+//                    w.setLocationRelativeTo(this);
+//                }
+//            }
+            return mon;
         } else {
             return monitorFactory.getMonitor(label, desc);
         }
