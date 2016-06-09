@@ -1194,7 +1194,7 @@ public class GuiSupport {
     }
 
 
-    private static void handleAddElementDialog(AddPlotElementDialog dia, final Application dom, ApplicationModel applicationModel) {
+    private static void handleAddElementDialog( final AddPlotElementDialog dia, final Application dom, final ApplicationModel applicationModel) {
         Plot plot = null;
         PlotElement pelement = null;
         int modifiers = dia.getModifiers();
@@ -1245,41 +1245,50 @@ public class GuiSupport {
             switch (depCount) {
                 case 0:
                     String val= uris[0];
-                    try {
-                        if ( val.endsWith(".vap") ) {
-                            mergeVap(dom,plot, pelement, val);
-                        } else {
-                            //TODO: this is still on event thread!!!
-                            String uri= val;
-                            DataSourceFactory factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), new NullProgressMonitor() );
-                            if ( factory==null ) {
-                                if ( uri.startsWith("vap+internal:") ) { // allow testing.
-                                    DataSourceFilter dsf= dom.getController().addDataSourceFilter();
-                                    dsf.setUri( uri );
-                                    dom.getController().addPlotElement( plot, dsf );
-                                    return;
-                                } else {
-                                    throw new IllegalArgumentException("unable to resolve URI: "+uri);
+                    if ( val.endsWith(".vap") ) {
+                        mergeVap(dom,lplot, lpelement, val);
+                    } else {
+                        final String lval= val;
+                        run= new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    String uri= lval;
+                                    DataSourceFactory factory = DataSetURI.getDataSourceFactory( DataSetURI.getURI(uri), new NullProgressMonitor() );
+                                    if ( factory==null ) {
+                                        if ( uri.startsWith("vap+internal:") ) { // allow testing.
+                                            DataSourceFilter dsf= dom.getController().addDataSourceFilter();
+                                            dsf.setUri( uri );
+                                            dom.getController().addPlotElement( lplot, dsf );
+                                            return;
+                                        } else {
+                                            throw new IllegalArgumentException("unable to resolve URI: "+uri);
+                                        }
+                                    }
+                                    List<String> problems= new ArrayList<>();
+                                    while ( factory.reject( uri, problems, new NullProgressMonitor() ) ) {
+                                        dia.setTitle("Add Plot, URI was rejected...");
+
+                                        WindowManager.getInstance().showModalDialog(dia);
+
+                                        if ( dia.isCancelled() ) {
+                                            return;
+                                        }
+                                        String val= dia.getPrimaryDataSetSelector().getValue();
+                                        uri= val;
+                                    }
+                                    PlotElement pelement= dom.getController().doplot(lplot, lpelement, lval );
+                                    DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, pelement.getDataSourceFilterId() );
+                                    if ( dia.getPrimaryFilters().length()>0 ) dsf.setFilters(dia.getPrimaryFilters());
+   
+                                } catch ( IOException | URISyntaxException ex ) {
+                                    applicationModel.showMessage( ex.getMessage(), "Illegal Argument", JOptionPane.ERROR_MESSAGE );
+                                } finally {
+                                    dom.getController().changePerformed( dom, lock );
                                 }
                             }
-                            List<String> problems= new ArrayList<>();
-                            while ( factory.reject( uri, problems, new NullProgressMonitor() ) ) {
-                                dia.setTitle("Add Plot, URI was rejected...");
-
-                                WindowManager.getInstance().showModalDialog(dia);
-
-                                if ( dia.isCancelled() ) {
-                                    return;
-                                }
-                                val= dia.getPrimaryDataSetSelector().getValue();
-                                uri= val;
-                            }
-                            pelement= dom.getController().doplot(plot, pelement, val );
-                            DataSourceFilter dsf= (DataSourceFilter)DomUtil.getElementById( dom, pelement.getDataSourceFilterId() );
-                            if ( dia.getPrimaryFilters().length()>0 ) dsf.setFilters(dia.getPrimaryFilters());
-                        }   
-                    } finally {
-                        dom.getController().changePerformed( dom, lock );
+                        };
+                        new Thread(run).start();
                     }
                     break;
                 case 1:
@@ -1339,7 +1348,7 @@ public class GuiSupport {
                 default:
                     break;
             }
-        } catch ( URISyntaxException | IOException | IllegalArgumentException ex ) { // TODO: the IllegalArgumentException is wrapped in a RuntimeException, I don't know why.  I should have MalformedURIException
+        } catch ( IllegalArgumentException ex ) { // TODO: the IllegalArgumentException is wrapped in a RuntimeException, I don't know why.  I should have MalformedURIException
             applicationModel.showMessage( ex.getMessage(), "Illegal Argument", JOptionPane.ERROR_MESSAGE );
         }
     }
