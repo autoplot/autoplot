@@ -24,13 +24,20 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-06-07 r19036):</p>
+        <p>Bugfixes (2016-06-09 r19044):</p>
         <ul>
+            <li>bugfix 1268: avoid download on the event thread in addPlot dialog</li>
+            <li>bugfix: simplifyScriptToGetParams didn't consider comments, creating a confusing situation where it wasn't clear why it was failing to parse.</li>
+            <li>1603: check for ordinal units in closestIndex function.</li>
+            <li>putProperty( ds, QDataSet.SCALE_MIN, rank0qds ) supported.</li>
             <li>Code put in to automatically name the default plane of das2stream didn't consider that there might already be a plane "y", and uses the name property instead for the default value.  Thanks Chris and Bill!</li>
             <li>"UNKNOWN ERROR" message was printed when CreatePngwalk was cancelled.</li>
             <li>add noCheckCertificate setting to work around where LANL's certificate is suddenly not working.</li>
             <li>dataset([d1,d2]) where d1 and d2 are Datums of different but convertible Units created incorrect dataset.  Thanks Ivar!</li>
             <li>1599: experiment with invokeLater to avoid hang seen with TimeRangeEditor.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>1596: initial feedback on the mash up GUI.  Thanks, Craig!</li>
             <li>isSimpleTableDataSet failed with Juno/JADE dataset with rank 2 DEPEND_1.  Thanks, Chris!</li>
             <li>1595: If the Time Format in PNGWalk was not specified, then one png of years 1000-9000 would be run, creating problems for many data servers.  Thanks, Chris!</li>
@@ -164,63 +171,14 @@
             <li>update the crosshair digitizer when we install RBGImageRenderer, so that R,G,B values are reported.</li>
             <li>treat http://user@... the same as http://... when credentials are needed either way.  PNGWalkTool had a bug where user@ was added automatically, causing a second login dialog.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>digital rank 2 renderer supports %x for hex format.</li>
-            <li>openBrowser code assumed that the Java 6 system could be used, but it isn't supported on Linux (Mint).</li>
-            <li>1512: I/O Error reading CDF files on 32 bit machines.  Fall back to alternate method for opening files.</li>
-            <li>RGB indication on crosshair renderer corrected for images without DEPEND_1 tags.</li>
-            <li>1511: resetting the data set URI in a stack of plots would reset the timerange.  Thanks, Bill, for pointing this out!</li>
-            <li>relax timeout on read to 60 seconds, because sometimes the das2server would take more 10 seconds before sending out data.</li>
-            <li>1510: pngwalks of aggregations of sparse data, limitation is no longer needed, and we just don't look for gaps when this would be impractical.</li>
-            <li>correction to PNGWalkTool thread sync bug, where check failed to see that thumbnail wasn't ready.</li>
-            <li>keep track of separate control for HTTP read timeout, before there was just timeout for connection.</li>
-            <li>pngwalk write to html corrected to make pngwalk more portable.</li>
-            <li>1506: allow subsequent repeat of lsd to reset the multiplier, fixing $Y$(m,delta=4)/$Y$m$d.dat</li>
-            <li>grayPeaks didn't draw in StackedHistogram mode, because the lightGray.brighter() would result in white.</li>
-            <li>undo operation was performed on event thread, which could easily lock the application</li>
-            <li>CDAWeb result was missing CACHE_TAG, so result would be reloaded when it wasn't needed.</li>
-            <li>CDAWeb uses web service to more accurately identify needed files.</li>
-            <li>1509: do sanity check to make sure new dialogs are not positioned outside of screen bounds.</li>
-            <li>export to rich ascii will allocate name when dataset doesn't have name property.</li>
-            <li>Screenshots tool would clip the pointer when it was partially outside of the GUI boundaries.</li>
-            <li>1437: export to rich ascii must preserve as much metadata as possible</li>
-            <li>check for missing/problem with Rich PNG JSON, Where Dan's pngwalk contained bad metadata that showed in a demo at AGU.</li>
-            <li>dashup tool gets quick-n-dirty rename variable code</li>
-            <li>screenshots tool would clip the pointer when it was on the edge of window</li>
-            <li>time unit t2000 works in das2stream again.</li>
-            <li>clean up DataPointRecorder's use of threads, to avoid RTE.</li>
-            <li>1500: two autoplot script editors, pointing at same file, detect changes incorrectly</li>
-            <li>1498: pngwalk digitizer jumps ahead when delta=15 should have been used </li>
-            <li>add typographicPoints unit, and correct meters to inches conversion, which was using inverse.</li>            
-            <li>bugfix: offline status wasn't respected in one code, causing hang.</li>
-            <li>Netbeans is able to compile dasCore again, the project metadata was messed up.</li>
-            <li>set the bounds properly when fontSize is used to enlarge font.  Thanks Rich!</li>
-            <li>add code to ensure that ephemeris data is monotonic and non-repeating.</li>
-            <li>1495: detect when maximized state should be used when restoring .vap files</li>
-            <li>minor improvements to status bar messages</li>
-            <li>466: copy-n-paste plots.  Feature now does error checking</li>
-            <li>Updates to Rich ASCII parser to support Firebird files.</li>
-            <li>"getParam (" wasn't parsed properly when generating GUI.  Thanks Rich!</li>
-            <li>Aggregation listings constrained to timerange, when timerange is in the URI.</li>
-            <li>das2stream supports yFormat property</li>
-            <li>annotations now visible in pngwalks and with the server.</li>
-            <li>qds formatter also handles BIN_MINUS and BIN_PLUS</li>
-            <li>corrections to autorange hints</li>
-            <li>annotation bounds were not set properly for pngwalks and with the servlet.</li>
-            <li>formatDataSet to CDF on Windows with Webstart failed because of move, so we fall back to copy.</li>
-            <li>rte 1586184923: user exceptions were confusing because RTE dialog showed</li>
-            <li>try/finally block used with web communication to get mime type.</li>
-            <li>1486: minor corrections to layout tab to improve usability</li>
-            <li>corrections to Dashup tool caused by minus sign vs negation in Jython AST.</li>
-            <li>"and" and "or" must be implemented as inline operators in Dashup tool</li>
-            <li>introduce rank0 transform methods to support Jython rank 1 iterator returns rank 0 datasets instead of doubles, breaking Juno/Waves planning script.</li>
-            <li>rfe 457: add hidden plot would intercept mouse events, making the connected plots difficult to work with.</li>
-            <li>rfe 464: update the initial colors.txt template so that it is not confusing.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>Jython plot command gets control for spectrogram color table.  Thanks Babtiste and Kristoff!</li>
+            <li>add control to set the maximum thread count, useful for Ivar's strange .jyds bug</li>
             <li>add plots dialog allows up to 6 by 6 plots now, useful for things like hourly plots of a day (6x4=24).</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>About low memory link on the About Autoplot page, when less than 700Mb of memory is detected.</li>
             <li>381: pdb should be supported in jython editor.  Loosen requirements for matching lines.</li>
             <li>APDataSet adapter for IDL and Matlab allows a filter process to be applied.</li>
@@ -283,29 +241,6 @@
             <li>Data Mash up is now accessible from menus.  Improvements to mashup including thumbnails.</li>
             <li>Autoplot servlet experiment with checking for exceptions in the plot and putting them in the response headers.</li>
             <li>472: allow $x to be used in aggregation without time fields.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>About screen includes a bullet explicitly identifying 32bit Java and provides a link to fix this.</li>
-            <li>html version of pngwalk uses precalculated thumbnails.</li>
-            <li>470: DasProgressPanel shows the thread name to improve serviceability</li>
-            <li>CDAWeb now shows availability.</li>
-            <li>StackedHistogram gets style panel</li>
-            <li>StackedHistogramRenderer name fixes</li>
-            <li>CDF editor dialog indicates internal type to improve transparency and support creating new files.</li>
-            <li>468: unplot can use iso8601 times.</li>
-            <li>Canvas size GUI supports "7 inch" or "30 centimeters" for dimensions, not just pixels.</li>
-            <li>add LSpec rebin that uses bundle of buckshot (T,L,Z) for the input.</li>
-            <li>467: add accessory to allow override timerange when loading vap files.</li>
-            <li>das2server items can now be a comma-delimited list of indeces.</li>
-            <li>Single filesystems can be reset now, double-clicking in FileSystem manager will trigger reset.</li>
-            <li>format to QDS supports BIN_PLUS and BIN_MINUS properies</li>
-            <li>443: autorange hint log=T supported, corrections to initial implementation of center and includeZero</li>
-            <li>466: copy-n-paste plots.</li>
-            <li>script editor allows entry into data source editors with right-click&rarr;actions&rarr;"inspect URI"</li>
-            <li>ISO8601 parser now supports time zone offsets.</li>
-            <li>Clean-up and logging of OpenDap code so more predicatable failures can be studied.</li>
-            <li>nc4 extension is recognized as NetCDF.</li>
         </ul>
 
         <p>Known issues:</p>
