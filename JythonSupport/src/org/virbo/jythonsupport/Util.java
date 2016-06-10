@@ -188,7 +188,7 @@ public class Util {
         if ( tsb!=null ) {
             tsb.setTimeRange( timeRange );
         } else {
-            logger.info("Warning: TimeSeriesBrowse capability not found, simply returning dataset.");
+            logger.fine("TimeSeriesBrowse capability not found, simply returning dataset.");
         }
         QDataSet rds= result.getDataSet(monitor);
 
