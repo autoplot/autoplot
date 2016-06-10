@@ -58,7 +58,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.BufferedWriter;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.regex.*;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * MakePngWalk code implemented in Java.  This was once a Python script, but it got complex enough that it was useful to
@@ -227,7 +236,7 @@ public class CreatePngWalk {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
 
-    private static BufferedImage myWriteToPng(String filename, ApplicationModel appmodel, Application ldom, int width, int height) throws InterruptedException, FileNotFoundException, IOException {
+    private static BufferedImage myWriteToPng(String filename, Application ldom, int width, int height) throws InterruptedException, FileNotFoundException, IOException {
         OutputStream out=null;
         BufferedImage image=null;
         try {
@@ -498,7 +507,9 @@ public class CreatePngWalk {
                 currentTimeLabel= dr.toString();
                 timeLabels.add(currentTimeLabel);
                 
-                dom2.setTimeRange(dr);
+                if ( !dom2.getTimeRange().equals(dr) ) { // don't even call it for one png--I don't think it matters.
+                    dom2.setTimeRange(dr);
+                }
 
             } catch (ParseException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
@@ -526,7 +537,7 @@ public class CreatePngWalk {
             BufferedImage image = null;
             
             if ( params.outputFormat.equals("png") ) {
-                image= myWriteToPng( filename, appmodel, dom2, w0, h0);
+                image= myWriteToPng(filename, dom2, w0, h0);
                 
                 
                 
@@ -874,6 +885,42 @@ public class CreatePngWalk {
             // Note, no files found does not yeild non-zero exit code!
         }
         
+        if ( System.getProperty( "noCheckCertificate","true").equals("true") ) {
+            logger.fine("disabling HTTP certificate checks.");
+            try {
+                TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+                        
+                        public void checkClientTrusted(X509Certificate[] certs, String authType) {  }
+                        
+                        public void checkServerTrusted(X509Certificate[] certs, String authType) {  }
+                        
+                    }
+                };
+                
+                SSLContext sc = SSLContext.getInstance("SSL");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+                
+                // Create all-trusting host name verifier
+                HostnameVerifier allHostsValid = new HostnameVerifier() {
+                    public boolean verify(String hostname, SSLSession session) {
+                        return true;
+                    }
+                };
+                
+                HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+                
+            } catch (NoSuchAlgorithmException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            } catch ( KeyManagementException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+
         Params params= new Params();
         params.createThumbs= alm.getValue("createThumbs").equals("y");
         params.outputFolder= alm.getValue("outputFolder");
