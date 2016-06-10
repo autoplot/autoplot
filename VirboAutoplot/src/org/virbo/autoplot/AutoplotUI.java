@@ -340,8 +340,8 @@ public final class AutoplotUI extends javax.swing.JFrame {
             }
         }
         
-        if ( System.getProperty( "noCheckCertificate","false").equals("true") ) {
-            logger.info("disabling certificate checks.");
+        if ( System.getProperty( "noCheckCertificate","true").equals("true") ) {
+            logger.fine("disabling HTTP certificate checks.");
             try {
                 TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
