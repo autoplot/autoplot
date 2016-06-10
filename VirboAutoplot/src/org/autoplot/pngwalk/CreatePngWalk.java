@@ -858,7 +858,7 @@ public class CreatePngWalk {
      */
     public static void main( String[] args ) throws InterruptedException, ParseException, IOException {
         
-        System.err.println("CreatePngWalk 20141111");
+        System.err.println("CreatePngWalk 20160610");
         final ArgumentList alm = new ArgumentList("CreatePngWalk");
         alm.addOptionalSwitchArgument( "timeFormat", "f", "timeFormat", "$Y$m$d", "timeformat for png files, e.g. $Y is year, $j is day of year");
         alm.addOptionalSwitchArgument( "timeRange", "r", "timeRange", "", "time range to cover, e.g. 2011 through 2012" );
@@ -943,10 +943,10 @@ public class CreatePngWalk {
         } else {
             vap= URISplit.makeAbsolute(new File(".").getAbsolutePath(),vap);
         }
-        ScriptContext.plot(vap);
 
-        int status= doIt( ScriptContext.getDocumentModel(), params );
+        Application dom= (Application) StatePersistence.restoreState(new File(vap));
         
+        int status= doIt( dom, params );
         
         System.exit(status); // something starts up thread that prevents java from exiting.
     }
