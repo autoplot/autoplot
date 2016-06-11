@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Energy pitch angle distribution of ECT/HOPE data.
+        <p><small>Student Ben uses Autoplot to learn Python.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,7 +26,9 @@
         
         <p>Bugfixes (2016-06-09 r19044):</p>
         <ul>
-            <li>bugfix 1268: avoid download on the event thread in addPlot dialog</li>
+            <li>warning about using a timerange with a non-TSB getDataSet call removed.  It wasn't effective.</li>
+            <li>0899: avoid extraneous load of data when createPngWalk is used to create single pngs.</li>
+            <li>1268: avoid download on the event thread in addPlot dialog</li>
             <li>bugfix: simplifyScriptToGetParams didn't consider comments, creating a confusing situation where it wasn't clear why it was failing to parse.</li>
             <li>1603: check for ordinal units in closestIndex function.</li>
             <li>putProperty( ds, QDataSet.SCALE_MIN, rank0qds ) supported.</li>
