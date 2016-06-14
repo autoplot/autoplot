@@ -11,7 +11,7 @@
 resourceURI= getParam( 'resourceURI', 'ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/1986', 'example file to load' )
 
 # getAp=1 read Ap, otherwise read Kp.
-getAp= getParam( 'getAp', 0, '0= read Kp data, 1= read Ap data' )
+getAp= getParam( 'getAp', 'Ap', 'read Kp or Ap data', [ 'Kp','Ap' ] )
 
 # Download the file to make it local.  Monitor is a progress monitor for the download.
 file= getFile( resourceURI, monitor ).toString()
@@ -25,16 +25,14 @@ timeparser= TimeParser.create( '$Y$m$d' )
 timetags= DataSetBuilder( 1, 100 )   # create builders for the data and timetags, allocate 100 records initially.
 kpap= DataSetBuilder( 1, 100 )
 
-if ( getAp ):
+if ( getAp=='Ap' ):
    offs= 31
    spac= 3
-   kpap.putProperty( QDataSet.NAME, 'Ap' )
-   kpap.putProperty( QDataSet.TITLE, 'Ap' )
 else:
    offs= 12
    spac= 2
-   kpap.putProperty( QDataSet.NAME, 'Kp' )
-   kpap.putProperty( QDataSet.TITLE, 'Kp' )
+kpap.putProperty( QDataSet.NAME, getAp )
+kpap.putProperty( QDataSet.TITLE, getAp )
 
 for line in fp:
     stime= syear + line[2:6]     # form YYYYMMDD by adding the year to MMDD in the 2,3,4,and 5th characters
