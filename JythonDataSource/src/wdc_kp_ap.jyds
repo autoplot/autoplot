@@ -21,10 +21,7 @@ syear= file[-4:]
 
 fp= open( file, "r" )
 
-# Import the DataSetBuilder class which is used to build up the dataset.
-from org.virbo.dsutil import DataSetBuilder
-
-timeparser= TimeParser.create( '%Y%m%d' )
+timeparser= TimeParser.create( '$Y$m$d' )
 timetags= DataSetBuilder( 1, 100 )   # create builders for the data and timetags, allocate 100 records initially.
 kpap= DataSetBuilder( 1, 100 )
 
@@ -46,10 +43,8 @@ for line in fp:
        i= offs + j*spac
        d= int( line[i:i+spac] )
        t= base_t2000 + 3600 * ( 1.5 + j*3 )
-       timetags.putValue( -1, t )  # add the offset seconds for each of 8 measurements.
-       kpap.putValue( -1, d )
-       timetags.nextRecord()
-       kpap.nextRecord()
+       timetags.nextRecord( t )  # add the offset seconds for each of 8 measurements.
+       kpap.nextRecord( d )
 
 timetags.putProperty( QDataSet.UNITS, Units.t2000 )                # indicate the times are seconds since 2000-01-01T00:00.
 kpap.putProperty( QDataSet.DEPEND_0, timetags.getDataSet() )       # connect the timetags to the data.
