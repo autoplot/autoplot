@@ -7,15 +7,14 @@
 # vap+jyds:ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/1989?script=file:/home/jbf/temp/autoplot2010/JythonDataSource/src/wdc_kp_ap.jyds
 #          \--------------- resourceURI ---------------------------------/
 #
+
+resourceURI= getParam( 'resourceURI', 'ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/1986', 'example file to load' )
+
 # getAp=1 read Ap, otherwise read Kp.
 getAp= getParam( 'getAp', 0, '0= read Kp data, 1= read Ap data' )
 
-# If not specified, assume Jeremy is testing.
-if ( resourceURI==None ):
-   resourceURI= 'ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/1986' 
-
 # Download the file to make it local.  Monitor is a progress monitor for the download.
-file= getFile( java.net.URI( resourceURI ), monitor ).toString()
+file= getFile( resourceURI, monitor ).toString()
 
 # Get the year from the last four characters of the resource name.
 syear= file[-4:]
