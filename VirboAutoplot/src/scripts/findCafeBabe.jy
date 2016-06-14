@@ -20,13 +20,13 @@ print 'Index is at ', index
 print 'All indeces: ', r
 
 ds.putProperty( QDataSet.DEPEND_0, None )
-formatDataSet( ds[0:index], 'bin.file:///home/jbf/temp/installer.sh?type=ubyte' )
+formatDataSet( ds[0:index], 'vap+bin:file:///home/jbf/temp/installer.sh?type=ubyte' )
 
 print 'done writing shell script part' 
 
-ds= getDataSet('bin.file:///net/spot3/home/jbf/incoming/netbeans-6.5rc2-ml-linux.sh?byteOffset=%d' % index )
+ds= getDataSet('vap+bin:file:///net/spot3/home/jbf/incoming/netbeans-6.5rc2-ml-linux.sh?byteOffset=%d' % index )
 
 ds.putProperty( QDataSet.DEPEND_0, None )
-formatDataSet( ds, 'bin.file:///home/jbf/temp/installer.class?type=ubyte' )
+formatDataSet( ds, 'var+bin:file:///home/jbf/temp/installer.class?type=ubyte' )
 
 print 'done'
