@@ -14,12 +14,12 @@ resourceURI= getParam( 'resourceURI', 'ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_D
 getAp= getParam( 'getAp', 'Ap', 'read Kp or Ap data', [ 'Kp','Ap' ] )
 
 # Download the file to make it local.  Monitor is a progress monitor for the download.
-file= getFile( resourceURI, monitor ).toString()
+filename= getFile( resourceURI, monitor ).toString()
 
 # Get the year from the last four characters of the resource name.
-syear= file[-4:]
+syear= filename[-4:]
 
-fp= open( file, "r" )
+fp= open( filename, "r" )
 
 timeparser= TimeParser.create( '$Y$m$d' )
 timetags= DataSetBuilder( 1, 100 )   # create builders for the data and timetags, allocate 100 records initially.
