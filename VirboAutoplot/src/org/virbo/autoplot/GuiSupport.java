@@ -1288,7 +1288,8 @@ public class GuiSupport {
                                 }
                             }
                         };
-                        new Thread(run).start();
+                        //new Thread(run).start(); //
+                        run.run();
                     }
                     break;
                 case 1:
