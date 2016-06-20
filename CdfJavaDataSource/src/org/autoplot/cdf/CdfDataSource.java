@@ -843,18 +843,15 @@ public class CdfDataSource extends AbstractDataSource {
             // doFill must not be true for this branch.
         }
 
-        final boolean doFill= ! ( UnitsUtil.isTimeLocation(units) || UnitsUtil.isNominalMeasurement(units) );
-        if ( doFill ) {
-            Object f= thisAttributes.get("FILLVAL");
-            double dv= IstpMetadataModel.doubleValue( f, units, Double.NaN, IstpMetadataModel.VALUE_MIN );
-            if ( !Double.isNaN(dv) ) {
-                result.putProperty(QDataSet.FILL_VALUE, dv );
-            }
-            DatumRange vrange= IstpMetadataModel.getValidRange( thisAttributes, units );
-            if ( vrange!=null ) {
-                result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
-                result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
-            }
+        Object f= thisAttributes.get("FILLVAL");
+        double dv= IstpMetadataModel.doubleValue( f, units, Double.NaN, IstpMetadataModel.VALUE_MIN );
+        if ( !Double.isNaN(dv) ) {
+            result.putProperty(QDataSet.FILL_VALUE, dv );
+        }
+        DatumRange vrange= IstpMetadataModel.getValidRange( thisAttributes, units );
+        if ( vrange!=null ) {
+            result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+            result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
         }
 
         if ( slice && depend ) {
