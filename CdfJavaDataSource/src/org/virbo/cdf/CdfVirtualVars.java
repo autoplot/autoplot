@@ -101,27 +101,27 @@ public class CdfVirtualVars {
             //return args.get(0);
             ArrayDataSet real_data = ArrayDataSet.copy( args.get(0) );
             QDataSet region_data = args.get(1);
-            Double fill= (Double) metadata.get(QDataSet.FILL_VALUE);
+            Number fill= (Number) metadata.get(QDataSet.FILL_VALUE);
             if ( fill==null ) fill= Double.NaN;
             for ( int i=0; i<real_data.length(); i++ ) {
                 if ( region_data.value(i) != 1 ) { // 1=solar wind
-                    real_data.putValue(i,fill);
+                    real_data.putValue(i,fill.doubleValue());
                 }
             }
             return real_data;
         } else if ( function.equalsIgnoreCase("apply_esa_qflag") ) {
             ArrayDataSet esa_data= ArrayDataSet.copy(args.get(0));
             QDataSet quality_data= args.get(1);
-            Double fill= (Double) metadata.get(QDataSet.FILL_VALUE);
+            Number fill= (Number) metadata.get(QDataSet.FILL_VALUE);
             if ( fill==null ) fill= Double.NaN;
             int n= DataSetUtil.product(DataSetUtil.qubeDims(esa_data.slice(0)));
             for ( int i=0; i<quality_data.length(); i++ ) {
                 if ( quality_data.value(i) > 0 ) {
                     if ( esa_data.rank()==1 ) {
-                        esa_data.putValue(i,fill);
+                        esa_data.putValue(i,fill.doubleValue());
                     } else {
                         for ( int j=0; j<n; j++ ) {
-                            esa_data.putValue(i,j,fill); // CAUTION: this uses array aliasing of ArrayDataSet for rank>2
+                            esa_data.putValue(i,j,fill.doubleValue()); // CAUTION: this uses array aliasing of ArrayDataSet for rank>2
                         }
                     }
                 }
