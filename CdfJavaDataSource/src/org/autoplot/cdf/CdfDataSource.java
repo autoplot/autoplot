@@ -853,8 +853,14 @@ public class CdfDataSource extends AbstractDataSource {
             if ( vrange.width().value()<=0 ) {
                 logger.warning("ignoring VALID_MIN and VALID_MAX because they are equal or out of order.");
             } else {
-                result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
-                result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
+                DatumRange extent= DataSetUtil.asDatumRange( Ops.extentSimple( result,null ) );
+                if ( depend || extent.intersects(vrange) ) { // if this data depends on other independent data, or intersects the valid range.
+                    // typical route
+                    result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+                    result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );                    
+                } else {
+                    logger.warning("ignoring VALID_MIN and VALID_MAX because no timetags would be considered valid.");
+                }
             }
         }
 
