@@ -1492,19 +1492,11 @@ public final class PngWalkTool extends javax.swing.JPanel {
             digitizer.addDataPointSelectionListener(new DataPointSelectionListener() {
                 @Override
                 public void dataPointSelected(DataPointSelectionEvent e) {
-                    Datum x= e.getX();
-                    if ( UnitsUtil.isTimeLocation( x.getUnits() ) ) {
-                        DatumRange dr= new DatumRange( x,x );
-                        if ( seq.indexOfSubrange(dr)>-1 ) {
-                            seq.gotoSubrange( dr );
-                        }
-                    } else {
-                        String image= (e.getPlane("image").toString());
-                        if ( image!=null ) {
-                            int i= seq.findIndex(image);
-                            if ( i>-1 ) {
-                                seq.setIndex(i);
-                            }
+                    String image= (e.getPlane("image").toString());
+                    if ( image!=null ) {
+                        int i= seq.findIndex(image);
+                        if ( i>-1 ) {
+                            seq.setIndex(i);
                         }
                     }
                 }
