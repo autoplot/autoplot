@@ -1003,7 +1003,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             view.getMouseTarget().addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if ( e.getClickCount()==2 ) {
+                    if ( e.getClickCount()==2 && digitizer==null ) {
                         int oldIndex= tabs.getSelectedIndex();
                         if ( oldIndex==0 ) {
                             tabs.setSelectedIndex( returnTabIndex );
