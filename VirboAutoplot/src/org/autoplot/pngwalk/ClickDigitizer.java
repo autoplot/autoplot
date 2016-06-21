@@ -9,7 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -23,6 +25,7 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.ImageUtil;
 import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.json.JSONArray;
@@ -30,6 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.dsops.Ops;
@@ -191,6 +195,9 @@ public class ClickDigitizer {
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
         File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
         String json= ImageUtil.getJSONMetadata( file );
+        Map meta= new HashMap();
+        meta.put( "image", view.seq.getSelectedName() );
+        
         if ( json!=null ) {
             try {
                 JSONObject jo = new JSONObject( json );
@@ -206,7 +213,8 @@ public class ClickDigitizer {
                         view.seq.setStatus(  "Plot Coordinates: " + xx + ", "+ yy );
                         if ( release==false && viewer.digitizer!=null ) {
                             try {
-                                viewer.digitizer.addDataPoint( DataSetUtil.asDatum(xx), DataSetUtil.asDatum(yy) );
+                                viewer.digitizer.addDataPoint( DataSetUtil.asDatum(xx), DataSetUtil.asDatum(yy), meta );
+                                //viewer.digitizer.addDataPoint( DataSetUtil.asDatum(xx), DataSetUtil.asDatum(yy) );
                             } catch ( RuntimeException ex ) { // units conversion
                                 String msg= DataSourceUtil.getMessage(ex);
                                 JOptionPane.showMessageDialog( viewer, msg );
@@ -239,7 +247,8 @@ public class ClickDigitizer {
                 view.seq.setStatus( "Pixel Coordinates: " + xx + ", "+ yy );                
                 if ( viewer.digitizer!=null ) {
                     try {
-                        viewer.digitizer.addDataPoint( xx, yy );
+                        viewer.digitizer.addDataPoint( xx, yy, meta );
+                        //viewer.digitizer.addDataPoint( xx, yy );
                     } catch ( RuntimeException ex ) { // units conversion
                         JOptionPane.showMessageDialog( viewer,ex.getMessage());
                     }
@@ -305,7 +314,7 @@ public class ClickDigitizer {
         if ( ds.length()==0 ) return null;
         QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
         if ( ds.rank()>1 ) {
-            ds= ds.slice(0);
+            ds= Ops.slice1(ds,0);
         }
         if (dep0.rank()>1 ){
             dep0= dep0.slice(0);
