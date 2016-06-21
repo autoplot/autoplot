@@ -462,7 +462,12 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                     l= l+" ("+getTimeUnitLabel()+")";
                 }
             }
-            if ( !"none".equals(head) ) out.print(" " + l + ", ");
+            if ( !"none".equals(head) ) {
+                if ( "rich".equals(head) ) {
+                    out.print( "# " ); 
+                }
+                out.print( l + ", ");
+            }
         }
 
         int i;
@@ -513,6 +518,9 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 nelements*= bundleDesc.value(i,k);
             }
             if ( !"none".equals(head) ) {
+                if ( dep0==null && "rich".equals(head) ) {
+                    out.print( "# " );
+                }
                 for ( int k=0; k<nelements; k++ ) {
                     out.print( l1  );
                     if ( i==bundleDesc.length()-1 && k==nelements-1 ) {
@@ -772,7 +780,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             }
         }
 
-        if ( !"none".equals(head) ) out.println( buf.substring(2) );
+        if ( !"none".equals(head) ) {
+            if ( "rich".equals(head) ) {
+                out.println( "# " + buf.substring(2) );
+            } else {
+                out.println( buf.substring(2) );
+            }
+        }
         
         mon.setTaskSize(data.length());
         mon.started();
