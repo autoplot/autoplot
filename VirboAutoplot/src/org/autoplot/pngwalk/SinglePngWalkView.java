@@ -94,25 +94,6 @@ public class SinglePngWalkView extends PngWalkView {
             
             @Override
             public void mouseClicked(MouseEvent e) { 
-                Rectangle lrect= imageLocation;
-                if ( imageLocation==null ) return;
-                BufferedImage i = seq.currentImage().getImage();
-                if ( i==null ) return;
-                double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
-                
-                int imageX= (int)( ( e.getX() - lrect.x ) / factor );
-                int imageY= (int)( ( e.getY() - lrect.y ) / factor );
-                
-                try {
-                    if ( clickDigitizerSelect==-1 ) {
-                        clickDigitizer.doLookupMetadata( imageX, imageY, false );
-                    }
-                } catch ( IOException ex ) {
-                    logger.log(Level.SEVERE, null, ex);
-                } catch (ParseException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                }
-                
             }
 
             @Override
