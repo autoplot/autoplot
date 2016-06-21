@@ -56,6 +56,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -103,6 +104,7 @@ import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.autoplot.bookmarks.Util;
 import org.virbo.autoplot.transferrable.ImageSelection;
+import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.FileSystemUtil;
@@ -955,7 +957,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
         views[4]= new CoversWalkView( null );
         views[5]= new SinglePngWalkView( null );
         views[6]= new ContextFlowView(null);
-
+        
+        ((SinglePngWalkView)views[2]).clickDigitizer.setViewer(this);
+        
         final int SCROLLBAR_HEIGHT = (int) Math.round( new JScrollPane().getHorizontalScrollBar().getPreferredSize().getHeight() );
 
         final JSplitPane filmStripSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[1], views[2] );
@@ -1365,6 +1369,35 @@ public final class PngWalkTool extends javax.swing.JPanel {
         if ( setting0 ) firePropertyChange(PROP_TIMERANGE, old, timeRange );
         setting= false;
     }
+    
+    private QDataSet mousePressLocation = null;
+
+    public static final String PROP_MOUSEPRESSLOCATION = "mousePressLocation";
+
+    public QDataSet getMousePressLocation() {
+        return mousePressLocation;
+    }
+
+    public void setMousePressLocation(QDataSet mousePressLocation) {
+        QDataSet oldMousePressLocation = this.mousePressLocation;
+        this.mousePressLocation = mousePressLocation;
+        firePropertyChange(PROP_MOUSEPRESSLOCATION, oldMousePressLocation, mousePressLocation);
+    }
+
+    private QDataSet mouseReleaseLocation = null;
+
+    public static final String PROP_MOUSERELEASELOCATION = "mouseReleaseLocation";
+
+    public QDataSet getMouseReleaseLocation() {
+        return mouseReleaseLocation;
+    }
+
+    public void setMouseReleaseLocation(QDataSet mouseReleaseLocation) {
+        QDataSet oldMouseReleaseLocation = this.mouseReleaseLocation;
+        this.mouseReleaseLocation = mouseReleaseLocation;
+        firePropertyChange(PROP_MOUSERELEASELOCATION, oldMouseReleaseLocation, mouseReleaseLocation);
+    }
+
 
     transient PropertyChangeListener seqTimeRangeListener= new PropertyChangeListener() {
         @Override
@@ -1446,7 +1479,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
     private void startDigitizer() {
         if ( digitizer==null ) {
             digitizer= new DataPointRecorder();
-            digitizer.addDataSetUpdateListener( new DataSetUpdateListener() {
+            digitizer.addDataSetUpdateListener(new DataSetUpdateListener() {
                 @Override
                 public void dataSetUpdated(DataSetUpdateEvent e) {
                     for (PngWalkView v : views) {
@@ -1456,7 +1489,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                     }
                 }
             });
-            digitizer.addDataPointSelectionListener( new DataPointSelectionListener() {
+            digitizer.addDataPointSelectionListener(new DataPointSelectionListener() {
                 @Override
                 public void dataPointSelected(DataPointSelectionEvent e) {
                     Datum x= e.getX();
@@ -1478,7 +1511,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
             JComboBox annoType= new JComboBox( new String[] { "| vertical line", "+ cross hairs", ". dots" } );
             digitizer.addAccessory( annoType );
             
-            annoType.addItemListener( new ItemListener() {
+            annoType.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
                     annoTypeChar= e.getItem().toString().charAt(0);
@@ -1525,6 +1558,35 @@ public final class PngWalkTool extends javax.swing.JPanel {
         JButton b= new JButton( abstractAction );
         this.actionButtons.add( b );
         actionButtonsPanel.add( b );
+        this.revalidate();
+    }
+    
+    /**
+     * add a component that will get property change events and should respond
+     * to property changes.  This gives Ivar a way he can connect actions to
+     * the PNGWalk tool.
+     * @param c null or a smallish JComponent that should be about the size of a button.
+     * @param p null or the listener for the selected file and timerange.
+     */
+    public void addActionComponent( JComponent c, PropertyChangeListener p ) {
+        if ( c!=null ) actionButtonsPanel.add(c);
+        if ( p!=null ) {
+            this.addPropertyChangeListener( PROP_SELECTED_NAME, p );
+            this.addPropertyChangeListener( PROP_TIMERANGE, p );
+            this.addPropertyChangeListener( PROP_MOUSEPRESSLOCATION, p );
+            this.addPropertyChangeListener( PROP_MOUSERELEASELOCATION, p );
+        }
+        this.revalidate();
+    }
+    
+    public void removeActionComponent( JComponent c, PropertyChangeListener p ) {
+        if ( c!=null ) actionButtonsPanel.remove(c);
+        if ( p!=null ) {
+            this.removePropertyChangeListener( PROP_SELECTED_NAME, p );
+            this.removePropertyChangeListener( PROP_TIMERANGE, p );            
+            this.removePropertyChangeListener( PROP_MOUSEPRESSLOCATION, p );
+            this.removePropertyChangeListener( PROP_MOUSERELEASELOCATION, p );
+        }
         this.revalidate();
     }
     
@@ -1747,12 +1809,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1078, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 228, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 463, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
@@ -1766,8 +1828,8 @@ public final class PngWalkTool extends javax.swing.JPanel {
                                 .add(editRangeButton)
                                 .add(18, 18, 18)
                                 .add(showMissingCheckBox))
-                            .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1054, Short.MAX_VALUE)))
-                    .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1066, Short.MAX_VALUE))
+                            .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -1907,6 +1969,16 @@ public final class PngWalkTool extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_showMissingCheckBoxActionPerformed
 
+    /**
+     * we need to make this public.
+     * @param propertyName
+     * @param oldValue
+     * @param newValue 
+     */
+    @Override
+    public void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        super.firePropertyChange(propertyName, oldValue, newValue); //To change body of generated methods, choose Tools | Templates.
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

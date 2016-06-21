@@ -16,12 +16,12 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="pngsPanel" alignment="1" pref="1078" max="32767" attributes="0"/>
+          <Component id="pngsPanel" alignment="1" max="32767" attributes="0"/>
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="jPanel1" min="-2" max="-2" attributes="1"/>
-                      <EmptySpace pref="228" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="actionButtonsPanel" min="-2" pref="463" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
@@ -37,10 +37,10 @@
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="showMissingCheckBox" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="dataSetSelector1" alignment="0" pref="1054" max="32767" attributes="0"/>
+                          <Component id="dataSetSelector1" alignment="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
-                  <Component id="statusLabel" alignment="0" pref="1066" max="32767" attributes="1"/>
+                  <Component id="statusLabel" alignment="0" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
