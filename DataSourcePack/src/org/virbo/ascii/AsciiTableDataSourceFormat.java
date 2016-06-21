@@ -173,11 +173,28 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
      */
     private boolean jsonProp( JSONObject jo1, QDataSet ds, String prop, int i ) throws JSONException {
         Object o;
+        Units u;
         if ( i>-1 ) {
             o= ds.property(prop,i);
+            u= (Units)ds.property(QDataSet.UNITS,i);
+            if ( u==null ) u= Units.dimensionless;
         } else {
             o= ds.property(prop);
+            u= (Units)ds.property(QDataSet.UNITS);
+            if ( u==null ) u= Units.dimensionless;
         }
+        
+        boolean isTime= UnitsUtil.isTimeLocation( u );
+        if ( isTime ) { // since we are formatting to UTC and not reporting the Units, we can't use these values.
+            if ( prop.equals("VALID_MIN") 
+               || prop.equals("VALID_MAX") 
+                    || prop.equals("TYPICAL_MIN") 
+                    || prop.equals("TYPICAL_MAX") 
+                    || prop.equals("FILL_VALUE") ) {
+                return false;
+            }
+        }
+        
         if ( prop.equals(QDataSet.START_INDEX) ) {
             prop= "START_COLUMN";
         }
@@ -379,6 +396,12 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         }
     }
     
+    private String getDelim( ) {
+        String head= getParam( "header", "" ); // could be "rich"
+        String delim = "rich".equals(head) ? " " : ", ";
+        return delim;
+    }
+    
     /**
      * format the rank 2 bundle of data.
      * @param out
@@ -406,6 +429,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
         DatumFormatter tf= getTimeFormatter( );
         
+        String delim= getDelim();
         
         String df= getParam( "format", "" );
 
@@ -459,14 +483,14 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 }
             } else {
                 if ( Units.t2000.isConvertibleTo( SemanticOps.getUnits(dep0) ) ) {
-                    l= l+" ("+getTimeUnitLabel()+")";
+                    l= l+"("+getTimeUnitLabel()+")";
                 }
             }
             if ( !"none".equals(head) ) {
                 if ( "rich".equals(head) ) {
                     out.print( "# " ); 
                 }
-                out.print( l + ", ");
+                out.print( l + delim );
             }
         }
 
@@ -526,7 +550,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                     if ( i==bundleDesc.length()-1 && k==nelements-1 ) {
                         out.print( "\n" );
                     } else {
-                        out.print( ", " );
+                        out.print( delim );
                     }
                 }
             }
@@ -555,12 +579,12 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             if ( mon.isCancelled() ) break;
             if (dep0 != null) {
                 assert u0!=null;
-                out.print("" + cf0.format( u0.createDatum(dep0.value(i)) ) + ", ");
+                out.print("" + cf0.format( u0.createDatum(dep0.value(i)) ) + delim );
             }
 
             int j;
             for ( j = 0; j < data.length(i) - 1; j++) {
-                out.print( formats[j].format( uu[j].createDatum(data.value(i,j)), uu[j] ) + ", ");
+                out.print( formats[j].format( uu[j].createDatum(data.value(i,j)), uu[j] ) + delim );
             }
             out.println( formats[j].format( uu[j].createDatum(data.value(i,j)), uu[j] )  );
         }
@@ -571,6 +595,8 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
     private void formatRank2(PrintWriter out, QDataSet data, ProgressMonitor mon) {
         QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
+        
+        String delim= getDelim();
         
         boolean okay= DataSetUtil.checkQube(data); // some RBSP/ECT data has rank 2 DEPEND_1 when it is really a qube.
         
@@ -620,7 +646,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                         l= "dep0";
                     }
                 }
-                out.print( l + ", ");
+                out.print( l + delim );
             }
             Units dep1units = (Units) dep1.property(QDataSet.UNITS);
             if (dep1units == null) dep1units = Units.dimensionless;
@@ -631,9 +657,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             
             int i;
             for (  i = 0; i < dep1.length()-1; i++) {
-                out.print(dep1units == null ? "" + dep1.value(i) : dep1units.createDatum(dep1.value(i)) + ", " );
+                Datum d= dep1units.createDatum(dep1.value(i));
+                String s= d.toString().replaceAll("\\s+","");
+                out.print(dep1units == null ? "" + dep1.value(i) : s + delim );
             }
-            out.println(dep1units == null ? "" + dep1.value(i) : dep1units.createDatum(dep1.value(i)) );
+            Datum d= dep1units.createDatum(dep1.value(i));
+            String s= d.toString().replaceAll("\\s+","");
+            out.println(dep1units == null ? "" + dep1.value(i) : s );
         }
 
         Units u0 = null;
@@ -661,12 +691,12 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 assert dep0!=null;
                 assert cf0!=null;
                 assert u0!=null;
-                out.print("" + cf0.format( u0.createDatum(dep0.value(i)),u0 ) + ", ");
+                out.print("" + cf0.format( u0.createDatum(dep0.value(i)),u0 ) + delim );
             }
 
             int j;
             for ( j = 0; j < data.length(i) - 1; j++) {
-                out.print( cf1.format( u.createDatum(data.value(i,j)), u ) + ", ");
+                out.print( cf1.format( u.createDatum(data.value(i,j)), u ) + delim );
             }
             out.println( cf1.format( u.createDatum(data.value(i,j)), u )  );
         }
@@ -713,8 +743,10 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         Units u0=null;
         Units u;
 
-        List<QDataSet> planes= new ArrayList<QDataSet>();
-        List<Units> planeUnits= new ArrayList<Units>();
+        String delim= getDelim();
+        
+        List<QDataSet> planes= new ArrayList<>();
+        List<Units> planeUnits= new ArrayList<>();
 //        List<DatumFormatter> planeFormats= new ArrayList<DatumFormatter>();
 
         String head= getParam( "header", "" ); // could be "rich"
@@ -752,13 +784,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         String l;
         if (dep0 != null) {
             l = dataSetLabel( dep0, "dep0" );
-            buf.append(", ").append( l);
+            buf.append( delim ).append( l);
             u0= (Units) dep0.property(QDataSet.UNITS);
             if ( u0==null ) u0= Units.dimensionless;
         }
 
         l = dataSetLabel( data, "data" );
-        buf.append(", ").append( l);
+        buf.append( delim ).append( l);
         u= (Units) data.property(QDataSet.UNITS);
         if ( u==null ) u= Units.dimensionless;
 
@@ -774,7 +806,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 planeUnits.add((Units)plane.property(QDataSet.UNITS));
                 if ( planeUnits.get(i)==null ) planeUnits.add(i, Units.dimensionless );
                 l= dataSetLabel( plane, "data"+i );
-                buf.append(", ").append( l);
+                buf.append( delim ).append( l);
             } else {
                 break;
             }
@@ -782,9 +814,9 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
         if ( !"none".equals(head) ) {
             if ( "rich".equals(head) ) {
-                out.println( "# " + buf.substring(2) );
+                out.println( "# " + buf.substring(1) );
             } else {
-                out.println( buf.substring(2) );
+                out.println( buf.substring(1) );
             }
         }
         
@@ -823,13 +855,13 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             if (dep0 != null) {
                 assert cf0!=null;
                 assert u0!=null;
-                out.print("" + cf0.format( u0.createDatum(dep0.value(i)),dep0units ) + ", ");
+                out.print("" + cf0.format( u0.createDatum(dep0.value(i)),dep0units ) + delim );
             }
 
             out.print( cf1.format(u.createDatum(data.value(i)), u) );
 
             for ( int j=0; j<planes.size(); j++) {
-                out.print( ", " + cf1.format( planeUnits.get(j).createDatum(planes.get(j).value(i)), planeUnits.get(j) ) );
+                out.print( delim + cf1.format( planeUnits.get(j).createDatum(planes.get(j).value(i)), planeUnits.get(j) ) );
             }
             out.println();
         }
