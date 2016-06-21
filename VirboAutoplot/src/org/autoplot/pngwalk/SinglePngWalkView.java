@@ -50,6 +50,23 @@ public class SinglePngWalkView extends PngWalkView {
                 } catch (ParseException ex) {
                     Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                if ( clickDigitizerSelect==-1 ) {
+                    Rectangle lrect= imageLocation;
+                    if ( imageLocation==null ) return;
+                    BufferedImage i = seq.currentImage().getImage();
+                    if ( i==null ) return;
+                    double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
+                    int imageX= (int)( ( e.getX() - lrect.x ) / factor );
+                    int imageY= (int)( ( e.getY() - lrect.y ) / factor );                    
+                    try {
+                        clickDigitizer.doLookupMetadata( imageX, imageY, false );
+                    } catch (IOException ex) {
+                        Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                
             }
 
             public void mouseReleased(MouseEvent e) {
@@ -57,7 +74,22 @@ public class SinglePngWalkView extends PngWalkView {
                 if ( e.isPopupTrigger() ) {
                     getPopup().show(e.getComponent(),e.getX(), e.getY());
                 }
-                
+                if ( clickDigitizerSelect==-1 ) {
+                    Rectangle lrect= imageLocation;
+                    if ( imageLocation==null ) return;
+                    BufferedImage i = seq.currentImage().getImage();
+                    if ( i==null ) return;
+                    double factor = (double) lrect.getWidth() / (double) i.getWidth(null);
+                    int imageX= (int)( ( e.getX() - lrect.x ) / factor );
+                    int imageY= (int)( ( e.getY() - lrect.y ) / factor );                    
+                    try {
+                        clickDigitizer.doLookupMetadata( imageX, imageY, true );
+                    } catch (IOException ex) {
+                        Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(SinglePngWalkView.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             }
             
             @Override
@@ -73,7 +105,7 @@ public class SinglePngWalkView extends PngWalkView {
                 
                 try {
                     if ( clickDigitizerSelect==-1 ) {
-                        clickDigitizer.doLookupMetadata( imageX, imageY );
+                        clickDigitizer.doLookupMetadata( imageX, imageY, false );
                     }
                 } catch ( IOException ex ) {
                     logger.log(Level.SEVERE, null, ex);
@@ -85,7 +117,7 @@ public class SinglePngWalkView extends PngWalkView {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                System.err.println(e);
+                
             }
             
             

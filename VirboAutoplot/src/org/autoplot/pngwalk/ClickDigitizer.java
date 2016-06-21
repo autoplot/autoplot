@@ -164,8 +164,6 @@ public class ClickDigitizer {
         
     }
     
-    
-    
     /**
      * look up the richPng metadata within the png images.  If the metadata is not
      * available, then the x and y coordinates, with 0,0 in the lower-left corner, are used.
@@ -176,6 +174,20 @@ public class ClickDigitizer {
      * @throws IOException when the file cannot be read.
      */
     protected void doLookupMetadata( int x, int y ) throws IOException, ParseException {
+        doLookupMetadata( x, y, false );
+    }
+    
+    /**
+     * look up the richPng metadata within the png images.  If the metadata is not
+     * available, then the x and y coordinates, with 0,0 in the lower-left corner, are used.
+     * Note the output has y=0 at the bottom to be consistent with the ImageDataSource.
+     * @param x x coordinate in image where 0 is the left side.
+     * @param y y coordinate in image where 0 is the top.  Note the output has y=0 at the bottom.
+     * @param release true if the mouse is released and a 
+     * @throws ParseException when the JSON cannot be parsed.
+     * @throws IOException when the file cannot be read.
+     */
+    protected void doLookupMetadata( int x, int y, boolean release ) throws IOException, ParseException {
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
         File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
         String json= ImageUtil.getJSONMetadata( file );
@@ -200,6 +212,13 @@ public class ClickDigitizer {
                                 JOptionPane.showMessageDialog( viewer, msg );
                             }
                         }
+                        QDataSet q= Ops.bundle( xx, yy );
+                        if ( release ) {
+                            viewer.firePropertyChange( PngWalkTool.PROP_MOUSERELEASELOCATION, null, q );
+                        } else {
+                            viewer.firePropertyChange( PngWalkTool.PROP_MOUSEPRESSLOCATION, null, q );
+                        }
+                        
                     } else {
                         view.seq.setStatus(  "Plot Coordinates: " + xx + ", "+ yy + "  (Options->Start Digitizer to record)");
                     }
@@ -346,19 +365,22 @@ public class ClickDigitizer {
 
         int isel;
         
-        if ( viewer.annoTypeChar=='.' ) {
-            isel= viewer.digitizer.select(xrange, yrange );
+        if ( viewer.digitizer!=null ) {
+            if ( viewer.annoTypeChar=='.' ) {
+                isel= viewer.digitizer.select(xrange, yrange );
             
-        } else if ( viewer.annoTypeChar=='+' ) {
-            isel= viewer.digitizer.select(xrange, yrange, true );
+            } else if ( viewer.annoTypeChar=='+' ) {
+                isel= viewer.digitizer.select(xrange, yrange, true );
 
-        } else { // if ( viewer.annoTypeChar=='|' ) {
-            isel= viewer.digitizer.select(xrange, null);
-        } 
+            } else { // if ( viewer.annoTypeChar=='|' ) {
+                isel= viewer.digitizer.select(xrange, null);
+            } 
+            return isel;
+            
+        } else {
+            return -1;
+        }
         
-        return isel;
-
+        
     }
-
-
 }
