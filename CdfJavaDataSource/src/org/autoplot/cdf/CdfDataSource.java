@@ -851,7 +851,7 @@ public class CdfDataSource extends AbstractDataSource {
         DatumRange vrange= IstpMetadataModel.getValidRange( thisAttributes, units );
         if ( vrange!=null ) {
             if ( vrange.width().value()<=0 ) {
-                logger.fine("ignoring VALID_MIN and VALID_MAX because they are equal or out of order.");
+                logger.warning("ignoring VALID_MIN and VALID_MAX because they are equal or out of order.");
             } else {
                 result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
                 result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );
