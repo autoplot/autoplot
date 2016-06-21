@@ -24,6 +24,7 @@ import static org.autoplot.pngwalk.PngWalkView.logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.ImageUtil;
@@ -31,6 +32,7 @@ import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
@@ -304,6 +306,7 @@ public class ClickDigitizer {
             
     /**
      * return rank 2 bundle dataset that is ds[n;i,j]
+     * or null if there are no points.
      */
     QDataSet doTransform() throws IOException {
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
@@ -312,10 +315,17 @@ public class ClickDigitizer {
         QDataSet ds = viewer.digitizer.getDataSet();
         if ( ds==null ) return null;
         if ( ds.length()==0 ) return null;
-        QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
         if ( ds.rank()>1 ) {
+            QDataSet images= Ops.slice1(ds,1);
+            EnumerationUnits eu= (EnumerationUnits)SemanticOps.getUnits(images);
+            QDataSet r= Ops.where( Ops.eq( images, eu.createDatum(view.seq.getSelectedName()) ) );
+            if ( r.length()==0 ) {
+                return null;
+            }
+            ds= DataSetOps.applyIndex( ds, 0, r, true );
             ds= Ops.slice1(ds,0);
         }
+        QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
         if (dep0.rank()>1 ){
             dep0= dep0.slice(0);
         }
