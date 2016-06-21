@@ -313,18 +313,14 @@ public final class PngWalkTool extends javax.swing.JPanel {
             tool.baseurl= "";
         }
 
-        String sdeft= "<?xml version=\"1.0\" encoding=\"UTF-8\"?><bookmark-list version=\"1.1\">    <bookmark-folder remoteUrl=\"http://virbo.org/meta/viewDataFile.jsp?docname=418DBD06-4CA9-4D8E-44EB-F548AE6DBB9C&amp;filetype=data\">" +
+        String sdeft= "<?xml version=\"1.0\" encoding=\"UTF-8\"?><bookmark-list version=\"1.1\">    " +
+        "<bookmark-folder remoteUrl=\"http://autoplot.org/git/pngwalks.xml\">" +
         "<title>Demos</title>" +
         "<bookmark-list>" +
         "    <bookmark>" +
-        "        <title>Northern Auroral Images</title>" +
-        "        <uri>pngwalk:http://www.swpc.noaa.gov/ftpdir/lists/hpi/plots/pmap_$Y_$m_$d_$H$M_N*.gif</uri>" +
-        "        <description>North Auroral Image from Space Weather Prediction Center</description>" +
-        "    </bookmark>" +
-        "    <bookmark>" +
-        "        <title>Southern Auroral Images</title>" +
-        "        <uri>pngwalk:http://www.swpc.noaa.gov/ftpdir/lists/hpi/plots/pmap_$Y_$m_$d_$H$M_S*.gif</uri>" +
-        "        <description>Southern Auroral Image from Space Weather Prediction Center</description>" +
+        "        <title>POLAR/VIS Images</title>" +
+        "        <uri>pngwalk:http://vis.physics.uiowa.edu/survey/1996/04-apr/03/images/VIS_$Y_$m_$d_$H_$M_$S_EC.PNG</uri>" +
+        "        <description>Images from the POLAR/VIS instrument</description>" +
         "    </bookmark>" +
         "    <bookmark>" +
         "        <title>RBSP Emfisis HFR-WFR Orbits</title>" +
@@ -332,7 +328,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         "    </bookmark>" +
         "    <bookmark>" +
         "        <title>RBSP-A MagEIS Combined Spectra</title>" +
-        "        <uri>pngwalk:http://www.rbsp-ect.lanl.gov/data_pub/rbspa/ect/level2/combined-elec/rbspa_ect_L2-elec_$Y$m$d_v.1.0.0.png</uri>" +
+        "        <uri>pngwalk:https://www.rbsp-ect.lanl.gov/data_pub/rbspa/ect/level2/combined-elec/rbspa_ect_L2-elec_$Y$m$d_v.1.0.0.png</uri>" +
         "    </bookmark>" +
         "</bookmark-list>" +
     "</bookmark-folder>" +
