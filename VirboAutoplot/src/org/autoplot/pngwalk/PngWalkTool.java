@@ -1498,6 +1498,14 @@ public final class PngWalkTool extends javax.swing.JPanel {
                         if ( seq.indexOfSubrange(dr)>-1 ) {
                             seq.gotoSubrange( dr );
                         }
+                    } else {
+                        String image= (e.getPlane("image").toString());
+                        if ( image!=null ) {
+                            int i= seq.findIndex(image);
+                            if ( i>-1 ) {
+                                seq.setIndex(i);
+                            }
+                        }
                     }
                 }
             });
