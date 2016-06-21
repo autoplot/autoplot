@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Student Ben uses Autoplot to learn Python.
+        <p><small>PNGWalk tool default bookmarks are updated and now maintained at GitHub.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,11 +24,15 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-06-09 r19044):</p>
-        <ul>
+        <p>Bugfixes (2016-06-21 r19068):</p>
+        <ul> 
+            <li>rte_1147829159: update the default pngwalk bookmarks, connect to github bookmarks file for easier maintenence.</li>
+            <li>1612: Mark's example showed where very negative Long for TT2000 was treated inconsistently and mucking up autoranging.</li>
+            <li>updates to example scripts in svn.</li>
+            <li>1268: back out until this can be fixed carefully.  (Bug is avoid download on the event thread in addPlot dialog)</li>
+            <li>Recent change to Add Plot dialog would result in incomplete URIs and other strange errors.</li>
             <li>warning about using a timerange with a non-TSB getDataSet call removed.  It wasn't effective.</li>
             <li>0899: avoid extraneous load of data when createPngWalk is used to create single pngs.</li>
-            <li>1268: avoid download on the event thread in addPlot dialog</li>
             <li>bugfix: simplifyScriptToGetParams didn't consider comments, creating a confusing situation where it wasn't clear why it was failing to parse.</li>
             <li>1603: check for ordinal units in closestIndex function.</li>
             <li>putProperty( ds, QDataSet.SCALE_MIN, rank0qds ) supported.</li>
