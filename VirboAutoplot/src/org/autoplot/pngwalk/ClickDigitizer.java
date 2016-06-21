@@ -183,7 +183,7 @@ public class ClickDigitizer {
      * Note the output has y=0 at the bottom to be consistent with the ImageDataSource.
      * @param x x coordinate in image where 0 is the left side.
      * @param y y coordinate in image where 0 is the top.  Note the output has y=0 at the bottom.
-     * @param release true if the mouse is released and a 
+     * @param release true if the mouse is released and PngWalkTool.PROP_MOUSERELEASELOCATION change should be fired.
      * @throws ParseException when the JSON cannot be parsed.
      * @throws IOException when the file cannot be read.
      */
@@ -204,7 +204,7 @@ public class ClickDigitizer {
                     
                     if ( viewer!=null ) {
                         view.seq.setStatus(  "Plot Coordinates: " + xx + ", "+ yy );
-                        if ( viewer.digitizer!=null ) {
+                        if ( release==false && viewer.digitizer!=null ) {
                             try {
                                 viewer.digitizer.addDataPoint( DataSetUtil.asDatum(xx), DataSetUtil.asDatum(yy) );
                             } catch ( RuntimeException ex ) { // units conversion
