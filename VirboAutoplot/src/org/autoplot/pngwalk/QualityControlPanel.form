@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
@@ -25,7 +25,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="commentSplitPane" alignment="0" pref="324" max="32767" attributes="0"/>
+          <Component id="commentSplitPane" alignment="0" max="32767" attributes="0"/>
           <Component id="jPanel3" alignment="0" max="32767" attributes="0"/>
           <Component id="jPanel1" alignment="1" max="32767" attributes="0"/>
       </Group>
@@ -62,14 +62,14 @@
                       <Component id="problemRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="ignoreRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="150" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
                       <Component id="okButton" min="-2" pref="69" max="-2" attributes="0"/>
                       <Component id="loginButton" alignment="1" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
-              <Component id="sequencePropertiesHost" alignment="0" pref="320" max="32767" attributes="0"/>
+              <Component id="sequencePropertiesHost" alignment="0" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -188,7 +188,7 @@
           <SubComponents>
             <Component class="javax.swing.JEditorPane" name="previousCommentEditorPane">
               <Properties>
-                <Property name="contentType" type="java.lang.String" value="text/html"/>
+                <Property name="contentType" type="java.lang.String" value="text/html" noResource="true"/>
                 <Property name="editable" type="boolean" value="false"/>
               </Properties>
               <AuxValues>
@@ -260,7 +260,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="statusLabel" pref="320" max="32767" attributes="0"/>
+              <Component id="statusLabel" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">

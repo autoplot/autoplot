@@ -468,21 +468,35 @@ public class QualityControlPanel extends javax.swing.JPanel {
         }
         
     }
-
-    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
-        String text=  newCommentTextArea.getText();
-        if ( ignoreRadioButton.isSelected() ) {
-            qcRecord.setStatus(QualityControlRecord.Status.IGNORE);
-        } else if ( problemRadioButton.isSelected() ) {
-            qcRecord.setStatus(QualityControlRecord.Status.PROBLEM);
-        } else if ( okRadioButton.isSelected() ) {
-            qcRecord.setStatus(QualityControlRecord.Status.OK);
-        }
+    
+    /**
+     * provide method for programmatically setting status.
+     * @param text text to accompany status.
+     * @param status the status.
+     */
+    protected void setStatus( String text, QualityControlRecord.Status status ) {
+        if ( text==null ) text="";
+        qcRecord.setStatus(status);
         qcRecord.setNewCommentText(System.getProperty("user.name"), text );
         qcRecord.save();
         // re-initialize record display with updated content
         walkImageSequence.getQualityControlSequence().refreshQCTotals();
         displayRecord(qcRecord);
+    }
+
+    private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
+        String text=  newCommentTextArea.getText();
+        QualityControlRecord.Status status;
+        if ( ignoreRadioButton.isSelected() ) {
+            status= QualityControlRecord.Status.IGNORE;
+        } else if ( problemRadioButton.isSelected() ) {
+            status= QualityControlRecord.Status.PROBLEM;
+        } else if ( okRadioButton.isSelected() ) {
+            status= QualityControlRecord.Status.OK;
+        } else {
+            status= QualityControlRecord.Status.PROBLEM;
+        }
+        setStatus( text, status );
     }//GEN-LAST:event_okButtonActionPerformed
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
