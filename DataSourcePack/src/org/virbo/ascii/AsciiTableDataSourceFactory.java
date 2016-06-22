@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.ProgressMonitor;
@@ -280,6 +281,15 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     CompletionContext.CONTEXT_PARAMETER_VALUE,
                     s,
                     label, null ) ) ;
+        }
+        
+
+        Map<String,String> richFields= parser.getRichFields();
+        for ( Entry<String,String> e: richFields.entrySet() ) {
+            result.add(new CompletionContext(
+                    CompletionContext.CONTEXT_PARAMETER_NAME,
+                    e.getValue(),
+                    e.getKey(), null ) );
         }
         
         if ( parser.getFieldCount()>2 && UnitsUtil.isTimeLocation(parser.getUnits(0)) && UnitsUtil.isTimeLocation(parser.getUnits(1) ) ) {
