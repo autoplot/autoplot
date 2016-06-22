@@ -1640,6 +1640,18 @@ public final class PngWalkTool extends javax.swing.JPanel {
     public static boolean isQualityControlEnabled() {
         return ENABLE_QUALITY_CONTROL;
     }
+    
+    /**
+     * provide a method for setting the QCStatus externally.
+     * @param text
+     * @param status 
+     */
+    public void setQCStatus( String text, QualityControlRecord.Status status ) {
+        if ( this.qcPanel==null ) {
+            throw new IllegalArgumentException("QC Panel must be started");
+        }
+        this.qcPanel.setStatus(text, status);
+    }
 
     /** This method is called from within the constructor to
      * initialize the form.
