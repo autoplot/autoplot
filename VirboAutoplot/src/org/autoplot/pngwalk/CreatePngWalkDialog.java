@@ -307,6 +307,11 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
 
         buttonGroup1.add(eventsFileRadioButton);
         eventsFileRadioButton.setText("Use events file that contains list of times:");
+        eventsFileRadioButton.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                eventsFileRadioButtonItemStateChanged(evt);
+            }
+        });
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, eventsFileRadioButton, org.jdesktop.beansbinding.ELProperty.create("${selected}"), eventsFileSelector, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
         bindingGroup.addBinding(binding);
@@ -505,6 +510,13 @@ public class CreatePngWalkDialog extends javax.swing.JPanel {
     private void batchUriNameCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_batchUriNameCBActionPerformed
         timeFormatCB.setEnabled( !batchUriNameCB.isSelected() );
     }//GEN-LAST:event_batchUriNameCBActionPerformed
+
+    private void eventsFileRadioButtonItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_eventsFileRadioButtonItemStateChanged
+        if ( !eventsFileRadioButton.isSelected() ) {
+            batchUriNameCB.setSelected(false);
+            timeFormatCB.setEnabled(true);
+        }
+    }//GEN-LAST:event_eventsFileRadioButtonItemStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox autorangeCB;

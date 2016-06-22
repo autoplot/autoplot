@@ -337,6 +337,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Use events file that contains list of times:"/>
       </Properties>
+      <Events>
+        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="eventsFileRadioButtonItemStateChanged"/>
+      </Events>
     </Component>
     <Component class="org.virbo.datasource.DataSetSelector" name="eventsFileSelector">
       <BindingProperties>
