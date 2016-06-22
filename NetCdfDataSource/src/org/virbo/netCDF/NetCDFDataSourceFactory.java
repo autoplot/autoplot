@@ -32,7 +32,9 @@ import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URISplit;
 import ucar.ma2.DataType;
+import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFile;
+import ucar.nc2.Structure;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.ncml.NcMLReader;
@@ -66,12 +68,40 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
             for ( int j=0; j<vars.size();j++ ) {
                 Variable v= vars.get(j);
                 if ( v.getDimensions().isEmpty() ) continue;
-                boolean isFormattedTime= v.getDataType()==DataType.CHAR && v.getRank()==2 && v.getShape(1)>=14 && v.getShape(1)<=30;
-                if ( !isFormattedTime && !v.getDataType().isNumeric() ) continue;
-                result.add( new CompletionContext(
-                        CompletionContext.CONTEXT_PARAMETER_NAME,
-                        v.getName(), this, "arg_0",
-                        v.getNameAndDimensions(), v.getDescription(), true ) );
+                if ( v instanceof Structure ) {
+                    for ( Variable v2: ((Structure) v).getVariables() ) {
+                        if ( !v2.getDataType().isNumeric() ) continue;
+                        StringBuilder description= new StringBuilder( v2.getName()+"[" );
+                        for ( int k=0; k<v2.getDimensions().size(); k++ ) {
+                            Dimension d= v2.getDimension(k);
+                            if ( k>0 ) description.append(",");
+                            try {
+                                String n= d.getName();
+                                if ( n!=null && !n.equals(v2.getName()) ) {
+                                    description.append(d.getName()).append("=");
+                                }
+                                description.append(d.getLength());
+                            } catch ( NullPointerException ex ) {
+                                throw ex;
+                            }
+                        }
+                        description.append("]");
+                        
+                        ///parameters.put( v2.getName(), description.toString() );
+                        result.add( new CompletionContext( 
+                            CompletionContext.CONTEXT_PARAMETER_NAME,
+                            v2.getName(), this, "arg_0",
+                            v2.getNameAndDimensions(), v2.getDescription(), true ) );
+                    }
+                    
+                } else {
+                    boolean isFormattedTime= v.getDataType()==DataType.CHAR && v.getRank()==2 && v.getShape(1)>=14 && v.getShape(1)<=30;
+                    if ( !isFormattedTime && !v.getDataType().isNumeric() ) continue;
+                    result.add( new CompletionContext(
+                            CompletionContext.CONTEXT_PARAMETER_NAME,
+                            v.getName(), this, "arg_0",
+                            v.getNameAndDimensions(), v.getDescription(), true ) );
+                }
             }
             dataset.close();
             
@@ -160,15 +190,23 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
             for ( int j=0; j<vars.size();j++ ) {
                 Variable v= vars.get(j);
                 if ( v.getDimensions().isEmpty() ) continue;
-                List l= v.getDimension(0).getCoordinateVariables();
-                if ( l.size()>1 ) throw new IllegalArgumentException("Huh?");
-                for ( int i=0; i<l.size(); i++ ) {
-                    Variable dv= (Variable) l.get(0);
-                    if ( dv!=v ) {
-                        depCount++;
+                if ( v instanceof Structure ) {
+                    for ( Variable v2: ((Structure) v).getVariables() ) {
+                        if ( !v2.getDataType().isNumeric() ) continue;
+                        if ( v2.getName().replaceAll(" ","+").equals( svariable) ) haveIt= true;
                     }
+                                        
+                } else {
+                    List l= v.getDimension(0).getCoordinateVariables();
+                    if ( l.size()>1 ) throw new IllegalArgumentException("Huh?");
+                    for ( int i=0; i<l.size(); i++ ) {
+                        Variable dv= (Variable) l.get(0);
+                        if ( dv!=v ) {
+                            depCount++;
+                        }
+                    }
+                    if ( v.getName().replaceAll(" ", "+").equals(svariable) ) haveIt= true;
                 }
-                if ( v.getName().replaceAll(" ", "+").equals(svariable) ) haveIt= true;
             }
 
             dataset.close();

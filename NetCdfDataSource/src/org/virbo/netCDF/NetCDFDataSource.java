@@ -35,6 +35,7 @@ import org.virbo.dsutil.TransposeRankNDataSet;
 import org.virbo.metatree.IstpMetadataModel;
 import ucar.nc2.Attribute;
 import ucar.nc2.NetcdfFile;
+import ucar.nc2.Structure;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.ncml.NcMLReader;
@@ -230,8 +231,15 @@ public class NetCDFDataSource extends AbstractDataSource {
                 if ( variable==null ) throw new IllegalArgumentException("Unable to identify dependent variable");
             } else {
                 for (Variable v : variables) {
-                    if ( v.getName().replaceAll(" ", "+").equals( svariable ) ) { //TODO: verify this, it's probably going to cause problems now.
-                        variable= v;
+                    if ( v instanceof Structure ) {
+                        for ( Variable v2: ((Structure) v).getVariables() ) {
+                            if ( !v2.getDataType().isNumeric() ) continue;
+                            if ( v2.getName().replaceAll(" ","+").equals( svariable) ) variable= v2;
+                        }
+                    } else {
+                        if ( v.getName().replaceAll(" ", "+").equals( svariable ) ) { //TODO: verify this, it's probably going to cause problems now.
+                            variable= v;
+                        }
                     }
                 }
                 if ( variable==null ) throw new IllegalArgumentException("No such variable: "+svariable);
@@ -241,8 +249,15 @@ public class NetCDFDataSource extends AbstractDataSource {
                 int i= swhereVariable.indexOf(".");
                 String swv= swhereVariable.substring(0,i);
                 for (Variable v : variables) {
-                    if ( v.getName().replaceAll(" ", "+").equals( swv ) ) { //TODO: verify this, it's probably going to cause problems now.
-                        whereVariable= v;
+                    if ( v instanceof Structure ) {
+                        for ( Variable v2: ((Structure) v).getVariables() ) {
+                            if ( !v2.getDataType().isNumeric() ) continue;
+                            if ( v2.getName().replaceAll(" ","+").equals( swv ) ) whereVariable= v;
+                        }
+                    } else {
+                        if ( v.getName().replaceAll(" ", "+").equals( swv ) ) { //TODO: verify this, it's probably going to cause problems now.
+                            whereVariable= v;
+                        }
                     }
                 }
                 if ( whereVariable==null ) throw new IllegalArgumentException("No such variable: "+swv );

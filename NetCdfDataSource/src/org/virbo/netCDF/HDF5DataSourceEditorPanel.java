@@ -30,6 +30,7 @@ import static org.virbo.netCDF.NetCDFDataSourceFactory.checkMatlab;
 import ucar.ma2.DataType;
 import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFile;
+import ucar.nc2.Structure;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
 
@@ -333,30 +334,57 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             
             for (Variable v : vars) {
                 if ( v.getDimensions().isEmpty() ) continue;
-                boolean isFormattedTime= v.getDataType()==DataType.CHAR && v.getRank()==2 && v.getShape(1)>=14 && v.getShape(1)<=30;
-                if ( !isFormattedTime && !v.getDataType().isNumeric() ) continue;
-                StringBuilder description= new StringBuilder( v.getName()+"[" );
-                for ( int k=0; k<v.getDimensions().size(); k++ ) {
-                    Dimension d= v.getDimension(k);
-                    if ( k>0 ) description.append(",");
-                    try {
-                        String n= d.getName();
-                        if ( n!=null && !n.equals(v.getName()) ) {
-                            description.append(d.getName()).append("=");
+                if ( v instanceof Structure ) {
+                    
+                    for ( Variable v2: ((Structure) v).getVariables() ) {
+                        if ( !v2.getDataType().isNumeric() ) continue;
+                        StringBuilder description= new StringBuilder( v2.getName()+"[" );
+                        for ( int k=0; k<v2.getDimensions().size(); k++ ) {
+                            Dimension d= v2.getDimension(k);
+                            if ( k>0 ) description.append(",");
+                            try {
+                                String n= d.getName();
+                                if ( n!=null && !n.equals(v2.getName()) ) {
+                                    description.append(d.getName()).append("=");
+                                }
+                                description.append(d.getLength());
+                            } catch ( NullPointerException ex ) {
+                                throw ex;
+                            }
                         }
-                        description.append(d.getLength());
-                    } catch ( NullPointerException ex ) {
-                        throw ex;
+                        description.append("]");
+                        
+                        parameters.put( v2.getName(), description.toString() );
                     }
-                }
-                description.append("]");
+                    
+                } else {
                 
-                parameters.put( v.getName(), description.toString() );
+                    boolean isFormattedTime= v.getDataType()==DataType.CHAR && v.getRank()==2 && v.getShape(1)>=14 && v.getShape(1)<=30;
+                    if ( !isFormattedTime && !v.getDataType().isNumeric() ) continue;
+                    StringBuilder description= new StringBuilder( v.getName()+"[" );
+                    for ( int k=0; k<v.getDimensions().size(); k++ ) {
+                        Dimension d= v.getDimension(k);
+                        if ( k>0 ) description.append(",");
+                        try {
+                            String n= d.getName();
+                            if ( n!=null && !n.equals(v.getName()) ) {
+                                description.append(d.getName()).append("=");
+                            }
+                            description.append(d.getLength());
+                        } catch ( NullPointerException ex ) {
+                            throw ex;
+                        }
+                    }
+                    description.append("]");
+
+                    parameters.put( v.getName(), description.toString() );
+                    
+                }
             }
 
             String label= "Select Parameter (%d parameters):";
             
-            int numData= vars.size();
+            int numData= parameters.size();
 
             this.selectVariableLabel.setText( String.format( label, numData ) );
 

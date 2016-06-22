@@ -34,6 +34,7 @@ import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Range;
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
+import ucar.nc2.Structure;
 import ucar.nc2.dataset.NetcdfDataset;
 
 /**
@@ -208,6 +209,11 @@ public class NetCdfVarDataSet extends AbstractDataSet {
        
         properties.put( QDataSet.NAME, Ops.safeName(variable.getName()) );
         if ( shape.length>1 ) properties.put( QDataSet.QUBE, Boolean.TRUE );
+
+        if ( v.getParentStructure()!=null ) { //TODO: this is probably wrong for structure of rank 2 data.
+            shape= new int[] { data.length };
+            slice= new boolean[shape.length];
+        }
         
         boolean isCoordinateVariable= false;
         
@@ -216,18 +222,20 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 logger.log(Level.FINER, "v.getDimension({0})", ir);
                 ucar.nc2.Dimension d= v.getDimension(ir);
 
-                logger.log(Level.FINER, "ncfile.findVariable({0})", d.getName());
-                Variable cv = ncfile.findVariable(d.getName());
-                if ((cv != null) && cv.isCoordinateVariable()) {
-                    Variable dv= cv;
-                    if ( dv!=variable && dv.getRank()==1 ) {
-                        mon.setProgressMessage( "reading "+dv.getNameAndDimensions() );
-                        QDataSet dependi= create( dv, sliceConstraints(constraints,ir), ncfile, new NullProgressMonitor() );
-                        properties.put( "DEPEND_"+(ir-sliceCount(slice,ir) ), dependi );
-                    } else {
-                        isCoordinateVariable= true;
-                    }
-                } 
+                if ( d!=null ) {
+                    logger.log(Level.FINER, "ncfile.findVariable({0})", d.getName());
+                    Variable cv = ncfile.findVariable(d.getName());
+                    if ((cv != null) && cv.isCoordinateVariable()) {
+                        Variable dv= cv;
+                        if ( dv!=variable && dv.getRank()==1 ) {
+                            mon.setProgressMessage( "reading "+dv.getNameAndDimensions() );
+                            QDataSet dependi= create( dv, sliceConstraints(constraints,ir), ncfile, new NullProgressMonitor() );
+                            properties.put( "DEPEND_"+(ir-sliceCount(slice,ir) ), dependi );
+                        } else {
+                            isCoordinateVariable= true;
+                        }
+                    } 
+                }
             }
         }
         
