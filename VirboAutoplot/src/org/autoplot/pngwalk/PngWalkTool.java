@@ -1464,8 +1464,10 @@ public final class PngWalkTool extends javax.swing.JPanel {
         if ( !isQualityControlEnabled() ) {
             qcPanel= new QualityControlPanel();
             tabs.add( "Quality Control", qcPanel );
-            qcPanel.setWalkImageSequece(seq);
-            seq.addPropertyChangeListener(WalkImageSequence.PROP_BADGE_CHANGE, qcStatusListener);
+            if ( seq!=null ) {
+                qcPanel.setWalkImageSequece(seq);
+                seq.addPropertyChangeListener(WalkImageSequence.PROP_BADGE_CHANGE, qcStatusListener);
+            }
             ENABLE_QUALITY_CONTROL= true;
         } else {
             throw new RuntimeException("Quality Control is already running.");
