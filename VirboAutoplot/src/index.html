@@ -24,8 +24,9 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-06-21 r19068):</p>
+        <p>Bugfixes (2016-06-22 r19090):</p>
         <ul> 
+            <li>Rich ASCII code would run on any comment block containing {}, causing error message popup for some files.</li>
             <li>1490: Improvements to Rich ASCII output following meeting with LANL folks.</li>
             <li>rte_1147829159: update the default pngwalk bookmarks, connect to github bookmarks file for easier maintenence.</li>
             <li>1612: Mark's example showed where very negative Long for TT2000 was treated inconsistently and mucking up autoranging.</li>
@@ -180,6 +181,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Refactor HTTPFileSystem to make the code a little easier to follow.</li>
+            <li>PNGWalkTool provides a method for programmatically adding QC metadata.</li>
+            <li>HDF reader supports structures.</li>
             <li>PngWalkTool digitizer now includes column identifying the image.</li>
             <li>PngWalkTool provides mechanism for extension, where scripts can get events and can plug in small GUI.</li>
             <li>Jython plot command gets control for spectrogram color table.  Thanks Babtiste and Kristoff!</li>
