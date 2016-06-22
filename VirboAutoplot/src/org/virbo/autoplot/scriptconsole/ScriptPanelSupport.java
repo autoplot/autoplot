@@ -545,9 +545,13 @@ public class ScriptPanelSupport {
                 if ( traceback.tb_frame==null ) { // this happens with invokeLater and Java exception
                     PyObject o= ex.value;
                     if ( o!=null ) {
-                        Exception e= (Exception)o.__tojava__(Exception.class);
-                        if ( e!=null ) {
-                            annotateError(e);
+                        if ( o instanceof PyObject ) {
+                            // error popup should follow.
+                        } else {
+                            Exception e= (Exception)o.__tojava__(Exception.class);
+                            if ( e!=null ) {
+                                annotateError(e);
+                            }
                         }
                     }
                     otraceback= traceback.tb_next;
