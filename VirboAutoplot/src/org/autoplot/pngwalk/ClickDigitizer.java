@@ -389,6 +389,10 @@ public class ClickDigitizer {
         DatumRange xrange= DatumRangeUtil.union( DataSetUtil.asDatum(ds1.slice(0)), DataSetUtil.asDatum(ds2.slice(0)) );
         DatumRange yrange= DatumRangeUtil.union( DataSetUtil.asDatum(ds1.slice(1)), DataSetUtil.asDatum(ds2.slice(1)) );
 
+        if ( !UnitsUtil.isTimeLocation( SemanticOps.getUnits(ds2) ) ) {
+            return -1;
+        } 
+        
         int isel;
         
         if ( viewer.digitizer!=null ) {
