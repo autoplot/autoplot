@@ -1534,7 +1534,6 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         
         BufferedReader read = null;
         try {
-            if ( true ) throw new IOException("this is 403" );
             File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
             if ( !f2.exists() ) {
                 boolean ok= f2.mkdirs();
