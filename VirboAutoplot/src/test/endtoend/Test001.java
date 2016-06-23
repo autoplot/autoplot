@@ -26,10 +26,11 @@ public class Test001 {
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             
             long t0;
-            
+            QDataSet ds;
+               
             System.err.println( "--- test001_001 ---" );
             t0= System.currentTimeMillis();
-            QDataSet ds= Util.getDataSet( "http://www.autoplot.org/data/fireworks.wav" );
+            ds= Util.getDataSet( "http://www.autoplot.org/data/fireworks.wav" );
             plot( 0, ds );
             plot( 1, fftWindow( ds, 512 ) );
             setCanvasSize( 800, 600 );
