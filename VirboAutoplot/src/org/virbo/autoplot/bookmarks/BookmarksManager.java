@@ -1534,7 +1534,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         
         BufferedReader read = null;
         try {
-
+            if ( true ) throw new IOException("this is 403" );
             File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
             if ( !f2.exists() ) {
                 boolean ok= f2.mkdirs();
@@ -1611,7 +1611,16 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
             showMessage( "XML error while parsing " + bookmarksFile +"\n" +ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
             model.setList(new ArrayList());
         } catch (IOException ex) {
-            showMessage( "IO Error while parsing. " + bookmarksFile +"\n" + ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
+            if ( ex.getMessage().contains("403") ) { // don't make a popup for 403 errors, which is happening at LANL.
+                Container p= getParent();
+                if ( p instanceof AutoplotUI ) {
+                    ((AutoplotUI)p).setMessage( AutoplotUI.WARNING_ICON,ex.getMessage() );
+                } else {
+                    showMessage( "IO Error while parsing. " + bookmarksFile +"\n" + ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
+                }
+            } else {
+                showMessage( "IO Error while parsing. " + bookmarksFile +"\n" + ex.getMessage(), "Error while parsing bookmarks", JOptionPane.WARNING_MESSAGE );
+            }
             model.setList(new ArrayList());
         } finally {
             try {
