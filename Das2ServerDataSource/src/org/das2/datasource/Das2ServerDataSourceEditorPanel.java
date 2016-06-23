@@ -146,7 +146,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         setName("das2serverDataSourceEditorPanel"); // NOI18N
 
         das2ServerComboBox.setEditable(true);
-        das2ServerComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "http://www-pw.physics.uiowa.edu/das/das2Server", "http://cassini.physics.uiowa.edu/das/das2Server" }));
+        das2ServerComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "http://planet.physics.uiowa.edu/das/das2Server", "http://www-pw.physics.uiowa.edu/das/das2Server", "http://cassini.physics.uiowa.edu/das/das2Server" }));
         das2ServerComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 das2ServerComboBoxActionPerformed(evt);
@@ -628,10 +628,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
      */
     private List<String> listDas2Servers() {
         List<String> d2ss1= new ArrayList( );
-        d2ss1.add( "http://www-pw.physics.uiowa.edu/das/das2Server" );
+        d2ss1.add( "http://planet.physics.uiowa.edu/das/das2Server" );
 
         if ( serverURL.length()==0 ) {
-            d2ss1.addAll( listPeers("http://www-pw.physics.uiowa.edu/das/das2Server") );
+            d2ss1.addAll( listPeers("http://planet.physics.uiowa.edu/das/das2Server") );
         } else {
             d2ss1.addAll( listPeers(serverURL) );
         }
@@ -943,10 +943,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     public boolean reject(String uri) throws Exception {
         URISplit split = URISplit.parse(uri);
         if ( split.file==null || split.file.equals("file:///") ) { // use UIOWA's main one by default.
-            split.file= "http://www-pw.physics.uiowa.edu/das/das2Server";
+            split.file= "http://planet.physics.uiowa.edu/das/das2Server";
         }
         String s= split.file;
-        if ( s.equals("http://www-pw.physics.uiowa.edu/das/das2Server") ) {
+        if ( s.equals("http://planet.physics.uiowa.edu/das/das2Server") ) {
             return false;
         }
         URL url= new URL(s+"?server=logo");
