@@ -5,6 +5,7 @@
 package org.autoplot.pngwalk;
 
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -247,7 +248,7 @@ public class ClickDigitizer {
             Datum yy= Units.dimensionless.createDatum(h-y);
             if ( viewer!=null ) {
                 view.seq.setStatus( "Pixel Coordinates: " + xx + ", "+ yy );                
-                if ( viewer.digitizer!=null ) {
+                if ( release==false && viewer.digitizer!=null ) {
                     try {
                         viewer.digitizer.addDataPoint( xx, yy, meta );
                         //viewer.digitizer.addDataPoint( xx, yy );
@@ -294,19 +295,22 @@ public class ClickDigitizer {
                 int h= view.seq.imageAt( view.seq.getIndex() ).getImage().getHeight();
                 Datum xx= Units.dimensionless.createDatum(x);
                 Datum yy= Units.dimensionless.createDatum(h-y);
-                return Ops.link( xx, yy );
+                return  Ops.bundle( Ops.dataset(xx), Ops.dataset(yy) );
              }
         } else {
             int h= view.seq.imageAt( view.seq.getIndex() ).getImage().getHeight();
             Datum xx= Units.dimensionless.createDatum(x);
             Datum yy= Units.dimensionless.createDatum(h-y);
-            return Ops.link( xx, yy );
+            return Ops.bundle( Ops.dataset(xx), Ops.dataset(yy) );
         }
     }
             
     /**
      * return rank 2 bundle dataset that is ds[n;i,j]
-     * or null if there are no points.
+     * or null if there are no points.  The point 0,0 is in 
+     * the upper right corner of the image.
+     * This is [N;x,y] where N is the number of points.
+     * @return null or rank 2 bundle.
      */
     QDataSet doTransform() throws IOException {
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
@@ -331,7 +335,10 @@ public class ClickDigitizer {
         }
         
         if ( json==null ) {
-            return ds;
+            BufferedImage im= view.seq.imageAt( view.seq.getIndex() ).getImageIfLoaded();
+            if ( im==null ) return null;
+            return Ops.bundle( dep0, Ops.subtract( Ops.dataset(im.getHeight()), ds ) );
+            
         } else {
             QDataSet result=null;
             for ( int ii= 0; ii<ds.length(); ii++ ) {
@@ -360,7 +367,7 @@ public class ClickDigitizer {
     }
 
     /**
-     * select the datapoint that is 
+     * select the datapoint that is near the click position, based on the annoTypeChar
      * @param p
      * @return
      * @throws IOException
@@ -368,7 +375,7 @@ public class ClickDigitizer {
      */
     protected int maybeSelect(Point p) throws IOException, ParseException {
         
-        if ( viewer==null ) {
+        if ( viewer==null || viewer.digitizer==null ) {
             return -1;
         }
         
