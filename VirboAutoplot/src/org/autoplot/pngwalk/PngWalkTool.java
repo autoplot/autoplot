@@ -27,6 +27,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -1637,6 +1638,14 @@ public final class PngWalkTool extends javax.swing.JPanel {
         firePropertyChange( PROP_SELECTED_NAME, oldName, name );
     }
 
+    /**
+     * return the currently selected image.
+     * @return the currently selected image
+     */
+    public BufferedImage getSelectedImage() {
+        return seq.currentImage().getImage();
+    }
+    
     DataSetSelector getSelector() {
         return this.dataSetSelector1;
     }
