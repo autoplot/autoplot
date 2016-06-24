@@ -293,6 +293,12 @@ public final class PngWalkTool extends javax.swing.JPanel {
         return baseurl;
     }
     
+    /**
+     * initialize a new PNGWalkTool with the given template.  
+     * @param template the template, such as http://autoplot.org/data/pngwalk/product_$Y$m$d.vap
+     * @param parent null or a parent component to own this application.
+     * @return a PngWalkTool, which is visible and packed.
+     */
     public static PngWalkTool start( String template, final Window parent ) {
 
         final PngWalkTool tool = new PngWalkTool();
@@ -1994,6 +2000,13 @@ public final class PngWalkTool extends javax.swing.JPanel {
         super.firePropertyChange(propertyName, oldValue, newValue); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * provide means for scripts to add component to develop new applications.
+     * @return 
+     */
+    public TearoffTabbedPane getTabs() {
+        return tabs;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel actionButtonsPanel;
