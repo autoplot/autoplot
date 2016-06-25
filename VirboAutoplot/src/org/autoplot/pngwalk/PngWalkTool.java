@@ -1938,7 +1938,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         LoggerManager.logGuiEvent(evt);
         seq.first();
     }//GEN-LAST:event_jumpToFirstButtonActionPerformed
-
+   
     private void dataSetSelector1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelector1ActionPerformed
         LoggerManager.logGuiEvent(evt);
         String t= dataSetSelector1.getValue();
@@ -2017,6 +2017,15 @@ public final class PngWalkTool extends javax.swing.JPanel {
         return tabs;
     }
 
+    /**
+     * return the container for the sequence of images, which contains the
+     * current index and provides a method for jumping to other images.
+     * @return the sequence.
+     */
+    public WalkImageSequence getSequence() {
+        return this.seq;
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel actionButtonsPanel;
     private org.virbo.datasource.DataSetSelector dataSetSelector1;
