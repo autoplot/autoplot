@@ -86,6 +86,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DomainDivider;
 import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.OrbitDatumRange;
+import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
@@ -427,8 +428,21 @@ public class DataSetSelector extends javax.swing.JPanel {
                                 logger.fine("resetting TSB timeRange to URI range");
                                 timeRange= tsb.getTimeRange();
                             }
-                        }
+                        }    
                     }
+                    }
+                    
+                    if ( tsb!=null ) {
+                        try {
+                            tsb.setURI(surl);
+                            if ( tsb.getTimeRange().width().le(Units.seconds.createDatum(0) ) ) {
+                                JOptionPane.showMessageDialog( plotItButton, "Unable to parse timerange in "+surl);
+                                return;
+                            }
+                        } catch (ParseException ex) {
+                            JOptionPane.showMessageDialog( plotItButton, "Unable to parse: "+surl);
+                            return;
+                        }
                     }
                     
                     setMessage("busy: checking to see if uri looks acceptable");
