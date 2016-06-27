@@ -436,11 +436,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                         try {
                             tsb.setURI(surl);
                             if ( tsb.getTimeRange().width().le(Units.seconds.createDatum(0) ) ) {
-                                JOptionPane.showMessageDialog( plotItButton, "Unable to parse timerange in "+surl);
+                                JOptionPane.showMessageDialog( plotItButton, "<html>Unable to parse timerange in <br>"+surl+"<br>See http://autoplot.org/help#Time_Parsing_.2F_Formatting");
                                 return;
                             }
-                        } catch (ParseException ex) {
-                            JOptionPane.showMessageDialog( plotItButton, "Unable to parse: "+surl);
+                        } catch (ParseException | ArrayIndexOutOfBoundsException ex) {
+                            JOptionPane.showMessageDialog( plotItButton, "<html>Unable to parse: "+surl+"<br>See http://autoplot.org/help#Time_Parsing_.2F_Formatting");
                             return;
                         }
                     }
