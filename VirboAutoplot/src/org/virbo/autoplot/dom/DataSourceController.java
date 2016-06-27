@@ -1719,9 +1719,11 @@ public class DataSourceController extends DomNodeController {
                 logger.log(Level.FINE, "{0} read dataset: {1}", new Object[]{dss, result});
                 Map<String, Object> props = dss.getMetadata(new AlertNullProgressMonitor("getMetadata"));
 
-                if ( result != null && getTsb() != null && result.rank() > 0 
+                TimeSeriesBrowse ltsb= getTsb();
+                TimeSeriesBrowseController ltsbc= getTimeSeriesBrowseController();
+                if ( result != null && ltsb != null && ltsbc!=null && result.rank() > 0 
                         && !UnitsUtil.isTimeLocation(SemanticOps.getUnits(SemanticOps.xtagsDataSet(result))) ) {
-                    Plot p = timeSeriesBrowseController.getPlot();
+                    Plot p = ltsbc.getPlot();
                     if ( p==null ) {
                         logger.warning("unexpected timeSeriesBrowseController.domPlot==null");
                     } else {
@@ -1734,13 +1736,14 @@ public class DataSourceController extends DomNodeController {
                 setDataSetInternal(result, props, dom.controller.isValueAdjusting());
 
                 // look again to see if it has timeSeriesBrowse now--JythonDataSource
-                if (getTsb() == null && dss.getCapability(TimeSeriesBrowse.class) != null) {
+                if ( ltsb== null && dss.getCapability(TimeSeriesBrowse.class) != null) {
                     TimeSeriesBrowse tsb1 = dss.getCapability(TimeSeriesBrowse.class);
                     PlotElement pe = getPlotElement();
                     if (pe != null && this.doesPlotElementSupportTsb(pe)) {  //TODO: less flakey
                         setTsb(tsb1);
-                        timeSeriesBrowseController = new TimeSeriesBrowseController(this, pe);
-                        timeSeriesBrowseController.setup(false);
+                        ltsbc= new TimeSeriesBrowseController(this, pe);
+                        timeSeriesBrowseController= ltsbc;
+                        ltsbc.setup(false);
                     }
                 }
                 //embedDsDirty = true;
@@ -1763,7 +1766,7 @@ public class DataSourceController extends DomNodeController {
                 setDataSet(null);
                 setStatus("warning: " + ex.getMessage());
 
-                if (dsf.getController().getTsb() == null) {
+                if ( getTsb() == null) {
                     String title = "no data in interval";
                     model.showMessage("" + ex.getMessage(), title, JOptionPane.INFORMATION_MESSAGE);
                 } else {
