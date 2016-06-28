@@ -194,13 +194,18 @@ public class BinaryDataSource extends AbstractDataSource {
         if ( recFormatParse!=null ) {
             recSizeBytes= (Integer)recFormatParse[3];
         }
-        if ( recSizeBytes==-1 ) recSizeBytes= BufferDataSet.byteCount(columnType) * fieldCount;
-
-        if ( recFormatParse==null ) {
-            fieldCount= recSizeBytes / BufferDataSet.byteCount(columnType);
+        int recSizeBits;
+        if ( recSizeBytes==-1 ) {
+            recSizeBits= BufferDataSet.bitCount(columnType) * fieldCount;
+        } else {
+            recSizeBits= recSizeBytes * 8;
         }
 
-        final int frecCount= Math.min( length / recSizeBytes, recCount );
+        if ( recFormatParse==null ) {
+            fieldCount= recSizeBits / BufferDataSet.bitCount(columnType);
+        }
+
+        final int frecCount= Math.min( length * 8 / recSizeBits, recCount );
 
         int[] rank2= null;
 
@@ -231,7 +236,7 @@ public class BinaryDataSource extends AbstractDataSource {
             if ( recFormatParse!=null ) {
                 recOffset= ((int[])recFormatParse[0])[col];
             } else {
-                recOffset= col * BufferDataSet.byteCount(columnType);
+                recOffset= col * BufferDataSet.bitCount(columnType) / 8;
             }
         }
         
@@ -253,9 +258,9 @@ public class BinaryDataSource extends AbstractDataSource {
             if ( rank2[0]<0 ) {
                 rank2[0]= fieldCount + rank2[0];
             }
-            ds= BufferDataSet.makeDataSet( 2, recSizeBytes, recOffset, frecCount, rank2[1]-rank2[0], 1, 1, buf, columnType );
+            ds= BufferDataSet.makeDataSetBits( 2, recSizeBits, recOffset*8, frecCount, rank2[1]-rank2[0], 1, 1, buf, columnType );
         } else {
-            ds= BufferDataSet.makeDataSet( 1, recSizeBytes, recOffset, frecCount, 1, 1, 1, buf, columnType );
+            ds= BufferDataSet.makeDataSetBits( 1, recSizeBits, recOffset*8, frecCount, 1, 1, 1, buf, columnType );
         }
 
         if (dep0 > -1 || dep0Offset > -1 ) {
@@ -270,7 +275,7 @@ public class BinaryDataSource extends AbstractDataSource {
                     dep0Offset= ((int[])recFormatParse[0])[dep0];
                 }
             }
-            BufferDataSet dep0ds = BufferDataSet.makeDataSet( 1, recSizeBytes, dep0Offset, frecCount, 1, 1, 1, buf, dep0Type );
+            BufferDataSet dep0ds = BufferDataSet.makeDataSetBits( 1, recSizeBits, dep0Offset*8, frecCount, 1, 1, 1, buf, dep0Type );
             String dep0Units= getParameter("depend0Units", "" );
             if ( dep0Units.length()>0 ) {
                 dep0Units= dep0Units.replaceAll("\\+", " ");
@@ -281,7 +286,7 @@ public class BinaryDataSource extends AbstractDataSource {
         } else {
             boolean reportOffset= !( getParameter( "reportOffset", "no" ).equals("no") );
             if ( reportOffset ) {
-                final int finalRecSizeBytes= recSizeBytes;
+                final int finalRecSizeBytes= recSizeBits/8;
                 final int finalRecOffset= recOffset;
                 MutablePropertyDataSet dep0ds= new AbstractRank1DataSet(frecCount) {
                     @Override
@@ -289,7 +294,7 @@ public class BinaryDataSource extends AbstractDataSource {
                         return offset + finalRecOffset + i * finalRecSizeBytes;
                     }
                 };
-                dep0ds.putProperty( QDataSet.CADENCE, DataSetUtil.asDataSet((double)recSizeBytes) );
+                dep0ds.putProperty( QDataSet.CADENCE, DataSetUtil.asDataSet((double)recSizeBits/8) );
                 ds.putProperty(QDataSet.DEPEND_0, dep0ds);
             }
         }
