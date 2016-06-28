@@ -376,7 +376,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
     public WalkImage imageAt(int n) {
         if (n<0 || n>displayImages.size()-1) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("index must be within 0-"+(displayImages.size()-1)+": "+n);
         } else {
             return displayImages.get(n);
         }
