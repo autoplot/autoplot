@@ -5,6 +5,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import org.virbo.jythonsupport.ui.EditorContextMenu;
 import java.awt.Font;
@@ -507,7 +508,6 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         ScriptContext.setWindow(model);
         if ( support.file!=null ) this.setRunningScript(support.file);
         support.executeScript( evt.getModifiers() );
-        if ( support.file!=null ) this.setRunningScript(null);
     }//GEN-LAST:event_executeButtonActionPerformed
 
     private void saveAsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsButtonActionPerformed
@@ -620,6 +620,15 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
      * @param f 
      */
     public void setRunningScript( File f ) {
-        this.runningScript= f;
+        this.runningScript= f;        
+    }
+    
+    /**
+     * return the name of the script that the panel is busy running, or null.
+     * When this is non-null, don't load other scripts.
+     * @return null or the running script.  
+     */
+    public File getRunningScript() {
+        return this.runningScript;
     }
 }
