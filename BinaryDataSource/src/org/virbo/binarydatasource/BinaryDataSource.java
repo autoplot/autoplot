@@ -140,7 +140,7 @@ public class BinaryDataSource extends AbstractDataSource {
         int length = getIntParameter("byteLength", defLen );
 
         if ( length == defLen && ( f.length()-(long)offset ) > Integer.MAX_VALUE ) {
-            throw new IllegalArgumentException("default length is too big!");
+            throw new IllegalArgumentException("default length (entire file) is bigger than 2G, which is not supported.");
         }
 
         int fieldCount = getIntParameter("fieldCount", params.get("depend0") == null ? 1 : 2);
