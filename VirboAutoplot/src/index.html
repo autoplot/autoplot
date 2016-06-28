@@ -24,8 +24,9 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-06-28 r19115):</p>
+        <p>Bugfixes (2016-06-28 r19126):</p>
         <ul> 
+            <li>startDigitizer is a public method now, and startQC can be called multiple times without complaint.</li>            
             <li>rte_0400646374: Index out of bounds when QC is running and pngwalk is empty.  Thanks Ivar!</li>
             <li>rte_0370111585: SliceFilterEditorPanel.validateFilter assumed data was a QUBE.</li>
             <li>rte_0724070161: address inconsistent state associated with Time Series Browse observed by two people.</li>
@@ -57,6 +58,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>BinaryDataSource can now read data as array of nybbles.</li>
             <li>PNGWalkTool provides more hooks for new Jython apps, including magnifier and auto-increment.</li>
             <li>planet.physics.uiowa.edu is the default das2server now.</li>
             <li>Refactor HTTPFileSystem to make the code a little easier to follow.</li>
