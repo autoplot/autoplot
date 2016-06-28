@@ -145,6 +145,12 @@ public class ScriptPanelSupport {
                 logger.fine("editor is dirty, not showing script.");
                 return false;
             }
+            
+            if ( this.panel.getRunningScript()!=null ) {
+                logger.fine("editor is busy running a script.");
+                return false;
+            }
+            
             if ( split.params!=null ) {
                 Map<String,String> params= URISplit.parseParams(split.params);
                 if ( params.containsKey("script") ) {
@@ -662,6 +668,8 @@ public class ScriptPanelSupport {
                         panel.setFilename(file.toString());
                     }
                 }
+                
+                panel.setRunningScript(null);
 
             } else if (panel.getContext() == JythonScriptPanel.CONTEXT_APPLICATION) {
                 applicationController.setStatus("busy: executing application script");
@@ -807,6 +815,7 @@ public class ScriptPanelSupport {
                         } finally {
                             if ( !mon.isFinished() ) mon.finished();  // bug1251: in case script didn't call finished
                             setInterruptible( null );
+                            panel.setRunningScript(null);
                         }
 
                     }
@@ -816,6 +825,7 @@ public class ScriptPanelSupport {
 
         } catch (IOException iOException) {
             model.getExceptionHandler().handle(iOException);
+            panel.setRunningScript(null);
         }
 
     }
