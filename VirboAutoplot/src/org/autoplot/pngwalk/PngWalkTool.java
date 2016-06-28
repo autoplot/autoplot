@@ -1467,6 +1467,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
         this.statusLabel.setToolTipText(message);
     }
 
+    /**
+     * start the quality control if it is not started already.
+     */
     public void startQC() {
         if ( !isQualityControlEnabled() ) {
             qcPanel= new QualityControlPanel();
@@ -1476,16 +1479,16 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 seq.addPropertyChangeListener(WalkImageSequence.PROP_BADGE_CHANGE, qcStatusListener);
             }
             ENABLE_QUALITY_CONTROL= true;
-        } else {
-            throw new RuntimeException("Quality Control is already running.");
         }
-
     }
 
     protected DataPointRecorder digitizer= null;
     protected char annoTypeChar= '|';
-            
-    private void startDigitizer() {
+          
+    /**
+     * start the digitizer if it is not started already.
+     */
+    public void startDigitizer() {
         if ( digitizer==null ) {
             digitizer= new DataPointRecorder();
             digitizer.addDataSetUpdateListener(new DataSetUpdateListener() {
