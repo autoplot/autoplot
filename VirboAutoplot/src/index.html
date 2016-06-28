@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNGWalk tool default bookmarks are updated and now maintained at GitHub.
+        <p><small>PNGWalk tool stress testing, where one .jyds source is used to create many plots on one product.  This was showing occasional problems.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-06-23 r19100):</p>
+        <p>Bugfixes (2016-06-28 r19115):</p>
         <ul> 
+            <li>rte_0400646374: Index out of bounds when QC is running and pngwalk is empty.  Thanks Ivar!</li>
+            <li>rte_0370111585: SliceFilterEditorPanel.validateFilter assumed data was a QUBE.</li>
+            <li>rte_0724070161: address inconsistent state associated with Time Series Browse observed by two people.</li>
+            <li>corrections in digitizer (DataPointRecorder) when column sorts are used.</li>
             <li>corrections to pngwalk digitizer when digitizing plots without JSON metadata.</li>
             <li>catch annoying 403 error message that shows at LANL.</li>
             <li>1582: tweak to the guessCadence logic shown by Rosie's data.</li>
@@ -39,6 +43,9 @@
             <li>Recent change to Add Plot dialog would result in incomplete URIs and other strange errors.</li>
             <li>warning about using a timerange with a non-TSB getDataSet call removed.  It wasn't effective.</li>
             <li>0899: avoid extraneous load of data when createPngWalk is used to create single pngs.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>bugfix: simplifyScriptToGetParams didn't consider comments, creating a confusing situation where it wasn't clear why it was failing to parse.</li>
             <li>1603: check for ordinal units in closestIndex function.</li>
             <li>putProperty( ds, QDataSet.SCALE_MIN, rank0qds ) supported.</li>
@@ -48,217 +55,21 @@
             <li>dataset([d1,d2]) where d1 and d2 are Datums of different but convertible Units created incorrect dataset.  Thanks Ivar!</li>
             <li>1599: experiment with invokeLater to avoid hang seen with TimeRangeEditor.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>1596: initial feedback on the mash up GUI.  Thanks, Craig!</li>
-            <li>isSimpleTableDataSet failed with Juno/JADE dataset with rank 2 DEPEND_1.  Thanks, Chris!</li>
-            <li>1595: If the Time Format in PNGWalk was not specified, then one png of years 1000-9000 would be run, creating problems for many data servers.  Thanks, Chris!</li>
-            <li>improve error feedback when a component ("Bx") cannot be found in the das2stream.</li>
-            <li>improve feedback for low memory problems, with link to Autoplot.org.</li>
-            <li>CDF reader never called monitor.finished(), relying on sloppy clean-up code to call finished.</li>
-            <li>1590: Autoplot's runtime exception handler is used throughout Das2 code.</li>
-            <li>1587: jython error location when callbacks are used.</li>
-            <li>1589: javadoc popup window view-in-browser broken with Illegal character in fragment</li>
-            <li>new autoplot.py would use new function getAutoplotScriptingVersion, preventing old Autoplots from running. (never released)</li>
-            <li>rte_1262492318: csv reader with bundle=field1-field5 had issues.  Thanks Masafumi!</li>
-            <li>new Data Sources area in Layout could prevent selection of a plotElement.  Thanks Chris!</li>
-            <li>rte_0520679223: "####" splits to zero-length array, so input caused index out of bounds.  Thanks Bob!</li>
-            <li>Jython datumRange('2015-06-25 11:00 to 13:00') would fail to parse as time range.  Thanks Kristoff!</li>
-            <li>Jython popup documentation box size was not stored on disk between sessions.  Thanks Ivar!</li>
-            <li>Jython plot command can plot None again, to create a placeholder for data later in script.</li>
-            <li>Jython Data Source Time Series Browse mistaken when commented out.  Thanks Ivar!</li>
-            <li>check that the monitor passed into reference cache park isn't already finished.  Thanks Ivar!</li>
-            <li>1584: jyds scripts get 2010-01-01 for timerange on reset, because the TSB controller was still listening.  Thanks Masafumi!</li>
-            <li>further cleanup of .jyds handling, where exception could occur outside of try/finally block, leaving parked JythonDataSource read hanging.  Thanks Ivar!</li>
-            <li>rte_1270364473: index out of bounds when handling URI because MMS server doesn't quote the filename like VxOWare code would, improve feedback.</li>
-            <li>require that 99% of the data tags be increasing or decreasing to even allow a cadence to be measured.  This was 90%.  Thanks George!</li>
-            <li>improve support for empty VOTable result from PDS/PPI node.  Thanks Jenkins!</li>
-            <li>spectrogram updatePlotImage would make a local copy of the colorbar for thread safety, but this was not used consistently.</li>
-            <li>extraneous calls to monitor.finished would cause noise on stderr.</li>
-            <li>1583: when creating PNGWalk from list of events, make sure orbit timeranges are used so that the pngs can refer to them</li>
-            <li>1582: Juno trajectory segment failed to paint properly because of cadence calculation.</li>
-            <li>1425: jump back into Autoplot button is enabled, but the timerange cannot be resolved. </li>
-            <li>das2servers allow realms with HTTP access, limiting the number of times authentication is needed.</li>
-            <li>1560: copy plot when vap+internal is used.</li>
-            <li>1581: null result of ReferenceCache.getDataSet is ambiguous.</li>
-            <li>TrimDataSet's trim operator was incorrect when start gt 0, creating error messages.</li>
-            <li>1580: support multiple orbit selection in the TimeRangeEditor</li>
-            <li>1579: old caching mechanism with .jyds scripts would fail to coordinate many simultaneous reads.</li>
-            <li>DasProgressPanel multiple calls to finished warning stack trace correctly prints the two calls.</li>
-            <li>EventsBar renderer Gantt mode supports where column would be less than two pixels.</li>
-            <li>TrimDataSet's trim operator (trim of trim) would fail when the start was greater than 0.</li>
-            <li>Jython dataset(QDataSet) wouldn't work, because there was no test for the PyJavaInstance of TrimDataSet.</li>
-            <li>trim operator would fail when second index was past the end of the array with incorrect error message.</li>
-            <li>link(x,y,z) would fail because of incorrect check when Y was rank 1 and Z was rank 2.  Thanks, Masafumi!</li>
-            <li>zFill supported for multiple interleaved tables in das2stream.  Thanks Chris!</li>
-            <li>do early check for unique names in das2stream.  This would misformatted das2stream result in strange error.</li>
-            <li>Feb2013 change of "asOrderOneUnits" to prevent ms->msec conversion also prevented hr->hr, so that the original unit was never used, even if it is the best.</li>
-            <li>script shortcut cheatsheet was missing save.</li>
-            <li>butterworth GUI would reject float parameters, which are valid, and would clobber the scientist's input.  Thanks, Kristoff!</li>
-            <li>revalidate after TSB is loaded and trimmed to timerange, since the trim might break some datasets.</li>
-            <li>the timerange editor should load orbits off the event thread.</li>
-            <li>When adapting legacy VectorDataSets to QDataSet, name the default plane "y".</li>
-            <li>1576: pointed out extraneous load when undo was pressed caused by leftover TSB listener.  Thanks Masafumi!</li>
-            <li>das2stream containing new unit would fail to read, whoops!</li>
-            <li>bundleNames function would fail to add element when it found an unnamed dataset, now returns "ch_i". Thanks Ivar!</li>
-            <li>Jython "recently used files" area shows both .jy and .jyds files, so you don't have to think about the current context.</li>
-            <li>1570: make sure the axis timerange is returned in %{TIMERANGE} macro, not the loaded timerange.</li>
-            <li>corrections to triangulation routines.  Scale data to be around one before tesselation.</li>
-            <li>476: add plot below resulted in NullPointerException.</li>
-            <li>1567:  das2server URIs fail to embed within .vap.zip file, other problems.  Also see if a common file path can be calculated.</li>
-            <li>rebin mishandled NaN data, resulting in weights dataset which was inconsistent with the data.</li>
-            <li>1278: das2server URIs fail to embed within .vap.zip file</li>
-            <li>rte_0405096901: initialization of TickCurveRenderer caused NullPointerException</li>
-            <li>rebin(ds,int,int) would fail under test data.</li>
-            <li>rfe #453 underimplementation show both timerange and data set URI.</li>
-            <li>1566: improve support for international desktops, with UTF-8 filenames.</li>
-            <li>send a separate graphics object to each renderer, so that sloppy renderers (like the orbit mode) don't affect others.</li>
-            <li>das2stream cache tag was not propagated up to the QDataSet</li>
-            <li>plot timerange GUI on axis tab goes insensitive when no one is listening.</li>
-            <li>1565: dataset selector use off the event thread.</li>
-            <li>plotCommand with four parameters (index,x,y,z) would cause error</li>
-            <li>reset the pointer cursor from BUSY to default when cancel is pressed in inspect-vap path</li>
-            <li>reset the current folder for vap files when a vap is loaded. </li>
-            <li>bugfix 1562: the trailing DD was mistaken for a unit.  Thanks, Chris!</li>
-            <li>bundle(ds1,ds2) never supported rank 0 bundled to rank 1 dataset.</li>
-            <li>rte_0990623712: set the focus URI and support edit function on vap+internal dsf</li>
-            <li>an orbits file with a comment would result in an unterminated loop.  Thanks, Ivar!</li>
-            <li>1557: corrections to the SAMP listener.  Thanks, Babtiste!</li>
-            <li>csv reader properly sets column headings to field0..fieldN</li>
-            <li>remove restriction that asynchronous (slow) filters cannot be used in the dataSourceFilter node, since there is no feedback of the problem.</li>
-            <li>add experimental dep0 mismatch test when joining two TSBs with vap+internal:data_0,data_1.</li>
-            <li>don't accept the click context (x,y) if no events were plotted</li>
-            <li>events bar supports fill values for xtags.</li>
-            <li>events bar supports rank 0 dataset.</li>
-            <li>findbugs cleanup to get back down to 100.</li>
-            <li>1553: slice1 is dropped from cdaweb uris, components not shown for GSE_POS</li>
-            <li>1549: filter GUIs only fire events when focus is lost, or if they manually fire the event.</li>
-            <li>1545: render type fails to switch because of extraneous event firings from data panel.</li>
-            <li>1547: path reduction code would fail to connect dataset of two points with same X.</li>
-            <li>version is identified as v2016a</li>
-            <li>ISTP-CDF metadata node dataset/METADATA/GlobalAttributes is now shown as a map.</li>
-            <li>When a TSB trims the data to the range because there is no X-axis, an extra point was trimmed from the end.</li>
-            <li>Events bar should allow for units sloppiness when X values are Stevens' ratio scale units.</li>
-            <li>don't assume that rank0 datasets will use digital renderer, they my use eventsBar.</li>
-            <li>printing to PDF with a bottomDecorator would result in stderr chatter as it failed to update.</li>
-            <li>1542: after printing with background decorator, the cacheImageBounds would be incorrect but this was not resolved, getting stuck in a loop.</li>
-            <li>1509: popup windows below screen were not moved up sufficiently.  Thanks Scott!</li>
-            <li>1541: jython code showed where looping over dom.dataSourceFilters could cause a concurrent modification problem.  Thanks Larry!</li>
-            <li>1540: catch RTE from "bookmrks:" typo, when http or other valid protocol is not used.  Thanks Bob!</li>
-            <li>layout tab updates to current canvas within ~200 ms.</li>
-            <li>axes tab plot timerange is now enabled when the app timerange is *not* the default.</li>
-            <li>Larry pointed out his plots now show "slice1=1", which is because the loaded data set has a CONTEXT_0.  Thanks Larry!</li>
-            <li>boolean property types in das2streams are supported.  Thanks Chris!</li>
-            <li>vap+inline for Y(X) list was broken since vap+inline:4 now returns rank 0 dataset, not rank 1 dataset.</li>
-            <li>rte_0110509791: when rank 1 dataset get into code to autorange spectrogram render type.</li>
-            <li>rte_0123356543: runtime error when no records are returned from das2server Mars_Express/ASPERA/ELS.  Thanks Ed!</li>
-            <li>ImageDataSource now correctly extracts red and green components.</li>
-            <li>1536: CDF Themis virtual variables slice1=i doesn't work.  Thanks Cindy!</li>
-            <li>automatic completions-based GUI doesn't show "null" when label is not available for option.  Show documentation.</li>
-            <li>rte_1240063716: error: java.lang.String cannot be cast to org.virbo.dataset.QDataSet seen at Juno meeting.  Thanks Rob!</li>
-            <li>corrections to the AutoplotDataServer, where "NoDataInInterval" was not thrown properly in reduce.</li>
-            <li>checkStatusLoop was not started in child applications, so the busy indicator used the old logic.</li>
-            <li>bugfix where QStream had references to data that could not be resolved would prevent aggregation of JADE data.</li>
-            <li>bugs when loading vap files with time series browse datasets that are not visible with a time axis.</li>
-            <li>FilterChainPanel now limits the flashing of intermediate state by allowing 300ms to process before the color is changed.</li>
-            <li>1531: BufferDataSet append assumed compact data.</li>
-            <li>swap needs to turn off TCAs.  Experiment with fixLayout.</li>
-            <li>1530: support error bars in X, add control to turn off error bars with drawError=F.  Thanks Lawrance!</li>
-            <li>CDF where constraint works when data is rank 4 and filter data is rank 0.</li>
-            <li>1524: mashup handles when dataset loads fail.  thumbnails are calculated more independently of one another.</li>
-            <li>1526: PDS/PPI didn't support quoted ISO8601 times</li>
-            <li>annotation "point at" operation doesn't move the annotation, so "point at" and "move" are orthogonal operations.</li>
-            <li>turn on timerange editor when vap+inline: is TimeSeriesBrowse</li>
-            <li>events bar autoranging of one time datum should expand out to one hour duration</li>
-            <li>the vertical slice "dump data set" now forces the .d2s extension so Autoplot can read this result.</li> 
-            <li>1528: add an invisible plotElement when adding a hidden plot, so it can be turned on and provide overlays.</li>    
-            <li>vap+inline:3 now returns a rank 0 scalar.</li>
-            <li>rte 1695465728: single-tab tear off on Mac would result in RTE.</li>
-            <li>setDepend0Cadence would not properly set the units</li>
-            <li>webstart on Linux/Mint creates a launcher that likes pass in %U when there is no file argument.  -open xx (with any two characters) is now ignored.</li>
-            <li>1517: Sebastian's script hangs when calling DataPointRecorder.save</li>
-            <li>1515: remove extraneous user permissions dialogs caused when user@ added to it automatically.</li>
-            <li>add PENDING_CHECK_REJECT so that the waitUntilIdle function properly detects that the application is not idle.  Thanks Kenzie!</li>
-            <li>improve feedback while reading CDF file data, MMS has large datasets that take non-trivial time to extract</li>
-            <li>update the crosshair digitizer when we install RBGImageRenderer, so that R,G,B values are reported.</li>
-            <li>treat http://user@... the same as http://... when credentials are needed either way.  PNGWalkTool had a bug where user@ was added automatically, causing a second login dialog.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>PNGWalkTool provides more hooks for new Jython apps, including magnifier and auto-increment.</li>
             <li>planet.physics.uiowa.edu is the default das2server now.</li>
             <li>Refactor HTTPFileSystem to make the code a little easier to follow.</li>
             <li>PNGWalkTool provides a method for programmatically adding QC metadata.</li>
             <li>HDF reader supports structures.</li>
             <li>PngWalkTool digitizer now includes column identifying the image.</li>
             <li>PngWalkTool provides mechanism for extension, where scripts can get events and can plug in small GUI.</li>
-            <li>Jython plot command gets control for spectrogram color table.  Thanks Babtiste and Kristoff!</li>
-            <li>add control to set the maximum thread count, useful for Ivar's strange .jyds bug</li>
-            <li>add plots dialog allows up to 6 by 6 plots now, useful for things like hourly plots of a day (6x4=24).</li>
        </ul>
         <p>Less recent features:</p>
         <ul>
-            <li>About low memory link on the About Autoplot page, when less than 700Mb of memory is detected.</li>
-            <li>381: pdb should be supported in jython editor.  Loosen requirements for matching lines.</li>
-            <li>APDataSet adapter for IDL and Matlab allows a filter process to be applied.</li>
-            <li>Add ConsoleTextProgressMonitor, for examples and to support IDLMatlabBridge</li>
-            <li>whiteBlueBlack colorbar added.  Thanks, Masafumi!</li>
-            <li>add convertUnitsTo for DatumRange and Datum.  Thanks, Ivar!</li>
-            <li>dataSetBuilder nextRecord with rank 1 data.</li>
-            <li>smoothFit supports rank2 data to match the smooth function</li>
-            <li>360: Jython scripts have setOutputParam and requireAutoplotScriptingVersion, so that scripts can identify what they need.</li>
-            <li>julianDay units added (days since noon, January 1, 4713 BC) to support Masafumi's data.</li>
-            <li>491: allow %{TIMERANGE,FORMAT=$Y$m$d} and %{TIMERANGE,FORMAT=$o}</li>
-            <li>389: buttons indicate the address bar or timerange selection.</li>
-            <li>plot command gets lineWidth alias for lineThick, since this is a more consistent name.</li>
-            <li>482: Jython script save as allows the old name to be deleted, renaming the file.</li>
-            <li>NetCDF/HDF reader now allows units to be specified in the URI, to support time tags with units=t1970, etc</li>
-            <li>Jython supports Datum instances as PyDatums, supporting inline operators (like +)</li>
-            <li>Auralizer code supports rank 2 waveform data</li>
-            <li>486: IDL/Matlab interface loadDataSet(uri) loads the URI with one command, returning status code.</li>
-            <li>485: run script shortcut key, experiment with F6.</li>
-            <li>addPlotElement code added for scripting, to support overplots.</li>
-            <li>X axis with %{CONTEXT} property will show DEPEND_0 context.</li>
-            <li>Y axis with %{CONTEXT} property updates properly.</li>
-            <li>screenshotsTool supports manual calls to get the screenshot, so that scripts can write documentation.</li>
-            <li>jython popup documentation box size can be set.</li>
-            <li>rank 3 flatten and rebinBundle routines added.</li>
-            <li>kludge in controls like %{TIMERANGE,NOORBIT} for Ivar's study.</li>
-            <li>FileUtil.find added which allows regular expressions to be used when looking for files.</li>
-            <li>buckshotInterpolate introduced, adding support for 2-D and 3-D interpolations of buckshot data.</li>
-            <li>ProGAL library added, which supports 2-D and 3-D tesselations.</li>
-            <li>24-bit wav files can now be read.  24-bit and 32-bit wav files can be exported.  Thanks, Sarah!</li>
-            <li>circle command now allows x and y positions</li>
-            <li>update to SAMP 1.3.5, which is able to initialize a hub so javascript can talk to Autoplot.</li>
-            <li>org.das2.util.FileUtil supports find file with regular expressions.</li>
-            <li>Add setFillValue and setValidRange filters and GUIs</li>
-            <li>Add flattenWaveform to the filters, which was needed for testing.</li>
-            <li>Annotations support macros like %{USER_PROPERTIES.Name}</li>
-            <li>DataSource nodes on layout tab now have a shiny blue icon and tooltip indicating Time Series Browse.</li>
-            <li>DataSource focus can be set on the layout tab, allowing access to composite data components.</li>
-            <li>fontSize property is more uniform for annotation, orbit plot, and digital plot</li>
-            <li>interpolate supports rank 3 data.</li>
-            <li>Image mode type now has control panel, and nearest neighbor rendering is provided.</li>
-            <li>ImageDataSource now hints at the colorbar to use for red, green and blue components.</li>
-            <li>Orbit mode now has control panel.</li>
-            <li>Orbit mode allows tick label size to be controlled.</li>
-            <li>Events list GUI is now two-column table.  Thanks Chris for the suggestion!</li>
-            <li>479: consider if interpolateMod should allow range (e.g. -180 to 180).</li>
-            <li>html table data source no longer requires a header row, first row will be interpretted as headers if no numbers are found.</li>
-            <li>DataSetBuilder nextRecord method accepts array of doubles, as well as array of objects (datums)</li>
-            <li>bug 1530: add control switch for error bars.</li>
-            <li>support now-P1D/now+PT1H</li>
-            <li>plug-in filters can now validate the string, allowing mousewheel on pipes string to be limited.</li>
-            <li>BinaryDataSet supports "time21," fore where the ascii bytes of an ISO8601 time are found within binary PDS data.</li>
-            <li>476: control for data source filter's filter string is provided.</li>
-            <li>linspace() supports rank 0 datasets.</li>
-            <li>rank 4 random functions</li>
-            <li>vap+inline: automatically supports timeSeriesBrowse</li>
-            <li>events bar autoranging of one time datum should expand out to one hour duration</li>
-            <li>add Units.nT.</li>
-            <li>Autoplot servlet allows multiple colors to be specified for stack of traces.</li>
-            <li>Data Mash up is now accessible from menus.  Improvements to mashup including thumbnails.</li>
-            <li>Autoplot servlet experiment with checking for exceptions in the plot and putting them in the response headers.</li>
-            <li>472: allow $x to be used in aggregation without time fields.</li>
+            <li>Jython plot command gets control for spectrogram color table.  Thanks Babtiste and Kristoff!</li>
+            <li>add control to set the maximum thread count, useful for Ivar's strange .jyds bug</li>
+            <li>add plots dialog allows up to 6 by 6 plots now, useful for things like hourly plots of a day (6x4=24).</li>
         </ul>
 
         <p>Known issues:</p>
