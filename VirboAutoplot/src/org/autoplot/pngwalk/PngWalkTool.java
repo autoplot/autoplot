@@ -1541,6 +1541,15 @@ public final class PngWalkTool extends javax.swing.JPanel {
     private boolean isDigitizerEnabled() {
         return digitizer!=null;
     }
+    
+    /**
+     * provide access to the digitizer DataPointRecorder, so that points 
+     * can be deleted programmatically.
+     * @return the DataPointRecorder.
+     */
+    public DataPointRecorder getDigitizerDataPointRecorder() {
+        return digitizer;
+    }
 
     public static interface ActionEnabler {
         boolean isActionEnabled( String filename );
