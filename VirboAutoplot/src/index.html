@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNGWalk tool stress testing, where one .jyds source is used to create many plots on one product.  This was showing occasional problems.
+        <p><small>PNGWalk new feature, where here we add a convenient "ok" button.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -60,6 +60,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>UInt24DataSet added so that we can read pairs of two nybbles to get data deom LWA telescope.</li>
             <li>BinaryDataSource can now read data as array of nybbles.</li>
             <li>PNGWalkTool provides more hooks for new Jython apps, including magnifier and auto-increment.</li>
             <li>planet.physics.uiowa.edu is the default das2server now.</li>
