@@ -435,7 +435,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                     if ( tsb!=null ) {
                         try {
                             tsb.setURI(surl);
-                            if ( tsb.getTimeRange().width().le(Units.seconds.createDatum(0) ) ) {
+                            DatumRange tr= tsb.getTimeRange();
+                            if ( tr!=null && tr.width().le(Units.seconds.createDatum(0) ) ) {
                                 JOptionPane.showMessageDialog( plotItButton, "<html>Unable to parse timerange in <br>"+surl+"<br>See http://autoplot.org/help#Time_Parsing_.2F_Formatting");
                                 return;
                             }
