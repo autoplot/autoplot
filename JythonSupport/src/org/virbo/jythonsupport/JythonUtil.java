@@ -136,8 +136,7 @@ public class JythonUtil {
         
         boolean loadAutoplotStuff= true;
         if ( loadAutoplotStuff ) {
-            Py.getAdapter().addPostClass(new PyQDataSetAdapter());
-            Py.getAdapter().addPostClass(new PyDatumAdapter());
+            maybeLoadAdapters();
             if ( Util.isLegacyImports() ) {
                 URL imports= JythonOps.class.getResource("imports.py");
                 if ( imports==null ) {
@@ -406,6 +405,19 @@ public class JythonUtil {
         return errs.size()>0;
 
 
+    }
+
+    private static boolean haveloadedAdapters= false;
+    
+    /**
+     * load the adapters, once.
+     */
+    private synchronized static void maybeLoadAdapters() {
+        if ( !haveloadedAdapters ) {
+            Py.getAdapter().addPostClass(new PyQDataSetAdapter());
+            Py.getAdapter().addPostClass(new PyDatumAdapter());
+            haveloadedAdapters= true;
+        }
     }
 
     /**
