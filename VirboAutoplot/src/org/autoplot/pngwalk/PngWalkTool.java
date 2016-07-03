@@ -1483,6 +1483,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
     }
 
     protected DataPointRecorder digitizer= null;
+    protected boolean digitizerRecording= true;
     protected char annoTypeChar= '|';
           
     /**
@@ -1535,6 +1536,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 }
                 
             });
+            digitizerRecording= true;
         }
     }
 
@@ -1544,13 +1546,22 @@ public final class PngWalkTool extends javax.swing.JPanel {
     
     /**
      * provide access to the digitizer DataPointRecorder, so that points 
-     * can be deleted programmatically.
+     * can be deleted programmatically.  
      * @return the DataPointRecorder.
      */
     public DataPointRecorder getDigitizerDataPointRecorder() {
         return digitizer;
     }
 
+    
+    /**
+     * this can be used to disable recording of the points.  
+     * @param enable true means record points, false means don't record.
+     */
+    public void setDigitizerRecording( boolean enable ) {
+        this.digitizerRecording= enable;
+    }
+    
     public static interface ActionEnabler {
         boolean isActionEnabled( String filename );
     }

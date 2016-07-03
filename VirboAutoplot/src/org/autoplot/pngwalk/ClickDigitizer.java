@@ -214,10 +214,9 @@ public class ClickDigitizer {
                     
                     if ( viewer!=null ) {
                         view.seq.setStatus(  "Plot Coordinates: " + xx + ", "+ yy );
-                        if ( release==false && viewer.digitizer!=null ) {
+                        if ( release==false && viewer.digitizer!=null && viewer.digitizerRecording ) {
                             try {
                                 viewer.digitizer.addDataPoint( DataSetUtil.asDatum(xx), DataSetUtil.asDatum(yy), meta );
-                                //viewer.digitizer.addDataPoint( DataSetUtil.asDatum(xx), DataSetUtil.asDatum(yy) );
                             } catch ( RuntimeException ex ) { // units conversion
                                 String msg= DataSourceUtil.getMessage(ex);
                                 JOptionPane.showMessageDialog( viewer, msg );
