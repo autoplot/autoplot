@@ -11,17 +11,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.metadata.IIOMetadataNode;
-import javax.imageio.stream.ImageInputStream;
 import javax.swing.JOptionPane;
-import static org.autoplot.pngwalk.PngWalkView.logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -29,6 +22,7 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.ImageUtil;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.AlertNullProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,8 +34,6 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.dsops.Ops;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * Quick-n-dirty class for picking off points from images.  The ClickDigitizer knows how to 
@@ -54,6 +46,8 @@ public class ClickDigitizer {
     //WalkImageSequence seq;
     PngWalkView view;
     PngWalkTool viewer;
+    
+    private static final Logger logger= LoggerManager.getLogger("autoplot.pngwalk");
     
     public ClickDigitizer( PngWalkView view ) {
         this.view= view;
@@ -106,7 +100,7 @@ public class ClickDigitizer {
             range= DatumRangeUtil.parseISO8601Range( axis.getString("min")+"/"+axis.getString("max") );
 
         } else {
-            String sunits= "";
+            String sunits;
             sunits= axis.getString("units"); 
             Units units= Units.lookupUnits(sunits);
             range= new DatumRange(units.parse(axis.getString("min")),
@@ -310,8 +304,9 @@ public class ClickDigitizer {
      * the upper right corner of the image.
      * This is [N;x,y] where N is the number of points.
      * @return null or rank 2 bundle.
+     * @throws java.io.IOException
      */
-    QDataSet doTransform() throws IOException {
+    protected QDataSet doTransform() throws IOException {
         URI uri= view.seq.imageAt( view.seq.getIndex() ).getUri();
         File file = DataSetURI.getFile( uri, new AlertNullProgressMonitor("get image file") ); // assume it's local.
         String json= ImageUtil.getJSONMetadata( file ); // json might be null after
@@ -356,9 +351,8 @@ public class ClickDigitizer {
                             result= Ops.join( result, Ops.join( DataSetUtil.asDataSet(ix), DataSetUtil.asDataSet(iy) ) );
                         }
                     }
-                } catch ( ParseException ex ){
-
-                } catch ( JSONException ex ){
+                } catch ( ParseException | JSONException ex ){
+                    logger.log(Level.SEVERE, "error parsing rich png JSON metadata", ex );
                 }                
             }
             return result;
@@ -395,15 +389,19 @@ public class ClickDigitizer {
         int isel;
         
         if ( viewer.digitizer!=null ) {
-            if ( viewer.annoTypeChar=='.' ) {
-                isel= viewer.digitizer.select(xrange, yrange );
-            
-            } else if ( viewer.annoTypeChar=='+' ) {
-                isel= viewer.digitizer.select(xrange, yrange, true );
-
-            } else { // if ( viewer.annoTypeChar=='|' ) {
-                isel= viewer.digitizer.select(xrange, null);
-            } 
+            switch (viewer.annoTypeChar) {
+                case '.':
+                    isel= viewer.digitizer.select(xrange, yrange );
+                    break;
+                case '+':
+                    isel= viewer.digitizer.select(xrange, yrange, true );
+                    break;
+                case '|':
+                    isel= viewer.digitizer.select(xrange, null);
+                    break;
+                default:
+                    throw new RuntimeException("can't find annoTypeChar");
+            }
             return isel;
             
         } else {
