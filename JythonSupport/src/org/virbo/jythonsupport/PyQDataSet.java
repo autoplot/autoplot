@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
 import org.virbo.dsops.Ops;
 import org.virbo.dataset.DataSetIterator;
@@ -419,6 +420,29 @@ public class PyQDataSet extends PyJavaInstance {
         return rods.length();
     }
 
+    /**
+     * bug 1623, where we might want to interpret the PyList as 
+     * a rank 1 dataset.
+     * @param arg0 any python object
+     * @return the same object, or rank 1 PyQDataSet when PyList can be adapted.
+     */
+    private PyObject maybeAdaptList( PyObject arg0 ) {
+        if ( arg0 instanceof PyList ) {
+            PyList list= ((PyList)arg0);
+            if ( list.size()>0 ) {
+                Object o= list.get(0);
+                if ( o instanceof Number ) {
+                    arg0= new PyQDataSet( PyQDataSetAdapter.adaptList(list) );
+                } else if ( o instanceof QDataSet || o instanceof Datum ) {
+                    arg0= new PyQDataSet( PyQDataSetAdapter.adaptList(list) );
+                } else if ( o instanceof PyInteger || o instanceof PyFloat || o instanceof PyLong ) {
+                    arg0= new PyQDataSet( PyQDataSetAdapter.adaptList(list) );
+                }
+            }
+        }
+        return arg0;
+    }
+    
     /* accessor and mutator */
     /**
      * This implements the Python indexing, such as data[4,:,3:5].  Note this
@@ -427,11 +451,14 @@ public class PyQDataSet extends PyJavaInstance {
      * alone.  See http://autoplot.org/developer.python.indexing
      *
      * TODO: preserve metadata
-     * @param arg0
-     * @return
+     * @param arg0 various python types http://autoplot.org/developer.python.indexing
+     * @return element or subset of data.
      */
     @Override
     public PyObject __getitem__(PyObject arg0) {
+        if ( arg0 instanceof PyList ) {
+            arg0= maybeAdaptList((PyList)arg0);
+        }
         Object o = arg0.__tojava__(QDataSet.class);
         if (o == null || o == Py.NoConversion) {
             if (arg0 instanceof PySlice) {
@@ -607,7 +634,9 @@ public class PyQDataSet extends PyJavaInstance {
             throw new RuntimeException("__setitem__ on dataset that is read-only, use copy(ds) to make a mutable copy.");
         }
         DataSetIterator iter = new QubeDataSetIterator(ds);
-
+        if ( arg0 instanceof PyList ) {
+            arg0= maybeAdaptList((PyList)arg0);
+        }
         if (!arg0.isSequenceType()) {
             PyObject a = arg0;
             QubeDataSetIterator.DimensionIteratorFactory fit;
