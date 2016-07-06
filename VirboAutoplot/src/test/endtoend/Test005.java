@@ -135,7 +135,7 @@ public class Test005 {
             //TODO: why does this not reset with the plot command below?  This only occurs in testing server.
             getDocumentModel().getDataSourceFilters(0).setFilters("");
 
-            plot("http://satdat.ngdc.noaa.gov/sem/goes/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&validMax=32000&timerange=Dec+2004");
+            plot("http://satdat.ngdc.noaa.gov/sem/goes/data/new_avg/$Y/$m/goes10/csv/g10_eps_5m_$Y$m$d_$(Y,end)$m$d.csv?column=field1&depend0=field0&skip=456&timerange=Dec+2004");
             writeToPng("test005_demo14.png");
             xxx("demo14");
 
