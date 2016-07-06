@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNGWalk new feature, where here we add a convenient "ok" button.
+        <p><small>Blooper where all the Juno orbit data was loaded, instead of one orbit.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -25,7 +25,11 @@
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
         <p>Bugfixes (2016-06-28 r19126):</p>
-        <ul> 
+        <ul>
+            <li>1623: jython index bug, where Jython list was misinterpretted as the single index for each dimension.</li>
+            <li>test005_014 corrected, as old site http://satdat.ngdc.noaa.gov/sem/goes/data/avg/$Y/A105$y$m.TXT appears to be gone.</li>
+            <li>1616:  hooks in pngwalk to allow for scripting new apps.   Add switch to disable automatic digitizer recording.</li>
+            <li>rte_1585690286: code failed to check if null was found for units.</li>
             <li>1541: Larry's Jython code where dom.dataSourceFilters would result in Concurrent exception </li>
             <li>1618: botched bugfix breaks File->"Add Plot From..."->CDAWeb</li>
             <li>startDigitizer is a public method now, and startQC can be called multiple times without complaint.</li>            
