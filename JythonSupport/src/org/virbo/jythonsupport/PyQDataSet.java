@@ -80,6 +80,9 @@ public class PyQDataSet extends PyJavaInstance {
     /* plus, minus, multiply, divide */
     @Override
     public PyQDataSet __add__(PyObject arg0) {
+        if ( arg0 instanceof PyInteger && !arg0.__nonzero__() ) { // special check to support "sum" which starts with zero.
+            return this;
+        }
         QDataSet that = coerce_ds(arg0);
         return new PyQDataSet(Ops.add(rods, that));
     }
