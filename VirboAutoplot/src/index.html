@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Blooper where all the Juno orbit data was loaded, instead of one orbit.
+        <p><small>Experiments with creating a new colorbar from scripts.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,9 +24,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-06-28 r19126):</p>
+        <p>Bugfixes (2016-06-28 r19148):</p>
         <ul>
+            <li>1624: local .gz files are not uncompressed automatically.</li>
+            <li>1569: check for zero in __add__ function, to support Jython sum operation.</li>
             <li>1623: jython index bug, where Jython list was misinterpretted as the single index for each dimension.</li>
+            <li>1621: wrong ordinal selected when table is sorted by ordinal.</li>
             <li>test005_014 corrected, as old site http://satdat.ngdc.noaa.gov/sem/goes/data/avg/$Y/A105$y$m.TXT appears to be gone.</li>
             <li>1616:  hooks in pngwalk to allow for scripting new apps.   Add switch to disable automatic digitizer recording.</li>
             <li>rte_1585690286: code failed to check if null was found for units.</li>
@@ -64,6 +67,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>allow clients to declare new types of colorbars.</li>
             <li>UInt24DataSet added so that we can read pairs of two nybbles to get data deom LWA telescope.</li>
             <li>BinaryDataSource can now read data as array of nybbles.</li>
             <li>PNGWalkTool provides more hooks for new Jython apps, including magnifier and auto-increment.</li>
