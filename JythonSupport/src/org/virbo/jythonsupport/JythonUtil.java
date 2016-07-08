@@ -336,9 +336,11 @@ public class JythonUtil {
         if ( ! ff4.exists() || vers.equals("") || Double.parseDouble(vers)<currentVersion ) {
             logger.log(Level.FINE, "looking for version={0} of {1}, but didn''t find it.", new Object[] { currentVersion, ff4 } );
             logger.log(Level.FINE, "doesn't seem like we have the right file, downloading...");
-            if ( !ff3.exists() ) {
-                if ( !ff3.mkdir() ) {
-                    throw new IOException("Unable to mkdir "+ff3);
+            synchronized ( JythonUtil.class ) {
+                if ( !ff3.exists() ) {
+                    if ( !ff3.mkdir() ) {
+                        throw new IOException("Unable to mkdir "+ff3);
+                    }
                 }
             }
             String[] ss= new String[] { "autoplot.py", "autoplotapp.py" };
