@@ -770,12 +770,18 @@ public class CreatePngWalk {
      *
      */
     public static void writeHTMLFile( Params params, ArrayList<String> pngFilenameArrayThumbs, ArrayList<String> pngFilenameArrayBig, ArrayList<String> timeLabels ){
+        
+        if ( params.update || ( timeLabels.size()!=pngFilenameArrayBig.size() ) ) {
+            logger.info("skipping create HTML step because of partial run");
+            return;
+        }
+        
         String filePath= params.outputFolder+""+ params.product + ".html";
         //String filePath = "pngImagePage2.html";
         File f= new File(filePath);
         
         String htmlOpen= "<html>\n";
-        String htmlHead="\t<head><title>PNG Gallery TEST</title></head>\n";
+        String htmlHead="\t<head><title>PNG Gallery "+params.product+"</title></head>\n";
         String htmlBody="\t<body style=\"background-color: #6B6B6B; margin=0;\">\n";
         String htmlClose1= "\t\t</div2Close>\n";
         String htmlClose2= "\t</body>\n";
