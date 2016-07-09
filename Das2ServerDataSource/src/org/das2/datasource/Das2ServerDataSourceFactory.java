@@ -63,7 +63,12 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
                 List<String> dss= getDatasetsList( uri.toString() ); // bug 3055130 okay
                 for ( String ds: dss ) {
                     if ( ds.startsWith(cc.completable) ) {
-                        result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ds ) );
+                        int i= ds.indexOf('|');
+                        if ( i==-1 ) {
+                            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ds ) );
+                        } else {
+                            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ds.substring(0,i), ds.substring(i+1).trim() ) );
+                        }
                     }
                 }
             }
