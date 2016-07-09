@@ -456,13 +456,13 @@ public class JythonUtil {
      *  <li>TITLE sentence
      *  <li>DESCRIPTION short paragraph
      * </ul>
-     * @param reader
-     * @return 
+     * @param reader, open and ready to read, which will be closed.
+     * @return the documentation found.
      * @throws java.io.IOException 
      */
      public static Map<String,String> getDocumentation( BufferedReader reader ) throws IOException {
 
-         Map<String,String> result= new HashMap<String, String>();
+         Map<String,String> result= new HashMap<>();
          String s= reader.readLine();
          Pattern p= Pattern.compile("#\\s*([a-zA-Z]+)\\s*:(.*)");
          while ( s!=null ) {
