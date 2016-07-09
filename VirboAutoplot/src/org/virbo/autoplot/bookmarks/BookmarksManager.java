@@ -130,6 +130,8 @@ public class BookmarksManager extends javax.swing.JDialog {
         this( parent, modal, null );
     }
     
+    private boolean plotBelowAndOverplotVisible;
+    
     /** 
      * Creates new BookmarksManager
      * @param parent the parent component.
@@ -142,6 +144,13 @@ public class BookmarksManager extends javax.swing.JDialog {
         this.name= name;
         this.setTitle( name + " Manager");
         initComponents();
+        plotBelowAndOverplotVisible= !name.equals("Tools");
+        if ( name.equals("Tools") ) {
+            overplotButton.setVisible(false);
+            plotBelowButton.setVisible(false);
+            plotButton.setText("Execute");
+            plotButton.setToolTipText("Execute");
+        }
         this.setLocationRelativeTo(parent);
         this.model = new BookmarksManagerModel();
         this.model.setName( name );
@@ -676,13 +685,13 @@ public class BookmarksManager extends javax.swing.JDialog {
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
                         .add(0, 0, Short.MAX_VALUE)
-                        .add(overplotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 83, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(overplotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 97, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(plotBelowButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 103, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(plotBelowButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 119, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(plotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 103, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(plotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 117, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(editButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 79, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(editButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 94, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(dismissButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 71, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
@@ -704,13 +713,13 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
-        layout.linkSize(new java.awt.Component[] {editButton, plotButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+        layout.linkSize(new java.awt.Component[] {overplotButton, plotBelowButton, plotButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(titleLabel)
@@ -1716,8 +1725,13 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
      * @param v 
      */
     public void setPlotActionsVisible( boolean v ) {
-        plotBelowButton.setVisible(v);
-        overplotButton.setVisible(v);
+        if ( plotBelowAndOverplotVisible ) {
+            plotBelowButton.setVisible(v);
+            overplotButton.setVisible(v);
+        } else {
+            plotBelowButton.setVisible(false);
+            overplotButton.setVisible(false);
+        }
         plotButton.setVisible(v);
         editButton.setVisible(v);
     }
