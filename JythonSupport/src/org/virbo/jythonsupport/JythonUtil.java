@@ -196,13 +196,8 @@ public class JythonUtil {
         
         interp.set("monitor", mon);
         
-        try {
-            InputStream in= JythonOps.class.getResource("/autoplot.py").openStream();
-            try {
-                interp.execfile( in, "/autoplot.py"); // import everything into default namespace.
-            } finally {
-                in.close();
-            }
+        try ( InputStream in= JythonOps.class.getResource("/autoplot.py").openStream() ) {
+            interp.execfile( in, "/autoplot.py"); // import everything into default namespace.
         } catch ( IOException ex ) {
             logger.log( Level.SEVERE, ex.getMessage(), ex );
         }
@@ -258,39 +253,40 @@ public class JythonUtil {
         if ( ff4.exists() ) {
             return ff3.toString();
         }
-        if ( !ff3.exists() ) {
-            if ( !ff3.mkdirs() ) {
-                throw new IOException("Unable to mkdirs "+ff3);
+        synchronized ( JythonUtil.class ) {
+            if ( !ff3.exists() ) {
+                if ( !ff3.mkdirs() ) {
+                    throw new IOException("Unable to mkdirs "+ff3);
+                }
             }
         }
-        InputStream inn= JythonUtil.class.getResourceAsStream("/pylisting.txt");
-        BufferedReader r= new BufferedReader( new InputStreamReader(inn) );
-        String s= r.readLine();
-        while ( s!=null ) {
-            File ff5= new File( ff3, s );
-            logger.log(Level.FINER, "copy to local folder python code: {0}", s);
-            InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
-            if ( s.contains("/") ) {
-                if ( !makeHomeFor( ff5 ) ) {
-                    throw new IOException("Unable to makeHomeFor "+ff5);
+        try ( BufferedReader r= new BufferedReader( new InputStreamReader( JythonUtil.class.getResourceAsStream("/pylisting.txt") ) ) ) {
+            String s= r.readLine();
+            while ( s!=null ) {
+                File ff5= new File( ff3, s );
+                logger.log(Level.FINER, "copy to local folder python code: {0}", s);
+                InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
+                if ( s.contains("/") ) {
+                    if ( !makeHomeFor( ff5 ) ) {
+                        throw new IOException("Unable to makeHomeFor "+ff5);
+                    }
                 }
+                FileOutputStream out= new FileOutputStream( ff5 ); // TODO: test this on Windows.
+                try {
+                    transferStream(in,out);
+                } finally {
+                    out.close();
+                    in.close();
+                    if ( new File( ff3, s ).setReadOnly()==false ) {
+                        logger.log( Level.FINER, "set read-only on file {0} failed", s );
+                    }
+                    if ( new File( ff3, s ).setWritable( true, true )==false ) {
+                        logger.log( Level.FINER, "set write for user only on file {0} failed", s );
+                    }
+                }
+                s= r.readLine();
             }
-            FileOutputStream out= new FileOutputStream( ff5 ); // TODO: test this on Windows.
-            try {
-                transferStream(in,out);
-            } finally {
-                out.close();
-                in.close();
-                if ( new File( ff3, s ).setReadOnly()==false ) {
-                    logger.log( Level.FINER, "set read-only on file {0} failed", s );
-                }
-                if ( new File( ff3, s ).setWritable( true, true )==false ) {
-                    logger.log( Level.FINER, "set write for user only on file {0} failed", s );
-                }
-            }
-            s= r.readLine();
         }
-        r.close();
         logger.fine("   ...done");
         return ff3.toString();
     }
@@ -311,8 +307,7 @@ public class JythonUtil {
         double currentVersion= 1.51;  //rfe320 improved getParam support.
                 
         if ( ff4.exists() ) {
-            BufferedReader r= new BufferedReader( new FileReader( ff4 ) );
-            try {
+            try ( BufferedReader r= new BufferedReader( new FileReader( ff4 ) ) ) {
                 String line= r.readLine();
                 if ( line!=null ) {
                     Pattern versPattern= Pattern.compile("# autoplot.py v([\\d\\.]+) .*");  // must be parsable as a double.
@@ -321,8 +316,6 @@ public class JythonUtil {
                         vers= m.group(1);
                     }
                 }
-            } finally {
-                r.close();
             }
         }
         
@@ -1003,15 +996,12 @@ public class JythonUtil {
      public static String readScript( Reader reader ) throws IOException {
         String s;
         StringBuilder build= new StringBuilder();
-        BufferedReader breader= new BufferedReader(reader);
-        try {
+        try ( BufferedReader breader= new BufferedReader(reader) ) {
             s= breader.readLine();
             while (s != null) {
                build.append(s).append("\n");
                s = breader.readLine();
             }
-        } finally {
-            breader.close();
         }
         return build.toString();
      }
@@ -1117,7 +1107,7 @@ public class JythonUtil {
         PyList sort= (PyList) interp.eval( "autoplot._paramSort" );
         
         boolean altWhy= false; // I don't know why things are suddenly showing up in this other space.
-        if ( sort.size()==0 ) {
+        if ( sort.isEmpty() ) {
             try {
                 sort= (PyList) interp.eval( "_paramSort" );
                 if ( sort.size()>0 ) {
@@ -1153,42 +1143,45 @@ public class JythonUtil {
             if ( p.name.equals("resourceUri") ) {
                 p.name= "resourceURI"; //  I will regret allowing for this sloppiness...
             }
-            if ( p.name.equals("resourceURI") ) {
-                p.type= 'R';
-                p.deft= p.deft.toString();
-            } else if ( p.name.equals("timerange") ) {
-                p.type= 'T';
-                p.deft= p.deft.toString();
-            } else {
-                if ( p.deft instanceof String ) {
-                    p.type= 'A';
+            switch (p.name) {
+                case "resourceURI":
+                    p.type= 'R';
                     p.deft= p.deft.toString();
-                } else if ( p.deft instanceof PyString ) {
-                    p.type= 'A';
+                    break;
+                case "timerange":
+                    p.type= 'T';
                     p.deft= p.deft.toString();
-                } else if ( p.deft instanceof PyInteger ) { //TODO: Consider if int types should be preserved.
-                    p.type= 'F';
-                    p.deft= ((PyInteger)p.deft).__tojava__(int.class);
-                } else if ( p.deft instanceof PyFloat ) {
-                    p.type= 'F';
-                    p.deft= ((PyFloat)p.deft).__tojava__(double.class);
-                } else if ( p.deft instanceof PyJavaInstance ) {
-                    Object pp=  ((PyJavaInstance)p.deft).__tojava__( URI.class );
-                    if ( pp==Py.NoConversion ) {
-                        pp=  ((PyJavaInstance)p.deft).__tojava__( Datum.class );
+                    break;
+                default:
+                    if ( p.deft instanceof String ) {
+                        p.type= 'A';
+                        p.deft= p.deft.toString();
+                    } else if ( p.deft instanceof PyString ) {
+                        p.type= 'A';
+                        p.deft= p.deft.toString();
+                    } else if ( p.deft instanceof PyInteger ) { //TODO: Consider if int types should be preserved.
+                        p.type= 'F';
+                        p.deft= ((PyInteger)p.deft).__tojava__(int.class);
+                    } else if ( p.deft instanceof PyFloat ) {
+                        p.type= 'F';
+                        p.deft= ((PyFloat)p.deft).__tojava__(double.class);
+                    } else if ( p.deft instanceof PyJavaInstance ) {
+                        Object pp=  ((PyJavaInstance)p.deft).__tojava__( URI.class );
                         if ( pp==Py.NoConversion ) {
-                            pp=  ((PyJavaInstance)p.deft).__tojava__( DatumRange.class );
-                            p.type= 'S';
-                            p.deft= pp; 
+                            pp=  ((PyJavaInstance)p.deft).__tojava__( Datum.class );
+                            if ( pp==Py.NoConversion ) {
+                                pp=  ((PyJavaInstance)p.deft).__tojava__( DatumRange.class ); 
+                                p.type= 'S';
+                                p.deft= pp;
+                            } else {
+                                p.type= 'D';
+                                p.deft= pp;
+                            }
                         } else {
-                            p.type= 'D';
+                            p.type= 'U';
                             p.deft= pp;
                         }
-                    } else {
-                        p.type= 'U';
-                        p.deft= pp;
-                    }
-                }
+                    }   break;
             }
             result.add(p);
         }
@@ -1255,11 +1248,11 @@ public class JythonUtil {
         try {
             interp.exec(prog);
         } catch ( PyException ex ) {
-            ex.printStackTrace();
+            logger.log( Level.WARNING, null, ex );
             throw ex;
         }
         
-        Map<String,String> result= new LinkedHashMap<String, String>();
+        Map<String,String> result= new LinkedHashMap<>();
         PyDictionary r= (PyDictionary)interp.get("gds");
         
         for ( Object k : r.keys() ) {
@@ -1290,7 +1283,7 @@ public class JythonUtil {
 
             boolean inDef= false;
 
-            Map<String,String> result= new LinkedHashMap<String, String>(); // from ID to description
+            Map<String,String> result= new LinkedHashMap<>(); // from ID to description
 
             while (s != null) {
 
@@ -1436,11 +1429,8 @@ public class JythonUtil {
             String scrip= org.virbo.jythonsupport.JythonUtil.simplifyScriptToGetParams(script,true);
             File f= new File(file);
             String fout= "./test038_"+f.getName();
-            FileWriter fw= new FileWriter(fout);
-            try {
+            try ( FileWriter fw= new FileWriter(fout) ) {
                 fw.append(scrip);
-            } finally {
-                fw.close();
             }
             List<Param> parms= org.virbo.jythonsupport.JythonUtil.getGetParams( script );
             for ( Param p: parms ) {
