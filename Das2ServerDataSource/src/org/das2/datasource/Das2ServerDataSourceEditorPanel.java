@@ -338,11 +338,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     DatumRange validTimeRange= null; // some timerange believed to be valid.
     
+    Map<String,String> readerParams= new HashMap(); // from dataset url to params.
+            
     /**
      * this is called off the event thread for the web transaction, then hop back on it to populate the GUI.
      * @param url
      */
-    private void updateDataSetSelected( URL url ) {
+    private void updateDataSetSelected( final URL url ) {
         InputStream in= null;
         try {
             in = url.openStream();
@@ -448,6 +450,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         }
                     }
                     
+                    String rp= readerParams.get( getDataSetId(url) );
+                    readerParamsTextArea.setText( rp==null ? "" : rp );
+                    
                     Node validRange= (Node)  xpath.evaluate( "/stream/properties/@validRange", document, XPathConstants.NODE );
                     if ( validRange!=null ) {
                         Das2ServerDataSourceEditorPanel.this.validRangeLabel.setText( "valid range: " + validRange.getNodeValue() );
@@ -487,9 +492,42 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }
 
+    /**
+     * return the dataset id (Juno/JED/ElectronSpectra) for the tree path.
+     * @param p the tree path.
+     * @return the dataset id like "http://jupiter.physics.uiowa.edu/das/server?Juno/JED/ElectronSpectra"
+     */
+    private String getDataSetId( TreePath p ) {
+        Object[] oo= p.getPath(); 
+        StringBuilder ds= new StringBuilder( String.valueOf( oo[0] ) );
+        ds.append("?").append(oo[1]);
+        for ( int i=2; i<oo.length; i++ ) {
+            ds.append( "/" ).append( oo[i] );
+        }
+        return ds.toString();
+    }
+    
+    /**
+     * return <url>?<id>
+     * @param url
+     * @return "http://jupiter.physics.uiowa.edu/das/server?Juno/JED/ElectronSpectra"
+     */
+    private String getDataSetId( URL url ) {
+        Map<String,String> p= URISplit.parseParams(url.getQuery());
+        return url.getProtocol()+"://"+url.getHost() + url.getPath() + "?" + p.get("dataset");
+    }
+    
     private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
         TreePath p= evt.getPath();
+        TreePath old= evt.getOldLeadSelectionPath();
+        
         TreeModel m= ((JTree)evt.getSource()).getModel();
+
+        if ( old!=null && m.isLeaf(old.getLastPathComponent()) ) {
+            String osurl = getDataSetId( old );
+            readerParams.put( osurl, readerParamsTextArea.getText() );
+        }
+        
         if ( ! m.isLeaf( p.getLastPathComponent() ) ) {
             descriptionLabel.setText( "" );
             this.validRangeLabel.setText("<html><i>no dataset selected</i></html>");
@@ -497,12 +535,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         } else {
             this.viewDsdfButton.setEnabled(true);
             this.validRangeLabel.setText("<html><i>retrieving dataset info...</i></html>");
-            Object[] oo= p.getPath();
-            StringBuilder ds= new StringBuilder( String.valueOf( oo[1] ) );
-            for ( int i=2; i<oo.length; i++ ) {
-                ds.append( "/" ).append( oo[i] );
-            }
-            String surl = oo[0] + "?server=dsdf&dataset=" + ds.toString();
+            String ds= getDataSetId( p );
+            int i= ds.indexOf('?');
+            String surl = p.getPath()[0] + "?server=dsdf&dataset=" + ds.substring(i+1);
             try {
                 final URL url = new URL(surl);
                 RequestProcessor.invokeLater( new Runnable() {
@@ -1017,8 +1052,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             timeRangeTextField.setText( DEFAULT_TIMERANGE );
         }
 		  
-		  String intrinsic = params.remove("intrinsic");
-		  intrinsicCb.setSelected("true".equals(intrinsic));
+        String intrinsic = params.remove("intrinsic");
+        intrinsicCb.setSelected("true".equals(intrinsic));
 		  
         String interval= params.remove("interval");
         if ( interval!=null ) {
@@ -1037,6 +1072,8 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         }
         readerParamsTextArea.setText(paramsStr.toString());
+        String key= serverURL + "?" + dataSetId;
+        readerParams.put( key, paramsStr.toString() );
 
         updateDas2ServersImmediately(); // this will set serverUrl to the last used server if nothing is specified.
 
