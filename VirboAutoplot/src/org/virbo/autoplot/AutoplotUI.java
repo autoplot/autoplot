@@ -5599,18 +5599,35 @@ APSplash.checkTime("init 240");
     }
 
     /**
-     * install the script into the tools folder.
+     * install the script into the tools folder.  This is run on a 
+     * separate thread, so it will not be installed immediately.  The
+     * tool script is read in to get the title and label.
      * @param ff
      * @param resourceUri 
      */
-    protected void installTool( File ff, URI resourceUri ) {
+    protected void installTool( final File ff, URI resourceUri ) {
         try {
             String scriptUri= new URI( "script", resourceUri.toString(), null ).toString();
-            toolsManager.addBookmark(scriptUri);
-            Window w= ScriptContext.getViewWindow();
-            if ( w instanceof AutoplotUI ) {
-                ((AutoplotUI)w).reloadTools();
-            }
+            final Bookmark b= toolsManager.addBookmark(scriptUri);
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    try ( BufferedReader reader= new BufferedReader( new FileReader(ff) ) ) {
+                        Map<String,String> doc= org.virbo.jythonsupport.JythonUtil.getDocumentation( reader );
+                        String title= doc.get( "TITLE" );
+                        if ( title!=null ) b.setDescription(title); //TODO: bookmarks use inconsistent names... 
+                        String label= doc.get( "LABEL" );
+                        if ( label!=null ) b.setTitle(label);
+                        Window w= ScriptContext.getViewWindow();
+                        if ( w instanceof AutoplotUI ) {
+                            ((AutoplotUI)w).reloadTools();
+                        }
+                    } catch ( IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            new Thread(run).start();
         } catch (URISyntaxException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
