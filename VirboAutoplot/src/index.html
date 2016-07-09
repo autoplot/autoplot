@@ -24,8 +24,11 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-06-28 r19148):</p>
+        <p>Bugfixes (2016-07-09 r19160):</p>
         <ul>
+            <li>1604: Tools Manager has overplot and plot below buttons.</li>
+            <li>1626: das2server dataset parameters are reset as id is changed.</li>
+            <li>make block that creates /home/Dragon/autoplot_data/jython synchronized, to avoid errors seen during tests.</li>
             <li>das2stream adapter for rank 3 join of tables supports xTagWidth.</li>
             <li>1625: writeHTML PngWalk crashes when --update is used.  Thanks, Jon N.!</li>
             <li>1624: local .gz files are not uncompressed automatically.</li>
@@ -69,8 +72,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe504: install tool now checks the script for the label and description of the script.</li>
             <li>allow clients to declare new types of colorbars.</li>
-            <li>UInt24DataSet added so that we can read pairs of two nybbles to get data deom LWA telescope.</li>
+            <li>UInt24DataSet added so that we can read pairs of two nybbles to get data from LWA telescope.</li>
             <li>BinaryDataSource can now read data as array of nybbles.</li>
             <li>PNGWalkTool provides more hooks for new Jython apps, including magnifier and auto-increment.</li>
             <li>planet.physics.uiowa.edu is the default das2server now.</li>
