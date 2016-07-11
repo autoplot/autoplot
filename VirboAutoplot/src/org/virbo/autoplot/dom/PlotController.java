@@ -298,6 +298,7 @@ public class PlotController extends DomNodeController {
     
     /**
      * A new dataset has been loaded or the axis is focused on a new range.
+     * bug 1627: out-of-memory caused here by careless copying of data.  This is improved, but more could be done.
      * @param dr0 the new range for the axis.
      * @param ds the dataset to find next or previous focus.
      */
@@ -306,7 +307,11 @@ public class PlotController extends DomNodeController {
         if ( ds!=null && SemanticOps.isBundle(ds) ) {
             logger.log(Level.FINE, "unbundling: {0}", ds);
             QDataSet xds= SemanticOps.xtagsDataSet(ds);
-            ds= SemanticOps.getDependentDataSet(ds);
+            if ( ds.rank()==2 ) {
+                ds= Ops.unbundle( ds, ds.length(0)-1 );
+            } else {
+                ds= SemanticOps.getDependentDataSet(ds);
+            }
             ds= Ops.link( xds, ds );
         }
                         
