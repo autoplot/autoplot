@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsConverter;
 import org.virbo.dsops.Ops;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.IndexListDataSetIterator;
@@ -747,10 +748,19 @@ public class PyQDataSet extends PyJavaInstance {
         }
 
         QDataSet val = coerceDsInternal(arg1);
+        Units units= (Units)this.ds.property(QDataSet.UNITS);
+        if ( units==null ) {
+            logger.fine("resetting units based on values assigned");
+            Units u= SemanticOps.getUnits(val);
+            this.ds.putProperty(QDataSet.UNITS,u);
+            units= u;
+        }
 
+        UnitsConverter uc= SemanticOps.getUnits(val).getConverter(units);
+                
         // see org.virbo.dsops.CoerceUtil, make version that makes iterators.
         if ( val.rank()==0 ) {
-            double d = val.value();
+            double d = uc.convert(val.value());
             while (iter.hasNext()) {
                 iter.next();
                 iter.putValue(ds, d);
@@ -761,18 +771,12 @@ public class PyQDataSet extends PyJavaInstance {
             QubeDataSetIterator it = new QubeDataSetIterator(val);
             while (it.hasNext()) {
                 it.next();
-                double d = it.getValue(val);
+                double d = uc.convert(it.getValue(val));
                 iter.next();
                 iter.putValue(ds, d);
             }
         }
-        
-        if ( this.ds.property(QDataSet.UNITS)==null ) {
-            logger.fine("resetting units based on values assigned");
-            Units u= SemanticOps.getUnits(val);
-            this.ds.putProperty(QDataSet.UNITS,u);
-        }
-        
+                
     }
     
     /**
