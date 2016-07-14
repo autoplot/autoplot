@@ -87,7 +87,8 @@ public class CsvDataSource extends AbstractDataSource {
         InputStream in = DataSetURI.getInputStream(uri, mon);
 
         BufferedReader breader= new BufferedReader(new InputStreamReader(in) );
-        String skip= getParam( "skip", "" );
+        String skip= getParam( "skipLines", "" );
+        if ( skip.length()==0 ) skip= getParam( "skip", "" );
         if ( skip.length()>0 ) {
             int iskip= Integer.parseInt(skip);  // TODO: getIntegerParam( "skip", -1, "min=0,max=100" );
             for ( int i=0; i<iskip; i++ ) {
