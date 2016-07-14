@@ -742,11 +742,10 @@ public class PyQDataSet extends PyJavaInstance {
         }
 
         QDataSet val = coerceDsInternal(arg1);
-        Units units= (Units)this.ds.property(QDataSet.UNITS);
         if ( units==null ) {
             logger.fine("resetting units based on values assigned");
             Units u= SemanticOps.getUnits(val);
-            this.ds.putProperty(QDataSet.UNITS,u);
+            if ( u!=Units.dimensionless ) this.ds.putProperty(QDataSet.UNITS,u);
             units= u;
         }
 
@@ -794,6 +793,7 @@ public class PyQDataSet extends PyJavaInstance {
     /* we need to wrap put methods as well... */
     public void putProperty( String prop, Object value ) {
         if ( ds==null ) throw new RuntimeException("putProperty on dataset that could not be made into mutable, use copy.");
+        if ( prop.equals(QDataSet.UNITS) ) this.units= (Units)value;
         ds.putProperty(prop,value);
     }
     public void putProperty( String prop, int index, Object value ) {
