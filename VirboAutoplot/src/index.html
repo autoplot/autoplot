@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Experiments with creating a new colorbar from scripts.
+        <p><small>The screenshot tool takes a screenshot of the application and masks other windows for privacy.  See <a href="http://autoplot.org/data/tools/createScreenShot.jy">createScreenShot.jy</a>
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,14 +24,18 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-07-09 r19160):</p>
-        <ul>
+        <p>Bugfixes (2016-07-14 r19170):</p>
+        <ul> 
+            <li>1624: local .gz files are now uncompressed automatically.  Create-parent-directories portion needed to be synchronized.</li>
+            <li>in-lining weights calculation of histogram routine, after seeing use of WeightsDataSet doubles execution time.</li>
+            <li>support compressed das2streams with zero-length compressed portion.  This would hang before the fix.</li>
+            <li>1628:  vap+inline:ripplesTimeSeries(100000) hangs in AutoHistogram.
+            <li>1627: (rte_0554827090) reduce memory requirement by handling bundle dataset using just the last bundled dataset to keep track of fill.</li>
             <li>1604: Tools Manager has overplot and plot below buttons.</li>
             <li>1626: das2server dataset parameters are reset as id is changed.</li>
             <li>make block that creates /home/Dragon/autoplot_data/jython synchronized, to avoid errors seen during tests.</li>
             <li>das2stream adapter for rank 3 join of tables supports xTagWidth.</li>
             <li>1625: writeHTML PngWalk crashes when --update is used.  Thanks, Jon N.!</li>
-            <li>1624: local .gz files are not uncompressed automatically.</li>
             <li>1569: check for zero in __add__ function, to support Jython sum operation.</li>
             <li>1623: Jython index bug, where Jython list was misinterpretted as the single index for each dimension.</li>
             <li>1621: wrong ordinal selected when table is sorted by ordinal.</li>
@@ -72,6 +76,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe505: Jython setItem will correctly convert units as well as implicitly assign them.</li>
+            <li>operations processor supports datums in histogram command.</li>
             <li>rfe504: install tool now checks the script for the label and description of the script.</li>
             <li>allow clients to declare new types of colorbars.</li>
             <li>UInt24DataSet added so that we can read pairs of two nybbles to get data from LWA telescope.</li>
