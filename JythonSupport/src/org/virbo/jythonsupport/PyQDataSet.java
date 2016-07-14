@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
+import org.das2.datum.Units;
 import org.virbo.dsops.Ops;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.IndexListDataSetIterator;
@@ -627,6 +628,9 @@ public class PyQDataSet extends PyJavaInstance {
     }
 
     /**
+     * Assign the values to the indeces specified.  
+     * Note, if the value has units and the PyQDataSet does not yet have units, 
+     * then the units are assigned.
      * See http://autoplot.org/developer.python.indexing
      * @param arg0 the indeces
      * @param arg1 the values to assign
@@ -762,6 +766,13 @@ public class PyQDataSet extends PyJavaInstance {
                 iter.putValue(ds, d);
             }
         }
+        
+        if ( this.ds.property(QDataSet.UNITS)==null ) {
+            logger.fine("resetting units based on values assigned");
+            Units u= SemanticOps.getUnits(val);
+            this.ds.putProperty(QDataSet.UNITS,u);
+        }
+        
     }
     
     /**
