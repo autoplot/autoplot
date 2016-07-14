@@ -55,6 +55,7 @@ public class PyQDataSet extends PyJavaInstance {
 
     WritableDataSet ds;
     QDataSet rods; // read-only dataset
+    Units units; // indicates if the units have been set.
 
     /**
      * Note getDataSet will always provide a writable dataset.
@@ -73,6 +74,7 @@ public class PyQDataSet extends PyJavaInstance {
             this.ds= null;
             this.rods= ds;
         }
+        this.units= (Units)ds.property(QDataSet.UNITS);
     }
 
     public QDataSet getQDataSet() {
@@ -133,10 +135,6 @@ public class PyQDataSet extends PyJavaInstance {
         return new PyQDataSet(Ops.divide(that, rods));
     }
 
-    /**
-     * TODO: this is incorrect.  floordiv is where
-     * be 5/2=2 (integer devision)
-     */    
     @Override
     public PyObject __floordiv__(PyObject arg0) {
         QDataSet that = coerce_ds(arg0);
@@ -149,10 +147,6 @@ public class PyQDataSet extends PyJavaInstance {
         return new PyQDataSet(Ops.mod(rods, that));
     }
     
-    /**
-     * TODO: this is incorrect.  rfloordiv is where
-     * be 5/2=2 (integer devision)
-     */ 
     @Override
     public PyObject __rfloordiv__(PyObject arg0) {
         QDataSet that = coerce_ds(arg0);
