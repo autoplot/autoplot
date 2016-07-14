@@ -57,12 +57,12 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
     public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
             List<CompletionContext> result = new ArrayList<CompletionContext>();
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "skip="));
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recCount="));
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column="));
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units="));
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "ordinal=fpe,fuh"));
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "fixedColumns="));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "skipLines=", "the number of lines to skip before attempting to parse"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recCount=", "the number of records to read in"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column=", "the column to read in"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "units of the data"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "ordinal=fpe,fuh", "set of ordinals that appear in this column"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "fixedColumns=", "use the fixed columns parser"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "rank2=", "read in more than one column to create a rank 2 dataset."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "bundle=", "read in more than one column to create a rank 2 bundle dataset."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend1Labels=", "label each of the columns, bundling different data together in rank 2 dataset"));
@@ -99,7 +99,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             return result;
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
-            if (paramName.equals("skip")) {
+            if (paramName.equals("skip") || paramName.equals("skipLines")) {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "the number of lines to skip before attempting to parse."));
             } else if ( paramName.equals("headerDelim") ) {
                 List<CompletionContext> result = new ArrayList<CompletionContext>();
