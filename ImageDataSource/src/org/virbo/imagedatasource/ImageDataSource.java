@@ -201,9 +201,10 @@ class ImageDataSource extends AbstractDataSource {
                     throw new IllegalArgumentException("this image has less than three bands, which is interpretted to mean no alpha");
                 }
                 DDataSet ds= DDataSet.createRank2(image.getWidth(), image.getHeight() );
+                int n= ds.length(0);
                 for ( int i=0; i<ds.length(); i++ ) {
                     for ( int j=0; j<ds.length(0); j++ ) {
-                        ds.putValue(i, j, image.getAlphaRaster().getSample( i,j,0 ) );
+                        ds.putValue(i, j, image.getAlphaRaster().getSample( i,n-j-1,0 ) );
                     }
                 }
                 ds.putProperty( QDataSet.LABEL, "alpha" );
