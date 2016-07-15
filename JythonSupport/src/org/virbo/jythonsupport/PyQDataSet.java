@@ -39,6 +39,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.TrimStrideWrapper;
 import org.virbo.dataset.WritableDataSet;
+import org.virbo.dsops.CoerceUtil;
 
 /**
  * PyQDataSet wraps a QDataSet to provide Python operator overloading and
@@ -676,16 +677,32 @@ public class PyQDataSet extends PyJavaInstance {
             boolean allLists= true;
             for (int i = 0; i < slices.__len__(); i++) {
                 PyObject a = slices.__getitem__(i);
-                if ( ! ( a instanceof PyQDataSet ) ) {
+                if ( ! ( a instanceof PyQDataSet ) && !( a instanceof PyInteger ) ) {
                     allLists= false;
+                } else if ( a instanceof PyInteger ) {
+                    lists[i]= DataSetUtil.asDataSet( ((PyInteger)a).getValue() );
+                } else if ( a instanceof PyFloat ) {
+                    lists[i]= DataSetUtil.asDataSet( ((PyFloat)a).getValue() );
                 } else {
                     lists[i]= ((PyQDataSet)a).rods;
                 }
             }
             if ( allLists ) {
-                int n= lists[0].length();
                 QDataSet val= coerceDsInternal(  arg1 );
+                
+                QDataSet[] ll= new QDataSet[2];
+                ll[0]= lists[0];
+                for ( int i=1; i<slices.__len__(); i++) {
+                    ll[1]= lists[i];
+                    CoerceUtil.coerce( ll[0], ll[1], false, ll );
+                    lists[0]= ll[0];
+                    lists[i]= ll[1];
+                }
+                CoerceUtil.coerce( ll[0], val, false, ll );
+                val= ll[1];
                 QubeDataSetIterator it = new QubeDataSetIterator( val );
+                
+                int n= lists[0].length();
                 if ( ds.rank()==1 ) {
                     for ( int i=0;i<n;i++ ) {
                         it.next();
