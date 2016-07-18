@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The screenshot tool takes a screenshot of the application and masks other windows for privacy.  See <a href="http://autoplot.org/data/tools/createScreenShot.jy">createScreenShot.jy</a>
+        <p><small>A script provides an easy way to extract a subset of the ephemeris parameters.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-07-14 r19178):</p>
+        <p>Bugfixes (2016-07-17 r19178):</p>
         <ul> 
+            <li>Juno Waves survey dataset showed a bug with the LanlNNRebin mode for spectrograms.</li>
+            <li>copy plots down initializes DSF TSB properly.  The bug would occasionally cause a fault in test100_042.</li>
             <li>ImageDataSource alpha channel was upside-down, relative to the other channels.</li>
             <li>CSV and ASCII table reader use skipLines consistently (instead of skip), and this is presented in completions.</li>
             <li>1629: jython index bug, where two lists of indeces and one index are used.</li>
@@ -46,6 +48,9 @@
             <li>1616:  hooks in pngwalk to allow for scripting new apps.   Add switch to disable automatic digitizer recording.</li>
             <li>rte_1585690286: code failed to check if null was found for units.</li>
             <li>1541: Larry's Jython code where dom.dataSourceFilters would result in Concurrent exception </li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>1618: botched bugfix breaks File->"Add Plot From..."->CDAWeb</li>
             <li>startDigitizer is a public method now, and startQC can be called multiple times without complaint.</li>            
             <li>rte_0400646374: Index out of bounds when QC is running and pngwalk is empty.  Thanks Ivar!</li>
@@ -66,25 +71,18 @@
             <li>warning about using a timerange with a non-TSB getDataSet call removed.  It wasn't effective.</li>
             <li>0899: avoid extraneous load of data when createPngWalk is used to create single pngs.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>bugfix: simplifyScriptToGetParams didn't consider comments, creating a confusing situation where it wasn't clear why it was failing to parse.</li>
-            <li>1603: check for ordinal units in closestIndex function.</li>
-            <li>putProperty( ds, QDataSet.SCALE_MIN, rank0qds ) supported.</li>
-            <li>Code put in to automatically name the default plane of das2stream didn't consider that there might already be a plane "y", and uses the name property instead for the default value.  Thanks Chris and Bill!</li>
-            <li>"UNKNOWN ERROR" message was printed when CreatePngwalk was cancelled.</li>
-            <li>add noCheckCertificate setting to work around where LANL's certificate is suddenly not working.</li>
-            <li>dataset([d1,d2]) where d1 and d2 are Datums of different but convertible Units created incorrect dataset.  Thanks Ivar!</li>
-            <li>1599: experiment with invokeLater to avoid hang seen with TimeRangeEditor.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>tearoffTabbedPane allows tab to be selected programmatically by title.</li>
             <li>rfe505: Jython setItem will correctly convert units as well as implicitly assign them.</li>
             <li>operations processor supports datums in histogram command.</li>
             <li>rfe504: install tool now checks the script for the label and description of the script.</li>
             <li>allow clients to declare new types of colorbars.</li>
             <li>UInt24DataSet added so that we can read pairs of two nybbles to get data from LWA telescope.</li>
             <li>BinaryDataSource can now read data as array of nybbles.</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>PNGWalkTool provides more hooks for new Jython apps, including magnifier and auto-increment.</li>
             <li>planet.physics.uiowa.edu is the default das2server now.</li>
             <li>Refactor HTTPFileSystem to make the code a little easier to follow.</li>
@@ -92,12 +90,6 @@
             <li>HDF reader supports structures.</li>
             <li>PngWalkTool digitizer now includes column identifying the image.</li>
             <li>PngWalkTool provides mechanism for extension, where scripts can get events and can plug in small GUI.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Jython plot command gets control for spectrogram color table.  Thanks Babtiste and Kristoff!</li>
-            <li>add control to set the maximum thread count, useful for Ivar's strange .jyds bug</li>
-            <li>add plots dialog allows up to 6 by 6 plots now, useful for things like hourly plots of a day (6x4=24).</li>
         </ul>
 
         <p>Known issues:</p>
