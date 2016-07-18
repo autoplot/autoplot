@@ -1629,7 +1629,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             if ( !dataSetNeedsLoading ) {
                 dsfnew.controller.setUriNeedsResolution( false );
-                dsfnew.controller.resetDataSource(false,dsfsrc.controller.getDataSource());
+                dsfnew.controller.resetDataSource(true,dsfsrc.controller.getDataSource());
                 dsfnew.controller.setDataSetNeedsLoading( false );
                 dsfnew.controller.setResetDimensions(false);
                 dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet(),dsfsrc.controller.getRawProperties(),isValueAdjusting()); // fire off data event.
