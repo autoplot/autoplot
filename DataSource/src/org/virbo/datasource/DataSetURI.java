@@ -473,7 +473,7 @@ public class DataSetURI {
         String resourceSuri = uri.getRawSchemeSpecificPart();
         resourceUri = new URI(resourceSuri); //bug3055130 okay
 
-        ext = DataSetURI.getExt(uri.toASCIIString());
+        ext = DataSetURI.getExt(uri.toString());
         if (ext == null) ext = "";
 
         DataSourceFactory factory;
@@ -623,7 +623,7 @@ public class DataSetURI {
      * @return
      */
     public static String fromUri( URI uri ) {
-        String surl= uri.toASCIIString();
+        String surl= uri.toString();
         int i= surl.indexOf("?");
         String query= i==-1 ? "" : surl.substring(i);
         if ( i!=-1 ) {
@@ -1879,15 +1879,15 @@ public class DataSetURI {
                         offlineMsg= offlineMsg.substring(0,17)+"...";
                     }
                     if ( offlineCode==0 ) {
-                        completions.add( new DataSetURI.CompletionResult( fs.getRootURI().toASCIIString(), "(FileSystem is offline: "+offlineMsg+")", 
-                                "<html>The filesystem is offline because of<br>"+wfs.getOfflineMessage()+"<br>Use Tools->Cache->Reset Memory Caches to reset", fs.getRootURI().toASCIIString(), false ) );                        
+                        completions.add( new DataSetURI.CompletionResult( fs.getRootURI().toString(), "(FileSystem is offline: "+offlineMsg+")", 
+                                "<html>The filesystem is offline because of<br>"+wfs.getOfflineMessage()+"<br>Use Tools->Cache->Reset Memory Caches to reset", fs.getRootURI().toString(), false ) );                        
                     } else {
-                        completions.add( new DataSetURI.CompletionResult( fs.getRootURI().toASCIIString(), "(FileSystem is offline: "+offlineMsg+")", 
-                                "<html>The filesystem is offline because of<br>"+offlineCode + ": "+wfs.getOfflineMessage()+"<br>Use Tools->Cache->Reset Memory Caches to reset", fs.getRootURI().toASCIIString(), false ) );
+                        completions.add( new DataSetURI.CompletionResult( fs.getRootURI().toString(), "(FileSystem is offline: "+offlineMsg+")", 
+                                "<html>The filesystem is offline because of<br>"+offlineCode + ": "+wfs.getOfflineMessage()+"<br>Use Tools->Cache->Reset Memory Caches to reset", fs.getRootURI().toString(), false ) );
                     }
                     
                 } else {
-                    completions.add( new DataSetURI.CompletionResult( fs.getRootURI().toASCIIString(), "(FileSystem is offline)", "The filesystem is offline.  Use Tools->Cache->Reset Memory Caches to reset", fs.getRootURI().toASCIIString(), false ) );
+                    completions.add( new DataSetURI.CompletionResult( fs.getRootURI().toString(), "(FileSystem is offline)", "The filesystem is offline.  Use Tools->Cache->Reset Memory Caches to reset", fs.getRootURI().toString(), false ) );
                 }
             }
         }

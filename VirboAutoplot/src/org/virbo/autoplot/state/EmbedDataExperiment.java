@@ -163,7 +163,7 @@ public class EmbedDataExperiment {
                 }
                 if ( DataSetURI.isAggregating( uri.toString() ) ) {
                     try {
-                        String [] rr= DataSetURI.unaggregate( uri.toASCIIString(), dom.getTimeRange() );
+                        String [] rr= DataSetURI.unaggregate( uri.toString(), dom.getTimeRange() );
                         for ( String r: rr ) {
                             try {
                                 result.add( new URI( r ) );

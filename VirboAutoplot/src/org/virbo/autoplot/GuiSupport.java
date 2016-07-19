@@ -182,7 +182,7 @@ public class GuiSupport {
     }
 
     public void doCopyDataSetURL() {
-        StringSelection stringSelection = new StringSelection( DataSetURI.toUri(parent.dataSetSelector.getValue()).toASCIIString() );
+        StringSelection stringSelection = new StringSelection( DataSetURI.toUri(parent.dataSetSelector.getValue()).toString() );
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, new ClipboardOwner() {
             @Override

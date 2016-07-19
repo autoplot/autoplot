@@ -337,7 +337,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
         
         boolean useReferenceCache= "true".equals( System.getProperty( ReferenceCache.PROP_ENABLE_REFERENCE_CACHE, "false" ) );
         
-        String theUri= this.tsb!=null ? this.tsb.getURI() : this.uri.toASCIIString();
+        String theUri= this.tsb!=null ? this.tsb.getURI() : this.uri.toString();
         
         ReferenceCache.ReferenceCacheEntry cacheEntry=null;
         if ( useReferenceCache ) {

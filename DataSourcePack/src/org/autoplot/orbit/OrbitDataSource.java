@@ -35,12 +35,12 @@ class OrbitDataSource extends AbstractDataSource {
         String str= params.get( URISplit.PARAM_TIME_RANGE );
         if ( str!=null ) {
             try {
-                tsb.setURI(uri.toASCIIString());
+                tsb.setURI(uri.toString());
             } catch (ParseException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
-        addCability(TimeSeriesBrowse.class, tsb );
+        addCapability(TimeSeriesBrowse.class, tsb );
     }
 
     @Override
