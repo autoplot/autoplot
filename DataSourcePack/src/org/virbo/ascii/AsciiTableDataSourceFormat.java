@@ -21,7 +21,6 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DatumFormatter;
 import org.das2.datum.format.DefaultDatumFormatter;
-import org.das2.datum.format.EnumerationDatumFormatter;
 import org.das2.datum.format.TimeDatumFormatter;
 import org.das2.datum.format.TimeDatumFormatterFactory;
 import org.das2.util.monitor.ProgressMonitor;
@@ -127,7 +126,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 }
 
             } catch (ParseException ex) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, ex.getMessage(), ex);
                 timeFormatter = TimeDatumFormatterFactory.getInstance().defaultFormatter();
                 
             }
@@ -142,7 +141,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             //TODO: would be nice if we could verify formatter.  I had %f5.2 instead of %5.2f and it wasn't telling me.
             return new FormatStringFormatter( df, false );
         } catch ( RuntimeException ex ) {
-            ex.printStackTrace();
+            logger.log( Level.SEVERE, ex.getMessage(), ex);
             return u.getDatumFormatterFactory().defaultFormatter();
         }
     }
@@ -439,7 +438,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 formatBundleDescRichAscii( out, data, bundleDesc );
                 haveRich= true;
             } catch ( JSONException ex ) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, ex.getMessage(), ex );
             }
         } else {
             maybeOutputProperty(out, data, QDataSet.TITLE);
@@ -642,7 +641,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 bds.bundle( ds );
                 formatBundleDescRichAscii( out, data, bds );
             } catch ( JSONException ex ) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, ex.getMessage(), ex );
             }
         } else {
             maybeOutputProperty(out, data, QDataSet.TITLE);
@@ -714,26 +713,27 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
             int j;
 
-            if ( data.rank()==2 ) {
-                for ( j = 0; j < data.length(i) - 1; j++) {
-                    out.print( cf1.format( u.createDatum(data.value(i,j)), u ) + ", ");
-                }
-                out.println( cf1.format( u.createDatum(data.value(i,j)), u )  );
-            } else if ( data.rank()==3 ) {
-                int m= data.length(i);
-                int n= data.length(i,0);
-                for ( j = 0; j < m; j++) {
-                    for ( int k=0; k<n; k++ ) {
-                        out.print( cf1.format( u.createDatum(data.value(i,j,k)), u ) );
-                        if ( j<m-1 || k<n-1 ) {
-                            out.print( ", " );
-                        } else {
-                            out.print( "\n");
+            switch (data.rank()) {
+                case 2:
+                    for ( j = 0; j < data.length(i) - 1; j++) {
+                        out.print( cf1.format( u.createDatum(data.value(i,j)), u ) + ", ");
+                    }   out.println( cf1.format( u.createDatum(data.value(i,j)), u )  );
+                    break;
+                case 3:
+                    int m= data.length(i);
+                    int n= data.length(i,0);
+                    for ( j = 0; j < m; j++) {
+                        for ( int k=0; k<n; k++ ) {
+                            out.print( cf1.format( u.createDatum(data.value(i,j,k)), u ) );
+                            if ( j<m-1 || k<n-1 ) {
+                                out.print( ", " );
+                            } else {
+                                out.print( "\n");
+                            }
                         }
-                    }
-                }
-            } else {
-                throw new IllegalArgumentException("rank error, expected 2 or 3" );
+                    }   break;
+                default:
+                    throw new IllegalArgumentException("rank error, expected 2 or 3" );
             }
         }
         mon.finished();
@@ -809,7 +809,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 QDataSet bds= Ops.join( ids, ds );
                 formatBundleDescRichAscii( out,data,bds );
             } catch ( JSONException ex ) {
-                ex.printStackTrace();
+                logger.log( Level.SEVERE, ex.getMessage(), ex);
             }
         } else {
             maybeOutputProperty(out, data, QDataSet.TITLE);
@@ -935,33 +935,34 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 //                throw new IOException( "Unable to write file: "+f );
 //            }
 //        }
-        PrintWriter out = new PrintWriter( f ); //TODO: it would be nice to support a preview, this assumes file.
-
-        String head= getParam( "header", "" ); // could be "rich" or "none"
-        if ( !"rich".equals( head ) && !"none".equals(head)) {
-            out.println("# Generated by Autoplot on " + new Date());
-        }
-
-        if (data.rank() == 2) {
-            if ( SemanticOps.isBundle(data) ) {
-                formatRank2Bundle( out, data, mon ); // data should have property BUNDLE_1 because of isBundle==true
-            } else {
-                formatRank2(out, data, mon);
+        try ( PrintWriter out = new PrintWriter( f ) ) { //TODO: it would be nice to support a preview, this assumes file.
+            String head= getParam( "header", "" ); // could be "rich" or "none"
+            if ( !"rich".equals( head ) && !"none".equals(head)) {
+                out.println("# Generated by Autoplot on " + new Date());
             }
-        } else if (data.rank() == 1) {
-            formatRank1(out, data, mon);
-        } else if ( data.rank()==3 && "rich".equals( head ) ) {
-            formatRank2(out, data, mon);
-        } else {
-            throw new IllegalArgumentException("only rank 1 and rank 2 data are supported");
-        }
-        out.close();
+            
+            if (data.rank() == 2) {
+                if ( SemanticOps.isBundle(data) ) {
+                    formatRank2Bundle( out, data, mon ); // data should have property BUNDLE_1 because of isBundle==true
+                } else {
+                    formatRank2(out, data, mon);
+                }
+            } else if (data.rank() == 1) {
+                formatRank1(out, data, mon);
+            } else if ( data.rank()==3 && "rich".equals( head ) ) {
+                formatRank2(out, data, mon);
+            } else {
+                throw new IllegalArgumentException("only rank 1 and rank 2 data are supported");
+            }
+        } // could be "rich" or "none"
     }
 
+    @Override
    public boolean canFormat(QDataSet ds) {
         return ( ds.rank()>0 && ds.rank()<3 );
     }
 
+    @Override
     public String getDescription() {
         return "ASCII Table";
     }
