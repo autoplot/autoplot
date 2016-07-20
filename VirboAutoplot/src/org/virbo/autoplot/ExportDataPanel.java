@@ -10,14 +10,22 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import org.das2.util.LoggerManager;
@@ -29,6 +37,7 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
 
 /**
@@ -74,7 +83,127 @@ public class ExportDataPanel extends javax.swing.JPanel {
             processedDataB.setEnabled(false);
         }
     }
+    
+    /**
+     * set the dataset to export.
+     * @param ds the dataset.
+     */
+    public void setDataSet( QDataSet ds ) {
+        originalDataSet= ds;
+        processedDataB.setEnabled(false);
+        processedWithinXRangeB.setEnabled(false);
+        
+        List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
+        Collections.sort(exts);
+        getFormatDL().setModel( new DefaultComboBoxModel(exts.toArray()) );
+        getFormatDL().setRenderer( new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                String ext= String.valueOf(value);
+                DataSourceFormat format= DataSourceRegistry.getInstance().getFormatByExt(ext);
+                Component parent= super.getListCellRendererComponent( list, value, index, isSelected, cellHasFocus );
+                if ( parent instanceof JLabel ) {
+                    if ( format!=null ) {
+                        ((JLabel)parent).setText( value.toString() + " " + format.getDescription() );
+                    }
+                }
+                return parent;
+            }
+        });
+        
+        Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
+        String currentFileString = prefs.get("ExportDataCurrentFile", "");
+        String currentExtString = prefs.get("ExportDataCurrentExt", ".txt");
+        if ( !currentExtString.equals("") ) {
+            getFormatDL().setSelectedItem(currentExtString);
+        }        
+        if ( !currentFileString.equals("") ) {
+            URISplit split= URISplit.parse(currentFileString);
+            getFilenameTF().setText(split.file);
+            getFormatDL().setSelectedItem( "." + split.ext );
+            if ( currentFileString.contains("/") ) {
+                setFile( currentFileString );
+                if ( split.params!=null && getDataSourceFormatEditorPanel()!=null ) {
+                    getDataSourceFormatEditorPanel().setURI(currentFileString);
+                }
+            }
+        }
+        
+    }
 
+    /**
+     * return the filename selected by the GUI.  This will append the correct 
+     * extension.
+     * @return the filename.
+     */
+    public String getFilename() {
+        String name = getFilenameTF().getText();
+        String ext = (String) getFormatDL().getSelectedItem();
+
+        List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
+
+        if (name.startsWith("file://")) {
+            name = name.substring(7);
+        }
+        if (name.startsWith("file:")) {
+            name = name.substring(5);
+        }
+        String osName = System.getProperty("os.name", "applet");
+        if (osName.startsWith("Windows") && name.startsWith("/") && name.length() > 3 && name.charAt(2) == ':') {
+            name = name.substring(1); // Windows gets file:///c:/foo.wav
+        }
+
+        URISplit split = URISplit.parse(name);
+        if (split.file == null) {
+            try {
+                name = new File(FileSystemUtil.getPresentWorkingDirectory(), name).toString();
+                split = URISplit.parse(name);
+                if (split.file == null) {
+                    throw new IllegalArgumentException("Can't use this filename: " + name);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(ExportDataPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (!split.file.endsWith(ext)) {
+            String s = split.file;
+            boolean addExt = true;
+            for (String ext1 : exts) {
+                if (s.endsWith(ext1)) {
+                    addExt = false;
+                    ext = ext1;
+                }
+            }
+            if (addExt) {
+                split.file = s + ext;
+            }
+            //name= URISplit.format(split);
+        }
+        
+        // mimic JChooser logic.
+        String s1= split.file;
+        if ( s1.startsWith("file://") ) {
+            s1= s1.substring(7);
+        }
+        if ( s1.startsWith("file:") ) {
+            s1= s1.substring(5);
+        }
+
+        Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
+        prefs.put("ExportDataCurrentFile", s1 );
+        prefs.put("ExportDataCurrentExt", ext );
+        
+        return s1;
+    }
+    
+    /**
+     * return the extension selected
+     * @return the extension selected
+     */
+    public String getExtension() {
+        return (String)getFormatDL().getSelectedItem();
+    }
+    
     /**
      * return the processed data within the plot element.
      * @return 
@@ -369,7 +498,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 processedDataB.setEnabled( true );
                 processedWithinXRangeB.setEnabled( true );
             }
-            if ( processedDataSet.equals(originalDataSet ) ) {
+            if ( originalDataSet.equals(processedDataSet) ) {
                 processedDataB.setEnabled(false);
             }
             if ( !originalDataB.isEnabled() && originalDataB.isSelected() ) {
