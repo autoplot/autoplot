@@ -44,7 +44,6 @@ import org.das2.util.ByteBufferInputStream;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSourceUtil;
 //import org.virbo.datasource.ReferenceCache;
 import org.virbo.dsops.Ops;
@@ -123,7 +122,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
      */
     int eventListColorColumn= -1;
     
-    /** Creates a new instance of AsciiTableDataSource */
+    /** 
+     * Creates a new instance of AsciiTableDataSource
+     * @param uri the URI to read.
+     * @throws java.io.FileNotFoundException 
+     */
     public AsciiTableDataSource(URI uri) throws FileNotFoundException, IOException {
         super(uri);
 
@@ -796,6 +799,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 if ( fields[2].startsWith("x") || fields[2].startsWith("0x" ) ) { // kludge for RGB color third column starts with x
                     parser.setUnits(2,Units.dimensionless);
                     parser.setFieldParser( 2, new FieldParser() {
+                        @Override
                         public double parseField(String field, int columnIndex) throws ParseException {
                             if ( field.startsWith("x") ) {
                                 return Integer.decode( "0"+field ); // kludge for Scott
@@ -931,13 +935,17 @@ public class AsciiTableDataSource extends AbstractDataSource {
             while ( tailCount<tailNum && ipos>0 ) {
                 ipos--;
                 byte ch= buff.get((int)ipos);
-                if ( ch==10 ) {
-                    if ( ipos>1 && buff.get(ipos-1)==13 ) ipos=ipos-1;
-                    if ( foundNonEOL ) tailCount++;
-                } else if ( ch==13 ) {
-                    if ( foundNonEOL ) tailCount++;
-                } else {
-                    foundNonEOL= true;
+                switch (ch) {
+                    case 10:
+                        if ( ipos>1 && buff.get(ipos-1)==13 ) ipos=ipos-1;
+                        if ( foundNonEOL ) tailCount++;
+                        break;
+                    case 13:
+                        if ( foundNonEOL ) tailCount++;
+                        break;
+                    default:
+                        foundNonEOL= true;
+                        break;
                 }
             }
             buff.position( tailCount<tailNum ? 0 : ipos+1 );
@@ -955,7 +963,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
     @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         if (ds == null) {
-            return new HashMap<String, Object>();
+            return new HashMap<>();
         }
         @SuppressWarnings("unchecked")
         Map<String, Object> props = (Map<String, Object>) ds.property(QDataSet.USER_PROPERTIES);
