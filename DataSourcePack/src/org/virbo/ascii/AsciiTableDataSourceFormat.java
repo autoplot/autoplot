@@ -716,7 +716,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             switch (data.rank()) {
                 case 2:
                     for ( j = 0; j < data.length(i) - 1; j++) {
-                        out.print( cf1.format( u.createDatum(data.value(i,j)), u ) + ", ");
+                        out.print( cf1.format( u.createDatum(data.value(i,j)), u ) + delim );
                     }   out.println( cf1.format( u.createDatum(data.value(i,j)), u )  );
                     break;
                 case 3:
@@ -726,7 +726,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                         for ( int k=0; k<n; k++ ) {
                             out.print( cf1.format( u.createDatum(data.value(i,j,k)), u ) );
                             if ( j<m-1 || k<n-1 ) {
-                                out.print( ", " );
+                                out.print( delim );
                             } else {
                                 out.print( "\n");
                             }
