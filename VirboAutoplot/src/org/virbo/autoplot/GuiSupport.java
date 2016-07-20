@@ -583,60 +583,21 @@ public class GuiSupport {
                 if ( AutoplotUtil.showConfirmDialog2( parent, edp, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                      try {
                         String name= edp.getFilenameTF().getText();
-                        String ext = (String)edp.getFormatDL().getSelectedItem();
-
-                        if ( name.startsWith("file://") ) {
-                            name= name.substring(7);
+                        String ext = edp.getExtension();
+                        String file;
+                        try {
+                            file= edp.getFilename();
+                        } catch ( IllegalArgumentException ex ) {
+                            JOptionPane.showMessageDialog(parent, ex.getMessage() );
+                            return;
                         }
-                        if ( name.startsWith("file:") ) {
-                            name= name.substring(5);
-                        }
-                        String osName =System.getProperty("os.name", "applet" );
-                        if ( osName.startsWith("Windows") && name.startsWith("/") && name.length()>3 && name.charAt(2)==':' ) {
-                            name= name.substring(1); // windows gets file:///c:/foo.wav
-                        }
-
-                        URISplit split= URISplit.parse(name);
-                        if ( split.file==null ) {
-                            name= new File( FileSystemUtil.getPresentWorkingDirectory(), name ).toString(); 
-                            split= URISplit.parse(name);
-                            if ( split.file==null ) {
-                                JOptionPane.showMessageDialog(parent, "Can't use this filename: " + name);
-                                return;
-                            }
-                        }
-                        if ( !split.file.endsWith(ext) ) {
-                            String s=  split.file;
-                            boolean addExt= true;
-                            for (String ext1 : exts) {
-                                if (s.endsWith(ext1)) {
-                                    addExt= false;
-                                    ext = ext1;
-                                }
-                            }
-                            if ( addExt ) {
-                                split.file= s+ext;
-                            }
-                            //name= URISplit.format(split);
-                        }
-
-                        // mimic JChooser logic.
-                        String s1= split.file;
-                        if ( s1.startsWith("file://") ) {
-                            s1= s1.substring(7);
-                        }
-                        if ( s1.startsWith("file:") ) {
-                            s1= s1.substring(5);
-                        }
-
-                        File ff= new File(s1);
-                        name= ff.getAbsolutePath();
-
 
                         if (ext == null) {
                             ext = "";
                         }
 
+                        URISplit split= URISplit.parse(file);
+                        
                         final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
                         if (format == null) {
                             JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
@@ -691,7 +652,7 @@ public class GuiSupport {
 
                         new Thread( run ).start();
 
-                    } catch ( IllegalArgumentException | IOException | HeadlessException | URISyntaxException ex) {
+                    } catch ( IllegalArgumentException | HeadlessException | URISyntaxException ex) {
                         parent.applicationModel.getExceptionHandler().handle(ex);
 
                     } catch (RuntimeException ex ) {
