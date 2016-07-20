@@ -6,6 +6,13 @@ package org.virbo.autoplot.dom;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -21,7 +28,12 @@ import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
@@ -57,6 +69,7 @@ import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.AutoplotUtil;
 import static org.virbo.autoplot.AutoplotUtil.SERIES_SIZE_LIMIT;
+import org.virbo.autoplot.ExportDataPanel;
 import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.layout.LayoutConstants;
@@ -67,6 +80,9 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceFormat;
+import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
@@ -2665,6 +2681,8 @@ public class PlotElementController extends DomNodeController {
         
         final Renderer oldRenderer = getRenderer();
 
+        final Window parent = SwingUtilities.getWindowAncestor( plotElement.controller.getDasPlot().getCanvas() );
+                
         //logger.fine( "oldRenderer= "+oldRenderer + "  plotElementController="+ this + " ("+this.hashCode()+")" + " " + Thread.currentThread().getName() );
         DasColorBar cb= null;
         if ( RenderTypeUtil.needsColorbar(plotElement.getRenderType()) ) cb= getColorbar();
@@ -2730,7 +2748,6 @@ public class PlotElementController extends DomNodeController {
                                         @Override
                                         public void actionPerformed(ActionEvent e) {
                                             org.das2.util.LoggerManager.logGuiEvent(e);
-                                            logger.warning("adding slice below");
                                             final QDataSet ds= hmm.getSlicer().getDataSet();
                                             final Datum y= hmm.getSlicer().getSliceY();
                                             RequestProcessor.invokeLater( new Runnable() {
@@ -2739,6 +2756,45 @@ public class PlotElementController extends DomNodeController {
                                                     addPlotBelow(ds,y);
                                                 }
                                             });
+                                        }
+                                    });
+                                    hmm.getSlicer().addAction( new AbstractAction("Export Data") {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            org.das2.util.LoggerManager.logGuiEvent(e);
+                                            final QDataSet ds= hmm.getSlicer().getDataSet();
+                                            ExportDataPanel p= new ExportDataPanel();
+                                            p.setDataSet(ds);
+                                            if ( AutoplotUtil.showConfirmDialog2( parent, p, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                                                final String f= p.getFilename();
+                                                String ext= p.getExtension();
+                                                final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
+                                                if (format == null) {
+                                                    JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
+                                                    return;
+                                                }
+                                                try {
+                                                    format.formatData( f, ds, DasProgressPanel.createFramed("export slice data") );
+                                                    JPanel panel= new JPanel();
+                                                    panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+                                                    panel.add( new JLabel( "<html>Data formatted to<br>" + f ) );
+                                                    panel.add( new JButton( new AbstractAction("Copy filename to clipboard") {
+                                                        @Override
+                                                        public void actionPerformed(ActionEvent e) {
+                                                            StringSelection stringSelection = new StringSelection( f );
+                                                            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                                                            clipboard.setContents(stringSelection, new ClipboardOwner() {
+                                                                @Override
+                                                                public void lostOwnership(Clipboard clipboard, Transferable contents) {
+                                                                }
+                                                            } );
+                                                        }
+                                                    } ) );
+                                                    JOptionPane.showMessageDialog(parent, panel );
+                                                } catch (Exception ex) {
+                                                    JOptionPane.showMessageDialog(parent, "Exception while formatting: " + ex.getMessage() );
+                                                }
+                                            }
                                         }
                                     });
                                 }
