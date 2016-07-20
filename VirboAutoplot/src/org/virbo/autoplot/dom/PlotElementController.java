@@ -44,6 +44,7 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.event.HorizontalSlicerMouseModule;
 import org.das2.event.MouseModule;
+import org.das2.event.VerticalSlicerMouseModule;
 import org.das2.graph.ContoursRenderer;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
@@ -2796,9 +2797,51 @@ public class PlotElementController extends DomNodeController {
                                                 }
                                             }
                                         }
-                                    });
+                                    });                                    
                                 }
-                                
+                                mm= plot.getDasMouseInputAdapter().getModuleByLabel("Vertical Slice");
+                                final VerticalSlicerMouseModule vmm= ((VerticalSlicerMouseModule)mm);
+                                if ( vmm!=null ) { // for example in headless mode
+                                    vmm.getSlicer().addAction( new AbstractAction("Export Data") {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            org.das2.util.LoggerManager.logGuiEvent(e);
+                                            final QDataSet ds= vmm.getSlicer().getDataSet();
+                                            ExportDataPanel p= new ExportDataPanel();
+                                            p.setDataSet(ds);
+                                            if ( AutoplotUtil.showConfirmDialog2( parent, p, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                                                final String f= p.getFilename();
+                                                String ext= p.getExtension();
+                                                final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
+                                                if (format == null) {
+                                                    JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
+                                                    return;
+                                                }
+                                                try {
+                                                    format.formatData( f, ds, DasProgressPanel.createFramed("export slice data") );
+                                                    JPanel panel= new JPanel();
+                                                    panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+                                                    panel.add( new JLabel( "<html>Data formatted to<br>" + f ) );
+                                                    panel.add( new JButton( new AbstractAction("Copy filename to clipboard") {
+                                                        @Override
+                                                        public void actionPerformed(ActionEvent e) {
+                                                            StringSelection stringSelection = new StringSelection( f );
+                                                            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                                                            clipboard.setContents(stringSelection, new ClipboardOwner() {
+                                                                @Override
+                                                                public void lostOwnership(Clipboard clipboard, Transferable contents) {
+                                                                }
+                                                            } );
+                                                        }
+                                                    } ) );
+                                                    JOptionPane.showMessageDialog(parent, panel );
+                                                } catch (Exception ex) {
+                                                    JOptionPane.showMessageDialog(parent, "Exception while formatting: " + ex.getMessage() );
+                                                }
+                                            }
+                                        }
+                                    });                                
+                                }
                             } else {
                                 Renderer[] rends= plot.getRenderers();
                                 int best=-1;
