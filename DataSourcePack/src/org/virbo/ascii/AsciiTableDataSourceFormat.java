@@ -278,7 +278,16 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         QDataSet dep= (QDataSet) data.property(QDataSet.DEPEND_1);
         if ( dep!=null && UnitsUtil.isRatioMeasurement( SemanticOps.getUnits(dep) ) && data.property(QDataSet.BUNDLE_1)==null ) {
             dep1Name= (String) Ops.guessName(dep);
+            if ( dep1Name==null ) dep1Name= "dep1";
             jo.put( dep1Name, formatDataSetInline( dep ) );
+        }
+        
+        String dep2Name= null;
+        dep= (QDataSet) data.property(QDataSet.DEPEND_2);
+        if ( dep!=null && UnitsUtil.isRatioMeasurement( SemanticOps.getUnits(dep) ) && data.property(QDataSet.BUNDLE_1)==null ) {
+            dep2Name= (String) Ops.guessName(dep);
+            if ( dep2Name==null ) dep2Name= "dep2";
+            jo.put( dep2Name, formatDataSetInline( dep ) );
         }
         
         if ( dep0!=null ) {
@@ -304,8 +313,9 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         String[] elementNames= new String[bundleDesc.length()];
         String[] elementLabels= new String[bundleDesc.length()];
         if ( bundleDesc.length()==1 && bundleDesc.length(0)==1 ) {
-            elementNames= new String[(int)bundleDesc.value(0,0)];
-            for ( int i=0; i<bundleDesc.value(0,0); i++ ) {
+            int n= DataSetUtil.product( DataSetUtil.qubeDims(data.slice(0) ) );
+            elementNames= new String[n];
+            for ( int i=0; i<n; i++ ) {
                 elementNames[i]= "ch_"+i;
             }
             QDataSet theOne= Ops.unbundle( bundleDesc,0);
@@ -354,7 +364,12 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         jo1.put( "START_COLUMN", startColumn  );
         if ( data.rank()>1 ) {
             if ( bundleDesc.length()==1 ) { // bundle of 1 rank 2
-                jo1.put( "DIMENSION", new int[] { (int)bundleDesc.value(0,0)} );            
+                if ( data.rank()>2 ) {
+                    int[] dims= DataSetUtil.qubeDims(data.slice(0));
+                    jo1.put( "DIMENSION", dims );  
+                } else {
+                    jo1.put( "DIMENSION", new int[] { (int)bundleDesc.value(0,0)} );                                
+                }
             } else {                        // bundle of N rank 1
                 jo1.put( "DIMENSION", new int[] { bundleDesc.length()} );
             }
@@ -365,6 +380,9 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             if ( dep1Name!=null ) {
                 jo1.put("DEPEND_1", dep1Name );
                 jo1.put("RENDER_TYPE", "spectrogram" );
+            }
+            if ( dep2Name!=null ) {
+                jo1.put("DEPEND_2", dep2Name );
             }
             jo.put( Ops.guessName(data,"data"), jo1 );    
         }
@@ -695,10 +713,28 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             }
 
             int j;
-            for ( j = 0; j < data.length(i) - 1; j++) {
-                out.print( cf1.format( u.createDatum(data.value(i,j)), u ) + delim );
+
+            if ( data.rank()==2 ) {
+                for ( j = 0; j < data.length(i) - 1; j++) {
+                    out.print( cf1.format( u.createDatum(data.value(i,j)), u ) + ", ");
+                }
+                out.println( cf1.format( u.createDatum(data.value(i,j)), u )  );
+            } else if ( data.rank()==3 ) {
+                int m= data.length(i);
+                int n= data.length(i,0);
+                for ( j = 0; j < m; j++) {
+                    for ( int k=0; k<n; k++ ) {
+                        out.print( cf1.format( u.createDatum(data.value(i,j,k)), u ) );
+                        if ( j<m-1 || k<n-1 ) {
+                            out.print( ", " );
+                        } else {
+                            out.print( "\n");
+                        }
+                    }
+                }
+            } else {
+                throw new IllegalArgumentException("rank error, expected 2 or 3" );
             }
-            out.println( cf1.format( u.createDatum(data.value(i,j)), u )  );
         }
         mon.finished();
     }
@@ -914,6 +950,8 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             }
         } else if (data.rank() == 1) {
             formatRank1(out, data, mon);
+        } else if ( data.rank()==3 && "rich".equals( head ) ) {
+            formatRank2(out, data, mon);
         } else {
             throw new IllegalArgumentException("only rank 1 and rank 2 data are supported");
         }
