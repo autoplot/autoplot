@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
+import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.virbo.dsops.Ops;
@@ -766,7 +767,12 @@ public class PyQDataSet extends PyJavaInstance {
             units= u;
         }
 
-        UnitsConverter uc= SemanticOps.getUnits(val).getConverter(units);
+        UnitsConverter uc;
+        try {
+            uc= SemanticOps.getUnits(val).getConverter(units);
+        } catch ( InconvertibleUnitsException ex ) {
+            uc= UnitsConverter.IDENTITY;
+        }
                 
         // see org.virbo.dsops.CoerceUtil, make version that makes iterators.
         if ( val.rank()==0 ) {
