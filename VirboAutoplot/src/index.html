@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A script provides an easy way to extract a subset of the ephemeris parameters.
+        <p><small>The binary source is used to explore the data with a CDF file.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-07-17 r19178):</p>
+        <p>Bugfixes (2016-07-21 r19210):</p>
         <ul> 
+            <li>1634: AutoplotDataServer misformats NoDataInIntervalException</li>
+            <li>1629: recent change for setItem for datasets in Jython needed to account for sloppy codes that mishandled units.</li> 
+            <li>1490: RichAscii delim was not set properly in one branch (unreleased bug).</li>
+            <li>1630: turn on flag that suppresses reset of TSB, which only affected some of the Hudson tests.</li>
             <li>1566: rte_0610709130: load vap supports folder names with UTF-8 characters with local files and http.</li>
             <li>Juno Waves survey dataset showed a bug with the LanlNNRebin mode for spectrograms.</li>
             <li>copy plots down initializes DSF TSB properly.  The bug would occasionally cause a fault in test100_042.</li>
@@ -74,6 +78,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe509: horizontal and vertical slices support export data</li>
             <li>tearoffTabbedPane allows tab to be selected programmatically by title.</li>
             <li>rfe505: Jython setItem will correctly convert units as well as implicitly assign them.</li>
             <li>operations processor supports datums in histogram command.</li>
@@ -84,6 +89,7 @@
        </ul>
         <p>Less recent features:</p>
         <ul>
+            <li>NearestNeighborTcaFunction to support using calculated data for ticks.  Thanks, Kristoff!</li>
             <li>PNGWalkTool provides more hooks for new Jython apps, including magnifier and auto-increment.</li>
             <li>planet.physics.uiowa.edu is the default das2server now.</li>
             <li>Refactor HTTPFileSystem to make the code a little easier to follow.</li>
