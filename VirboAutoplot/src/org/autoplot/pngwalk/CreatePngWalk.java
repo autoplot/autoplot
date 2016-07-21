@@ -1,16 +1,9 @@
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.autoplot.pngwalk;
 
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -42,7 +35,6 @@ import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.OptionsPrefsController;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.DataSetOps;
@@ -51,9 +43,6 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
-
-//METHOD TO GENERATE HTML
-//IMPORTS:
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -61,7 +50,6 @@ import java.io.BufferedWriter;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
-import java.util.regex.*;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -377,10 +365,7 @@ public class CreatePngWalk {
         StringBuilder build= new StringBuilder();
         build.append( String.format( "JAVA -cp autoplot.jar org.autoplot.pngwalk.CreatePngWalk " ) );
 
-        // Write out the parameters used to create this pngwalk in product.pngwalk
-        PrintWriter ff=null;
-        try {
-            ff= new PrintWriter( new FileWriter( new java.io.File( outputFolder, params.product + ".pngwalk" ) ) );
+        try ( PrintWriter ff = new PrintWriter( new FileWriter( new java.io.File( outputFolder, params.product + ".pngwalk" ) ) ) ) {  // Write out the parameters used to create this pngwalk in product.pngwalk
 
             build.append("--vap=").append(vap).append( " ");
             build.append("--outputFolder=").append(params.outputFolder).append( " ");
@@ -423,8 +408,6 @@ public class CreatePngWalk {
                 build.append("--outputFormat=").append( params.outputFormat );
             }
             
-        } finally {
-            if ( ff!=null ) ff.close();
         }
          
         if ( !( mon instanceof NullProgressMonitor ) ) { // only show in interactive session
@@ -767,6 +750,10 @@ public class CreatePngWalk {
     /**
      * Method to write HTML file of all the pictures to give a gallery view
      * @author Armond Luthens
+     * @param params
+     * @param pngFilenameArrayThumbs
+     * @param pngFilenameArrayBig
+     * @param timeLabels
      *
      */
     public static void writeHTMLFile( Params params, ArrayList<String> pngFilenameArrayThumbs, ArrayList<String> pngFilenameArrayBig, ArrayList<String> timeLabels ){
@@ -807,10 +794,6 @@ public class CreatePngWalk {
         String currentPngFilenameBIG;
         String fileNameToDisplay;
         String bigImageLink;
-        String year;
-        String month;
-        String day;
-        String fullDate;
         String fullImageCaption;
         int count=0;
         
@@ -843,14 +826,8 @@ public class CreatePngWalk {
             bw.write(htmlClose1);
             bw.write(htmlClose2);
             bw.write(htmlClose3);
-        } 
-        catch(IOException e){
-            System.err.println("IO ERROR.");
-            e.printStackTrace();
-        }
-        catch(Exception e2){
-            System.err.println("UNKNOWN ERROR.");
-            e2.printStackTrace();
+        } catch(Exception e){
+            logger.log( Level.WARNING, e.getMessage(), e );
         }
     }
 
@@ -896,12 +873,15 @@ public class CreatePngWalk {
             try {
                 TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
+                        @Override
                         public java.security.cert.X509Certificate[] getAcceptedIssuers() {
                             return null;
                         }
                         
+                        @Override
                         public void checkClientTrusted(X509Certificate[] certs, String authType) {  }
                         
+                        @Override
                         public void checkServerTrusted(X509Certificate[] certs, String authType) {  }
                         
                     }
@@ -913,6 +893,7 @@ public class CreatePngWalk {
                 
                 // Create all-trusting host name verifier
                 HostnameVerifier allHostsValid = new HostnameVerifier() {
+                    @Override
                     public boolean verify(String hostname, SSLSession session) {
                         return true;
                     }
@@ -920,10 +901,8 @@ public class CreatePngWalk {
                 
                 HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
                 
-            } catch (NoSuchAlgorithmException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            } catch ( KeyManagementException ex) {
-                logger.log(Level.SEVERE, null, ex);
+            } catch (NoSuchAlgorithmException | KeyManagementException ex) {
+                logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
 
