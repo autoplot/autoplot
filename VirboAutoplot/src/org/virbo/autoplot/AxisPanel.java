@@ -13,6 +13,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -25,7 +26,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
-import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -39,6 +39,7 @@ import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
+import org.virbo.autoplot.dom.TimeSeriesBrowseController;
 import org.virbo.datasource.TimeRangeEditor;
 
 /**
@@ -320,6 +321,20 @@ public class AxisPanel extends javax.swing.JPanel {
         
     }
     
+    private boolean isSomeoneListening( Plot p ) {
+        List<PlotElement> pes= dom.getController().getPlotElementsFor(p);
+        for ( PlotElement pe: pes ) {
+            DataSourceFilter dsf= pe.getController().getDataSourceFilter();
+            TimeSeriesBrowseController tsbc= dsf.getController().getTimeSeriesBrowseController();
+            if ( tsbc!=null ) {
+                if ( p.getId().equals(tsbc.getPlotId()) ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
     /**
      * do the somewhat expensive check to see if the timerange controller needs
      * to be bound.
@@ -333,26 +348,27 @@ public class AxisPanel extends javax.swing.JPanel {
         if ( UnitsUtil.isTimeLocation( p.getXaxis().getRange().getUnits() ) ) {
             type= "xaxis";    
         } else if ( dom.getController().findBindings( p, "context").size()>0 && dom.getController().isTimeSeriesBrowse(p) ) {
-            type= "context";
+            type= "context_"+p.getId();
+        } else if ( isSomeoneListening(p) ) {
+            type= "context_"+p.getId();
         } else {
             type= "none";
         }
-        
+
+        System.err.println( "timeRangeBindingType " + type + " " + p ); 
         logger.log(Level.FINE, "timeRangeBindingType {0}", type);
         
         if ( !type.equals(timeRangeBindingType) ) {
             BindingGroup bc= bindingGroup;
             if ( timeRangeBinding!=null ) bc.removeBinding( timeRangeBinding );
-            switch (type) {
-                case "xaxis":
+            if ( type.equals("xaxis") ) {
                     this.timeRangeEditor1.setEnabled(true);
                     this.timeRangeEditor1.setToolTipText("controlling "+p.getId()+" xaxis");
                     timeRangeBinding= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p.getXaxis(), BeanProperty.create("range"), timeRangeEditor1, BeanProperty.create( TimeRangeEditor.PROP_RANGE ) );
                     bc.addBinding(timeRangeBinding);
                     timeRangeBinding.setConverter( new DontChangeAxisUnitsConverter(p.getXaxis()) );
                     timeRangeBindingType= type;
-                    break;
-                case "context":
+            } else if ( type.startsWith("context") ) {
                     this.timeRangeEditor1.setEnabled(true);
                     this.timeRangeEditor1.setToolTipText("controlling "+p.getId()+".context");
                     timeRangeBinding= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("context"), 
@@ -360,15 +376,14 @@ public class AxisPanel extends javax.swing.JPanel {
                     timeRangeBinding.setConverter( new DontChangePlotUnitsConverter(p) );
                     bc.addBinding(timeRangeBinding);
                     timeRangeBindingType= type;
-                    break;
-                default:            
+            } else {
                     this.timeRangeEditor1.setEnabled(false);
                     this.timeRangeEditor1.setToolTipText("plot context control has no effect.");
                     timeRangeBinding= null;
                     timeRangeBindingType= type;
-                    break;
             }
             bc.bind();
+            timeRangeEditor1.setToolTipText(timeRangeBindingType);
         }
     }
     
