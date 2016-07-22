@@ -42,6 +42,7 @@ public class Test_042_TwoTsb implements Scenario {
             for ( String s: bis ) {
                 System.err.println(s);
             }
+            System.err.println( "build.jenkinsURL: " +AboutUtil.getJenkinsURL() );
         } catch (IOException ex) {
             Logger.getLogger(Test_042_TwoTsb.class.getName()).log(Level.SEVERE, null, ex);
         }
