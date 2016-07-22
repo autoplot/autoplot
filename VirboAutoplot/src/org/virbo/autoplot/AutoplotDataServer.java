@@ -134,7 +134,7 @@ public class AutoplotDataServer {
                         logger.fine( String.format( "dataset doesn't appear to be a timeseries, reloading everything" ) );
                         ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, outer.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                         logger.log( Level.FINE, "  --> {0} )", ds1 );
-                        writeData( format, out, ds1, ascii );
+                        writeData(format, out, ds1, ascii, stream );
                         someValid= true;
                         break;
                     }
@@ -148,7 +148,7 @@ public class AutoplotDataServer {
                         logger.log( Level.FINE, "time at read done read of {0}= {1}\n", new Object[]{ dr.toString(), System.currentTimeMillis()-t0 } );
                     }
                     
-                    writeData( format, out, ds1, ascii );
+                    writeData(format, out, ds1, ascii, stream );
                     
                     outEmpty.add("out is no longer empty");
                     someValid= true;
@@ -169,7 +169,7 @@ public class AutoplotDataServer {
             logger.log(Level.FINE, "loaded ds={0}", ds);
             
             if ( ds!=null ) {
-                writeData( format, out, ds, false );
+                writeData(format, out, ds, false, false );
                 someValid= true;
             }
         }
@@ -198,36 +198,36 @@ public class AutoplotDataServer {
         throw new IllegalArgumentException("AutoplotDataServer should not be instantiated");
     }
 
-    private static void formatD2S( QDataSet data, OutputStream fo, boolean ascii) {
+    private static void formatD2S( QDataSet data, OutputStream fo, boolean ascii, boolean stream ) {
         boolean binary = !ascii;
         if (data.rank() == 3) {
             TableDataSet tds = TableDataSetAdapter.create(data);
             if (binary) {
-                TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), false, false );
+                TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), false, !stream );
             } else {
-                TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), true, false );
+                TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), true, !stream );
             }
         } else if (data.rank() == 2) {
             TableDataSet tds = TableDataSetAdapter.create(data);
             if (binary) {
-                TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), false, false );
+                TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), false, !stream );
             } else {
-                TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), true, false );
+                TableUtil.dumpToDas2Stream( tds, Channels.newChannel(fo), true, !stream );
             }
         } else if (data.rank() == 1) {
             VectorDataSet vds = VectorDataSetAdapter.create(data);
             if (binary) {
-                VectorUtil.dumpToDas2Stream( vds, Channels.newChannel(fo), false, false );
+                VectorUtil.dumpToDas2Stream( vds, Channels.newChannel(fo), false, !stream );
             } else {
-                VectorUtil.dumpToDas2Stream( vds, Channels.newChannel(fo), true, false );
+                VectorUtil.dumpToDas2Stream( vds, Channels.newChannel(fo), true, !stream );
             }
         }
     }
 
-    private static void writeData( String format, OutputStream out, QDataSet ds, boolean ascii ) throws Exception {
+    private static void writeData( String format, OutputStream out, QDataSet ds, boolean ascii, boolean stream) throws Exception {
         if ( format.equals(FORM_D2S) ) {
             
-            formatD2S( ds, out, ascii );
+            formatD2S( ds, out, ascii, stream );
             
         } else if ( format.equals(FORM_QDS) ) {
             if ( ds.property( QDataSet.DEPEND_1 )!=null && ds.property( QDataSet.BUNDLE_1 )!=null ) {
@@ -238,7 +238,7 @@ public class AutoplotDataServer {
             new SimpleStreamFormatter().format(ds, out, ascii );
             
         } else if ( format.equals("dat") || format.equals("xls") || format.equals("bin") ) {
-            File file= File.createTempFile( "autoplotDataServer", "."+format );
+            File file= File.createTempFile("autoplotDataServer", "."+format );
             
             formatDataSet( ds, file.toString() );
             
@@ -317,7 +317,7 @@ public class AutoplotDataServer {
         alm.addOptionalSwitchArgument("timeRange", "t", "timeRange", "", "timerange for TimeSeriesBrowse datasources");
         alm.addOptionalSwitchArgument("timeStep", "s", "timeStep", "86400s", "atom step size for loading and sending, default is 86400s");
         alm.addOptionalSwitchArgument("cache", "c", "cache", "", "location where files are downloaded, default is $HOME/autoplot_data/cache");
-        alm.addBooleanSwitchArgument("nostream",  "", "nostream","disable streaming, as with Bill's dataset which is X and Y table");
+        alm.addBooleanSwitchArgument( "nostream", "", "nostream","disable streaming, as with Bill's dataset which is X and Y table");
         alm.addBooleanSwitchArgument( "ascii", "a", "ascii", "request that ascii streams be sent instead of binary.");
         alm.addBooleanSwitchArgument( "noexit", "z", "noexit", "don't exit after running, for use with scripts." );
 
@@ -412,9 +412,9 @@ public class AutoplotDataServer {
              out = new PrintStream(outfile);
         }
 
-        if ( format.equals(FORM_D2S) ) {
+        if ( format.equals(FORM_D2S) && stream ) {
             mon= new D2SMonitor(out,outEmpty);
-        } else if ( format.equals(FORM_QDS) ) {
+        } else if ( format.equals(FORM_QDS) && stream ) {
             mon= new QStreamMonitor(out,outEmpty);
         } else {
             logger.fine("no progress available because output is not d2s stream");
