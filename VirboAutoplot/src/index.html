@@ -26,6 +26,9 @@
         
         <p>Bugfixes (2016-07-21 r19210):</p>
         <ul> 
+            <li>dataset( PyObject, Units ) was thoroughly implemented.</li>
+            <li>1632: copy over copy over SCALE_TYPE, TITLE, etc when writing das2streams.</li>
+            <li>1637: binary source fails to read large JADE files gt Integer.MAX_VALUE/8 bytes.</li>
             <li>1634: AutoplotDataServer misformats NoDataInIntervalException</li>
             <li>1629: recent change for setItem for datasets in Jython needed to account for sloppy codes that mishandled units.</li> 
             <li>1490: RichAscii delim was not set properly in one branch (unreleased bug).</li>
@@ -85,7 +88,7 @@
             <li>rfe504: install tool now checks the script for the label and description of the script.</li>
             <li>allow clients to declare new types of colorbars.</li>
             <li>UInt24DataSet added so that we can read pairs of two nybbles to get data from LWA telescope.</li>
-            <li>BinaryDataSource can now read data as array of nybbles.</li>
+            <li>rfe511: BinaryDataSource can now read data as array of nybbles.</li>
        </ul>
         <p>Less recent features:</p>
         <ul>
