@@ -187,6 +187,12 @@ public class TimeSeriesBrowseController {
         return false;
     }
 
+    /**
+     * it's a little shocking that after all these years, there isn't a trivial
+     * way to see the time and property that was are listening to.
+     * @param node
+     * @param property 
+     */
     protected void setupGen( DomNode node, final String property ) {
         timeSeriesBrowseListener = new PropertyChangeListener() {
             @Override
