@@ -205,7 +205,12 @@ public class BinaryDataSource extends AbstractDataSource {
             fieldCount= recSizeBits / BufferDataSet.bitCount(columnType);
         }
 
-        final int frecCount= Math.min( length * 8 / recSizeBits, recCount );
+        final int frecCount;
+        if ( ( recSizeBits % 8 )==0 ) {
+            frecCount= Math.min( length / recSizeBytes, recCount );
+        } else {
+            frecCount= Math.min( length * 8 / recSizeBits, recCount ); // Note this limits size to less than 1/8 GB.
+        }
 
         int[] rank2= null;
 
