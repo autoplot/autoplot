@@ -39,9 +39,9 @@ public class Test_042_TwoTsb implements Scenario {
         try {
             System.err.println( AboutUtil.getReleaseTag() );
             List<String> bis= AboutUtil.getBuildInfos();
-            for ( String s: bis ) {
+            bis.stream().forEach((s) -> {
                 System.err.println(s);
-            }
+            });
             System.err.println( "build.jenkinsURL: " +AboutUtil.getJenkinsURL() );
         } catch (IOException ex) {
             Logger.getLogger(Test_042_TwoTsb.class.getName()).log(Level.SEVERE, null, ex);
