@@ -6,8 +6,10 @@
 package org.autoplot.test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.util.AboutUtil;
 import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.Scenario;
@@ -34,6 +36,16 @@ public class Test_042_TwoTsb implements Scenario {
     @Override
     public int runIt(Object o) {
 
+        try {
+            System.err.println( AboutUtil.getReleaseTag() );
+            List<String> bis= AboutUtil.getBuildInfos();
+            for ( String s: bis ) {
+                System.err.println(s);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Test_042_TwoTsb.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput());
 
         try {
