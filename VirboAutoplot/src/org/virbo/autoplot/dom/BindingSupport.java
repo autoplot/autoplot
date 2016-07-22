@@ -268,6 +268,29 @@ public class BindingSupport {
 
     }
 
+    /**
+     * return true if the object is bound to something.  Note this is 
+     * beyond the vap bindings, and includes the bindings used to implement
+     * features like TimeSeriesBrowse.
+     * @param node the dom node.
+     * @param property the property name.
+     * @return true if a binding is found.
+     */
+    public boolean isBound( Object node, String property) {
+        List<BindingImpl> list = implBindingContexts.get(node);
+        if (list == null) {
+            return false;
+        }
+        for (BindingImpl bi : list) {
+            if ( bi.dst==node && bi.dstProp.equals(property) ) {
+                return true;
+            } else if ( bi.src==node && bi.srcProp.equals(property) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public void unbind(DomNode master) {
         synchronized (implBindingContexts) {
             List<BindingImpl> list = implBindingContexts.get(master);
