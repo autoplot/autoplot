@@ -765,9 +765,9 @@ public class JythonUtil {
      }
      
      private static StringBuilder appendToResult( StringBuilder result, String line ) {
-         //if ( line.contains("getDataSet") ) {
-         //    System.err.println("here626");
-         //}
+         if ( line.contains("sTimeBinSeconds") ) {
+             System.err.println("heresTimeBinSeconds");
+         }
          result.append(line);
          return result;
      }
@@ -969,6 +969,11 @@ public class JythonUtil {
          
          // check for continuation in last getParam call.
          while ( ss.length>lastLine+1 && ss[lastLine].trim().length()>0 && Character.isWhitespace( ss[lastLine].charAt(0) ) ) {
+             lastLine++;
+         }
+         // Chris showed that a closing bracket or paren doesn't need to be indented.  See test038/jydsCommentBug.jyds
+         String closeParenCheck= ss[lastLine].trim();
+         if ( closeParenCheck.equals(")") || closeParenCheck.equals("]") ) {
              lastLine++;
          }
          
