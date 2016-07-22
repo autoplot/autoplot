@@ -944,14 +944,13 @@ public class JythonUtil {
          return vb.getNames();
      }
      
-     /**
+    /**
      * extracts the parts of the program that get parameters.  
      *
      * @param script the entire python program
      * @param addSort if true, add parameters to keep track of the order that getParam was called.  This has no effect now.
      * @return the python program with lengthy calls removed, up to the last getParam call.
      */
-    
      public static String simplifyScriptToGetParams( String script, boolean addSort) throws PySyntaxError {
          String[] ss= script.split("\n");
          
@@ -972,9 +971,11 @@ public class JythonUtil {
              lastLine++;
          }
          // Chris showed that a closing bracket or paren doesn't need to be indented.  See test038/jydsCommentBug.jyds
-         String closeParenCheck= ss[lastLine].trim();
-         if ( closeParenCheck.equals(")") || closeParenCheck.equals("]") ) {
-             lastLine++;
+         if ( lastLine<ss.length ) {
+             String closeParenCheck= ss[lastLine].trim();
+             if ( closeParenCheck.equals(")") || closeParenCheck.equals("]") ) {
+                 lastLine++;
+             }
          }
          
          HashSet variableNames= new HashSet();
