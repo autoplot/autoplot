@@ -383,7 +383,7 @@ public class AxisPanel extends javax.swing.JPanel {
                     timeRangeBindingType= type;
             }
             bc.bind();
-            timeRangeEditor1.setToolTipText(timeRangeBindingType);
+            timeRangeEditor1.setToolTipText(timeRangeBindingType); // temporary for debugging
         }
     }
     
