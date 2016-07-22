@@ -180,7 +180,12 @@ public class AutoplotDataServer {
             switch (format) {
                 case FORM_D2S:
                     {
-                        String s= String.format( "<exception type=\"NoDataInInterval\" message='%s'/>\n", "no data found in "+timeRange );
+                        String s;
+                        if ( stream ) {
+                            s= "<stream><properties int:taskSize=\"00000010\" /></stream>";
+                            out.printf( String.format( "[00]%06d%s", s.length(), s ) ); 
+                        }
+                        s= String.format( "<exception type=\"NoDataInInterval\" message='%s'/>\n", "no data found in "+timeRange );
                         out.printf( String.format( "[xx]%06d%s", s.length(), s ) );
                         break;
                     }
