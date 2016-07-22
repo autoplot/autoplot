@@ -50,6 +50,7 @@ import java.io.BufferedWriter;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -305,6 +306,8 @@ public class CreatePngWalk {
 
         TimeParser tp = TimeParser.create(params.timeFormat);
         Application dom= (Application) readOnlyDom.copy();
+        dom.getOptions().syncToAll( readOnlyDom.getOptions(), new ArrayList() );
+        
         try {
             String atime= times[0];
             int ic= atime.indexOf(": ");
