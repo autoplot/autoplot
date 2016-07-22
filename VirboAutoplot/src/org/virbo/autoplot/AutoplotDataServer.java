@@ -181,7 +181,7 @@ public class AutoplotDataServer {
                 case FORM_D2S:
                     {
                         String s;
-                        if ( stream ) {
+                        if ( !stream ) {
                             s= "<stream><properties int:taskSize=\"00000010\" /></stream>";
                             out.printf( String.format( "[00]%06d%s", s.length(), s ) ); 
                         }
