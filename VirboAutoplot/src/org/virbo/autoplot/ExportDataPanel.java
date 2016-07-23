@@ -416,7 +416,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 ext = "";
             }
 
-            DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext);
+            DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); 
             if (format == null) {
                 if (chooser.getFileFilter().getDescription().startsWith("*.")) {
                     ext = chooser.getFileFilter().getDescription().substring(1);
