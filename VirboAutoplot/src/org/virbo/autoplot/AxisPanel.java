@@ -36,7 +36,6 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.DataSourceFilter;
-import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.TimeSeriesBrowseController;
@@ -48,8 +47,7 @@ import org.virbo.datasource.TimeRangeEditor;
  */
 public class AxisPanel extends javax.swing.JPanel {
 
-    private ApplicationModel applicationModel;
-    private Application dom;
+    private final Application dom;
     private ApplicationController applicationController;
     private DatumRangeEditor xredit;
     private DatumRangeEditor yredit;
@@ -57,7 +55,6 @@ public class AxisPanel extends javax.swing.JPanel {
     
     private BindingGroup plotBindingGroup;
     private BindingGroup panelBindingGroup;    
-    private PlotElement panel;
     private Binding timeRangeBinding= null;
     private String timeRangeBindingType= "none";
     
@@ -69,7 +66,6 @@ public class AxisPanel extends javax.swing.JPanel {
      */
     public AxisPanel(final ApplicationModel applicationModel) {
         APSplash.checkTime("in axispanel 10");
-        this.applicationModel = applicationModel;
         this.dom = applicationModel.dom;
         this.applicationController= this.dom.getController();
         dom.addPropertyChangeListener( Application.PROP_BINDINGS, timeRangeContextControllerEnabler );
@@ -262,7 +258,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
     private static class DontChangePlotUnitsConverter extends Converter {
         
-        private Plot p;
+        private final Plot p;
         
         private DontChangePlotUnitsConverter( Plot p ) {
             this.p= p;
@@ -293,7 +289,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
     private static class DontChangeAxisUnitsConverter extends Converter {
         
-        private Axis p;
+        private final Axis p;
         
         private DontChangeAxisUnitsConverter( Axis p ) {
             this.p= p;
@@ -391,7 +387,6 @@ public class AxisPanel extends javax.swing.JPanel {
         if (panelBindingGroup != null) panelBindingGroup.unbind();
 
         PlotElement p = applicationController.getPlotElement();
-        panel= p;
         
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("legendLabel"), legendTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, p, BeanProperty.create("displayLegend"), legendEnableCheckbox, BeanProperty.create("selected")));
