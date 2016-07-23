@@ -48,12 +48,18 @@ import org.virbo.datasource.TimeRangeEditor;
  */
 public class AxisPanel extends javax.swing.JPanel {
 
-    ApplicationModel applicationModel;
-    Application dom;
-    ApplicationController applicationController;
-    DatumRangeEditor xredit;
-    DatumRangeEditor yredit;
-    DatumRangeEditor zredit;
+    private ApplicationModel applicationModel;
+    private Application dom;
+    private ApplicationController applicationController;
+    private DatumRangeEditor xredit;
+    private DatumRangeEditor yredit;
+    private DatumRangeEditor zredit;
+    
+    private BindingGroup plotBindingGroup;
+    private BindingGroup panelBindingGroup;    
+    private PlotElement panel;
+    private Binding timeRangeBinding= null;
+    private String timeRangeBindingType= "none";
     
     private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui");
 
@@ -62,7 +68,7 @@ public class AxisPanel extends javax.swing.JPanel {
      * @param applicationModel
      */
     public AxisPanel(final ApplicationModel applicationModel) {
-   APSplash.checkTime("in axispanel 10");
+        APSplash.checkTime("in axispanel 10");
         this.applicationModel = applicationModel;
         this.dom = applicationModel.dom;
         this.applicationController= this.dom.getController();
@@ -89,7 +95,7 @@ public class AxisPanel extends javax.swing.JPanel {
             }
         });
 
-   APSplash.checkTime("in axispanel 15");
+        APSplash.checkTime("in axispanel 15");
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
@@ -107,10 +113,10 @@ public class AxisPanel extends javax.swing.JPanel {
             }
         });
             // there's a strange delay here on a mac.  We work around this be delaying construction on gui.
-   APSplash.checkTime("in axispanel 17");
+        APSplash.checkTime("in axispanel 17");
         initComponents();
 
-   APSplash.checkTime("in axispanel 20");
+        APSplash.checkTime("in axispanel 20");
         DasPlot plot = applicationController.getPlot().getController().getDasPlot();
         DasColorBar colorbar = applicationController.getPlot().getController().getDasColorBar();
 
@@ -131,7 +137,7 @@ public class AxisPanel extends javax.swing.JPanel {
         zredit.addFocusListener( createDatumRangeEditorListener(zredit) );
         zredit.setToolTipText("Z axis range");
         zAxisRangePanel.add(zredit, BorderLayout.CENTER);
-   APSplash.checkTime("in axispanel 30");
+        APSplash.checkTime("in axispanel 30");
 
         xredit.addPropertyChangeListener( new PropertyChangeListener() {
            @Override
@@ -176,10 +182,10 @@ public class AxisPanel extends javax.swing.JPanel {
             }
         }     );
 
-   APSplash.checkTime("in axispanel 40");
+        APSplash.checkTime("in axispanel 40");
 
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "axisPanel");
-   APSplash.checkTime("in axispanel 50");
+        APSplash.checkTime("in axispanel 50");
 
     }
 
@@ -194,8 +200,6 @@ public class AxisPanel extends javax.swing.JPanel {
             }
         };
     }
-
-    BindingGroup plotBindingGroup;
 
     private void doPlotBindings() {
 
@@ -235,10 +239,6 @@ public class AxisPanel extends javax.swing.JPanel {
         p.getXaxis().addPropertyChangeListener( Axis.PROP_RANGE, timeRangeAxisControllerEnabler );
         
     }
-
-    private Binding timeRangeBinding= null;
-    private String timeRangeBindingType= "none";
-    
     
     private PropertyChangeListener timeRangeAxisControllerEnabler= new PropertyChangeListener() {
         @Override
@@ -253,7 +253,7 @@ public class AxisPanel extends javax.swing.JPanel {
     /**
      * this listens for binding changes to the plot context property.
      */
-    private PropertyChangeListener timeRangeContextControllerEnabler= new PropertyChangeListener() {
+    private final PropertyChangeListener timeRangeContextControllerEnabler= new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             doCheckTimeRangeControllerEnable();
@@ -262,7 +262,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
     private static class DontChangePlotUnitsConverter extends Converter {
         
-        Plot p;
+        private Plot p;
         
         private DontChangePlotUnitsConverter( Plot p ) {
             this.p= p;
@@ -293,7 +293,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
     private static class DontChangeAxisUnitsConverter extends Converter {
         
-        Axis p;
+        private Axis p;
         
         private DontChangeAxisUnitsConverter( Axis p ) {
             this.p= p;
@@ -355,7 +355,6 @@ public class AxisPanel extends javax.swing.JPanel {
             type= "none";
         }
 
-        System.err.println( "timeRangeBindingType " + type + " " + p ); 
         logger.log(Level.FINE, "timeRangeBindingType {0}", type);
         
         if ( !type.equals(timeRangeBindingType) ) {
@@ -371,8 +370,7 @@ public class AxisPanel extends javax.swing.JPanel {
             } else if ( type.startsWith("context") ) {
                     this.timeRangeEditor1.setEnabled(true);
                     this.timeRangeEditor1.setToolTipText("controlling "+p.getId()+".context");
-                    timeRangeBinding= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("context"), 
-                        timeRangeEditor1, BeanProperty.create( TimeRangeEditor.PROP_RANGE ) );
+                    timeRangeBinding= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("context"), timeRangeEditor1, BeanProperty.create( TimeRangeEditor.PROP_RANGE ) );
                     timeRangeBinding.setConverter( new DontChangePlotUnitsConverter(p) );
                     bc.addBinding(timeRangeBinding);
                     timeRangeBindingType= type;
@@ -387,10 +385,6 @@ public class AxisPanel extends javax.swing.JPanel {
         }
     }
     
-    BindingGroup panelBindingGroup;
-    
-    PlotElement panel;
-
     private void doPlotElementBindings() {
         BindingGroup bc = new BindingGroup();
         
@@ -861,7 +855,7 @@ public class AxisPanel extends javax.swing.JPanel {
         return result;
     }
 
-    JPopupMenu initLabelMenu( JTextField tf ) {
+    private JPopupMenu initLabelMenu( JTextField tf ) {
         JPopupMenu processMenu;
         processMenu= new JPopupMenu();
         processMenu.add( createMenuItem( tf, "%{COMPONENT}", "Component property from the plot element" ) );
@@ -872,12 +866,12 @@ public class AxisPanel extends javax.swing.JPanel {
         return processMenu;
     }
 
-    void showLabelMenu( MouseEvent ev) {
+    private void showLabelMenu( MouseEvent ev) {
         JPopupMenu processMenu= initLabelMenu( (JTextField)ev.getSource() );
         processMenu.show(ev.getComponent(), ev.getX(), ev.getY());
     }
 
-    JPopupMenu initTitleMenu( JTextField tf ) {
+    private JPopupMenu initTitleMenu( JTextField tf ) {
         JPopupMenu processMenu;
         processMenu= new JPopupMenu();
         processMenu.add( createMenuItem( tf, "%{CONTEXT}", "Context from the dataset, such as slice location or component" ) );
@@ -889,12 +883,12 @@ public class AxisPanel extends javax.swing.JPanel {
         return processMenu;
     }
 
-    void showTitleMenu( MouseEvent ev) {
+    private void showTitleMenu( MouseEvent ev) {
         JPopupMenu processMenu= initTitleMenu( (JTextField)ev.getSource() );
         processMenu.show(ev.getComponent(), ev.getX(), ev.getY());
     }
 
-    JPopupMenu initAxisMenu( JTextField tf ) {
+    private JPopupMenu initAxisMenu( JTextField tf ) {
         JPopupMenu processMenu;
         processMenu= new JPopupMenu();
         processMenu.add( createMenuItem( tf, "%{UNITS}", "Units of the axis" ) );
@@ -904,7 +898,7 @@ public class AxisPanel extends javax.swing.JPanel {
         return processMenu;
     }
 
-    void showAxisMenu( MouseEvent ev) {
+    private void showAxisMenu( MouseEvent ev) {
         JPopupMenu processMenu= initAxisMenu( (JTextField)ev.getSource() );
         processMenu.show(ev.getComponent(), ev.getX(), ev.getY());
     }    
