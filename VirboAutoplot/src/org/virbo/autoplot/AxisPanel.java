@@ -55,7 +55,7 @@ public class AxisPanel extends javax.swing.JPanel {
     
     private BindingGroup plotBindingGroup;
     private BindingGroup panelBindingGroup;    
-    private Binding timeRangeBinding= null;
+    private BindingGroup timeRangeBindingGroup;
     private String timeRangeBindingType= "none";
     
     private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui");
@@ -354,8 +354,9 @@ public class AxisPanel extends javax.swing.JPanel {
         logger.log(Level.FINE, "timeRangeBindingType {0}", type);
         
         if ( !type.equals(timeRangeBindingType) ) {
-            BindingGroup bc= bindingGroup;
-            if ( timeRangeBinding!=null ) bc.removeBinding( timeRangeBinding );
+            BindingGroup bc = new BindingGroup();
+            Binding timeRangeBinding;
+            if ( timeRangeBindingGroup!=null ) timeRangeBindingGroup.unbind();
             if ( type.equals("xaxis") ) {
                     this.timeRangeEditor1.setEnabled(true);
                     this.timeRangeEditor1.setToolTipText("controlling "+p.getId()+" xaxis");
@@ -373,9 +374,10 @@ public class AxisPanel extends javax.swing.JPanel {
             } else {
                     this.timeRangeEditor1.setEnabled(false);
                     this.timeRangeEditor1.setToolTipText("plot context control has no effect.");
-                    timeRangeBinding= null;
+                    //timeRangeBinding= null;
                     timeRangeBindingType= type;
             }
+            timeRangeBindingGroup = bc;
             bc.bind();
             timeRangeEditor1.setToolTipText(timeRangeBindingType); // temporary for debugging
         }
