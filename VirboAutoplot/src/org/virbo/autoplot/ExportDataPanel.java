@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
  * ExportDataPanel.java
@@ -29,7 +25,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import org.das2.util.LoggerManager;
-import org.virbo.ascii.AsciiTableDataSourceFormatEditorPanel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.dataset.QDataSet;
@@ -459,32 +454,21 @@ public class ExportDataPanel extends javax.swing.JPanel {
 
     private void formatDLItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_formatDLItemStateChanged
         String ss=  (String) evt.getItem();
-
-        if ( ss.equals(".txt") || ss.equals(".dat") ) { //TODO: hard coded for ASCII
-            editorPanel= new AsciiTableDataSourceFormatEditorPanel();
+        
+        Object oeditorPanel= DataSourceRegistry.getInstance().getDataSourceFormatEditorByExt(ss);
+        if ( oeditorPanel!=null ) {
+            if ( oeditorPanel instanceof String ) {
+                editorPanel= (DataSourceFormatEditorPanel)DataSourceRegistry.getInstanceFromClassName( (String)oeditorPanel );
+                if ( editorPanel==null ) throw new IllegalArgumentException("unable to create instance: "+oeditorPanel);
+            } else {
+                editorPanel= (DataSourceFormatEditorPanel)oeditorPanel;
+            }
             String t=  getFilenameTF().getText();
             if ( t.contains("/" ) ) {
                 editorPanel.setURI( getFilenameTF().getText() );
             }
-        } else if ( ss.equals(".csv" ) ) {
-            editorPanel= null;
-
         } else {
-            Object oeditorPanel= DataSourceRegistry.getInstance().getDataSourceFormatEditorByExt(ss);
-            if ( oeditorPanel!=null ) {
-                if ( oeditorPanel instanceof String ) {
-                    editorPanel= (DataSourceFormatEditorPanel)DataSourceRegistry.getInstanceFromClassName( (String)oeditorPanel );
-                    if ( editorPanel==null ) throw new IllegalArgumentException("unable to create instance: "+oeditorPanel);
-                } else {
-                    editorPanel= (DataSourceFormatEditorPanel)oeditorPanel;
-                }
-                String t=  getFilenameTF().getText();
-                if ( t.contains("/" ) ) {
-                    editorPanel.setURI( getFilenameTF().getText() );
-                }
-            } else {
-                editorPanel= null;
-            }
+            editorPanel= null;
         }
 
         if ( evt.getStateChange()==ItemEvent.SELECTED ) {
