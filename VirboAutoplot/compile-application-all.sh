@@ -203,6 +203,7 @@ if ! $JAVAC $JAVAARGS test/endtoend/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/virbo/idlsupport/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/system/NullPreferencesFactory.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/tca/UriTcaSource.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/virbo/dataset/NearestNeighborTcaFunction.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/virbo/autoplot/ScreenshotsTool.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/wgetfs/WGetFileSystemFactory.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/fsm/FileStorageModelNew.java; then echo "*****"; hasErrors=1; fi  # some scripts use this old name.
