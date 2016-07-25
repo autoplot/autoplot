@@ -256,6 +256,7 @@ if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStab
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/idlsupport/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/system/NullPreferencesFactory.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/tca/UriTcaSource.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/dataset/NearestNeighborTcaFunction.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/qstream/filter/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/event/*.java; then echo "****"; hasErrors=1; fi
 if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/dataset/NoDataInIntervalException.java; then echo "****"; hasErrors=1; fi
