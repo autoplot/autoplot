@@ -68,8 +68,17 @@ public class AsciiTableMaker {
                         units.set(i,Units.dimensionless);
                         format.set(i,null);
                     } catch ( NumberFormatException ex2 ) {
-                        units.set( i, new EnumerationUnits("default") );
-                        format.set(i,null);
+                        String[] ss= field.split("\\s",-2);  // "3.4 sec"
+                        if ( ss.length>1 ) {
+                            try {
+                                Double.parseDouble(ss[0]);
+                                units.set(i,Units.lookupUnits( field.substring( ss[0].length() ).trim() ) );
+                                format.set(i,null);
+                            } catch ( NumberFormatException ex3 ) {
+                                units.set( i, new EnumerationUnits("default") );
+                                format.set(i,null);
+                            }
+                        }
                     }
                 }
             }
