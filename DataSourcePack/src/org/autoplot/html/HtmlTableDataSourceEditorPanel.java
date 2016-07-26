@@ -56,6 +56,7 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
         return fs.isDirectory( split.file.substring(split.path.length()) );
     }
     
+    @Override
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
         split = URISplit.parse(uri);
         params = URISplit.parseParams(split.params);
@@ -348,7 +349,7 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
     }// </editor-fold>//GEN-END:initComponents
 
     private void tableComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_tableComboBoxItemStateChanged
-        final String ltable = (String) tableComboBox.getSelectedItem();
+        final String ltable = getSelectedTable();
         params.put(PROP_TABLE, ltable);
         setTable(ltable);
     }//GEN-LAST:event_tableComboBoxItemStateChanged
@@ -361,7 +362,24 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
         params.put(PROP_COLUMN, (String) columnsComboBox.getSelectedItem());
     }//GEN-LAST:event_columnsComboBoxItemStateChanged
 
-
+    private String getSelectedTable() {
+        String s= (String)tableComboBox.getSelectedItem();
+        int i= s.indexOf(":");
+        if ( i==-1 ) i= s.length();
+        return s.substring(0,i);
+    }
+    
+    private void setSelectedTable( String t ) {
+        for ( int j=0; j<tableComboBox.getItemCount(); j++ ) {
+            String s= (String)tableComboBox.getItemAt(j);
+            int i= s.indexOf(":");
+            if ( i==-1 ) i= s.length();
+            if ( s.substring(0,i).equals(t) ) {
+                tableComboBox.setSelectedIndex(i);
+            }
+        }
+    }
+    
     private void resetFile() {
         if (file == null) {
             return;
@@ -378,12 +396,12 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
             tableComboBox.setModel( new DefaultComboBoxModel( parser.getTables().toArray( )) );
             String ltable= lparams.get("table");
             if ( ltable!=null ) {
-                tableComboBox.setSelectedItem(ltable);
+                setSelectedTable( ltable );
             } else {
                 tableComboBox.setSelectedIndex(0);
-                params.put( "table", String.valueOf( tableComboBox.getSelectedItem() ) );
+                params.put( "table", getSelectedTable() );
             }
-        } catch ( Exception ex ) {
+        } catch ( URISyntaxException | IOException ex ) {
             logger.log( Level.WARNING, ex.toString(), ex );
         }
     }
@@ -423,7 +441,7 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
             String column= lparams.get("column");
             if ( column!=null ) this.columnsComboBox.setSelectedItem(lparams.get("column"));
 
-        } catch (Exception ex) {
+        } catch (URISyntaxException | IOException ex) {
             columnsComboBox.setModel( new DefaultComboBoxModel( new String[] { "(no records found)" } ) );
             DefaultTableModel dtm= new DefaultTableModel(1,1);
             dtm.setValueAt( "no records found", 0, 0 );
@@ -433,6 +451,7 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
         }
 
     }
+    
     protected File file = null;
     public static final String PROP_FILE = "file";
 
@@ -446,6 +465,7 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
         resetTable( );
 
     }
+    
     protected String table;
     public static final String PROP_TABLE = "table";
 
@@ -453,6 +473,10 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
         return table;
     }
 
+    /**
+     * reset everything to this table.
+     * @param table 
+     */
     public void setTable(String table) {
         String oldTable = this.table;
         this.table = table;
@@ -488,8 +512,8 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
             setFile(f);
 
             if ( params.get(PROP_TABLE)!=null ) {
-                tableComboBox.setSelectedItem( params.get(PROP_TABLE) );
-                setTable( params.get(PROP_TABLE) );
+                setSelectedTable( params.get(PROP_TABLE) );
+                setTable( getSelectedTable() );
             } 
 
             if ( params.get(PROP_COLUMN)!=null ) columnsComboBox.setSelectedItem( params.get(PROP_COLUMN) );
