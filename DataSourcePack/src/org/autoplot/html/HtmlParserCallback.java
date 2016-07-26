@@ -31,6 +31,8 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
     int fieldCount = -1;
     boolean inField = false;
     String fieldText = "";
+    
+    int recordCount= -1;
 
     boolean isHeader= false;
 
@@ -40,7 +42,13 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
 
     List<String> tables= new ArrayList();
 
+    /**
+     * set the table to read.
+     * @param name 
+     */
     void setTable( String name ) {
+        int i= name.indexOf(":");
+        if ( i>-1 ) name= name.substring(0,i);
         this.stable= name;
         try {
             itable= Integer.parseInt(name);
@@ -59,14 +67,19 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
         }
 
     }
-
+    
+    private List<String> currentTableName= new ArrayList(); // tables can be nested
+    int nest=0;
+    
     @Override
     public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
         if ( t==HTML.Tag.TABLE ) {
             tableCount++;
+            nest++;
+            recordCount= 0;
             String tableName= (String)a.getAttribute("id");
             if ( tableName==null ) tableName= ""+tableCount;
-            tables.add(tableName);
+            currentTableName.add( tableName );
             if ( itable>-1 ) {
                 if ( tableCount==itable ) inTable= true;
             } else {
@@ -92,6 +105,17 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
     @Override
     public void handleEndTag(HTML.Tag t, int pos) {
         if (t == HTML.Tag.TABLE) {
+            nest--;
+            String dim;
+            if ( fieldCount>-1 ) {
+                dim= recordCount + " rows, "+fieldCount+ " colums";
+            } else {
+                dim= recordCount + " rows";
+            }
+            //if ( nest==0 ) {
+                if ( currentTableName.isEmpty() ) throw new IllegalArgumentException("table html syntax");
+                tables.add( currentTableName.remove(0) + ": "+dim );
+            //}
             if ( inTable ) inTable= false;
         } else if ( inTable ) {
             if (t == HTML.Tag.TR) {
@@ -122,6 +146,7 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
                             ascii.addHeader( values );
                         }
                     } else {
+                        recordCount++;
                         ascii.addRecord( currentRow );
                     }
                 }
@@ -141,6 +166,10 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
         } 
     }
 
+    /**
+     * return the collected dataset
+     * @return 
+     */
     public QDataSet getDataSet() {
         DDataSet result= ascii.getDataSet();
         if ( itable==-1 ) {
@@ -149,8 +178,12 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
         return result;
     }
 
+    /**
+     * return a list of table names "name: &lt;dims&gt;
+     * @return 
+     */
     public List<String> getTables() {
-        return new ArrayList<String>(tables);
+        return new ArrayList<>(tables);
     }
 
 }
