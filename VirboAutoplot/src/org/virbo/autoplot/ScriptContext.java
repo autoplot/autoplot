@@ -1327,6 +1327,48 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
+     * binds two bean properties together.  Bindings are bidirectional, but
+     * the initial copy is from src to dst.  In MVC terms, src should be the model
+     * and dst should be a view.  The properties must fire property
+     * change events for the binding mechanism to work.
+     * 
+     * As of v2014a_10, if the src is a DomNode and a child of the application, then use
+     * dom.getController().bind so that the vap will contain the binding.
+     * 
+     * Example:
+     *<blockquote><pre><small>{@code
+     * model= getApplicationModel()
+     * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
+     *}</small></pre></blockquote>
+     * 
+     * @see org.virbo.autoplot.dom.ApplicationController#bind(org.virbo.autoplot.dom.DomNode, java.lang.String, java.lang.Object, java.lang.String, org.jdesktop.beansbinding.Converter) which will save the binding to a vap.
+     * @param src java bean such as model.getPlotDefaults()
+     * @param srcProp a property name such as "title"
+     * @param dst java bean such as model.getPlotDefaults().getXAxis()
+     * @param dstProp a property name such as "label"
+     * @param c converter for the binding, or null.
+     */    
+    public static void bindGuiSafe( final Object src, final String srcProp, 
+        final Object dst, final String dstProp, final Converter c ) {
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                bind( src, srcProp, dst, dstProp, c );
+            }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch ( InterruptedException|InvocationTargetException ex ) {
+                logger.log( Level.WARNING, ex.getMessage(), ex );
+            }
+        }
+    }
+
+    
+    /**
      * serializes the dataset to a QStream, a self-documenting, streaming format
      * useful for moving datasets.
      *
