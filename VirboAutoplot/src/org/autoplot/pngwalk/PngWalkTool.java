@@ -277,7 +277,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         if ( baseurl.equals(".") ) {
             URISplit split= URISplit.parse(template);
             String f= split.path;
-            int i= f.indexOf( "/"+product );
+            int i= f.indexOf( "/"+product+".pngwalk" );
             if ( i==-1 ) {
                 i= f.indexOf("*");
                 if ( i>-1 ) i= f.lastIndexOf("/",i);
