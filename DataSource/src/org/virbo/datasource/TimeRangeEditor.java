@@ -160,6 +160,14 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     public void setNoOneListeningRange( DatumRange dr ) {
         this.noOneListening= dr;
     }
+    
+    /**
+     * special marker object indicates that the "no one listening" message should be shown.
+     * @return special marker object
+     */
+    public DatumRange getNoOneListeningRange() {
+        return this.noOneListening;
+    }
 
     /**
      * return true if the string appears to be a URI.
