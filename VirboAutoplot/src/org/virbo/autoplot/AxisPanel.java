@@ -35,6 +35,7 @@ import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
+import org.virbo.autoplot.dom.BindingSupport;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
@@ -54,8 +55,8 @@ public class AxisPanel extends javax.swing.JPanel {
     private DatumRangeEditor zredit;
     
     private BindingGroup plotBindingGroup;
+    private Plot currentPlot; // the plot we are currently controlling, should be consistent with plotBindingGroup.
     private BindingGroup panelBindingGroup;    
-    private BindingGroup timeRangeBindingGroup;
     private String timeRangeBindingType= "none";
     
     private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui");
@@ -166,17 +167,7 @@ public class AxisPanel extends javax.swing.JPanel {
         doPlotBindings();
         doPlotElementBindings();
                 
-        dom.addPropertyChangeListener( Application.PROP_TIMERANGE, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                Object o= evt.getNewValue();
-                if ( o instanceof DatumRange ) {
-                    DatumRange v= (DatumRange) evt.getNewValue();
-                    timeRangeEditor1.setEnabled(v!=Application.DEFAULT_TIME_RANGE ); // TODO: kludge
-                }
-                
-            }
-        }     );
+        timeRangeEditor1.addPropertyChangeListener( TimeRangeEditor.PROP_RANGE, timeRangeEditorListener);
 
         APSplash.checkTime("in axispanel 40");
 
@@ -211,7 +202,7 @@ public class AxisPanel extends javax.swing.JPanel {
         
         //http://www.infoq.com/news/2007/09/beans-binding
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.label"), xTitleTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p,BeanProperty.create( "xaxis.range"), xredit, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.range"), xredit, BeanProperty.create("value")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.log"), xLog, BeanProperty.create("selected")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.drawTickLabels"), showXAxisLabelsCB, BeanProperty.create("selected")));
 
@@ -236,15 +227,17 @@ public class AxisPanel extends javax.swing.JPanel {
         
     }
     
-    private PropertyChangeListener timeRangeAxisControllerEnabler= new PropertyChangeListener() {
+    private class TimeAxisPropertyChangeListener implements PropertyChangeListener {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             Plot p= applicationController.getPlot();
-            if ( timeRangeBindingType.equals("xaxis") != UnitsUtil.isTimeLocation( p.getXaxis().getRange().getUnits() ) ) {
+            if ( p!=currentPlot || timeRangeBindingType.equals("xaxis") != UnitsUtil.isTimeLocation( p.getXaxis().getRange().getUnits() ) ) {
                 doCheckTimeRangeControllerEnable();
             }
-        }   
-    };
+        }  
+    }
+    
+    private PropertyChangeListener timeRangeAxisControllerEnabler= new TimeAxisPropertyChangeListener();
 
     /**
      * this listens for binding changes to the plot context property.
@@ -256,66 +249,6 @@ public class AxisPanel extends javax.swing.JPanel {
         }
     };
 
-    private static class DontChangePlotUnitsConverter extends Converter {
-        
-        private final Plot p;
-        
-        private DontChangePlotUnitsConverter( Plot p ) {
-            this.p= p;
-        }
-        
-        @Override
-        public Object convertForward(Object value) {
-            DatumRange r= (DatumRange)value;
-            if ( r.getUnits().isConvertibleTo(p.getContext().getUnits()) ) {
-                return r;
-            } else {
-                return p.getContext();
-            }
-        }
-
-        @Override
-        public Object convertReverse(Object value) {
-            DatumRange r= (DatumRange)value;
-            if ( r.getUnits().isConvertibleTo(p.getContext().getUnits()) ) {
-                return r;
-            } else {
-                return p.getContext();
-            }
-        }
-        
-    }
-
-
-    private static class DontChangeAxisUnitsConverter extends Converter {
-        
-        private final Axis p;
-        
-        private DontChangeAxisUnitsConverter( Axis p ) {
-            this.p= p;
-        }
-        
-        @Override
-        public Object convertForward(Object value) {
-            DatumRange r= (DatumRange)value;
-            if ( r.getUnits().isConvertibleTo(p.getRange().getUnits()) ) {
-                return r;
-            } else {
-                return p.getRange();
-            }
-        }
-
-        @Override
-        public Object convertReverse(Object value) {
-            DatumRange r= (DatumRange)value;
-            if ( r.getUnits().isConvertibleTo(p.getRange().getUnits()) ) {
-                return r;
-            } else {
-                return p.getRange();
-            }
-        }
-        
-    }
     
     private boolean isSomeoneListening( Plot p ) {
         List<PlotElement> pes= dom.getController().getPlotElementsFor(p);
@@ -331,6 +264,39 @@ public class AxisPanel extends javax.swing.JPanel {
         return false;
     }
     
+    PropertyChangeListener pcl1= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ( timeRangeBindingType.equals("xaxis") ) {
+                DatumRange dr= currentPlot.getXaxis().getRange();
+                if ( dr.getUnits().isConvertibleTo(timeRangeEditor1.getRange().getUnits() ) ) {
+                    timeRangeEditor1.setRange( dr );
+                }
+            } else if ( timeRangeBindingType.startsWith("context")) {
+                DatumRange dr= currentPlot.getContext();
+                if ( dr.getUnits().isConvertibleTo(timeRangeEditor1.getRange().getUnits() ) ) {
+                    timeRangeEditor1.setRange( dr );
+                }
+            }
+        }
+    };
+            
+    PropertyChangeListener timeRangeEditorListener= new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            DatumRange dr=  timeRangeEditor1.getRange();
+            if ( timeRangeBindingType.equals("xaxis") ) {
+                if ( dr.getUnits().isConvertibleTo( currentPlot.getXaxis().getRange().getUnits() ) ) {
+                    currentPlot.getXaxis().setRange( dr );
+                }
+            } else if ( timeRangeBindingType.startsWith("context")) {
+                if ( dr.getUnits().isConvertibleTo( currentPlot.getContext().getUnits() ) ) {
+                    currentPlot.setContext( dr );
+                }
+            }
+        }
+    };
+            
     /**
      * do the somewhat expensive check to see if the timerange controller needs
      * to be bound.
@@ -353,32 +319,30 @@ public class AxisPanel extends javax.swing.JPanel {
 
         logger.log(Level.FINE, "timeRangeBindingType {0}", type);
         
-        if ( !type.equals(timeRangeBindingType) ) {
-            BindingGroup bc = new BindingGroup();
-            Binding timeRangeBinding;
-            if ( timeRangeBindingGroup!=null ) timeRangeBindingGroup.unbind();
+        if ( p!=currentPlot && currentPlot!=null ) {
+            currentPlot.removePropertyChangeListener(pcl1);
+            currentPlot.getXaxis().removePropertyChangeListener(pcl1);
+        }
+        if ( (!type.equals(timeRangeBindingType)) || ( p!=currentPlot ) ) {
             if ( type.equals("xaxis") ) {
                     this.timeRangeEditor1.setEnabled(true);
                     this.timeRangeEditor1.setToolTipText("controlling "+p.getId()+" xaxis");
-                    timeRangeBinding= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p.getXaxis(), BeanProperty.create("range"), timeRangeEditor1, BeanProperty.create( TimeRangeEditor.PROP_RANGE ) );
-                    bc.addBinding(timeRangeBinding);
-                    timeRangeBinding.setConverter( new DontChangeAxisUnitsConverter(p.getXaxis()) );
                     timeRangeBindingType= type;
+                    this.timeRangeEditor1.setRange( p.getXaxis().getRange() );
             } else if ( type.startsWith("context") ) {
                     this.timeRangeEditor1.setEnabled(true);
                     this.timeRangeEditor1.setToolTipText("controlling "+p.getId()+".context");
-                    timeRangeBinding= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("context"), timeRangeEditor1, BeanProperty.create( TimeRangeEditor.PROP_RANGE ) );
-                    timeRangeBinding.setConverter( new DontChangePlotUnitsConverter(p) );
-                    bc.addBinding(timeRangeBinding);
                     timeRangeBindingType= type;
+                    this.timeRangeEditor1.setRange( p.getContext() );
             } else {
                     this.timeRangeEditor1.setEnabled(false);
                     this.timeRangeEditor1.setToolTipText("plot context control has no effect.");
-                    //timeRangeBinding= null;
+                    this.timeRangeEditor1.setRange( this.timeRangeEditor1.getNoOneListeningRange() );
                     timeRangeBindingType= type;
             }
-            timeRangeBindingGroup = bc;
-            bc.bind();
+            currentPlot= p;
+            currentPlot.addPropertyChangeListener(pcl1);
+            currentPlot.getXaxis().addPropertyChangeListener(pcl1);
             timeRangeEditor1.setToolTipText(timeRangeBindingType); // temporary for debugging
         }
     }
