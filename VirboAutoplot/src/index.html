@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The binary source is used to explore the data with a CDF file.
+        <p><small>Image of Pikachu is loaded with a script, which showed a bug with indexing (bug <a href="https://sourceforge.net/p/autoplot/bugs/1629/">1629</a>).
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2016-07-27 r19254):</p>
         <ul>
+            <li>1646: overplot of TSB of TSB without timeaxis flips back to timeaxis.</li>
             <li>1645: add listener for the timerange.</li>
             <li>1642: add bindGuiSafe, since GUI bindings need to be done on the event thread.</li>
             <li>corrections and improvements to HtmlDataSource.</li>
