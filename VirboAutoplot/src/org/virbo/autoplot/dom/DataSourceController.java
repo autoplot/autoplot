@@ -303,11 +303,11 @@ public class DataSourceController extends DomNodeController {
      * component string or plotElements where the component string won't be set
      * automatically.
      *
-     * @param p
+     * @param plotElement
      * @return
      */
-    private boolean doesPlotElementSupportTsb(PlotElement p) {
-        Plot plot = p.getController().getApplication().getController().getPlotFor(p);
+    private boolean doesPlotElementSupportTsb(PlotElement plotElement) {
+        Plot plot = plotElement.getController().getApplication().getController().getPlotFor(plotElement);
         if (plot == null) {
             return false;
         }
@@ -316,7 +316,7 @@ public class DataSourceController extends DomNodeController {
             return true;
         }
         //return false;
-        return p.isAutoComponent() || (!(p.getComponent().contains("|slice0") || p.getComponent().contains("|collapse0")));
+        return plotElement.isAutoComponent() || (!(plotElement.getComponent().contains("|slice0") || plotElement.getComponent().contains("|collapse0")));
     }
 
     /**
@@ -409,7 +409,14 @@ public class DataSourceController extends DomNodeController {
                     setDataSet(null);
                     if (ps.size() > 0) {
                         timeSeriesBrowseController = new TimeSeriesBrowseController(this, ps.get(0));
-                        timeSeriesBrowseController.setup(valueWasAdjusting);
+                        Plot p = dom.controller.getFirstPlotFor(dsf);
+                        List<PlotElement> pes= dom.controller.getPlotElementsFor(p);
+                        if ( pes.size()>1 ) {
+                            timeSeriesBrowseController.setupGen(p,Plot.PROP_CONTEXT);
+                            timeSeriesBrowseController.updateTsb(false);
+                        } else {
+                            timeSeriesBrowseController.setup(valueWasAdjusting);
+                        }
                     }
                 } else if (getTsb() != null && ps.isEmpty()) {
                     timeSeriesBrowseController = new TimeSeriesBrowseController(this, null);
