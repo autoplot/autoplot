@@ -24,8 +24,11 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-07-23 r19239):</p>
+        <p>Bugfixes (2016-07-27 r19254):</p>
         <ul>
+            <li>1645: add listener for the timerange.</li>
+            <li>1642: add bindGuiSafe, since GUI bindings need to be done on the event thread.</li>
+            <li>corrections and improvements to HtmlDataSource.</li>
             <li>DISPLAY_LOG_LEVEL property of Options included in syncToAll so we have more control over pngwalk output, to turn off message bubbles</li>
             <li>1640: AutoplotDataServer d2s output drops metadata</li>
             <li>1635: xaxis fails to unbind</li>
