@@ -26,19 +26,20 @@
         
         <p>Bugfixes (2016-07-27 r19254):</p>
         <ul>
+            <li>bugfix in medianFilter, which was never tested thoroughly.  Thanks, Ivar!</li>
             <li>1643: pngwalk file basename property would fail when when product and folder contained "JNO-IONS"</li>
-            <li>1646: overplot of TSB of TSB without timeaxis flips back to timeaxis.</li>
+            <li>1646: overplot of TSB of TSB without timeaxis flips back to timeaxis.  Thanks, Ivar!</li>
             <li>1645: add listener for the timerange.</li>
             <li>1642: add bindGuiSafe, since GUI bindings need to be done on the event thread.</li>
             <li>corrections and improvements to HtmlDataSource.</li>
             <li>DISPLAY_LOG_LEVEL property of Options included in syncToAll so we have more control over pngwalk output, to turn off message bubbles</li>
-            <li>1640: AutoplotDataServer d2s output drops metadata</li>
-            <li>1635: xaxis fails to unbind</li>
+            <li>1640: AutoplotDataServer d2s output drops metadata.</li>
+            <li>1635: xaxis fails to unbind.</li>
             <li>1639: new bug shown by non-timeaxis-TSB script where TSB rebinding is not done. (Never released.)</li>
             <li>1638: Jython getParam scraping doesn't support Chris' file with no indentation on closing paren.</li>
             <li>dataset( PyObject, Units ) was thoroughly implemented.</li>
             <li>1632: copy over copy over SCALE_TYPE, TITLE, etc when writing das2streams.</li>
-            <li>1637: binary source fails to read large JADE files gt Integer.MAX_VALUE/8 bytes.</li>
+            <li>1637: binary source failed to read large JADE files gt 268,435,456 bytes.</li>
             <li>1634: AutoplotDataServer misformats NoDataInIntervalException</li>
             <li>1629: recent change for setItem for datasets in Jython needed to account for sloppy codes that mishandled units.</li> 
             <li>1490: RichAscii delim was not set properly in one branch (unreleased bug).</li>
