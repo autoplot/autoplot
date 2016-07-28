@@ -412,8 +412,22 @@ public class DataSourceController extends DomNodeController {
                         Plot p = dom.controller.getFirstPlotFor(dsf);
                         List<PlotElement> pes= dom.controller.getPlotElementsFor(p);
                         if ( pes.size()>1 ) {
-                            timeSeriesBrowseController.setupGen(p,Plot.PROP_CONTEXT);
-                            timeSeriesBrowseController.updateTsb(false);
+                            boolean context= true;
+                            for ( PlotElement pe: pes ) {
+                                DataSourceFilter dsf1= dom.controller.getDataSourceFilterFor(pe);
+                                if ( dsf1!=this.dsf ) {
+                                    TimeSeriesBrowseController tsbc= dsf1.getController().getTimeSeriesBrowseController();
+                                    if ( tsbc!=null ) {
+                                        if ( tsbc.isListeningToAxis() ) context= false;
+                                    }
+                                }
+                            }
+                            if ( context ) {
+                                timeSeriesBrowseController.setupGen(p,Plot.PROP_CONTEXT);
+                                timeSeriesBrowseController.updateTsb(false);
+                            } else {
+                                timeSeriesBrowseController.setup(valueWasAdjusting);
+                            }
                         } else {
                             timeSeriesBrowseController.setup(valueWasAdjusting);
                         }
