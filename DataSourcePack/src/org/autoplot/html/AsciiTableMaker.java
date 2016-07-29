@@ -78,6 +78,9 @@ public class AsciiTableMaker {
                                 units.set( i, new EnumerationUnits("default") );
                                 format.set(i,null);
                             }
+                        } else {
+                            units.set( i, new EnumerationUnits("default") );
+                            format.set(i,null);
                         }
                     }
                 }
