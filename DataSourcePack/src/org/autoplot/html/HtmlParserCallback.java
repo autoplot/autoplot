@@ -124,6 +124,7 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
                 }
                 if (currentRow.size() != fieldCount) {
                     logger.fine("skipping row because of field count");
+                    return;
                 }
                 if ( isHeader ) {
                     ascii.addHeader( currentRow );
