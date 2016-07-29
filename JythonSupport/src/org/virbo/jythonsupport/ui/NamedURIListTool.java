@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -24,6 +25,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -261,7 +263,11 @@ public class NamedURIListTool extends JPanel {
                     refresh();
                 }
             } );
-            sub.add( subDelete, BorderLayout.EAST );
+            JPanel p= new JPanel();
+            p.setLayout( new BoxLayout( p, BoxLayout.X_AXIS ) );
+            p.add( Box.createHorizontalStrut(11) );
+            p.add( subDelete );
+            sub.add( p, BorderLayout.EAST );
         }
 
         if ( fi>=0 ) {
