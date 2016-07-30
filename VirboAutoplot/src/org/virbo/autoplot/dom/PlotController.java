@@ -1541,6 +1541,40 @@ public class PlotController extends DomNodeController {
     }
 
     /**
+     * See https://sourceforge.net/p/autoplot/bugs/1649/
+     * @param newSettingsXaxis
+     * @return 
+     */
+    private boolean shouldBindX( Axis newSettingsXaxis ) {
+        boolean shouldBindX= false;
+        DatumRange xrange= newSettingsXaxis.getRange();  
+        if ( dom.timeRange.getUnits().isConvertibleTo(xrange.getUnits()) &&
+                UnitsUtil.isTimeLocation(xrange.getUnits()) ) {
+            if ( dom.controller.isConnected( plot ) ) {
+                logger.log(Level.FINER, "not binding because plot is connected: {0}", plot);
+                // don't bind a connected plot.
+            } else if ( dom.timeRange.intersects( xrange ) ) {
+                try {
+                    double reqOverlap= UnitsUtil.isTimeLocation( dom.timeRange.getUnits() ) ? 0.01 : 0.8;
+                    DatumRange droverlap= DatumRangeUtil.sloppyIntersection( xrange, dom.timeRange );
+                    double overlap= droverlap.width().divide(dom.timeRange.width()).doubleValue(Units.dimensionless);
+                    if ( overlap > 1.0 ) overlap= 1/overlap;
+                    if ( overlap > reqOverlap ) {
+                        shouldBindX= true;
+                        logger.log( Level.FINER, "binding axis because there is significant overlap dom.timerange={0}", dom.timeRange.toString());
+                        dom.getController().setStatus("binding axis because there is significant overlap");
+                    }
+                } catch ( InconvertibleUnitsException ex ) {
+                    shouldBindX= false;
+                } catch ( IllegalArgumentException ex ) {
+                    shouldBindX= false;  //logERatio
+                }                    
+            }
+        }
+        return shouldBindX;
+    }
+    
+    /**
      * after autoranging, we need to check to see if a plotElement's plot looks like
      * it should be automatically bound or unbound.
      *
@@ -1567,12 +1601,12 @@ public class PlotController extends DomNodeController {
         
         // if we aren't autoranging, then only change the bindings if there will be a conflict.
         if ( plot.getXaxis().isAutoRange()==false ) {
-            shouldBindX= bm!=null;
+            shouldBindX= bm!=null; // this binding is no longer set.
             if ( bm!=null && !newSettings.getXaxis().getRange().getUnits().isConvertibleTo( plot.getXaxis().getRange().getUnits() ) ) {
                 shouldBindX= false;
                 logger.finer("remove timerange binding that would cause inconvertable units");
             }
-            
+            if (!shouldBindX) shouldBindX= shouldBindX(newSettings.getXaxis());
             needToAutorangeAfterAll= !shouldBindX;
         }
 
@@ -1591,33 +1625,7 @@ public class PlotController extends DomNodeController {
             if ( !plot.getXaxis().isAutoRange() ) {
                 plot.getXaxis().setAutoRange(true); // setting the time range would clear autoRange here.
             }
-            DatumRange xrange= newSettings.getXaxis().getRange();
-            if ( dom.timeRange.getUnits().isConvertibleTo(xrange.getUnits()) &&
-                    UnitsUtil.isTimeLocation(xrange.getUnits()) ) {
-                if ( dom.controller.isConnected( plot ) ) {
-                    logger.log(Level.FINER, "not binding because plot is connected: {0}", plot);
-                    // don't bind a connected plot.
-                } else if ( dom.timeRange.intersects( xrange ) ) {
-                    // we want to support the case where we've zoomed in on a range and want to
-                    // add another parameter.  We need to be more aggressive about binding in this
-                    // case.
-                    double reqOverlap= UnitsUtil.isTimeLocation( dom.timeRange.getUnits() ) ? 0.01 : 0.8;
-                    DatumRange droverlap= DatumRangeUtil.sloppyIntersection( xrange, dom.timeRange );
-                    try {
-                        double overlap= droverlap.width().divide(dom.timeRange.width()).doubleValue(Units.dimensionless);
-                        if ( overlap > 1.0 ) overlap= 1/overlap;
-                        if ( !shouldBindX && overlap > reqOverlap ) {
-                            shouldBindX= true;
-                            logger.log( Level.FINER, "binding axis because there is significant overlap dom.timerange={0}", dom.timeRange.toString());
-                            dom.getController().setStatus("binding axis because there is significant overlap");
-                        }
-                    } catch ( InconvertibleUnitsException ex ) {
-                        shouldBindX= false;
-                    } catch ( IllegalArgumentException ex ) {
-                        shouldBindX= false;  //logERatio
-                    }
-                }
-            }
+            shouldBindX= shouldBindX(newSettings.getXaxis());
         }
 
         if ( shouldBindX && !plot.getColumnId().equals( dom.getCanvases(0).getMarginColumn().getId() ) ) {
