@@ -24,8 +24,11 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-07-27 r19254):</p>
+        <p>Bugfixes (2016-07-30 r19268):</p>
         <ul>
+            <li>1649: autoranging failure where code to support TSBs without timeaxis inadvertently would allow plot below TSBs to reset axis.  Thanks, Bill!</li>
+            <li>1647: changes to HTML source to support "3.4 sec" broke test 140.</li>
+            <li>1648: new issue with URI handling, where the trailing / gets encoded, and don't look for 2014/.gz automatically.</li>
             <li>bugfix in medianFilter, which was never tested thoroughly.  Thanks, Ivar!</li>
             <li>1643: pngwalk file basename property would fail when when product and folder contained "JNO-IONS"</li>
             <li>1646: overplot of TSB of TSB without timeaxis flips back to timeaxis.  Thanks, Ivar!</li>
@@ -92,6 +95,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>mashup has sqrt function.</li>
             <li>rfe509: horizontal and vertical slices support export data</li>
             <li>tearoffTabbedPane allows tab to be selected programmatically by title.</li>
             <li>rfe505: Jython setItem will correctly convert units as well as implicitly assign them.</li>
