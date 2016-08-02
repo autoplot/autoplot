@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Image of Pikachu is loaded with a script, which showed a bug with indexing (bug <a href="https://sourceforge.net/p/autoplot/bugs/1629/">1629</a>).
+        <p><small>More fun comparing time series datasets against one another.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,14 +24,14 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-07-30 r19268):</p>
+        <p>Bugfixes (2016-08-02 r19271):</p>
         <ul>
+            <li>1646: correction to overplot of TSB of TSB without timeaxis flips back to timeaxis.  Thanks, Ivar!</li>
             <li>1649: autoranging failure where code to support TSBs without timeaxis inadvertently would allow plot below TSBs to reset axis.  Thanks, Bill!</li>
             <li>1647: changes to HTML source to support "3.4 sec" broke test 140.</li>
             <li>1648: new issue with URI handling, where the trailing / gets encoded, and don't look for 2014/.gz automatically.</li>
             <li>bugfix in medianFilter, which was never tested thoroughly.  Thanks, Ivar!</li>
             <li>1643: pngwalk file basename property would fail when when product and folder contained "JNO-IONS"</li>
-            <li>1646: overplot of TSB of TSB without timeaxis flips back to timeaxis.  Thanks, Ivar!</li>
             <li>1645: add listener for the timerange.</li>
             <li>1642: add bindGuiSafe, since GUI bindings need to be done on the event thread.</li>
             <li>corrections and improvements to HtmlDataSource.</li>
