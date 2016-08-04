@@ -24,8 +24,9 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-08-02 r19271):</p>
+        <p>Bugfixes (2016-08-04 r19274):</p>
         <ul>
+            <li>rfe509: maybeCreateDasPeer should check headless before adding an export data button to the horizontal and vertical slice.</li>
             <li>1646: correction to overplot of TSB of TSB without timeaxis flips back to timeaxis.  Thanks, Ivar!</li>
             <li>1649: autoranging failure where code to support TSBs without timeaxis inadvertently would allow plot below TSBs to reset axis.  Thanks, Bill!</li>
             <li>1647: changes to HTML source to support "3.4 sec" broke test 140.</li>
