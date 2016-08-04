@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>More fun comparing time series datasets against one another.
+        <p><small>SciPy Plasma colorbar added, and the slicers have an export data button.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2016-08-04 r19274):</p>
         <ul>
+            <li>rfe499: SciPy Plasma colorbar added.</li>
             <li>rfe509: maybeCreateDasPeer should check headless before adding an export data button to the horizontal and vertical slice.</li>
             <li>1646: correction to overplot of TSB of TSB without timeaxis flips back to timeaxis.  Thanks, Ivar!</li>
             <li>1649: autoranging failure where code to support TSBs without timeaxis inadvertently would allow plot below TSBs to reset axis.  Thanks, Bill!</li>
