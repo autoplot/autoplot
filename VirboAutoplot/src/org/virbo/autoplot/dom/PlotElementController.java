@@ -2682,7 +2682,11 @@ public class PlotElementController extends DomNodeController {
         
         final Renderer oldRenderer = getRenderer();
 
-        final Window parent = SwingUtilities.getWindowAncestor( plotElement.controller.getDasPlot().getCanvas() );
+        Window p= null;
+        if ( !( "true".equals( System.getProperty("java.awt.headless") ) ) ) {
+            p= SwingUtilities.getWindowAncestor( plotElement.controller.getDasPlot().getCanvas() );
+        }
+        final Window parent= p;
                 
         //logger.fine( "oldRenderer= "+oldRenderer + "  plotElementController="+ this + " ("+this.hashCode()+")" + " " + Thread.currentThread().getName() );
         DasColorBar cb= null;
