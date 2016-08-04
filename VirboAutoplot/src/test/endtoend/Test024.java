@@ -334,7 +334,7 @@ public class Test024 {
             example2();
             example3();  // Jared's slice
             example4();
-            example5();
+            //example5(); //OpenDAP server/client code is very unreliable, and not used much.
             //example6();
             
             //test6();
