@@ -11,6 +11,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ConsoleTextProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.dataset.DataSetUtil;
@@ -319,11 +320,28 @@ public class Test024 {
         }
     }
     
+    /**
+     * There's a little problem with the mac when you run from the command line, 
+     * because it will fail to bring up the credentials GUI when called from IDL
+     * on the command line.
+     * @throws InterruptedException 
+     */
+    public static void testAuth() throws InterruptedException {
+        System.err.println( "\n= testAuth =\n");
+        org.virbo.idlsupport.APDataSet apds  = new org.virbo.idlsupport.APDataSet();
+        apds.loadDataSet("vap+das2Server:http://jupiter.physics.uiowa.edu/das/server?end_time=2015-05-22T00:00:00.000Z&start_time=2015-05-21T00:00:00.000Z&dataset=Juno/WAV/Survey");
+        if ( apds.getStatus()==0 ) {
+            System.err.println( apds.toString() );
+        }
+    }
+    
     public static void main( String[] args )  {
         try {
             
             LoggerManager.readConfiguration();
-
+            
+            //testAuth();
+            
             testFilters();
             
             test9();
