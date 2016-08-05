@@ -56,6 +56,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
         cancelButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         bookmarksButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -83,6 +84,13 @@ public class TcaElementDialog extends javax.swing.JDialog {
             }
         });
 
+        jButton1.setText("Clear Additional Ticks");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -93,6 +101,8 @@ public class TcaElementDialog extends javax.swing.JDialog {
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(bookmarksButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(jButton1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(cancelButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(plotButton))
@@ -111,7 +121,8 @@ public class TcaElementDialog extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(plotButton)
                     .add(cancelButton)
-                    .add(bookmarksButton))
+                    .add(bookmarksButton)
+                    .add(jButton1))
                 .addContainerGap())
         );
 
@@ -139,6 +150,13 @@ public class TcaElementDialog extends javax.swing.JDialog {
             primaryDataSetSelector.setValue( ((Bookmark.Item)book).getUri() );
         }
     }//GEN-LAST:event_bookmarksButtonActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        cancelled= false;
+        setModifiers(0);
+        primaryDataSetSelector.setValue("");
+        setVisible(false);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     protected int modifiers = 0;
     public static final String PROP_MODIFIERS = "modifiers";
@@ -172,6 +190,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bookmarksButton;
     private javax.swing.JButton cancelButton;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton plotButton;
     private org.virbo.datasource.DataSetSelector primaryDataSetSelector;
