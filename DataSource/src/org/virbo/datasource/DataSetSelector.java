@@ -432,29 +432,28 @@ public class DataSetSelector extends javax.swing.JPanel {
                     }
                     }
                     
+                    String tsbProblem= "";
                     if ( tsb!=null ) {
                         try {
                             tsb.setURI(surl);
                             DatumRange tr= tsb.getTimeRange();
                             if ( tr!=null && tr.width().le(Units.seconds.createDatum(0) ) ) {
-                                JOptionPane.showMessageDialog( plotItButton, "<html>Unable to parse timerange in <br>"+surl+"<br>See http://autoplot.org/help#Time_Parsing_.2F_Formatting");
-                                return;
+                                tsbProblem= "<html>Unable to parse timerange in <br>"+surl+"<br>See http://autoplot.org/help#Time_Parsing_.2F_Formatting";
                             }
                         } catch (ParseException | ArrayIndexOutOfBoundsException ex) {
-                            JOptionPane.showMessageDialog( plotItButton, "<html>Unable to parse: "+surl+"<br>See http://autoplot.org/help#Time_Parsing_.2F_Formatting");
-                            return;
+                            tsbProblem= "<html>Unable to parse: "+surl+"<br>See http://autoplot.org/help#Time_Parsing_.2F_Formatting";
                         }
                     }
+                    logger.warning(tsbProblem);
                     
                     setMessage("busy: checking to see if uri looks acceptable");
-                    String surl1 = surl;
                     ProgressMonitor mon= getMonitor();
                     List<String> problems= new ArrayList();
-                    if (f.reject(surl1, problems,mon)) { // This is the often-seen code that replaces the timerange in a URI. +#+#+
+                    if (f.reject(surl, problems,mon)) { // This is the often-seen code that replaces the timerange in a URI. +#+#+
                         if ( tsb!=null ) {
                             if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) && !timeRange.equals(DataSourceUtil.DEFAULT_TIME_RANGE) ) {
                                 try {
-                                    tsb.setURI(surl1);
+                                    tsb.setURI(surl);
                                     tsb.setTimeRange(timeRange);
                                     String suri= tsb.getURI();
                                     problems.remove( TimeSeriesBrowse.PROB_NO_TIMERANGE_PROVIDED ); 
@@ -486,7 +485,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             if ( tsb!=null ) {
                                 if ( timeRange!=null && !timeRange.equals(DataSourceUtil.DEFAULT_TIME_RANGE) && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
                                     try {
-                                        tsb.setURI(surl1);
+                                        tsb.setURI(surl);
                                         if ( tsb.getTimeRange()!=null && !timeRange.equals(tsb.getTimeRange() ) ) {
                                             timeRange= pickTimeRange( this,
                                                     Arrays.asList( timeRange, tsb.getTimeRange() ),
