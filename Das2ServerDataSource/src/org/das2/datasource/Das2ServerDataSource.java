@@ -468,7 +468,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                 }
             }
 
-            mon.finished(); // just to be sure;
+            if ( !mon.isFinished() ) mon.finished(); // I don't believe the das2stream reader calls finished.
 
             DataSet ds = handler.getDataSet();
 
@@ -580,7 +580,7 @@ class Das2ServerDataSource extends AbstractDataSource {
             ex.printStackTrace();
         }
         
-        mon.finished();
+        if ( !mon.isFinished() ) mon.finished();
         return result1;
 
     }
