@@ -30,9 +30,12 @@ public class APDataSet extends QDataSetBridge {
         registry.register( new Das2StreamDataSourceFactory(), ".qds" ); */
     }
 
+    /**
+     * 1.4.1 clean up Das2Server source so that monitor is only called once.
+     */
     public APDataSet() {
         super();
-        System.err.println("APDataSet v1.4.0");
+        System.err.println("APDataSet v1.4.1");
     }
 
     /**
