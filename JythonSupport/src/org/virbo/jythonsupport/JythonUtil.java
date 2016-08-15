@@ -93,36 +93,20 @@ public class JythonUtil {
         
         String[] loadClasses= new String[] { "glob.py", "autoplot.py", "autoplotapp.py" }; // these must be in the root of the interpretter search path.
         for ( String pysrc: loadClasses ) {
-            if ( !pysrc.equals("glob.py") ) {
-                String f= getLocalJythonAutoplotLib();
-                if ( !pySys.path.contains( new PyString(f) ) ) {
-                    pySys.path.insert(0,new PyString(f) );
-                }
-            } else {
+            if ( pysrc.equals("glob.py") ) {
                 URL jarUrl= InteractiveInterpreter.class.getResource("/"+pysrc);
                 if ( jarUrl!=null ) {
-                    String jarFile= jarUrl.toString();
-                    if ( jarFile.startsWith("jar:file:") && jarFile.contains("!") ) {
-                        int i= jarFile.indexOf("!");
-                        String jar= jarFile.substring(9,i);
-                        File ff= new File(jar);
-                        if ( ff.exists() ) {
-                            pySys.path.insert(0, new PyString(jar));
-                        } else {
-                            String f= getLocalJythonLib();
-                            pySys.path.insert(0, new PyString( f ));
-                        }
-                    } else if ( jarUrl.toString().startsWith("file:/") ) {
-                        File f= new File( jarUrl.getFile() );  //TODO: test on Windows
-                        pySys.path.insert(0, new PyString( f.getParent() ));
-                    } else {
-                        String f= getLocalJythonLib();
-                        pySys.path.insert(0, new PyString( f ));
-                    }
+                    String f= getLocalJythonLib();
+                    pySys.path.insert(0, new PyString( f ));
 
                 } else {
                     logger.log(Level.WARNING, "Couldn''t find jar containing {0}.  See https://sourceforge.net/p/autoplot/bugs/576/", pysrc);
                 }
+            } else {
+                String f= getLocalJythonAutoplotLib();
+                if ( !pySys.path.contains( new PyString(f) ) ) {
+                    pySys.path.insert(0,new PyString(f) );
+                }    
             }
         }
 
@@ -260,32 +244,36 @@ public class JythonUtil {
                 }
             }
         }
-        try ( BufferedReader r= new BufferedReader( new InputStreamReader( JythonUtil.class.getResourceAsStream("/pylisting.txt") ) ) ) {
-            String s= r.readLine();
-            while ( s!=null ) {
-                File ff5= new File( ff3, s );
-                logger.log(Level.FINER, "copy to local folder python code: {0}", s);
-                InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
-                if ( s.contains("/") ) {
-                    if ( !makeHomeFor( ff5 ) ) {
-                        throw new IOException("Unable to makeHomeFor "+ff5);
+        if ( JythonUtil.class.getResource("/pylisting.txt")==null ) {
+            try ( BufferedReader r= new BufferedReader( new InputStreamReader( JythonUtil.class.getResourceAsStream("/pylisting.txt") ) ) ) {
+                String s= r.readLine();
+                while ( s!=null ) {
+                    File ff5= new File( ff3, s );
+                    logger.log(Level.FINER, "copy to local folder python code: {0}", s);
+                    InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
+                    if ( s.contains("/") ) {
+                        if ( !makeHomeFor( ff5 ) ) {
+                            throw new IOException("Unable to makeHomeFor "+ff5);
+                        }
                     }
+                    FileOutputStream out= new FileOutputStream( ff5 ); // TODO: test this on Windows.
+                    try {
+                        transferStream(in,out);
+                    } finally {
+                        out.close();
+                        in.close();
+                        if ( new File( ff3, s ).setReadOnly()==false ) {
+                            logger.log( Level.FINER, "set read-only on file {0} failed", s );
+                        }
+                        if ( new File( ff3, s ).setWritable( true, true )==false ) {
+                            logger.log( Level.FINER, "set write for user only on file {0} failed", s );
+                        }
+                    }
+                    s= r.readLine();
                 }
-                FileOutputStream out= new FileOutputStream( ff5 ); // TODO: test this on Windows.
-                try {
-                    transferStream(in,out);
-                } finally {
-                    out.close();
-                    in.close();
-                    if ( new File( ff3, s ).setReadOnly()==false ) {
-                        logger.log( Level.FINER, "set read-only on file {0} failed", s );
-                    }
-                    if ( new File( ff3, s ).setWritable( true, true )==false ) {
-                        logger.log( Level.FINER, "set write for user only on file {0} failed", s );
-                    }
-                }
-                s= r.readLine();
             }
+        } else {
+            throw new IllegalArgumentException("unable to find pylisting.txt, which is needed to install Jython codes.");
         }
         logger.fine("   ...done");
         return ff3.toString();
