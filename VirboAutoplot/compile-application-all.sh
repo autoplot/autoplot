@@ -57,7 +57,10 @@ for i in ../../APLibs/lib/commons/*.jar; do
 done
 
 if [ "" = "$RSYNC" ]; then
+    echo "using default rsync, assuming it is on the path"
     RSYNC=rsync
+else
+    echo "RSYNC="$RSYNC
 fi
 
 cd ..
@@ -78,8 +81,8 @@ for i in \
   FitsDataSource OpenDapDataSource \
   CdfDataSource CdfJavaDataSource CDAWebDataSource PDSPPIDataSource \
   VirboAutoplot; do
-    echo rsync -a --exclude .svn ../${i}/src/ temp-src/
-    rsync -a --exclude .svn ../${i}/src/ temp-src/
+    echo $RSYNC -a --exclude .svn ../${i}/src/ temp-src/
+    $RSYNC -a --exclude .svn ../${i}/src/ temp-src/
 done
 echo "done copy sources"
 
