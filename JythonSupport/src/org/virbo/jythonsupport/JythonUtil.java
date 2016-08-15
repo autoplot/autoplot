@@ -245,6 +245,8 @@ public class JythonUtil {
             }
         }
         if ( JythonUtil.class.getResource("/pylisting.txt")==null ) {
+            throw new IllegalArgumentException("unable to find pylisting.txt, which is needed to install Jython codes.");
+        } else {
             try ( BufferedReader r= new BufferedReader( new InputStreamReader( JythonUtil.class.getResourceAsStream("/pylisting.txt") ) ) ) {
                 String s= r.readLine();
                 while ( s!=null ) {
@@ -272,9 +274,8 @@ public class JythonUtil {
                     s= r.readLine();
                 }
             }
-        } else {
-            throw new IllegalArgumentException("unable to find pylisting.txt, which is needed to install Jython codes.");
         }
+        
         logger.fine("   ...done");
         return ff3.toString();
     }
