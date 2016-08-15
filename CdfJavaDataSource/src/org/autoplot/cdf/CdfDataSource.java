@@ -706,13 +706,13 @@ public class CdfDataSource extends AbstractDataSource {
      * @param svariable the name of the variable to read
      * @param constraints null or a constraint string like "[0:10000]" to read a subset of records.
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
-     * @param depend if true, recurse to read variables this depends on.
+     * @param dependantVariable if true, recurse to read variables this depends on.
      * @param slice1 if >-1, then slice on the first dimension.  This is to support extracting components.
      * @return the dataset 
      * @throws CDFException
      * @throws ParseException
      */
-    private synchronized MutablePropertyDataSet wrapDataSet(final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> thisAttributes, int slice1, ProgressMonitor mon) throws Exception, ParseException {
+    private synchronized MutablePropertyDataSet wrapDataSet(final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean dependantVariable, Map<String,Object> thisAttributes, int slice1, ProgressMonitor mon) throws Exception, ParseException {
 
         if ( !hasVariable(cdf, svariable) ) {
             throw new IllegalArgumentException( "No such variable: "+svariable );
@@ -771,14 +771,14 @@ public class CdfDataSource extends AbstractDataSource {
 
         if (reform) {
             //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.
-            result = CdfUtil.wrapCdfData(cdf,svariable, 0, -1, 1, slice1, depend, new NullProgressMonitor() );
+            result = CdfUtil.wrapCdfData(cdf,svariable, 0, -1, 1, slice1, dependantVariable, new NullProgressMonitor() );
         } else {
             long recCount = (recs[1] - recs[0]) / recs[2];
             if ( slice ) {
                 recCount= -1;
                 recs[2]= 1;
             }
-            result = CdfUtil.wrapCdfData(cdf,svariable, recs[0], recCount, recs[2], slice1, depend, mon);
+            result = CdfUtil.wrapCdfData(cdf,svariable, recs[0], recCount, recs[2], slice1, dependantVariable, mon);
             //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
         }
         result.putProperty(QDataSet.NAME, svariable);
@@ -853,18 +853,25 @@ public class CdfDataSource extends AbstractDataSource {
             if ( vrange.width().value()<=0 ) {
                 logger.warning("ignoring VALID_MIN and VALID_MAX because they are equal or out of order.");
             } else {
-                DatumRange extent= DataSetUtil.asDatumRange( Ops.extentSimple( result,null ) );
-                if ( depend || extent.intersects(vrange) ) { // if this data depends on other independent data, or intersects the valid range.
-                    // typical route
-                    result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
-                    result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );                    
+                QDataSet extentds= Ops.extentSimple( result,null );
+                if ( Double.isFinite( extentds.value(0) ) ) {
+                    DatumRange extent= DataSetUtil.asDatumRange( extentds );
+                    if ( dependantVariable || extent.intersects(vrange) ) { // if this data depends on other independent data, or intersects the valid range.
+                        // typical route
+                        result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+                        result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );                    
+                    } else {
+                        logger.warning("ignoring VALID_MIN and VALID_MAX because no timetags would be considered valid.");
+                    }
                 } else {
-                    logger.warning("ignoring VALID_MIN and VALID_MAX because no timetags would be considered valid.");
+                    logger.fine("using VALID_MIN and VALID_MAX to indictate that all data is invalid.");
+                    result.putProperty(QDataSet.VALID_MIN, vrange.min().doubleValue(units) );
+                    result.putProperty(QDataSet.VALID_MAX, vrange.max().doubleValue(units) );          
                 }
             }
         }
 
-        if ( slice && depend ) {
+        if ( slice && dependantVariable ) {
             Map dep0map= (Map) thisAttributes.get( "DEPEND_0" );
             if ( dep0map!=null ) {
                 QDataSet dep0= wrapDataSet( cdf, (String) dep0map.get("NAME"), constraints, false, false, null );
@@ -874,7 +881,7 @@ public class CdfDataSource extends AbstractDataSource {
 
         // CDF uses DELTA_PLUS and DELTA_MINUS on a dependency to represent the BIN boundaries.
         // vap+cdfj:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H has units error.
-        boolean doPlusMinus= depend==false;
+        boolean doPlusMinus= dependantVariable==false;
         Object deltaPlus= thisAttributes.get( "DELTA_PLUS_VAR" );
         Object deltaMinus= thisAttributes.get( "DELTA_MINUS_VAR" );
         if ( doPlusMinus 
@@ -919,7 +926,7 @@ public class CdfDataSource extends AbstractDataSource {
 
 
         int[] qubeDims= DataSetUtil.qubeDims(result);
-        if ( depend ) {
+        if ( dependantVariable ) {
             for (int idep = 0; idep < result.rank(); idep++) {
                 //int sidep= slice ? (idep+1) : idep; // idep taking slice into account.
                 int sidep= idep;
