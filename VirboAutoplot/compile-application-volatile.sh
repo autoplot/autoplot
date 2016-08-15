@@ -19,6 +19,9 @@ if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.7.0_80/
 fi
 
+JAVAC=$JAVA_HOME/bin/javac
+JAR=$JAVA_HOME/bin/jar
+
 if [ "" = "$TAG" ]; then
     if [ "" = "$AP_VERSION" ]; then
        TAG=untagged
@@ -165,56 +168,59 @@ echo "done copy help files."
 
 hasErrors=0
 
+#JAVAARGS="-g -target 1.7 -source 1.7 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10"
+JAVAARGS="-g -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10"
+
 # compile key java classes.
 echo "=== compile sources..."
 cd temp-volatile-src
 echo `pwd`
-echo ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/state/*.java; then echo "****"; hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotDataServer.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/PngWalkTool1.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/ImageResize.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/QualityControlPanel.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/util/awt/*.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/idlsupport/*.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/system/NullPreferencesFactory.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/tca/UriTcaSource.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/dataset/NearestNeighborTcaFunction.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/qstream/filter/*.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/event/*.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/dataset/NoDataInIntervalException.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/qstream/filter/*.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/ScreenshotsTool.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/wgetfs/WGetFileSystemFactory.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/components/DataPointRecorderNew.java; then hasErrors=1; fi  # some scripts use this old name.
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/graph/Auralizor.java; then hasErrors=1; fi 
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/datum/Ratio.java; then echo "****"; hasErrors=1; fi  
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/datum/RationalNumber.java; then echo "****"; hasErrors=1; fi  
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/datum/SIUnits.java; then echo "****"; hasErrors=1; fi  
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/dataset/RepeatIndexDataSet.java; then echo "****"; hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/jythonsupport/ui/DataMashUp.java; then echo "****"; hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/util/*Formatter.java; then echo "****"; hasErrors=1; fi
+echo $JAVAC $JAVAARGS org/virbo/autoplot/AutoplotUI.java
+if ! $JAVAC $JAVAARGS org/virbo/autoplot/AutoplotUI.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/virbo/autoplot/state/*.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/help/AutoplotHelpViewer.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/virbo/autoplot/AutoplotServer.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/virbo/autoplot/AutoplotDataServer.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/PngWalkTool1.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/ImageResize.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/pngwalk/QualityControlPanel.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/beans/*.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/util/awt/*.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS test/endtoend/*.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/virbo/idlsupport/*.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/system/NullPreferencesFactory.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/tca/UriTcaSource.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/virbo/dataset/NearestNeighborTcaFunction.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/qstream/filter/*.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/event/*.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/dataset/NoDataInIntervalException.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/qstream/filter/*.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/virbo/autoplot/ScreenshotsTool.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/autoplot/wgetfs/WGetFileSystemFactory.java; then hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/components/DataPointRecorderNew.java; then hasErrors=1; fi  # some scripts use this old name.
+if ! $JAVAC $JAVAARGS org/das2/graph/Auralizor.java; then hasErrors=1; fi 
+if ! $JAVAC $JAVAARGS org/das2/datum/Ratio.java; then echo "****"; hasErrors=1; fi  
+if ! $JAVAC $JAVAARGS org/das2/datum/RationalNumber.java; then echo "****"; hasErrors=1; fi  
+if ! $JAVAC $JAVAARGS org/das2/datum/SIUnits.java; then echo "****"; hasErrors=1; fi  
+if ! $JAVAC $JAVAARGS org/virbo/dataset/RepeatIndexDataSet.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/virbo/jythonsupport/ui/DataMashUp.java; then echo "****"; hasErrors=1; fi
+if ! $JAVAC $JAVAARGS org/das2/util/*Formatter.java; then echo "****"; hasErrors=1; fi
 
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
-   if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+   echo $JAVAC $JAVAARGS $i.java
+   if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
 done
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
-   if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+   echo $JAVAC $JAVAARGS $i.java
+   if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
 done
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
-   if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+   echo $JAVAC $JAVAARGS $i.java
+   if ! $JAVAC $JAVAARGS $i.java; then hasErrors=1; fi
 done
 
 # NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
