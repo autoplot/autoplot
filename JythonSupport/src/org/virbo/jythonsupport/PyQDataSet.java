@@ -704,55 +704,67 @@ public class PyQDataSet extends PyJavaInstance {
                 QubeDataSetIterator it = new QubeDataSetIterator( val );
                 
                 if ( lists[0].rank()==0 ) { // all datasets in lists[] will have the same rank.
-                    if ( ds.rank()==1 ) {
-                        it.next();
-                        ds.putValue( (int)lists[0].value(), it.getValue(val));
-                    } else if ( ds.rank()==2 ) {
+                    switch (ds.rank()) {
+                        case 1:
+                            it.next();
+                            ds.putValue( (int)lists[0].value(), it.getValue(val));
+                            break;
+                        case 2:
                             it.next();
                             ds.putValue( (int)lists[0].value(),
-                                (int)lists[1].value(), it.getValue(val));
-                    } else if ( ds.rank()==3 ) {
-                        it.next();
-                        ds.putValue( (int)lists[0].value(),
-                                (int)lists[1].value(),
-                                (int)lists[2].value(), it.getValue(val));
-                    } else if ( ds.rank()==4 ) {
-                        it.next();
-                        ds.putValue( (int)lists[0].value(),
-                                (int)lists[1].value(),
-                                (int)lists[2].value(),
-                                (int)lists[3].value(), it.getValue(val));
+                                    (int)lists[1].value(), it.getValue(val));
+                            break;
+                        case 3:
+                            it.next();
+                            ds.putValue( (int)lists[0].value(),
+                                    (int)lists[1].value(),
+                                    (int)lists[2].value(), it.getValue(val));
+                            break;
+                        case 4:
+                            it.next();
+                            ds.putValue( (int)lists[0].value(),
+                                    (int)lists[1].value(),
+                                    (int)lists[2].value(),
+                                    (int)lists[3].value(), it.getValue(val));
+                            break;
+                        default:
+                            break;
                     }
                 } else {
                     int n= lists[0].length();
-                    if ( ds.rank()==1 ) {
-                        for ( int i=0;i<n;i++ ) {
-                            it.next();
-                            ds.putValue( (int)lists[0].value(i), it.getValue(val));
-                        }
-                    } else if ( ds.rank()==2 ) {
-                        for ( int i=0;i<n;i++ ) {
-                            it.next();
-                            ds.putValue( (int)lists[0].value(i),
-                                    (int)lists[1].value(i), it.getValue(val));
-                        }
-
-                    } else if ( ds.rank()==3 ) {
-                        for ( int i=0;i<n;i++ ) {
-                            it.next();
-                            ds.putValue( (int)lists[0].value(i),
-                                    (int)lists[1].value(i),
-                                    (int)lists[2].value(i), it.getValue(val));
-                        }
-
-                    } else if ( ds.rank()==4 ) {
-                        for ( int i=0;i<n;i++ ) {
-                            it.next();
-                            ds.putValue( (int)lists[0].value(i),
-                                    (int)lists[1].value(i),
-                                    (int)lists[2].value(i),
-                                    (int)lists[3].value(i), it.getValue(val));
-                        }
+                    switch (ds.rank()) {
+                        case 1:
+                            for ( int i=0;i<n;i++ ) {
+                                it.next();
+                                ds.putValue( (int)lists[0].value(i), it.getValue(val));
+                            }   
+                            break;
+                        case 2:
+                            for ( int i=0;i<n;i++ ) {
+                                it.next();
+                                ds.putValue( (int)lists[0].value(i),
+                                        (int)lists[1].value(i), it.getValue(val));
+                            }   
+                            break;
+                        case 3:
+                            for ( int i=0;i<n;i++ ) {
+                                it.next();
+                                ds.putValue( (int)lists[0].value(i),
+                                        (int)lists[1].value(i),
+                                        (int)lists[2].value(i), it.getValue(val));
+                            }   
+                            break;
+                        case 4:
+                            for ( int i=0;i<n;i++ ) {
+                                it.next();
+                                ds.putValue( (int)lists[0].value(i),
+                                        (int)lists[1].value(i),
+                                        (int)lists[2].value(i),
+                                        (int)lists[3].value(i), it.getValue(val));
+                            }   
+                            break;
+                        default:
+                            break;
                     }
                 }
                 return;
