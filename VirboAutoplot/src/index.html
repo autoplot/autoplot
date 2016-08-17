@@ -26,10 +26,11 @@
         
         <p>Bugfixes (2016-08-17 r19283):</p>
         <ul>
-            <li>1661: update CDF library to fix bug where CDF file written on Windows was not closed properly.  Thanks Kristoff and Nand!</li>
+            <li>1662: smooth function fails when fill exists in the first boxcar.</li>
             <li>1660: Jython setItem assignment of ds[i,j] to rank 0 dataset.  Thanks Kristoff!</li>
             <li>rte_0520679247: don't do separate check for timeSeriesBrowse part of URI, which produces confusing messages</li>
             <li>1612: recent change would cause RTE when all data was fill.</li>
+            <li>1659: "monitor finished was called twice" when reading das2stream from das2server.</li>
             <li>1658: failure to start jython because pylisting.txt, clarify error message</li>
             <li>1633: ImageDataSet renderer recoded to extract just the visible portion</li>
             <li>1653: add explicit "clear" button to the ephemeris dialog</li>
