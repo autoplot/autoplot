@@ -11,6 +11,7 @@
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
             <name>VirboAutoplot</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
+            <explicit-platform explicit-source-supported="true"/>
             <source-roots>
                 <root id="src.javahelp.dir" name="JavaHelp Files"/>
                 <root id="src.src.dir" name="Source Packages"/>
