@@ -25,6 +25,8 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.TimeParser;
+import org.das2.datum.TimeUtil;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.FileSystemUtil;
@@ -78,7 +80,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         java.util.Map<String, String> params= URISplit.parseParams( split.params );
 
         File ffile= new File( split.resourceUri.getPath() );
-        File file= new File( split.resourceUri.getPath()+".temp" ); 
+        
+        //String tag= TimeParser.create("$Y$m$d_$H$M$S_$(subsec,places=3)").format( TimeUtil.now() );
+        
+        String tag= split.file.substring( split.path.length(), split.file.length()-4 ) + ".";
+        
+        File file= File.createTempFile( tag, ".cdf" );
+        //File file= new File( split.resourceUri.getPath().replaceFirst("\\.cdf$","") +"."+tag+".cdf" ); 
         
         boolean append= "T".equals( params.get("append") ) ;
 
