@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
  * BinaryDataSourceEditorPanel.java
@@ -11,8 +7,9 @@
 
 package org.virbo.binarydatasource;
 
+import java.awt.Rectangle;
 import java.awt.Window;
-import java.io.File;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
@@ -31,6 +28,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
+import javax.swing.AbstractAction;
+import javax.swing.InputMap;
+import javax.swing.KeyStroke;
+import javax.swing.text.BadLocationException;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.datasource.URISplit;
 
@@ -45,6 +46,21 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
     /** Creates new form BinaryDataSourceEditorPanel */
     public BinaryDataSourceEditorPanel() {
         initComponents();
+		InputMap im = paramsTextArea1.getInputMap();
+		KeyStroke tab= KeyStroke.getKeyStroke("TAB");
+		paramsTextArea1.getActionMap().put( im.get(tab), new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				jButton1ActionPerformed(e);
+				try {
+					Rectangle r= paramsTextArea1.modelToView( paramsTextArea1.getCaretPosition() );
+					paramsTextArea1.showPopup( r.x, r.y );
+				} catch ( BadLocationException ex ) {
+					
+				}
+			}
+		});
+		
         jTable1.getTableHeader().setReorderingAllowed(false);
         
     }
@@ -137,10 +153,12 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
+	@Override
     public JPanel getPanel() {
         return this;
     }
 
+	@Override
     public void setURI(String uri) {
         try {
             this.suri= uri;
@@ -155,10 +173,12 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
         }
     }
 
+	@Override
     public void markProblems(List<String> problems) {
     
     }
 
+	@Override
     public String getURI() {
         URISplit split = URISplit.parse(suri);
         Map<String,String> params= paramsTextArea1.getParams();
@@ -176,6 +196,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
     public org.virbo.datasource.ui.ParamsTextArea paramsTextArea1;
     // End of variables declaration//GEN-END:variables
 
+	@Override
     public boolean reject( String url ) throws IOException, URISyntaxException {
         URISplit split = URISplit.parse(url);
         FileSystem fs = FileSystem.create( DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI() );
@@ -185,6 +206,7 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
         return false;
     }
 
+	@Override
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
         URISplit split = URISplit.parse(uri);
         DataSetURI.getFile(new URL(split.file), mon );
