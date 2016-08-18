@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.cdf;
 
 import gov.nasa.gsfc.spdf.cdfj.CDFDataType;
@@ -25,8 +22,6 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.das2.datum.TimeParser;
-import org.das2.datum.TimeUtil;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.FileSystemUtil;
@@ -49,8 +44,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     private static final Logger logger= LoggerManager.getLogger("apdss.cdf");
     
     public CdfDataSourceFormat() {
-        names= new HashMap<QDataSet,String>();
-        seman= new HashMap<String,QDataSet>();
+        names= new HashMap<>();
+        seman= new HashMap<>();
     }
 
     private synchronized String nameFor(QDataSet dep0) {
@@ -119,12 +114,12 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if ( dep0 != null ) {
             if ( !append ) {
                 String name= nameFor(dep0);
-                Map<String,String> params1= new HashMap<String,String>();
+                Map<String,String> params1= new HashMap<>();
                 params1.put( "timeType",params.get("timeType") );
                 addVariableRankN( dep0, name, true, params1, mon );
             } else {
                 String name= nameFor(dep0);
-                Map<String,String> params1= new HashMap<String,String>();
+                Map<String,String> params1= new HashMap<>();
                 params1.put( "timeType",params.get("timeType") );
                 try {
                     addVariableRankN( dep0, name, true, params1, mon );
@@ -142,7 +137,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 addVariableRank1NoVary(dep1, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
             } else {
                 String name= nameFor(dep1);
-                Map<String,String> params1= new HashMap<String,String>();
+                Map<String,String> params1= new HashMap<>();
                 try {
                     addVariableRankN( dep1, name, true, params1, mon );
                 } catch ( Exception e ) {
@@ -159,7 +154,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 addVariableRank1NoVary(dep2, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
             } else {
                 String name= nameFor(dep2);
-                Map<String,String> params1= new HashMap<String,String>();
+                Map<String,String> params1= new HashMap<>();
                 try {
                     addVariableRankN( dep2, name, true, params1, mon );
                 } catch ( Exception e ) {
@@ -358,23 +353,17 @@ public class CdfDataSourceFormat implements DataSourceFormat {
      * @return a ByteBuffer containing the data.
      */
     private ByteBuffer dataSetToNioArray( QDataSet ds, UnitsConverter uc, CDFDataType type, ProgressMonitor mon ){
-        if ( ds.rank()==1 ) {
-            return doIt1Nio( ds, uc, type );
-            
-        } else if ( ds.rank()==2 ) {
-
-            throw new UnsupportedOperationException("not implemented");
-
-        } else if ( ds.rank()==3 ) {
-
-            throw new UnsupportedOperationException("not implemented");
-            
-        } else if ( ds.rank()==4 ) {
-
-            throw new UnsupportedOperationException("not implemented");
-            
-        } else {
-            throw new IllegalArgumentException("rank 0 not supported");
+        switch (ds.rank()) {
+            case 1:
+                return doIt1Nio( ds, uc, type );
+            case 2:
+                throw new UnsupportedOperationException("not implemented");
+            case 3:
+                throw new UnsupportedOperationException("not implemented");
+            case 4:
+                throw new UnsupportedOperationException("not implemented");
+            default:
+                throw new IllegalArgumentException("rank 0 not supported");
         }
         
     }
@@ -460,74 +449,71 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     private Object dataSetToArray( QDataSet ds, UnitsConverter uc, CDFDataType type, ProgressMonitor mon ){
         Object oexport;
 
-        if ( ds.rank()==1 ) {
-            return doIt1( ds, uc, type );
-            
-        } else if ( ds.rank()==2 ) {
-
-            if ( type==CDFDataType.DOUBLE ) {
-                oexport= new double[ds.length()][];
-            } else if ( type==CDFDataType.TT2000 ) {
-                oexport= new long[ds.length()][];
-            } else if ( type==CDFDataType.FLOAT ) {
-                oexport= new float[ds.length()][];
-            } else if ( type==CDFDataType.INT4 ) {
-                oexport= new int[ds.length()][];
-            } else if ( type==CDFDataType.INT2 ) {
-                oexport= new short[ds.length()][];
-            } else if ( type==CDFDataType.INT1 ) {
-                oexport= new byte[ds.length()][];
-            } else {
-                throw new IllegalArgumentException("type not supported: "+type);
-            }
-            for ( int i=0; i<ds.length(); i++ ) {
-                Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
-            }
-            return oexport;
-        } else if ( ds.rank()==3 ) {
-
-            if ( type==CDFDataType.DOUBLE ) {
-                oexport= new double[ds.length()][][];
-            } else if ( type==CDFDataType.TT2000 ) {
-                oexport= new long[ds.length()][][];                
-            } else if ( type==CDFDataType.FLOAT ) {
-                oexport= new float[ds.length()][][];
-            } else if ( type==CDFDataType.INT4 ) {
-                oexport= new int[ds.length()][][];
-            } else if ( type==CDFDataType.INT2 ) {
-                oexport= new short[ds.length()][][];
-            } else if ( type==CDFDataType.INT1 ) {
-                oexport= new byte[ds.length()][][];
-            } else {
-                throw new IllegalArgumentException("type not supported"+type);
-            }
-            for ( int i=0; i<ds.length(); i++ ) {
-                Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
-            }
-            return oexport;
-        } else if ( ds.rank()==4 ) {
-
-            if ( type==CDFDataType.DOUBLE ) {
-                oexport= new double[ds.length()][][][];
-            } else if ( type==CDFDataType.TT2000 ) {
-                oexport= new long[ds.length()][][][];
-            } else if ( type==CDFDataType.FLOAT ) {
-                oexport= new float[ds.length()][][][];
-            } else if ( type==CDFDataType.INT4 ) {
-                oexport= new int[ds.length()][][][];
-            } else if ( type==CDFDataType.INT2 ) {
-                oexport= new short[ds.length()][][][];
-            } else if ( type==CDFDataType.INT1 ) {
-                oexport= new byte[ds.length()][][][];
-            } else {
-                throw new IllegalArgumentException("type not supported"+type);
-            }
-            for ( int i=0; i<ds.length(); i++ ) {
-                Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
-            }
-            return oexport;
-        } else {
-            throw new IllegalArgumentException("rank 0 not supported");
+        switch (ds.rank()) {
+            case 1:
+                return doIt1( ds, uc, type );
+            case 2:
+                if ( type==CDFDataType.DOUBLE ) {
+                    oexport= new double[ds.length()][];
+                } else if ( type==CDFDataType.TT2000 ) {
+                    oexport= new long[ds.length()][];
+                } else if ( type==CDFDataType.FLOAT ) {
+                    oexport= new float[ds.length()][];
+                } else if ( type==CDFDataType.INT4 ) {
+                    oexport= new int[ds.length()][];
+                } else if ( type==CDFDataType.INT2 ) {
+                    oexport= new short[ds.length()][];
+                } else if ( type==CDFDataType.INT1 ) {
+                    oexport= new byte[ds.length()][];
+                } else {
+                    throw new IllegalArgumentException("type not supported: "+type);
+                }
+                for ( int i=0; i<ds.length(); i++ ) {
+                    Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
+                }
+                return oexport;
+            case 3:
+                if ( type==CDFDataType.DOUBLE ) {
+                    oexport= new double[ds.length()][][];
+                } else if ( type==CDFDataType.TT2000 ) {
+                    oexport= new long[ds.length()][][];
+                } else if ( type==CDFDataType.FLOAT ) {
+                    oexport= new float[ds.length()][][];
+                } else if ( type==CDFDataType.INT4 ) {
+                    oexport= new int[ds.length()][][];
+                } else if ( type==CDFDataType.INT2 ) {
+                    oexport= new short[ds.length()][][];
+                } else if ( type==CDFDataType.INT1 ) {
+                    oexport= new byte[ds.length()][][];
+                } else {
+                    throw new IllegalArgumentException("type not supported"+type);
+                }
+                for ( int i=0; i<ds.length(); i++ ) {
+                    Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
+                }
+                return oexport;
+            case 4:
+                if ( type==CDFDataType.DOUBLE ) {
+                    oexport= new double[ds.length()][][][];
+                } else if ( type==CDFDataType.TT2000 ) {
+                    oexport= new long[ds.length()][][][];
+                } else if ( type==CDFDataType.FLOAT ) {
+                    oexport= new float[ds.length()][][][];
+                } else if ( type==CDFDataType.INT4 ) {
+                    oexport= new int[ds.length()][][][];
+                } else if ( type==CDFDataType.INT2 ) {
+                    oexport= new short[ds.length()][][][];
+                } else if ( type==CDFDataType.INT1 ) {
+                    oexport= new byte[ds.length()][][][];
+                } else {
+                    throw new IllegalArgumentException("type not supported"+type);
+                }
+                for ( int i=0; i<ds.length(); i++ ) {
+                    Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
+                }
+                return oexport;
+            default:
+                throw new IllegalArgumentException("rank 0 not supported");
         }
         
     }
@@ -538,24 +524,36 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
         String t= params.get("type");
         if ( t!=null ) {
-            if ( t.equals("float") ) {
-                type= CDFDataType.FLOAT;
-            } else if ( t.equals("byte")) {
-                type= CDFDataType.INT1;
-            } else if ( t.equals("int1")) {
-                type= CDFDataType.INT1;
-            } else if ( t.equals("int2")) {
-                type= CDFDataType.INT2;
-            } else if ( t.equals("int4")) {
-                type= CDFDataType.INT4;
-            } else if ( t.equals("uint1")) {
-                type= CDFDataType.UINT1;
-            } else if ( t.equals("uint2")) {
-                type= CDFDataType.UINT2;
-            } else if ( t.equals("uint4")) {
-                type= CDFDataType.UINT4;
-            } else if ( t.equals("double")) {
-                type= CDFDataType.DOUBLE;
+            switch (t) {
+                case "float":
+                    type= CDFDataType.FLOAT;
+                    break;
+                case "byte":
+                    type= CDFDataType.INT1;
+                    break;
+                case "int1":
+                    type= CDFDataType.INT1;
+                    break;
+                case "int2":
+                    type= CDFDataType.INT2;
+                    break;
+                case "int4":
+                    type= CDFDataType.INT4;
+                    break;
+                case "uint1":
+                    type= CDFDataType.UINT1;
+                    break;
+                case "uint2":
+                    type= CDFDataType.UINT2;
+                    break;
+                case "uint4":
+                    type= CDFDataType.UINT4;
+                    break;
+                case "double":
+                    type= CDFDataType.DOUBLE;
+                    break;
+                default:
+                    break;
             }
         } else {
             if ( ds.rank()<3 ) {
@@ -596,12 +594,18 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 cdf.defineCompressedVariable( name, type, new int[0] );
                 addData( name, dataSetToNioArray( ds, uc, type, mon ) ); //TODO: I think I need to compress the channel.
             } else { 
-                if ( ds.rank()==2 ) {
-                    defineCompressedVariable( name, type, new int[] { ds.length(0) } );
-                } else if ( ds.rank()==3 ) {
-                    defineCompressedVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
-                } else if ( ds.rank()==4 ) {
-                    defineCompressedVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
+                switch (ds.rank()) {
+                    case 2:
+                        defineCompressedVariable( name, type, new int[] { ds.length(0) } );
+                        break;
+                    case 3:
+                        defineCompressedVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
+                        break;
+                    case 4:
+                        defineCompressedVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
+                        break;
+                    default:
+                        break;
                 }
                 Object o= dataSetToArray( ds, uc, type, mon );
                 logger.log(Level.FINE, "call cdf.addData(name,{0})", o);
@@ -612,13 +616,19 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             if ( ds.rank()==1 ) {
                 defineVariable( name, type, new int[0] );
                 addData( name, dataSetToNioArray( ds, uc, type, mon ) );
-            } else { 
-                if ( ds.rank()==2 ) {
-                    defineVariable( name, type, new int[] { ds.length(0) } );
-                } else if ( ds.rank()==3 ) {
-                    defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
-                } else if ( ds.rank()==4 ) {
-                    defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
+            } else { // this branch doesn't use dataSetToNioArray
+                switch (ds.rank()) {
+                    case 2:
+                        defineVariable( name, type, new int[] { ds.length(0) } );
+                        break;
+                    case 3:
+                        defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0) } );
+                        break;
+                    case 4:
+                        defineVariable( name, type, new int[] { ds.length(0),ds.length(0,0),ds.length(0,0,0) } );
+                        break;
+                    default:
+                        break;
                 }
                 addData( name, dataSetToArray( ds, uc, type, mon ) );
             }
@@ -758,12 +768,21 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if ( displayType==null || displayType.length()==0 ) {
             displayType= DataSourceUtil.guessRenderType(ds);
         }
-        if ( displayType.equals("nnSpectrogram") || displayType.equals("spectrogram") ) {
-            displayType= "spectrogram";
-        } else if ( displayType.equals("image")) {
-            displayType= "image";
-        } else if ( displayType.equals("series") || displayType.equals("scatter") || displayType.equals("hugeScatter") ) {
-            displayType= "time_series";
+        switch (displayType) {
+            case "nnSpectrogram":
+            case "spectrogram":
+                displayType= "spectrogram";
+                break;
+            case "image":
+                displayType= "image";
+                break;
+            case "series":
+            case "scatter":
+            case "hugeScatter":
+                displayType= "time_series";
+                break;
+            default:
+                break;
         }
         cdf.addVariableAttributeEntry( name,"DISPLAY_TYPE", CDFDataType.CHAR, displayType );
         
