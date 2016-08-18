@@ -95,7 +95,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             cdf = new CDFWriter( false );
 
         } else {
-            logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", file.toString() );
+            logger.log(Level.FINE, "call cdf= new CDFWriter( {0}, false )", ffile.toString() );
             cdf = new CDFWriter( ffile.toString(), false ); // read in the old file first
             
         }
