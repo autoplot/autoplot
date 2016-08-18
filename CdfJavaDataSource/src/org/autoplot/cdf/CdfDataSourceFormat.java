@@ -83,10 +83,10 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         
         //String tag= TimeParser.create("$Y$m$d_$H$M$S_$(subsec,places=3)").format( TimeUtil.now() );
         
-        String tag= split.file.substring( split.path.length(), split.file.length()-4 ) + ".";
+        String tag= "xxx"; //split.file.substring( split.path.length(), split.file.length()-4 ) + ".";
         
-        File file= File.createTempFile( tag, ".cdf" );
-        //File file= new File( split.resourceUri.getPath().replaceFirst("\\.cdf$","") +"."+tag+".cdf" ); 
+        //File file= File.createTempFile( tag, ".cdf" );
+        File file= new File( split.resourceUri.getPath().replaceFirst("\\.cdf$","") +"."+tag+".cdf" ); 
         
         boolean append= "T".equals( params.get("append") ) ;
 
@@ -129,7 +129,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 try {
                     addVariableRankN( dep0, name, true, params1, mon );
                 } catch ( Exception e ) {
-                    logger.warning("CDF Exception, presumably because the variable already exists.");
+                    logger.fine("CDF Exception, presumably because the variable already exists.");
                 }
             }
         }
@@ -146,7 +146,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 try {
                     addVariableRankN( dep1, name, true, params1, mon );
                 } catch ( Exception e ) {
-                    logger.warning("CDF Exception, presumably because the variable already exists.");
+                    logger.fine("CDF Exception, presumably because the variable already exists.");
                 }                
             }
         }
@@ -163,7 +163,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 try {
                     addVariableRankN( dep2, name, true, params1, mon );
                 } catch ( Exception e ) {
-                    logger.warning("CDF Exception, presumably because the variable already exists.");
+                    logger.fine("CDF Exception, presumably because the variable already exists.");
                 }                
             }
         }
@@ -180,19 +180,32 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             
         write( file.toString() );
         
+        if ( ffile.exists() ) {
+            if ( !ffile.delete() ) {
+                logger.log(Level.WARNING, "unable to delete old file to make way for new file: {0}", ffile);
+            }
+        }
+        
+        logger.log(Level.FINE, "rename file {0} {1}", new Object[]{file, ffile});
         if ( !file.renameTo(ffile) ) {
             if ( !FileSystemUtil.copyFile( file, ffile ) ) {
                 throw new IllegalArgumentException("unable move or copy temporary file to final name: "+ffile);
             } else {
                 if ( !file.delete() ) {
-                    logger.warning("the file should be deleted later.");
-                    file.deleteOnExit();
+                    Thread.sleep(4000);
+                    if ( !file.delete() ) { // Windows likes a little delay.
+                        logger.warning("the file should be deleted later.");
+                        file.deleteOnExit();
+                    } else {
+                        logger.fine("rename was implemented with copy after delay of four seconds.");
+                    }
                 } else {
                     logger.fine("rename was implemented with copy.");
                 }
             }
         }
         
+        //System.err.println("check lock status.");
     }
 
     private void addVariableRank1NoVary( QDataSet ds, String name, boolean isSupport, Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon ) throws Exception {
@@ -624,7 +637,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
      */
     private String logName( Object o ) {
         if ( o.getClass().isArray() ) {
-            StringBuilder s= new StringBuilder("[");
+            StringBuilder s= new StringBuilder(o.getClass().getComponentType().toString()+"[");
             s.append( Array.getLength(o));
             if ( Array.getLength(o)>0 ) {
                 o= Array.get(o,0);
@@ -634,15 +647,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 }
             }
             s.append("]");
-            String n= o.getClass().toString();
-            if ( n.startsWith("class java.lang.") ) {
-                n= n.substring(16);
-            }
-            return n + s.toString();
+            return s.toString();
         } else if ( o instanceof String ) {
             return "\"" + o + "\"";
         } else if ( o instanceof CDFDataType ) {
-            return "CDFDataType." + ((CDFDataType)o).getValue();
+            return "CDFDataType=" + ((CDFDataType)o).getValue();
         } else {
             return o.toString();
         }
