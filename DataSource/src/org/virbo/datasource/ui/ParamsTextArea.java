@@ -64,11 +64,21 @@ public class ParamsTextArea extends JTextArea {
     }
     
     public void showPopup( MouseEvent e ) {
+        final int pos= this.viewToModel( e.getPoint() );
+        this.setCaretPosition(pos);
+        showPopup(e.getX(),e.getY());
+
+	}
+	
+	/**
+	 * show the completions popup at the given point.
+	 * @param x in the component coordinates.
+	 * @param y in the component coordinates.
+	 */
+    public void showPopup( int x, int y ) {
         try {
-            final int pos= this.viewToModel( e.getPoint() );
-
-            this.setCaretPosition(pos);
-
+			final int pos= this.getCaretPosition();
+			
             int row= this.getLineOfOffset(pos);
             int linePos= this.getLineStartOffset(row);
             int col= pos - linePos;
@@ -101,7 +111,7 @@ public class ParamsTextArea extends JTextArea {
                 mi.setToolTipText(acc.doc);
                 popup.add( mi );
             }
-            popup.show(this, e.getX(), e.getY() );
+            popup.show(this, x,y  );
             
         } catch (Exception ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
