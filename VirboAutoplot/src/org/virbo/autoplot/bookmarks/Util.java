@@ -140,7 +140,9 @@ public class Util {
         List<String> result= new ArrayList();
         for ( Bookmark b: recent ) {
             if ( b instanceof Bookmark.Item ) {
-                result.add( ((Bookmark.Item)b).getUri() );
+                String s= ((Bookmark.Item)b).getUri();
+                result.remove(s); // move s to the top of the list if it exists already
+                result.add(s);
             }
         }
         sel.setRecent(result);
