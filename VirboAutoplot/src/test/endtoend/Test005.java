@@ -126,6 +126,7 @@ public class Test005 {
             
             plot("http://autoplot.org/data/hsi_qlimg_5050601_001.fits");  // note this is not what happens, but it's still an interesting test.
             getDocumentModel().getDataSourceFilters(0).setFilters("|slice0(2)");
+            Thread.sleep(1000); // We shouldn't have to do this.
             getDocumentModel().getPlotElements(0).setComponent("");
             Thread.sleep(1000); // it's probably because the app isn't locked properly.
             writeToPng("test005_demo12.png");
