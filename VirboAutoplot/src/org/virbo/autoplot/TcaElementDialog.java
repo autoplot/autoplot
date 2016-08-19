@@ -12,11 +12,16 @@
 package org.virbo.autoplot;
 
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingUtilities;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceRegistry;
 
 /**
  *
@@ -30,6 +35,27 @@ public class TcaElementDialog extends javax.swing.JDialog {
         initComponents();
         setLocationRelativeTo(parent);
         primaryDataSetSelector.setPlotItButtonVisible(false);
+        DefaultComboBoxModel m= new DefaultComboBoxModel();
+        m.addElement("Add from...");
+        final List<String> ss= DataSetURI.getSortedDiscoverableExtentions();
+        for ( String s: ss) {
+            if ( !s.equals( "file:" ) ) {
+                m.addElement( s );
+            }
+        }
+        addTicksFromComboBox.setModel(m);
+        addTicksFromComboBox.addActionListener( new ActionListener() { 
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                String s= (String)addTicksFromComboBox.getSelectedItem();
+                if ( s.startsWith(".") ) {
+                    String ext= s;
+                    addTicksFromComboBox.setSelectedIndex(0);
+                    primaryDataSetSelector.setValue("vap+"+ext.substring(1)+":");
+                    primaryDataSetSelector.browseSourceType();
+                }
+            }
+        });
         org.virbo.autoplot.bookmarks.Util.loadRecent( "tcaRecent", primaryDataSetSelector, getDefault() );
 
 
@@ -57,6 +83,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         bookmarksButton = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
+        addTicksFromComboBox = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -85,11 +112,14 @@ public class TcaElementDialog extends javax.swing.JDialog {
         });
 
         jButton1.setText("Clear Additional Ticks");
+        jButton1.setToolTipText("Remove the additional ticks.");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
+
+        addTicksFromComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -100,6 +130,8 @@ public class TcaElementDialog extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(bookmarksButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(addTicksFromComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 237, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .add(jButton1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -122,7 +154,8 @@ public class TcaElementDialog extends javax.swing.JDialog {
                     .add(plotButton)
                     .add(cancelButton)
                     .add(bookmarksButton)
-                    .add(jButton1))
+                    .add(jButton1)
+                    .add(addTicksFromComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -146,7 +179,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
         //man.setPrefNode("tca");
         man.setVisible(true);
         Bookmark book= man.getSelectedBookmark();
-        if ( book!=null ) {
+        if ( book!=null && book instanceof Bookmark.Item ) {
             primaryDataSetSelector.setValue( ((Bookmark.Item)book).getUri() );
         }
     }//GEN-LAST:event_bookmarksButtonActionPerformed
@@ -188,6 +221,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> addTicksFromComboBox;
     private javax.swing.JButton bookmarksButton;
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton jButton1;
