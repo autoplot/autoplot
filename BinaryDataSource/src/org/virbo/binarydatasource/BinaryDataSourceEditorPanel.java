@@ -43,26 +43,28 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     private static final Logger logger= Logger.getLogger("apdss.binary");
 
-    /** Creates new form BinaryDataSourceEditorPanel */
+    /**
+     * Creates new form BinaryDataSourceEditorPanel
+     */
     public BinaryDataSourceEditorPanel() {
         initComponents();
-		InputMap im = paramsTextArea1.getInputMap();
-		KeyStroke tab= KeyStroke.getKeyStroke("TAB");
-		paramsTextArea1.getActionMap().put( im.get(tab), new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				jButton1ActionPerformed(e);
-				try {
-					Rectangle r= paramsTextArea1.modelToView( paramsTextArea1.getCaretPosition() );
-					paramsTextArea1.showPopup( r.x, r.y );
-				} catch ( BadLocationException ex ) {
-					
-				}
-			}
-		});
-		
+        InputMap im = paramsTextArea1.getInputMap();
+        KeyStroke tab = KeyStroke.getKeyStroke("TAB");
+        paramsTextArea1.getActionMap().put(im.get(tab), new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jButton1ActionPerformed(e);
+                try {
+                    Rectangle r = paramsTextArea1.modelToView(paramsTextArea1.getCaretPosition());
+                    paramsTextArea1.showPopup(r.x, r.y);
+                } catch (BadLocationException ex) {
+
+                }
+            }
+        });
+
         jTable1.getTableHeader().setReorderingAllowed(false);
-        
+
     }
 
     String suri;
