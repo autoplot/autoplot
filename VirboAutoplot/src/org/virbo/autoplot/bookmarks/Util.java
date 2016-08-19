@@ -25,7 +25,7 @@ import org.virbo.datasource.DataSetSelector;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Utility functions for the DataSetSelector.
  * @author jbf
  */
 public class Util {
@@ -56,42 +56,28 @@ public class Util {
             try {
                 recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement());
                 setRecent(sel,recent);
-            } catch (BookmarksException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (SAXException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } catch (ParserConfigurationException ex) {
+            } catch (BookmarksException | SAXException | IOException | ParserConfigurationException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
 
         } else {
             setRecent( sel, deft );
-            PrintStream fout= null; // redundant code, see below.
-            try {
-                fout = new PrintStream(f);
+            try (PrintStream fout = new PrintStream(f) ) { // redundant code, see below. 
                 Bookmark.formatBooks(fout,getRecent(sel));
                 fout.close();
             } catch (FileNotFoundException ex) {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
-            } finally {
-                if ( fout!=null ) fout.close();
             }
         }
-
+        
         sel.addPropertyChangeListener( DataSetSelector.PROP_RECENT, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                PrintStream fout= null;
-                try {
-                    fout = new PrintStream(f);
+                try (PrintStream fout = new PrintStream(f)) {
                     Bookmark.formatBooks(fout,getRecent(sel));
                     fout.close();
                 } catch (FileNotFoundException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } finally {
-                    if ( fout!=null ) fout.close();
                 }
 
             }
@@ -100,17 +86,13 @@ public class Util {
         sel.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                PrintStream fout= null;
-                try {
-                    fout = new PrintStream(f);
+                try (PrintStream fout = new PrintStream(f)) {
                     List<Bookmark> result= getRecent(sel);
                     result.add( new Bookmark.Item( sel.getValue() ) );
                     Bookmark.formatBooks(fout,result);
                     fout.close();
                 } catch (FileNotFoundException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } finally {
-                    if ( fout!=null ) fout.close();
                 }
             }
         });        
