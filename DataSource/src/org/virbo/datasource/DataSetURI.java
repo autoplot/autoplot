@@ -14,10 +14,12 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import ftpfs.FTPBeanFileSystemFactory;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
@@ -1951,6 +1953,58 @@ public class DataSetURI {
         return result;
     }
 
+    /**
+     * return the list of discoverable extentions, sorted by recent use.
+     * @return 
+     */
+    public static List<String> getSortedDiscoverableExtentions() {
+        final List<String> exts= DataSetURI.getDiscoverableExtensions();
+        exts.add("file:"); // special marker for local files.
+        File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) + "/bookmarks/discovery.txt" );
+        if ( f.exists()&& f.canRead()) {
+            BufferedReader reader=null;
+            try {
+                reader= new BufferedReader( new FileReader(f) );
+                String s= reader.readLine();
+                while ( s!=null ) {
+                    if ( s.length()>29 ) {
+                        String ss= s.substring(25,29);
+                        switch (ss) {
+                            case "file":
+                                {
+                                    String ex1= "file:";
+                                    if ( exts.contains(ex1) ) {
+                                        exts.remove(ex1);
+                                        exts.add(0,ex1);
+                                    }       break;
+                                }
+                            case "vap+":
+                                {
+                                    int i= s.indexOf(":",29);
+                                    String ex1= "."+s.substring(29,i);
+                                    if ( exts.contains(ex1) ) {
+                                        exts.remove(ex1);
+                                        exts.add(0,ex1);
+                                    }       break;
+                                }
+                        }
+                    }
+                    s= reader.readLine();
+                }
+            } catch ( IOException ex ) {
+            } finally {
+                if ( reader!=null ) {
+                    try {
+                        reader.close();
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+        return exts;
+    }
+    
     /**
      * get the completions from the plug-in factory..
      * @param surl1
