@@ -113,6 +113,8 @@ public class DataSetSelector extends javax.swing.JPanel {
     
     private Map<Object,Object> pendingChanges= new HashMap(); // lockObject->Client
     
+    private final String MESSAGE_RECENT= "(application will put recent items here)"; // warning: this is repeat code.
+    
     /**
      * the edit (inspect) button has been pressed.
      */
@@ -1949,7 +1951,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         this.recent = recent;
         String value = editor.getText();
         ArrayList<String> r = new ArrayList<>(recent);
-        if ( r.size()>0 ) {
+        if ( r.size()>0 && !value.equals(MESSAGE_RECENT)) {
             if ( !r.get(r.size()-1).equals(value) ) {
                 r.add(value);
             }
