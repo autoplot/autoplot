@@ -572,8 +572,8 @@ public class CdfDataSource extends AbstractDataSource {
     /* read all the variable attributes into a Map */
     private synchronized HashMap<String, Object> readAttributes(CDFReader cdf, String var, int depth) {
         try {
-            LinkedHashMap<String, Object> props = new LinkedHashMap<String, Object>();
-            LinkedHashMap<String, Object> gattrs = new LinkedHashMap<String, Object>();
+            LinkedHashMap<String, Object> props = new LinkedHashMap<>();
+            LinkedHashMap<String, Object> gattrs = new LinkedHashMap<>();
 
             Pattern p = Pattern.compile("DEPEND_[0-9]");
 
@@ -662,7 +662,7 @@ public class CdfDataSource extends AbstractDataSource {
 
             return props;
         } catch ( CDFException ex ) {
-            return new HashMap<String, Object>();
+            return new HashMap<>();
         }
     }
 
@@ -693,6 +693,15 @@ public class CdfDataSource extends AbstractDataSource {
             delta= Ops.replicate( delta, ds.length() );
         }               
         return delta;
+    }
+
+    /**
+     * implement isFinite until Java 8 is available.  
+     * @param v
+     * @return true if v is finite.
+     */
+    private static boolean isFinite( double v ) {
+        return !(Double.isInfinite(v) || Double.isNaN(v));
     }
     
     private MutablePropertyDataSet wrapDataSet(final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean depend, Map<String,Object> attr ) throws Exception, ParseException {
@@ -854,7 +863,7 @@ public class CdfDataSource extends AbstractDataSource {
                 logger.warning("ignoring VALID_MIN and VALID_MAX because they are equal or out of order.");
             } else {
                 QDataSet extentds= Ops.extentSimple( result,null );
-                if ( Double.isFinite( extentds.value(0) ) ) {
+                if ( isFinite( extentds.value(0) ) ) {
                     DatumRange extent= DataSetUtil.asDatumRange( extentds );
                     if ( dependantVariable || extent.intersects(vrange) ) { // if this data depends on other independent data, or intersects the valid range.
                         // typical route
@@ -1193,7 +1202,7 @@ public class CdfDataSource extends AbstractDataSource {
                 }
                 
                 return attributes; // transient state
-            } catch ( Exception ex ) {
+            } catch ( IOException | IllegalArgumentException ex ) {
                 if ( ex instanceof IllegalArgumentException ) {
                     throw (IllegalArgumentException)ex;
                 } else {
@@ -1230,9 +1239,7 @@ public class CdfDataSource extends AbstractDataSource {
         if ( cdfFile.length()<4 ) {
             throw new IllegalArgumentException("CDF file is empty");
         }
-        InputStream in=null;
-        try {
-            in= new FileInputStream(cdfFile);
+        try (InputStream in = new FileInputStream(cdfFile)) {
             int n= in.read(magic);
             if ( n==4 ) {
                 if ( ( magic[0] & 0xFF )==0xCD && ( magic[1] & 0xFF )==0xF3 ) {
@@ -1249,8 +1256,6 @@ public class CdfDataSource extends AbstractDataSource {
                     // assume it's the old version of CDF that didn't have a magic number.
                 }
             }
-        } finally {
-            if ( in!=null ) in.close();
         }
     }
 
