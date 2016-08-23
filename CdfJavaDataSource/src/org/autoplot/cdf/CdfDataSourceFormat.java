@@ -75,22 +75,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         java.util.Map<String, String> params= URISplit.parseParams( split.params );
 
         File ffile= new File( split.resourceUri.getPath() );
-        
-        //String tag= TimeParser.create("$Y$m$d_$H$M$S_$(subsec,places=3)").format( TimeUtil.now() );
-        
-        String tag= "xxx"; //split.file.substring( split.path.length(), split.file.length()-4 ) + ".";
-        
-        //File file= File.createTempFile( tag, ".cdf" );
-        File file= new File( split.resourceUri.getPath().replaceFirst("\\.cdf$","") +"."+tag+".cdf" ); 
-        
+           
         boolean append= "T".equals( params.get("append") ) ;
-
-        if ( file.exists() && !file.delete() ) {
-            throw new IllegalArgumentException("Unable to delete file"+file);
-        }
         
         if ( ! append ) {
-            logger.log(Level.FINE, "create CDF file {0}", file);
+            logger.log(Level.FINE, "create CDF file {0}", ffile);
             logger.log(Level.FINE, "call cdf= new CDFWriter( false )");
             cdf = new CDFWriter( false );
 
@@ -173,34 +162,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             logger.log( Level.WARNING, ex.getMessage() , ex );
         }
             
-        write( file.toString() );
+        write( ffile.toString() );
         
-        if ( ffile.exists() ) {
-            if ( !ffile.delete() ) {
-                logger.log(Level.WARNING, "unable to delete old file to make way for new file: {0}", ffile);
-            }
-        }
-        
-        logger.log(Level.FINE, "rename file {0} {1}", new Object[]{file, ffile});
-        if ( !file.renameTo(ffile) ) {
-            if ( !FileSystemUtil.copyFile( file, ffile ) ) {
-                throw new IllegalArgumentException("unable move or copy temporary file to final name: "+ffile);
-            } else {
-                if ( !file.delete() ) {
-                    Thread.sleep(4000);
-                    if ( !file.delete() ) { // Windows likes a little delay.
-                        logger.warning("the file should be deleted later.");
-                        file.deleteOnExit();
-                    } else {
-                        logger.fine("rename was implemented with copy after delay of four seconds.");
-                    }
-                } else {
-                    logger.fine("rename was implemented with copy.");
-                }
-            }
-        }
-        
-        //System.err.println("check lock status.");
     }
 
     private void addVariableRank1NoVary( QDataSet ds, String name, boolean isSupport, Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon ) throws Exception {
