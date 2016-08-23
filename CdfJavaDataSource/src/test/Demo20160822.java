@@ -45,6 +45,8 @@ public class Demo20160822 {
         cdf.addData("v2",v2);
         cdf.write( tempFile.toString() );
         
+        System.err.println( "tempFile.delete()=" + tempFile.delete() );
+        
         // CDF should be closed at this point, but file still has lock.        
         if ( !( tempFile.renameTo( targetFile ) ) ) {
             if ( tempFile.exists() ) tempFile.delete();
