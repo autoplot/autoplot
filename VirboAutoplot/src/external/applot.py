@@ -62,7 +62,7 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
           rank= len(d.shape)
 
       if ( rank==1 ):
-         packetDescriptor.append( '   <y type="'+datatype+'" name="'+name+'" idlname="'+tags[i]+'" />' )
+         packetDescriptor.append( '   <y type="'+datatype+'" name="'+name+'" units="" idlname="'+tags[i]+'" />' )
 
          if ( i<nt-1 ): format.append('%16.4e')
          else: format.append( '%15.3e' )
@@ -71,7 +71,7 @@ def das2stream( dataStruct, filename, ytags=None, ascii=1, xunits='' ):
          if ytags==None: ytags= range(s[2])
          sytags= ','.join( [ "%f"%n for n in ytags ] )
          nitems= len(ytags)
-         packetDescriptor.append( '   <yscan type="' +datatype+'" name="' +name +'" nitems="'+str(nitems) +'" yTags="'+sytags+'"' +' />' )
+         packetDescriptor.append( '   <yscan type="' +datatype+'" name="' +name +'" units="" nitems="'+str(nitems) +'" yTags="'+sytags+'"' +' />' )
  
          for i in xrange(1,nitems): format.append('%16.4e')
          if ( i<nt-1 ):
