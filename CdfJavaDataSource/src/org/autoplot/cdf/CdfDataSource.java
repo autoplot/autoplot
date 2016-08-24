@@ -448,6 +448,10 @@ public class CdfDataSource extends AbstractDataSource {
             }
         }
 
+        if ( "T".equals(getParam("replaceLabels","F")) ) {
+            maybeReplaceLabels(result);
+        }
+        
         if (!"no".equals(interpMeta)) {
             MetadataModel model = new IstpMetadataModel();
 
@@ -548,6 +552,23 @@ public class CdfDataSource extends AbstractDataSource {
         
         return result;
 
+    }
+
+    /**
+     * Replace the channel label can be replaced by a constant, single value,
+     * should there be one.  This is often used with the where constraint, for
+     * example https://www.rbsp-ect.lanl.gov/data_pub/rbspa/hope/level3/PA/rbspa_rel03_ect-hope-PA-L3_20130601_v6.1.0.cdf?FEDU&where=Mode_Ele.eq(0)&replaceLabels=T
+     * https://sourceforge.net/p/autoplot/bugs/1664/
+     * @param ds 
+     */
+    private void maybeReplaceLabels( MutablePropertyDataSet ds ) {
+        for ( int i=1; i<5; i++ ) {
+            MutablePropertyDataSet depDs= (MutablePropertyDataSet) (QDataSet) ds.property( "DEPEND_"+i );
+            MutablePropertyDataSet lablDs= (MutablePropertyDataSet) (QDataSet) ds.property( "BUNDLE_"+i );            
+            if ( depDs!=null && depDs.rank()==1 && lablDs!=null) { // it can be used as labels.
+                ds.putProperty( "BUNDLE_"+i, null );
+            }
+        }
     }
 
     private boolean hasVariable( CDFReader cdf, String var ) {
@@ -996,7 +1017,7 @@ public class CdfDataSource extends AbstractDataSource {
 
                         depDs = wrapDataSet(cdf, depName, constraints, reformDep, false, dep, -1, null);
 
-                        if ( idep>0 && reformDep==false && depDs.length()==1 && ( qubeDims[0]==1 || qubeDims[0]>depDs.length() ) ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
+                        if ( idep>0 && reformDep==false && depDs.length()==1 && ( qubeDims[0]==1 || qubeDims[0]>depDs.length() ) ) { //bugfix https://sourceforge.net/p/autoplot/bugs/471/
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
                             //depDs= Ops.reform(depDs);  // This would be more explicit, but reform doesn't handle metadata properly.
                         }
