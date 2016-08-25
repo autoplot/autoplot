@@ -410,17 +410,18 @@ def sendCommand( s, cmd ):
 #    X,Y,Z as with plot.  If X is an integer, then it is the position in Autoplot, so that multiple plots can be sent to 
 #      one autoplot canvas.
 # CALLING SEQUENCE:
-#    APPLOT, X, Y
-#    APPLOT, X, Y, Z   for a spectrogram
+#    plot( X, Y )
+#    plot( X, Y, Z )  for a spectrogram
 #
 # KEYWORDS:
 #   tmpfile=   explicitly set the file used to move data into Autoplot.  This can also be used with /noplot
 #   /noplot    just make the tmpfile, don't actually try to plot.
 #   xunits=    units as a string, especially like "seconds since 2010-01-01T00:00"
+#   ylabel=''  label is currently ignored.
 #   delta_plus=  array of positive lengths showing the upper limit of the 1-sigma confidence interval.
 #   delta_minus= array of positive lengths showing the lower limit of the 1-sigma confidence interval.
 #-
-def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, respawn=0, delta_plus=None, delta_minus=None ):
+def plot( x=None, y=None, z=None, z4=None, xunits='', ylabel='', tmpfile=None, noplot=0, respawn=0, delta_plus=None, delta_minus=None ):
    
    #sep= !version.os_family eq 'Windows' ? ';' : ':'
    sep= ':'
@@ -435,7 +436,10 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
      import datetime
      dt= datetime.datetime.today()
      tag= dt.strftime("%Y%m%dT%H%M%S")
-     tmpfile= '/tmp/' + 'autoplot.' + tag + '.001.'+ext   # TODO: IDL version handles multiple plots in one second.
+     import glob
+     ff= glob.glob( '/tmp/' + 'autoplot.' + tag + '.???.'+ext )
+     seq= '.%03d.' % len(ff)
+     tmpfile= '/tmp/' + 'autoplot.' + tag + seq +ext   # TODO: IDL version handles multiple plots in one second.
    else:
      if ( tmpfile.index('.'+ext) != len(tmpfile)-4 ):
        tmpfile= tmpfile + '.'+ext  # add the extension
@@ -515,10 +519,10 @@ def applot( x=None, y=None, z=None, z4=None, xunits='', tmpfile=None, noplot=0, 
        s.connect(('localhost',port))
 
        if ( pos>-1 ):
-           cmd= 'plotx( '+pos.trim()+', "file:'+tmpfile+'" );\n'  # semicolon means no echo
+           cmd= 'plot( '+str(pos)+', "file:'+tmpfile+'" );\n'  # semicolon means no echo
 
        else:
-           cmd= 'plotx( "file:'+tmpfile+'" );\n'  # semicolon means no echo
+           cmd= 'plot( "file:'+tmpfile+'" );\n'  # semicolon means no echo
 
        foo= sendCommand( s, cmd )
        s.shutdown(1)
