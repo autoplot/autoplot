@@ -411,17 +411,18 @@ public final class AggregatingDataSource extends AbstractDataSource {
             }
 
             logger.log(Level.FINE, "aggregating {0} files for {1}", new Object[]{ss.length, lviewRange});
-            StringBuilder log= new StringBuilder( "== getDataSet will read the following ==" );
-            for ( String s : ss ) {
-                log.append("\n").append(s);
+            if ( logger.isLoggable(Level.FINE) ) {
+                StringBuilder log= new StringBuilder( "== getDataSet will read the following ==" );
+                for ( String s : ss ) {
+                    log.append("\n").append(s);
+                }
+                logger.log( Level.FINE, log.toString() );
             }
-            logger.log( Level.FINE, log.toString() );
-
-            
 
             MutablePropertyDataSet result = null;
             JoinDataSet altResult= null; // used when JoinDataSets are found
-
+            DataSetBuilder dep0Builder= null;  // used when joining non-time-series.
+            
             if ( ss.length==0 ) {
                 if ( null==getFsm().getRepresentativeFile( mon.getSubtaskMonitor("get representative file") ) ) {
                     throw new FileNotFoundException("Unable to find representative file: No files found matching "+getFsm().toString());
@@ -562,24 +563,31 @@ public final class AggregatingDataSource extends AbstractDataSource {
                             DDataSet mpds= DDataSet.create(new int[0]);
                             altResult.putProperty(QDataSet.JOIN_0,mpds );
                         } else {
-                            if ( ds1 instanceof BufferDataSet ) {
-                                if ( ss.length==1 ) {
-                                    result= BufferDataSet.maybeCopy(ds1);
-                                } else {
-                                    result = BufferDataSet.copy(ds1);
-                                    ((BufferDataSet)result).grow(result.length()*ss.length*11/10);  //110%
-                                }
-                                //result= checkBoundaries( dr1, result );
-                                //result= checkSort(result);
+                            QDataSet dep0= (QDataSet)ds1.property(QDataSet.DEPEND_0);
+                            if ( dep0==null ) {
+                                result= new JoinDataSet(ds1);
+                                dep0Builder= new DataSetBuilder(1,ss.length);
+                                dep0Builder.nextRecord(dr1.middle());
                             } else {
-                                if ( ss.length==1 ) {
-                                    result= ArrayDataSet.maybeCopy(ds1);
+                                if ( ds1 instanceof BufferDataSet ) {
+                                    if ( ss.length==1 ) {
+                                        result= BufferDataSet.maybeCopy(ds1);
+                                    } else {
+                                        result = BufferDataSet.copy(ds1);
+                                        ((BufferDataSet)result).grow(result.length()*ss.length*11/10);  //110%
+                                    }
+                                    //result= checkBoundaries( dr1, result );
+                                    //result= checkSort(result);
                                 } else {
-                                    result = ArrayDataSet.copy(ds1);
-                                    ((ArrayDataSet)result).grow(result.length()*ss.length*11/10);  //110%
+                                    if ( ss.length==1 ) {
+                                        result= ArrayDataSet.maybeCopy(ds1);
+                                    } else {
+                                        result = ArrayDataSet.copy(ds1);
+                                        ((ArrayDataSet)result).grow(result.length()*ss.length*11/10);  //110%
+                                    }
+                                    //result= checkBoundaries( dr1, result );
+                                    //result= checkSort(result);
                                 }
-                                //result= checkBoundaries( dr1, result );
-                                //result= checkSort(result);
                             }
                         }
                         this.metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
@@ -607,8 +615,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                 doThrow= true;
                                 throw ex; // the exception occurring in the append step was hidden because the code assumed it was a problem with the read.
                             }
-                        } else {
-                            assert result instanceof ArrayDataSet;
+                        } else if ( ds1 instanceof ArrayDataSet ) {
+                            assert result!=null;
                             ArrayDataSet aresult= ((ArrayDataSet)result);
                             ArrayDataSet ads1= ArrayDataSet.maybeCopy( aresult.getComponentType(),ds1);
                             //ads1= ArrayDataSet.monotonicSubset(ads1);
@@ -632,6 +640,11 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                 doThrow= true;
                                 throw ex; // the exception occurring in the append step was hidden because the code assumed it was a problem with the read.
                             }                            
+                        } else {
+                            assert result instanceof JoinDataSet;
+                            assert dep0Builder!=null;
+                            ((JoinDataSet)result).join(ds1);
+                            dep0Builder.nextRecord(dr1.middle());
                         }
 
                         //TODO: combine metadata.  We don't have a way of doing this.
@@ -705,7 +718,14 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 return altResult;
 
             } else {
-                MutablePropertyDataSet dep0 = result == null ? null : (MutablePropertyDataSet) result.property(DDataSet.DEPEND_0);
+                MutablePropertyDataSet dep0;
+                if ( dep0Builder!=null ) {
+                    assert result!=null;
+                    dep0= dep0Builder.getDataSet();
+                    result.putProperty(QDataSet.DEPEND_0,dep0);
+                } else {
+                    dep0 = result == null ? null : (MutablePropertyDataSet) result.property(DDataSet.DEPEND_0);
+                }
                 Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
                 if ( dep0 != null && cacheRange1.getUnits().isConvertibleTo( dep0units ) ) {
                     dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, reduce?lresolution:null));
