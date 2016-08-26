@@ -597,7 +597,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                         if ( ds1 instanceof JoinDataSet ) {
                             assert altResult!=null;
                             altResult.joinAll( (JoinDataSet)ds1 );
-                        } else if ( ds1 instanceof BufferDataSet ) {
+                        } else if ( result instanceof BufferDataSet ) {
                             assert result!=null;
                             BufferDataSet bresult= (BufferDataSet)result;
                             BufferDataSet ads1= (BufferDataSet)Ops.maybeCopy( ds1 );
@@ -615,7 +615,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                                 doThrow= true;
                                 throw ex; // the exception occurring in the append step was hidden because the code assumed it was a problem with the read.
                             }
-                        } else if ( ds1 instanceof ArrayDataSet ) {
+                        } else if ( result instanceof ArrayDataSet ) {
                             assert result!=null;
                             ArrayDataSet aresult= ((ArrayDataSet)result);
                             ArrayDataSet ads1= ArrayDataSet.maybeCopy( aresult.getComponentType(),ds1);
