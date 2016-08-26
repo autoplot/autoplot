@@ -83,6 +83,10 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
+                    <file>${file.reference.cdfj-20160820.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
                     <file>${file.reference.batik-awt-util.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
@@ -108,10 +112,6 @@
                 </library>
                 <library dirs="200">
                     <file>${file.reference.jfits-0.93.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library dirs="200">
-                    <file>${file.reference.cdfj-20150828.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
