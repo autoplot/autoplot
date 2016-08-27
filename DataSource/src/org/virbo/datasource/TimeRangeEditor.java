@@ -75,7 +75,9 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);
-                parseRange();
+                if ( !suppressRecentComboBoxActionEvents ) {
+                    parseRange();
+                }
             }
         });
 
