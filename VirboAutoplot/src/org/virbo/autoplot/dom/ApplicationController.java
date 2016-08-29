@@ -1395,6 +1395,31 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
+     * add a floating plot at arbitrary position.
+     * @param xpos the new column e.g. "10%,90%"
+     * @param ypos the new row e.g. "10%+6em,100%-6em"
+     * @return 
+     */
+    public Plot addPlot( String xpos, String ypos ) {
+        DomLock lock = mutatorLock();
+        lock.lock( "addPlot" );
+        final CanvasController ccontroller = getCanvas().getController();
+        Column c= ccontroller.addColumn();
+        String[] ss;
+        ss= xpos.split(",");
+        c.setLeft(ss[0]);
+        c.setRight(ss[1]);
+        Row r= ccontroller.addRow();
+        ss= ypos.split(",");
+        r.setTop(ss[0]);
+        r.setBottom(ss[1]);
+        Plot p = addPlot(r,c); 
+        addPlotElement(p, null);
+        return p;
+    }
+        
+    
+    /**
      * adds a block of plots to the canvas below the focus plot.  A plotElement
      * is added for each plot as well.
      * @param nrow number of rows
