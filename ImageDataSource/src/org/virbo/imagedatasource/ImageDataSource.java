@@ -34,6 +34,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.ImageUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -260,8 +261,13 @@ class ImageDataSource extends AbstractDataSource {
             xx= Ops.subtract( xx, transform[1] );
             xx= Ops.multiply( xx, (transform[2].subtract(transform[0]).doubleValue(xunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() ) );
             xx= Ops.add( Ops.putProperty( xx, QDataSet.UNITS, xunits.getOffsetUnits() ), transform[0] );
-            ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,transform[0]);
-            ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,transform[2]);
+            if ( UnitsUtil.isIntervalMeasurement(xunits) ) {
+                ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,transform[0].doubleValue(xunits) );
+                ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,transform[2].doubleValue(xunits) );
+            } else {
+                ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MIN,transform[0].value());
+                ((MutablePropertyDataSet)xx).putProperty( QDataSet.TYPICAL_MAX,transform[2].value());
+            }
             result.putProperty( QDataSet.DEPEND_0, xx );
         }
         String yaxis= getParam( "yaxis", null );
@@ -273,8 +279,13 @@ class ImageDataSource extends AbstractDataSource {
             yy= Ops.subtract( yy, transform[1] );
             yy= Ops.multiply( yy, (transform[2].subtract(transform[0]).doubleValue(yunits.getOffsetUnits())/transform[3].subtract(transform[1]).value() ) );
             yy= Ops.add( Ops.putProperty( yy, QDataSet.UNITS, yunits.getOffsetUnits() ), transform[0] );
-            ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,transform[0]);
-            ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,transform[2]);
+            if ( UnitsUtil.isIntervalMeasurement(yunits) ) {
+                ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,transform[0].doubleValue(yunits) );
+                ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,transform[2].doubleValue(yunits) );
+            } else {
+                ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MIN,transform[0].value() );
+                ((MutablePropertyDataSet)yy).putProperty( QDataSet.TYPICAL_MAX,transform[2].value() );                
+            }
             result.putProperty( QDataSet.DEPEND_1, yy );
         }
         
