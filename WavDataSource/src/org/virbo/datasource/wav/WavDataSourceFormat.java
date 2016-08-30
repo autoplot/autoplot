@@ -50,7 +50,8 @@ public class WavDataSourceFormat implements DataSourceFormat {
     private ByteBuffer formatRank1(QDataSet data, ProgressMonitor mon, Map<String, String> params) {
 
         String type = params.get("type");
-
+        boolean doscale= !"F".equals( params.get("scale") );
+                
         QDataSet extent= Ops.extent(data);
         int dep0Len = 0; //(dep0 == null ? 0 : 1);
         int typeSize = BufferDataSet.byteCount(type);
@@ -64,7 +65,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 recSize, dep0Len * typeSize,
                 data.length(), 1, 1, 1,
                 result, type);
-
+        
         double shift= 0;
         boolean unsigned= type.startsWith("u");
         long typeOrdinals= (int)Math.pow(2,8*typeSize);
@@ -77,12 +78,12 @@ public class WavDataSourceFormat implements DataSourceFormat {
                     shift= ( extent.value(1)+extent.value(0) ) / 2;
                 }
             } else {
-                throw new IllegalArgumentException("data extent is too great: "+extent);
+                if ( !doscale ) throw new IllegalArgumentException("data extent is too great: "+extent);
             }
         }
 
         double scale= 1.0;
-        if ( "T".equals( params.get("scale") ) ) {
+        if ( doscale ) {
             shift= ( extent.value(1)+extent.value(0) ) / 2;
             scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
         }
@@ -107,7 +108,8 @@ public class WavDataSourceFormat implements DataSourceFormat {
     private ByteBuffer formatRank2Waveform(QDataSet data, ProgressMonitor mon, Map<String, String> params) {
 
         String type = params.get("type");
-
+        boolean doscale= !"F".equals( params.get("scale") );
+        
         if ( !DataSetUtil.isQube(data) ) {
             throw new IllegalArgumentException("data must be qube");
         }
@@ -158,12 +160,12 @@ public class WavDataSourceFormat implements DataSourceFormat {
                     shift= ( extent.value(1)+extent.value(0) ) / 2;
                 }
             } else {
-                throw new IllegalArgumentException("data extent is too great: "+extent);
+                if ( !doscale ) throw new IllegalArgumentException("data extent is too great: "+extent);
             }
         }
 
         double scale= 1.0;
-        if ( "T".equals( params.get("scale") ) ) {
+        if ( doscale ) {
             shift= ( extent.value(1)+extent.value(0) ) / 2;
             scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
         }
@@ -189,7 +191,8 @@ public class WavDataSourceFormat implements DataSourceFormat {
     private ByteBuffer formatRank2(QDataSet data, ProgressMonitor mon, Map<String, String> params) {
 
         String type = params.get("type");
-
+        boolean doscale= !"F".equals( params.get("scale") );
+        
         QDataSet extent= Ops.extent(data);
         int dep0Len = 0;
         int typeSize = BufferDataSet.byteCount(type);
@@ -219,13 +222,13 @@ public class WavDataSourceFormat implements DataSourceFormat {
                     shift= ( extent.value(1)+extent.value(0) ) / 2;
                 }
             } else {
-                throw new IllegalArgumentException("data extent is too great: "+extent);
+                if ( !doscale ) throw new IllegalArgumentException("data extent is too great: "+extent);
             }
         }
         
         double scale= 1.0;
-        if ( "T".equals( params.get("scale") ) ) {
-            shift= 0;
+        if ( doscale ) {
+            shift= 0; // TODO: this is inconsistent with other branches.
             scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
         }
         
