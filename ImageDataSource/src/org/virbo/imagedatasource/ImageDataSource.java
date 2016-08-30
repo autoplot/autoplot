@@ -256,6 +256,7 @@ class ImageDataSource extends AbstractDataSource {
         if ( xaxis!=null ) {
             Datum[] transform= tryParseArray( xaxis );
             if ( transform[1].getUnits()!=Units.dimensionless ) throw new IllegalArgumentException("xaxis second and last components must be dimensionless.");
+            if ( transform[3].subtract(transform[1]).value()< 0 ) throw new IllegalArgumentException("xaxis=[datamin,pixmin,datamax,pixmax] pixmin must be less than pixmax value"); 
             Units xunits= transform[0].getUnits();
             QDataSet xx= Ops.findgen(result.length());
             xx= Ops.subtract( xx, transform[1] );
@@ -274,6 +275,7 @@ class ImageDataSource extends AbstractDataSource {
         if ( yaxis!=null ) {
             Datum[] transform= tryParseArray( yaxis );
             if ( transform[1].getUnits()!=Units.dimensionless ) throw new IllegalArgumentException("xaxis second and last components must be dimensionless.");
+            if ( transform[3].subtract(transform[1]).value()< 0 ) throw new IllegalArgumentException("yaxis=[datamin,pixmin,datamax,pixmax] pixmin must be less than pixmax value"); 
             Units yunits= transform[1].getUnits();
             QDataSet yy= Ops.findgen(result.length(0));
             yy= Ops.subtract( yy, transform[1] );
@@ -383,6 +385,7 @@ class ImageDataSource extends AbstractDataSource {
     private static Datum[] tryParseArray( String s ) {
         s= s.trim();
         if ( s.startsWith("[") && s.endsWith("]") ) s= s.substring(1,s.length()-1);
+        if ( s.startsWith("(") && s.endsWith(")") ) s= s.substring(1,s.length()-1);
         String[] ss= s.split(",");
         Datum[] result= new Datum[ss.length];
         for ( int i=0; i<result.length; i++ ) {
