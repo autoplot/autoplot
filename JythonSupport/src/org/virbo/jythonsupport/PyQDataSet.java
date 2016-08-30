@@ -529,7 +529,12 @@ public class PyQDataSet extends PyJavaInstance {
                     } else if ( a instanceof PyQDataSet ) {
                         Object o2 = a.__tojava__(QDataSet.class);
                         QDataSet that = (QDataSet) o2;
-                        fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                        if ( that.rank()==0 ) {
+                            int idx = (int)(that.value());
+                            fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
+                        } else {
+                            fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                        }
                         
                     } else if (a.isNumberType()) {
                         int idx = ((Number) getNumber( a )).intValue();
