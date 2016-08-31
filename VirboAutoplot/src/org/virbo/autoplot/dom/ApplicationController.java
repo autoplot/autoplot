@@ -1403,19 +1403,23 @@ public class ApplicationController extends DomNodeController implements RunLater
     public Plot addPlot( String xpos, String ypos ) {
         DomLock lock = mutatorLock();
         lock.lock( "addPlot" );
-        final CanvasController ccontroller = getCanvas().getController();
-        Column c= ccontroller.addColumn();
-        String[] ss;
-        ss= xpos.split(",");
-        c.setLeft(ss[0]);
-        c.setRight(ss[1]);
-        Row r= ccontroller.addRow();
-        ss= ypos.split(",");
-        r.setTop(ss[0]);
-        r.setBottom(ss[1]);
-        Plot p = addPlot(r,c); 
-        addPlotElement(p, null);
-        return p;
+        try {
+            final CanvasController ccontroller = getCanvas().getController();
+            Column c= ccontroller.addColumn();
+            String[] ss;
+            ss= xpos.split(",");
+            c.setLeft(ss[0]);
+            c.setRight(ss[1]);
+            Row r= ccontroller.addRow();
+            ss= ypos.split(",");
+            r.setTop(ss[0]);
+            r.setBottom(ss[1]);
+            Plot p = addPlot(r,c); 
+            addPlotElement(p, null);
+            return p;
+        } finally {
+            lock.unlock();
+        }
     }
         
     
