@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
@@ -21,6 +22,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -142,29 +144,33 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         }
         
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 jTable1.setModel(tm);
+                jTable1.setDefaultRenderer( Object.class, tableCellRenderer );
             }
         });
         
         
     }
     
-    ListCellRenderer listCellRenderer= new ListCellRenderer() {
+    TableCellRenderer tableCellRenderer= new TableCellRenderer() {
         @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel result= new JLabel(String.valueOf(value));
+            
+            int index= row;
             
             result.setIcon(null);
             
             Color background, foreground;
             
             if (isSelected) {
-                background = list.getSelectionBackground();
-                foreground = list.getSelectionForeground();
+                background = jTable1.getSelectionBackground();
+                foreground = jTable1.getSelectionForeground();
             } else {
-                background = list.getBackground();
-                foreground = list.getForeground();
+                background = jTable1.getBackground();
+                foreground = jTable1.getForeground();
             }
             
             result.setOpaque(true);
@@ -196,8 +202,13 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             Units eu= (Units) bds.property(QDataSet.UNITS,3);
             String s= eu.createDatum(rec.value(3)).toString();            
             
-            result.setText( String.valueOf(value)+": "+s );
-            if ( hasIcons ) {
+            if ( column==0 ) {
+                result.setText( String.valueOf(value) );
+            } else {
+                result.setText( s );
+            }
+            
+            if ( hasIcons && column==0) {
                 int color= (int)rec.value(2);
                 Icon icon= colorIcon( new Color(color), 12,12 );
                 result.setIcon(icon);
@@ -205,8 +216,9 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             
             return result;
         }
+        
     };
-    
+            
     /**
      * return a block with the color and size.
      * @param w
