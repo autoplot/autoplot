@@ -85,7 +85,9 @@ public class WavDataSourceFormat implements DataSourceFormat {
         double scale= 1.0;
         if ( doscale ) {
             shift= ( extent.value(1)+extent.value(0) ) / 2;
-            scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
+            if ( ( extent.value(1)-extent.value(0) )>0 ) {
+                scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
+            }
         }
 
         QubeDataSetIterator it = new QubeDataSetIterator(data);
@@ -167,7 +169,9 @@ public class WavDataSourceFormat implements DataSourceFormat {
         double scale= 1.0;
         if ( doscale ) {
             shift= ( extent.value(1)+extent.value(0) ) / 2;
-            scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
+            if ( ( extent.value(1)-extent.value(0) )>0 ) {
+                scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
+            }
         }
 
         QubeDataSetIterator it = new QubeDataSetIterator(data);
@@ -229,7 +233,9 @@ public class WavDataSourceFormat implements DataSourceFormat {
         double scale= 1.0;
         if ( doscale ) {
             shift= 0; // TODO: this is inconsistent with other branches.
-            scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
+            if ( ( extent.value(1)-extent.value(0) )>0 ) {
+                scale= typeOrdinals / ( extent.value(1)-extent.value(0) );
+            }
         }
         
         while (it.hasNext()) {
