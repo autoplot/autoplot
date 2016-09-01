@@ -35,7 +35,7 @@ AP_ARGS=""
 memIsImplicit=1
 
 for i in "$@"; do
-   if [ "$APDEBUG"="1" ]; then    
+   if [ "$APDEBUG" == "1" ]; then    
        echo "arg: \"$i\""
    fi
    if [[ $i == -J-Xmx* ]]; then
