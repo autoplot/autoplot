@@ -4869,7 +4869,17 @@ APSplash.checkTime("init 230");
                     if ( app!=null ) app.initialBookmarksUrl= bookmarks;
                 }
 
-                final String script= alm.getValue("script");
+                String script_= alm.getValue("script");
+                if ( script_.equals("") && finitialURL!=null ) {
+                    if ( finitialURL.startsWith("script:") ) {
+                        script_= finitialURL.substring(7);
+                    } else if ( finitialURL.endsWith(".jy") ) {
+                        script_= finitialURL;
+                    }
+                }
+
+                final String script= script_;
+                
                 if ( !script.equals("") ) {
                     if ( headless ) {
                         model.setExceptionHandler(new ExceptionHandler() {
