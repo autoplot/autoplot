@@ -58,8 +58,6 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>" ) );
             } else if ( paramName.equals("fieldCount" ) ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>" ) );
-            } else if ( paramName.equals("byteLength" ) ) {
-                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>" ) );
             } else if ( paramName.equals("recLength" ) ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>" ) );
             } else if ( paramName.equals("recCount" ) ) {
