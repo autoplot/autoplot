@@ -4858,23 +4858,28 @@ APSplash.checkTime("init 220");
 
                 }
 APSplash.checkTime("init 230");
+                boolean useInitialURL= false;
                 if ( !headless && finitialURL!=null) {
                     if ( app!=null ) {
                         app.dataSetSelector.setValue(finitialURL);
                         app.dataSetSelector.maybePlot(false);
+                        useInitialURL= true;
                     }
                 }
                 
                 if ( bookmarks!=null ) {
                     if ( app!=null ) app.initialBookmarksUrl= bookmarks;
                 }
-
+                
                 String script_= alm.getValue("script");
-                if ( script_.equals("") && finitialURL!=null ) {
-                    if ( finitialURL.startsWith("script:") ) {
-                        script_= finitialURL.substring(7);
-                    } else if ( finitialURL.endsWith(".jy") ) {
-                        script_= finitialURL;
+                
+                if ( !useInitialURL ) {
+                    if ( script_.equals("") && finitialURL!=null ) {
+                        if ( finitialURL.startsWith("script:") ) {
+                            script_= finitialURL.substring(7);
+                        } else if ( finitialURL.endsWith(".jy") ) {
+                            script_= finitialURL;
+                        }
                     }
                 }
 
