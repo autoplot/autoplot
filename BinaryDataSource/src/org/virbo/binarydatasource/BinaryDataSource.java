@@ -304,11 +304,23 @@ public class BinaryDataSource extends AbstractDataSource {
         if ( s!= null ) {
             ds.putProperty( QDataSet.VALID_MIN, java.lang.Double.parseDouble(s) );
         }
+        
         s= params.get( "validMax" );
         if ( s!= null ) {
             ds.putProperty( QDataSet.VALID_MAX, java.lang.Double.parseDouble(s) );
         }
+
+        s= params.get( "fillValue" );
+        if ( s!=null ) {
+            ds.putProperty( QDataSet.FILL_VALUE, java.lang.Double.parseDouble(s) ); //TODO: consider parsing to Number type (Float or Long as well as Double)
+        }
+            
         
+        s= params.get( "units" );
+        if ( s!=null ) {
+            ds.putProperty( QDataSet.UNITS, Units.lookupUnits(s) );
+        }
+            
         return ds;
     }
 
