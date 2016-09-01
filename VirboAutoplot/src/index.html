@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>More fun trying to parse power meter display.
+        <p><small>Contour, Digital and Spectrogram plotElements make this plot.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,10 @@
         
         <p>Bugfixes (2016-08-27 r19352):</p>
         <ul>
+            <li>1666: Jython ds[i,j] would return rank 1 when i was integer and j was rank 0 dataset.</li>
+            <li>rte_1104366814: format .wav data extent is too great message didn't consider scale.</li>
+            <li>ImageDataSource would use Datum is TYPICAL_MAX and TYPICAL_MIN, instead of Number</li>
+            <li>slices GUI formatted command that was then not supported (: vs ':')</li>
             <li>code to repaint layout panel was triggering itself, causing unnecessary paints.</li>
             <li>1665: new jumpiness when click-n-drag on x axis.</li>
             <li>1661: new version of CDF library supports export to CDF using append now works on Windows.</li>
@@ -109,6 +113,11 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add hilbertFrequency, hilbertPhase, and hilbertEnvelope filters.</li>
+            <li>hilbert function added.</li>
+            <li>unbundle supports rank 2 unbundle. </li>
+            <li>addPlot(rowSpec,columnSpec) command added</li>
+            <li>rfe 523: format to wav now scales data by default.</li>
             <li>rfe521: aggregation of images is supported with new rules for aggregation.</li>
             <li>Improvements to applot.py, which supports plotting from C Python.</li>
             <li>Introduce ifft, for inverse transforms, to support hilbert function.</li>
