@@ -564,7 +564,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                             altResult.putProperty(QDataSet.JOIN_0,mpds );
                         } else {
                             QDataSet dep0= (QDataSet)ds1.property(QDataSet.DEPEND_0);
-                            if ( dep0==null ) {
+                            if ( dep0==null && ds1.rank()>2 ) { // rfe521: experiment with aggregation types.
                                 result= new JoinDataSet(ds1);
                                 dep0Builder= new DataSetBuilder(1,ss.length);
                                 dep0Builder.nextRecord(dr1.middle());
