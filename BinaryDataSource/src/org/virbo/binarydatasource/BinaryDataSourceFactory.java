@@ -45,6 +45,8 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "depend0Units=", "support timetags like 'seconds since 2001-001'" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "validMin=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "validMax=") );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "fillValue=", "value indicating invalid data.") );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "indicating unit type, like cmps or TT2000.") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "byteOrder=", "endianess of the data" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "reportOffset=yes", "depend0 is byte offset into file, this is the legacy (2010) behavior"));
             return result;
@@ -68,6 +70,16 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>" ) );
             } else if ( paramName.equals("validMax" ) ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>" ) );
+            } else if ( paramName.equals("units") ) {
+                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "cdfTT2000", "CDF time tags") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "cmps", "cm per second") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "V/m", "Volts per meter") );
+                return result;
+            } else if ( paramName.equals("fillValue") ) {
+                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>", "invalid value") );
+                return result;
             } else if ( paramName.equals("column") ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>" ) );
             } else if ( paramName.equals("rank2") ) {
