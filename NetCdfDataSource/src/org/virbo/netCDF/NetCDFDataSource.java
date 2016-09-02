@@ -157,6 +157,12 @@ public class NetCDFDataSource extends AbstractDataSource {
                 result= Ops.putProperty( result, QDataSet.VALID_MAX, validMax );
             }
             
+            String sfillValue= getParam("fillValue",null );
+            if ( sfillValue!=null ) {
+                Double fillValue= Double.parseDouble(sfillValue);
+                result= Ops.putProperty( result, QDataSet.FILL_VALUE, fillValue );
+            }
+            
             
             logger.finer("ncfile.close()");
             ncfile.close();
