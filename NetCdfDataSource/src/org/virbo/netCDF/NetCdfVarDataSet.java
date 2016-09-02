@@ -32,6 +32,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.IstpMetadataModel;
+import ucar.ma2.DataType;
 import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Range;
 import ucar.nc2.Variable;
@@ -261,6 +262,10 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                             mon.setProgressMessage( "reading "+dv.getNameAndDimensions() );
                             QDataSet dependi= create( dv, sliceConstraints(constraints,ir), ncfile, new NullProgressMonitor() );
                             properties.put( "DEPEND_"+(ir-sliceCount(slice,ir) ), dependi );
+                        } else if ( dv!=variable && dv.getRank()==2 && dv.getDataType()==DataType.CHAR ) { // assume they are times.
+                            mon.setProgressMessage( "reading "+dv.getNameAndDimensions() );
+                            QDataSet dependi= create( dv, sliceConstraints(constraints,ir), ncfile, new NullProgressMonitor() );
+                            properties.put( "DEPEND_"+(ir-sliceCount(slice,ir) ), dependi );
                         } else {
                             isCoordinateVariable= true;
                         }
@@ -350,9 +355,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
 
         if ( attributes.containsKey("_FillValue" ) ) {
             double fill= Double.parseDouble( (String) attributes.get("_FillValue") );
-            for ( int i=0; i<data.length; i++ ) {
-                if ( data[i]==fill ) data[i]= -1e31;  //TODO: this is probably not necessary now.
-            }
+            properties.put( QDataSet.FILL_VALUE, fill );
         }
 
 
