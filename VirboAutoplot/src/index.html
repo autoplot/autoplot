@@ -26,6 +26,8 @@
         
         <p>Bugfixes (2016-09-01 r19377):</p>
         <ul>
+            <li>1499: Brian's events file (two ISO8601/line) fails to parse. </li>
+            <li>1667: color icons not shown in events list tool.</li>
             <li>rfe521: devel-release had a bug where events list couldn't be aggregated</li>
             <li>1666: Jython ds[i,j] would return rank 1 when i was integer and j was rank 0 dataset.</li>
             <li>rte_1104366814: format .wav data extent is too great message didn't consider scale.</li>
@@ -114,6 +116,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add fillValue, validMin and validMax keywords to NetCDF reader.</li>
+            <li>AMDA had a .nc file where the times were 1997223000009297, so special code is added to look for this case.</li>
+            <li>script:/tmp/foo.jy, /tmp/foo.jy, are all treated as "--script /tmp/foo.jy" to support running from the command line.</li>
             <li>BinaryDataSource has fillValue and units keywords to support PDS4.</li>
             <li>abstract dataset trim(0,len) returns self, improving performance slightly</li> 
             <li>unwrap function to mimic SciPy and Matlab function</li>
