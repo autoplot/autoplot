@@ -20,7 +20,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 import org.das2.datum.LoggerManager;
+import org.das2.datum.TimeParser;
 import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -133,6 +135,34 @@ public class NetCdfVarDataSet extends AbstractDataSet {
              if ( b < 0 ) data[i]= b + limit;
          }
          return data;
+     }
+     
+     /**
+      * return a time parser object for the string.  If it is 17 digits
+      * use "$Y$j$H$M$S$(subsec,places=3)", etc.
+      * @param s string like "1997223000009297&lt;NULL&gt;"
+      * @return TimeParser or null.
+      */
+     private TimeParser guessTimeParser( String s ) {
+        TimeParser tp=null;
+        int digitCount=-1;
+        for ( int ich=0; ich<s.length(); ich++ ) {
+            if ( !Character.isDigit(s.charAt(ich) ) ) {
+                if ( digitCount==-1 ) digitCount= ich; // http://amda-dev.irap.omp.eu/BASE/DATA/WND/SWE/swe19970812.nc?Time has null char at 17.
+            } else {
+                if ( digitCount>-1 ) return null; // we found a non-digit preceeding a digit, so this isn't a block of digits like expected.
+            }
+        }
+        switch (digitCount) {
+            case 16:
+                tp= TimeParser.create("$Y$j$H$M$S$(subsec,places=3)");
+                break;
+            case 17:
+                tp= TimeParser.create("$Y$m$d$H$M$S$(subsec,places=3)");
+                break;
+            default:
+        }
+        return tp;
      }
      
     /**
@@ -282,13 +312,33 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 logger.fine("parsing times formatted in char arrays");
                 data= new double[shape[0]];
                 String ss= new String(cdata);
+                TimeParser tp= null;
+                boolean tryGuessTimeParser= true;
                 for ( int i=0; i<shape[0]; i++ ) {
                     int n= i*shape[1];
                     String s= ss.substring( n, n+shape[1] );
                     try {
-                        data[i] = Units.us2000.parse(s).doubleValue(Units.us2000);
+                        if ( tp!=null ) {
+                            data[i]= tp.parse(s).getTime(Units.us2000);
+                        } else {
+                            data[i] = Units.us2000.parse(s).doubleValue(Units.us2000);
+                        }
                     } catch (ParseException ex) {
-                        data[i]= Units.us2000.getFillDouble();
+                        if ( tryGuessTimeParser ) {
+                            tryGuessTimeParser= false;
+                            tp= guessTimeParser(s);
+                            if ( tp==null ) {
+                                data[i]= Units.us2000.getFillDouble();
+                            } else {
+                                try {
+                                    data[i]= tp.parse(s).getTime(Units.us2000);
+                                } catch ( ParseException ex2 ) {
+                                    data[i]= Units.us2000.getFillDouble();
+                                }
+                            }
+                        } else {
+                            data[i]= Units.us2000.getFillDouble();
+                        }
                     }
                 }
                 properties.put(QDataSet.UNITS,Units.us2000);
