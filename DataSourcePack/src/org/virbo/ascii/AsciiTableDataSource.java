@@ -202,7 +202,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
             dep0.putProperty( QDataSet.UNITS, parser.getUnits(0) );
             dep0.putProperty( QDataSet.BINS_1, QDataSet.VALUE_BINS_MIN_MAX );
-            column= eventListColumn;
+            if ( !eventListColumn.equals("") ) {
+                column= eventListColumn;
+            }
         }
 
         if ( ds.length()==0 ) {
@@ -778,37 +780,43 @@ public class AsciiTableDataSource extends AbstractDataSource {
         
         // rfe https://sourceforge.net/p/autoplot/bugs/1425/: create events list automatically.
         if ( parser.getFieldLabels().length>=2 && parser.getFieldLabels().length <= 5 && UnitsUtil.isTimeLocation(parser.getUnits(0)) && UnitsUtil.isTimeLocation(parser.getUnits(1)) ) {
-            eventListColumn= "field"+(parser.getFieldLabels().length-1);
+            if ( parser.getFieldCount()>2 ) {
+                eventListColumn= "field"+(parser.getFieldLabels().length-1);
+            } else {
+                eventListColumn= "";
+            }
         }
         
-        // rfe3489706: add support for HDMC's simple event list format, where the first two columns are start and stop times.
+        // rfe https://sourceforge.net/p/autoplot/feature-requests/256: add support for HDMC's simple event list format, where the first two columns are start and stop times.
         if ( eventListColumn!=null ) {
             parser.setUnits( 0, AsciiParser.UNIT_UTC );
             parser.setUnits( 1, AsciiParser.UNIT_UTC );
             //if ( UnitsUtil.isTimeLocation( parser.getUnits(1) ) ) parser.setUnits(1,Units.us2000); // enough of a guess that this will find a good record.
             parser.setFieldParser(0, parser.UNITS_PARSER);
             parser.setFieldParser(1, parser.UNITS_PARSER);
-            int icol = parser.getFieldIndex(eventListColumn);
-            EnumerationUnits eu= EnumerationUnits.create("events");
-            parser.setUnits(icol,eu);
-            parser.setFieldParser(icol,parser.ENUMERATION_PARSER);
-            if ( icol>2 ) { //get the RGB color as well.
-                String[] fields = new String[parser.getRecordParser().fieldCount()];
-                String s= parser.readFirstParseableRecord(file.toString());
-                parser.getRecordParser().splitRecord(s,fields);
-                if ( fields[2].startsWith("x") || fields[2].startsWith("0x" ) ) { // kludge for RGB color third column starts with x
-                    parser.setUnits(2,Units.dimensionless);
-                    parser.setFieldParser( 2, new FieldParser() {
-                        @Override
-                        public double parseField(String field, int columnIndex) throws ParseException {
-                            if ( field.startsWith("x") ) {
-                                return Integer.decode( "0"+field ); // kludge for Scott
-                            } else {
-                                return Integer.decode( field );
+            if ( !eventListColumn.equals("") ) { //"" means it is just two columns: st,en.
+                int icol = parser.getFieldIndex(eventListColumn);
+                EnumerationUnits eu= EnumerationUnits.create("events");
+                parser.setUnits(icol,eu);
+                parser.setFieldParser(icol,parser.ENUMERATION_PARSER);
+                if ( icol>2 ) { //get the RGB color as well.
+                    String[] fields = new String[parser.getRecordParser().fieldCount()];
+                    String s= parser.readFirstParseableRecord(file.toString());
+                    parser.getRecordParser().splitRecord(s,fields);
+                    if ( fields[2].startsWith("x") || fields[2].startsWith("0x" ) ) { // kludge for RGB color third column starts with x
+                        parser.setUnits(2,Units.dimensionless);
+                        parser.setFieldParser( 2, new FieldParser() {
+                            @Override
+                            public double parseField(String field, int columnIndex) throws ParseException {
+                                if ( field.startsWith("x") ) {
+                                    return Integer.decode( "0"+field ); // kludge for Scott
+                                } else {
+                                    return Integer.decode( field );
+                                }
                             }
-                        }
-                    });
-                    eventListColorColumn= 2;
+                        });
+                        eventListColorColumn= 2;
+                    }
                 }
             }
         }
