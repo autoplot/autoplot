@@ -17,6 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -57,7 +58,7 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
     
     @Override
     public List<CompletionContext> getCompletions( CompletionContext cc ,org.das2.util.monitor.ProgressMonitor mon ) throws IOException {
-        List<CompletionContext> result= new ArrayList<CompletionContext>();
+        List<CompletionContext> result= new ArrayList<>();
         
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             File file= DataSetURI.getFile( cc.resourceURI, mon );
@@ -104,9 +105,29 @@ public class NetCDFDataSourceFactory extends AbstractDataSourceFactory implement
                 }
             }
             dataset.close();
-            
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units="));
 
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "override the file units"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "where=",
+                    "add constraint by another field's value"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "validMin=",
+                    "values less than this value are treated as fill."));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "validMax=",
+                    "values greater than this value are treated as fill."));
+
+        } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
+            String paramName= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
+            if (paramName.equals("fill")) {
+                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
+            } else if (paramName.equals("validMin")) {
+                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
+            } else if (paramName.equals("validMax")) {
+                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));            
+            } else if (paramName.equals("where")) { // TODO: a fun project would be to make completions for this that look in the file...
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field17.gt(1)","where the double value in field17 is greater than 17 "));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field5.eq(off)", "where the nominal data in field5 is equal to \"off\""));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field0.le(2000-01-01T00:00)", "where the nominal data in field5 is equal to \"off\""));
+                return result;
+            }
         }
         
         return result;
