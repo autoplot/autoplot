@@ -137,19 +137,32 @@ public class NetCDFDataSource extends AbstractDataSource {
                 result = doWhereFilter( w, whereParm, DataSetOps.makePropertiesMutable(result) );
             }
 
-            QDataSet qresult= checkLatLon(result);
+            result= checkLatLon(result);
                
             String unitsString= getParam("units", null );
             if ( unitsString!=null ) {
-                Units u = Units.lookupTimeUnits(unitsString);
+                Units u = Units.lookupUnits(unitsString);
                 result= Ops.putProperty( result, QDataSet.UNITS, u );
             }
+            
+            String svalidMin= getParam("validMin",null );
+            if ( svalidMin!=null ) {
+                Double validMin= Double.parseDouble(svalidMin);
+                result= Ops.putProperty( result, QDataSet.VALID_MIN, validMin );
+            }
+
+            String svalidMax= getParam("validMax",null );
+            if ( svalidMax!=null ) {
+                Double validMax= Double.parseDouble(svalidMax);
+                result= Ops.putProperty( result, QDataSet.VALID_MAX, validMax );
+            }
+            
             
             logger.finer("ncfile.close()");
             ncfile.close();
             
             ncfile= null;
-            return qresult;
+            return result;
             
         } finally {
             mon.finished();
