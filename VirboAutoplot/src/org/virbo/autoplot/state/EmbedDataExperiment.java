@@ -250,6 +250,12 @@ public class EmbedDataExperiment {
                 }
             }
         }
+        if ( commonPath!=null && !commonPath.endsWith("/") ) { // bug 1669
+            int i= commonPath.lastIndexOf('/');
+            if ( i>-1 ) {
+                commonPath= commonPath.substring(0,i+1);
+            }
+        }
         
         FileOutputStream fout= new FileOutputStream(f);
         ZipOutputStream out=null;
