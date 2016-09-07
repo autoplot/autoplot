@@ -614,6 +614,8 @@ public class PlotElementController extends DomNodeController {
                 return true;
             } else if ( fillDs.rank()==2 ) {
                 return SemanticOps.isBundle(fillDs) || SemanticOps.isRank2Waveform(fillDs);
+            } else if ( fillDs.rank()==3 ) {
+                return SemanticOps.isJoin(fillDs) && SemanticOps.isRank2Waveform(fillDs.slice(0));
             } else {
                 return false;
             }
@@ -622,6 +624,8 @@ public class PlotElementController extends DomNodeController {
                 return true;
             } else if ( fillDs.rank()==2 ) {
                 return SemanticOps.isBundle(fillDs) ||  SemanticOps.isRank2Waveform(fillDs);
+            } else if ( fillDs.rank()==3 ) {
+                return SemanticOps.isJoin(fillDs) && SemanticOps.isRank2Waveform(fillDs.slice(0));
             } else {
                 return false;
             }
@@ -2329,8 +2333,23 @@ public class PlotElementController extends DomNodeController {
             peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
 
             QDataSet xds= depend0;
-            if (xds == null) {
-                xds = DataSetUtil.indexGenDataSet(fillDs.length());
+            if ( SemanticOps.isJoin(fillDs) && fillDs.length()>0 && fillDs.rank()==3 ) {
+                xds= (QDataSet) fillDs.slice(0).property(QDataSet.DEPEND_0);
+                if ( xds!=null ) {
+                    for ( int i=1; i<fillDs.length(); i++ ) {
+                        xds= Ops.concatenate( xds, (QDataSet)fillDs.slice(i).property(QDataSet.DEPEND_0) );
+                    }
+                } else {
+                    int n=fillDs.slice(0).length();
+                    for ( int i=1; i<fillDs.length(); i++ ) {
+                        n+= fillDs.slice(i).length();
+                    }
+                    xds = DataSetUtil.indexGenDataSet(n);
+                }
+            } else {
+                if (xds == null) {
+                    xds = DataSetUtil.indexGenDataSet(fillDs.length());
+                }
             }
 
             if ( !peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
