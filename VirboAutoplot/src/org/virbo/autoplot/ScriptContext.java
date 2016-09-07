@@ -624,10 +624,14 @@ public class ScriptContext extends PyJavaInstance {
      */    
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, String renderType ) {
         maybeInitModel();
-        ArrayDataSet yds= y==null ? null : ArrayDataSet.copy(y);
-        if ( x!=null && yds!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
-        if ( ( x!=null && yds!=null ) || renderType!=null ) yds.putProperty( QDataSet.RENDER_TYPE, renderType ); // plot command calls this with all-null arguments, and we don't when RENDER_TYPE setting to be nulled.
-        model.setDataSet( chNum, label, yds);
+        if ( x==null && renderType==null ) {
+            model.setDataSet( chNum, label, y);
+        } else {
+            ArrayDataSet yds= y==null ? null : ArrayDataSet.copy(y);
+            if ( x!=null && yds!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
+            if ( ( x!=null && yds!=null ) || renderType!=null ) yds.putProperty( QDataSet.RENDER_TYPE, renderType ); // plot command calls this with all-null arguments, and we don't when RENDER_TYPE setting to be nulled.
+            model.setDataSet( chNum, label, yds);
+        }
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
     }
     
