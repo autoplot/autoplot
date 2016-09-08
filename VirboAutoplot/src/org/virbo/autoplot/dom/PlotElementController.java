@@ -1673,7 +1673,7 @@ public class PlotElementController extends DomNodeController {
     }
 
     public void setResetPlotElement(boolean resetPlotElement) {
-        logger.log(Level.FINEST, "setResetPlotElement({0})", resetPlotElement);
+        logger.log(Level.FINER, "{0}.setResetPlotElement({1})", new Object[] { plotElement.id, resetPlotElement } );
         boolean old = this.resetPlotElement;
         this.resetPlotElement = resetPlotElement;
         propertyChangeSupport.firePropertyChange(PROP_RESETPLOTELEMENT, old, resetPlotElement);
