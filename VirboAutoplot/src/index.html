@@ -26,14 +26,14 @@
         
         <p>Bugfixes (2016-09-07 r19398):</p>
         <ul>
-            <li>1670: spectrogram averaging code assumed that 0*NaN would be 0.</li>
+            <li>1670: spectrogram averaging code assumed that 0*NaN would be 0.  Thanks, Ivar!</li>
             <li>1669: "common path" code, which tries to obscure local references in .vap.zip files, would use "" for data filename (and it would work, surprisingly).</li>
             <li>add a bit of fuzz to the fill value test, after seeing a d2s with 1e31 failing to detect fill</li>
             <li>1499: Brian's events file (two ISO8601/line) fails to parse. </li>
             <li>1667: color icons not shown in events list tool.</li>
             <li>rfe521: devel-release had a bug where events list couldn't be aggregated</li>
             <li>1666: Jython ds[i,j] would return rank 1 when i was integer and j was rank 0 dataset.</li>
-            <li>rte_1104366814: format .wav data extent is too great message didn't consider scale.</li>
+            <li>rte_1104366814: format .wav "data extent is too great" message didn't consider scale.</li>
             <li>ImageDataSource would use Datum is TYPICAL_MAX and TYPICAL_MIN, instead of Number</li>
             <li>slices GUI formatted command that was then not supported (: vs ':')</li>
             <li>code to repaint layout panel was triggering itself, causing unnecessary paints.</li>
@@ -50,6 +50,9 @@
             <li>1653: add explicit "clear" button to the ephemeris dialog.</li>
             <li>rfe499: SciPy Plasma colorbar added.  Thanks, Steve!</li>
             <li>rfe509: maybeCreateDasPeer should check headless before adding an export data button to the horizontal and vertical slice.</li>
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>1646: correction to overplot of TSB of TSB without timeaxis flips back to timeaxis.  Thanks, Ivar!</li>
             <li>1649: autoranging failure where code to support TSBs without timeaxis inadvertently would allow plot below TSBs to reset axis.  Thanks, Bill!</li>
             <li>1647: changes to HTML source to support "3.4 sec" broke test 140.</li>
@@ -95,31 +98,9 @@
             <li>rte_1585690286: code failed to check if null was found for units.</li>
             <li>1541: Larry's Jython code where dom.dataSourceFilters would result in Concurrent exception </li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>1618: botched bugfix breaks File->"Add Plot From..."->CDAWeb</li>
-            <li>startDigitizer is a public method now, and startQC can be called multiple times without complaint.</li>            
-            <li>rte_0400646374: Index out of bounds when QC is running and pngwalk is empty.  Thanks Ivar!</li>
-            <li>rte_0370111585: SliceFilterEditorPanel.validateFilter assumed data was a QUBE.</li>
-            <li>rte_0724070161: address inconsistent state associated with Time Series Browse observed by two people.</li>
-            <li>corrections in digitizer (DataPointRecorder) when column sorts are used.</li>
-            <li>corrections to pngwalk digitizer when digitizing plots without JSON metadata.</li>
-            <li>catch annoying 403 error message that shows at LANL.</li>
-            <li>1582: tweak to the guessCadence logic shown by Rosie's data.</li>
-            <li>1594: HDF reader cannot find data in sweswi_data_12min_year1999.hdf.  Now groups are supported.</li>
-            <li>Rich ASCII code would run on any comment block containing {}, causing error message popup for some files.</li>
-            <li>1490: Improvements to Rich ASCII output following meeting with LANL folks.</li>
-            <li>rte_1147829159: update the default pngwalk bookmarks, connect to github bookmarks file for easier maintenence.</li>
-            <li>1612: Mark's example showed where very negative Long for TT2000 was treated inconsistently and mucking up autoranging.</li>
-            <li>updates to example scripts in svn.</li>
-            <li>1268: back out until this can be fixed carefully.  (Bug is avoid download on the event thread in addPlot dialog)</li>
-            <li>Recent change to Add Plot dialog would result in incomplete URIs and other strange errors.</li>
-            <li>warning about using a timerange with a non-TSB getDataSet call removed.  It wasn't effective.</li>
-            <li>0899: avoid extraneous load of data when createPngWalk is used to create single pngs.</li>
-        </ul>
         <p>Features:</p>
         <ul>
-            <li>rfe 526: add test for rank join of rank 2 waveforms, to support cases where sampling rate changes for example.</li>
+            <li>rfe526: add test for rank join of rank 2 waveforms, to support cases where sampling rate changes for example.</li>
             <li>dataset index range checking flag is enabled by default now, improving error message precision.</li>
             <li>sin,cos,atan,etc added to Mash Up tool.</li>
             <li>add fillValue, validMin and validMax keywords to NetCDF reader.</li>
@@ -136,12 +117,15 @@
             <li>rfe521: aggregation of images is supported with new rules for aggregation.</li>
             <li>Improvements to applot.py, which supports plotting from C Python.</li>
             <li>Introduce ifft, for inverse transforms, to support hilbert function.</li>
-            <li>CDF data source URI keyword replaceLabels=T will use the channel values to label (e.g. 14eV instead of ch01).  Thanks, Cindy!</li>
+            <li>bug1664: CDF data source URI keyword replaceLabels=T will use the channel values to label (e.g. 14eV instead of ch01).  Thanks, Cindy!</li>
             <li>BinaryDataSource editor supports tab</li>
             <li>trim1 which trims elements from the first dimension, not just the zeroth.</li>
             <li>smooth1 which smooths over the first dimension, not just the zeroth.</li>
             <li>add matplotlib plasma colorbar</li>
             <li>rfe515: add DOTS where the dots/spacing is [0,3]</li>
+       </ul>
+        <p>Less recent features:</p>
+        <ul>
             <li>mashup has sqrt function.</li>
             <li>rfe509: horizontal and vertical slices support export data</li>
             <li>tearoffTabbedPane allows tab to be selected programmatically by title.</li>
@@ -151,17 +135,6 @@
             <li>allow clients to declare new types of colorbars.</li>
             <li>UInt24DataSet added so that we can read pairs of two nybbles to get data from LWA telescope.</li>
             <li>rfe511: BinaryDataSource can now read data as array of nybbles.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>NearestNeighborTcaFunction to support using calculated data for ticks.  Thanks, Kristoff!</li>
-            <li>PNGWalkTool provides more hooks for new Jython apps, including magnifier and auto-increment.</li>
-            <li>planet.physics.uiowa.edu is the default das2server now.</li>
-            <li>Refactor HTTPFileSystem to make the code a little easier to follow.</li>
-            <li>PNGWalkTool provides a method for programmatically adding QC metadata.</li>
-            <li>HDF reader supports structures.</li>
-            <li>PngWalkTool digitizer now includes column identifying the image.</li>
-            <li>PngWalkTool provides mechanism for extension, where scripts can get events and can plug in small GUI.</li>
         </ul>
 
         <p>Known issues:</p>
