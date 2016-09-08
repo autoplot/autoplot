@@ -1898,7 +1898,7 @@ public class DataSourceController extends DomNodeController {
     }
 
     /**
-     * set the data source uri.
+     * Set the data source URI.
      *
      * @param suri
      * @param mon
@@ -1914,7 +1914,7 @@ public class DataSourceController extends DomNodeController {
     }
 
     /**
-     * set the data source uri, forcing a reload if it is the same.
+     * Set the data source URI, forcing a reload if it is the same.
      *
      * @param suri
      * @param mon
@@ -1939,9 +1939,10 @@ public class DataSourceController extends DomNodeController {
      * A thread has been started that will load the dataset. Side Effects:
      * update is called to start the download, unless if this is headless, then
      * the dataset has been loaded synchronously.
-     * @param valueWasAdjusting true if the application was busy loading (see dom.controller.isValueAdjusting())
+     * @param valueWasAdjusting true if the application was busy loading (see dom.controller.isValueAdjusting()), or if you don't want things to reset.
+     * @param mon
      */
-    private void resolveDataSource(boolean valueWasAdjusting, ProgressMonitor mon) {
+    protected void resolveDataSource(boolean valueWasAdjusting, ProgressMonitor mon) {
         Caching cache1 = getCaching();
 
         if (dom.getController().isValueAdjusting()) {
