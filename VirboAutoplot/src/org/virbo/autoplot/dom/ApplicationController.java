@@ -54,6 +54,7 @@ import org.das2.graph.Renderer;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
 import org.das2.util.LoggerManager;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -63,6 +64,7 @@ import org.jdesktop.beansbinding.Bindings;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Property;
 import org.virbo.autoplot.ApplicationModel;
+import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.LayoutListener;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
@@ -229,6 +231,9 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     };
 
+    /**
+     * This plugs in listeners as arrays of DomNodes change.
+     */
     PropertyChangeListener domListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
@@ -579,6 +584,30 @@ public class ApplicationController extends DomNodeController implements RunLater
         return support.plot(plot, pele, primaryUri);
     }
 
+    /**
+     * provide method for plotting a URI without any axis resetting.
+     * @param suri the URI to plot
+     * @param resetPlot 
+     */
+    public void plotUri( final String suri, final boolean resetPlot ) {
+        DomLock lock=null;
+        if ( !resetPlot ) {
+            lock= application.controller.changesSupport.mutatorLock();
+            lock.lock("plotUriWithoutChanges");
+        }
+        //registerPendingChange( this, PENDING_CHANGE_REPLOTURI );
+        //performingChange( this, PENDING_CHANGE_REPLOTURI );
+        DataSourceFilter dsf= getDataSourceFilter();
+        dsf.getController().setSuri(suri, new NullProgressMonitor() );
+        //dsf.getController().resolveDataSource( false, new NullProgressMonitor() );
+        dsf.getController().update(true);
+        //changePerformed( this, PENDING_CHANGE_REPLOTURI );
+        if ( !resetPlot ) {
+            assert lock!=null;
+            lock.unlock();
+        }
+    }
+    
     /**
      * block the calling thread until the application is idle.
      * @see isPendingChanges.
