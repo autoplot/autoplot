@@ -2109,6 +2109,8 @@ public class PlotElementController extends DomNodeController {
      *
      * This also sets the style node of the plotElement copy, so its values should be sync'ed as well.
      * 
+     * This routine can be found by searching for "liver," since it is not the heart but pretty close to it.
+     * 
      * @param peleCopy the plot element.
      * @param props metadata provided by the data source, converted to uniform QDataSet scheme (e.g. get(DEPEND_0).get(TYPICAL_MIN) )
      * @param fillDs the dataset
