@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Contour, Digital and Spectrogram plotElements make this plot.
+        <p><small>Background decorator draws paper, and vap+inline provides the data.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,11 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-09-01 r19377):</p>
+        <p>Bugfixes (2016-09-07 r19398):</p>
         <ul>
+            <li>1670: spectrogram averaging code assumed that 0*NaN would be 0.</li>
+            <li>1669: "common path" code, which tries to obscure local references in .vap.zip files, would use "" for data filename (and it would work, surprisingly).</li>
+            <li>add a bit of fuzz to the fill value test, after seeing a d2s with 1e31 failing to detect fill</li>
             <li>1499: Brian's events file (two ISO8601/line) fails to parse. </li>
             <li>1667: color icons not shown in events list tool.</li>
             <li>rfe521: devel-release had a bug where events list couldn't be aggregated</li>
@@ -116,6 +119,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe 526: add test for rank join of rank 2 waveforms, to support cases where sampling rate changes for example.</li>
+            <li>dataset index range checking flag is enabled by default now, improving error message precision.</li>
+            <li>sin,cos,atan,etc added to Mash Up tool.</li>
             <li>add fillValue, validMin and validMax keywords to NetCDF reader.</li>
             <li>AMDA had a .nc file where the times were 1997223000009297, so special code is added to look for this case.</li>
             <li>script:/tmp/foo.jy, /tmp/foo.jy, are all treated as "--script /tmp/foo.jy" to support running from the command line.</li>
