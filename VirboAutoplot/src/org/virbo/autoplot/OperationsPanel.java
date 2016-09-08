@@ -212,6 +212,7 @@ public class OperationsPanel extends javax.swing.JPanel {
         final String news= s;
 
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 try {
                     if ( !olds.equals(news) ) {
@@ -550,7 +551,7 @@ public class OperationsPanel extends javax.swing.JPanel {
         return dataSet;
     }
 
-    public void setDataSet(QDataSet dataSet) {
+    public void setDataSet( QDataSet dataSet ) {
         QDataSet oldDataSet = this.dataSet;
         this.dataSet = dataSet;
         this.dataSetLabel.setText( dataSet==null ? "None" : String.valueOf( dataSet ) );
@@ -620,6 +621,7 @@ public class OperationsPanel extends javax.swing.JPanel {
     public static void main( String[] args ) throws Exception {
         
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 try {
                     mainEvt();
