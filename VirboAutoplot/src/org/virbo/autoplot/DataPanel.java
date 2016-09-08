@@ -7,6 +7,8 @@
 
 package org.virbo.autoplot;
 
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -276,6 +278,7 @@ public class DataPanel extends javax.swing.JPanel {
         dataSetSelector = new org.virbo.datasource.DataSetSelector();
         dataSourceFiltersPanel = new org.virbo.autoplot.OperationsPanel();
         additionalOperationsCheckBox = new javax.swing.JCheckBox();
+        doSuppressReset = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         sliceAutorangesCB = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
@@ -312,6 +315,10 @@ public class DataPanel extends javax.swing.JPanel {
             }
         });
 
+        doSuppressReset.setSelected(true);
+        doSuppressReset.setText("Suppress Reset");
+        doSuppressReset.setToolTipText("Normally the play button would reset the axis ranges and plot style, but this suppresses this behavior.");
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -322,7 +329,8 @@ public class DataPanel extends javax.swing.JPanel {
                     .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(additionalOperationsCheckBox)
-                        .add(0, 0, Short.MAX_VALUE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .add(doSuppressReset))
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(12, 12, 12)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -335,7 +343,9 @@ public class DataPanel extends javax.swing.JPanel {
             .add(jPanel1Layout.createSequentialGroup()
                 .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(additionalOperationsCheckBox)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(additionalOperationsCheckBox)
+                    .add(doSuppressReset))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -407,9 +417,19 @@ public class DataPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
     
     private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
-        String uri= dataSetSelector.getValue();
+        final String uri= dataSetSelector.getValue();
         int modifiers= evt.getModifiers();
-        app.doPlotGoButton( uri, modifiers );
+        boolean suppressReset= doSuppressReset.isSelected();
+        if ( suppressReset ) {
+            Runnable run= new Runnable() {
+                public void run() {
+                    app.dom.getController().plotUri( uri, false );
+                }
+            };
+            new Thread( run, "plotUri" ).start();
+        } else {
+            app.doPlotGoButton( uri, modifiers );
+        }
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
     private void additionalOperationsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_additionalOperationsCheckBoxActionPerformed
@@ -429,6 +449,7 @@ public class DataPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox additionalOperationsCheckBox;
     private org.virbo.datasource.DataSetSelector dataSetSelector;
     private org.virbo.autoplot.OperationsPanel dataSourceFiltersPanel;
+    private javax.swing.JCheckBox doSuppressReset;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;

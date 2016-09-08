@@ -67,7 +67,8 @@
                           <Component id="dataSetSelector" pref="578" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Component id="additionalOperationsCheckBox" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="doSuppressReset" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <EmptySpace min="12" pref="12" max="-2" attributes="0"/>
@@ -86,7 +87,10 @@
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="dataSetSelector" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Component id="additionalOperationsCheckBox" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="additionalOperationsCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="doSuppressReset" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -127,6 +131,13 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="additionalOperationsCheckBoxActionPerformed"/>
               </Events>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="doSuppressReset">
+              <Properties>
+                <Property name="selected" type="boolean" value="true"/>
+                <Property name="text" type="java.lang.String" value="Suppress Reset"/>
+                <Property name="toolTipText" type="java.lang.String" value="Normally the play button would reset the axis ranges and plot style, but this suppresses this behavior."/>
+              </Properties>
             </Component>
           </SubComponents>
         </Container>
