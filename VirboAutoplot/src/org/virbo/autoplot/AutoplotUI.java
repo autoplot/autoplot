@@ -4446,7 +4446,8 @@ private void updateFrameTitle() {
             }
         } catch ( IOException ex ) {
             if ( quit ) {
-                logger.log( Level.WARNING, ex.getMessage(), ex );
+                logger.log( Level.WARNING, ex.getMessage(), ex ); 
+                System.err.println( ex.getMessage() );
                 AppManager.getInstance().quit(1);
             } else {
                 model.getExceptionHandler().handle(ex);
@@ -4570,6 +4571,8 @@ private void updateFrameTitle() {
         alm.addBooleanSwitchArgument( "samp", null, "samp", "enable SAMP connection for use with European Space Agency applications and websites");
         alm.addOptionalSwitchArgument( "server", null, "server", "-1", "start server at the given port listening to commands. (Replaces port)");
         alm.addBooleanSwitchArgument( "nop", null, "nop", "no operation, to be a place holder for jnlp script.");
+        alm.addBooleanSwitchArgument( "headless", null, "headless", "run in headless mode" );
+        
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
            if ( args[i].equals("-print") ) args[i]="--print";
            if ( args[i].equals("-open") ) {
@@ -4608,6 +4611,10 @@ private void updateFrameTitle() {
             }
         }
         alm.process(args);
+        
+        if ( alm.getBooleanValue("headless") ) {
+            System.setProperty("java.awt.headless","true");
+        }
 
         AutoplotUtil.maybeLoadSystemProperties();
                         
