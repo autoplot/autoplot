@@ -93,6 +93,8 @@ public class DataPanel extends javax.swing.JPanel {
         
         doBindings();
         
+        dataSetSelector.setPlayButton(false);
+        
         dataSourceFiltersPanel.setVisible(false);
         jLabel2.setVisible(false);
     }
