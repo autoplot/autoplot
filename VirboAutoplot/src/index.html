@@ -24,8 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-09-07 r19412):</p>
+        <p>Bugfixes (2016-09-07 r19420):</p>
         <ul>
+            <li>1672: layout panel was failing to repaint when plots were added.</li>
+            <li>1636: if statements in Jython scripts could mess up code that would extract the getParam calls to create GUI.  Thanks Ivar!</li>
             <li>1671: contour insert fill values but property is not set</li>
             <li>1670: spectrogram averaging code assumed that 0*NaN would be 0.  Thanks, Ivar!</li>
             <li>1669: "common path" code, which tries to obscure local references in .vap.zip files, would use "" for data filename (and it would work, surprisingly).</li>
@@ -101,8 +103,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe247: experiment with allowing the data source to be edited without resetting everything else.  Thanks Chris, Bob, and Bill!</li>
             <li>Tooltips indicate description of filters in Filter Chain.  Thanks, Chris!</li>
-            <li>rfe247: experiment with allowing the data source to be edited without resetting everything else.</li>
             <li>rfe526: add test for rank join of rank 2 waveforms, to support cases where sampling rate changes for example.</li>
             <li>dataset index range checking flag is enabled by default now, improving error message precision.</li>
             <li>sin,cos,atan,etc added to Mash Up tool.</li>
