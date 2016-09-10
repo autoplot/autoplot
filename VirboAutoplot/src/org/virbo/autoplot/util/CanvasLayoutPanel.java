@@ -71,7 +71,7 @@ public class CanvasLayoutPanel extends JLabel {
             public void actionPerformed(ActionEvent e) {
                 itsme= true;
                 BufferedImage img= new BufferedImage( target.getWidth(), target.getHeight(), BufferedImage.TYPE_INT_ARGB );
-                ((DasCanvas)target).writeToImageImmediatelyNonPrint(img);
+                ((DasCanvas)target).writeToImageImmediatelyNoCount(img);
                 canvasImage= img;
                 itsme= false;
                 repaint();
