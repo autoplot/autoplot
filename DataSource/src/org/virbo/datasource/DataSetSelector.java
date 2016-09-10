@@ -222,7 +222,8 @@ public class DataSetSelector extends javax.swing.JPanel {
     MonitorFactory monitorFactory = null;
     Timer maybePlotTimer;
     int keyModifiers = 0;
-
+    
+    boolean playButton= true; // for popups, if false just allow okay/cancel
 
     /**
      * provide direct access to the editor component.
@@ -243,6 +244,15 @@ public class DataSetSelector extends javax.swing.JPanel {
         return plotItButton;
     }
 
+    /**
+     * if this is false, then the editor dialogs will show only "okay" and
+     * "plot below" is hidden.
+     * @param t 
+     */
+    public void setPlayButton( boolean t ) {
+        this.playButton= t;
+    }
+    
     /**
      * provide access to timer for GUI testing.
      * @return
@@ -909,7 +919,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 dialog.setTitle(title);
                 dialog.setProblems(problems);
 
-                if ( actionListenerList==null || actionListenerList.isEmpty() ) {
+                if ( actionListenerList==null || actionListenerList.isEmpty() || playButton==false ) {
                     dialog.setPlayButton(false); // nothing is going to happen, so don't show play button.
                 } else {
                     dialog.setExpertMode(isExpertMode());
