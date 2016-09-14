@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Background decorator draws paper, and vap+inline provides the data.
+        <p><small>New image parsing challenge: monitoring home water use with $8 webcam and $30 Raspberry PI.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-09-07 r19420):</p>
+        <p>Bugfixes (2016-09-14 r19424):</p>
         <ul>
+            <li>1677: interpolate2D should allow interpolation along edges when the opposite edge contains fill</li>
+            <li>interpolate2D with two rank 0 datasets for xx and yy would cause RTE.</li>
             <li>1672: layout panel was failing to repaint when plots were added.</li>
             <li>1636: if statements in Jython scripts could mess up code that would extract the getParam calls to create GUI.  Thanks Ivar!</li>
             <li>1671: contour insert fill values but property is not set</li>
