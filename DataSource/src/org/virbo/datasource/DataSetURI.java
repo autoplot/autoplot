@@ -349,6 +349,7 @@ public class DataSetURI {
     public static String blurTsbUri(String value) {
         try {
             DataSourceFactory dsf= getDataSourceFactory( new URI(value), new NullProgressMonitor() );
+            if ( dsf==null ) return null; // I was getting this because I removed a datasource (HAPI)
             TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
             if (tsb==null ) return null;
             tsb.setURI(value);
