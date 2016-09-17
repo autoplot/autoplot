@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+    <servlet>
+        <description>Provides the server catalog.</description>
+        <servlet-name>CatalogServlet</servlet-name>
+        <servlet-class>org.autoplot.hapiserver.CatalogServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <description>Provides data</description>
+        <servlet-name>DataServlet</servlet-name>
+        <servlet-class>org.autoplot.hapiserver.DataServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>InfoServlet</servlet-name>
+        <servlet-class>org.autoplot.hapiserver.InfoServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CatalogServlet</servlet-name>
+        <url-pattern>/catalog</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DataServlet</servlet-name>
+        <url-pattern>/data</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>InfoServlet</servlet-name>
+        <url-pattern>/info</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+</web-app>
