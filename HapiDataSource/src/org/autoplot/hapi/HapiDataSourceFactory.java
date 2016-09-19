@@ -1,14 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.hapi;
 
 import java.net.URI;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
@@ -36,6 +34,11 @@ public class HapiDataSourceFactory extends AbstractDataSourceFactory {
         if ( server==null ) problems.add("server is not identified");
         if ( id==null ) problems.add("the parameter id is needed");
         if ( timerange==null ) problems.add("the timerange is needed");
+        try {
+            DatumRangeUtil.parseTimeRange(timerange);
+        } catch ( ParseException ex ) {
+            problems.add("timerange cannot be parsed");
+        }
         return problems.size()>0;
     }
 
