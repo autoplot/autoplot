@@ -45,7 +45,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             throw new RuntimeException(ex);
         }
         initComponents();
-        serversComboBox.setModel( new DefaultComboBoxModel<>( HapiServer.getKnownServersArray() ));
+        serversComboBox.setModel( new DefaultComboBoxModel<>( HapiServer.listHapiServersArray() ));
     }
 
     /**
