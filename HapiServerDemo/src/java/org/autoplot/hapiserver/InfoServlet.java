@@ -32,7 +32,7 @@ public class InfoServlet extends HttpServlet {
         JSONObject parameter;
         parameter= new JSONObject();
         parameter.put( "name", "Time" );
-        parameter.put( "type", "ISOTIME" );
+        parameter.put( "type", "isotime" );
         parameter.put( "length", 24 );
         parameters.put( 0, parameter );
 
@@ -40,6 +40,7 @@ public class InfoServlet extends HttpServlet {
         parameter.put( "name", "Temperature" );
         parameter.put( "type", "float" );
         parameter.put( "units", "deg F" );
+        parameter.put( "fill", "1e31" );
         parameter.put( "description", "temperature at sensor" + id );
         parameters.put( 1, parameter );
 
