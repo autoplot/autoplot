@@ -1375,7 +1375,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * @param ex
      * @param messageType
      */
-    public void showUserExceptionDialog( Component parent, String msg, String title, final Exception ex, int messageType ) {
+    public static void showUserExceptionDialog( Component parent, String msg, String title, final Exception ex, int messageType ) {
         JPanel p= new JPanel();
         p.add( new JLabel( msg ), BorderLayout.CENTER );
         JPanel buttons= new JPanel( );
