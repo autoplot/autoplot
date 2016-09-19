@@ -1,0 +1,70 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.autoplot.hapi;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.datasource.AbstractDataSourceFactory;
+import org.virbo.datasource.CompletionContext;
+import org.virbo.datasource.DataSource;
+import org.virbo.datasource.URISplit;
+
+/**
+ * Constructor for HAPI data sources.
+ * @author jbf
+ */
+public class HapiDataSourceFactory extends AbstractDataSourceFactory {
+
+    @Override
+    public DataSource getDataSource(URI uri) throws Exception {
+        return new HapiDataSource(uri);
+    }
+
+    @Override
+    public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
+        URISplit split= URISplit.parse(surl);
+        String server= split.file;
+        LinkedHashMap<String,String> params= URISplit.parseParams(split.params);
+        String id= params.get("id");
+        String timerange= params.get( URISplit.PARAM_TIME_RANGE );
+        if ( server==null ) problems.add("server is not identified");
+        if ( id==null ) problems.add("the parameter id is needed");
+        if ( timerange==null ) problems.add("the timerange is needed");
+        return problems.size()>0;
+    }
+
+    
+    @Override
+    public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
+        List<CompletionContext> result = new ArrayList<>();
+        if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "id=", "dataset identifier"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=", "time range"));
+        } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
+            String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
+            if (paramName.equals("id")) {
+                URI uri= cc.resourceURI;
+                if ( uri==null ) throw new IllegalArgumentException("expected das2server location");
+                List<String> dss= HapiServer.getCatalog(uri.toURL()); 
+                for ( String ds: dss ) {
+                    if ( ds.startsWith(cc.completable) ) {
+                        result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ds ) );
+                    }
+                }
+            } 
+        }
+        return result;
+    }
+
+    @Override
+    public boolean supportsDiscovery() {
+        return true;
+    }
+    
+}
