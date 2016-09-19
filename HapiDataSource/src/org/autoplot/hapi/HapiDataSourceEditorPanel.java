@@ -91,6 +91,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             }
         });
 
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/hapi/calendar.png"))); // NOI18N
         jButton1.setToolTipText("Time Range Tool");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -135,7 +136,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                             .addComponent(jLabel2))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
