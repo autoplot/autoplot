@@ -40,7 +40,9 @@ public class CatalogServlet extends HttpServlet {
             jo.put("HAPI","1.0");
             JSONArray catalog= new JSONArray();
             catalog.put( 0, new JSONObject().put("id", "0B000800408DD710" ) );
-            catalog.put( 1, new JSONObject().put("id", "10.04E02F000800" ) );
+            catalog.put( 1, new JSONObject().put("id", "8500080044259C10" ) );
+            catalog.put( 2, new JSONObject().put("id", "610008002FE00410" ) );
+            catalog.put( 3, new JSONObject().put("id", "AC00080040250510" ) );
             jo.put("catalog",catalog);
             jo.write(out);
             
