@@ -33,11 +33,14 @@ public class HapiDataSourceFactory extends AbstractDataSourceFactory {
         String timerange= params.get( URISplit.PARAM_TIME_RANGE );
         if ( server==null ) problems.add("server is not identified");
         if ( id==null ) problems.add("the parameter id is needed");
-        if ( timerange==null ) problems.add("the timerange is needed");
-        try {
-            DatumRangeUtil.parseTimeRange(timerange);
-        } catch ( ParseException ex ) {
-            problems.add("timerange cannot be parsed");
+        if ( timerange==null ) {
+            problems.add("the timerange is needed");
+        } else {
+            try {
+                DatumRangeUtil.parseTimeRange(timerange);
+            } catch ( ParseException ex ) {
+                problems.add("timerange cannot be parsed");
+            }
         }
         return problems.size()>0;
     }
