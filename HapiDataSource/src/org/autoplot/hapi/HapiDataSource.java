@@ -106,6 +106,8 @@ public class HapiDataSource extends AbstractDataSource {
         double[] fillValues= new double[nparameters];
         Units[] units= new Units[nparameters];
         String[] names= new String[nparameters];
+        String[] descriptions= new String[nparameters];
+        
         for ( int i=0; i<nparameters; i++ ) {
             String name= parameters.getJSONObject(i).getString("name");
             names[i]= name;
@@ -129,6 +131,11 @@ public class HapiDataSource extends AbstractDataSource {
                     hasFill[i]= true;
                 } else {
                     fillValues[i]= FILL_VALUE; // when a value cannot be parsed, but it is not identified.
+                }
+                if ( parameters.getJSONObject(i).has("description") ) {
+                    descriptions[i]= parameters.getJSONObject(i).getString("description");
+                } else {
+                    descriptions[i]= ""; // when a value cannot be parsed, but it is not identified.
                 }
             }
         }
@@ -168,6 +175,7 @@ public class HapiDataSource extends AbstractDataSource {
             ds= Ops.copy( Ops.slice1( ds, 1 ) );
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
             ds= Ops.putProperty( ds, QDataSet.NAME, names[1] );
+            ds= Ops.putProperty( ds, QDataSet.TITLE, descriptions[1] );
             ds= Ops.putProperty( ds, QDataSet.UNITS, units[1] );
             if ( hasFill[1] ) {
                 ds= Ops.putProperty( ds, QDataSet.FILL_VALUE, fillValues[1] );
@@ -177,6 +185,7 @@ public class HapiDataSource extends AbstractDataSource {
             BundleBuilder bdsb= new BundleBuilder(nparameters-1);
             for ( int i=1; i<nparameters; i++ ) {
                 bdsb.putProperty( QDataSet.NAME, i-1, names[i] );
+                bdsb.putProperty( QDataSet.TITLE, i-1, descriptions[1] );
                 bdsb.putProperty( QDataSet.UNITS, i-1, units[i] );
                 if ( hasFill[i] ) {
                     bdsb.putProperty( QDataSet.FILL_VALUE, i-1, fillValues[i+1] );
