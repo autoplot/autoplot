@@ -28,6 +28,10 @@ public class InfoServlet extends HttpServlet {
         JSONObject jo= new JSONObject();
         jo.put("HAPI","1.0");
         jo.put("Created at",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
+        
+        if ( !parameterNames.equals("") ) {
+            throw new IllegalArgumentException("subset of parameters is not supported.");
+        }
         JSONArray parameters= new JSONArray();
         JSONObject parameter;
         parameter= new JSONObject();
@@ -40,8 +44,8 @@ public class InfoServlet extends HttpServlet {
         parameter.put( "name", "Temperature" );
         parameter.put( "type", "float" );
         parameter.put( "units", "deg F" );
-        parameter.put( "fill", "1e31" );
-        parameter.put( "description", "temperature at sensor" + id );
+        parameter.put( "fill", "-1e31" );
+        parameter.put( "description", "temperature at sensor " + id );
         parameters.put( 1, parameter );
 
         jo.put("parameters",parameters);
@@ -65,29 +69,11 @@ public class InfoServlet extends HttpServlet {
         
         if ( id==null ) throw new ServletException("required parameter 'id' is missing from request");
         
-        response.setContentType("application/json;charset=UTF-8");
+        response.setContentType("application/json;charset=UTF-8");        
         PrintWriter out = response.getWriter();
         try {
-            JSONObject jo= new JSONObject();
-            jo.put("HAPI","1.0");
-            jo.put("Created at",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
-            JSONArray parameters= new JSONArray();
-            JSONObject parameter;
-            parameter= new JSONObject();
-            parameter.put( "name", "Time" );
-            parameter.put( "type", "ISOTIME" );
-            parameter.put( "length", 24 );
-            parameters.put( 0, parameter );
-            
-            parameter= new JSONObject();
-            parameter.put( "name", "Temperature" );
-            parameter.put( "type", "float" );
-            parameter.put( "units", "deg F" );
-            parameter.put( "description", "temperature at sensor" + id );
-            parameters.put( 1, parameter );
-            
-            jo.put("parameters",parameters);
-            jo.write(out);
+           
+           doHeader( out, id, "" );
             
         } catch ( JSONException ex ) {
             throw new ServletException(ex);
