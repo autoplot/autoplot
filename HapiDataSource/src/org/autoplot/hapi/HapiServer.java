@@ -2,19 +2,26 @@
 package org.autoplot.hapi;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Icon;
+import javax.swing.JOptionPane;
 import org.das2.datum.DatumRange;
 import org.das2.datum.TimeParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.virbo.datasource.AutoplotSettings;
 
 /**
  * Utility methods for interacting with HAPI servers.
@@ -45,6 +52,74 @@ public class HapiServer {
         List<String> result= getKnownServers();
         return result.toArray( new String[result.size()] );
     }
+     
+    /**
+     * add the default known servers, plus the ones we know about.
+     * @return list of servers
+     */
+    public static String[] listHapiServersArray() {
+        List<String> result= listHapiServers();
+        return result.toArray( new String[result.size()] );        
+    }
+    
+    /**
+     * add the default known servers, plus the ones we know about.
+     * @return list of servers
+     */
+    public static List<String> listHapiServers() {
+        List<String> d2ss1= new ArrayList( );
+        d2ss1.addAll( getKnownServers() );
+
+        File home = new File(AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA));
+        File book = new File(home, "bookmarks");
+        File hist = new File(book, "history.txt");
+        long t0= System.currentTimeMillis();
+        logger.log( Level.FINE, "reading recent datasources from {0}", hist.toString());
+
+        if ( hist.exists() ) {
+            BufferedReader r=null;
+            try {
+                String seek="hapi:";
+                int ttaglen= 25;
+                r = new BufferedReader(new FileReader(hist));
+                String s = r.readLine();
+                LinkedHashSet dss = new LinkedHashSet();
+
+                while (s != null) {
+                    if ( s.length()>ttaglen+15 && s.substring(ttaglen+4,ttaglen+9).equalsIgnoreCase(seek)) {
+                        int i= s.indexOf("?");
+                        if ( i==-1 ) i= s.length();
+                        String key= s.substring(ttaglen+4+seek.length(),i);
+                        if ( dss.contains(key) ) dss.remove( key ); // move to the end
+                        dss.add( key );
+                    }
+                    s = r.readLine();
+                }
+
+                d2ss1.removeAll(dss);  // remove whatever we have already
+                List<String> d2ssDiscoveryList= new ArrayList(dss);
+                Collections.reverse( d2ssDiscoveryList );
+                d2ssDiscoveryList.addAll(d2ss1);
+                d2ss1= d2ssDiscoveryList; // put the most recently used ones at the front of the list
+                
+                logger.log( Level.FINE, "read extra das2servers in {0} millis\n", (System.currentTimeMillis()-t0) );
+            } catch ( IOException ex ) {
+                
+            } finally {
+                try {
+                    if ( r!=null ) r.close();
+                } catch (IOException ex) {
+                    logger.log( Level.SEVERE, ex.getMessage(), ex );
+                }
+            }
+        } else {
+            logger.log( Level.FINE, "no history file found: {0}", hist );
+        }
+                
+        return d2ss1;
+
+    }
+    
     /**
      * return the list of datasets available at the server
      * @param server the root of the server, which should should contain "catalog"
