@@ -4,6 +4,7 @@
     Author     : jbf
 --%>
 
+<%@page import="org.autoplot.hapiserver.Util"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -17,5 +18,7 @@
         <a href="info?id=0B000800408DD710">Info</a><br>
         <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05">Data</a><br>
         <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&include=header">Data w/header</a><br>
+        
+        <br><small>deployed <%= Util.getDurationForHumans( System.currentTimeMillis() - org.virbo.dataset.RecordIterator.TIME_STAMP ) %> ago</small>
     </body>
 </html>
