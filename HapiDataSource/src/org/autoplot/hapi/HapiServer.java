@@ -40,7 +40,7 @@ public class HapiServer {
     public static List<String> getKnownServers() {
         ArrayList<String> result= new ArrayList<>();
         result.add("http://tsds.org/get/IMAGE/PT1M/hapi");
-        result.add("http://localhost:8084/HapiServerDemo");
+        result.add("http://jfaden.net:8180/HapiServerDemo/hapi");
         return result;
     }
     
