@@ -11,20 +11,21 @@
         <servlet-class>org.autoplot.hapiserver.DataServlet</servlet-class>
     </servlet>
     <servlet>
+        <description>Provides parameter information</description>
         <servlet-name>InfoServlet</servlet-name>
         <servlet-class>org.autoplot.hapiserver.InfoServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>CatalogServlet</servlet-name>
-        <url-pattern>/catalog</url-pattern>
+        <url-pattern>/hapi/catalog</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>DataServlet</servlet-name>
-        <url-pattern>/data</url-pattern>
+        <url-pattern>/hapi/data</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>InfoServlet</servlet-name>
-        <url-pattern>/info</url-pattern>
+        <url-pattern>/hapi/info</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
