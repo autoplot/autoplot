@@ -40,14 +40,38 @@ public class InfoServlet extends HttpServlet {
         parameter.put( "length", 24 );
         parameters.put( 0, parameter );
 
-        parameter= new JSONObject();
-        parameter.put( "name", "Temperature" );
-        parameter.put( "type", "float" );
-        parameter.put( "units", "deg F" );
-        parameter.put( "fill", "-1e31" );
-        parameter.put( "description", "temperature at sensor " + id );
-        parameters.put( 1, parameter );
-
+        if ( id.equals("Iowa City Conditions") ) {
+            parameter= new JSONObject();
+            parameter.put( "name", "Temperature" );
+            parameter.put( "type", "float" );
+            parameter.put( "units", "deg F" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Iowa City Air Temperature" );
+            parameters.put( 1, parameter );
+            parameter= new JSONObject();
+            parameter.put( "name", "Humidity" );
+            parameter.put( "type", "float" );
+            parameter.put( "units", "percent" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Iowa City Relative Humidity" );
+            parameters.put( 2, parameter );
+            parameter= new JSONObject();
+            parameter.put( "name", "Pressure" );
+            parameter.put( "type", "float" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Iowa City Barometric Pressure" );
+            parameters.put( 3, parameter );
+                        
+        } else {
+            parameter= new JSONObject();
+            parameter.put( "name", "Temperature" );
+            parameter.put( "type", "float" );
+            parameter.put( "units", "deg F" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "temperature at sensor " + id );
+            parameters.put( 1, parameter );
+        }
+        
         jo.put("parameters",parameters);
         jo.write(out);
 
