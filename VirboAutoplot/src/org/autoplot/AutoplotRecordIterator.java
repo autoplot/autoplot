@@ -27,7 +27,14 @@ public class AutoplotRecordIterator implements Iterator<QDataSet>  {
             QDataSet ds= org.virbo.jythonsupport.Util.getDataSet( uri, dr.toString() );
             QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
             if ( dep0!=null ) {
-                this.src= Ops.bundle( dep0, ds );
+                if ( ds.rank()==1 ) {
+                    this.src= Ops.bundle( dep0, ds );
+                } else if ( ds.rank()==2 ) {
+                    this.src= Ops.bundle( dep0, Ops.unbundle(ds,0) );
+                    for ( int i=1; i<ds.length(0); i++ ) {
+                        this.src= Ops.bundle( this.src, Ops.unbundle(ds,i) );
+                    }
+                }
             } else {
                 this.src= ds;
             }
@@ -49,6 +56,8 @@ public class AutoplotRecordIterator implements Iterator<QDataSet>  {
         QDataSet findeces= Ops.findex( dep0, dr );
         this.index= (int)Math.ceil( findeces.value(0) );
         this.lastIndex= (int)Math.ceil( findeces.value(1) );
+        this.index= Math.max(0,this.index);
+        this.lastIndex= Math.min(src.length(),this.lastIndex);
     }
     
     @Override
