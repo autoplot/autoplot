@@ -55,7 +55,7 @@ public class CatalogServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             JSONObject jo= getCatalog();
-            jo.write(out);
+            out.write( jo.toString(4) );
             
         } catch ( JSONException ex ) {
             throw new ServletException(ex);
