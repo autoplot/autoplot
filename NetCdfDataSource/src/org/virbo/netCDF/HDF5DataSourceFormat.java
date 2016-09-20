@@ -85,6 +85,8 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
                 return DataType.LONG;
             } else if ( suggest.equals("int") ) {
                 return DataType.INT;
+            } else if ( suggest.equals("short") ) {
+                return DataType.SHORT;
             } else {
                 return DataType.DOUBLE;
             }
