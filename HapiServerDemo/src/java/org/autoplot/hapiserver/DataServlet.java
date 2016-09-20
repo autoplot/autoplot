@@ -5,11 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.ParseException;
-import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import javax.script.ScriptContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,13 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.autoplot.AutoplotRecordIterator;
 import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.DatumUtil;
 import org.das2.datum.Units;
 import org.json.JSONException;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.RecordIterator;
-import org.virbo.dataset.examples.Schemes;
 
 /**
  *
@@ -79,7 +71,13 @@ public class DataServlet extends HttpServlet {
             throw new IllegalArgumentException(ex);
         }
 
-        AutoplotRecordIterator dsiter= new AutoplotRecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/"+id+".$Y$m$d.d2s", dr );
+        AutoplotRecordIterator dsiter;
+        
+        if ( id.equals("Iowa City Conditions") ) { // TODO: 
+            dsiter= new AutoplotRecordIterator( "vap+jyds:file:///home/jbf/public_html/1wire/ictemp/readTemperaturesMulti.jyds", dr );
+        } else {
+            dsiter= new AutoplotRecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/"+id+".$Y$m$d.d2s", dr );
+        }
         
         dsiter.constrainDepend0(dr);
                 
