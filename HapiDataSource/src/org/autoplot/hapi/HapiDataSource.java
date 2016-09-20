@@ -171,10 +171,11 @@ public class HapiDataSource extends AbstractDataSource {
                 
         QDataSet ds= builder.getDataSet();
         QDataSet depend0= Ops.slice1( ds,0 );
-        if ( ds.length(0)==2 ) {
+        if ( false && ds.length(0)==2 ) {
             ds= Ops.copy( Ops.slice1( ds, 1 ) );
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
-            ds= Ops.putProperty( ds, QDataSet.NAME, names[1] );
+            ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(names[1]) );
+            ds= Ops.putProperty( ds, QDataSet.LABEL, names[1] );
             ds= Ops.putProperty( ds, QDataSet.TITLE, descriptions[1] );
             ds= Ops.putProperty( ds, QDataSet.UNITS, units[1] );
             if ( hasFill[1] ) {
@@ -184,17 +185,18 @@ public class HapiDataSource extends AbstractDataSource {
         } else {
             BundleBuilder bdsb= new BundleBuilder(nparameters-1);
             for ( int i=1; i<nparameters; i++ ) {
-                bdsb.putProperty( QDataSet.NAME, i-1, names[i] );
-                bdsb.putProperty( QDataSet.TITLE, i-1, descriptions[1] );
+                bdsb.putProperty( QDataSet.NAME, i-1, Ops.safeName(names[i]) );
+                bdsb.putProperty( QDataSet.LABEL, i-1, names[1] );
+                bdsb.putProperty( QDataSet.TITLE, i-1, descriptions[i] );
                 bdsb.putProperty( QDataSet.UNITS, i-1, units[i] );
                 if ( hasFill[i] ) {
-                    bdsb.putProperty( QDataSet.FILL_VALUE, i-1, fillValues[i+1] );
+                    bdsb.putProperty( QDataSet.FILL_VALUE, i-1, fillValues[i] );
                 }
             }
             
             ds= Ops.copy( Ops.trim1( ds, 1, ds.length(0) ) );
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
-            ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, bdsb.getDataSet().trim(1,nparameters) );
+            ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, bdsb.getDataSet() );
         }
         
         return ds;
