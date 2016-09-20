@@ -19,7 +19,7 @@ import org.virbo.dsops.Ops;
  * Introduce class to hold code for iterating through any dataset.
  * @author jbf
  */
-public class AutoplotRecordIterator implements Iterator<QDataSet>  {
+public class RecordIterator implements Iterator<QDataSet>  {
 
     int index;
     int lastIndex;
@@ -68,7 +68,7 @@ public class AutoplotRecordIterator implements Iterator<QDataSet>  {
         return rds;        
     }
     
-    public AutoplotRecordIterator( String uri, DatumRange dr ) {
+    public RecordIterator( String uri, DatumRange dr ) {
         try {
             QDataSet ds= getDataSet( uri, dr, new NullProgressMonitor() );
             QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
@@ -86,7 +86,7 @@ public class AutoplotRecordIterator implements Iterator<QDataSet>  {
             }
             constrainDepend0(dr);
         } catch (Exception ex) {
-            Logger.getLogger(AutoplotRecordIterator.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RecordIterator.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
         
