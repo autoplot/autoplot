@@ -174,16 +174,22 @@ public class HapiServer {
      * @param server
      * @param id
      * @param tr
+     * @param parameters zero-length, or a comma-delineated list of parameters.
      * @return 
      */
-    public static URL getDataURL( URL server, String id, DatumRange tr ) {
+    public static URL getDataURL( URL server, String id, DatumRange tr, String parameters ) {
         try {
             TimeParser tp= TimeParser.create(TimeParser.TIMEFORMAT_Z);
+            String serverStr;
             if (server.toString().contains( "http://tsds.org/get/IMAGE/PT1M/hapi" )  ) {
-                return new URL( server.toString()+"/data/?id="+id+"&time.min="+tp.format(tr.min())+"&time.max="+tp.format(tr.max()) );
+                serverStr= server.toString()+"/data/?id="+id+"&time.min="+tp.format(tr.min())+"&time.max="+tp.format(tr.max());
             } else {
-                return new URL( server.toString()+"/data?id="+id+"&time.min="+tp.format(tr.min())+"&time.max="+tp.format(tr.max()) );
+                serverStr= server.toString()+"/data?id="+id+"&time.min="+tp.format(tr.min())+"&time.max="+tp.format(tr.max());
             }
+            if ( parameters.length()>0 ) {
+                serverStr= serverStr + "&parameters="+parameters;
+            }
+            return new URL( serverStr );
         } catch ( MalformedURLException ex ) {
             throw new RuntimeException(ex);
         }

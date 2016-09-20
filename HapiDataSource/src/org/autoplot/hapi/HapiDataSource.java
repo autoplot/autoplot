@@ -12,8 +12,12 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.print.attribute.HashAttributeSet;
 import static org.autoplot.hapi.HapiServer.logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -90,27 +94,36 @@ public class HapiDataSource extends AbstractDataSource {
         return o;
     }
     
+    private static class ParamDescription {
+        boolean hasFill= false;
+        double fillValue= -1e38;
+        Units units= Units.dimensionless;
+        String name= "";
+        String description= "";
+        private ParamDescription( String name ) {
+            this.name= name;
+        }
+    }
+    
     @Override
     public QDataSet getDataSet(ProgressMonitor monitor) throws Exception {
         URI server = this.resourceURI;
         String id= getParam("id","" );
         if ( id.equals("") ) throw new IllegalArgumentException("missing id");
 
+        String pp= getParam("parameters","");
         
         JSONObject doc= getDocument();
         
         JSONArray parameters= doc.getJSONArray("parameters");
         int nparameters= parameters.length();
                 
-        boolean[] hasFill= new boolean[nparameters];
-        double[] fillValues= new double[nparameters];
-        Units[] units= new Units[nparameters];
-        String[] names= new String[nparameters];
-        String[] descriptions= new String[nparameters];
+        ParamDescription[] pds= new ParamDescription[nparameters];
         
         for ( int i=0; i<nparameters; i++ ) {
             String name= parameters.getJSONObject(i).getString("name");
-            names[i]= name;
+            pds[i]= new ParamDescription( name );
+
             String type;
             if ( parameters.getJSONObject(i).has("type") ) {
                 type= parameters.getJSONObject(i).getString("type");
@@ -118,33 +131,50 @@ public class HapiDataSource extends AbstractDataSource {
                 type= "";
             }
             if ( name.equalsIgnoreCase("ISOTIME") || type.equalsIgnoreCase("isotime") ) {
-                units[i]= Units.us2000;
+                pds[i].units= Units.us2000;
             } else {
                 if ( parameters.getJSONObject(i).has("units") ) {
                     String sunits= parameters.getJSONObject(i).getString("units");
-                    units[i]= Units.lookupUnits(sunits);
+                    pds[i].units= Units.lookupUnits(sunits);
                 } else {
-                    units[i]= Units.dimensionless;
+                    pds[i].units= Units.dimensionless;
                 }
                 if ( parameters.getJSONObject(i).has("fill") ) {
-                    fillValues[i]= units[i].parse(parameters.getJSONObject(i).getString("fill") ).doubleValue( units[i] );
-                    hasFill[i]= true;
+                    pds[i].fillValue= pds[i].units.parse(parameters.getJSONObject(i).getString("fill") ).doubleValue( pds[i].units );
+                    pds[i].hasFill= true;
                 } else {
-                    fillValues[i]= FILL_VALUE; // when a value cannot be parsed, but it is not identified.
+                    pds[i].fillValue= FILL_VALUE; // when a value cannot be parsed, but it is not identified.
                 }
                 if ( parameters.getJSONObject(i).has("description") ) {
-                    descriptions[i]= parameters.getJSONObject(i).getString("description");
+                    pds[i].description= parameters.getJSONObject(i).getString("description");
                 } else {
-                    descriptions[i]= ""; // when a value cannot be parsed, but it is not identified.
+                    pds[i].description= ""; // when a value cannot be parsed, but it is not identified.
                 }
             }
         }
         DatumRange tr; // TSB = DatumRangeUtil.parseTimeRange(timeRange);
         tr= tsb.getTimeRange();
         
-        URL url= HapiServer.getDataURL( server.toURL(), id, tr );
+        URL url= HapiServer.getDataURL( server.toURL(), id, tr, pp );
         
-        DataSetBuilder builder= new DataSetBuilder(2,100,doc.getJSONArray("parameters").length());
+        JSONArray parametersArray= doc.getJSONArray("parameters");
+        int nparam= parametersArray.length();
+        if ( pp.length()>0 ) {
+            String[] pps= pp.split(",");
+            Map<String,Integer> map= new HashMap();
+            for ( int i=0; i<nparam; i++ ) {
+                map.put( parametersArray.getJSONObject(i).getString("name"), i ); // really--should name/id are two names for the same thing...
+            }
+            nparam= pps.length;
+            ParamDescription[] subsetPds= new ParamDescription[pps.length];
+            for ( int ip=0; ip<pps.length; ip++ ) {
+                int i= map.get(pps[ip]);
+                subsetPds[ip]= pds[i];
+            }
+            pds= subsetPds;
+        }
+        
+        DataSetBuilder builder= new DataSetBuilder(2,100,nparam);
 
         logger.log(Level.FINE, "getDataSet {0}", url.toString());
         
@@ -154,10 +184,10 @@ public class HapiDataSource extends AbstractDataSource {
                 String[] ss= line.split(",");
                 for ( int i=0; i<nparameters; i++ ) {
                     try {
-                        builder.putValue( -1, i, units[i].parse(ss[i]) );
+                        builder.putValue( -1, i, pds[i].units.parse(ss[i]) );
                     } catch ( ParseException ex ) {
-                        builder.putValue( -1, i, fillValues[i] );
-                        hasFill[i]= true;
+                        builder.putValue( -1, i, pds[i].fillValue );
+                        pds[i].hasFill= true;
                     }
                 }
                 builder.nextRecord();
@@ -170,26 +200,26 @@ public class HapiDataSource extends AbstractDataSource {
                 
         QDataSet ds= builder.getDataSet();
         QDataSet depend0= Ops.slice1( ds,0 );
-        if ( false && ds.length(0)==2 ) {
+        if ( ds.length(0)==2 ) {
             ds= Ops.copy( Ops.slice1( ds, 1 ) );
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
-            ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(names[1]) );
-            ds= Ops.putProperty( ds, QDataSet.LABEL, names[1] );
-            ds= Ops.putProperty( ds, QDataSet.TITLE, descriptions[1] );
-            ds= Ops.putProperty( ds, QDataSet.UNITS, units[1] );
-            if ( hasFill[1] ) {
-                ds= Ops.putProperty( ds, QDataSet.FILL_VALUE, fillValues[1] );
+            ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(pds[1].name) );
+            ds= Ops.putProperty( ds, QDataSet.LABEL, pds[1].name );
+            ds= Ops.putProperty( ds, QDataSet.TITLE, pds[1].description );
+            ds= Ops.putProperty( ds, QDataSet.UNITS, pds[1].units );
+            if ( pds[1].hasFill ) {
+                ds= Ops.putProperty( ds, QDataSet.FILL_VALUE, pds[1].fillValue );
             }
             
         } else {
             BundleBuilder bdsb= new BundleBuilder(nparameters-1);
             for ( int i=1; i<nparameters; i++ ) {
-                bdsb.putProperty( QDataSet.NAME, i-1, Ops.safeName(names[i]) );
-                bdsb.putProperty( QDataSet.LABEL, i-1, names[i] );
-                bdsb.putProperty( QDataSet.TITLE, i-1, descriptions[i] );
-                bdsb.putProperty( QDataSet.UNITS, i-1, units[i] );
-                if ( hasFill[i] ) {
-                    bdsb.putProperty( QDataSet.FILL_VALUE, i-1, fillValues[i] );
+                bdsb.putProperty( QDataSet.NAME, i-1, Ops.safeName(pds[i].name) );
+                bdsb.putProperty( QDataSet.LABEL, i-1, pds[i].name );
+                bdsb.putProperty( QDataSet.TITLE, i-1, pds[i].description );
+                bdsb.putProperty( QDataSet.UNITS, i-1, pds[i].units );
+                if ( pds[i].hasFill ) {
+                    bdsb.putProperty( QDataSet.FILL_VALUE, i-1,  pds[i].fillValue );
                 }
             }
             
