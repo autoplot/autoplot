@@ -23,6 +23,24 @@ import org.json.JSONObject;
 public class CatalogServlet extends HttpServlet {
 
     /**
+     * return the JSONObject for the catalog.
+     * @return
+     * @throws JSONException 
+     */
+    public static JSONObject getCatalog() throws JSONException {
+        JSONObject jo= new JSONObject();
+        jo.put("HAPI","1.0");
+        JSONArray catalog= new JSONArray();
+        catalog.put( 0, new JSONObject().put("id", "0B000800408DD710" ) );
+        catalog.put( 1, new JSONObject().put("id", "8500080044259C10" ) );
+        catalog.put( 2, new JSONObject().put("id", "610008002FE00410" ) );
+        catalog.put( 3, new JSONObject().put("id", "AC00080040250510" ) );
+        catalog.put( 4, new JSONObject().put("id", "Iowa City Conditions" ) );
+        jo.put("catalog",catalog);
+        return jo;
+    }
+    
+    /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
@@ -36,15 +54,7 @@ public class CatalogServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         try {
-            JSONObject jo= new JSONObject();
-            jo.put("HAPI","1.0");
-            JSONArray catalog= new JSONArray();
-            catalog.put( 0, new JSONObject().put("id", "0B000800408DD710" ) );
-            catalog.put( 1, new JSONObject().put("id", "8500080044259C10" ) );
-            catalog.put( 2, new JSONObject().put("id", "610008002FE00410" ) );
-            catalog.put( 3, new JSONObject().put("id", "AC00080040250510" ) );
-            catalog.put( 4, new JSONObject().put("id", "Iowa City Conditions" ) );
-            jo.put("catalog",catalog);
+            JSONObject jo= getCatalog();
             jo.write(out);
             
         } catch ( JSONException ex ) {
