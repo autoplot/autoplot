@@ -18,7 +18,7 @@ public class Util {
         } else if ( dt<2*3600000 ) {
             return String.format("%.1f",dt/60000.)+" min";
         } else if ( dt<2*86400000 ) {
-            return String.format("%.1f",dt/36000000.)+" hr";
+            return String.format("%.1f",dt/3600000.)+" hr";
         } else {
             return String.format("%.1f",dt/86400000.)+" days";
         }
