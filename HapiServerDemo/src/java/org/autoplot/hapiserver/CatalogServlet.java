@@ -43,6 +43,7 @@ public class CatalogServlet extends HttpServlet {
             catalog.put( 1, new JSONObject().put("id", "8500080044259C10" ) );
             catalog.put( 2, new JSONObject().put("id", "610008002FE00410" ) );
             catalog.put( 3, new JSONObject().put("id", "AC00080040250510" ) );
+            catalog.put( 4, new JSONObject().put("id", "Iowa City Conditions" ) );
             jo.put("catalog",catalog);
             jo.write(out);
             
