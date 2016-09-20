@@ -19,16 +19,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- *
+ * Info servlet returns information about parameters.
  * @author jbf
  */
 public class InfoServlet extends HttpServlet {
 
-    protected static void doHeader(PrintWriter out, String id, String parameterNames ) throws JSONException {
+    protected static JSONObject getInfo( String id, String parameterNames ) throws JSONException, IllegalArgumentException {
         JSONObject jo= new JSONObject();
         jo.put("HAPI","1.0");
         jo.put("Created at",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
         
+        boolean haveEntry= false;
+        JSONObject catalog= CatalogServlet.getCatalog();
+        JSONArray catalogEntries= catalog.getJSONArray("catalog");
+        for ( int i=0; i<catalogEntries.length(); i++ ) {
+            if ( catalogEntries.getJSONObject(i).getString("id").equals(id) ) haveEntry=true;
+        }
+        if ( !haveEntry ) {
+            throw new IllegalArgumentException("invalid parameter id: \""+id+"\" is not known.");
+        }
         if ( !parameterNames.equals("") ) {
             throw new IllegalArgumentException("subset of parameters is not supported.");
         }
@@ -73,7 +82,7 @@ public class InfoServlet extends HttpServlet {
         }
         
         jo.put("parameters",parameters);
-        jo.write(out);
+        return jo;
 
     }
 
@@ -97,9 +106,12 @@ public class InfoServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
            
-           doHeader( out, id, "" );
+           JSONObject jo= getInfo( id, "" );
+           jo.write(out);
             
         } catch ( JSONException ex ) {
+            throw new ServletException(ex);
+        } catch ( IllegalArgumentException ex ) {
             throw new ServletException(ex);
         } finally {
             out.close();

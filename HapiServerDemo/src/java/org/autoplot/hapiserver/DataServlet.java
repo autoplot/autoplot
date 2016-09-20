@@ -15,6 +15,7 @@ import org.autoplot.AutoplotRecordIterator;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.virbo.dataset.QDataSet;
 
 /**
@@ -90,7 +91,8 @@ public class DataServlet extends HttpServlet {
             try {
                 ByteArrayOutputStream boas= new ByteArrayOutputStream(10000);
                 PrintWriter pw= new PrintWriter(boas);
-                InfoServlet.doHeader( pw, id, parameters ); //TODO: BUG
+                JSONObject jo= InfoServlet.getInfo( id, parameters ); //TODO: BUG
+                jo.write(pw);
                 pw.close();
                 boas.close();
                 out.write( boas.toByteArray() );
