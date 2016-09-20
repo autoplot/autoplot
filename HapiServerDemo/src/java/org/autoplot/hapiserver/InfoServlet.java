@@ -107,7 +107,8 @@ public class InfoServlet extends HttpServlet {
         try {
            
            JSONObject jo= getInfo( id, "" );
-           jo.write(out);
+           String s= jo.toString(4);
+           out.write(s);
             
         } catch ( JSONException ex ) {
             throw new ServletException(ex);
