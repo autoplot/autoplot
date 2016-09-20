@@ -153,7 +153,6 @@ public class HapiDataSource extends AbstractDataSource {
             while ( line!=null ) {
                 String[] ss= line.split(",");
                 for ( int i=0; i<nparameters; i++ ) {
-                    if ( i==1 ) System.err.println("ss[1]="+ss[i]);
                     try {
                         builder.putValue( -1, i, units[i].parse(ss[i]) );
                     } catch ( ParseException ex ) {
