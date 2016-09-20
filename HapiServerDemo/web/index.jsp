@@ -20,6 +20,8 @@
         <a href="hapi/info?id=0B000800408DD710">Info</a><br>
         <a href="hapi/data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05">Data</a><br>
         <a href="hapi/data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&include=header">Data w/header</a><br>
+        <a href="hapi/data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/multiple parameters</a><br>
+        <a href="hapi/data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/subset</a><br>
         
         <br><small>deployed <%= Util.getDurationForHumans( System.currentTimeMillis() - org.virbo.dataset.RecordIterator.TIME_STAMP ) %> ago</small>
     </body>

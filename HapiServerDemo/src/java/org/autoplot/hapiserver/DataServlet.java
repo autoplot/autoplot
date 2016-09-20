@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,9 +16,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.virbo.datasource.RecordIterator;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dsops.Ops;
 
 /**
  *
@@ -60,9 +64,11 @@ public class DataServlet extends HttpServlet {
         if ( format.equals("binary") ) {
             response.setContentType("application/binary");
             dataFormatter= new BinaryDataFormatter();
+            response.setHeader("Content-disposition", "attachment; filename="+ Ops.safeName(id) + "_"+timeMin+ "_"+timeMax + ".bin" );
         } else {
             response.setContentType("text/csv;charset=UTF-8");  
             dataFormatter= new CsvDataFormatter();
+            response.setHeader("Content-disposition", "attachment; filename="+ Ops.safeName(id) + "_"+timeMin+ "_"+timeMax + ".csv" ); 
         }
 
         DatumRange dr;
@@ -81,7 +87,7 @@ public class DataServlet extends HttpServlet {
         }
         
         dsiter.constrainDepend0(dr);
-                
+        
         OutputStream out = response.getOutputStream();
         
         if ( include.equals("header") ) {
@@ -91,12 +97,36 @@ public class DataServlet extends HttpServlet {
             try {
                 ByteArrayOutputStream boas= new ByteArrayOutputStream(10000);
                 PrintWriter pw= new PrintWriter(boas);
-                JSONObject jo= InfoServlet.getInfo( id, parameters ); //TODO: BUG
-                jo.write(pw);
+                JSONObject jo= InfoServlet.getInfo( id );
+                                
+                if ( !parameters.equals("") ) {
+                    String[] pps= parameters.split(",");
+                    Map<String,Integer> map= new HashMap();
+                    JSONArray jsonParameters= jo.getJSONArray("parameters");
+                    for ( int i=0; i<jsonParameters.length(); i++ ) {
+                        map.put( jsonParameters.getJSONObject(i).getString("name"), i ); // really--should name/id are two names for the same thing...
+                    }
+                    JSONArray newParameters= new JSONArray();
+                    int[] indexMap= new int[pps.length];
+                    for ( int ip=0; ip<pps.length; ip++ ) {
+                        int i= map.get(pps[ip]);
+                        indexMap[ip]= i;
+                        newParameters.put( ip, jsonParameters.get(i) );
+                    }
+                    dsiter.resortFields( indexMap );
+                    jsonParameters= newParameters;
+                    jo.put( "parameters", jsonParameters );
+                }
+                
+                pw.write( jo.toString(4) );
                 pw.close();
                 boas.close();
-                out.write( boas.toByteArray() );
-                out.write((char)10);
+                String[] ss= boas.toString("UTF-8").split("\n");
+                for ( String s: ss ) {
+                    out.write( "# ".getBytes("UTF-8") );
+                    out.write( s.getBytes("UTF-8") );
+                    out.write( (char)10 );
+                }
             } catch (JSONException ex) {
                 throw new ServletException(ex);
             }

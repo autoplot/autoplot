@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -24,7 +26,7 @@ import org.json.JSONObject;
  */
 public class InfoServlet extends HttpServlet {
 
-    protected static JSONObject getInfo( String id, String parameterNames ) throws JSONException, IllegalArgumentException {
+    protected static JSONObject getInfo( String id ) throws JSONException, IllegalArgumentException {
         JSONObject jo= new JSONObject();
         jo.put("HAPI","1.0");
         jo.put("Created at",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
@@ -37,9 +39,6 @@ public class InfoServlet extends HttpServlet {
         }
         if ( !haveEntry ) {
             throw new IllegalArgumentException("invalid parameter id: \""+id+"\" is not known.");
-        }
-        if ( !parameterNames.equals("") ) {
-            throw new IllegalArgumentException("subset of parameters is not supported.");
         }
         JSONArray parameters= new JSONArray();
         JSONObject parameter;
@@ -106,7 +105,7 @@ public class InfoServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
            
-           JSONObject jo= getInfo( id, "" );
+           JSONObject jo= getInfo( id );
            String s= jo.toString(4);
            out.write(s);
             

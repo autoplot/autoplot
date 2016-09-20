@@ -11,6 +11,14 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
+                    <file>${file.reference.jython-lib-2.2.1.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.jython.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
                     <file>${reference.QDataSet.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
@@ -31,10 +39,6 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${reference.VirboAutoplot.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library dirs="200">
                     <file>${reference.DataSource.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
@@ -46,6 +50,10 @@
                     <file>${reference.JythonSupport.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
+                <library dirs="200">
+                    <file>${reference.JythonDataSource.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
             </web-module-libraries>
             <web-module-additional-libraries/>
             <source-roots>
@@ -55,6 +63,7 @@
                 <root id="test.src.dir"/>
             </test-roots>
         </data>
+        <libraries xmlns="http://www.netbeans.org/ns/cdnjs-libraries/1"/>
         <references xmlns="http://www.netbeans.org/ns/ant-project-references/1">
             <reference>
                 <foreign-project>DataSource</foreign-project>
@@ -66,6 +75,14 @@
             </reference>
             <reference>
                 <foreign-project>DataSourcePack</foreign-project>
+                <artifact-type>jar</artifact-type>
+                <script>build.xml</script>
+                <target>jar</target>
+                <clean-target>clean</clean-target>
+                <id>jar</id>
+            </reference>
+            <reference>
+                <foreign-project>JythonDataSource</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>
@@ -90,14 +107,6 @@
             </reference>
             <reference>
                 <foreign-project>QStream</foreign-project>
-                <artifact-type>jar</artifact-type>
-                <script>build.xml</script>
-                <target>jar</target>
-                <clean-target>clean</clean-target>
-                <id>jar</id>
-            </reference>
-            <reference>
-                <foreign-project>VirboAutoplot</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>

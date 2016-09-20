@@ -859,6 +859,9 @@ exists or setup the property manually. For example like this:
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
+        <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="jar">
+            <property name="deploy.on.save" value="false"/>
+        </ant>
         <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
@@ -866,9 +869,6 @@ exists or setup the property manually. For example like this:
             <property name="deploy.on.save" value="false"/>
         </ant>
         <ant antfile="${project.QStream}/build.xml" inheritall="false" target="jar">
-            <property name="deploy.on.save" value="false"/>
-        </ant>
-        <ant antfile="${project.VirboAutoplot}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
         <ant antfile="${project.dasCore}/build.xml" inheritall="false" target="jar">
@@ -888,6 +888,9 @@ exists or setup the property manually. For example like this:
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
+        <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="jar">
+            <property name="deploy.on.save" value="false"/>
+        </ant>
         <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
@@ -895,9 +898,6 @@ exists or setup the property manually. For example like this:
             <property name="deploy.on.save" value="false"/>
         </ant>
         <ant antfile="${project.QStream}/build.xml" inheritall="false" target="jar">
-            <property name="deploy.on.save" value="false"/>
-        </ant>
-        <ant antfile="${project.VirboAutoplot}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
         <ant antfile="${project.dasCore}/build.xml" inheritall="false" target="jar">
@@ -1054,29 +1054,33 @@ exists or setup the property manually. For example like this:
     <target depends="init,compile,compile-jsps,-pre-dist,-do-dist-with-manifest,-do-dist-without-manifest" name="do-dist"/>
     <target depends="init" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <copyfiles files="${file.reference.json-2011-01-27-gitrelease.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.jython-lib-2.2.1.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.jython.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.QDataSet.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.QStream.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.dasCoreDatum.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.dasCoreUtil.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.dasCore.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${reference.VirboAutoplot.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.DataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.DataSourcePack.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.JythonSupport.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${reference.JythonDataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update"/>
     </target>
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
         <copyfiles files="${file.reference.json-2011-01-27-gitrelease.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.jython-lib-2.2.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.jython.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.QDataSet.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.QStream.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.dasCoreDatum.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.dasCoreUtil.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.dasCore.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${reference.VirboAutoplot.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.DataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.DataSourcePack.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.JythonSupport.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${reference.JythonDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
     </target>
     <target depends="init" if="dist.ear.dir" name="-clean-webinf-lib">
         <delete dir="${build.web.dir}/WEB-INF/lib"/>
@@ -1492,10 +1496,10 @@ exists or setup the property manually. For example like this:
     <target depends="init" name="deps-clean" unless="no.deps">
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.QStream}/build.xml" inheritall="false" target="clean"/>
-        <ant antfile="${project.VirboAutoplot}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.dasCore}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.dasCoreDatum}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.dasCoreUtil}/build.xml" inheritall="false" target="clean"/>
