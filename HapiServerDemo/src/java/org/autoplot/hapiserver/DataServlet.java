@@ -11,7 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.autoplot.AutoplotRecordIterator;
+import org.virbo.datasource.RecordIterator;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.json.JSONException;
@@ -72,12 +72,12 @@ public class DataServlet extends HttpServlet {
             throw new IllegalArgumentException(ex);
         }
 
-        AutoplotRecordIterator dsiter;
+        RecordIterator dsiter;
         
         if ( id.equals("Iowa City Conditions") ) { // TODO: 
-            dsiter= new AutoplotRecordIterator( "vap+jyds:file:///home/jbf/public_html/1wire/ictemp/readTemperaturesMulti.jyds", dr );
+            dsiter= new RecordIterator( "vap+jyds:file:///home/jbf/public_html/1wire/ictemp/readTemperaturesMulti.jyds", dr );
         } else {
-            dsiter= new AutoplotRecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/"+id+".$Y$m$d.d2s", dr );
+            dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/"+id+".$Y$m$d.d2s", dr );
         }
         
         dsiter.constrainDepend0(dr);
