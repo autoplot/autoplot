@@ -185,7 +185,7 @@ public class HapiDataSource extends AbstractDataSource {
             BundleBuilder bdsb= new BundleBuilder(nparameters-1);
             for ( int i=1; i<nparameters; i++ ) {
                 bdsb.putProperty( QDataSet.NAME, i-1, Ops.safeName(names[i]) );
-                bdsb.putProperty( QDataSet.LABEL, i-1, names[1] );
+                bdsb.putProperty( QDataSet.LABEL, i-1, names[i] );
                 bdsb.putProperty( QDataSet.TITLE, i-1, descriptions[i] );
                 bdsb.putProperty( QDataSet.UNITS, i-1, units[i] );
                 if ( hasFill[i] ) {
