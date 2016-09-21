@@ -23,6 +23,15 @@
         <a href="hapi/data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/multiple parameters</a><br>
         <a href="hapi/data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/subset</a><br>
         
+        <%
+            long l= org.virbo.dataset.RecordIterator.TIME_STAMP; // load RecordIterator class first, or we'll get a negative time.
+        %>
         <br><small>deployed <%= Util.getDurationForHumans( System.currentTimeMillis() - org.virbo.dataset.RecordIterator.TIME_STAMP ) %> ago</small>
+        
+        <small>
+        <ul>
+            <li>2016-09-21: bugfix: parameters supported when include is not set.
+        </ul>
+        </small>
     </body>
 </html>
