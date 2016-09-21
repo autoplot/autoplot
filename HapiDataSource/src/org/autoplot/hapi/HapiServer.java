@@ -6,12 +6,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Icon;
@@ -203,17 +207,82 @@ public class HapiServer {
      * @return 
      */
     public static URL createURL( URL server, String append ) {
-        String s= server.toString();
+        return createURL( server, append, null );
+    }
+    
+    /**
+     * make sure spaces are encoded.
+     * @param id
+     * @return 
+     */
+    public static String urlEncode( String id ) {
+        try {
+            return URLEncoder.encode( id, "UTF-8" );
+        } catch (UnsupportedEncodingException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
+    public static JSONArray getCatalog(URL server, String id) throws IOException, JSONException {
+        JSONObject o= getInfo( server, id );
+        JSONArray catalog= o.getJSONArray("parameters");
+        return catalog;
+    }
+    
+    /**
+     * return the info as a JSONObject.
+     * @param server
+     * @param id
+     * @return
+     * @throws IOException
+     * @throws JSONException 
+     */
+    public static JSONObject getInfo( URL server, String id) throws IOException, JSONException {
+        URL url;
+        url= HapiServer.createURL( server, "info", Collections.singletonMap( "id", id ) );
+        StringBuilder builder= new StringBuilder();
+        logger.log(Level.FINE, "getCatalog {0}", url.toString());
+        try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
+            String line= in.readLine();
+            while ( line!=null ) {
+                builder.append(line);
+                line= in.readLine();
+            }
+        }
+        JSONObject o= new JSONObject(builder.toString());
+        
+        return o;
+    }
+    
+    /**
+     * return the URL by appending the text to the end of the server URL.  This
+     * avoids extra slashes, etc.
+     * @param server the hapi server
+     * @param append the folder to append.
+     * @param singletonMap parameters to append.
+     * @return the url.
+     */
+    public static URL createURL(URL server, String append, Map<String, String> singletonMap) {
+        StringBuilder s= new StringBuilder( server.toString() );
         if ( append.startsWith("/") ) {
             append= append.substring(1);
         }
-        if ( s.endsWith("/") ) {
-            s= s + append;
+        if ( s.substring(s.length()-1).equals("/") ) {
+            s= s.append( append );
         } else {
-            s= s + "/" + append;
+            s= s.append("/").append( append );
+        }
+        if ( server.toString().contains( "http://tsds.org/get/IMAGE/PT1M/hapi" ) ) {
+            s.append("/");
+        }
+        if ( singletonMap!=null && !singletonMap.isEmpty() ) {
+            s.append("?");
+            for ( Entry<String,String> entry: singletonMap.entrySet() ) {
+                s.append(entry.getKey()).append("=").append( urlEncode( entry.getValue() ) );
+            }
         }
         try {
-            return new URL(s);
+            return new URL(s.toString());
         } catch ( MalformedURLException ex ) {
             throw new IllegalArgumentException(ex);
         }
