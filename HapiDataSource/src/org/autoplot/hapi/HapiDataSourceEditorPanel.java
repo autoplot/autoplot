@@ -64,7 +64,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     protected final static Logger logger= Logger.getLogger("apdss.hapi");
     
     private JSONArray currentParameters;
-    
+    private URL currentServer= null;
      
     /**
      * Creates new form HapiDataSourceEditorPanel
@@ -389,6 +389,10 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             DefaultListModel model= new DefaultListModel();
             for ( String id: ids ) model.addElement( id );
             idsList.setModel( model );
+            if ( !server.equals(currentServer) ) {
+                idsList.setSelectedIndex(0);
+                currentServer= server;
+            }
         } catch ( IOException ex ) {
             DataSetSelector.showUserExceptionDialog( this, "Error when connecting to server", "I/O Exception", ex, JOptionPane.WARNING_MESSAGE );
         }
