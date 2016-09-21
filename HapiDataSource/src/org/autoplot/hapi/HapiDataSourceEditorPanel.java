@@ -76,14 +76,19 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             throw new RuntimeException(ex);
         }
         initComponents();
+
+        parametersPanel.setLayout( new BoxLayout( parametersPanel, BoxLayout.Y_AXIS ) );
+
         serversComboBox.setModel( new DefaultComboBoxModel<>( HapiServer.listHapiServersArray() ));
         idsList.addListSelectionListener( new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                try {
-                    resetVariable( new URL( (String)serversComboBox.getSelectedItem() ), idsList.getSelectedValue() );
-                } catch (MalformedURLException ex) {
-                    JOptionPane.showMessageDialog( parametersPanel, ex.toString() );
+                if ( !e.getValueIsAdjusting() ) {
+                    try {
+                        resetVariable( new URL( (String)serversComboBox.getSelectedItem() ), idsList.getSelectedValue() );  
+                    } catch (MalformedURLException ex) {
+                        JOptionPane.showMessageDialog( parametersPanel, ex.toString() );
+                    }
                 }
             }
         } );
@@ -395,7 +400,6 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             JSONArray parameters= info.getJSONArray("parameters");
             
             parametersPanel.removeAll();
-            parametersPanel.setLayout( new BoxLayout( parametersPanel, BoxLayout.Y_AXIS ) );
             for ( int i=0; i<parameters.length(); i++ ) {
                 JSONObject parameter= parameters.getJSONObject(i);
                 JCheckBox cb= new JCheckBox(parameter.getString("name"));
@@ -404,6 +408,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 parametersPanel.add( cb );
             }
             parametersPanel.revalidate();
+            parametersPanel.repaint();
             currentParameters= parameters;
             DatumRange range= getRange(info);
             if ( range==null ) {
