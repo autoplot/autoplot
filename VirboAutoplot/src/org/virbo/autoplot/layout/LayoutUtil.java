@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.das2.graph.DasAnnotation;
-import org.das2.graph.DasColorBar;
 
 /**
  * utility methods for adjusting canvas layout.
@@ -33,7 +32,7 @@ public class LayoutUtil {
             logger.log(Level.SEVERE, "autolayout failure: {0}", em);
         }
         double em0= c.getEmMaximum();
-        c.setMax(norm,(em+em+em0)/3,pt);
+        c.setMax(norm,(em+em+em0)/3,pt); // dampen by splitting the difference https://sourceforge.net/p/autoplot/bugs/1022/
         logger.log(Level.FINE, "reset maximum: {0}", c);
         return true;
     }
