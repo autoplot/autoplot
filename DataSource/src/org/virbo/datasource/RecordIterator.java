@@ -10,6 +10,7 @@ import org.das2.datum.DatumRange;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.capability.Streaming;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -104,6 +105,14 @@ public class RecordIterator implements Iterator<QDataSet>  {
         this.lastIndex= (int)Math.ceil( findeces.value(1) );
         this.index= Math.max(0,this.index);
         this.lastIndex= Math.min(src.length(),this.lastIndex);
+    }
+    
+    /**
+     * get a subset or rearrange the fields of each record.
+     * @param sort 
+     */
+    public final void resortFields( int[] sort ) {
+        src= DataSetOps.applyIndex( src, 1, Ops.dataset(sort), true );
     }
     
     @Override
