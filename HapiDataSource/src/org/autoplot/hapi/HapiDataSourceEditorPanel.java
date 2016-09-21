@@ -7,9 +7,12 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -325,9 +328,15 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             Logger.getLogger(HapiDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
         Map<String,String> params= URISplit.parseParams( split.params );
+        
         String id= params.get("id");
         if ( id!=null ) {
-            idsList.setSelectedValue( id, true );
+            try {
+                id= URLDecoder.decode(id,"UTF-8");
+                idsList.setSelectedValue( id, true );
+            } catch (UnsupportedEncodingException ex) {
+                throw new RuntimeException(ex);
+            }
         }
         String timerange= params.get("timerange");
         if ( timerange!=null ) {
@@ -352,10 +361,20 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     @Override
     public String getURI() {
         String parameters= getParameters();
+        String id= idsList.getSelectedValue();
+        if ( id==null ) {
+            id= "";
+        } else {           
+            try {
+                id= URLEncoder.encode(id,"UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
         if ( parameters.length()>0 ) {
-            return "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + idsList.getSelectedValue() + "&timerange="+timeRangeTextField.getText().replaceAll(" ","+") + "&parameters="+parameters;
+            return "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + id + "&timerange="+timeRangeTextField.getText().replaceAll(" ","+") + "&parameters="+parameters;
         } else {
-            return "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + idsList.getSelectedValue() + "&timerange="+timeRangeTextField.getText().replaceAll(" ","+");
+            return "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + id + "&timerange="+timeRangeTextField.getText().replaceAll(" ","+");
         }
     }
     
