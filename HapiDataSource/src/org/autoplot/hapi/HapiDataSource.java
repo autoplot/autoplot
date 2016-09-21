@@ -158,7 +158,7 @@ public class HapiDataSource extends AbstractDataSource {
         URL url= HapiServer.getDataURL( server.toURL(), id, tr, pp );
         
         JSONArray parametersArray= doc.getJSONArray("parameters");
-        int nparam= parametersArray.length();
+        int nparam= parametersArray.length(); // this is the actual number sent.
         if ( pp.length()>0 ) {
             String[] pps= pp.split(",");
             Map<String,Integer> map= new HashMap();
@@ -182,7 +182,7 @@ public class HapiDataSource extends AbstractDataSource {
             String line= in.readLine();
             while ( line!=null ) {
                 String[] ss= line.split(",");
-                for ( int i=0; i<nparameters; i++ ) {
+                for ( int i=0; i<nparam; i++ ) {
                     try {
                         builder.putValue( -1, i, pds[i].units.parse(ss[i]) );
                     } catch ( ParseException ex ) {
@@ -213,7 +213,7 @@ public class HapiDataSource extends AbstractDataSource {
             
         } else {
             BundleBuilder bdsb= new BundleBuilder(nparameters-1);
-            for ( int i=1; i<nparameters; i++ ) {
+            for ( int i=1; i<nparam; i++ ) {
                 bdsb.putProperty( QDataSet.NAME, i-1, Ops.safeName(pds[i].name) );
                 bdsb.putProperty( QDataSet.LABEL, i-1, pds[i].name );
                 bdsb.putProperty( QDataSet.TITLE, i-1, pds[i].description );
