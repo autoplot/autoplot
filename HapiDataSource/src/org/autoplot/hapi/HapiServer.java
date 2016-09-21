@@ -278,7 +278,9 @@ public class HapiServer {
         if ( singletonMap!=null && !singletonMap.isEmpty() ) {
             s.append("?");
             for ( Entry<String,String> entry: singletonMap.entrySet() ) {
-                s.append(entry.getKey()).append("=").append( urlEncode( entry.getValue() ) );
+                if ( entry.getValue()!=null ) {
+                    s.append(entry.getKey()).append("=").append( urlEncode( entry.getValue() ) );
+                }
             }
         }
         try {
