@@ -32,7 +32,8 @@ public class LayoutUtil {
         if ( Math.abs(em)>100 ) {
             logger.log(Level.SEVERE, "autolayout failure: {0}", em);
         }
-        c.setMax(norm,em,pt);
+        double em0= c.getEmMaximum();
+        c.setMax(norm,(em+em+em0)/3,pt);
         logger.log(Level.FINE, "reset maximum: {0}", c);
         return true;
     }
@@ -72,20 +73,19 @@ public class LayoutUtil {
      * be brought in.
      * 
      * @param canvas
-     * @param c
-     * @param r 
+     * @param marginColumn
+     * @param marginRow 
      */
-    public static void autolayout(DasCanvas canvas, DasRow r, DasColumn c) {
+    public static void autolayout(DasCanvas canvas, DasRow marginRow, DasColumn marginColumn) {
         
         logger.fine( "enter autolayout" );
         
-        // horizontal
-        double em = c.getEmSize();
+        double em = marginColumn.getEmSize();
 
-        int xmin = 90000;
-        int xmax = -90000;
-        int ymin = 90000;
-        int ymax = -90000;
+        int currentBoundsXMin = 90000;
+        int currentBoundsXMax = -90000;
+        int currentBoundsYMin = 90000;
+        int currentBoundsYMax = -90000;
 
         if ( canvas.getWidth()==0 ) {
             logger.fine( "exit autolayout because canvas.getWidth()==0" );
@@ -100,8 +100,8 @@ public class LayoutUtil {
             
             if ( cc instanceof DasAnnotation ) continue; // there's a set of components we want to ignore because it's easy to mess up.
                         
-            if ( cc.isVisible() && ( cc.getColumn() == c || cc.getColumn().getParentDevicePosition() == c 
-                    || ( cc.getColumn().getParentDevicePosition()!=null && cc.getColumn().getParentDevicePosition().getParentDevicePosition() == c ) ) ) {
+            if ( cc.isVisible() && ( cc.getColumn() == marginColumn || cc.getColumn().getParentDevicePosition() == marginColumn 
+                    || ( cc.getColumn().getParentDevicePosition()!=null && cc.getColumn().getParentDevicePosition().getParentDevicePosition() == marginColumn ) ) ) {
                 
                 logger.log(Level.FINER, "here cc= {0}", cc);
                             
@@ -110,22 +110,22 @@ public class LayoutUtil {
                 if ( bounds.width>0 ) {
                     logger.finest( String.format( "%d %d %d %s", count, bounds.x, bounds.width, cc.toString() ) );
                 
-                    xmin = Math.min(xmin, bounds.x);
-                    xmax = Math.max(xmax, bounds.x + bounds.width);
+                    currentBoundsXMin = Math.min(currentBoundsXMin, bounds.x);
+                    currentBoundsXMax = Math.max(currentBoundsXMax, bounds.x + bounds.width);
                     
-                    if ( Math.abs(xmin)>9999 ) {
+                    if ( Math.abs(currentBoundsXMin)>9999 ) {
                         logger.log(Level.FINER, "component messes up bounds: {0}", cc);
                         //bounds = cc.getBounds(); // for debugging.
                     }
                 }
             }
             
-            if ( cc.isVisible() && ( cc.getRow() == r ||  cc.getRow().getParentDevicePosition()==r 
-                    || ( cc.getRow().getParentDevicePosition()!=null && cc.getRow().getParentDevicePosition().getParentDevicePosition() == r ) ) ) {
+            if ( cc.isVisible() && ( cc.getRow() == marginRow ||  cc.getRow().getParentDevicePosition()==marginRow 
+                    || ( cc.getRow().getParentDevicePosition()!=null && cc.getRow().getParentDevicePosition().getParentDevicePosition() == marginRow ) ) ) {
                 bounds = cc.getBounds();
                 if ( bounds.height>0 ) {
-                    ymin = Math.min(ymin, bounds.y);
-                    ymax = Math.max(ymax, bounds.y + bounds.height);
+                    currentBoundsYMin = Math.min(currentBoundsYMin, bounds.y);
+                    currentBoundsYMax = Math.max(currentBoundsYMax, bounds.y + bounds.height);
                 }
             }
         }
@@ -137,13 +137,13 @@ public class LayoutUtil {
            // return;
         //}
 
-        logger.finest( String.format( "%d %d %d %s", count, xmin, xmax-xmin, "all_together" ) );
+        logger.finest( String.format( "%d %d %d %s", count, currentBoundsXMin, currentBoundsXMax-currentBoundsXMin, "all_together" ) );
         
         double MARGIN_LEFT_RIGHT_EM = 1;
 
         boolean changed = false;
 
-        if ( Math.abs(xmin)>9999 || Math.abs(xmax)>9999 || Math.abs(ymin)>9999 || Math.abs(ymax)>9999  ) {
+        if ( Math.abs(currentBoundsXMin)>9999 || Math.abs(currentBoundsXMax)>9999 || Math.abs(currentBoundsYMin)>9999 || Math.abs(currentBoundsYMax)>9999  ) {
             logger.fine("invalid bounds returned, returning.");
             return;
         }
@@ -152,39 +152,39 @@ public class LayoutUtil {
         // these are the additional pixels needed in each direction.
         int needXmin, needXmax, needYmin, needYmax;
 
-        old = c.getDMinimum();
-        needXmin = old - xmin;
+        old = marginColumn.getDMinimum();
+        needXmin = old - currentBoundsXMin;
 
-        old = c.getDMaximum();
-        needXmax = xmax - old;
+        old = marginColumn.getDMaximum();
+        needXmax = currentBoundsXMax - old;
 
-        old = r.getDMinimum();
-        needYmin = old - ymin;
+        old = marginRow.getDMinimum();
+        needYmin = old - currentBoundsYMin;
 
-        old = r.getDMaximum();
-        needYmax = ymax - old;
+        old = marginRow.getDMaximum();
+        needYmax = currentBoundsYMax - old;
 
         if ( needXmax<-120 ) {
             logger.log(Level.FINE, "needXmax: {0}", needXmax);
-            c.getParent().resizeAllComponents();
+            marginColumn.getParent().resizeAllComponents();
             return;
         }
         
         if ( needYmax<-120 ) {
             logger.log(Level.FINE, "needYmax: {0}", needYmax); // this clearly doesn't matter since it happens all the time.
-            c.getParent().resizeAllComponents();
+            marginColumn.getParent().resizeAllComponents();
             return;
         }
         
         logger.log( Level.FINE, "needYmin: {0} needYmax: {1}", new Object[]{needYmin, needYmax});
        
-        changed = changed | maybeSetMinimum(c, needXmin, 0, needXmin / em + MARGIN_LEFT_RIGHT_EM, 0);
-        changed = changed | maybeSetMaximum(c, needXmax, 1.0, -needXmax / em - MARGIN_LEFT_RIGHT_EM, 0);
-        changed = changed | maybeSetMinimum(r, needYmin, 0, needYmin / em, 0);
-        changed = changed | maybeSetMaximum(r, needYmax, 1.0, -needYmax / em, 0);
+        changed = changed | maybeSetMinimum(marginColumn, needXmin, 0, needXmin / em + MARGIN_LEFT_RIGHT_EM, 0);
+        changed = changed | maybeSetMaximum(marginColumn, needXmax, 1.0, -needXmax / em - MARGIN_LEFT_RIGHT_EM, 0);
+        changed = changed | maybeSetMinimum(marginRow, needYmin, 0, needYmin / em, 0);
+        changed = changed | maybeSetMaximum(marginRow, needYmax, 1.0, -needYmax / em, 0);
 
         if (changed) {
-            c.getParent().resizeAllComponents();
+            marginColumn.getParent().resizeAllComponents();
         }
         
         logger.log(Level.FINER, "exit autolayout, changed={0}", changed);
