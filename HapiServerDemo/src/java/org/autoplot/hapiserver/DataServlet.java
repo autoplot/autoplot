@@ -29,8 +29,14 @@ import org.virbo.dsops.Ops;
 @WebServlet(urlPatterns = {"/DataServlet"})
 public class DataServlet extends HttpServlet {
 
-    private String getParam( HttpServletRequest request, String name, String deft, String doc, Pattern constraints ) {
-        String v= request.getParameter(name);
+    private String getParam( Map<String,String[]> request, String name, String deft, String doc, Pattern constraints ) {
+        String[] vs= request.remove(name);
+        String v;
+        if ( vs==null ) {
+            v= deft;
+        } else {
+            v= vs[0];
+        }
         if ( v==null ) v= deft;
         if ( constraints!=null ) {
             if ( !constraints.matcher(v).matches() ) {
@@ -53,12 +59,17 @@ public class DataServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        String id= getParam( request,"id",null,"The identifier for the resource.", null );
-        String timeMin= getParam( request, "time.min", null, "The smallest value of time to include in the response.", null );
-        String timeMax= getParam( request, "time.max", null, "The largest value of time to include in the response.", null );
-        String parameters= getParam( request, "parameters", "", "The comma separated list of parameters to include in the response ", null );
-        String include= getParam( request, "include", "", "include header at the top", Pattern.compile("(|header)") );
-        String format= getParam( request, "format", "", "The desired format for the data stream.", Pattern.compile("(|csv|binary)") );
+        Map<String,String[]> params= new HashMap<String, String[]>( request.getParameterMap() );
+        String id= getParam( params,"id",null,"The identifier for the resource.", null );
+        String timeMin= getParam( params, "time.min", null, "The smallest value of time to include in the response.", null );
+        String timeMax= getParam( params, "time.max", null, "The largest value of time to include in the response.", null );
+        String parameters= getParam( params, "parameters", "", "The comma separated list of parameters to include in the response ", null );
+        String include= getParam( params, "include", "", "include header at the top", Pattern.compile("(|header)") );
+        String format= getParam( params, "format", "", "The desired format for the data stream.", Pattern.compile("(|csv|binary)") );
+        
+        if ( !params.isEmpty() ) {
+            throw new ServletException("unrecognized parameters: "+params);
+        }
         
         DataFormatter dataFormatter;
         if ( format.equals("binary") ) {
@@ -90,33 +101,36 @@ public class DataServlet extends HttpServlet {
         
         OutputStream out = response.getOutputStream();
         
-        if ( include.equals("header") ) {
-            if ( format.equals("binary") ) {
-                throw new IllegalArgumentException("header cannot be sent with binary");
+        if ( format.equals("binary") ) {
+            if ( include.equals("header") ) throw new IllegalArgumentException("header cannot be sent with binary");
+        }
+        
+        try {
+
+            JSONObject jo= InfoServlet.getInfo( id );
+
+            if ( !parameters.equals("") ) {
+                String[] pps= parameters.split(",");
+                Map<String,Integer> map= new HashMap();
+                JSONArray jsonParameters= jo.getJSONArray("parameters");
+                for ( int i=0; i<jsonParameters.length(); i++ ) {
+                    map.put( jsonParameters.getJSONObject(i).getString("name"), i ); // really--should name/id are two names for the same thing...
+                }
+                JSONArray newParameters= new JSONArray();
+                int[] indexMap= new int[pps.length];
+                for ( int ip=0; ip<pps.length; ip++ ) {
+                    int i= map.get(pps[ip]);
+                    indexMap[ip]= i;
+                    newParameters.put( ip, jsonParameters.get(i) );
+                }
+                dsiter.resortFields( indexMap );
+                jsonParameters= newParameters;
+                jo.put( "parameters", jsonParameters );
             }
-            try {
+
+            if ( include.equals("header") ) {
                 ByteArrayOutputStream boas= new ByteArrayOutputStream(10000);
                 PrintWriter pw= new PrintWriter(boas);
-                JSONObject jo= InfoServlet.getInfo( id );
-                                
-                if ( !parameters.equals("") ) {
-                    String[] pps= parameters.split(",");
-                    Map<String,Integer> map= new HashMap();
-                    JSONArray jsonParameters= jo.getJSONArray("parameters");
-                    for ( int i=0; i<jsonParameters.length(); i++ ) {
-                        map.put( jsonParameters.getJSONObject(i).getString("name"), i ); // really--should name/id are two names for the same thing...
-                    }
-                    JSONArray newParameters= new JSONArray();
-                    int[] indexMap= new int[pps.length];
-                    for ( int ip=0; ip<pps.length; ip++ ) {
-                        int i= map.get(pps[ip]);
-                        indexMap[ip]= i;
-                        newParameters.put( ip, jsonParameters.get(i) );
-                    }
-                    dsiter.resortFields( indexMap );
-                    jsonParameters= newParameters;
-                    jo.put( "parameters", jsonParameters );
-                }
                 
                 pw.write( jo.toString(4) );
                 pw.close();
@@ -127,10 +141,11 @@ public class DataServlet extends HttpServlet {
                     out.write( s.getBytes("UTF-8") );
                     out.write( (char)10 );
                 }
-            } catch (JSONException ex) {
-                throw new ServletException(ex);
             }
+        } catch (JSONException ex) {
+            throw new ServletException(ex);
         }
+
         
         try {
 
