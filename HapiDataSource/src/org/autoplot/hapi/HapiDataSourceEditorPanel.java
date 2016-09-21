@@ -1,6 +1,7 @@
 
 package org.autoplot.hapi;
 
+import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -264,7 +265,53 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         ids= HapiServer.getCatalog(new URL(split.file));
         return true;
     }
+    
+    /** make the parameters checklist reflect parameters spec.
+     * 
+     * @param parameters comma-delineated list of parameters.
+     */
+    private void setParameters( String parameters ) {
+        if ( parameters.length()>0 ) {
+            String[] ss= parameters.split(",");
+            for ( Component c: parametersPanel.getComponents() ) {
+                if ( c instanceof JCheckBox ) {
+                    String name= ((JCheckBox)c).getName();
+                    ((JCheckBox)c).setSelected(false);
+                    for ( int i=0; i<ss.length; i++ ) {
+                        if ( ss[i].equals(name) ) {
+                            ((JCheckBox)c).setSelected(true);
+                        }
+                    }
+                }
+            }
+        } else {
+            for ( Component c: parametersPanel.getComponents() ) {
+                if ( c instanceof JCheckBox ) {
+                    ((JCheckBox)c).setSelected(true);
+                }
+            }
+        }
+    }
 
+    private String getParameters() {
+        StringBuilder b= new StringBuilder();
+        boolean areAllTrue= true;
+        for ( Component c: parametersPanel.getComponents() ) {
+            if ( c instanceof JCheckBox ) {
+                if ( ((JCheckBox)c).isSelected() ) {
+                    b.append(",").append(c.getName());
+                } else {
+                    areAllTrue= false;
+                }
+            }
+        }
+        if ( areAllTrue ) {
+            return "";
+        } else {
+            return b.substring(1); // remove first comma.
+        }
+    }
+    
     @Override
     public void setURI(String uri) {
         URISplit split = URISplit.parse(uri);        
@@ -286,6 +333,10 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         if ( timerange!=null ) {
             timeRangeTextField.setText(timerange);
         }
+        String parameters= params.get("parameters");
+        if ( parameters!=null ) {
+            setParameters( parameters );
+        }
         
     }
 
@@ -300,7 +351,12 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
     @Override
     public String getURI() {
-        return "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + idsList.getSelectedValue() + "&timerange="+timeRangeTextField.getText().replaceAll(" ","+");
+        String parameters= getParameters();
+        if ( parameters.length()>0 ) {
+            return "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + idsList.getSelectedValue() + "&timerange="+timeRangeTextField.getText().replaceAll(" ","+") + "&parameters="+parameters;
+        } else {
+            return "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + idsList.getSelectedValue() + "&timerange="+timeRangeTextField.getText().replaceAll(" ","+");
+        }
     }
     
     private void resetServer( URL server ) throws IOException, JSONException {
@@ -324,6 +380,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             for ( int i=0; i<parameters.length(); i++ ) {
                 JSONObject parameter= parameters.getJSONObject(i);
                 JCheckBox cb= new JCheckBox(parameter.getString("name"));
+                cb.setName(parameter.getString("name"));
                 cb.setSelected(true);
                 parametersPanel.add( cb );
             }
