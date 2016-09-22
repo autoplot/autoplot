@@ -2,6 +2,7 @@
 package org.autoplot.cdf;
 
 import gov.nasa.gsfc.spdf.cdfj.CDFDataType;
+import gov.nasa.gsfc.spdf.cdfj.CDFException;
 import gov.nasa.gsfc.spdf.cdfj.CDFWriter;
 import java.lang.reflect.Array;
 import org.virbo.datasource.DataSourceUtil;
@@ -182,6 +183,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             //cdf.createVariable( name, type, new int[0] );
             
             Object array= dataSetToArray( ds, uc, type, mon );
+            logger.log(Level.FINE, "call cdf.addNRVVariable( {0},{1},{2})", new Object[]{name, logName(type), logName( new int[] { ds.length() } ), logName(array) });
             cdf.addNRVVariable( name, type, new int[] { ds.length() }, array );
 
         } else {
@@ -554,6 +556,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             
         if ( compressed ) {
             if ( ds.rank()==1 ) {
+                logger.log(Level.FINE, "call cdf.defineCompressedVariable( {0}, {1}, {2} )", new Object[] { name, logName(type), logName(new int[0]) } );
                 cdf.defineCompressedVariable( name, type, new int[0] );
                 addData( name, dataSetToNioArray( ds, uc, type, mon ) ); //TODO: I think I need to compress the channel.
             } else { 
@@ -571,7 +574,6 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                         break;
                 }
                 Object o= dataSetToArray( ds, uc, type, mon );
-                logger.log(Level.FINE, "call cdf.addData(name,{0})", o);
                 addData( name, o );
             }
             
@@ -650,6 +652,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         cdf.addData( name, d );
     }
 
+    private void addVariableAttributeEntry( String varName, String attrName, CDFDataType type, Object o ) throws CDFException.WriterError {
+        logger.log( Level.FINE, "call cdf.addVariableAttributeEntry( {0}, {1}, {2}, {3} )",  new Object[] { logName(varName), logName(attrName), logName(type), logName( o ) } );
+        cdf.addVariableAttributeEntry( varName, attrName, type, o );
+    }
+    
     /**
      * copy metadata for the variable.
      * @param units Units object to identify time types.
@@ -661,23 +668,23 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         
         if ( units!=null ) {
             if (units != Units.cdfEpoch) {
-                cdf.addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, units.toString() );
+                addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, units.toString() );
             } else {
-                cdf.addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, "ms" );
+                addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, "ms" );
             }
         } else {
-            cdf.addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, " " );
+            addVariableAttributeEntry( name, "UNITS", CDFDataType.CHAR, " " );
         }
         String label = (String) ds.property(QDataSet.LABEL);
         if (label != null && label.length()>0 ) {
             if ( units!=null && label.endsWith("("+units+")") ) {
                 label= label.substring(0,label.length()-units.toString().length()-2);
             }
-            cdf.addVariableAttributeEntry( name,"LABLAXIS", CDFDataType.CHAR, label);
+            addVariableAttributeEntry( name,"LABLAXIS", CDFDataType.CHAR, label);
         }
         String title = (String) ds.property(QDataSet.TITLE);
         if (title != null && title.length()>0 ) {
-            cdf.addVariableAttributeEntry( name,"CATDESC", CDFDataType.CHAR, title);
+            addVariableAttributeEntry( name,"CATDESC", CDFDataType.CHAR, title);
         }
         Number vmax= (Number) ds.property( QDataSet.VALID_MAX );
         Number vmin= (Number) ds.property( QDataSet.VALID_MIN );
@@ -719,12 +726,12 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         }
         String scaleTyp= (String) ds.property(QDataSet.SCALE_TYPE);
         if ( scaleTyp!=null ) {
-            cdf.addVariableAttributeEntry( name,"SCALETYP",CDFDataType.CHAR,scaleTyp);
+            addVariableAttributeEntry( name,"SCALETYP",CDFDataType.CHAR,scaleTyp);
         }
 
         String format= (String) ds.property( QDataSet.FORMAT );
         if ( format!=null ) {
-            cdf.addVariableAttributeEntry( name,"FORMAT",CDFDataType.CHAR,format);
+            addVariableAttributeEntry( name,"FORMAT",CDFDataType.CHAR,format);
         }
 
         String displayType= (String)ds.property( QDataSet.RENDER_TYPE );
@@ -747,9 +754,9 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             default:
                 break;
         }
-        cdf.addVariableAttributeEntry( name,"DISPLAY_TYPE", CDFDataType.CHAR, displayType );
+        addVariableAttributeEntry( name,"DISPLAY_TYPE", CDFDataType.CHAR, displayType );
         
-        cdf.addVariableAttributeEntry( name,"VAR_TYPE", CDFDataType.CHAR, isSupport ? "support_data" : "data" );
+        addVariableAttributeEntry( name,"VAR_TYPE", CDFDataType.CHAR, isSupport ? "support_data" : "data" );
         
     }
 
