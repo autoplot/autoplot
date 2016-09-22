@@ -51,7 +51,11 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private DatumRange getRange( JSONObject info ) {
         try {
             if ( info.has("firstDate") && info.has("lastDate") ) {
-                return new DatumRange( Units.us2000.parse(info.getString("firstDate")), Units.us2000.parse(info.getString("lastDate" ) ) );
+                String firstDate= info.getString("firstDate");
+                String lastDate= info.getString("lastDate");
+                if ( firstDate!=null && lastDate!=null ) {
+                    return new DatumRange( Units.us2000.parse(firstDate), Units.us2000.parse(lastDate) );
+                }
             }
         } catch ( JSONException ex ) {
             ex.printStackTrace();

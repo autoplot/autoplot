@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,6 +81,7 @@ public class HapiDataSource extends AbstractDataSource {
         URI server = this.resourceURI;
         String id= getParam("id","" );
         if ( id.equals("") ) throw new IllegalArgumentException("missing id");
+        id= URLDecoder.decode(id,"UTF-8");
         URL url= HapiServer.getInfoURL(server.toURL(), id);
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
@@ -110,6 +112,7 @@ public class HapiDataSource extends AbstractDataSource {
         URI server = this.resourceURI;
         String id= getParam("id","" );
         if ( id.equals("") ) throw new IllegalArgumentException("missing id");
+        id= URLDecoder.decode( id,"UTF-8" );
 
         String pp= getParam("parameters","");
         
@@ -127,26 +130,36 @@ public class HapiDataSource extends AbstractDataSource {
             String type;
             if ( parameters.getJSONObject(i).has("type") ) {
                 type= parameters.getJSONObject(i).getString("type");
+                if ( type==null ) type="";
             } else {
                 type= "";
+            }
+            if ( type.equals("") ) {
+                logger.log(Level.FINE, "type is not defined: {0}", name);
             }
             if ( name.equalsIgnoreCase("ISOTIME") || type.equalsIgnoreCase("isotime") ) {
                 pds[i].units= Units.us2000;
             } else {
                 if ( parameters.getJSONObject(i).has("units") ) {
                     String sunits= parameters.getJSONObject(i).getString("units");
-                    pds[i].units= Units.lookupUnits(sunits);
+                    if ( sunits!=null ) {
+                        pds[i].units= Units.lookupUnits(sunits);
+                    }
                 } else {
                     pds[i].units= Units.dimensionless;
                 }
                 if ( parameters.getJSONObject(i).has("fill") ) {
-                    pds[i].fillValue= pds[i].units.parse(parameters.getJSONObject(i).getString("fill") ).doubleValue( pds[i].units );
-                    pds[i].hasFill= true;
+                    String sfill= parameters.getJSONObject(i).getString("fill");
+                    if ( sfill!=null ) {
+                        pds[i].fillValue= pds[i].units.parse( sfill ).doubleValue( pds[i].units );
+                        pds[i].hasFill= true;
+                    }
                 } else {
                     pds[i].fillValue= FILL_VALUE; // when a value cannot be parsed, but it is not identified.
                 }
-                if ( parameters.getJSONObject(i).has("description") ) {
+                if ( parameters.getJSONObject(i).has("description") ) {                   
                     pds[i].description= parameters.getJSONObject(i).getString("description");
+                    if ( pds[i].description==null ) pds[i].description= "";
                 } else {
                     pds[i].description= ""; // when a value cannot be parsed, but it is not identified.
                 }
@@ -154,8 +167,6 @@ public class HapiDataSource extends AbstractDataSource {
         }
         DatumRange tr; // TSB = DatumRangeUtil.parseTimeRange(timeRange);
         tr= tsb.getTimeRange();
-        
-        URL url= HapiServer.getDataURL( server.toURL(), id, tr, pp );
         
         JSONArray parametersArray= doc.getJSONArray("parameters");
         int nparam= parametersArray.length(); // this is the actual number sent.
@@ -176,6 +187,8 @@ public class HapiDataSource extends AbstractDataSource {
         
         DataSetBuilder builder= new DataSetBuilder(2,100,nparam);
 
+        URL url= HapiServer.getDataURL( server.toURL(), id, tr, pp );
+        
         logger.log(Level.FINE, "getDataSet {0}", url.toString());
         
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {

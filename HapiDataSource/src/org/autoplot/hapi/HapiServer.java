@@ -12,6 +12,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -134,9 +136,6 @@ public class HapiServer {
     public static List<String> getCatalog( URL server ) throws IOException, JSONException {
         URL url;
         url= HapiServer.createURL( server, "catalog" );
-        if ( server.toString().contains( "http://tsds.org/get/IMAGE/PT1M/hapi" ) ) {
-            url= HapiServer.createURL( server, "catalog/" );
-        }
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getCatalog {0}", url.toString());
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
@@ -162,41 +161,29 @@ public class HapiServer {
      * @return 
      */
     public static URL getInfoURL( URL server, String id ) {
-        try {
-            if (server.toString().contains( "http://tsds.org/get/IMAGE/PT1M/hapi" )  ) {
-                return new URL( server.toString() + "/info/?id="+id );
-            } else {
-                return new URL( server.toString() + "/info?id="+id );
-            }
-        } catch ( MalformedURLException ex ) {
-            throw new RuntimeException(ex);
-        }
+        URL url= HapiServer.createURL( server, "info", Collections.singletonMap("id", id) );
+        return url;
     }
     
     /**
      * return the URL for data requests.
      * @param server
-     * @param id
+     * @param id string like "data4" or "spase://..."
      * @param tr
      * @param parameters zero-length, or a comma-delineated list of parameters.
      * @return 
      */
     public static URL getDataURL( URL server, String id, DatumRange tr, String parameters ) {
-        try {
-            TimeParser tp= TimeParser.create(TimeParser.TIMEFORMAT_Z);
-            String serverStr;
-            if (server.toString().contains( "http://tsds.org/get/IMAGE/PT1M/hapi" )  ) {
-                serverStr= server.toString()+"/data/?id="+id+"&time.min="+tp.format(tr.min())+"&time.max="+tp.format(tr.max());
-            } else {
-                serverStr= server.toString()+"/data?id="+id+"&time.min="+tp.format(tr.min())+"&time.max="+tp.format(tr.max());
-            }
-            if ( parameters.length()>0 ) {
-                serverStr= serverStr + "&parameters="+parameters;
-            }
-            return new URL( serverStr );
-        } catch ( MalformedURLException ex ) {
-            throw new RuntimeException(ex);
+        TimeParser tp= TimeParser.create(TimeParser.TIMEFORMAT_Z);
+        HashMap<String,String> map= new LinkedHashMap();
+        map.put( "id", id );
+        map.put( "time.min", tp.format(tr.min()) );
+        map.put( "time.max", tp.format(tr.max()) );
+        if ( parameters.length()>0 ) {
+            map.put( "parameters", parameters );
         }
+        URL serverUrl= createURL(server, "data", map );
+        return serverUrl;
     }
         
     /**
@@ -274,11 +261,19 @@ public class HapiServer {
         }
         if ( server.toString().contains( "http://tsds.org/get/IMAGE/PT1M/hapi" ) ) {
             s.append("/");
+        } else if ( server.toString().contains( "http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi" ) ) {
+            s.append(".xql");
         }
         if ( singletonMap!=null && !singletonMap.isEmpty() ) {
-            s.append("?");
+            boolean firstArg= true;
             for ( Entry<String,String> entry: singletonMap.entrySet() ) {
                 if ( entry.getValue()!=null ) {
+                    if ( firstArg ) {
+                        s.append("?");
+                        firstArg=false;
+                    } else {
+                        s.append("&");
+                    }
                     s.append(entry.getKey()).append("=").append( urlEncode( entry.getValue() ) );
                 }
             }
