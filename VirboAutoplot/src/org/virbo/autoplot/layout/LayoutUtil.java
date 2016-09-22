@@ -23,6 +23,15 @@ public class LayoutUtil {
 
     private static final boolean ALLOW_EXCESS_SPACE = true;
 
+    /**
+     * reset the maximum, unless the current setting is acceptable.
+     * @param c the row or column to adjust
+     * @param need
+     * @param norm proposed new normal position
+     * @param em proposed new em offset
+     * @param pt proposed new point offset
+     * @return true if the position was changed.
+     */
     private static boolean maybeSetMaximum(DasDevicePosition c, double need, double norm, double em, int pt) {
         em = Math.floor(em);
         double excess = -1 * (c.getEmMaximum() - em);
@@ -31,8 +40,7 @@ public class LayoutUtil {
         if ( Math.abs(em)>100 ) {
             logger.log(Level.SEVERE, "autolayout failure: {0}", em);
         }
-        double em0= c.getEmMaximum();
-        c.setMax(norm,(em+em+em0)/3,pt); // dampen by splitting the difference https://sourceforge.net/p/autoplot/bugs/1022/
+        c.setMax(norm,em,pt); // dampen by splitting the difference https://sourceforge.net/p/autoplot/bugs/1022/
         logger.log(Level.FINE, "reset maximum: {0}", c);
         return true;
     }
@@ -65,7 +73,7 @@ public class LayoutUtil {
     /**
      * resets the layout on the canvas so that labels are not clipped (somewhat).
      * Child row and columns are inspected as well, and it's assumed that adjusting
-     * this row and column, that everyone will be correctly adjusted.
+     * this row and column (Autoplot's margin row and column), that everyone will be correctly adjusted.
      * 
      * We calculate bounds on each component dependent on the row and column, then
      * the region outside the canvas determines how much the row and column should
@@ -181,7 +189,7 @@ public class LayoutUtil {
         changed = changed | maybeSetMaximum(marginColumn, needXmax, 1.0, -needXmax / em - MARGIN_LEFT_RIGHT_EM, 0);
         changed = changed | maybeSetMinimum(marginRow, needYmin, 0, needYmin / em, 0);
         changed = changed | maybeSetMaximum(marginRow, needYmax, 1.0, -needYmax / em, 0);
-
+        
         if (changed) {
             marginColumn.getParent().resizeAllComponents();
         }
