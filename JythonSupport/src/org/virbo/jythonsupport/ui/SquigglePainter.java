@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.jythonsupport.ui;
 
 import java.awt.Color;
@@ -33,7 +30,7 @@ public class SquigglePainter extends DefaultHighlighter.DefaultHighlightPainter
 	/**
 	 * Paints a portion of a highlight.
 	 *
-	 * @param  g the graphics context
+	 * @param  g1 the graphics context
 	 * @param  offs0 the starting model offset >= 0
 	 * @param  offs1 the ending model offset >= offs1
 	 * @param  bounds the bounding box of the view, which is not
@@ -42,12 +39,16 @@ public class SquigglePainter extends DefaultHighlighter.DefaultHighlightPainter
 	 * @param  view View painting for
 	 * @return region drawing occured in
 	 */
-	public Shape paintLayer(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c, View view)
+    @Override
+	public Shape paintLayer(Graphics g1, int offs0, int offs1, Shape bounds, JTextComponent c, View view)
 	{
 		Rectangle r = getDrawingArea(offs0, offs1, bounds, view);
 
 		if (r == null) return null;
 
+        Graphics2D g= (Graphics2D)g1;
+        g.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+        
 		//  Do your custom painting
 
 		Color color = getColor();
