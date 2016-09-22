@@ -654,6 +654,9 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
     private void addVariableAttributeEntry( String varName, String attrName, CDFDataType type, Object o ) throws CDFException.WriterError {
         logger.log( Level.FINE, "call cdf.addVariableAttributeEntry( {0}, {1}, {2}, {3} )",  new Object[] { logName(varName), logName(attrName), logName(type), logName( o ) } );
+        if ( type==CDFDataType.CHAR && o.toString().length()==0 ) { 
+            o= " ";
+        }
         cdf.addVariableAttributeEntry( varName, attrName, type, o );
     }
     
