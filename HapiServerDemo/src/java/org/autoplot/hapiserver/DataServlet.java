@@ -149,15 +149,18 @@ public class DataServlet extends HttpServlet {
         
         try {
 
-            QDataSet first= dsiter.next();
+            if ( dsiter.hasNext() ) {
+                            
+                QDataSet first= dsiter.next();
             
-            dataFormatter.initialize( out, first );
+                dataFormatter.initialize( out, first );
         
-            dataFormatter.sendRecord( out, first );
-            while ( dsiter.hasNext() ) {
-                dataFormatter.sendRecord( out, dsiter.next() );
+                dataFormatter.sendRecord( out, first );
+                while ( dsiter.hasNext() ) {
+                    dataFormatter.sendRecord( out, dsiter.next() );
+                }
             }
-        
+            
             dataFormatter.finalize(out);
             
         } finally {
