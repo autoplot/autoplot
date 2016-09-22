@@ -72,6 +72,11 @@ public class RecordIterator implements Iterator<QDataSet>  {
     public RecordIterator( String uri, DatumRange dr ) {
         try {
             QDataSet ds= getDataSet( uri, dr, new NullProgressMonitor() );
+            if ( ds==null ) {
+                this.index= 0;
+                this.lastIndex=0;
+                return;
+            }
             QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
             if ( dep0!=null ) {
                 if ( ds.rank()==1 ) {
@@ -97,6 +102,9 @@ public class RecordIterator implements Iterator<QDataSet>  {
      * @param dr 
      */
     public final void constrainDepend0( DatumRange dr ) {
+        if ( this.src==null ) {
+            return;
+        }
         index= 0;
         lastIndex= src.length();
         QDataSet dep0= Ops.slice1( this.src, 0 );
@@ -112,7 +120,9 @@ public class RecordIterator implements Iterator<QDataSet>  {
      * @param sort 
      */
     public final void resortFields( int[] sort ) {
-        src= DataSetOps.applyIndex( src, 1, Ops.dataset(sort), true );
+        if ( this.src!=null ) {
+            src= DataSetOps.applyIndex( src, 1, Ops.dataset(sort), true );
+        }
     }
     
     @Override
