@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>New image parsing challenge: monitoring home water use with $8 webcam and $30 Raspberry PI.
+        <p><small>verifying smooth1.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-09-15 r19429):</p>
+        <p>Bugfixes (2016-09-22 r19486):</p>
         <ul>
+            <li>applyIndex supports BUNDLE_i.</li>
+            <li>Series renderer plotSymbols would show when units were inconvertable, but then connectors would refuse to paint.  Now both will paint with a warning.</li>
             <li>blurTsbUri would fail when a data source was removed, but one of its URIs was still in the history.</li>
             <li>1677: interpolate2D should allow interpolation along edges when the opposite edge contains fill</li>
             <li>interpolate2D with two rank 0 datasets for xx and yy would cause RTE.</li>
@@ -106,6 +108,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DataPointRecorder allows the time format to be controlled.</li>
+            <li>rfe529: support for the HAPI Server.</li>
             <li>rfe247: experiment with allowing the data source to be edited without resetting everything else.  Thanks Chris, Bob, and Bill!</li>
             <li>Tooltips indicate description of filters in Filter Chain.  Thanks, Chris!</li>
             <li>rfe526: add test for rank join of rank 2 waveforms, to support cases where sampling rate changes for example.</li>
