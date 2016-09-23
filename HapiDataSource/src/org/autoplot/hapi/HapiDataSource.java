@@ -163,7 +163,7 @@ public class HapiDataSource extends AbstractDataSource {
             if ( type.equals("") ) {
                 logger.log(Level.FINE, "type is not defined: {0}", name);
             }
-            if ( name.equalsIgnoreCase("ISOTIME") || type.equalsIgnoreCase("isotime") ) {
+            if ( type.equalsIgnoreCase("isotime") ) {
                 pds[i].units= Units.us2000;
             } else {
                 if ( parameters.getJSONObject(i).has("units") ) {
@@ -246,7 +246,10 @@ public class HapiDataSource extends AbstractDataSource {
             if ( type.equals("") ) {
                 logger.log(Level.FINE, "type is not defined: {0}", name);
             }
-            if ( name.equalsIgnoreCase("ISOTIME") || type.equalsIgnoreCase("isotime") ) {
+            if ( type.equalsIgnoreCase("isotime") ) {
+                if ( !type.equals("isotime") ) {
+                    logger.log(Level.WARNING, "isotime should not be capitalized: {0}", type);
+                }
                 pds[i].units= Units.us2000;
             } else {
                 if ( parameters.getJSONObject(i).has("units") ) {

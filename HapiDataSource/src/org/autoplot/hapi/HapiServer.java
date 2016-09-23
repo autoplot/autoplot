@@ -259,9 +259,8 @@ public class HapiServer {
         } else {
             s= s.append("/").append( append );
         }
-        if ( server.toString().contains( "http://tsds.org/get/IMAGE/PT1M/hapi" ) ) {
-            s.append("/");
-        } else if ( server.toString().contains( "http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi" ) ) {
+        if ( server.toString().contains( "http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi" ) ) {
+            logger.warning("appending .xql on cdaweb URL");
             s.append(".xql");
         }
         if ( singletonMap!=null && !singletonMap.isEmpty() ) {
