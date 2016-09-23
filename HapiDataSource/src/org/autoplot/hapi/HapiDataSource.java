@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,7 +40,7 @@ import org.virbo.dsutil.DataSetBuilder;
  */
 public class HapiDataSource extends AbstractDataSource {
 
-    protected final static Logger logger= Logger.getLogger("apdss.hapi");
+    protected final static Logger logger= LoggerManager.getLogger("apdss.hapi");
     
     TimeSeriesBrowse tsb;
     
