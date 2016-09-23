@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -29,6 +31,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
+import org.das2.util.TickleTimer;
 import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -80,24 +83,32 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             throw new RuntimeException(ex);
         }
         initComponents();
+        jScrollPane3.getVerticalScrollBar().setUnitIncrement( parametersPanel.getFont().getSize() );
 
         parametersPanel.setLayout( new BoxLayout( parametersPanel, BoxLayout.Y_AXIS ) );
 
         serversComboBox.setModel( new DefaultComboBoxModel<>( HapiServer.listHapiServersArray() ));
-        idsList.addListSelectionListener( new ListSelectionListener() {
+        idsList2.addListSelectionListener( new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if ( !e.getValueIsAdjusting() ) {
-                    try {
-                        resetVariable( new URL( (String)serversComboBox.getSelectedItem() ), idsList.getSelectedValue() );  
-                    } catch (MalformedURLException ex) {
-                        JOptionPane.showMessageDialog( parametersPanel, ex.toString() );
-                    }
+                    resetVariableTimer.tickle();
                 }
             }
         } );
     }
 
+    TickleTimer resetVariableTimer= new TickleTimer( 500, new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            try {
+                resetVariable( new URL( (String)serversComboBox.getSelectedItem() ), idsList2.getSelectedValue() );  
+            } catch (MalformedURLException ex) {
+                JOptionPane.showMessageDialog( parametersPanel, ex.toString() );
+            }
+        }
+    });
+            
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -113,10 +124,10 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         timeRangeTextField = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        idsList = new javax.swing.JList<>();
         jScrollPane3 = new javax.swing.JScrollPane();
         parametersPanel = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        idsList2 = new javax.swing.JList<>();
         jLabel3 = new javax.swing.JLabel();
 
         jLabel1.setText("HAPI Server:");
@@ -147,33 +158,32 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         jSplitPane1.setDividerLocation(210);
 
-        idsList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        idsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        idsList.setMaximumSize(new java.awt.Dimension(9999, 135));
-        idsList.setMinimumSize(new java.awt.Dimension(200, 135));
-        idsList.setPreferredSize(new java.awt.Dimension(200, 135));
-        jScrollPane1.setViewportView(idsList);
-
-        jSplitPane1.setLeftComponent(jScrollPane1);
-
         javax.swing.GroupLayout parametersPanelLayout = new javax.swing.GroupLayout(parametersPanel);
         parametersPanel.setLayout(parametersPanelLayout);
         parametersPanelLayout.setHorizontalGroup(
             parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 324, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         parametersPanelLayout.setVerticalGroup(
             parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 219, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         jScrollPane3.setViewportView(parametersPanel);
 
         jSplitPane1.setRightComponent(jScrollPane3);
+
+        idsList2.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        idsList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        idsList2.setMinimumSize(new java.awt.Dimension(200, 540));
+        idsList2.setPreferredSize(new java.awt.Dimension(200, 540));
+        jScrollPane2.setViewportView(idsList2);
+
+        jSplitPane1.setLeftComponent(jScrollPane2);
 
         jLabel3.setText("jLabel3");
 
@@ -188,7 +198,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(serversComboBox, 0, 435, Short.MAX_VALUE))
+                        .addComponent(serversComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -208,18 +218,15 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     .addComponent(jLabel1)
                     .addComponent(serversComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(timeRangeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(timeRangeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel2))
+                    .addComponent(jButton1)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -250,12 +257,12 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JList<String> idsList;
+    private javax.swing.JList<String> idsList2;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JPanel parametersPanel;
@@ -342,7 +349,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         if ( id!=null ) {
             try {
                 id= URLDecoder.decode(id,"UTF-8");
-                idsList.setSelectedValue( id, true );
+                idsList2.setSelectedValue( id, true );
             } catch (UnsupportedEncodingException ex) {
                 throw new RuntimeException(ex);
             }
@@ -370,7 +377,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     @Override
     public String getURI() {
         String parameters= getParameters();
-        String id= idsList.getSelectedValue();
+        String id= idsList2.getSelectedValue();
         if ( id==null ) {
             id= "";
         } else {           
@@ -392,9 +399,9 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             List<String> ids= HapiServer.getCatalog(server);
             DefaultListModel model= new DefaultListModel();
             for ( String id: ids ) model.addElement( id );
-            idsList.setModel( model );
+            idsList2.setModel( model );
             if ( !server.equals(currentServer) ) {
-                idsList.setSelectedIndex(0);
+                idsList2.setSelectedIndex(0);
                 currentServer= server;
             }
         } catch ( IOException ex ) {
