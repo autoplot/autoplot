@@ -2,18 +2,13 @@
 package org.autoplot.hapi;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Window;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -28,7 +23,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.das2.datum.DatumRange;
@@ -138,7 +132,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jLabel1.setText("HAPI Server:");
 
         serversComboBox.setEditable(true);
-        serversComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "http://tsds.org/get/IMAGE/PT1M/hapi", "http://localhost:8080/HapiServerDemo", " " }));
+        serversComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "http://tsds.org/get/IMAGE/PT1M/hapi", " " }));
         serversComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 serversComboBoxActionPerformed(evt);
