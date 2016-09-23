@@ -15,11 +15,17 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.util.Arrays;
+import java.util.EventObject;
 import java.util.HashSet;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import javax.swing.event.CellEditorListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
+import org.das2.datum.LoggerManager;
 import org.virbo.autoplot.AutoplotUtil;
 
 /**
@@ -158,6 +164,8 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         initLogSettings();
         setLocationRelativeTo(parent);
         
+        //initLogTable();
+        
         verbosityPanel.validate();
         this.console= console;
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(16);
@@ -166,6 +174,46 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         timeStampsCheckBox.setSelected( console.showTimeStamps );
         logLevelCheckBox.setSelected( console.showLevel );
         loggerIDCheckBox.setSelected( console.showLoggerId );
+    }
+    
+    private Level getLoggerMindingInheritance( Logger anscestor )  {
+        Level value= anscestor.getLevel();
+        
+        while ( value==null ) {    
+            anscestor = anscestor.getParent();
+            value = anscestor.getLevel();
+        }
+        
+        return value;
+    }
+    
+    private void initLogTable() {
+        HashSet otherLoggers= new HashSet( org.das2.util.LoggerManager.getLoggers() );
+        otherLoggers.addAll( org.das2.datum.LoggerManager.getLoggers() );
+        String[] sloggers= (String[])otherLoggers.toArray( new String[otherLoggers.size()] );
+        Arrays.sort(sloggers);
+        DefaultTableModel m= new DefaultTableModel( new String[] { "name", "level" }, sloggers.length );
+        int irow= 0;
+        for ( String slogger: sloggers ) {
+            m.setValueAt( slogger, irow, 0 );
+            Logger logger= Logger.getLogger(slogger);
+            m.setValueAt( logger, irow, 1 );
+            irow++;
+        }
+        JTable jTable1= new JTable();
+        jTable1.setDefaultRenderer( java.util.logging.Logger.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                return new JLabel(""+row);
+            }
+        });
+        jTable1.setDefaultRenderer( Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                return new JLabel(""+value.toString());
+            }
+        });        
+        jTable1.setModel(m);
     }
 
     private void initLogSettings() {
@@ -291,15 +339,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel2)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 172, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 113, Short.MAX_VALUE)
-                        .add(jButton1))
+                    .add(jScrollPane1)
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jLabel1)
@@ -311,7 +351,13 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                                 .add(logLevelCheckBox)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(threadsCB)))
-                        .add(0, 0, Short.MAX_VALUE)))
+                        .add(0, 0, Short.MAX_VALUE))
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel2)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 172, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 113, Short.MAX_VALUE)
+                        .add(jButton1)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -320,7 +366,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(timeStampsCheckBox)
@@ -380,6 +426,10 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     * @param args the command line arguments
     */
     public static void main(String args[]) {
+        LoggerManager.getLogger("autoplot.first");
+        LoggerManager.getLogger("qdataset");
+        LoggerManager.getLogger("qdataset.first");
+        LoggerManager.getLogger("qdataset.second");
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 LogConsole console= new LogConsole();
