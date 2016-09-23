@@ -45,8 +45,12 @@ public class HapiServer {
      */
     public static List<String> getKnownServers() {
         ArrayList<String> result= new ArrayList<>();
-        result.add("http://tsds.org/get/IMAGE/PT1M/hapi");
+        if ( "true".equals(System.getProperty("hapiDeveloper","false")) ) {
+            result.add("http://tsds.org/get/IMAGE/PT1M/hapi");
+            result.add("http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi");
+        }            
         result.add("http://jfaden.net:8180/HapiServerDemo/hapi");
+
         return result;
     }
     
