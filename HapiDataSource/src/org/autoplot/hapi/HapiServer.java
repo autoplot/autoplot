@@ -169,12 +169,12 @@ public class HapiServer {
      * return the URL for data requests.
      * @param server
      * @param id string like "data4" or "spase://..."
-     * @param tr
+     * @param tr the time range
      * @param parameters zero-length, or a comma-delineated list of parameters.
-     * @return 
+     * @return the request, with the ID and parameters URL encoded.
      */
     public static URL getDataURL( URL server, String id, DatumRange tr, String parameters ) {
-        TimeParser tp= TimeParser.create(TimeParser.TIMEFORMAT_Z);
+        TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$S");
         HashMap<String,String> map= new LinkedHashMap();
         map.put( "id", id );
         map.put( "time.min", tp.format(tr.min()) );
