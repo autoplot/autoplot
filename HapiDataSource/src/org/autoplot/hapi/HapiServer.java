@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Icon;
-import javax.swing.JOptionPane;
 import org.das2.datum.DatumRange;
 import org.das2.datum.TimeParser;
 import org.json.JSONArray;
