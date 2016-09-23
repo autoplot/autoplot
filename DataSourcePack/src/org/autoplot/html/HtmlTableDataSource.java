@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.text.html.parser.ParserDelegator;
@@ -27,6 +28,7 @@ public class HtmlTableDataSource extends AbstractDataSource {
      */
     public static final String PARAM_COLUMN= "column";
     public static final String PARAM_TABLE= "table";
+    public static final String PARAM_UNITS= "units";
     
     public HtmlTableDataSource(URI uri) {
         super(uri);
@@ -45,6 +47,11 @@ public class HtmlTableDataSource extends AbstractDataSource {
 
             HtmlParserCallback callback = new HtmlParserCallback(  );
 
+            String units= getParam("units",null);
+            if ( units!=null ) {
+                callback.setUnits(URLDecoder.decode(units,"UTF-8"));
+            }
+            
             String stable= (String)getParams().get( PARAM_TABLE );
             if ( stable!=null ) callback.setTable( stable );
             new ParserDelegator().parse( reader, callback, true );
@@ -59,7 +66,7 @@ public class HtmlTableDataSource extends AbstractDataSource {
     @Override
     public QDataSet getDataSet( ProgressMonitor mon ) throws IOException {
         QDataSet ds = getTable( mon );
-
+        
         String column=  (String) getParams().get(PARAM_COLUMN);
         if ( column==null ) {
             return ds;
@@ -72,8 +79,8 @@ public class HtmlTableDataSource extends AbstractDataSource {
             }
         }
         
-    }
-
+        }
+        
     /**
      * return a list of the tables, with column and human readable description after.
      * @return a list of the tables, with column and human readable description after.

@@ -57,6 +57,14 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
         }
     }
 
+    /**
+     * set the units for the columns.
+     * @param units 
+     */
+    void setUnits(String units) {
+        ascii.setUnits( units );
+    }
+    
     @Override
     public void handleText(char[] data, int pos) {
         if (inField) {

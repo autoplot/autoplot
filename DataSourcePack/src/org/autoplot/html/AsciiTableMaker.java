@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.EnumerationUnits;
+import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DDataSet;
@@ -26,6 +27,7 @@ public class AsciiTableMaker {
     DataSetBuilder builder = null;
     QDataSet desc = null;  // bundle descriptor
     List<Units> units = null;
+    Units defaultUnits= null;
     List<String> labels = null;
     List<String> names = null;
     List<String> format= null;
@@ -33,12 +35,16 @@ public class AsciiTableMaker {
     int fieldCount= -1;
     boolean initializedFields= false;
     
+    void setUnits(String units) {
+        this.defaultUnits= Units.lookupUnits(units);
+    }
+    
     private void setUnitsAndFormat( List<String> values ) {
         for (int i = 0; i < fieldCount; i++) {
             String field = values.get(i).trim();
             boolean isTime= false;
             try {
-                if ( field.contains("T") ) { // allow ISO8601 times.
+                if ( TimeParser.isIso8601String(field) ) { // allow ISO8601 times.
                     Units.cdfTT2000.parse(field);
                     isTime= true;
                 } else if ( field.matches("\\d+/\\d+/\\d+") ) {
@@ -48,39 +54,41 @@ public class AsciiTableMaker {
             } catch (ParseException ex) {
                 Logger.getLogger(AsciiTableMaker.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if ( field.contains("$") ) {
-                units.set(i,Units.dollars);
-                format.set(i,"%.2f");
-            } else if ( field.endsWith("%") ) {
-                units.set(i,Units.percent);
-                format.set(i,null);
-            } else if ( isTime ) {
-                units.set(i,Units.us2000);
-                format.set(i,null);
-            } else {
-                try {
-                    Integer.parseInt(field);
-                    units.set(i,Units.dimensionless);
-                    format.set(i,"%d");
-                } catch ( NumberFormatException ex ) {
+            if ( units.get(i)==null ) {
+                if ( field.contains("$") ) {
+                    units.set(i,Units.dollars);
+                    format.set(i,"%.2f");
+                } else if ( field.endsWith("%") ) {
+                    units.set(i,Units.percent);
+                    format.set(i,null);
+                } else if ( isTime ) {
+                    units.set(i,Units.us2000);
+                    format.set(i,null);
+                } else {
                     try {
-                        Double.parseDouble(field);
+                        Integer.parseInt(field);
                         units.set(i,Units.dimensionless);
-                        format.set(i,null);
-                    } catch ( NumberFormatException ex2 ) {
-                        String[] ss= field.split("\\s",-2);  // "3.4 sec"
-                        if ( ss.length>1 ) {
-                            try {
-                                Double.parseDouble(ss[0]);
-                                units.set(i,Units.lookupUnits( field.substring( ss[0].length() ).trim() ) );
-                                format.set(i,null);
-                            } catch ( NumberFormatException ex3 ) {
+                        format.set(i,"%d");
+                    } catch ( NumberFormatException ex ) {
+                        try {
+                            Double.parseDouble(field);
+                            units.set(i,Units.dimensionless);
+                            format.set(i,null);
+                        } catch ( NumberFormatException ex2 ) {
+                            String[] ss= field.split("\\s",-2);  // "3.4 sec"
+                            if ( ss.length>1 ) {
+                                try {
+                                    Double.parseDouble(ss[0]);
+                                    units.set(i,Units.lookupUnits( field.substring( ss[0].length() ).trim() ) );
+                                    format.set(i,null);
+                                } catch ( NumberFormatException ex3 ) {
+                                    units.set( i, new EnumerationUnits("default") );
+                                    format.set(i,null);
+                                }
+                            } else {
                                 units.set( i, new EnumerationUnits("default") );
                                 format.set(i,null);
                             }
-                        } else {
-                            units.set( i, new EnumerationUnits("default") );
-                            format.set(i,null);
                         }
                     }
                 }
@@ -124,7 +132,7 @@ public class AsciiTableMaker {
         builder = new DataSetBuilder(2, 100, fieldCount);
         units = new ArrayList<Units>(fieldCount);
         for (int i = 0; i < fieldCount; i++) {
-            units.add(i, Units.dimensionless);
+            units.add(i, defaultUnits ); // null here means we can reset.
         }
         format= new ArrayList<String>(fieldCount);
         
