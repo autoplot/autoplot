@@ -2,6 +2,7 @@
 package org.autoplot.hapi;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -27,6 +28,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.das2.datum.DatumRange;
@@ -290,6 +292,11 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
      * @param parameters comma-delineated list of parameters.
      */
     private void setParameters( String parameters ) {
+        for ( Component c: parametersPanel.getComponents() ) {
+            if ( c instanceof JCheckBox ) {
+                ((JCheckBox)c).setSelected(false);
+            }
+        }
         if ( parameters.length()>0 ) {
             String[] ss= parameters.split(",");
             for ( Component c: parametersPanel.getComponents() ) {
@@ -400,6 +407,15 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             DefaultListModel model= new DefaultListModel();
             for ( String id: ids ) model.addElement( id );
             idsList2.setModel( model );
+            int maxLen=0;
+            for ( String s: ids ) {
+                maxLen= Math.max( s.length(), maxLen );
+            }
+            maxLen= maxLen*8; // pixels per character
+            maxLen= Math.min( maxLen,600 );
+            maxLen= Math.max( maxLen,300 );
+            jSplitPane1.setDividerLocation(maxLen);
+            
             if ( !server.equals(currentServer) ) {
                 idsList2.setSelectedIndex(0);
                 currentServer= server;
