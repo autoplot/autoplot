@@ -13,23 +13,17 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.print.attribute.HashAttributeSet;
-import static org.autoplot.hapi.HapiServer.logger;
-import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.TimeParser;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DefaultTimeSeriesBrowse;
@@ -107,9 +101,123 @@ public class HapiDataSource extends AbstractDataSource {
         }
     }
     
+    /**
+     * To assist in getting the CDAWeb HAPI server going, handle a few differences
+     * like:<ul>
+     * <li>parameters are returned within the JSON code.
+     * <li>Epoch is needed.
+     * </ul>
+     * @param monitor
+     * @return
+     * @throws Exception 
+     */
+    private QDataSet getDataSetCDAWeb( ProgressMonitor monitor) throws Exception {
+        URI server = this.resourceURI;
+        String id= getParam("id","" );
+        if ( id.equals("") ) throw new IllegalArgumentException("missing id");
+        id= URLDecoder.decode( id,"UTF-8" );
+
+        String pp= getParam("parameters","");
+        if ( !pp.equals("") && !pp.startsWith("Epoch,") ) {
+            pp= "Epoch,"+pp;
+        }
+        
+        if ( id.equals("") ) throw new IllegalArgumentException("missing id");
+        id= URLDecoder.decode(id,"UTF-8");
+        
+        DatumRange tr; // TSB = DatumRangeUtil.parseTimeRange(timeRange);
+        tr= tsb.getTimeRange();
+        
+        URL url= HapiServer.getDataURL( server.toURL(), id, tr, pp );
+        
+        StringBuilder builder= new StringBuilder();
+        logger.log(Level.FINE, "getDocument {0}", url.toString());
+        try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
+            String line= in.readLine();
+            while ( line!=null ) {
+                builder.append(line);
+                line= in.readLine();
+            }
+        }
+        JSONObject o= new JSONObject(builder.toString());
+        
+        JSONObject doc= o;
+        
+        JSONArray parameters= doc.getJSONArray("parameters");
+        int nparameters= parameters.length();
+                
+        ParamDescription[] pds= new ParamDescription[nparameters];
+        
+        for ( int i=0; i<nparameters; i++ ) {
+            String name= parameters.getJSONObject(i).getString("name");
+            pds[i]= new ParamDescription( name );
+
+            String type;
+            if ( parameters.getJSONObject(i).has("type") ) {
+                type= parameters.getJSONObject(i).getString("type");
+                if ( type==null ) type="";
+            } else {
+                type= "";
+            }
+            if ( type.equals("") ) {
+                logger.log(Level.FINE, "type is not defined: {0}", name);
+            }
+            if ( name.equalsIgnoreCase("ISOTIME") || type.equalsIgnoreCase("isotime") ) {
+                pds[i].units= Units.us2000;
+            } else {
+                if ( parameters.getJSONObject(i).has("units") ) {
+                    String sunits= parameters.getJSONObject(i).getString("units");
+                    if ( sunits!=null ) {
+                        pds[i].units= Units.lookupUnits(sunits);
+                    }
+                } else {
+                    pds[i].units= Units.dimensionless;
+                }
+                if ( parameters.getJSONObject(i).has("fill") ) {
+                    String sfill= parameters.getJSONObject(i).getString("fill");
+                    if ( sfill!=null ) {
+                        pds[i].fillValue= pds[i].units.parse( sfill ).doubleValue( pds[i].units );
+                        pds[i].hasFill= true;
+                    }
+                } else {
+                    pds[i].fillValue= FILL_VALUE; // when a value cannot be parsed, but it is not identified.
+                }
+                if ( parameters.getJSONObject(i).has("description") ) {                   
+                    pds[i].description= parameters.getJSONObject(i).getString("description");
+                    if ( pds[i].description==null ) pds[i].description= "";
+                } else {
+                    pds[i].description= ""; // when a value cannot be parsed, but it is not identified.
+                }
+            }
+        }
+        //http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi/data.xql?id=spase%3A%2F%2FVSPO%2FNumericalData%2FRBSP%2FB%2FEMFISIS%2FGEI%2FPT0.015625S&time.min=2012-10-09T00%3A00%3A00Z&time.max=2012-10-09T00%3A10%3A00Z&parameters=Magnitude
+        QDataSet result= null;
+        for ( ParamDescription pd: pds ) {
+            JSONArray param= doc.getJSONArray(pd.name);
+            Units u= pd.units;
+            DDataSet column= DDataSet.createRank1(param.length());
+            for ( int i=0; i<param.length(); i++ ) {
+                column.putValue( i, u.parse(param.getString(i) ).doubleValue(u) );
+            }
+            if ( pd.hasFill ) column.putProperty( QDataSet.FILL_VALUE, pd.fillValue );
+            column.putProperty( QDataSet.TITLE, pd.description );
+            column.putProperty( QDataSet.UNITS, pd.units );
+            result= Ops.bundle( result, column );
+        }
+        
+        result = repackage(result,pds);
+        
+        return result;
+    }
+            
     @Override
     public QDataSet getDataSet(ProgressMonitor monitor) throws Exception {
         URI server = this.resourceURI;
+        
+        if ( server.toString().contains("http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi") ) {
+            return getDataSetCDAWeb(monitor);
+        }
+        
         String id= getParam("id","" );
         if ( id.equals("") ) throw new IllegalArgumentException("missing id");
         id= URLDecoder.decode( id,"UTF-8" );
@@ -212,6 +320,16 @@ public class HapiDataSource extends AbstractDataSource {
         }
                 
         QDataSet ds= builder.getDataSet();
+        
+        ds = repackage(ds,pds);
+        
+        return ds;
+        
+    }
+
+    private QDataSet repackage(QDataSet ds, ParamDescription[] pds ) {
+        int nparameters= ds.length(0);
+        
         QDataSet depend0= Ops.slice1( ds,0 );
         if ( ds.length(0)==2 ) {
             ds= Ops.copy( Ops.slice1( ds, 1 ) );
@@ -226,7 +344,7 @@ public class HapiDataSource extends AbstractDataSource {
             
         } else {
             BundleBuilder bdsb= new BundleBuilder(nparameters-1);
-            for ( int i=1; i<nparam; i++ ) {
+            for ( int i=1; i<nparameters; i++ ) {
                 bdsb.putProperty( QDataSet.NAME, i-1, Ops.safeName(pds[i].name) );
                 bdsb.putProperty( QDataSet.LABEL, i-1, pds[i].name );
                 bdsb.putProperty( QDataSet.TITLE, i-1, pds[i].description );
@@ -240,9 +358,7 @@ public class HapiDataSource extends AbstractDataSource {
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
             ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, bdsb.getDataSet() );
         }
-        
         return ds;
-        
     }
     
 }
