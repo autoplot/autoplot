@@ -24,7 +24,7 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-09-22 r19486):</p>
+        <p>Bugfixes (2016-09-24 r19486):</p>
         <ul>
             <li>applyIndex supports BUNDLE_i.</li>
             <li>Series renderer plotSymbols would show when units were inconvertable, but then connectors would refuse to paint.  Now both will paint with a warning.</li>
@@ -108,6 +108,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>The console Logger control uses a table now, and allows sorting by log level.</li>
+            <li>HTML parser allows the units to be set externally.  "N/A" was causing the units to come back as ordinal units.</li>
             <li>DataPointRecorder allows the time format to be controlled.</li>
             <li>rfe529: support for the HAPI Server.</li>
             <li>rfe247: experiment with allowing the data source to be edited without resetting everything else.  Thanks Chris, Bob, and Bill!</li>
