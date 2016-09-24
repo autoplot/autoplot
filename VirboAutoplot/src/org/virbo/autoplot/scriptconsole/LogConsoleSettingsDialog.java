@@ -12,9 +12,8 @@
 package org.virbo.autoplot.scriptconsole;
 
 import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.EventObject;
 import java.util.HashSet;
 import java.util.logging.Handler;
@@ -22,9 +21,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.EventListenerList;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import org.das2.datum.LoggerManager;
 import org.virbo.autoplot.AutoplotUtil;
 
@@ -161,14 +165,11 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         super(parent, modal);
         setTitle("Log Console Settings");
         initComponents();
-        initLogSettings();
         setLocationRelativeTo(parent);
         
-        //initLogTable();
+        initLogTable();
         
-        verbosityPanel.validate();
         this.console= console;
-        jScrollPane1.getVerticalScrollBar().setUnitIncrement(16);
         
         searchForTextField.setText( console.getSearchText() );
         timeStampsCheckBox.setSelected( console.showTimeStamps );
@@ -187,6 +188,136 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         return value;
     }
     
+    
+    static class LevelCellRenderer implements TableCellRenderer {
+
+        JComponent component=null;
+        TableCellRenderer delegate;
+
+        public LevelCellRenderer( TableCellRenderer delegate) {
+            this.component = null;
+            this.delegate = delegate;
+        }
+        
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object lvalue, boolean isSelected, boolean hasFocus, int row, int column) {
+            Logger logger = (Logger) lvalue;
+            Object value= logger.getLevel();
+            //We just need to handle null as a special case
+            if (value == null) {
+                Logger anscestor = logger;
+                if (logger.getParent() == null) { // root logger.
+                    value = logger.getLevel();
+                } else {
+                    do {
+                        anscestor = anscestor.getParent();
+                        if (anscestor == null) {
+                            new Exception("anscestor is null").printStackTrace();
+                            value = "NULL"; // I don't think this happens...
+                        } else {
+                            value = anscestor.getLevel();
+                        }
+                    } while (value == null);
+                    value = "INHERITED(" + value + ")";
+
+                    if (component != null) {
+                        String name = anscestor.getName();
+                        if (name.equals("")) {
+                            name = "<anonymous>";
+                        }
+                        component.setToolTipText("inherited from " + name);
+                    }
+                }
+            } else {
+                ((JComponent) delegate).setToolTipText(null);
+            }
+            return delegate.getTableCellRendererComponent(
+                    table, value, isSelected, hasFocus, row, column );
+        }
+        
+    }
+    
+    class MyEditor implements TableCellEditor {
+        JComboBox cb;
+        Logger value;
+        
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            this.value= (Logger)value;
+            ComboBoxModel m= new LogLevelComboBoxModel((Logger)value);
+            cb= new JComboBox( m );
+            cb.setRenderer( new LogLevelCellRenderer( cb.getRenderer(), this.value ) );
+            return cb;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            return this.value;
+            //return cb.getSelectedItem();
+        }
+
+        @Override
+        public boolean isCellEditable(EventObject anEvent) {
+            return true;
+        }
+
+        @Override
+        public boolean shouldSelectCell(EventObject anEvent) {
+            return true;
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            fireEditingStopped();
+            return true;
+        }
+
+        @Override
+        public void cancelCellEditing() {
+            fireEditingCanceled();
+        }
+        
+        private final EventListenerList listeners = new EventListenerList();
+        private ChangeEvent evt;
+
+        private void fireEditingStopped() {
+        Object[] l = listeners.getListenerList();
+        for (int i = 0; i < l.length; i += 2) {
+            if (l[i] == CellEditorListener.class) {
+                CellEditorListener cel = (CellEditorListener) l[i + 1];
+                if (evt == null) {
+                    evt = new ChangeEvent(this);
+                }
+                cel.editingStopped(evt);
+            }
+        }
+    }
+
+    private void fireEditingCanceled() {
+        Object[] l = listeners.getListenerList();
+        for (int i = 0; i < l.length; i += 2) {
+            if (l[i] == CellEditorListener.class) {
+                CellEditorListener cel = (CellEditorListener) l[i + 1];
+                if (evt == null) {
+                    evt = new ChangeEvent(this);
+                }
+                cel.editingCanceled(evt);
+            }
+        }
+    }
+
+        @Override
+    public void addCellEditorListener(CellEditorListener l) {
+        listeners.add(CellEditorListener.class, l);
+    }
+
+        @Override
+    public void removeCellEditorListener(CellEditorListener l) {
+        listeners.add(CellEditorListener.class, l);
+    }
+        
+    }
+    
     private void initLogTable() {
         HashSet otherLoggers= new HashSet( org.das2.util.LoggerManager.getLoggers() );
         otherLoggers.addAll( org.das2.datum.LoggerManager.getLoggers() );
@@ -200,50 +331,24 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             m.setValueAt( logger, irow, 1 );
             irow++;
         }
-        JTable jTable1= new JTable();
-        jTable1.setDefaultRenderer( java.util.logging.Logger.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                return new JLabel(""+row);
-            }
-        });
-        jTable1.setDefaultRenderer( Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                return new JLabel(""+value.toString());
-            }
-        });        
+        jTable1.setAutoCreateRowSorter(true);
         jTable1.setModel(m);
-    }
-
-    private void initLogSettings() {
-        String[] sloggers;
-
-        HashSet otherLoggers= new HashSet( org.das2.util.LoggerManager.getLoggers() );
-        otherLoggers.addAll( org.das2.datum.LoggerManager.getLoggers() );
-        sloggers= (String[])otherLoggers.toArray( new String[otherLoggers.size()] );
-        Arrays.sort(sloggers);
-
-        GridBagConstraints c = new GridBagConstraints();
-
-        c.gridy= 0;
-        c.insets= new Insets(0,10,0,10);
-        for ( String slogger: sloggers ) {
-            Logger logger= Logger.getLogger(slogger);
-            JLabel l= new JLabel(slogger);
-            c.weightx= 0.4;
-            c.gridx= 0;
-			c.fill = GridBagConstraints.NONE;
-            verbosityPanel.add( l,c );
-            JComboBox cb= new JComboBox( new LogLevelComboBoxModel(logger) );
-			cb.setRenderer(new LogLevelCellRenderer(cb.getRenderer(),logger));
-            c.gridx= 1;
-            c.weightx= 0.6;
-			c.fill = GridBagConstraints.HORIZONTAL;
-            verbosityPanel.add( cb,c );
-            c.gridy++;
-        }
-
+        jTable1.getColumnModel().getColumn(1).setCellRenderer( new LevelCellRenderer( new DefaultTableCellRenderer() ) );
+        jTable1.getColumnModel().getColumn(1).setCellEditor( new MyEditor() );
+        
+        TableRowSorter<TableModel> rowSorter = new TableRowSorter<TableModel>(m);
+        jTable1.setRowSorter(rowSorter);
+        rowSorter.setComparator( 1, new Comparator() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                Logger l1= (Logger)o1;
+                Logger l2= (Logger)o2;
+                Level level1= getLoggerMindingInheritance(l1);
+                Level level2= getLoggerMindingInheritance(l2);
+                return level1.intValue() - level2.intValue();
+            }
+        } );
+        
     }
 
     private void updateSearchText() {
@@ -265,10 +370,10 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         searchForTextField = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        verbosityPanel = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         threadsCB = new javax.swing.JCheckBox();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -313,10 +418,6 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
         });
 
-        verbosityPanel.setAlignmentY(0.0F);
-        verbosityPanel.setLayout(new java.awt.GridBagLayout());
-        jScrollPane1.setViewportView(verbosityPanel);
-
         jButton1.setText("Okay");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -332,15 +433,34 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
         });
 
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(jTable1);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane1)
-                    .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(jScrollPane2)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                        .add(jLabel2)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 172, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 397, Short.MAX_VALUE)
+                        .add(jButton1))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jLabel1)
                             .add(layout.createSequentialGroup()
@@ -351,13 +471,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                                 .add(logLevelCheckBox)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(threadsCB)))
-                        .add(0, 0, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel2)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 172, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 113, Short.MAX_VALUE)
-                        .add(jButton1)))
+                        .add(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -366,7 +480,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(timeStampsCheckBox)
@@ -430,6 +544,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         LoggerManager.getLogger("qdataset");
         LoggerManager.getLogger("qdataset.first");
         LoggerManager.getLogger("qdataset.second");
+        LoggerManager.getLogger("qdataset.second").setLevel(Level.FINE);
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 LogConsole console= new LogConsole();
@@ -448,13 +563,13 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTable1;
     private javax.swing.JCheckBox logLevelCheckBox;
     private javax.swing.JCheckBox loggerIDCheckBox;
     private javax.swing.JTextField searchForTextField;
     private javax.swing.JCheckBox threadsCB;
     private javax.swing.JCheckBox timeStampsCheckBox;
-    private javax.swing.JPanel verbosityPanel;
     // End of variables declaration//GEN-END:variables
 
 }
