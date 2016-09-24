@@ -48,7 +48,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     /**
      * Just a list of all the log levels defined in {@link Level}
      */
-    private static final Level[] LOG_LEVELS = {
+    private static final Level[] LOG_LEVELS = { null,
         Level.OFF,
         Level.SEVERE,
         Level.WARNING,
@@ -58,7 +58,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         Level.FINER,
         Level.FINEST,
         Level.ALL,
-        null,};
+        };
 
     private class LogLevelComboBoxModel implements ComboBoxModel {
 
