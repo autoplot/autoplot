@@ -207,6 +207,31 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         return value;
     }
 
+        
+    static class TimeTaggingCellRenderer implements TableCellRenderer {
+
+        JComponent component = null;
+        TableCellRenderer delegate;
+
+        public TimeTaggingCellRenderer(TableCellRenderer delegate) {
+            this.component = null;
+            this.delegate = delegate;
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object lvalue, boolean isSelected, boolean hasFocus, int row, int column) {
+            Logger logger = (Logger) lvalue;
+            long time;
+            if ( logger instanceof org.das2.util.LoggerManager.TimeTaggingLogger ) {
+                time= ((org.das2.util.LoggerManager.TimeTaggingLogger)logger).getLastTime();
+                return new JLabel(String.valueOf( System.currentTimeMillis()-time ) );
+            } else {
+                return new JLabel("???");
+            }
+        }
+
+    }
+
     static class LevelCellRenderer implements TableCellRenderer {
 
         JComponent component = null;
@@ -342,19 +367,30 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         otherLoggers.addAll(org.das2.datum.LoggerManager.getLoggers());
         String[] sloggers = (String[]) otherLoggers.toArray(new String[otherLoggers.size()]);
         Arrays.sort(sloggers);
-        DefaultTableModel m = new DefaultTableModel(new String[]{"name", "level"}, sloggers.length);
+        
+        DefaultTableModel m ;
+        if ( org.das2.util.LoggerManager.isUseTimeTaggingLoggers() ) {
+            m = new DefaultTableModel(new String[]{"name", "level", "time"}, sloggers.length);
+        } else {
+            m = new DefaultTableModel(new String[]{"name", "level"}, sloggers.length);
+        }
+        
         int irow = 0;
         for (String slogger : sloggers) {
             m.setValueAt(slogger, irow, 0);
             Logger logger = Logger.getLogger(slogger);
             m.setValueAt(logger, irow, 1);
+            if ( org.das2.util.LoggerManager.isUseTimeTaggingLoggers() ) {
+                m.setValueAt(logger, irow, 2);
+            }
             irow++;
         }
         jTable1.setAutoCreateRowSorter(true);
         jTable1.setModel(m);
         jTable1.getColumnModel().getColumn(1).setCellRenderer(new LevelCellRenderer(new DefaultTableCellRenderer()));
         jTable1.getColumnModel().getColumn(1).setCellEditor(new MyEditor());
-
+        jTable1.getColumnModel().getColumn(2).setCellRenderer(new TimeTaggingCellRenderer(new DefaultTableCellRenderer()));
+        
         TableRowSorter<TableModel> rowSorter = new TableRowSorter<TableModel>(m);
         jTable1.setRowSorter(rowSorter);
         rowSorter.setComparator(1, new Comparator() {
@@ -559,8 +595,9 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        LoggerManager.getLogger("autoplot.first");
-        LoggerManager.getLogger("qdataset");
+        Logger l= org.das2.util.LoggerManager.getLogger("autoplot.first");
+        l.finest("hi there");
+        org.das2.util.LoggerManager.getLogger("qdataset");
         LoggerManager.getLogger("qdataset.first");
         LoggerManager.getLogger("qdataset.second");
         LoggerManager.getLogger("qdataset.second").setLevel(Level.FINE);
