@@ -92,22 +92,27 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
         }
 
+        @Override
         public Object getSelectedItem() {
             return logger.getLevel();
         }
 
+        @Override
         public int getSize() {
             return LOG_LEVELS.length;
         }
 
+        @Override
         public Object getElementAt(int index) {
             return LOG_LEVELS[index];
         }
 
+        @Override
         public void addListDataListener(javax.swing.event.ListDataListener l) {
             //No need to implement for a static model
         }
 
+        @Override
         public void removeListDataListener(javax.swing.event.ListDataListener l) {
             //No need to implement for a static model
         }
@@ -115,8 +120,8 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
     private static class LogLevelCellRenderer implements ListCellRenderer {
 
-        private Logger logger;
-        private ListCellRenderer delegate;
+        private final Logger logger;
+        private final ListCellRenderer delegate;
         private JComponent component;
 
         private LogLevelCellRenderer(ListCellRenderer delegate, Logger logger) {
@@ -127,6 +132,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
         }
 
+        @Override
         public Component getListCellRendererComponent(
                 JList list, Object value, int index,
                 boolean isSelected, boolean cellHasFocus) {
@@ -139,7 +145,6 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                     do {
                         anscestor = anscestor.getParent();
                         if (anscestor == null) {
-                            new Exception("anscestor is null").printStackTrace();
                             value = "NULL"; // I don't think this happens...
                         } else {
                             value = anscestor.getLevel();
@@ -166,6 +171,9 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
     /**
      * Creates new form LogConsoleSettingsDialog
+     * @param parent the dialog parent, used to position the GUI.
+     * @param modal specifies whether dialog blocks user input to other top-level windows when shown. If true, the modality type property is set to DEFAULT_MODALITY_TYPE, otherwise the dialog is modeless.
+     * @param console the log console for viewing the loggers.
      */
     public LogConsoleSettingsDialog(java.awt.Frame parent, boolean modal, LogConsole console) {
         super(parent, modal);
@@ -183,6 +191,11 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         loggerIDCheckBox.setSelected(console.showLoggerId);
     }
 
+    /**
+     * A logger can have a null level, meaning its parent's level should be used.
+     * @param anscestor the logger.
+     * @return the Level.
+     */
     private Level getLoggerMindingInheritance(Logger anscestor) {
         Level value = anscestor.getLevel();
 
@@ -351,7 +364,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 Logger l2 = (Logger) o2;
                 Level level1 = getLoggerMindingInheritance(l1);
                 Level level2 = getLoggerMindingInheritance(l2);
-                return level1.intValue() - level2.intValue();
+                return level2.intValue() - level1.intValue();
             }
         });
 
