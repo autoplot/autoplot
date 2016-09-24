@@ -3,12 +3,11 @@
  * and open the template in the editor.
  */
 
-/*
+ /*
  * LogConsoleSettingsDialog.java
  *
  * Created on May 19, 2009, 7:32:38 AM
  */
-
 package org.virbo.autoplot.scriptconsole;
 
 import java.awt.Component;
@@ -33,176 +32,182 @@ import org.das2.datum.LoggerManager;
 import org.virbo.autoplot.AutoplotUtil;
 
 /**
- * Settings GUI for the Log Console dialog.  The log console is more complex than it first seems, in that it
- * is actually receiving messages from loggers, not just stdout and stderr.  (See http://docs.oracle.com/javase/1.4.2/docs/guide/util/logging/overview.html,
- * but in short messages are sent to hierarchical named channels with verbosity levels.)  
+ * Settings GUI for the Log Console dialog. The log console is more complex than
+ * it first seems, in that it is actually receiving messages from loggers, not
+ * just stdout and stderr. (See
+ * http://docs.oracle.com/javase/1.4.2/docs/guide/util/logging/overview.html,
+ * but in short messages are sent to hierarchical named channels with verbosity
+ * levels.)
+ *
  * @author jbf
  */
 public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
     LogConsole console;
 
-	/**
-	 * Just a list of all the log levels defined in {@link Level}
-	 */
-	private static final Level[] LOG_LEVELS = {
-		Level.OFF,
-		Level.SEVERE,
-		Level.WARNING,
-		Level.INFO,
-		Level.CONFIG,
-		Level.FINE,
-		Level.FINER,
-		Level.FINEST,
-		Level.ALL,
-		null,
-	};
+    /**
+     * Just a list of all the log levels defined in {@link Level}
+     */
+    private static final Level[] LOG_LEVELS = {
+        Level.OFF,
+        Level.SEVERE,
+        Level.WARNING,
+        Level.INFO,
+        Level.CONFIG,
+        Level.FINE,
+        Level.FINER,
+        Level.FINEST,
+        Level.ALL,
+        null,};
 
-	private class LogLevelComboBoxModel implements ComboBoxModel {
-		private Logger logger;
-		private LogLevelComboBoxModel(Logger logger) {
-			if (logger == null) {
-				throw new NullPointerException("logger must be non-null");
-			}
-			this.logger = logger;
-		}
+    private class LogLevelComboBoxModel implements ComboBoxModel {
 
-		public void setSelectedItem(Object anItem) {
-			Level level = (Level)anItem;
-			logger.setLevel(level);
-                        boolean invisible= true;
-                        StringBuilder err= new StringBuilder();
-                        for ( Handler h: logger.getHandlers() ) {
-                            if ( level!=null && h.getLevel().intValue()>level.intValue() ) {
-                                err.append("handler filters data: ").append(h).append( "\n");
-                            } else {
-                                invisible= false; 
-                            }
+        private Logger logger;
+
+        private LogLevelComboBoxModel(Logger logger) {
+            if (logger == null) {
+                throw new NullPointerException("logger must be non-null");
+            }
+            this.logger = logger;
+        }
+
+        public void setSelectedItem(Object anItem) {
+            Level level = (Level) anItem;
+            logger.setLevel(level);
+            boolean invisible = true;
+            StringBuilder err = new StringBuilder();
+            for (Handler h : logger.getHandlers()) {
+                if (level != null && h.getLevel().intValue() > level.intValue()) {
+                    err.append("handler filters data: ").append(h).append("\n");
+                } else {
+                    invisible = false;
+                }
+            }
+            if (invisible) {//TODO: check parents
+                //err.append( String.format( "No handlers (of %d) will show this log level: %s", logger.getHandlers().length, level ) );
+            }
+            if (err.length() > 0) {
+                AutoplotUtil.showMessageDialog(LogConsoleSettingsDialog.this,
+                        err.toString(), "Misconfigured Logger", JOptionPane.OK_OPTION);
+            }
+        }
+
+        public Object getSelectedItem() {
+            return logger.getLevel();
+        }
+
+        public int getSize() {
+            return LOG_LEVELS.length;
+        }
+
+        public Object getElementAt(int index) {
+            return LOG_LEVELS[index];
+        }
+
+        public void addListDataListener(javax.swing.event.ListDataListener l) {
+            //No need to implement for a static model
+        }
+
+        public void removeListDataListener(javax.swing.event.ListDataListener l) {
+            //No need to implement for a static model
+        }
+    }
+
+    private static class LogLevelCellRenderer implements ListCellRenderer {
+
+        private Logger logger;
+        private ListCellRenderer delegate;
+        private JComponent component;
+
+        private LogLevelCellRenderer(ListCellRenderer delegate, Logger logger) {
+            this.delegate = delegate;
+            this.logger = logger;
+            if (delegate instanceof JComponent) {
+                this.component = (JComponent) delegate;
+            }
+        }
+
+        public Component getListCellRendererComponent(
+                JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+            //We just need to handle null as a special case
+            if (value == null) {
+                Logger anscestor = logger;
+                if (logger.getParent() == null) { // root logger.
+                    value = logger.getLevel();
+                } else {
+                    do {
+                        anscestor = anscestor.getParent();
+                        if (anscestor == null) {
+                            new Exception("anscestor is null").printStackTrace();
+                            value = "NULL"; // I don't think this happens...
+                        } else {
+                            value = anscestor.getLevel();
                         }
-                        if ( invisible ) {//TODO: check parents
-                            //err.append( String.format( "No handlers (of %d) will show this log level: %s", logger.getHandlers().length, level ) );
+                    } while (value == null);
+                    value = "INHERITED(" + value + ")";
+
+                    if (component != null) {
+                        String name = anscestor.getName();
+                        if (name.equals("")) {
+                            name = "<anonymous>";
                         }
-                        if ( err.length()>0 ) {
-                            AutoplotUtil.showMessageDialog( LogConsoleSettingsDialog.this, 
-                                    err.toString(), "Misconfigured Logger", JOptionPane.OK_OPTION );
-                        }
-		}
+                        component.setToolTipText("inherited from " + name);
+                    }
+                }
+            } else {
+                ((JComponent) delegate).setToolTipText(null);
+            }
+            return delegate.getListCellRendererComponent(
+                    list, value, index, isSelected, cellHasFocus);
+        }
 
-		public Object getSelectedItem() {
-			return logger.getLevel();
-		}
+    }
 
-		public int getSize() {
-			return LOG_LEVELS.length;
-		}
-
-		public Object getElementAt(int index) {
-			return LOG_LEVELS[index];
-		}
-
-		public void addListDataListener(javax.swing.event.ListDataListener l) {
-			//No need to implement for a static model
-		}
-
-		public void removeListDataListener(javax.swing.event.ListDataListener l) {
-			//No need to implement for a static model
-		}
-	}
-
-	private static class LogLevelCellRenderer implements ListCellRenderer {
-		private Logger logger;
-		private ListCellRenderer delegate;
-		private JComponent component;
-
-		private LogLevelCellRenderer(ListCellRenderer delegate, Logger logger) {
-			this.delegate = delegate;
-			this.logger = logger;
-			if (delegate instanceof JComponent)
-				this.component = (JComponent)delegate;
-		}
-
-		public Component getListCellRendererComponent(
-				JList list, Object value, int index,
-				boolean isSelected, boolean cellHasFocus)
-		{
-			//We just need to handle null as a special case
-			if (value == null) {
-				Logger anscestor = logger;
-                                if ( logger.getParent()==null ) { // root logger.
-                                    value= logger.getLevel();
-                                } else {
-                                    do {
-                                            anscestor = anscestor.getParent();
-                                            if ( anscestor==null ) {
-                                                new Exception("anscestor is null").printStackTrace();
-                                                value = "NULL"; // I don't think this happens...
-                                            } else {
-                                                value = anscestor.getLevel();
-                                            }
-                                    } while (value == null);
-                                    value = "INHERITED(" + value + ")";
-
-
-                                    if (component != null) {
-                                            String name = anscestor.getName();
-                                            if (name.equals(""))
-                                                    name = "<anonymous>";
-                                            component.setToolTipText("inherited from " + name);
-                                    }
-                                }
-			}
-			else {
-				((JComponent)delegate).setToolTipText(null);
-			}
-			return delegate.getListCellRendererComponent(
-					list, value, index, isSelected, cellHasFocus);
-		}
-		
-	}
-
-    /** Creates new form LogConsoleSettingsDialog */
-    public LogConsoleSettingsDialog(java.awt.Frame parent, boolean modal, LogConsole console ) {
+    /**
+     * Creates new form LogConsoleSettingsDialog
+     */
+    public LogConsoleSettingsDialog(java.awt.Frame parent, boolean modal, LogConsole console) {
         super(parent, modal);
         setTitle("Log Console Settings");
         initComponents();
         setLocationRelativeTo(parent);
-        
+
         initLogTable();
-        
-        this.console= console;
-        
-        searchForTextField.setText( console.getSearchText() );
-        timeStampsCheckBox.setSelected( console.showTimeStamps );
-        logLevelCheckBox.setSelected( console.showLevel );
-        loggerIDCheckBox.setSelected( console.showLoggerId );
+
+        this.console = console;
+
+        searchForTextField.setText(console.getSearchText());
+        timeStampsCheckBox.setSelected(console.showTimeStamps);
+        logLevelCheckBox.setSelected(console.showLevel);
+        loggerIDCheckBox.setSelected(console.showLoggerId);
     }
-    
-    private Level getLoggerMindingInheritance( Logger anscestor )  {
-        Level value= anscestor.getLevel();
-        
-        while ( value==null ) {    
+
+    private Level getLoggerMindingInheritance(Logger anscestor) {
+        Level value = anscestor.getLevel();
+
+        while (value == null) {
             anscestor = anscestor.getParent();
             value = anscestor.getLevel();
         }
-        
+
         return value;
     }
-    
-    
+
     static class LevelCellRenderer implements TableCellRenderer {
 
-        JComponent component=null;
+        JComponent component = null;
         TableCellRenderer delegate;
 
-        public LevelCellRenderer( TableCellRenderer delegate) {
+        public LevelCellRenderer(TableCellRenderer delegate) {
             this.component = null;
             this.delegate = delegate;
         }
-        
+
         @Override
         public Component getTableCellRendererComponent(JTable table, Object lvalue, boolean isSelected, boolean hasFocus, int row, int column) {
             Logger logger = (Logger) lvalue;
-            Object value= logger.getLevel();
+            Object value = logger.getLevel();
             //We just need to handle null as a special case
             if (value == null) {
                 Logger anscestor = logger;
@@ -232,21 +237,22 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 ((JComponent) delegate).setToolTipText(null);
             }
             return delegate.getTableCellRendererComponent(
-                    table, value, isSelected, hasFocus, row, column );
+                    table, value, isSelected, hasFocus, row, column);
         }
-        
+
     }
-    
+
     class MyEditor implements TableCellEditor {
+
         JComboBox cb;
         Logger value;
-        
+
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            this.value= (Logger)value;
-            ComboBoxModel m= new LogLevelComboBoxModel((Logger)value);
-            cb= new JComboBox( m );
-            cb.setRenderer( new LogLevelCellRenderer( cb.getRenderer(), this.value ) );
+            this.value = (Logger) value;
+            ComboBoxModel m = new LogLevelComboBoxModel((Logger) value);
+            cb = new JComboBox(m);
+            cb.setRenderer(new LogLevelCellRenderer(cb.getRenderer(), this.value));
             return cb;
         }
 
@@ -276,89 +282,89 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         public void cancelCellEditing() {
             fireEditingCanceled();
         }
-        
+
         private final EventListenerList listeners = new EventListenerList();
         private ChangeEvent evt;
 
         private void fireEditingStopped() {
-        Object[] l = listeners.getListenerList();
-        for (int i = 0; i < l.length; i += 2) {
-            if (l[i] == CellEditorListener.class) {
-                CellEditorListener cel = (CellEditorListener) l[i + 1];
-                if (evt == null) {
-                    evt = new ChangeEvent(this);
+            Object[] l = listeners.getListenerList();
+            for (int i = 0; i < l.length; i += 2) {
+                if (l[i] == CellEditorListener.class) {
+                    CellEditorListener cel = (CellEditorListener) l[i + 1];
+                    if (evt == null) {
+                        evt = new ChangeEvent(this);
+                    }
+                    cel.editingStopped(evt);
                 }
-                cel.editingStopped(evt);
             }
         }
-    }
 
-    private void fireEditingCanceled() {
-        Object[] l = listeners.getListenerList();
-        for (int i = 0; i < l.length; i += 2) {
-            if (l[i] == CellEditorListener.class) {
-                CellEditorListener cel = (CellEditorListener) l[i + 1];
-                if (evt == null) {
-                    evt = new ChangeEvent(this);
+        private void fireEditingCanceled() {
+            Object[] l = listeners.getListenerList();
+            for (int i = 0; i < l.length; i += 2) {
+                if (l[i] == CellEditorListener.class) {
+                    CellEditorListener cel = (CellEditorListener) l[i + 1];
+                    if (evt == null) {
+                        evt = new ChangeEvent(this);
+                    }
+                    cel.editingCanceled(evt);
                 }
-                cel.editingCanceled(evt);
             }
         }
-    }
 
         @Override
-    public void addCellEditorListener(CellEditorListener l) {
-        listeners.add(CellEditorListener.class, l);
-    }
+        public void addCellEditorListener(CellEditorListener l) {
+            listeners.add(CellEditorListener.class, l);
+        }
 
         @Override
-    public void removeCellEditorListener(CellEditorListener l) {
-        listeners.add(CellEditorListener.class, l);
+        public void removeCellEditorListener(CellEditorListener l) {
+            listeners.add(CellEditorListener.class, l);
+        }
+
     }
-        
-    }
-    
+
     private void initLogTable() {
-        HashSet otherLoggers= new HashSet( org.das2.util.LoggerManager.getLoggers() );
-        otherLoggers.addAll( org.das2.datum.LoggerManager.getLoggers() );
-        String[] sloggers= (String[])otherLoggers.toArray( new String[otherLoggers.size()] );
+        HashSet otherLoggers = new HashSet(org.das2.util.LoggerManager.getLoggers());
+        otherLoggers.addAll(org.das2.datum.LoggerManager.getLoggers());
+        String[] sloggers = (String[]) otherLoggers.toArray(new String[otherLoggers.size()]);
         Arrays.sort(sloggers);
-        DefaultTableModel m= new DefaultTableModel( new String[] { "name", "level" }, sloggers.length );
-        int irow= 0;
-        for ( String slogger: sloggers ) {
-            m.setValueAt( slogger, irow, 0 );
-            Logger logger= Logger.getLogger(slogger);
-            m.setValueAt( logger, irow, 1 );
+        DefaultTableModel m = new DefaultTableModel(new String[]{"name", "level"}, sloggers.length);
+        int irow = 0;
+        for (String slogger : sloggers) {
+            m.setValueAt(slogger, irow, 0);
+            Logger logger = Logger.getLogger(slogger);
+            m.setValueAt(logger, irow, 1);
             irow++;
         }
         jTable1.setAutoCreateRowSorter(true);
         jTable1.setModel(m);
-        jTable1.getColumnModel().getColumn(1).setCellRenderer( new LevelCellRenderer( new DefaultTableCellRenderer() ) );
-        jTable1.getColumnModel().getColumn(1).setCellEditor( new MyEditor() );
-        
+        jTable1.getColumnModel().getColumn(1).setCellRenderer(new LevelCellRenderer(new DefaultTableCellRenderer()));
+        jTable1.getColumnModel().getColumn(1).setCellEditor(new MyEditor());
+
         TableRowSorter<TableModel> rowSorter = new TableRowSorter<TableModel>(m);
         jTable1.setRowSorter(rowSorter);
-        rowSorter.setComparator( 1, new Comparator() {
+        rowSorter.setComparator(1, new Comparator() {
             @Override
             public int compare(Object o1, Object o2) {
-                Logger l1= (Logger)o1;
-                Logger l2= (Logger)o2;
-                Level level1= getLoggerMindingInheritance(l1);
-                Level level2= getLoggerMindingInheritance(l2);
+                Logger l1 = (Logger) o1;
+                Logger l2 = (Logger) o2;
+                Level level1 = getLoggerMindingInheritance(l1);
+                Level level2 = getLoggerMindingInheritance(l2);
                 return level1.intValue() - level2.intValue();
             }
-        } );
-        
+        });
+
     }
 
     private void updateSearchText() {
-        console.setSearchText( searchForTextField.getText() );
+        console.setSearchText(searchForTextField.getText());
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -500,19 +506,19 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
     private void loggerIDCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loggerIDCheckBoxActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
-        console.setShowLoggerId( loggerIDCheckBox.isSelected() );
+        console.setShowLoggerId(loggerIDCheckBox.isSelected());
         console.update();
 }//GEN-LAST:event_loggerIDCheckBoxActionPerformed
 
     private void timeStampsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeStampsCheckBoxActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
-        console.setShowTimeStamps( timeStampsCheckBox.isSelected() );
+        console.setShowTimeStamps(timeStampsCheckBox.isSelected());
         console.update();
 }//GEN-LAST:event_timeStampsCheckBoxActionPerformed
 
     private void logLevelCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logLevelCheckBoxActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
-        console.setShowLevel( logLevelCheckBox.isSelected() );
+        console.setShowLevel(logLevelCheckBox.isSelected());
         console.update();
 }//GEN-LAST:event_logLevelCheckBoxActionPerformed
 
@@ -532,13 +538,13 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
     private void threadsCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_threadsCBActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
-        console.setShowThreads( threadsCB.isSelected() );
+        console.setShowThreads(threadsCB.isSelected());
         console.update();
     }//GEN-LAST:event_threadsCBActionPerformed
 
     /**
-    * @param args the command line arguments
-    */
+     * @param args the command line arguments
+     */
     public static void main(String args[]) {
         LoggerManager.getLogger("autoplot.first");
         LoggerManager.getLogger("qdataset");
@@ -547,8 +553,8 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         LoggerManager.getLogger("qdataset.second").setLevel(Level.FINE);
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                LogConsole console= new LogConsole();
-                LogConsoleSettingsDialog dialog = new LogConsoleSettingsDialog(new javax.swing.JFrame(), true, console );
+                LogConsole console = new LogConsole();
+                LogConsoleSettingsDialog dialog = new LogConsoleSettingsDialog(new javax.swing.JFrame(), true, console);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
