@@ -1,16 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.hapiserver;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TimeZone;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -54,21 +47,54 @@ public class InfoServlet extends HttpServlet {
             parameter.put( "type", "float" );
             parameter.put( "units", "deg F" );
             parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Iowa City Air Temperature" );
+            parameter.put( "description", "Air Temperature" );
             parameters.put( 1, parameter );
+            parameter= new JSONObject();
+            parameter.put( "name", "DewPoint" );
+            parameter.put( "type", "float" );
+            parameter.put( "units", "deg F" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Dew Point" );
+            parameters.put( 2, parameter );
             parameter= new JSONObject();
             parameter.put( "name", "Humidity" );
             parameter.put( "type", "float" );
             parameter.put( "units", "percent" );
             parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Iowa City Relative Humidity" );
-            parameters.put( 2, parameter );
+            parameter.put( "description", "Relative Humidity" );
+            parameters.put( 3, parameter );
+            parameter= new JSONObject();
+            parameter.put( "name", "WindChill" );
+            parameter.put( "type", "float" );
+            parameter.put( "units", "deg F" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Wind Chill" );
+            parameters.put( 4, parameter );
+            parameter= new JSONObject();
+            parameter.put( "name", "HeatIndex" );
+            parameter.put( "type", "float" );
+            parameter.put( "units", "deg F" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Heat Index" );
+            parameters.put( 5, parameter );
+            parameter= new JSONObject();
+            parameter.put( "name", "Altimeter" );
+            parameter.put( "type", "float" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Altimeter" );
+            parameters.put( 6, parameter );
             parameter= new JSONObject();
             parameter.put( "name", "Pressure" );
             parameter.put( "type", "float" );
             parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Iowa City Barometric Pressure" );
-            parameters.put( 3, parameter );
+            parameter.put( "description", "Barometric Pressure" );
+            parameters.put( 7, parameter );
+            parameter= new JSONObject();
+            parameter.put( "name", "Precip" );
+            parameter.put( "type", "float" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Precipitation" );
+            parameters.put( 8, parameter );
                         
         } else {
             parameter= new JSONObject();
