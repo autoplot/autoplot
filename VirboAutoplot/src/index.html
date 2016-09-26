@@ -26,6 +26,8 @@
         
         <p>Bugfixes (2016-09-24 r19486):</p>
         <ul>
+            <li>1679: HAPI JSON would confuse Rich ASCII support.</li>
+            <li>improve feedback for qstreams when values are found in both the packet descriptor and in the packets.</li>
             <li>applyIndex supports BUNDLE_i.</li>
             <li>Series renderer plotSymbols would show when units were inconvertable, but then connectors would refuse to paint.  Now both will paint with a warning.</li>
             <li>blurTsbUri would fail when a data source was removed, but one of its URIs was still in the history.</li>
@@ -108,6 +110,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>rfe247: HAPI data streams, with HAPI JSON headers, can be read in now as a rich ascii dialect</li>
             <li>The console Logger control uses a table now, and allows sorting by log level.</li>
             <li>HTML parser allows the units to be set externally.  "N/A" was causing the units to come back as ordinal units.</li>
             <li>DataPointRecorder allows the time format to be controlled.</li>
