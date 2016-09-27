@@ -107,6 +107,8 @@ public class URISplit {
             if ( arg_0!=null ) params.put( "arg_0", arg_0 );
             List<String> keys= new ArrayList<>( paramsLoose.keySet() );
             Collections.sort(keys);
+            if ( keys.remove("start_time") ) keys.add("start_time"); //
+            if ( keys.remove("end_time" ) ) keys.add("end_time");
             for ( String k: keys ) {
                 params.put( k, paramsLoose.get(k) );
             }
