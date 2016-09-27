@@ -74,7 +74,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
      */
     public HapiDataSourceEditorPanel() {
         try {
-            this.defaultServer = new URL("http://tsds.org/get/IMAGE/PT1M/hapi");
+            List<String> servers= HapiServer.getKnownServers();
+            this.defaultServer = new URL(servers.get(servers.size()-1));
         } catch ( MalformedURLException ex ) {
             throw new RuntimeException(ex);
         }
