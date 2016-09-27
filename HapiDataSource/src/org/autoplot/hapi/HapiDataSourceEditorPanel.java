@@ -496,16 +496,16 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             parametersPanel.removeAll();
             for ( int i=0; i<parameters.length(); i++ ) {
                 JSONObject parameter= parameters.getJSONObject(i);
-                if ( parameter.has("size") ) {
-                    Object o= parameter.get("size");
-                    if ( !( o instanceof JSONArray ) ) {
-                        logger.log(Level.WARNING, "size is not an array of ints: {0}", o);
-                        continue;
-                    }
-                    JSONArray aa= parameter.getJSONArray("size");
-                    logger.log(Level.WARNING, "size is array is not supported in Autoplot.");
-                    continue;
-                }
+//                if ( parameter.has("size") ) {
+//                    Object o= parameter.get("size");
+//                    if ( !( o instanceof JSONArray ) ) {
+//                        logger.log(Level.WARNING, "size is not an array of ints: {0}", o);
+//                        continue;
+//                    }
+//                    JSONArray aa= parameter.getJSONArray("size");
+//                    logger.log(Level.WARNING, "size is array is not supported in Autoplot.");
+//                    continue;
+//                }
                 JCheckBox cb= new JCheckBox(parameter.getString("name"));
                 cb.setName(parameter.getString("name"));
                 cb.setSelected(true);
