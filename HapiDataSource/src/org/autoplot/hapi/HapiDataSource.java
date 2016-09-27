@@ -25,7 +25,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SparseDataSetBuilder;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DefaultTimeSeriesBrowse;
 import org.virbo.datasource.URISplit;
@@ -97,6 +99,7 @@ public class HapiDataSource extends AbstractDataSource {
         Units units= Units.dimensionless;
         String name= "";
         String description= "";
+        int[] size= new int[0]; // array of scalars
         private ParamDescription( String name ) {
             this.name= name;
         }
@@ -210,7 +213,7 @@ public class HapiDataSource extends AbstractDataSource {
         
         return result;
     }
-            
+    
     @Override
     public QDataSet getDataSet(ProgressMonitor monitor) throws Exception {
         URI server = this.resourceURI;
@@ -219,7 +222,7 @@ public class HapiDataSource extends AbstractDataSource {
             return getDataSetCDAWeb(monitor);
         }
         
-        String id= getParam("id","" );
+        String id= getParam("id","" );  // the name of the set of identifiers.
         if ( id.equals("") ) throw new IllegalArgumentException("missing id");
         id= URLDecoder.decode( id,"UTF-8" );
 
@@ -233,7 +236,7 @@ public class HapiDataSource extends AbstractDataSource {
         ParamDescription[] pds= new ParamDescription[nparameters];
         
         for ( int i=0; i<nparameters; i++ ) {
-            String name= parameters.getJSONObject(i).getString("name");
+            String name= parameters.getJSONObject(i).getString("name"); // the name of one of the parameters.
             pds[i]= new ParamDescription( name );
 
             String type;
@@ -275,8 +278,26 @@ public class HapiDataSource extends AbstractDataSource {
                 } else {
                     pds[i].description= ""; // when a value cannot be parsed, but it is not identified.
                 }
+                if ( parameters.getJSONObject(i).has("size") ) {
+                    Object o= parameters.getJSONObject(i).get("size");
+                    if ( !(o instanceof JSONArray) ) {
+                        if ( o.getClass()==Integer.class ) {
+                            pds[i].size= new int[ ((Integer)o) ];
+                            logger.log( Level.WARNING, "size should be an int array, found int: {0}", name);
+                        } else {
+                            throw new IllegalArgumentException( String.format( "size should be an int array: {0}", name ) );
+                        }                                                            
+                    } else {
+                        JSONArray a= (JSONArray)o;
+                        pds[i].size= new int[a.length()];
+                        for ( int j=0; j<a.length(); j++ ) {
+                            pds[i].size[j]= a.getInt(j);
+                        }
+                    }
+                }
             }
         }
+        
         DatumRange tr; // TSB = DatumRangeUtil.parseTimeRange(timeRange);
         tr= tsb.getTimeRange();
         
@@ -297,23 +318,51 @@ public class HapiDataSource extends AbstractDataSource {
             pds= subsetPds;
         }
         
-        DataSetBuilder builder= new DataSetBuilder(2,100,nparam);
-
         URL url= HapiServer.getDataURL( server.toURL(), id, tr, pp );
         
         logger.log(Level.FINE, "getDataSet {0}", url.toString());
+        
+        int[] nfields= new int[nparam];
+        for ( int i=0; i<nparam; i++ ) {
+            if ( pds[i].size.length==0 || ( pds[i].size.length==1 && pds[i].size[0]==1 ) ) {
+                nfields[i]= 1;
+            } else {
+                nfields[i]= DataSetUtil.product(pds[i].size);
+            }
+        }
+        int totalFields= DataSetUtil.sum(nfields);
+
+        DataSetBuilder builder= new DataSetBuilder(2,100,totalFields);
         
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
                 String[] ss= line.split(",");
+                if ( ss.length!=totalFields ) {
+                    logger.log(Level.WARNING, "expected {0} got {1}", new Object[]{totalFields, ss.length});
+                }
+                int ifield=0;
                 for ( int i=0; i<nparam; i++ ) {
-                    try {
-                        builder.putValue( -1, i, pds[i].units.parse(ss[i]) );
-                    } catch ( ParseException ex ) {
-                        builder.putValue( -1, i, pds[i].fillValue );
-                        pds[i].hasFill= true;
+                    if ( nfields[i]==1 ) {
+                        try {
+                            builder.putValue( -1, ifield, pds[i].units.parse(ss[ifield]) );
+                        } catch ( ParseException ex ) {
+                            builder.putValue( -1, ifield, pds[i].fillValue );
+                            pds[i].hasFill= true;
+                        }
+                        ifield++;
+                    } else {
+                        for ( int j=0; j<nfields[i]; j++ ) {
+                            try {
+                                builder.putValue( -1, ifield, pds[i].units.parse(ss[ifield]) );
+                            } catch ( ParseException ex ) {
+                                builder.putValue( -1, ifield, pds[i].fillValue );
+                                pds[i].hasFill= true;
+                            }
+                            ifield++;
+                        } 
                     }
+                    
                 }
                 builder.nextRecord();
                 line= in.readLine();
@@ -347,20 +396,43 @@ public class HapiDataSource extends AbstractDataSource {
             }
             
         } else {
-            BundleBuilder bdsb= new BundleBuilder(nparameters-1);
-            for ( int i=1; i<nparameters; i++ ) {
-                bdsb.putProperty( QDataSet.NAME, i-1, Ops.safeName(pds[i].name) );
-                bdsb.putProperty( QDataSet.LABEL, i-1, pds[i].name );
-                bdsb.putProperty( QDataSet.TITLE, i-1, pds[i].description );
-                bdsb.putProperty( QDataSet.UNITS, i-1, pds[i].units );
-                if ( pds[i].hasFill ) {
-                    bdsb.putProperty( QDataSet.FILL_VALUE, i-1,  pds[i].fillValue );
+            // we need to remove Epoch to DEPEND_0.
+            SparseDataSetBuilder sdsb= new SparseDataSetBuilder(2);
+            sdsb.setLength(nparameters-1);
+            int ifield=1;
+            for ( int i=1; i<pds.length; i++ ) {
+                int nfields1= DataSetUtil.product(pds[i].size);
+                int startIndex= ifield-1;
+                if ( nfields1>1 ) {
+                    //bdsb.putProperty( QDataSet.ELEMENT_DIMENSIONS, ifield-1, pds[i].size ); // not supported yet.
+                    sdsb.putProperty( QDataSet.ELEMENT_NAME, ifield-1, Ops.safeName( pds[i].name ) );
+                    sdsb.putProperty( QDataSet.ELEMENT_LABEL, ifield-1, pds[i].name );        
+                    for ( int j=0; j<pds[i].size.length; j++ ) {
+                        sdsb.putValue( ifield-1, j, pds[i].size[j] );
+                    }
+                    //sdsb.putValue( QDataSet.ELEMENT_DIMENSIONS, ifield-1, pds[i].size );                    
+                }
+                for ( int j=0; j<nfields1; j++ ) {
+                    if ( nfields1>1 ) {
+                        sdsb.putProperty( QDataSet.START_INDEX, ifield-1, startIndex );
+                    }
+                    sdsb.putProperty( QDataSet.NAME, ifield-1, Ops.safeName(pds[i].name) );
+                    sdsb.putProperty( QDataSet.LABEL, ifield-1, pds[i].name );
+                    sdsb.putProperty( QDataSet.TITLE, ifield-1, pds[i].description );
+                    sdsb.putProperty( QDataSet.UNITS, ifield-1, pds[i].units );
+                    if ( pds[i].hasFill ) {
+                        sdsb.putProperty( QDataSet.FILL_VALUE, ifield-1,  pds[i].fillValue );
+                    }
+                    if ( nfields1>1 ) {
+                        sdsb.putProperty( QDataSet.START_INDEX, ifield-1, startIndex );
+                    }                    
+                    ifield++;
                 }
             }
             
             ds= Ops.copy( Ops.trim1( ds, 1, ds.length(0) ) );
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
-            ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, bdsb.getDataSet() );
+            ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, sdsb.getDataSet() );
         }
         return ds;
     }
