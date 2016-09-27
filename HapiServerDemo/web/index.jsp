@@ -31,6 +31,7 @@
         <small>
         <ul>
             <li>2016-09-21: bugfix: parameters supported when include is not set.
+            <li>2016-09-26: more parameters in current conditions.
         </ul>
         </small>
     </body>
