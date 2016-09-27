@@ -23,6 +23,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.das2.datum.DatumRange;
@@ -66,8 +67,9 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     
     protected final static Logger logger= Logger.getLogger("apdss.hapi");
     
-    private JSONArray currentParameters;
+    private String currentParameters= null;
     private URL currentServer= null;
+    private String currentId= null;
      
     /**
      * Creates new form HapiDataSourceEditorPanel
@@ -89,6 +91,10 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if ( !e.getValueIsAdjusting() ) {
+                    if ( idsList2.getSelectedValue()!=null && !idsList2.getSelectedValue().equals(currentId) ) {
+                        currentParameters= null;
+                    }
+                    currentId= idsList2.getSelectedValue();
                     resetVariableTimer.tickle();
                 }
             }
@@ -350,9 +356,9 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         return true;
     }
     
-    /** make the parameters checklist reflect parameters spec.
+    /** make the currentParameters checklist reflect currentParameters spec.
      * 
-     * @param parameters comma-delineated list of parameters.
+     * @param parameters comma-delineated list of currentParameters.
      */
     private void setParameters( String parameters ) {
         for ( Component c: parametersPanel.getComponents() ) {
@@ -430,7 +436,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         }
         String parameters= params.get("parameters");
         if ( parameters!=null ) {
-            setParameters( parameters );
+            this.currentParameters= parameters;
+            setParameters(this.currentParameters);
         }
         
     }
@@ -513,7 +520,9 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             }
             parametersPanel.revalidate();
             parametersPanel.repaint();
-            currentParameters= parameters;
+            if ( currentParameters!=null ) {
+                setParameters(currentParameters);
+            }
             DatumRange range= getRange(info);
             if ( range==null ) {
                 jLabel3.setText( "range is not provided" );
