@@ -6,6 +6,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -161,7 +162,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
             return delegate.getListCellRendererComponent(
                     list, value, index, isSelected, cellHasFocus);
-        }
+            }
 
     }
 
@@ -228,14 +229,81 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
     }
 
+    static class MyCellRenderer implements TableCellRenderer {
+
+        TableCellRenderer delegate;
+        Color backgroundColor;
+        Color oddColor= Color.LIGHT_GRAY;
+        Color selectedColor;
+        Color selectedBackgroundColor;
+        Color focusColor;
+        Color focusBackgroundColor;
+        
+        public MyCellRenderer(TableCellRenderer delegate) {
+            this.delegate = delegate;
+            Component c=  delegate.getTableCellRendererComponent(
+                    null, "", false, false, 0, 0 );
+            backgroundColor= c.getBackground();
+            c=  delegate.getTableCellRendererComponent(
+                    null, "", true, false, 0, 0 );
+            selectedBackgroundColor= c.getBackground();
+            selectedColor= c.getForeground();
+            c=  delegate.getTableCellRendererComponent(
+                    null, "", false, true, 0, 0 );
+            focusBackgroundColor= c.getBackground();
+            focusColor= c.getForeground();
+            
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object lvalue, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c=  delegate.getTableCellRendererComponent(
+                    table, lvalue, isSelected, hasFocus, row, column);
+//            if ( false ) {
+//                if ( row % 2 == 1 && ! ( isSelected || hasFocus ) ) {
+//                    c.setBackground( oddColor );
+//                    c.setForeground( null );
+//                } else if ( isSelected ) {
+//                    c.setBackground( selectedBackgroundColor );
+//                    c.setForeground( selectedColor );
+//                } else if ( hasFocus ) {
+//                    c.setBackground( focusBackgroundColor );
+//                    c.setForeground( focusColor );
+//                } else {
+//                    c.setBackground( null );
+//                    c.setForeground( null );
+//                }
+//            }
+            return c;
+        }
+
+    }
+    
     static class LevelCellRenderer implements TableCellRenderer {
 
         JComponent component = null;
         TableCellRenderer delegate;
-
+        Color backgroundColor;
+        Color oddColor= Color.LIGHT_GRAY;
+        Color selectedColor;
+        Color selectedBackgroundColor;
+        Color focusColor;
+        Color focusBackgroundColor;      
         public LevelCellRenderer(TableCellRenderer delegate) {
             this.component = null;
             this.delegate = delegate;
+            Component c=  delegate.getTableCellRendererComponent(
+                    null, "", false, false, 0, 0 );
+            backgroundColor= c.getBackground();
+            c=  delegate.getTableCellRendererComponent(
+                    null, "", true, false, 0, 0 );
+            selectedBackgroundColor= c.getBackground();
+            selectedColor= c.getForeground();
+            c=  delegate.getTableCellRendererComponent(
+                    null, "", false, true, 0, 0 );
+            focusBackgroundColor= c.getBackground();
+            focusColor= c.getForeground();
+                        
         }
 
         @Override
@@ -270,8 +338,22 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             } else {
                 ((JComponent) delegate).setToolTipText(null);
             }
-            return delegate.getTableCellRendererComponent(
+            Component c=  delegate.getTableCellRendererComponent(
                     table, value, isSelected, hasFocus, row, column);
+//            if ( row % 2 == 1 && ! ( isSelected || hasFocus ) ) {
+//                c.setBackground( oddColor );
+//                c.setForeground( null );
+//            } else if ( isSelected ) {
+//                c.setBackground( selectedBackgroundColor );
+//                c.setForeground( selectedColor );
+//            } else if ( hasFocus ) {
+//                c.setBackground( focusBackgroundColor );
+//                c.setForeground( focusColor );
+//            } else {
+//                c.setBackground( null );
+//                c.setForeground( null );
+//            }
+            return c;
         }
 
     }
@@ -383,6 +465,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         }
         jTable1.setAutoCreateRowSorter(true);
         jTable1.setModel(m);
+        jTable1.getColumnModel().getColumn(0).setCellRenderer(new MyCellRenderer(new DefaultTableCellRenderer()));
         jTable1.getColumnModel().getColumn(1).setCellRenderer(new LevelCellRenderer(new DefaultTableCellRenderer()));
         jTable1.getColumnModel().getColumn(1).setCellEditor(new MyEditor());
         if (org.das2.util.LoggerManager.isUseTimeTaggingLoggers() ) {
