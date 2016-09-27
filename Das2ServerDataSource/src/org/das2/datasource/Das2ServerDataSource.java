@@ -599,7 +599,7 @@ class Das2ServerDataSource extends AbstractDataSource {
 
             @Override
             public String getURI() {
-                Map<String,String> c= new HashMap(params);
+                Map<String,String> c= new LinkedHashMap(params);
                 String stime= timeRange.min().toString().replace(" ", "+");
                 String etime= timeRange.max().toString().replace(" ", "+");
                 c.put("start_time",stime);
