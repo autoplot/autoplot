@@ -383,7 +383,7 @@ public class HapiDataSource extends AbstractDataSource {
     private QDataSet repackage(QDataSet ds, ParamDescription[] pds ) {
         int nparameters= ds.length(0);
         
-        QDataSet depend0= Ops.slice1( ds,0 );
+        QDataSet depend0= Ops.copy( Ops.slice1( ds,0 ) ); //TODO: this will be unnecessary after debugging.
         if ( ds.length(0)==2 ) {
             ds= Ops.copy( Ops.slice1( ds, 1 ) );
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
@@ -416,8 +416,8 @@ public class HapiDataSource extends AbstractDataSource {
                     if ( nfields1>1 ) {
                         sdsb.putProperty( QDataSet.START_INDEX, ifield-1, startIndex );
                     }
-                    sdsb.putProperty( QDataSet.NAME, ifield-1, Ops.safeName(pds[i].name) );
-                    sdsb.putProperty( QDataSet.LABEL, ifield-1, pds[i].name );
+                    sdsb.putProperty( QDataSet.NAME, ifield-1, Ops.safeName(pds[i].name)+"_"+j );
+                    sdsb.putProperty( QDataSet.LABEL, ifield-1, pds[i].name +" ch"+j );
                     sdsb.putProperty( QDataSet.TITLE, ifield-1, pds[i].description );
                     sdsb.putProperty( QDataSet.UNITS, ifield-1, pds[i].units );
                     if ( pds[i].hasFill ) {
