@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
  /*
  * LogConsoleSettingsDialog.java
@@ -389,7 +385,9 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         jTable1.setModel(m);
         jTable1.getColumnModel().getColumn(1).setCellRenderer(new LevelCellRenderer(new DefaultTableCellRenderer()));
         jTable1.getColumnModel().getColumn(1).setCellEditor(new MyEditor());
-        jTable1.getColumnModel().getColumn(2).setCellRenderer(new TimeTaggingCellRenderer(new DefaultTableCellRenderer()));
+        if (org.das2.util.LoggerManager.isUseTimeTaggingLoggers() ) {
+            jTable1.getColumnModel().getColumn(2).setCellRenderer(new TimeTaggingCellRenderer(new DefaultTableCellRenderer()));
+        }
         
         TableRowSorter<TableModel> rowSorter = new TableRowSorter<TableModel>(m);
         jTable1.setRowSorter(rowSorter);
