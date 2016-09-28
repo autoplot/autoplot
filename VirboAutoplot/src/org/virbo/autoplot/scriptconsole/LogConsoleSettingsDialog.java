@@ -229,6 +229,13 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
     }
 
+    private static Color slightlyDarker( Color c ) {
+        return new Color(Math.max((int)(c.getRed() * 0.90), 0),
+                     Math.max((int)(c.getGreen()*0.90), 0),
+                     Math.max((int)(c.getBlue() *0.90), 0),
+                     c.getAlpha());
+    }
+
     static class MyCellRenderer implements TableCellRenderer {
 
         TableCellRenderer delegate;
@@ -259,21 +266,19 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         public Component getTableCellRendererComponent(JTable table, Object lvalue, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c=  delegate.getTableCellRendererComponent(
                     table, lvalue, isSelected, hasFocus, row, column);
-//            if ( false ) {
-//                if ( row % 2 == 1 && ! ( isSelected || hasFocus ) ) {
-//                    c.setBackground( oddColor );
-//                    c.setForeground( null );
-//                } else if ( isSelected ) {
-//                    c.setBackground( selectedBackgroundColor );
-//                    c.setForeground( selectedColor );
-//                } else if ( hasFocus ) {
-//                    c.setBackground( focusBackgroundColor );
-//                    c.setForeground( focusColor );
-//                } else {
-//                    c.setBackground( null );
-//                    c.setForeground( null );
-//                }
-//            }
+            if ( row % 2 == 1 ) {
+                if ( isSelected ) {
+                    c.setBackground( slightlyDarker(table.getSelectionBackground()) );
+                } else {
+                    c.setBackground( slightlyDarker(table.getBackground()) );
+                }
+            } else {
+                if ( isSelected ) {
+                    c.setBackground( table.getSelectionBackground() );
+                } else {
+                    c.setBackground( table.getBackground() );
+                }                
+            }
             return c;
         }
 
@@ -340,19 +345,19 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
             Component c=  delegate.getTableCellRendererComponent(
                     table, value, isSelected, hasFocus, row, column);
-//            if ( row % 2 == 1 && ! ( isSelected || hasFocus ) ) {
-//                c.setBackground( oddColor );
-//                c.setForeground( null );
-//            } else if ( isSelected ) {
-//                c.setBackground( selectedBackgroundColor );
-//                c.setForeground( selectedColor );
-//            } else if ( hasFocus ) {
-//                c.setBackground( focusBackgroundColor );
-//                c.setForeground( focusColor );
-//            } else {
-//                c.setBackground( null );
-//                c.setForeground( null );
-//            }
+            if ( row % 2 == 1 ) {
+                if ( isSelected ) {
+                    c.setBackground( slightlyDarker(table.getSelectionBackground()) );
+                } else {
+                    c.setBackground( slightlyDarker(table.getBackground()) );
+                }
+            } else {
+                if ( isSelected ) {
+                    c.setBackground( table.getSelectionBackground() );
+                } else {
+                    c.setBackground( table.getBackground() );
+                }                
+            }
             return c;
         }
 
