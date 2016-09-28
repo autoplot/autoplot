@@ -6,8 +6,10 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EventObject;
@@ -26,7 +28,10 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.das2.datum.LoggerManager;
+import org.das2.util.Entities;
+import org.das2.util.awt.PdfGraphicsOutput;
 import org.virbo.autoplot.AutoplotUtil;
+import static org.virbo.autoplot.GuiSupport.setFont;
 
 /**
  * Settings GUI for the Log Console dialog. The log console is more complex than
@@ -515,6 +520,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         threadsCB = new javax.swing.JCheckBox();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        consoleFontButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -587,6 +593,13 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         ));
         jScrollPane2.setViewportView(jTable1);
 
+        consoleFontButton.setText("Console Font...");
+        consoleFontButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                consoleFontButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -602,16 +615,18 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 397, Short.MAX_VALUE)
                         .add(jButton1))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel1)
-                            .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel1)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                                 .add(loggerIDCheckBox)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(timeStampsCheckBox)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(logLevelCheckBox)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(threadsCB)))
+                                .add(threadsCB)
+                                .add(29, 29, 29)
+                                .add(consoleFontButton)))
                         .add(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -621,13 +636,14 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(timeStampsCheckBox)
                     .add(logLevelCheckBox)
                     .add(loggerIDCheckBox)
-                    .add(threadsCB))
+                    .add(threadsCB)
+                    .add(consoleFontButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
@@ -677,6 +693,16 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         console.update();
     }//GEN-LAST:event_threadsCBActionPerformed
 
+    private void consoleFontButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_consoleFontButtonActionPerformed
+        JFontChooser chooser = new JFontChooser( null );
+
+        chooser.setFont( console.getLogTextArea().getFont() );
+        chooser.setLocationRelativeTo(console);
+        if (chooser.showDialog() == JFontChooser.OK_OPTION) {
+            console.getLogTextArea().setFont( chooser.getFont() );
+        } 
+    }//GEN-LAST:event_consoleFontButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -702,6 +728,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton consoleFontButton;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
+import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileFilter;
@@ -237,6 +238,10 @@ public class LogConsole extends javax.swing.JPanel {
 
     public void setShowThreads(boolean selected) {
         this.showThreads= selected;
+    }
+    
+    protected JTextPane getLogTextArea() {
+        return this.logTextArea;
     }
     
     protected Map<String, Object> scriptContext = null;
