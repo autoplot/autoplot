@@ -463,6 +463,19 @@ public class HapiDataSource extends AbstractDataSource {
                 ds= Ops.putProperty( ds, QDataSet.FILL_VALUE, pds[1].fillValue );
             }
             
+        } else if ( pds.length==2 ) {
+            ds= Ops.copy( Ops.trim1( ds, 1, ds.length(0) ) );
+            ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
+            ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(pds[1].name) );
+            ds= Ops.putProperty( ds, QDataSet.LABEL, pds[1].name );
+            ds= Ops.putProperty( ds, QDataSet.TITLE, pds[1].description );
+            ds= Ops.putProperty( ds, QDataSet.UNITS, pds[1].units );
+            if ( pds[1].hasFill ) {
+                ds= Ops.putProperty( ds, QDataSet.FILL_VALUE, pds[1].fillValue );
+            }
+            if ( pds[1].depend1!=null ) {
+                ds= Ops.putProperty( ds, QDataSet.DEPEND_1, pds[1].depend1 );
+            }
         } else {
             // we need to remove Epoch to DEPEND_0.
             SparseDataSetBuilder sdsb= new SparseDataSetBuilder(2);
@@ -503,16 +516,7 @@ public class HapiDataSource extends AbstractDataSource {
             
             ds= Ops.copy( Ops.trim1( ds, 1, ds.length(0) ) );
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
-            if ( pds.length==2 && pds[1].depend1!=null ) {
-                ds= Ops.putProperty( ds, QDataSet.DEPEND_1, pds[1].depend1 );
-                ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, null );
-                ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(pds[1].name) );
-                ds= Ops.putProperty( ds, QDataSet.LABEL, pds[1].name );
-                ds= Ops.putProperty( ds, QDataSet.TITLE, pds[1].description );
-                ds= Ops.putProperty( ds, QDataSet.UNITS, pds[1].units );
-            } else {
-                ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, sdsb.getDataSet() );
-            }
+            ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, sdsb.getDataSet() );
         }
         return ds;
     }
