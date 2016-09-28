@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.util.LoggerManager;
@@ -222,6 +223,11 @@ public class HapiDataSource extends AbstractDataSource {
             return getDataSetCDAWeb(monitor);
         }
         
+        monitor.setTaskSize(100);
+        monitor.started();
+        
+        monitor.setProgressMessage("reading info");
+        
         String id= getParam("id","" );  // the name of the set of identifiers.
         if ( id.equals("") ) throw new IllegalArgumentException("missing id");
         id= URLDecoder.decode( id,"UTF-8" );
@@ -229,6 +235,8 @@ public class HapiDataSource extends AbstractDataSource {
         String pp= getParam("parameters","");
         
         JSONObject doc= getDocument();
+        monitor.setProgressMessage("got info");
+        monitor.setTaskProgress(20);
         
         JSONArray parameters= doc.getJSONArray("parameters");
         int nparameters= parameters.length();
@@ -334,6 +342,11 @@ public class HapiDataSource extends AbstractDataSource {
 
         DataSetBuilder builder= new DataSetBuilder(2,100,totalFields);
         
+        monitor.setProgressMessage("reading data");
+        monitor.setTaskProgress(20);
+        
+        long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
+        
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
@@ -342,8 +355,21 @@ public class HapiDataSource extends AbstractDataSource {
                     logger.log(Level.WARNING, "expected {0} got {1}", new Object[]{totalFields, ss.length});
                 }
                 int ifield=0;
-                for ( int i=0; i<nparam; i++ ) {
-                    if ( nfields[i]==1 ) {
+                Datum xx;
+                try {
+                    xx= pds[ifield].units.parse(ss[ifield]);
+                    if ( System.currentTimeMillis()-t0 > 100 ) {
+                        monitor.setProgressMessage("reading "+xx);
+                        t0= System.currentTimeMillis();
+                    }
+                } catch ( ParseException ex ) {
+                    line= in.readLine();
+                    continue;
+                }
+                builder.putValue( -1, ifield, xx );
+                ifield++;
+                for ( int i=1; i<nparam; i++ ) {  // nparam is number of parameters, which may have multiple fields.
+                    for ( int j=0; j<nfields[i]; j++ ) {
                         try {
                             builder.putValue( -1, ifield, pds[i].units.parse(ss[ifield]) );
                         } catch ( ParseException ex ) {
@@ -351,30 +377,26 @@ public class HapiDataSource extends AbstractDataSource {
                             pds[i].hasFill= true;
                         }
                         ifield++;
-                    } else {
-                        for ( int j=0; j<nfields[i]; j++ ) {
-                            try {
-                                builder.putValue( -1, ifield, pds[i].units.parse(ss[ifield]) );
-                            } catch ( ParseException ex ) {
-                                builder.putValue( -1, ifield, pds[i].fillValue );
-                                pds[i].hasFill= true;
-                            }
-                            ifield++;
-                        } 
-                    }
-                    
+                    } 
                 }
                 builder.nextRecord();
                 line= in.readLine();
             }
         } catch ( Exception e ) {
             e.printStackTrace();
+            monitor.finished();
             throw e;
         }
+        
+        
+        monitor.setTaskProgress(95);
                 
         QDataSet ds= builder.getDataSet();
         
         ds = repackage(ds,pds);
+        
+        monitor.setTaskProgress(100);
+        monitor.finished();
         
         return ds;
         
