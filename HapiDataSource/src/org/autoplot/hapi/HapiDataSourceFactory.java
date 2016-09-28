@@ -11,7 +11,9 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.DefaultTimeSeriesBrowse;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
  * Constructor for HAPI data sources.
@@ -66,6 +68,16 @@ public class HapiDataSourceFactory extends AbstractDataSourceFactory {
             } 
         }
         return result;
+    }
+
+    @Override
+    public <T> T getCapability(Class<T> clazz) {
+        if ( clazz==TimeSeriesBrowse.class ) {
+            return (T) new DefaultTimeSeriesBrowse();
+        } else {
+            return super.getCapability(clazz); //To change body of generated methods, choose Tools | Templates.
+        }
+        
     }
 
     @Override
