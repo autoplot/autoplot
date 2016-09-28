@@ -62,6 +62,41 @@ public class HapiDataSource extends AbstractDataSource {
         addCapability( TimeSeriesBrowse.class, tsb );
     }
 
+    private static QDataSet getJSONBins( JSONObject binsObject ) throws JSONException {
+        JSONArray bins= binsObject.getJSONArray("values");
+        DDataSet result= DDataSet.createRank1(bins.length());
+        DDataSet max= DDataSet.createRank1(bins.length());
+        DDataSet min= DDataSet.createRank1(bins.length());
+        boolean hasMin= false;
+        boolean hasMax= false;
+        for ( int j=0; j<bins.length(); j++ ) {
+            try {
+                JSONObject o= bins.getJSONObject(j);
+                result.putValue(j,o.getDouble("center"));
+                if ( hasMin || o.has("min") ) {
+                    hasMin= true;
+                    min.putValue(j,o.getDouble("min"));
+                }
+                if ( hasMax || o.has("max") ) {
+                    hasMin= true;
+                    min.putValue(j,o.getDouble("max"));
+                }
+            } catch (JSONException ex) {
+                logger.warning("expected array of JSONObjects for bins.");
+            }
+        }
+        if ( hasMin && hasMax ) {
+            result.putProperty( QDataSet.BIN_PLUS, Ops.subtract( max, result ) );
+            result.putProperty( QDataSet.BIN_MINUS, Ops.subtract( result, min ) );
+        } else if ( hasMin || hasMax ) {
+            logger.warning("need both min and max for bins.");
+        }
+        String sunits= binsObject.getString("units");
+        if ( sunits!=null ) result.putProperty( QDataSet.UNITS, Units.lookupUnits(sunits) );
+        
+        return result;
+    }
+
     public static class HapiParameter {
         String name="";
         String type="";
@@ -102,6 +137,7 @@ public class HapiDataSource extends AbstractDataSource {
         String name= "";
         String description= "";
         int[] size= new int[0]; // array of scalars
+        QDataSet depend1= null; // for spectrograms
         private ParamDescription( String name ) {
             this.name= name;
         }
@@ -245,12 +281,15 @@ public class HapiDataSource extends AbstractDataSource {
         ParamDescription[] pds= new ParamDescription[nparameters];
         
         for ( int i=0; i<nparameters; i++ ) {
-            String name= parameters.getJSONObject(i).getString("name"); // the name of one of the parameters.
+            
+            final JSONObject jsonObjecti = parameters.getJSONObject(i);
+            
+            String name= jsonObjecti.getString("name"); // the name of one of the parameters.
             pds[i]= new ParamDescription( name );
 
             String type;
-            if ( parameters.getJSONObject(i).has("type") ) {
-                type= parameters.getJSONObject(i).getString("type");
+            if ( jsonObjecti.has("type") ) {
+                type= jsonObjecti.getString("type");
                 if ( type==null ) type="";
             } else {
                 type= "";
@@ -264,16 +303,16 @@ public class HapiDataSource extends AbstractDataSource {
                 }
                 pds[i].units= Units.us2000;
             } else {
-                if ( parameters.getJSONObject(i).has("units") ) {
-                    String sunits= parameters.getJSONObject(i).getString("units");
+                if ( jsonObjecti.has("units") ) {
+                    String sunits= jsonObjecti.getString("units");
                     if ( sunits!=null ) {
                         pds[i].units= Units.lookupUnits(sunits);
                     }
                 } else {
                     pds[i].units= Units.dimensionless;
                 }
-                if ( parameters.getJSONObject(i).has("fill") ) {
-                    String sfill= parameters.getJSONObject(i).getString("fill");
+                if ( jsonObjecti.has("fill") ) {
+                    String sfill= jsonObjecti.getString("fill");
                     if ( sfill!=null ) {
                         pds[i].fillValue= pds[i].units.parse( sfill ).doubleValue( pds[i].units );
                         pds[i].hasFill= true;
@@ -281,14 +320,14 @@ public class HapiDataSource extends AbstractDataSource {
                 } else {
                     pds[i].fillValue= FILL_VALUE; // when a value cannot be parsed, but it is not identified.
                 }
-                if ( parameters.getJSONObject(i).has("description") ) {                   
-                    pds[i].description= parameters.getJSONObject(i).getString("description");
+                if ( jsonObjecti.has("description") ) {                   
+                    pds[i].description= jsonObjecti.getString("description");
                     if ( pds[i].description==null ) pds[i].description= "";
                 } else {
                     pds[i].description= ""; // when a value cannot be parsed, but it is not identified.
                 }
-                if ( parameters.getJSONObject(i).has("size") ) {
-                    Object o= parameters.getJSONObject(i).get("size");
+                if ( jsonObjecti.has("size") ) {
+                    Object o= jsonObjecti.get("size");
                     if ( !(o instanceof JSONArray) ) {
                         if ( o.getClass()==Integer.class ) {
                             pds[i].size= new int[ ((Integer)o) ];
@@ -302,6 +341,10 @@ public class HapiDataSource extends AbstractDataSource {
                         for ( int j=0; j<a.length(); j++ ) {
                             pds[i].size[j]= a.getInt(j);
                         }
+                    }
+                    if ( jsonObjecti.has("bins") ) {
+                        QDataSet dep1= getJSONBins(jsonObjecti.getJSONObject("bins"));
+                        pds[i].depend1= dep1;
                     }
                 }
             }
@@ -435,6 +478,9 @@ public class HapiDataSource extends AbstractDataSource {
                     for ( int j=0; j<pds[i].size.length; j++ ) {
                         sdsb.putValue( ifield-1, j, pds[i].size[j] );
                     }
+                    if ( pds[i].depend1!=null ) {
+                        sdsb.putProperty( QDataSet.DEPEND_1, ifield-1, pds[i].depend1 );
+                    }
                     //sdsb.putValue( QDataSet.ELEMENT_DIMENSIONS, ifield-1, pds[i].size );                    
                 }
                 for ( int j=0; j<nfields1; j++ ) {
@@ -457,7 +503,16 @@ public class HapiDataSource extends AbstractDataSource {
             
             ds= Ops.copy( Ops.trim1( ds, 1, ds.length(0) ) );
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
-            ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, sdsb.getDataSet() );
+            if ( pds.length==2 && pds[1].depend1!=null ) {
+                ds= Ops.putProperty( ds, QDataSet.DEPEND_1, pds[1].depend1 );
+                ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, null );
+                ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(pds[1].name) );
+                ds= Ops.putProperty( ds, QDataSet.LABEL, pds[1].name );
+                ds= Ops.putProperty( ds, QDataSet.TITLE, pds[1].description );
+                ds= Ops.putProperty( ds, QDataSet.UNITS, pds[1].units );
+            } else {
+                ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, sdsb.getDataSet() );
+            }
         }
         return ds;
     }
