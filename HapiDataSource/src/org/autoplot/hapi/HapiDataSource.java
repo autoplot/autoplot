@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
@@ -361,6 +362,8 @@ public class HapiDataSource extends AbstractDataSource {
                     if ( System.currentTimeMillis()-t0 > 100 ) {
                         monitor.setProgressMessage("reading "+xx);
                         t0= System.currentTimeMillis();
+                        double d= DatumRangeUtil.normalize( tr, xx );
+                        monitor.setTaskProgress( 20 + (int)( 75 * d ) );
                     }
                 } catch ( ParseException ex ) {
                     line= in.readLine();
