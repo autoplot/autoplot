@@ -23,7 +23,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.das2.datum.DatumRange;
@@ -82,7 +81,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             throw new RuntimeException(ex);
         }
         initComponents();
-        jScrollPane3.getVerticalScrollBar().setUnitIncrement( parametersPanel.getFont().getSize() );
+        jScrollPane4.getVerticalScrollBar().setUnitIncrement( parametersPanel.getFont().getSize() );
 
         parametersPanel.setLayout( new BoxLayout( parametersPanel, BoxLayout.Y_AXIS ) );
 
@@ -127,13 +126,13 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         timeRangeTextField = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jPanel1 = new javax.swing.JPanel();
-        parametersPanel = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         idsList2 = new javax.swing.JList<>();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        parametersPanel = new javax.swing.JPanel();
+        clearAllB = new javax.swing.JButton();
+        setAllB = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
 
         jLabel1.setText("HAPI Server:");
@@ -164,61 +163,6 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         jSplitPane1.setDividerLocation(210);
 
-        javax.swing.GroupLayout parametersPanelLayout = new javax.swing.GroupLayout(parametersPanel);
-        parametersPanel.setLayout(parametersPanelLayout);
-        parametersPanelLayout.setHorizontalGroup(
-            parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 219, Short.MAX_VALUE)
-        );
-        parametersPanelLayout.setVerticalGroup(
-            parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 195, Short.MAX_VALUE)
-        );
-
-        jButton2.setText("Clear All");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-
-        jButton3.setText("Set All");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(95, Short.MAX_VALUE)
-                .addComponent(jButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3)
-                .addContainerGap())
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(parametersPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(0, 201, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3)))
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addComponent(parametersPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGap(0, 37, Short.MAX_VALUE)))
-        );
-
-        jScrollPane3.setViewportView(jPanel1);
-
-        jSplitPane1.setRightComponent(jScrollPane3);
-
         idsList2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
@@ -230,6 +174,56 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jScrollPane2.setViewportView(idsList2);
 
         jSplitPane1.setLeftComponent(jScrollPane2);
+
+        javax.swing.GroupLayout parametersPanelLayout = new javax.swing.GroupLayout(parametersPanel);
+        parametersPanel.setLayout(parametersPanelLayout);
+        parametersPanelLayout.setHorizontalGroup(
+            parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 133, Short.MAX_VALUE)
+        );
+        parametersPanelLayout.setVerticalGroup(
+            parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 195, Short.MAX_VALUE)
+        );
+
+        jScrollPane4.setViewportView(parametersPanel);
+
+        clearAllB.setText("Clear All");
+        clearAllB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearAllBActionPerformed(evt);
+            }
+        });
+
+        setAllB.setText("Set All");
+        setAllB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setAllBActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(clearAllB)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(setAllB))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jScrollPane4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(clearAllB)
+                    .addComponent(setAllB)))
+        );
+
+        jSplitPane1.setRightComponent(jPanel3);
 
         jLabel3.setText("jLabel3");
 
@@ -301,7 +295,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         }
     }//GEN-LAST:event_serversComboBoxActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void clearAllBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearAllBActionPerformed
         boolean first= !currentServer.toString().contains("http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi");
         for ( Component c: parametersPanel.getComponents() ) {
             if ( c instanceof JCheckBox ) {
@@ -313,31 +307,31 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 }
             }
         }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_clearAllBActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void setAllBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setAllBActionPerformed
         for ( Component c: parametersPanel.getComponents() ) {
             if ( c instanceof JCheckBox ) {
                 ((JCheckBox)c).setSelected(true);
             }
         }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_setAllBActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton clearAllB;
     private javax.swing.JList<String> idsList2;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JPanel parametersPanel;
     private javax.swing.JComboBox<String> serversComboBox;
+    private javax.swing.JButton setAllB;
     private javax.swing.JTextField timeRangeTextField;
     // End of variables declaration//GEN-END:variables
 
