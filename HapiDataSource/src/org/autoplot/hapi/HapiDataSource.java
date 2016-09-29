@@ -524,9 +524,13 @@ public class HapiDataSource extends AbstractDataSource {
                 for ( int j=0; j<nfields1; j++ ) {
                     if ( nfields1>1 ) {
                         sdsb.putProperty( QDataSet.START_INDEX, ifield-1, startIndex );
+                        sdsb.putProperty( QDataSet.LABEL, ifield-1, pds[i].name +" ch"+j );                    
+                        sdsb.putProperty( QDataSet.NAME, ifield-1, Ops.safeName(pds[i].name)+"_"+j );
+                    } else {
+                        sdsb.putProperty( QDataSet.LABEL, ifield-1, pds[i].name );                    
+                        sdsb.putProperty( QDataSet.NAME, ifield-1, Ops.safeName(pds[i].name) ); 
                     }
-                    sdsb.putProperty( QDataSet.NAME, ifield-1, Ops.safeName(pds[i].name)+"_"+j );
-                    sdsb.putProperty( QDataSet.LABEL, ifield-1, pds[i].name +" ch"+j );
+                    
                     sdsb.putProperty( QDataSet.TITLE, ifield-1, pds[i].description );
                     sdsb.putProperty( QDataSet.UNITS, ifield-1, pds[i].units );
                     if ( pds[i].hasFill ) {
