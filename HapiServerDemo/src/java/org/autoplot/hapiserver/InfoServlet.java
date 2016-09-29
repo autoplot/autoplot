@@ -24,6 +24,22 @@ public class InfoServlet extends HttpServlet {
         jo.put("HAPI","1.0");
         jo.put("Created at",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
         
+        if ( id.equals("Iowa City Conditions") ) {
+            jo.put( "firstDate", "2012-05-25T00:00Z" );
+            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
+        } else if ( id.equals("0B000800408DD710") ) {
+            jo.put( "firstDate", "2012-01-09T00:00Z" );
+            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
+        } else if ( id.equals("8500080044259C10") ) {
+            jo.put( "firstDate", "2012-01-09T00:00Z" );
+            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
+        } else if ( id.equals("610008002FE00410") ) {
+            jo.put( "firstDate", "2012-01-09T00:00Z" );
+            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
+        } else if ( id.equals("AC00080040250510") ) {
+            jo.put( "firstDate", "2012-01-09T00:00Z" );
+            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
+        }
         boolean haveEntry= false;
         JSONObject catalog= CatalogServlet.getCatalog();
         JSONArray catalogEntries= catalog.getJSONArray("catalog");
