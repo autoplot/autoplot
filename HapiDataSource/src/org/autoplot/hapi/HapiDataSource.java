@@ -171,11 +171,24 @@ public class HapiDataSource extends AbstractDataSource {
         tr= tsb.getTimeRange();
         
         URL url= HapiServer.getDataURL( server.toURL(), id, tr, pp );
+        url= new URL( url.toString()+"&include=header" );
+        
+        monitor.started();
+        monitor.setProgressMessage("prepare data");
+         
+        long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
+       
+        int lineNum=0;
         
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
             String line= in.readLine();
+            lineNum++;
+            if ( System.currentTimeMillis()-t0 > 100 ) {
+                monitor.setProgressMessage("reading line "+lineNum);
+                t0= System.currentTimeMillis();
+            }
             while ( line!=null ) {
                 builder.append(line);
                 line= in.readLine();
@@ -187,7 +200,7 @@ public class HapiDataSource extends AbstractDataSource {
         
         JSONArray parameters= doc.getJSONArray("parameters");
         int nparameters= parameters.length();
-                
+          
         ParamDescription[] pds= new ParamDescription[nparameters];
         
         for ( int i=0; i<nparameters; i++ ) {
@@ -232,6 +245,8 @@ public class HapiDataSource extends AbstractDataSource {
                 }
             }
         }
+        monitor.setProgressMessage("parsing data");
+        
         //http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi/data.xql?id=spase%3A%2F%2FVSPO%2FNumericalData%2FRBSP%2FB%2FEMFISIS%2FGEI%2FPT0.015625S&time.min=2012-10-09T00%3A00%3A00Z&time.max=2012-10-09T00%3A10%3A00Z&parameters=Magnitude
         QDataSet result= null;
         for ( ParamDescription pd: pds ) {
@@ -246,6 +261,8 @@ public class HapiDataSource extends AbstractDataSource {
             column.putProperty( QDataSet.UNITS, pd.units );
             result= Ops.bundle( result, column );
         }
+        
+        monitor.finished();
         
         result = repackage(result,pds);
         
