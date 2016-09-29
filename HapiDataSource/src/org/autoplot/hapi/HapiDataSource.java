@@ -198,73 +198,75 @@ public class HapiDataSource extends AbstractDataSource {
         
         JSONObject doc= o;
         
-        JSONArray parameters= doc.getJSONArray("parameters");
-        int nparameters= parameters.length();
-          
-        ParamDescription[] pds= new ParamDescription[nparameters];
+        ParamDescription[] pds= getParameterDescriptions(doc);
         
-        for ( int i=0; i<nparameters; i++ ) {
-            String name= parameters.getJSONObject(i).getString("name");
-            pds[i]= new ParamDescription( name );
-
-            String type;
-            if ( parameters.getJSONObject(i).has("type") ) {
-                type= parameters.getJSONObject(i).getString("type");
-                if ( type==null ) type="";
+        monitor.setProgressMessage("parsing data");
+        
+        int[] nfields= new int[pds.length];
+        for ( int i=0; i<pds.length; i++ ) {
+            if ( pds[i].size.length==0 || ( pds[i].size.length==1 && pds[i].size[0]==1 ) ) {
+                nfields[i]= 1;
             } else {
-                type= "";
-            }
-            if ( type.equals("") ) {
-                logger.log(Level.FINE, "type is not defined: {0}", name);
-            }
-            if ( type.equalsIgnoreCase("isotime") ) {
-                pds[i].units= Units.us2000;
-            } else {
-                if ( parameters.getJSONObject(i).has("units") ) {
-                    String sunits= parameters.getJSONObject(i).getString("units");
-                    if ( sunits!=null ) {
-                        pds[i].units= Units.lookupUnits(sunits);
-                    }
-                } else {
-                    pds[i].units= Units.dimensionless;
-                }
-                if ( parameters.getJSONObject(i).has("fill") ) {
-                    String sfill= parameters.getJSONObject(i).getString("fill");
-                    if ( sfill!=null ) {
-                        pds[i].fillValue= pds[i].units.parse( sfill ).doubleValue( pds[i].units );
-                        pds[i].hasFill= true;
-                    }
-                } else {
-                    pds[i].fillValue= FILL_VALUE; // when a value cannot be parsed, but it is not identified.
-                }
-                if ( parameters.getJSONObject(i).has("description") ) {                   
-                    pds[i].description= parameters.getJSONObject(i).getString("description");
-                    if ( pds[i].description==null ) pds[i].description= "";
-                } else {
-                    pds[i].description= ""; // when a value cannot be parsed, but it is not identified.
-                }
+                nfields[i]= DataSetUtil.product(pds[i].size);
             }
         }
-        monitor.setProgressMessage("parsing data");
+        
+        boolean[] timeVary= new boolean[pds.length];
         
         //http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi/data.xql?id=spase%3A%2F%2FVSPO%2FNumericalData%2FRBSP%2FB%2FEMFISIS%2FGEI%2FPT0.015625S&time.min=2012-10-09T00%3A00%3A00Z&time.max=2012-10-09T00%3A10%3A00Z&parameters=Magnitude
         QDataSet result= null;
-        for ( ParamDescription pd: pds ) {
-            JSONArray param= doc.getJSONArray(pd.name);
-            Units u= pd.units;
-            DDataSet column= DDataSet.createRank1(param.length());
-            for ( int i=0; i<param.length(); i++ ) {
-                column.putValue( i, u.parse(param.getString(i) ).doubleValue(u) );
+        int ipd=0;
+        for ( ParamDescription pd: pds ) {       
+            JSONArray param;
+            try {
+                param= doc.getJSONArray(pd.name);
+            } catch ( JSONException ex ) {
+                timeVary[ipd]= false;
+                continue; // DEPEND_1, etc...
             }
-            if ( pd.hasFill ) column.putProperty( QDataSet.FILL_VALUE, pd.fillValue );
-            column.putProperty( QDataSet.TITLE, pd.description );
-            column.putProperty( QDataSet.UNITS, pd.units );
-            result= Ops.bundle( result, column );
+            timeVary[ipd]= true;
+            Units u= pd.units;
+            if ( nfields[ipd]>1 ) {
+                int nf= nfields[ipd];
+                DDataSet column= DDataSet.createRank2(param.length(),nfields[ipd]);
+                for ( int i=0; i<param.length(); i++ ) {
+                    JSONObject jo= param.getJSONObject(i);
+                    JSONArray joa= jo.getJSONArray("elements");
+                    for ( int j=0; j<nf; j++ ) {
+                        column.putValue( i, j, u.parse( joa.getString(j) ).doubleValue(u) );
+                    }
+                }
+                if ( pd.hasFill ) column.putProperty( QDataSet.FILL_VALUE, pd.fillValue );
+                column.putProperty( QDataSet.TITLE, pd.description );
+                column.putProperty( QDataSet.UNITS, pd.units );
+                for ( int j=0; j<nf; j++ ) {
+                    result= Ops.bundle( result, Ops.slice1(column,j) );
+                }
+            } else {
+                DDataSet column= DDataSet.createRank1(param.length());
+                for ( int i=0; i<param.length(); i++ ) {
+                    column.putValue( i, u.parse(param.getString(i) ).doubleValue(u) );
+                }
+                if ( pd.hasFill ) column.putProperty( QDataSet.FILL_VALUE, pd.fillValue );
+                column.putProperty( QDataSet.TITLE, pd.description );
+                column.putProperty( QDataSet.UNITS, pd.units );
+                result= Ops.bundle( result, column );
+            }
+            ipd++;
         }
         
         monitor.finished();
         
-        result = repackage(result,pds);
+        int ntimeVary= 0;
+        for ( boolean b: timeVary ){
+            if ( b ) ntimeVary++;
+        }
+        ParamDescription[] newPds= new ParamDescription[ntimeVary];
+        int k=0;
+        for ( int j=0; j<pds.length; j++ ) {
+            if ( timeVary[j] ) newPds[k++]= pds[j];
+        }
+        result = repackage(result,newPds);
         
         return result;
     }
@@ -292,80 +294,7 @@ public class HapiDataSource extends AbstractDataSource {
         monitor.setProgressMessage("got info");
         monitor.setTaskProgress(20);
         
-        JSONArray parameters= doc.getJSONArray("parameters");
-        int nparameters= parameters.length();
-                
-        ParamDescription[] pds= new ParamDescription[nparameters];
-        
-        for ( int i=0; i<nparameters; i++ ) {
-            
-            final JSONObject jsonObjecti = parameters.getJSONObject(i);
-            
-            String name= jsonObjecti.getString("name"); // the name of one of the parameters.
-            pds[i]= new ParamDescription( name );
-
-            String type;
-            if ( jsonObjecti.has("type") ) {
-                type= jsonObjecti.getString("type");
-                if ( type==null ) type="";
-            } else {
-                type= "";
-            }
-            if ( type.equals("") ) {
-                logger.log(Level.FINE, "type is not defined: {0}", name);
-            }
-            if ( type.equalsIgnoreCase("isotime") ) {
-                if ( !type.equals("isotime") ) {
-                    logger.log(Level.WARNING, "isotime should not be capitalized: {0}", type);
-                }
-                pds[i].units= Units.us2000;
-            } else {
-                if ( jsonObjecti.has("units") ) {
-                    String sunits= jsonObjecti.getString("units");
-                    if ( sunits!=null ) {
-                        pds[i].units= Units.lookupUnits(sunits);
-                    }
-                } else {
-                    pds[i].units= Units.dimensionless;
-                }
-                if ( jsonObjecti.has("fill") ) {
-                    String sfill= jsonObjecti.getString("fill");
-                    if ( sfill!=null ) {
-                        pds[i].fillValue= pds[i].units.parse( sfill ).doubleValue( pds[i].units );
-                        pds[i].hasFill= true;
-                    }
-                } else {
-                    pds[i].fillValue= FILL_VALUE; // when a value cannot be parsed, but it is not identified.
-                }
-                if ( jsonObjecti.has("description") ) {                   
-                    pds[i].description= jsonObjecti.getString("description");
-                    if ( pds[i].description==null ) pds[i].description= "";
-                } else {
-                    pds[i].description= ""; // when a value cannot be parsed, but it is not identified.
-                }
-                if ( jsonObjecti.has("size") ) {
-                    Object o= jsonObjecti.get("size");
-                    if ( !(o instanceof JSONArray) ) {
-                        if ( o.getClass()==Integer.class ) {
-                            pds[i].size= new int[ ((Integer)o) ];
-                            logger.log( Level.WARNING, "size should be an int array, found int: {0}", name);
-                        } else {
-                            throw new IllegalArgumentException( String.format( "size should be an int array: {0}", name ) );
-                        }                                                            
-                    } else {
-                        JSONArray a= (JSONArray)o;
-                        pds[i].size= new int[a.length()];
-                        for ( int j=0; j<a.length(); j++ ) {
-                            pds[i].size[j]= a.getInt(j);
-                        }
-                    }
-                    if ( jsonObjecti.has("bins") ) {
-                        QDataSet dep1= getJSONBins(jsonObjecti.getJSONObject("bins"));
-                        pds[i].depend1= dep1;
-                    }
-                }
-            }
-        }
+        ParamDescription[] pds= getParameterDescriptions(doc);
         
         DatumRange tr; // TSB = DatumRangeUtil.parseTimeRange(timeRange);
         tr= tsb.getTimeRange();
@@ -463,6 +392,85 @@ public class HapiDataSource extends AbstractDataSource {
         
         return ds;
         
+    }
+
+    private ParamDescription[] getParameterDescriptions(JSONObject doc) throws IllegalArgumentException, ParseException, JSONException {
+        JSONArray parameters= doc.getJSONArray("parameters");
+        int nparameters= parameters.length();
+        ParamDescription[] pds= new ParamDescription[nparameters];
+        for ( int i=0; i<nparameters; i++ ) {
+            
+            final JSONObject jsonObjecti = parameters.getJSONObject(i);
+            
+            String name= jsonObjecti.getString("name"); // the name of one of the parameters.
+            pds[i]= new ParamDescription( name );
+            
+            String type;
+            if ( jsonObjecti.has("type") ) {
+                type= jsonObjecti.getString("type");
+                if ( type==null ) type="";
+            } else {
+                type= "";
+            }
+            if ( type.equals("") ) {
+                logger.log(Level.FINE, "type is not defined: {0}", name);
+            }
+            if ( type.equalsIgnoreCase("isotime") ) {
+                if ( !type.equals("isotime") ) {
+                    logger.log(Level.WARNING, "isotime should not be capitalized: {0}", type);
+                }
+                pds[i].units= Units.us2000;
+            } else {
+                if ( jsonObjecti.has("units") ) {
+                    String sunits= jsonObjecti.getString("units");
+                    if ( sunits!=null ) {
+                        pds[i].units= Units.lookupUnits(sunits);
+                    }
+                } else {
+                    pds[i].units= Units.dimensionless;
+                }
+                if ( jsonObjecti.has("fill") ) {
+                    String sfill= jsonObjecti.getString("fill");
+                    if ( sfill!=null ) {
+                        pds[i].fillValue= pds[i].units.parse( sfill ).doubleValue( pds[i].units );
+                        pds[i].hasFill= true;
+                    }
+                } else {
+                    pds[i].fillValue= FILL_VALUE; // when a value cannot be parsed, but it is not identified.
+                }
+                if ( jsonObjecti.has("description") ) {
+                    pds[i].description= jsonObjecti.getString("description");
+                    if ( pds[i].description==null ) pds[i].description= "";
+                } else {
+                    pds[i].description= ""; // when a value cannot be parsed, but it is not identified.
+                }
+                if ( jsonObjecti.has("size") ) {
+                    Object o= jsonObjecti.get("size");
+                    if ( !(o instanceof JSONArray) ) {
+                        if ( o.getClass()==Integer.class ) {
+                            pds[i].size= new int[] { ((Integer)o) };
+                            logger.log( Level.WARNING, "size should be an int array, found int: {0}", name);
+                        } else if ( o.getClass()==String.class ) {
+                            pds[i].size= new int[] { Integer.parseInt( (String)o ) };
+                            logger.log( Level.WARNING, "size should be an int array, found String: {0}", name);
+                        } else {
+                            throw new IllegalArgumentException( String.format( "size should be an int array: {0}", name ) );
+                        }
+                    } else {
+                        JSONArray a= (JSONArray)o;
+                        pds[i].size= new int[a.length()];
+                        for ( int j=0; j<a.length(); j++ ) {
+                            pds[i].size[j]= a.getInt(j);
+                        }
+                    }
+                    if ( jsonObjecti.has("bins") ) {
+                        QDataSet dep1= getJSONBins(jsonObjecti.getJSONObject("bins"));
+                        pds[i].depend1= dep1;
+                    }
+                }
+            }
+        }
+        return pds;
     }
 
     private QDataSet repackage(QDataSet ds, ParamDescription[] pds ) {
