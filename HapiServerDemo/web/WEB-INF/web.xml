@@ -15,10 +15,6 @@
         <servlet-name>InfoServlet</servlet-name>
         <servlet-class>org.autoplot.hapiserver.InfoServlet</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>landingPage</servlet-name>
-        <jsp-file>/hapi/index.jsp</jsp-file>
-    </servlet>
     <servlet-mapping>
         <servlet-name>CatalogServlet</servlet-name>
         <url-pattern>/hapi/catalog</url-pattern>
@@ -31,16 +27,12 @@
         <servlet-name>InfoServlet</servlet-name>
         <url-pattern>/hapi/info</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>landingPage</servlet-name>
-        <url-pattern>/hapi</url-pattern>
-    </servlet-mapping>
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
     <welcome-file-list>
-        <welcome-file>hapi/index.jsp</welcome-file>
+        <welcome-file>/index.jsp</welcome-file>
     </welcome-file-list>
 </web-app>

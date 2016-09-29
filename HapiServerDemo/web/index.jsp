@@ -16,12 +16,12 @@
         <h1>This is a HAPI Server.</h1>
         
         <h3>Some example requests:</h3>
-        <a href="catalog">Catalog</a><br>
-        <a href="info?id=0B000800408DD710">Info</a><br>
-        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05">Data</a><br>
-        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&include=header">Data w/header</a><br>
-        <a href="data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/multiple parameters</a><br>
-        <a href="data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/subset</a><br>
+        <a href="hapi/catalog">Catalog</a><br>
+        <a href="hapi/info?id=0B000800408DD710">Info</a><br>
+        <a href="hapi/data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05">Data</a><br>
+        <a href="hapi/data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&include=header">Data w/header</a><br>
+        <a href="hapi/data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/multiple parameters</a><br>
+        <a href="hapi/data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/subset</a><br>
         
         <%
             long l= org.virbo.dataset.RecordIterator.TIME_STAMP; // load RecordIterator class first, or we'll get a negative time.
