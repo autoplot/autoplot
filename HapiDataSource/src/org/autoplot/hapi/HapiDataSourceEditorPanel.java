@@ -25,7 +25,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.util.TickleTimer;
 import org.das2.util.monitor.ProgressMonitor;
@@ -522,6 +525,21 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 jLabel3.setText( "range is not provided" );
             } else {
                 jLabel3.setText( range.toString() );
+                Datum end= TimeUtil.prevMidnight(range.max());
+                DatumRange landing= new DatumRange( end.subtract( 1, Units.days ), end );
+                String currentTimeRange= timeRangeTextField.getText().trim();
+                if ( currentTimeRange.length()==0 ) {
+                    timeRangeTextField.setText( landing.toString() );
+                } else {
+                    try {
+                        DatumRange current = DatumRangeUtil.parseTimeRange(currentTimeRange);
+                        if ( !current.intersects(landing) ) {
+                            timeRangeTextField.setText( landing.toString() );
+                        }
+                    } catch (ParseException ex) {
+                        // do nothing.
+                    }
+                }
             }
         } catch (IOException ex) {
             Logger.getLogger(HapiDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
