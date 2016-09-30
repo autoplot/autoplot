@@ -41,6 +41,17 @@ public class RecordIterator implements Iterator<QDataSet>  {
         logger.log( Level.FINE, "getDataSet(\"{0}\",DatumRangeUtil.parseTimeRange({1}),monitor)", new Object[]{suri, timeRange} );
         URI uri = DataSetURI.getURI(suri);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
+        if ( factory==null ) {
+            throw new IllegalArgumentException("no data source factory found for URI: "+ uri );
+        }
+        
+        TimeSeriesBrowse tsb= factory.getCapability(TimeSeriesBrowse.class);   // see if we can allow for URIs without timeranges.
+        if ( tsb!=null ) {
+            tsb.setURI(suri);
+            tsb.setTimeRange( timeRange ); 
+            uri= new URI( tsb.getURI() );
+        }
+        
         DataSource result = factory.getDataSource( uri );
         if (monitor == null) {
             monitor = new NullProgressMonitor();
@@ -51,7 +62,7 @@ public class RecordIterator implements Iterator<QDataSet>  {
             logger.fine("this data could be streamed");
         }
         
-        TimeSeriesBrowse tsb= result.getCapability( TimeSeriesBrowse.class );
+        tsb= result.getCapability( TimeSeriesBrowse.class );
         if ( tsb!=null ) {
             tsb.setTimeRange( timeRange );
         } else {
@@ -69,31 +80,33 @@ public class RecordIterator implements Iterator<QDataSet>  {
         return rds;        
     }
     
-    public RecordIterator( String uri, DatumRange dr ) {
-        try {
-            QDataSet ds= getDataSet( uri, dr, new NullProgressMonitor() );
-            if ( ds==null ) {
-                this.index= 0;
-                this.lastIndex=0;
-                return;
-            }
-            QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
-            if ( dep0!=null ) {
-                if ( ds.rank()==1 ) {
-                    this.src= Ops.bundle( dep0, ds );
-                } else if ( ds.rank()==2 ) {
-                    this.src= Ops.bundle( dep0, Ops.unbundle(ds,0) );
-                    for ( int i=1; i<ds.length(0); i++ ) {
-                        this.src= Ops.bundle( this.src, Ops.unbundle(ds,i) );
-                    }
-                }
-            } else {
-                this.src= ds;
-            }
-            constrainDepend0(dr);
-        } catch (Exception ex) {
-            Logger.getLogger(RecordIterator.class.getName()).log(Level.SEVERE, null, ex);
+    /**
+     * create a new RecordIterator for the given URI and time range.
+     * @param uri the data URI
+     * @param dr the time range
+     * @throws Exception if the data read throws an exception.
+     */
+    public RecordIterator( String uri, DatumRange dr ) throws Exception {
+        QDataSet ds= getDataSet( uri, dr, new NullProgressMonitor() );
+        if ( ds==null ) {
+            this.index= 0;
+            this.lastIndex=0;
+            return;
         }
+        QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+        if ( dep0!=null ) {
+            if ( ds.rank()==1 ) {
+                this.src= Ops.bundle( dep0, ds );
+            } else if ( ds.rank()==2 ) {
+                this.src= Ops.bundle( dep0, Ops.unbundle(ds,0) );
+                for ( int i=1; i<ds.length(0); i++ ) {
+                    this.src= Ops.bundle( this.src, Ops.unbundle(ds,i) );
+                }
+            }
+        } else {
+            this.src= ds;
+        }
+        constrainDepend0(dr);
     }
         
     /**
