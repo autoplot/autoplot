@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>verifying smooth1.
+        <p><small>Demo HAPI server shows data collected from 1-Wire temperature sensors, and allows selection of available parameters.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,9 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-09-24 r19486):</p>
+        <p>Bugfixes (2016-09-28 r19564):</p>
         <ul>
+            <li>QStream ASCII formats used banker's rounding, so 44.5 would have been rounded to 44.0.  Now 0.5 is rounded up.</li>
             <li>1679: HAPI JSON would confuse Rich ASCII support.</li>
             <li>improve feedback for qstreams when values are found in both the packet descriptor and in the packets.</li>
             <li>applyIndex supports BUNDLE_i.</li>
@@ -110,6 +111,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Logger control decorated with even/odd backgrounds.  Thanks, Ed!</li>
             <li>rfe247: HAPI data streams, with HAPI JSON headers, can be read in now as a rich ascii dialect</li>
             <li>The console Logger control uses a table now, and allows sorting by log level.</li>
             <li>HTML parser allows the units to be set externally.  "N/A" was causing the units to come back as ordinal units.</li>
