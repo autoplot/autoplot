@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -384,6 +385,11 @@ public class HapiDataSource extends AbstractDataSource {
         monitor.setTaskProgress(95);
                 
         QDataSet ds= builder.getDataSet();
+        
+        if ( ds.length()==0 ) {
+            monitor.finished();
+            throw new NoDataInIntervalException("no records found");
+        }
         
         ds = repackage(ds,pds);
         
