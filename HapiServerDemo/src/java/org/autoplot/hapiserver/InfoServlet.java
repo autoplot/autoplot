@@ -22,7 +22,7 @@ public class InfoServlet extends HttpServlet {
     protected static JSONObject getInfo( String id ) throws JSONException, IllegalArgumentException {
         JSONObject jo= new JSONObject();
         jo.put("HAPI","1.0");
-        jo.put("Created at",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
+        jo.put("createdAt",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
         
         if ( id.equals("Iowa City Conditions") ) {
             jo.put( "firstDate", "2012-05-25T00:00Z" );
@@ -40,15 +40,11 @@ public class InfoServlet extends HttpServlet {
             jo.put( "firstDate", "2012-01-09T00:00Z" );
             jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
         }
-        boolean haveEntry= false;
-        JSONObject catalog= CatalogServlet.getCatalog();
-        JSONArray catalogEntries= catalog.getJSONArray("catalog");
-        for ( int i=0; i<catalogEntries.length(); i++ ) {
-            if ( catalogEntries.getJSONObject(i).getString("id").equals(id) ) haveEntry=true;
-        }
-        if ( !haveEntry ) {
+        
+        if ( !HapiServerSupport.getCatalog().contains(id) ){
             throw new IllegalArgumentException("invalid parameter id: \""+id+"\" is not known.");
         }
+        
         JSONArray parameters= new JSONArray();
         JSONObject parameter;
         parameter= new JSONObject();
@@ -111,7 +107,30 @@ public class InfoServlet extends HttpServlet {
             parameter.put( "fill", "-1e31" );
             parameter.put( "description", "Precipitation" );
             parameters.put( 8, parameter );
-                        
+                 
+        } else if ( id.equals("Spectrum") ) {
+            parameter= new JSONObject();
+            parameter.put( "name", "Spectra" );
+            parameter.put( "type", "float" );
+            parameter.put( "units", "V^2 m^-2 Hz^-1" );
+            parameter.put( "fill", "-1e31" );
+            JSONObject bins= new JSONObject();
+            bins.put( "units", "eV" );
+            double[] ens= new double[] { 10000.0,10500.0,11000.0,11500.0,12100.0,12700.0,13300.0,14000.0,14700.0,15400.0,16200.0,17000.0,17800.0,18700.0,19600.0,20500.0,21500.0,22600.0,23700.0,24900.0,26100.0,27400.0,28700.0,30100.0,31600.0,33200.0,34800.0,36500.0,38300.0,40200.0,42200.0,44200.0,46400.0,48700.0,51100.0,53600.0,56200.0,59000.0,61900.0,64900.0,68100.0,71500.0,75000.0,78700.0,82500.0,86600.0,90900.0,95300.0,1.00000E5,1.05000E5,1.10000E5,1.15000E5,1.21000E5,1.27000E5,1.33000E5,1.40000E5,1.47000E5,1.54000E5,1.62000E5,1.69000E5,1.78000E5,1.87000E5,1.96000E5,2.05000E5,2.15000E5,2.26000E5,2.37000E5,2.49000E5,2.61000E5,2.74000E5,2.87000E5,3.01000E5,3.16000E5,3.32000E5,3.48000E5,3.65000E5,3.83000E5,4.02000E5,4.22000E5,4.42000E5,4.64000E5,4.87000E5 };
+            JSONArray values= new JSONArray();
+            for ( int i=0; i<ens.length; i++ ) {
+                JSONObject en= new JSONObject();
+                en.put("center",ens[i]);
+                values.put( i,en );
+            }
+            bins.put( "values", values );
+            bins.put( "name", "frequencies" );
+            bins.put( "units", "Hz" );
+            parameter.put( "bins", bins );
+            parameter.put( "size", new int[] { ens.length } );
+            parameter.put( "description", "spectrogram example that is not for publication." );
+            parameters.put( 1, parameter );
+        
         } else {
             parameter= new JSONObject();
             parameter.put( "name", "Temperature" );
