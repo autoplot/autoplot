@@ -33,6 +33,7 @@
             <li>2016-09-21: bugfix: parameters supported when include is not set.
             <li>2016-09-26: more parameters in current conditions.
             <li>2016-09-29: time ranges.
+            <li>2016-09-30: add spectrogram example.
         </ul>
         </small>
     </body>
