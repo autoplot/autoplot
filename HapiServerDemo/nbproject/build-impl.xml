@@ -853,6 +853,12 @@ exists or setup the property manually. For example like this:
                 COMPILATION SECTION
             -->
     <target depends="init" if="no.dist.ear.dir" name="deps-module-jar" unless="no.deps">
+        <ant antfile="${project.CDAWebDataSource}/build.xml" inheritall="false" target="jar">
+            <property name="deploy.on.save" value="false"/>
+        </ant>
+        <ant antfile="${project.CdfJavaDataSource}/build.xml" inheritall="false" target="jar">
+            <property name="deploy.on.save" value="false"/>
+        </ant>
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
@@ -882,6 +888,12 @@ exists or setup the property manually. For example like this:
         </ant>
     </target>
     <target depends="init" if="dist.ear.dir" name="deps-ear-jar" unless="no.deps">
+        <ant antfile="${project.CDAWebDataSource}/build.xml" inheritall="false" target="jar">
+            <property name="deploy.on.save" value="false"/>
+        </ant>
+        <ant antfile="${project.CdfJavaDataSource}/build.xml" inheritall="false" target="jar">
+            <property name="deploy.on.save" value="false"/>
+        </ant>
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="jar">
             <property name="deploy.on.save" value="false"/>
         </ant>
@@ -1056,15 +1068,18 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.json-2011-01-27-gitrelease.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.jython-lib-2.2.1.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.jython.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.cdfj-20160820.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${reference.dasCoreUtil.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${reference.dasCoreDatum.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.QDataSet.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.QStream.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${reference.dasCoreDatum.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${reference.dasCoreUtil.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.dasCore.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.DataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.DataSourcePack.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.JythonSupport.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${reference.JythonDataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${reference.CDAWebDataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${reference.CdfJavaDataSource.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update"/>
     </target>
@@ -1072,15 +1087,18 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.json-2011-01-27-gitrelease.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.jython-lib-2.2.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.jython.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.cdfj-20160820.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${reference.dasCoreUtil.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${reference.dasCoreDatum.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.QDataSet.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.QStream.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${reference.dasCoreDatum.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${reference.dasCoreUtil.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.dasCore.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.DataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.DataSourcePack.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.JythonSupport.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${reference.JythonDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${reference.CDAWebDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${reference.CdfJavaDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
     </target>
     <target depends="init" if="dist.ear.dir" name="-clean-webinf-lib">
         <delete dir="${build.web.dir}/WEB-INF/lib"/>
@@ -1494,6 +1512,8 @@ exists or setup the property manually. For example like this:
                 CLEANUP SECTION
             -->
     <target depends="init" name="deps-clean" unless="no.deps">
+        <ant antfile="${project.CDAWebDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.CdfJavaDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="clean"/>
