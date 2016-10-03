@@ -34,6 +34,7 @@
             <li>2016-09-26: more parameters in current conditions.
             <li>2016-09-29: time ranges.
             <li>2016-09-30: add spectrogram example.
+            <li>2016-10-03: correctly handle /hapi request, which redirects to /index.jsp.
         </ul>
         </small>
     </body>
