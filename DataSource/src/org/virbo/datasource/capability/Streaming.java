@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.datasource.capability;
 
 import java.util.Iterator;
@@ -16,5 +12,14 @@ import org.virbo.dataset.QDataSet;
  * @author jbf
  */
 public interface Streaming {
+    
+    /**
+     * provide an iterator that will provide access to each slice of the data
+     * set.  It should be understood that each record returned should be
+     * join-able to the previous records.  
+     * @param mon the monitor.  assert monitor.finished()==(!result.hasNext())
+     * @return a dataset iterator.
+     * @throws Exception 
+     */
     Iterator<QDataSet> streamDataSet( ProgressMonitor mon ) throws Exception;
 }
