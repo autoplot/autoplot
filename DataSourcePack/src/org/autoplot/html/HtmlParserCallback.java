@@ -6,6 +6,7 @@ package org.autoplot.html;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.html.HTML;
@@ -81,6 +82,7 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
     
     @Override
     public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
+        logger.log(Level.FINE, "startTag {0} @{1}", new Object[]{t, pos});        
         if ( t==HTML.Tag.TABLE ) {
             tableCount++;
             nest++;
@@ -112,6 +114,7 @@ public class HtmlParserCallback extends HTMLEditorKit.ParserCallback {
 
     @Override
     public void handleEndTag(HTML.Tag t, int pos) {
+        logger.log(Level.FINE, "endTag {0} @{1}", new Object[]{t, pos});        
         if (t == HTML.Tag.TABLE) {
             nest--;
             String dim;
