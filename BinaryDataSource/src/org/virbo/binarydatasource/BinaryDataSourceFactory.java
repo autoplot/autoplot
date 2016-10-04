@@ -86,6 +86,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     List<CompletionContext> result= new ArrayList<>();
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "first,last (exclusive) fields" ) );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0:", "return rank two to last field" ) );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ":", "as many as will fit in one record" ) );
                     return result;
                 }
                 case "type":
@@ -102,6 +103,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ushort") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ubyte") );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "time24", "ISO8601 time in 24 ASCII characters") );
                     return result;
                 }
                 case "depend0":
@@ -120,6 +122,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ushort") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ubyte") );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "time24", "ISO8601 time in 24 ASCII characters") );
                     return result;
                 }
                 case "depend0Units":
