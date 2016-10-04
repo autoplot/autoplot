@@ -39,6 +39,11 @@ public class InfoServlet extends HttpServlet {
         } else if ( id.equals("AC00080040250510") ) {
             jo.put( "firstDate", "2012-01-09T00:00Z" );
             jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
+        } else if ( id.equals("Spectrum") ) {
+            jo.put( "firstDate", "2012-08-30T00:00Z" );
+            jo.put( "lastDate", "2016-09-20T00:00Z" );
+            jo.put( "sampleStartDate", "2016-01-01T00:00Z" );
+            jo.put( "sampleEndDate", "2016-01-02T00:00Z" );
         }
         
         if ( !HapiServerSupport.getCatalog().contains(id) ){
