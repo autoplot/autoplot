@@ -486,6 +486,10 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             if ( !server.equals(currentServer) ) {
                 idsList2.setSelectedIndex(0);
                 currentServer= server;
+                idsList2.ensureIndexIsVisible(0);
+            } else {
+                int i= idsList2.getSelectedIndex();
+                idsList2.ensureIndexIsVisible( i==-1 ? 0 : i );
             }
         } catch ( IOException ex ) {
             DataSetSelector.showUserExceptionDialog( this, "Error when connecting to server", "I/O Exception", ex, JOptionPane.WARNING_MESSAGE );
