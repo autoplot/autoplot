@@ -8,13 +8,18 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.text.html.parser.ParserDelegator;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.capability.Streaming;
 
 /**
  * Data source for extracting data from HTML tables.  This has been used
@@ -23,6 +28,8 @@ import org.virbo.datasource.AbstractDataSource;
  */
 public class HtmlTableDataSource extends AbstractDataSource {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.html");
+    
     /**
      * the parameter name (not label) to plot
      */
@@ -32,6 +39,7 @@ public class HtmlTableDataSource extends AbstractDataSource {
     
     public HtmlTableDataSource(URI uri) {
         super(uri);
+        addCapability( Streaming.class, new AsciiTableStreamingSource() );
     }
 
     /**
@@ -101,5 +109,50 @@ public class HtmlTableDataSource extends AbstractDataSource {
 
         return tables;
 
+    }
+
+    private class AsciiTableStreamingSource implements Streaming {
+
+        public AsciiTableStreamingSource() {
+        }
+
+        @Override
+        public Iterator<QDataSet> streamDataSet(ProgressMonitor mon) throws Exception {
+            AsciiTableStreamer result= new AsciiTableStreamer();
+            final File f= getHtmlFile( resourceURI.toURL(),mon );
+
+            try (BufferedReader reader = new BufferedReader( new FileReader(f))) {
+
+                final HtmlParserStreamer callback = new HtmlParserStreamer(  );
+                callback.ascii= result;
+
+                String units= getParam("units",null);
+                if ( units!=null ) {
+                    callback.setUnits(URLDecoder.decode(units,"UTF-8"));
+                }
+            
+                String stable= (String)getParams().get( PARAM_TABLE );
+                if ( stable!=null ) callback.setTable( stable );
+                
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            new ParserDelegator().parse( reader, callback, true );
+                            logger.log(Level.FINE, "Done parsing {0}", f);
+                        } catch ( IOException ex ) {
+                            
+                        }
+                    }
+                };
+                
+                //new Thread( run, "HtmlTableDataStreamer" ).start();
+                new ParserDelegator().parse( reader, callback, true );
+                
+                return result;
+            
+            } 
+
+        }
     }
 }
