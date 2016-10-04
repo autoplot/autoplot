@@ -121,37 +121,41 @@ public class HtmlTableDataSource extends AbstractDataSource {
             AsciiTableStreamer result= new AsciiTableStreamer();
             final File f= getHtmlFile( resourceURI.toURL(),mon );
 
-            try (BufferedReader reader = new BufferedReader( new FileReader(f))) {
+            final BufferedReader reader = new BufferedReader( new FileReader(f) );
 
-                final HtmlParserStreamer callback = new HtmlParserStreamer(  );
-                callback.ascii= result;
+            final HtmlParserStreamer callback = new HtmlParserStreamer(  );
+            callback.ascii= result;
 
-                String units= getParam("units",null);
-                if ( units!=null ) {
-                    callback.setUnits(URLDecoder.decode(units,"UTF-8"));
-                }
-            
-                String stable= (String)getParams().get( PARAM_TABLE );
-                if ( stable!=null ) callback.setTable( stable );
-                
-                Runnable run= new Runnable() {
-                    @Override
-                    public void run() {
+            String units= getParam("units",null);
+            if ( units!=null ) {
+                callback.setUnits(URLDecoder.decode(units,"UTF-8"));
+            }
+
+            String stable= (String)getParams().get( PARAM_TABLE );
+            if ( stable!=null ) callback.setTable( stable );
+
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        new ParserDelegator().parse( reader, callback, true );
+                        logger.log(Level.FINE, "Done parsing {0}", f);
+                    } catch ( IOException ex ) {
+
+                    } finally {
                         try {
-                            new ParserDelegator().parse( reader, callback, true );
-                            logger.log(Level.FINE, "Done parsing {0}", f);
+                            reader.close();
                         } catch ( IOException ex ) {
-                            
+                            logger.log( Level.WARNING, ex.getMessage(), ex );
                         }
                     }
-                };
-                
-                //new Thread( run, "HtmlTableDataStreamer" ).start();
-                new ParserDelegator().parse( reader, callback, true );
-                
-                return result;
-            
-            } 
+                }
+            };
+
+            new Thread( run, "HtmlTableDataStreamer" ).start();
+            //new ParserDelegator().parse( reader, callback, true );
+
+            return result;
 
         }
     }
