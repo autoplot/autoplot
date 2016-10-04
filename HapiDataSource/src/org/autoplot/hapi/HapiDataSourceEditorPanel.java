@@ -166,14 +166,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         jSplitPane1.setDividerLocation(210);
 
-        idsList2.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         idsList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        idsList2.setMinimumSize(new java.awt.Dimension(200, 540));
-        idsList2.setPreferredSize(new java.awt.Dimension(200, 540));
+        idsList2.setPreferredSize(new java.awt.Dimension(200, 200));
         jScrollPane2.setViewportView(idsList2);
 
         jSplitPane1.setLeftComponent(jScrollPane2);
