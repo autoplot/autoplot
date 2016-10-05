@@ -6,8 +6,11 @@
 package org.autoplot.hapi;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -23,6 +26,8 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.util.LoggerManager;
+import org.das2.util.filesystem.FileSystemUtil;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -142,6 +147,9 @@ public class HapiDataSource extends AbstractDataSource {
         private ParamDescription( String name ) {
             this.name= name;
         }
+        public String toString() {
+            return this.name;
+        }
     }
     
     /**
@@ -183,7 +191,8 @@ public class HapiDataSource extends AbstractDataSource {
         
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
+        HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
+        try ( BufferedReader in= new BufferedReader( new InputStreamReader( httpConnect.getInputStream() ) ) ) {
             String line= in.readLine();
             lineNum++;
             if ( System.currentTimeMillis()-t0 > 100 ) {
@@ -193,6 +202,19 @@ public class HapiDataSource extends AbstractDataSource {
             while ( line!=null ) {
                 builder.append(line);
                 line= in.readLine();
+            }
+        } catch ( IOException ex ) {
+            ByteArrayOutputStream baos= new ByteArrayOutputStream();
+            FileSystemUtil.copyStream( httpConnect.getErrorStream(), baos, new NullProgressMonitor() );
+            String s= baos.toString("UTF-8");
+            if ( s.contains("No data available") ) {
+                throw new NoDataInIntervalException(s);
+            } else {
+                if ( s.length()<256 ) {
+                    throw new IOException( ex.getMessage() + ": "+s );
+                } else {
+                    throw ex;
+                }
             }
         }
         JSONObject o= new JSONObject(builder.toString());
