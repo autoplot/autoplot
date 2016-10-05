@@ -166,8 +166,9 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         jSplitPane1.setDividerLocation(210);
 
+        jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
         idsList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        idsList2.setPreferredSize(new java.awt.Dimension(200, 200));
         jScrollPane2.setViewportView(idsList2);
 
         jSplitPane1.setLeftComponent(jScrollPane2);
