@@ -100,10 +100,15 @@ public class DataServlet extends HttpServlet {
                 dsiter= new RecordIterator( "vap+jyds:file:///home/jbf/public_html/1wire/ictemp/readTemperaturesMulti.jyds", dr );
             } else if ( id.equals("Spectrum") ) {
                 dsiter= new RecordIterator( "vap+cdaweb:ds=RBSP-A_HFR-SPECTRA_EMFISIS-L2&id=HFR_Spectra", dr );
+            } else if ( id.equals("PowerWheel") ) {
+                dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerWheel.jyds?", dr );
+            } else if ( id.equals("PowerOnesDigitSegments") ) {
+                dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerOnes.jyds?", dr );
             } else {
                 dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/"+id+".$Y$m$d.d2s", dr );
             }
         } catch ( Exception ex ) {
+            ex.printStackTrace();
             throw new IllegalArgumentException("Exception thrown by data read", ex);
         }
         

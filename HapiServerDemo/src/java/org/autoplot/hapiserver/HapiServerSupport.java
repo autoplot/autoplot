@@ -3,8 +3,6 @@ package org.autoplot.hapiserver;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.das2.datum.Units;
-import org.json.JSONObject;
 import org.virbo.dataset.QDataSet;
 
 /**
@@ -24,6 +22,8 @@ public class HapiServerSupport {
         result.add( "AC00080040250510" );
         result.add( "Iowa City Conditions" );
         result.add( "Spectrum" );
+        result.add( "PowerWheel");
+        result.add( "PowerOnesDigitSegments");
         return result;
     }
     

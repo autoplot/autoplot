@@ -44,6 +44,16 @@ public class InfoServlet extends HttpServlet {
             jo.put( "lastDate", "2016-09-20T00:00Z" );
             jo.put( "sampleStartDate", "2016-01-01T00:00Z" );
             jo.put( "sampleEndDate", "2016-01-02T00:00Z" );
+        } else if ( id.equals("PowerWheel") ) {
+            jo.put( "firstDate",  "2016-07-28T00:00Z"  );
+            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
+            jo.put( "sampleStartDate", "2016-07-28T00:00Z" );
+            jo.put( "sampleEndDate", "2016-07-29T00:00Z" );
+        } else if ( id.equals("Spectrum") ) {
+            jo.put( "firstDate",  "2016-07-28T00:00Z"  );
+            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
+            jo.put( "sampleStartDate", "2016-07-28T00:00Z" );
+            jo.put( "sampleEndDate", "2016-07-29T00:00Z" );
         }
         
         if ( !HapiServerSupport.getCatalog().contains(id) ){
@@ -135,7 +145,50 @@ public class InfoServlet extends HttpServlet {
             parameter.put( "size", new int[] { ens.length } );
             parameter.put( "description", "spectrogram example that is not for publication." );
             parameters.put( 1, parameter );
-        
+        } else if ( id.equals("PowerWheel") ) {
+            parameter= new JSONObject();
+            parameter.put( "name", "PowerWheel" );
+            parameter.put( "type", "float" );
+            parameter.put( "units", "greyscale" );
+            JSONObject bins= new JSONObject();
+            bins.put( "units", "" );
+            double[] ens= new double[] { 241.000000, 241.800000, 242.600000, 243.400000, 244.200000, 245.000000, 245.800000, 246.600000, 247.400000, 248.200000, 249.000000, 249.800000, 250.600000, 251.400000, 252.200000, 253.000000, 253.800000, 254.600000, 255.400000, 256.200000, 257.000000 };
+            JSONArray values= new JSONArray();
+            for ( int i=0; i<ens.length; i++ ) {
+                JSONObject en= new JSONObject();
+                en.put("center",ens[i]);
+                values.put( i,en );
+            }
+            bins.put( "values", values );
+            bins.put( "name", "horizontal position" );
+            bins.put( "units", "pixels" );
+            parameter.put( "bins", bins );
+            parameter.put( "size", new int[] { ens.length } );
+            parameter.put( "description", "The little wheel thingy that spins around." );
+            parameters.put( 1, parameter );
+
+        } else if ( id.equals("PowerOnesDigitSegments") ) {
+            parameter= new JSONObject();
+            parameter.put( "name", "PowerOnesDigitSegments" );
+            parameter.put( "type", "float" );
+            parameter.put( "units", "greyscale" );
+            JSONObject bins= new JSONObject();
+            bins.put( "units", "" );
+            double[] ens= new double[] { 0,1,2,3,4,5,6 };
+            JSONArray values= new JSONArray();
+            for ( int i=0; i<ens.length; i++ ) {
+                JSONObject en= new JSONObject();
+                en.put("center",ens[i]);
+                values.put( i,en );
+            }
+            bins.put( "values", values );
+            bins.put( "name", "segmentNumber" );
+            bins.put( "units", "" );
+            parameter.put( "bins", bins );
+            parameter.put( "size", new int[] { ens.length } );
+            parameter.put( "description", "Each of the seven segments of the ones digit seven segment display" );
+            parameters.put( 1, parameter );
+                             
         } else {
             parameter= new JSONObject();
             parameter.put( "name", "Temperature" );
