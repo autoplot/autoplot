@@ -24,7 +24,12 @@ public class RecordIterator implements Iterator<QDataSet>  {
 
     int index;
     int lastIndex;
-    QDataSet src;
+    QDataSet src=null;
+    
+    Iterator<QDataSet> streamingIterator=null;
+    QDataSet sortDataSet=null;
+    
+    int recordCount=0;
     
     private static final Logger logger= Logger.getLogger("apdss.recordIterator");
     
@@ -82,31 +87,56 @@ public class RecordIterator implements Iterator<QDataSet>  {
     
     /**
      * create a new RecordIterator for the given URI and time range.
-     * @param uri the data URI
-     * @param dr the time range
+     * @param suri the data URI
+     * @param timeRange the time range
      * @throws Exception if the data read throws an exception.
      */
-    public RecordIterator( String uri, DatumRange dr ) throws Exception {
-        QDataSet ds= getDataSet( uri, dr, new NullProgressMonitor() );
-        if ( ds==null ) {
-            this.index= 0;
-            this.lastIndex=0;
-            return;
+    public RecordIterator( String suri, DatumRange timeRange ) throws Exception {
+        
+        URI uri = DataSetURI.getURI(suri);
+        DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
+        
+        if ( factory==null ) {
+            throw new IllegalArgumentException("no data source factory found for URI: "+ uri );
         }
-        QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
-        if ( dep0!=null ) {
-            if ( ds.rank()==1 ) {
-                this.src= Ops.bundle( dep0, ds );
-            } else if ( ds.rank()==2 ) {
-                this.src= Ops.bundle( dep0, Ops.unbundle(ds,0) );
-                for ( int i=1; i<ds.length(0); i++ ) {
-                    this.src= Ops.bundle( this.src, Ops.unbundle(ds,i) );
-                }
-            }
+        
+        TimeSeriesBrowse tsb= factory.getCapability(TimeSeriesBrowse.class);   // see if we can allow for URIs without timeranges.
+        if ( tsb!=null ) {
+            tsb.setURI(suri);
+            tsb.setTimeRange( timeRange ); 
+            uri= new URI( tsb.getURI() );
+        }
+        
+        DataSource result = factory.getDataSource( uri );
+    
+        Streaming streaming = result.getCapability( Streaming.class );
+        
+        if ( streaming!=null ) {
+            
         } else {
-            this.src= ds;
+            
+            QDataSet ds= getDataSet( uri.toString(), timeRange, new NullProgressMonitor() );
+            
+            if ( ds==null ) {
+                this.index= 0;
+                this.lastIndex=0;
+                return;
+            }
+            QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+            if ( dep0!=null ) {
+                if ( ds.rank()==1 ) {
+                    this.src= Ops.bundle( dep0, ds );
+                } else if ( ds.rank()==2 ) {
+                    this.src= Ops.bundle( dep0, Ops.unbundle(ds,0) );
+                    for ( int i=1; i<ds.length(0); i++ ) {
+                        this.src= Ops.bundle( this.src, Ops.unbundle(ds,i) );
+                    }
+                }
+            } else {
+                this.src= ds;
+            }
+            constrainDepend0(timeRange);
         }
-        constrainDepend0(dr);
     }
         
     /**
@@ -135,17 +165,46 @@ public class RecordIterator implements Iterator<QDataSet>  {
     public final void resortFields( int[] sort ) {
         if ( this.src!=null ) {
             src= DataSetOps.applyIndex( src, 1, Ops.dataset(sort), true );
+        } else if ( this.streamingIterator!=null ) {
+            this.sortDataSet= Ops.dataset(sort);
         }
     }
     
     @Override
     public boolean hasNext() {
-        return this.index < this.lastIndex;
+        if ( this.streamingIterator!=null ) {
+            if ( this.index>0 ) {
+                logger.finer("skipping "+this.index+" records");
+                for ( int i=0; i<this.index && this.streamingIterator.hasNext() ; i++ ) {
+                    streamingIterator.next();
+                }
+                this.lastIndex -= this.index;
+                this.index= 0;
+            }
+            return ( recordCount < this.lastIndex && this.streamingIterator.hasNext() );
+            
+        } else {
+            return this.index < this.lastIndex;
+        }
     }
 
     @Override
     public QDataSet next() {
-        return src.slice(index++);
+        if ( this.streamingIterator!=null ) {
+            if ( this.index>0 ) {
+                for ( int i=0; i<this.index && this.streamingIterator.hasNext() ; i++ ) {
+                    streamingIterator.next();
+                }
+            }
+            QDataSet nextRecord= streamingIterator.next();
+            if ( this.sortDataSet!=null ) {
+                nextRecord= DataSetOps.applyIndex( src, 1, sortDataSet, true );
+            }
+            recordCount++;
+            return nextRecord;
+        } else {
+            return src.slice(index++);
+        }
     }
     
 }
