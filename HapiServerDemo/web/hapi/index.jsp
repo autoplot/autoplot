@@ -30,12 +30,13 @@
         
         <small>
         <ul>
-            <li>2016-09-21: bugfix: parameters supported when include is not set.
-            <li>2016-09-26: more parameters in current conditions.
-            <li>2016-09-29: time ranges.
-            <li>2016-09-30: add spectrogram example.
-            <li>2016-10-03: correctly handle /hapi request, which redirects to /index.jsp.
-            <li>2016-10-04: add sample time range.
+            <li>2016-09-21: bugfix: parameters supported when include is not set.</li>
+            <li>2016-09-26: more parameters in current conditions.</li>
+            <li>2016-09-29: time ranges.</li>
+            <li>2016-09-30: add spectrogram example.</li>
+            <li>2016-10-03: correctly handle /hapi request, which redirects to /index.jsp.</li>
+            <li>2016-10-04: add sample time range.</li>
+            <li>2016-10-05: add power meter image spectrograms.</li>
         </ul>
         </small>
     </body>
