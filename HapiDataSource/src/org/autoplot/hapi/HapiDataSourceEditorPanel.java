@@ -344,7 +344,11 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         if ( split.file==null || split.file.equals("file:///") ) { // use TSDS's one by default.
             split.file= defaultServer.toString();
         }  
-        ids= HapiServer.getCatalog(new URL(split.file));
+        try {
+            ids= HapiServer.getCatalog(new URL(split.file));
+        } catch ( IOException ex ) {
+            
+        }
         return true;
     }
     
@@ -404,13 +408,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         URISplit split = URISplit.parse(uri);        
         if ( split.file==null || split.file.equals("file:///") ) { // use TSDS's one by default.
             split.file= defaultServer.toString();
-        } 
+        }     
         serversComboBox.setSelectedItem( split.file );
-        try {
-            resetServer( new URL(split.file) );
-        } catch (IOException | JSONException ex) {
-            Logger.getLogger(HapiDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
         Map<String,String> params= URISplit.parseParams( split.params );
         
         String id= params.get("id");
