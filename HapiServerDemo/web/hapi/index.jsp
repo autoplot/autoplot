@@ -35,6 +35,7 @@
             <li>2016-09-29: time ranges.
             <li>2016-09-30: add spectrogram example.
             <li>2016-10-03: correctly handle /hapi request, which redirects to /index.jsp.
+            <li>2016-10-04: add sample time range.
         </ul>
         </small>
     </body>
