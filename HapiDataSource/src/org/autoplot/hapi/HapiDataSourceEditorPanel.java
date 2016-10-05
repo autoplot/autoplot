@@ -531,7 +531,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 } else {
                     try {
                         DatumRange current = DatumRangeUtil.parseTimeRange(currentTimeRange);
-                        if ( !current.intersects(landing) ) {
+                        if ( !current.intersects(range) ) {
                             timeRangeTextField.setText( landing.toString() );
                         }
                     } catch (ParseException ex) {
