@@ -126,7 +126,7 @@ class ImageDataSource extends AbstractDataSource {
 
         mon.started();
 
-        File ff= DataSetURI.getFile(uri, mon);
+        File ff= DataSetURI.getFile(uri, mon.getSubtaskMonitor("get file") );
         if ( ff.length()==0 ) {
             throw new IllegalArgumentException("Image file is empty: "+ff);
         }
