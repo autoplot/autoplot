@@ -291,14 +291,16 @@ public class HapiDataSource extends AbstractDataSource {
             if ( timeVary[j] ) newPds[k++]= pds[j];
         }
         
-        // the data are delivered backwards 
-        if ( UnitsUtil.isTimeLocation( newPds[ntimeVary-1].units ) ) {
-            for ( int j=0; j<ntimeVary; j++ ) {
-                
-            }
-        }
+        // the data are sometimes delivered backwards 
+        int[] sort= null;
+//        if ( UnitsUtil.isTimeLocation( newPds[ntimeVary-1].units ) ) {
+//            sort= new int[result.length()];
+//            for ( int j=0; j<ntimeVary; j++ ) {
+//                sort[j]= ntimeVary-1-j;
+//            }
+//        }
         
-        result = repackage(result,newPds);
+        result = repackage(result,newPds,sort);
         
         return result;
     }
@@ -422,7 +424,7 @@ public class HapiDataSource extends AbstractDataSource {
             throw new NoDataInIntervalException("no records found");
         }
         
-        ds = repackage(ds,pds);
+        ds = repackage(ds,pds,null);
         
         monitor.setTaskProgress(100);
         monitor.finished();
@@ -510,7 +512,14 @@ public class HapiDataSource extends AbstractDataSource {
         return pds;
     }
 
-    private QDataSet repackage(QDataSet ds, ParamDescription[] pds ) {
+    /**
+     * 
+     * @param ds
+     * @param pds
+     * @param sort if non-null, resort the data with these indeces.
+     * @return 
+     */
+    private QDataSet repackage(QDataSet ds, ParamDescription[] pds, int[] sort ) {
         int nparameters= ds.length(0);
         
         QDataSet depend0= Ops.copy( Ops.slice1( ds,0 ) ); //TODO: this will be unnecessary after debugging.
@@ -545,7 +554,7 @@ public class HapiDataSource extends AbstractDataSource {
             int ifield=1;
             for ( int i=1; i<pds.length; i++ ) {
                 int nfields1= DataSetUtil.product(pds[i].size);
-                int startIndex= ifield-1;
+                int startIndex= sort==null ? ifield-1 : sort[ifield]-1;
                 if ( nfields1>1 ) {
                     //bdsb.putProperty( QDataSet.ELEMENT_DIMENSIONS, ifield-1, pds[i].size ); // not supported yet.
                     sdsb.putProperty( QDataSet.ELEMENT_NAME, startIndex, Ops.safeName( pds[i].name ) );
