@@ -461,7 +461,10 @@ public class JythonCompletionTask implements CompletionTask {
                 PyString s = (PyString) po2.__getitem__(i);
                 String ss = s.toString();
                 if (ss.startsWith(cc.completable)) {
-                    rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, null));
+                    String javaClass= cc.contextString + "." + ss;
+                    String signature= join( javaClass.split("\\."), "/") + ".html";  
+                    String link= JavadocLookup.getInstance().getLinkForJavaSignature(signature) + "#method_summary";
+                    rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, link ));
                     count++;
                     results.add(ss);
                 }
