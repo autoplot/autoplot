@@ -412,7 +412,8 @@ public class JythonCompletionTask implements CompletionTask {
             if (ss.startsWith(cc.completable)) {
                 String javaClass= cc.contextString + "." + ss;
                 String signature= join( javaClass.split("\\."), "/") + ".html";  
-                String link= JavadocLookup.getInstance().getLinkForJavaSignature(signature) + "#method_summary";
+                String link= JavadocLookup.getInstance().getLinkForJavaSignature(signature);
+                if ( link!=null ) link+= "#method_summary";
                 rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, link));
                 count++;
             }
@@ -463,7 +464,8 @@ public class JythonCompletionTask implements CompletionTask {
                 if (ss.startsWith(cc.completable)) {
                     String javaClass= cc.contextString + "." + ss;
                     String signature= join( javaClass.split("\\."), "/") + ".html";  
-                    String link= JavadocLookup.getInstance().getLinkForJavaSignature(signature) + "#method_summary";
+                    String link= JavadocLookup.getInstance().getLinkForJavaSignature(signature);
+                    if ( link!=null ) link+= "#method_summary";
                     rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, ss, link ));
                     count++;
                     results.add(ss);
