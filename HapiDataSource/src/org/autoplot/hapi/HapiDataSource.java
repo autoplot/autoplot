@@ -25,6 +25,7 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystemUtil;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -289,6 +290,14 @@ public class HapiDataSource extends AbstractDataSource {
         for ( int j=0; j<pds.length; j++ ) {
             if ( timeVary[j] ) newPds[k++]= pds[j];
         }
+        
+        // the data are delivered backwards 
+        if ( UnitsUtil.isTimeLocation( newPds[ntimeVary-1].units ) ) {
+            for ( int j=0; j<ntimeVary; j++ ) {
+                
+            }
+        }
+        
         result = repackage(result,newPds);
         
         return result;
@@ -539,33 +548,33 @@ public class HapiDataSource extends AbstractDataSource {
                 int startIndex= ifield-1;
                 if ( nfields1>1 ) {
                     //bdsb.putProperty( QDataSet.ELEMENT_DIMENSIONS, ifield-1, pds[i].size ); // not supported yet.
-                    sdsb.putProperty( QDataSet.ELEMENT_NAME, ifield-1, Ops.safeName( pds[i].name ) );
-                    sdsb.putProperty( QDataSet.ELEMENT_LABEL, ifield-1, pds[i].name );        
+                    sdsb.putProperty( QDataSet.ELEMENT_NAME, startIndex, Ops.safeName( pds[i].name ) );
+                    sdsb.putProperty( QDataSet.ELEMENT_LABEL, startIndex, pds[i].name );        
                     for ( int j=0; j<pds[i].size.length; j++ ) {
-                        sdsb.putValue( ifield-1, j, pds[i].size[j] );
+                        sdsb.putValue( startIndex, j, pds[i].size[j] );
                     }
                     if ( pds[i].depend1!=null ) {
-                        sdsb.putProperty( QDataSet.DEPEND_1, ifield-1, pds[i].depend1 );
+                        sdsb.putProperty( QDataSet.DEPEND_1, startIndex, pds[i].depend1 );
                     }
                     //sdsb.putValue( QDataSet.ELEMENT_DIMENSIONS, ifield-1, pds[i].size );                    
                 }
                 for ( int j=0; j<nfields1; j++ ) {
                     if ( nfields1>1 ) {
-                        sdsb.putProperty( QDataSet.START_INDEX, ifield-1, startIndex );
-                        sdsb.putProperty( QDataSet.LABEL, ifield-1, pds[i].name +" ch"+j );                    
-                        sdsb.putProperty( QDataSet.NAME, ifield-1, Ops.safeName(pds[i].name)+"_"+j );
+                        sdsb.putProperty( QDataSet.START_INDEX, startIndex + j, startIndex );
+                        sdsb.putProperty( QDataSet.LABEL, startIndex + j, pds[i].name +" ch"+j );                    
+                        sdsb.putProperty( QDataSet.NAME, startIndex + j, Ops.safeName(pds[i].name)+"_"+j );
                     } else {
-                        sdsb.putProperty( QDataSet.LABEL, ifield-1, pds[i].name );                    
-                        sdsb.putProperty( QDataSet.NAME, ifield-1, Ops.safeName(pds[i].name) ); 
+                        sdsb.putProperty( QDataSet.LABEL, startIndex + j, pds[i].name );                    
+                        sdsb.putProperty( QDataSet.NAME, startIndex + j, Ops.safeName(pds[i].name) ); 
                     }
                     
-                    sdsb.putProperty( QDataSet.TITLE, ifield-1, pds[i].description );
-                    sdsb.putProperty( QDataSet.UNITS, ifield-1, pds[i].units );
+                    sdsb.putProperty( QDataSet.TITLE, startIndex + j, pds[i].description );
+                    sdsb.putProperty( QDataSet.UNITS, startIndex + j, pds[i].units );
                     if ( pds[i].hasFill ) {
-                        sdsb.putProperty( QDataSet.FILL_VALUE, ifield-1,  pds[i].fillValue );
+                        sdsb.putProperty( QDataSet.FILL_VALUE, startIndex + j,  pds[i].fillValue );
                     }
                     if ( nfields1>1 ) {
-                        sdsb.putProperty( QDataSet.START_INDEX, ifield-1, startIndex );
+                        sdsb.putProperty( QDataSet.START_INDEX, startIndex + j, startIndex );
                     }                    
                     ifield++;
                 }
