@@ -547,6 +547,9 @@ public class HapiDataSource extends AbstractDataSource {
             if ( pds[1].depend1!=null ) {
                 ds= Ops.putProperty( ds, QDataSet.DEPEND_1, pds[1].depend1 );
             }
+        } else if ( pds.length==1 ) {
+            return depend0;
+            
         } else {
             // we need to remove Epoch to DEPEND_0.
             SparseDataSetBuilder sdsb= new SparseDataSetBuilder(2);
