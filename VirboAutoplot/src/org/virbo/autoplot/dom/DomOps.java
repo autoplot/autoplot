@@ -292,7 +292,7 @@ public class DomOps {
      * @param dom
      */
     public static void newCanvasLayout( Application dom ) {
-
+        
         Canvas canvas= dom.getCanvases(0);
 
         double emToPixels= java.awt.Font.decode(dom.getCanvases(0).font).getSize();

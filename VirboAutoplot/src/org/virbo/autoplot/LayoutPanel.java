@@ -197,7 +197,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                         Plot targetPlot= dom.getController().getPlotFor( (Component)s );
                         if ( targetPlot!=null ) {
                             DomOps.swapPosition( draggingPlot, targetPlot );
-                            DomOps.newCanvasLayout(dom);
+                            if ( dom.getOptions().isAutolayout() ) DomOps.newCanvasLayout(dom);
                             dom.getController().setStatus("swapped "+draggingPlot+ " and " +targetPlot );
                         }
                     }
@@ -1104,7 +1104,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         List<Plot> plots= getSelectedPlots();
         if ( plots.size()==2 ) {
             DomOps.swapPosition( plots.get(0), plots.get(1) );
-            DomOps.newCanvasLayout(dom);
+            if ( dom.getOptions().isAutolayout() ) DomOps.newCanvasLayout(dom);
             this.dom.getController().setStatus("swapped "+plots.get(0)+ " and " +plots.get(1) );
         } else {
             this.dom.getController().setStatus("warning: select two plots");
@@ -1272,7 +1272,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             } catch ( ParseException ex ) {}
         }
 
-        org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+        if ( dom.getOptions().isAutolayout() ) org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
         
     }//GEN-LAST:event_biggerMIActionPerformed
 
@@ -1317,7 +1317,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             } catch ( ParseException ex ) {}
         }
 
-        org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+        if ( dom.getOptions().isAutolayout() ) org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
         
     }//GEN-LAST:event_sameSizeMIActionPerformed
 
@@ -1340,7 +1340,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             } catch ( ParseException ex ) {}
         }
 
-        org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+        if ( dom.getOptions().isAutolayout() ) org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
 
     }//GEN-LAST:event_smallerMIActionPerformed
 

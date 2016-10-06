@@ -1791,7 +1791,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                     assert row!=null;
                     CanvasController cc = row.controller.getCanvas().controller;
                     cc.deleteRow(deleteRow);
-                    cc.removeGaps();
+                    if ( application.getOptions().isAutolayout() ) {
+                        cc.removeGaps();
+                    }
                 }
             }
 
