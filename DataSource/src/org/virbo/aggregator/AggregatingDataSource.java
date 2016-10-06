@@ -51,6 +51,7 @@ import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.ReferenceCache;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.Version;
+import org.virbo.datasource.capability.Streaming;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
 import org.virbo.dsops.Ops;
@@ -107,7 +108,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
         this.delegateDataSourceFactory = delegateFactory;
         if ( AggregatingDataSourceFactory.hasTimeFields( uri.toString() ) ) {
             tsb= new AggTimeSeriesBrowse();
-            addCapability(TimeSeriesBrowse.class, tsb );
+            addCapability( TimeSeriesBrowse.class, tsb );
+            //addCapability( Streaming.class, new StreamingCapability(uri,this) );
         }
         
         String stimeRange= super.params.get( URISplit.PARAM_TIME_RANGE );
@@ -352,15 +354,27 @@ public final class AggregatingDataSource extends AbstractDataSource {
                     throw ex;
                 }
             } else {
-                logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), resourceURI } );
+                logger.log(Level.FINE, "reference cache in use, {0} is loading {1}", new Object[] { Thread.currentThread().toString(), theUri } );
             }
         }
         
         logger.log(Level.FINE, "reading {0}", uri );
-
+        
         try {
-            DatumRange lviewRange= viewRange;
-            Datum lresolution= resolution;
+            QDataSet result= getDataSet( mon, viewRange, resolution );        
+            if ( cacheEntry!=null ) cacheEntry.finished(result);
+        
+            return result;
+        } catch ( Exception ex ) {
+            if ( cacheEntry!=null ) cacheEntry.exception(ex);
+            throw ex;
+
+        }
+
+    }
+    
+    public QDataSet getDataSet( ProgressMonitor mon, DatumRange lviewRange, Datum lresolution ) throws Exception {
+        try {
 
             mon.started();
             
@@ -404,7 +418,6 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 result.putProperty( QDataSet.TITLE, split.file );
 
                 mon.finished();
-                if ( cacheEntry!=null ) cacheEntry.finished(result);
                 
                 return result;
 
@@ -713,7 +726,6 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 if ( notes.length()>0 ) altResult.putProperty( QDataSet.NOTES, notes );
                 altResult.putProperty( QDataSet.USER_PROPERTIES, userProps );
 
-                if ( cacheEntry!=null ) cacheEntry.finished(altResult);
                 logger.log(Level.FINE, "loaded {0} {1}", new Object[] { altResult, describeRange(result) } );
                 return altResult;
 
@@ -736,7 +748,6 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 QDataSet notes= notesBuilder.getDataSet();
                 if ( result!=null && notes.length()>0 ) result.putProperty( QDataSet.NOTES, notes );
                 if ( result!=null && !result.isImmutable() ) result.putProperty( QDataSet.USER_PROPERTIES, userProps );
-                if ( cacheEntry!=null ) cacheEntry.finished(result);
                 
                 // check to see if all the notes are the same explaining the exception
                 if ( result==null && notes.length()>0 ) { 
@@ -763,7 +774,6 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 return result;
             }
         } catch ( Exception ex ) {
-            if ( cacheEntry!=null ) cacheEntry.exception(ex);
             throw ex;
         }
 
@@ -898,6 +908,10 @@ public final class AggregatingDataSource extends AbstractDataSource {
         String oldParams = this.sparams;
         this.sparams = params;
         propertyChangeSupport.firePropertyChange("args", oldParams, params);
+    }
+    
+    protected String getSParams() {
+        return this.sparams;
     }
 
     @Override
