@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Demo HAPI server shows data collected from 1-Wire temperature sensors, and allows selection of available parameters.
+        <p><small>Demo HAPI server used to demo "Scheme" font which will soon be available on all platforms.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,16 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-09-28 r19564):</p>
+        <p>Bugfixes (2016-10-07 r19609):</p>
         <ul>
+            <li>finally figure out why vertical axis sometimes clips the top tick.</li>
+            <li>Some automatic layout actions would occur when autolayout switch was off.  Thanks, Ivar!</li>
+            <li>1687: completions on jython import package names shows javadoc</li>
+            <li>add filters dialog is resizeable.   Thanks Chris!</li>
+            <li>Ed found "hey man" debugging print statement left in code.  Now a useful message is printed.</li>
+            <li>clarify dbAboveBackgroundDim1 GUI, and allow selection of 10 or 20 factor for fields intensity or power.  Thanks Chris!</li>
+            <li>DecimalFormat, often used to display decimal numbers and in das2streams and QStreams, was using banker's rounding (HALF_EVEN), instead of HALF_UP.</li>
+            <li>various bugs with the HAPI GUI.</li>
             <li>QStream ASCII formats used banker's rounding, so 44.5 would have been rounded to 44.0.  Now 0.5 is rounded up.</li>
             <li>1679: HAPI JSON would confuse Rich ASCII support.</li>
             <li>improve feedback for qstreams when values are found in both the packet descriptor and in the packets.</li>
@@ -111,6 +119,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>BinaryDataSource completions include time24, which has been available for a while.</li>
+            <li>531: Html parser has new streaming capability, to support servers</li>
+            
             <li>Logger control decorated with even/odd backgrounds.  Thanks, Ed!</li>
             <li>rfe247: HAPI data streams, with HAPI JSON headers, can be read in now as a rich ascii dialect</li>
             <li>The console Logger control uses a table now, and allows sorting by log level.</li>
