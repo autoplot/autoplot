@@ -25,6 +25,8 @@ public class AutoplotServer {
           
         System.err.println("org.virbo.autoplot.AutoplotServer 20160202");
 
+        Util.addFonts();
+        
         ArgumentList alm= new ArgumentList("AutoplotServer");
         alm.addOptionalSwitchArgument("uri", "u", "uri", "", "URI to plot");
         alm.addOptionalSwitchArgument("vap", "v", "vap", "", "VAP to plot");
