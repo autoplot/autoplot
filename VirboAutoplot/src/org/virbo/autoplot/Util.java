@@ -4,11 +4,15 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -295,4 +299,22 @@ public class Util {
 //        copyFileTree( new File("/home/jbf/temp/foo"), new File("/home/jbf/temp/foo2/" ));
 //        getBuildInfos();
 //    }
+    
+    /**
+     * this will add the Scheme font found in the /resources/ folder.
+     */
+    public static void addFonts() {
+        Class c= Util.class;
+
+        try ( InputStream in = c.getResourceAsStream("/resources/scheme_bk.otf") ) {
+            if ( in!=null ) {
+                Font font = Font.createFont(Font.TRUETYPE_FONT, in );
+                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                ge.registerFont(font);
+            }
+        } catch (FontFormatException | IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+   
+    }
 }
