@@ -4504,6 +4504,8 @@ private void updateFrameTitle() {
         //https://sourceforge.net/p/autoplot/bugs/1159/
         System.setProperty("java.util.Arrays.useLegacyMergeSort", "true"); // see also jnlp which sets the property.
         
+        Util.addFonts();
+                
         { // read in the file $HOME/autoplot_data/config/logging.properties, if it exists.
             File f1= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "config" );
             File f2= new File( f1, "logging.properties" );
