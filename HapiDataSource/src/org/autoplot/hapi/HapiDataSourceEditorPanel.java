@@ -12,6 +12,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.ParseException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -20,6 +21,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -39,6 +41,7 @@ import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
+import org.virbo.datasource.WindowManager;
 
 /**
  *
@@ -72,7 +75,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private String currentParameters= null;
     private URL currentServer= null;
     private String currentId= null;
-     
+    private String currentExtra=null;
+
     /**
      * Creates new form HapiDataSourceEditorPanel
      */
@@ -136,6 +140,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         parametersPanel = new javax.swing.JPanel();
         clearAllB = new javax.swing.JButton();
         setAllB = new javax.swing.JButton();
+        extraInfoButton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
 
         jLabel1.setText("HAPI Server:");
@@ -177,7 +182,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         parametersPanel.setLayout(parametersPanelLayout);
         parametersPanelLayout.setHorizontalGroup(
             parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 133, Short.MAX_VALUE)
+            .addGap(0, 208, Short.MAX_VALUE)
         );
         parametersPanelLayout.setVerticalGroup(
             parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -200,13 +205,21 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             }
         });
 
+        extraInfoButton.setText("Extra Info");
+        extraInfoButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                extraInfoButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane4)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(extraInfoButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(clearAllB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(setAllB))
@@ -218,7 +231,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(clearAllB)
-                    .addComponent(setAllB)))
+                    .addComponent(setAllB)
+                    .addComponent(extraInfoButton)))
         );
 
         jSplitPane1.setRightComponent(jPanel3);
@@ -229,7 +243,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -315,9 +329,15 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         }
     }//GEN-LAST:event_setAllBActionPerformed
 
+    private void extraInfoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extraInfoButtonActionPerformed
+        JLabel l= new JLabel( currentExtra );
+        JOptionPane.showMessageDialog( this, l, "Extra Info", JOptionPane.INFORMATION_MESSAGE );
+    }//GEN-LAST:event_extraInfoButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton clearAllB;
+    private javax.swing.JButton extraInfoButton;
     private javax.swing.JList<String> idsList2;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
@@ -490,11 +510,53 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         }
     }
     
+    private String getHtmlFor( Object o ) throws JSONException {
+        StringBuilder s= new StringBuilder();
+        if ( o instanceof JSONArray ) {
+            JSONArray joa= (JSONArray)o;
+            s.append("<ul>");
+            for ( int i=0; i<joa.length(); i++ ) {
+                s.append("<li>").append(getHtmlFor(joa.get(i))).append("<li>");
+            }
+            s.append("</ul>");
+        } else if ( o instanceof JSONObject ) {
+            JSONObject jo= (JSONObject)o;
+            s.append("<table>");
+            Iterator iter= jo.keys();
+            String k;
+            for ( ; iter.hasNext(); ) {
+                k=iter.next().toString();
+                Object v= jo.get(k);
+                String sv= (getHtmlFor(v));
+                s.append("<tr><td>").append(k).append("</td><td>").append(sv).append("</td></tr>");
+            }
+            s.append("</table>");
+        } else {
+            s.append(o.toString());
+        }
+        return s.toString();
+    }
+    
     private void resetVariable( URL server, String id ) {
         try {
             JSONObject info= HapiServer.getInfo( server, id );
             JSONArray parameters= info.getJSONArray("parameters");
             
+            StringBuilder extra= new StringBuilder();
+            extra.append("<html><table>");
+            Iterator iter= info.keys();
+            String k;
+            for ( ; iter.hasNext(); ) {
+                k=iter.next().toString();
+                if ( !k.equals("parameters") ) {
+                    Object v= info.get(k);
+                    extra.append("<tr><td>").append(k).append("</td><td>");
+                    extra.append( getHtmlFor(v) );
+                    extra.append("</td></tr>");
+                }
+            }
+            extra.append("</table></html>");
+            currentExtra= extra.toString();
             parametersPanel.removeAll();
             for ( int i=0; i<parameters.length(); i++ ) {
                 JSONObject parameter= parameters.getJSONObject(i);
