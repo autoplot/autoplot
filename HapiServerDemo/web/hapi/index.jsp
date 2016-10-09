@@ -37,6 +37,7 @@
             <li>2016-10-03: correctly handle /hapi request, which redirects to /index.jsp.</li>
             <li>2016-10-04: add sample time range.</li>
             <li>2016-10-05: add power meter image spectrograms.</li>
+            <li>2016-10-09: digits spectrogram is 27 channel spectrogram.</li>
         </ul>
         </small>
     </body>
