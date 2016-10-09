@@ -185,10 +185,23 @@ public class InfoServlet extends HttpServlet {
             }
             bins.put( "values", values );
             bins.put( "name", "segmentNumber" );
-            bins.put( "units", "" );
+            bins.put( "units", "" ); 
             parameter.put( "bins", bins );
             parameter.put( "size", new int[] { ens.length() } );
             parameter.put( "description", "Each of the seven segments of the ones digit seven segment display" );
+            parameter.put( "longDescription", "<html><p>This returns 27 channels, where each of the seven segments has three measurements, "
+                    + "and there are two reference measurements in the centers of the segments. <ul> "
+                    + "<li>Channels 0,1,2 are in the center of the top four segments, "
+                    + "<li>Channels 24,25,26 are in the center of the bottom four segments."
+                    + "<li>Channels 3,4,5 are the upper segment, typically labelled A"
+                    + "<li>Channels 6,7,8 are the upper segment, typically labelled B"
+                    + "<li>Channels 9,10,11 are the upper segment, typically labelled C"
+                    + "<li>Channels 12,13,14 are the upper segment, typically labelled D"
+                    + "<li>Channels 15,16,17 are the upper segment, typically labelled E"
+                    + "<li>Channels 18,19,20 are the upper segment, typically labelled F"
+                    + "<li>Channels 21,22,23 are the upper segment, typically labelled G"
+                    + "</ul></html>"
+            );
             parameters.put( 1, parameter );
                              
         } else {
