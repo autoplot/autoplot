@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.virbo.dataset.QDataSet;
+import org.virbo.dsops.Ops;
 
 /**
  * Info servlet returns information about parameters.
@@ -174,18 +176,18 @@ public class InfoServlet extends HttpServlet {
             parameter.put( "units", "greyscale" );
             JSONObject bins= new JSONObject();
             bins.put( "units", "" );
-            double[] ens= new double[] { 0,1,2,3,4,5,6 };
+            QDataSet ens= Ops.findgen(27);
             JSONArray values= new JSONArray();
-            for ( int i=0; i<ens.length; i++ ) {
+            for ( int i=0; i<ens.length(); i++ ) {
                 JSONObject en= new JSONObject();
-                en.put("center",ens[i]);
+                en.put("center",ens.value(i));
                 values.put( i,en );
             }
             bins.put( "values", values );
             bins.put( "name", "segmentNumber" );
             bins.put( "units", "" );
             parameter.put( "bins", bins );
-            parameter.put( "size", new int[] { ens.length } );
+            parameter.put( "size", new int[] { ens.length() } );
             parameter.put( "description", "Each of the seven segments of the ones digit seven segment display" );
             parameters.put( 1, parameter );
                              
