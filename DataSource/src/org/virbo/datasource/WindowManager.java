@@ -57,10 +57,10 @@ public class WindowManager {
      * @param icon
      * @return 
      */
-    public static int showConfirmDialog( Component parent, JPanel omessage, String title, int optionType, int messageType, Icon icon ) {
+    public static int showConfirmDialog( Component parent, Object omessage, String title, int optionType, int messageType, Icon icon ) {
         return showConfirmDialog( parent, omessage, title, optionType );
     }
-    
+            
     /**
      * call this before the window.
      * @param window the window.
