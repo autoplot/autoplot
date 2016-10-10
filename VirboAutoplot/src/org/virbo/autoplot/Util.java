@@ -316,5 +316,15 @@ public class Util {
             logger.log(Level.SEVERE, null, ex);
         }
    
+        try ( InputStream in = c.getResourceAsStream("/resources/Roboto-Regular.ttf") ) {
+            if ( in!=null ) {
+                Font font = Font.createFont(Font.TRUETYPE_FONT, in );
+                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                ge.registerFont(font);
+            }
+        } catch (FontFormatException | IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        
     }
 }
