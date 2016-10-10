@@ -305,8 +305,8 @@ public class Util {
      */
     public static void addFonts() {
         Class c= Util.class;
-
-        try ( InputStream in = c.getResourceAsStream("/resources/scheme_bk.otf") ) {
+   
+        try ( InputStream in = c.getResourceAsStream("/resources/Roboto-Regular.ttf") ) {
             if ( in!=null ) {
                 Font font = Font.createFont(Font.TRUETYPE_FONT, in );
                 GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -315,8 +315,8 @@ public class Util {
         } catch (FontFormatException | IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-   
-        try ( InputStream in = c.getResourceAsStream("/resources/Roboto-Regular.ttf") ) {
+
+        try ( InputStream in = c.getResourceAsStream("/resources/ArchitectsDaughter.ttf") ) {
             if ( in!=null ) {
                 Font font = Font.createFont(Font.TRUETYPE_FONT, in );
                 GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
