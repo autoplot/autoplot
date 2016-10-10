@@ -2,6 +2,7 @@
 package org.autoplot.hapi;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -24,6 +25,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -331,7 +333,11 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
     private void extraInfoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extraInfoButtonActionPerformed
         JLabel l= new JLabel( currentExtra );
-        JOptionPane.showMessageDialog( this, l, "Extra Info", JOptionPane.INFORMATION_MESSAGE );
+        
+        JScrollPane p= new JScrollPane(l);
+        //p.setPreferredSize( new Dimension( 800,600 ) );
+        p.setMaximumSize( new Dimension( 800,600 ) );
+        JOptionPane.showMessageDialog( this, p, "Extra Info", JOptionPane.INFORMATION_MESSAGE );
     }//GEN-LAST:event_extraInfoButtonActionPerformed
 
 
@@ -528,7 +534,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 k=iter.next().toString();
                 Object v= jo.get(k);
                 String sv= (getHtmlFor(v));
-                s.append("<tr><td>").append(k).append("</td><td>").append(sv).append("</td></tr>");
+                s.append("<tr valign=top><td>").append(k).append("</td><td>").append(sv).append("</td></tr>");
             }
             s.append("</table>");
         } else {
@@ -550,8 +556,14 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 k=iter.next().toString();
                 if ( !k.equals("parameters") ) {
                     Object v= info.get(k);
-                    extra.append("<tr><td>").append(k).append("</td><td>");
-                    extra.append( getHtmlFor(v) );
+                    extra.append("<tr valign=top><td>").append(k).append("</td><td>");
+                    String s= getHtmlFor(v);
+                    if ( s.length()>300 ) {
+                        extra.append("<i>(").append(v.toString().length()).append(" characters)</i>");
+                        //extra.append( s ) ; //v.toString() );
+                    } else {
+                        extra.append( s );
+                    }
                     extra.append("</td></tr>");
                 }
             }
