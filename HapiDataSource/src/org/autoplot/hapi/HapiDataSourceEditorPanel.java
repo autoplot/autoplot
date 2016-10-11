@@ -4,6 +4,8 @@ package org.autoplot.hapi;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -82,6 +84,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private URL currentServer= null;
     private String currentId= null;
     private String currentExtra=null;
+    private int lastParamIndex= -1; // the index of the last parameter selection.
 
     /**
      * Creates new form HapiDataSourceEditorPanel
@@ -589,8 +592,30 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 JCheckBox cb= new JCheckBox(parameter.getString("name"));
                 cb.setName(parameter.getString("name"));
                 cb.setSelected(true);
+                final int fi= i;
+                cb.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        if ( ( e.getModifiers() & ActionEvent.SHIFT_MASK ) == ActionEvent.SHIFT_MASK ) {
+                            if ( lastParamIndex>-1 ) {
+                                if ( lastParamIndex<fi ) {
+                                    for ( int i=lastParamIndex; i<=fi; i++ ) {
+                                        ( (JCheckBox)parametersPanel.getComponent(i) ).setSelected(true);
+                                    } 
+                                } else {
+                                    for ( int i=fi; i<=lastParamIndex; i++ ) {
+                                        ( (JCheckBox)parametersPanel.getComponent(i) ).setSelected(true);
+                                    } 
+                                }
+                            }
+                        }
+                        lastParamIndex= fi;
+                    }
+                    
+                });
                 parametersPanel.add( cb );
             }
+            parametersPanel.setToolTipText("shift-click will select range");
             parametersPanel.revalidate();
             parametersPanel.repaint();
             if ( currentParameters!=null ) {
