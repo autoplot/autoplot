@@ -262,10 +262,6 @@ public class HapiServer {
         } else {
             s= s.append("/").append( append );
         }
-        if ( server.toString().contains( "http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi" ) ) {
-            logger.warning("appending .xql on cdaweb URL");
-            s.append(".xql");
-        }
         if ( singletonMap!=null && !singletonMap.isEmpty() ) {
             boolean firstArg= true;
             for ( Entry<String,String> entry: singletonMap.entrySet() ) {
