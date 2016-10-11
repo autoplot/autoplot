@@ -38,6 +38,7 @@
             <li>2016-10-04: add sample time range.</li>
             <li>2016-10-05: add power meter image spectrograms.</li>
             <li>2016-10-09: digits spectrogram is 27 channel spectrogram.</li>
+            <li>2016-10-11: put in extension longDescription.</li>
         </ul>
         </small>
     </body>
