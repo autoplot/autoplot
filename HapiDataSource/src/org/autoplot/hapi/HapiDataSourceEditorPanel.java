@@ -554,7 +554,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             String k;
             for ( ; iter.hasNext(); ) {
                 k=iter.next().toString();
-                if ( !k.equals("parameters") ) {
+                //if ( !k.equals("parameters") ) {
                     Object v= info.get(k);
                     extra.append("<tr valign=top><td>").append(k).append("</td><td>");
                     String s= getHtmlFor(v);
@@ -565,7 +565,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                         extra.append( s );
                     }
                     extra.append("</td></tr>");
-                }
+                //}
             }
             extra.append("</table></html>");
             currentExtra= extra.toString();
