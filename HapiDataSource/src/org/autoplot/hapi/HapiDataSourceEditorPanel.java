@@ -187,6 +187,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         jSplitPane1.setLeftComponent(jScrollPane2);
 
+        parametersPanel.setMinimumSize(new java.awt.Dimension(100, 0));
+
         javax.swing.GroupLayout parametersPanelLayout = new javax.swing.GroupLayout(parametersPanel);
         parametersPanel.setLayout(parametersPanelLayout);
         parametersPanelLayout.setHorizontalGroup(
@@ -342,8 +344,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         JLabel l= new JLabel( currentExtra );
         
         JScrollPane p= new JScrollPane(l);
-        //p.setPreferredSize( new Dimension( 800,600 ) );
-        p.setMaximumSize( new Dimension( 800,600 ) );
+        p.setPreferredSize( new Dimension( 800,400 ) );
+        p.setMaximumSize( new Dimension( 800,400 ) );
         JOptionPane.showMessageDialog( this, p, "Extra Info", JOptionPane.INFORMATION_MESSAGE );
     }//GEN-LAST:event_extraInfoButtonActionPerformed
 
@@ -527,11 +529,9 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         StringBuilder s= new StringBuilder();
         if ( o instanceof JSONArray ) {
             JSONArray joa= (JSONArray)o;
-            s.append("<ul>");
             for ( int i=0; i<joa.length(); i++ ) {
-                s.append("<li>").append(getHtmlFor(joa.get(i))).append("<li>");
+                s.append(getHtmlFor(joa.get(i))).append("<br>");
             }
-            s.append("</ul>");
         } else if ( o instanceof JSONObject ) {
             JSONObject jo= (JSONObject)o;
             s.append("<table>");
@@ -565,7 +565,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     Object v= info.get(k);
                     extra.append("<tr valign=top><td>").append(k).append("</td><td>");
                     String s= getHtmlFor(v);
-                    if ( s.length()>300 ) {
+                    if ( s.length()>MAX_LENGTH_CHARACTERS ) {
                         extra.append("<i>(").append(v.toString().length()).append(" characters)</i>");
                         //extra.append( s ) ; //v.toString() );
                     } else {
@@ -649,4 +649,5 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         }
                 
     }
+    private static final int MAX_LENGTH_CHARACTERS = 3410;
 }
