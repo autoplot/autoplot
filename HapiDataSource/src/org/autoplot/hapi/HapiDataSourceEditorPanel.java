@@ -34,7 +34,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
-import org.das2.system.DasLogger;
 import org.das2.util.LoggerManager;
 import org.das2.util.TickleTimer;
 import org.das2.util.monitor.ProgressMonitor;
@@ -45,7 +44,6 @@ import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.WindowManager;
 
 /**
  *
