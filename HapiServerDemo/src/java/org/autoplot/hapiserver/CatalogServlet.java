@@ -13,6 +13,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.das2.datum.TimeParser;
+import org.das2.datum.TimeUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,6 +25,7 @@ import org.json.JSONObject;
  */
 public class CatalogServlet extends HttpServlet {
 
+    private static final String deployedAt= TimeParser.create( TimeParser.TIMEFORMAT_Z ).format( TimeUtil.now() );
     /**
      * return the JSONObject for the catalog.
      * @return
@@ -31,6 +34,7 @@ public class CatalogServlet extends HttpServlet {
     public static JSONObject getCatalog() throws JSONException {
         JSONObject jo= new JSONObject();
         jo.put("HAPI","1.0");
+        jo.put("x-deployedAt", deployedAt );
         JSONArray catalog= new JSONArray();
         List<String> ids= HapiServerSupport.getCatalog();
         for ( int i=0; i<ids.size(); i++ ) {
