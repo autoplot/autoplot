@@ -34,6 +34,8 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
+import org.das2.system.DasLogger;
+import org.das2.util.LoggerManager;
 import org.das2.util.TickleTimer;
 import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
@@ -51,6 +53,8 @@ import org.virbo.datasource.WindowManager;
  */
 public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.hapi");
+    
     List<String> ids;
     
     URL defaultServer;
@@ -61,19 +65,21 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 String firstDate= info.getString("firstDate");
                 String lastDate= info.getString("lastDate");
                 if ( firstDate!=null && lastDate!=null ) {
-                    return new DatumRange( Units.us2000.parse(firstDate), Units.us2000.parse(lastDate) );
+                    Datum t1= Units.us2000.parse(firstDate);
+                    Datum t2= Units.us2000.parse(lastDate);
+                    if ( t1.le(t2) ) {
+                        return new DatumRange( t1, t2 );
+                    } else {
+                        logger.warning( "firstDate and lastDate are out of order, ignoring.");
+                    }
                 }
             }
-        } catch ( JSONException ex ) {
-            ex.printStackTrace();
-        } catch ( ParseException ex ) {
-            ex.printStackTrace();
+        } catch ( JSONException | ParseException ex ) {
+            logger.log( Level.WARNING, ex.getMessage(), ex );
         }
         return null;
     }
-    
-    protected final static Logger logger= Logger.getLogger("apdss.hapi");
-    
+        
     private String currentParameters= null;
     private URL currentServer= null;
     private String currentId= null;
