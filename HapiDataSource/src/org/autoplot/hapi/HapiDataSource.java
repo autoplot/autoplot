@@ -414,7 +414,7 @@ public class HapiDataSource extends AbstractDataSource {
         } catch ( IOException e ) {
             e.printStackTrace();
             monitor.finished();
-            throw new IOException( ""+connection.getResponseCode()+": "+connection.getResponseMessage() );
+            throw new IOException( String.valueOf(connection.getResponseCode())+": "+connection.getResponseMessage() );
             
         } catch ( Exception e ) {
             e.printStackTrace();
