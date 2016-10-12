@@ -325,6 +325,16 @@ public class Util {
         } catch (FontFormatException | IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+
+        try ( InputStream in = c.getResourceAsStream("/resources/scheme_bk.otf") ) {
+            if ( in!=null ) {
+                Font font = Font.createFont(Font.TRUETYPE_FONT, in );
+                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                ge.registerFont(font);
+            }
+        } catch (FontFormatException | IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
         
     }
 }
