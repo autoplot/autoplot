@@ -58,6 +58,7 @@ import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
+import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFormat;
@@ -1556,6 +1557,15 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void load( String filename ) throws IOException {
         plot(filename);
+    }
+    
+    /**
+     * load a vap and return the dom.
+     * @param filename .vap file
+     * @return Application
+     */
+    public static Application loadVap( String filename ) throws IOException {
+        return (Application) StatePersistence.restoreState( new File( filename ) );
     }
     
     /**
