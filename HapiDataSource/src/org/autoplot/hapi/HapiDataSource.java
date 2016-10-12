@@ -371,7 +371,10 @@ public class HapiDataSource extends AbstractDataSource {
         
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
         
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
+        HttpURLConnection connection= (HttpURLConnection)url.openConnection();
+        connection.connect();
+        
+        try ( BufferedReader in= new BufferedReader( new InputStreamReader( connection.getInputStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
                 String[] ss= line.split(",");
@@ -408,6 +411,11 @@ public class HapiDataSource extends AbstractDataSource {
                 builder.nextRecord();
                 line= in.readLine();
             }
+        } catch ( IOException e ) {
+            e.printStackTrace();
+            monitor.finished();
+            throw new IOException( ""+connection.getResponseCode()+": "+connection.getResponseMessage() );
+            
         } catch ( Exception e ) {
             e.printStackTrace();
             monitor.finished();
