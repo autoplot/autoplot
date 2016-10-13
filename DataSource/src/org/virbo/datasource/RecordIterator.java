@@ -10,6 +10,7 @@ import org.das2.datum.DatumRange;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
+import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.capability.Streaming;
@@ -23,7 +24,7 @@ import org.virbo.dsops.Ops;
 public class RecordIterator implements Iterator<QDataSet>  {
 
     int index;
-    int lastIndex;
+    int lastIndex=-1; // -1 means we don't know, no constraint.
     QDataSet src=null;
     
     Iterator<QDataSet> streamingIterator=null;
@@ -92,6 +93,17 @@ public class RecordIterator implements Iterator<QDataSet>  {
      * @throws Exception if the data read throws an exception.
      */
     public RecordIterator( String suri, DatumRange timeRange ) throws Exception {
+        this( suri, timeRange, true );
+    }
+    
+    /**
+     * create a new RecordIterator for the given URI and time range.
+     * @param suri the data URI
+     * @param timeRange the time range
+     * @param allowStream if false, then don't use the streaming capability, even when it is available.
+     * @throws Exception if the data read throws an exception.
+     */
+    public RecordIterator( String suri, DatumRange timeRange, boolean allowStream ) throws Exception {
         
         URI uri = DataSetURI.getURI(suri);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
@@ -111,8 +123,9 @@ public class RecordIterator implements Iterator<QDataSet>  {
     
         Streaming streaming = result.getCapability( Streaming.class );
         
-        if ( streaming!=null ) {
-            
+        if ( streaming!=null && allowStream ) {
+            streamingIterator= streaming.streamDataSet( new NullProgressMonitor() );
+                    
         } else {
             
             QDataSet ds= getDataSet( uri.toString(), timeRange, new NullProgressMonitor() );
@@ -181,7 +194,7 @@ public class RecordIterator implements Iterator<QDataSet>  {
                 this.lastIndex -= this.index;
                 this.index= 0;
             }
-            return ( recordCount < this.lastIndex && this.streamingIterator.hasNext() );
+            return ( ( this.lastIndex<0 || recordCount<this.lastIndex ) && this.streamingIterator.hasNext() );
             
         } else {
             return this.index < this.lastIndex;
@@ -197,6 +210,23 @@ public class RecordIterator implements Iterator<QDataSet>  {
                 }
             }
             QDataSet nextRecord= streamingIterator.next();
+            QDataSet dep0= (QDataSet) nextRecord.property(QDataSet.CONTEXT_0);
+            if ( dep0!=null ) {
+                switch (nextRecord.rank()) {
+                    case 0:
+                        nextRecord= Ops.bundle( dep0, nextRecord );
+                        break;
+                    case 1:
+                        QDataSet d= Ops.bundle( dep0, nextRecord.slice(0) );
+                        for ( int j=1; j<nextRecord.length(); j++ ) {
+                            d= Ops.bundle( d, nextRecord.slice(j));
+                        }   
+                        nextRecord= d;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("rank>2 streaming not supported");
+                }
+            }
             if ( this.sortDataSet!=null ) {
                 nextRecord= DataSetOps.applyIndex( src, 1, sortDataSet, true );
             }
