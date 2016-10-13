@@ -109,7 +109,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
         if ( AggregatingDataSourceFactory.hasTimeFields( uri.toString() ) ) {
             tsb= new AggTimeSeriesBrowse();
             addCapability( TimeSeriesBrowse.class, tsb );
-            //addCapability( Streaming.class, new StreamingCapability(uri,this) );
+            addCapability( Streaming.class, new StreamingCapability(uri,this) );
         }
         
         String stimeRange= super.params.get( URISplit.PARAM_TIME_RANGE );
