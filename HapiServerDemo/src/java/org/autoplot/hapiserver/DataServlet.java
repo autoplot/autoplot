@@ -66,6 +66,7 @@ public class DataServlet extends HttpServlet {
         String parameters= getParam( params, "parameters", "", "The comma separated list of parameters to include in the response ", null );
         String include= getParam( params, "include", "", "include header at the top", Pattern.compile("(|header)") );
         String format= getParam( params, "format", "", "The desired format for the data stream.", Pattern.compile("(|csv|binary)") );
+        String stream= getParam( params, "stream", "true", "allow/disallow streaming.", Pattern.compile("(|true|false)") );
         
         if ( !params.isEmpty() ) {
             throw new ServletException("unrecognized parameters: "+params);
@@ -94,18 +95,20 @@ public class DataServlet extends HttpServlet {
         if ( !( HapiServerSupport.getCatalog().contains(id) ) ) {
             throw new IllegalArgumentException("id not recognized");
         }
+        
+        boolean allowStream= !stream.equals("false");
 
         try {
             if ( id.equals("Iowa City Conditions") ) { // TODO: 
-                dsiter= new RecordIterator( "vap+jyds:file:///home/jbf/public_html/1wire/ictemp/readTemperaturesMulti.jyds", dr );
+                dsiter= new RecordIterator( "vap+jyds:file:///home/jbf/public_html/1wire/ictemp/readTemperaturesMulti.jyds", dr, allowStream );
             } else if ( id.equals("Spectrum") ) {
-                dsiter= new RecordIterator( "vap+cdaweb:ds=RBSP-A_HFR-SPECTRA_EMFISIS-L2&id=HFR_Spectra", dr );
+                dsiter= new RecordIterator( "vap+cdaweb:ds=RBSP-A_HFR-SPECTRA_EMFISIS-L2&id=HFR_Spectra", dr , allowStream);
             } else if ( id.equals("PowerWheel") ) {
-                dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerWheel.jyds?", dr );
+                dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerWheel.jyds?", dr, allowStream );
             } else if ( id.equals("PowerOnesDigitSegments") ) {
-                dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerOnes.jyds?", dr );
+                dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerOnes.jyds?", dr, allowStream );
             } else {
-                dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/"+id+".$Y$m$d.d2s", dr );
+                dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/"+id+".$Y$m$d.d2s", dr, allowStream );
             }
         } catch ( Exception ex ) {
             ex.printStackTrace();
