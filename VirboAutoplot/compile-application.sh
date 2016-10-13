@@ -178,7 +178,7 @@ echo "done special handling of META-INF stuff."
 
 echo "=== copy resources..."
 cd temp-volatile-src
-for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.jyds' -o -name '*.xml' -o -name '*.xsl' -o -name '*.xsd' -o -name '*.CSV' -o -name '*.properties' ); do
+for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.jyds' -o -name '*.xml' -o -name '*.xsl' -o -name '*.xsd' -o -name '*.CSV' -o -name '*.properties' -o name '*.ttf' -o name '*.otf' ); do
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
@@ -206,7 +206,7 @@ done
 
 if [ -f  /home/jbf/project/autoplot/fonts/scheme_bk.otf ]; then
    cp /home/jbf/project/autoplot/fonts/scheme_bk.otf ../temp-volatile-classes/resources
-   echo "scheme_bk.otf is a proprietary font which is not licensed for use outside of Autoplot.\n" > ../temp-volatile-classes/resources/fonts.license.txt
+   echo "scheme_bk.otf is a proprietary font which is not licensed for use outside of Autoplot." > ../temp-volatile-classes/resources/fonts.license.txt
 fi
 
 cd ..
