@@ -17,8 +17,9 @@ import org.das2.util.LoggerManager;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
- * Default implementation commonly found, doesn't use resolution.  This
- * uses URISplit.PARAM_TIME_RANGE='timerange' and URISplit.PARAM_TIME_RANGE='resolution'
+ * Default implementation commonly found, which handles the resolution parameter
+ * but doesn't implement it.  This uses URISplit.PARAM_TIME_RANGE='timerange' 
+ * and URISplit.PARAM_TIME_RESOLUTION='resolution'
  * for representing the TSB state.
  * @author jbf
  */
@@ -68,14 +69,16 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
     @Override
     public void setTimeRange(DatumRange dr) {
         logger.log(Level.FINE, "setTimeRange {0}", dr);
-        URISplit split= URISplit.parse(uri);
-        Map<String,String> params= URISplit.parseParams(split.params);
-        params.put( URISplit.PARAM_TIME_RANGE, dr.toString().replaceAll(" ","+"));
-        if ( split.file!=null && split.file.equals("file:///") ) {
-            split.file= null; //grr... TODO: figure out why this is back.  DataSetURI.toURI vs DataSetURI.asUri...
+        if ( uri!=null ) {
+            URISplit split= URISplit.parse(uri);
+            Map<String,String> params= URISplit.parseParams(split.params);
+            params.put( URISplit.PARAM_TIME_RANGE, dr.toString().replaceAll(" ","+"));
+            if ( split.file!=null && split.file.equals("file:///") ) {
+                split.file= null; //grr... TODO: figure out why this is back.  DataSetURI.toURI vs DataSetURI.asUri...
+            }
+            split.params= URISplit.formatParams(params);
+            this.uri= URISplit.format(split);
         }
-        split.params= URISplit.formatParams(params);
-        this.uri= URISplit.format(split);
         timeRange= dr;
     }
 
