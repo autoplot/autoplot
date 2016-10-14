@@ -11,7 +11,6 @@
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
             <name>VirboAutoplot</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
-            <explicit-platform explicit-source-supported="true"/>
             <source-roots>
                 <root id="src.javahelp.dir" name="JavaHelp Files"/>
                 <root id="src.src.dir" name="Source Packages"/>
@@ -106,6 +105,14 @@
             </reference>
             <reference>
                 <foreign-project>FitsDataSource</foreign-project>
+                <artifact-type>jar</artifact-type>
+                <script>build.xml</script>
+                <target>jar</target>
+                <clean-target>clean</clean-target>
+                <id>jar</id>
+            </reference>
+            <reference>
+                <foreign-project>HapiDataSource</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>

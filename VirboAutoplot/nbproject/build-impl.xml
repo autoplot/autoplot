@@ -249,6 +249,7 @@ is divided into following sections:
         <condition else="" property="testng.debug.mode" value="-mixed">
             <istrue value="${junit+testng.available}"/>
         </condition>
+        <property name="java.failonerror" value="true"/>
     </target>
     <target name="-post-init">
         <!-- Empty placeholder for easier customization. -->
@@ -726,7 +727,7 @@ is divided into following sections:
             <sequential>
                 <property environment="env"/>
                 <resolve name="profiler.current.path" value="${profiler.info.pathvar}"/>
-                <java classname="@{classname}" dir="${profiler.info.dir}" fork="true" jvm="${profiler.info.jvm}">
+                <java classname="@{classname}" dir="${profiler.info.dir}" failonerror="${java.failonerror}" fork="true" jvm="${profiler.info.jvm}">
                     <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
                     <jvmarg value="${profiler.info.jvmargs.agent}"/>
                     <jvmarg line="${profiler.info.jvmargs}"/>
@@ -801,7 +802,7 @@ is divided into following sections:
             <attribute default="${debug.classpath}" name="classpath"/>
             <element name="customize" optional="true"/>
             <sequential>
-                <java classname="@{classname}" dir="${work.dir}" fork="true">
+                <java classname="@{classname}" dir="${work.dir}" failonerror="${java.failonerror}" fork="true">
                     <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
                     <jvmarg line="${debug-args-line}"/>
                     <jvmarg value="-Xrunjdwp:transport=${debug-transport},address=${jpda.address}"/>
@@ -828,7 +829,7 @@ is divided into following sections:
             <attribute default="jvm" name="jvm"/>
             <element name="customize" optional="true"/>
             <sequential>
-                <java classname="@{classname}" dir="${work.dir}" fork="true">
+                <java classname="@{classname}" dir="${work.dir}" failonerror="${java.failonerror}" fork="true">
                     <jvmarg line="${endorsed.classpath.cmd.line.arg}"/>
                     <jvmarg value="-Dfile.encoding=${runtime.encoding}"/>
                     <redirector errorencoding="${runtime.encoding}" inputencoding="${runtime.encoding}" outputencoding="${runtime.encoding}"/>
@@ -1013,6 +1014,14 @@ is divided into following sections:
             <param name="call.built.properties" value="${built-jar.properties}"/>
             <param location="${project.FitsDataSource}" name="call.subproject"/>
             <param location="${project.FitsDataSource}/build.xml" name="call.script"/>
+            <param name="call.target" value="jar"/>
+            <param name="transfer.built-jar.properties" value="${built-jar.properties}"/>
+            <param name="transfer.not.archive.disabled" value="true"/>
+        </antcall>
+        <antcall target="-maybe-call-dep">
+            <param name="call.built.properties" value="${built-jar.properties}"/>
+            <param location="${project.HapiDataSource}" name="call.subproject"/>
+            <param location="${project.HapiDataSource}/build.xml" name="call.script"/>
             <param name="call.target" value="jar"/>
             <param name="transfer.built-jar.properties" value="${built-jar.properties}"/>
             <param name="transfer.not.archive.disabled" value="true"/>
@@ -1705,6 +1714,14 @@ is divided into following sections:
             <param name="call.built.properties" value="${built-clean.properties}"/>
             <param location="${project.FitsDataSource}" name="call.subproject"/>
             <param location="${project.FitsDataSource}/build.xml" name="call.script"/>
+            <param name="call.target" value="clean"/>
+            <param name="transfer.built-clean.properties" value="${built-clean.properties}"/>
+            <param name="transfer.not.archive.disabled" value="true"/>
+        </antcall>
+        <antcall target="-maybe-call-dep">
+            <param name="call.built.properties" value="${built-clean.properties}"/>
+            <param location="${project.HapiDataSource}" name="call.subproject"/>
+            <param location="${project.HapiDataSource}/build.xml" name="call.script"/>
             <param name="call.target" value="clean"/>
             <param name="transfer.built-clean.properties" value="${built-clean.properties}"/>
             <param name="transfer.not.archive.disabled" value="true"/>
