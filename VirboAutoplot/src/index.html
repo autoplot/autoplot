@@ -24,8 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-10-12 r19635):</p>
+        <p>Bugfixes (2016-10-14 r19655):</p>
         <ul>
+            <li>Digital renderer properly sets the font.  Unify rank2 and rank1 code for consistent behavior.</li>
+            <li>DafaultTimeSeriesBrowse improves error feedback by checking for null uri.</li>
             <li>finally figure out why vertical axis sometimes clips the top tick.</li>
             <li>Some automatic layout actions would occur when autolayout switch was off.  Thanks, Ivar!</li>
             <li>1687: completions on jython import package names shows javadoc</li>
@@ -75,6 +77,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>DigitalRenderer has plotSymbol property to locate the text precisely.</li>
             <li>embed Google fonts Roboto and ArchitectsDaughter so that all platforms have these fonts.</li>
             <li>rfe529: support for the HAPI Server.  Make the unrecognized metadata available.</li>
             <li>BinaryDataSource completions include time24, which has been available for a while.</li>
