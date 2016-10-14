@@ -17,6 +17,7 @@ public class HapiServerSupport {
     public static List<String> getCatalog( ) {
         List<String> result= new ArrayList<String>();
         result.add( "0B000800408DD710" );
+        result.add( "0B000800408DD710.noStream" );
         result.add( "8500080044259C10" );
         result.add( "610008002FE00410" );
         result.add( "AC00080040250510" );

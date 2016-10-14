@@ -32,6 +32,9 @@ public class InfoServlet extends HttpServlet {
         } else if ( id.equals("0B000800408DD710") ) {
             jo.put( "firstDate", "2012-01-09T00:00Z" );
             jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
+        } else if ( id.equals("0B000800408DD710.nostream") ) {
+            jo.put( "firstDate", "2012-01-09T00:00Z" );
+            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
         } else if ( id.equals("8500080044259C10") ) {
             jo.put( "firstDate", "2012-01-09T00:00Z" );
             jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            

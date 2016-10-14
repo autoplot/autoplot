@@ -107,6 +107,8 @@ public class DataServlet extends HttpServlet {
                 dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerWheel.jyds?", dr, allowStream );
             } else if ( id.equals("PowerOnesDigitSegments") ) {
                 dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerOnes.jyds?", dr, allowStream );
+            } else if ( id.equals("0B000800408DD710.noStream") ) {
+                dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
             } else {
                 dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/"+id+".$Y$m$d.d2s", dr, allowStream );
             }
