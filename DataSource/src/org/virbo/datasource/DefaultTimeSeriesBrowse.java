@@ -63,6 +63,9 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
 
     @Override
     public String getURI() {
+        if ( uri==null ) {
+            throw new NullPointerException("uri has not been set");
+        }
         return this.uri;
     }
 
@@ -126,6 +129,9 @@ public class DefaultTimeSeriesBrowse implements TimeSeriesBrowse {
 
     @Override
     public String blurURI() {
+        if ( uri==null ) {
+            throw new NullPointerException("uri has not been set");
+        }
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
         params.remove( URISplit.PARAM_TIME_RANGE );
