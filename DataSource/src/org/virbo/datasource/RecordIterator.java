@@ -160,10 +160,13 @@ public class RecordIterator implements Iterator<QDataSet>  {
     /**
      * limit the data returned such that only data within the datum range
      * provided are returned.
-     * @param dr 
+     * @param dr the timerange.
      */
     public final void constrainDepend0( DatumRange dr ) {
         if ( this.src==null ) {
+            return;
+        }
+        if ( this.src.length()==0 ) {
             return;
         }
         index= 0;
