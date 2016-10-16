@@ -54,7 +54,7 @@ public class InfoServlet extends HttpServlet {
             jo.put( "lastDate", "2016-10-13T03:04Z" ); // String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
             jo.put( "sampleStartDate", "2016-07-28T00:00Z" );
             jo.put( "sampleEndDate", "2016-07-29T00:00Z" );
-        } else if ( id.equals("Spectrum") ) {
+        } else if ( id.equals("PowerOnesDigitSegments") ) {
             jo.put( "firstDate",  "2016-07-28T00:00Z"  );
             jo.put( "lastDate",  "2016-10-13T03:04Z" ); // String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
             jo.put( "sampleStartDate", "2016-07-28T00:00Z" );
