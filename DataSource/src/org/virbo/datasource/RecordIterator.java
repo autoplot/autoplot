@@ -128,8 +128,12 @@ public class RecordIterator implements Iterator<QDataSet>  {
                     
         } else {
             
-            QDataSet ds= getDataSet( uri.toString(), timeRange, new NullProgressMonitor() );
-            
+            QDataSet ds;
+            try {
+                ds= getDataSet( uri.toString(), timeRange, new NullProgressMonitor() );
+            } catch ( Exception ex ) {
+                throw ex; // breakpoint here
+            }
             if ( ds==null ) {
                 this.index= 0;
                 this.lastIndex=0;
@@ -149,6 +153,7 @@ public class RecordIterator implements Iterator<QDataSet>  {
                 this.src= ds;
             }
             constrainDepend0(timeRange);
+            
         }
     }
         
