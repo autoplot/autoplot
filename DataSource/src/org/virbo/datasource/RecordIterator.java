@@ -246,7 +246,7 @@ public class RecordIterator implements Iterator<QDataSet>  {
     }
     
     @Override
-    public void remove() {
+    public void remove() {  //JAVA7: this can be removed when Java 8 is required.
         // do nothing.
     }
 }
