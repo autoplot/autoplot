@@ -245,4 +245,8 @@ public class RecordIterator implements Iterator<QDataSet>  {
         }
     }
     
+    @Override
+    public void remove() {
+        // do nothing.
+    }
 }
