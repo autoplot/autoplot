@@ -51,12 +51,12 @@ public class InfoServlet extends HttpServlet {
             jo.put( "sampleEndDate", "2016-01-02T00:00Z" );
         } else if ( id.equals("PowerWheel") ) {
             jo.put( "firstDate",  "2016-07-28T00:00Z"  );
-            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
+            jo.put( "lastDate", "2016-10-13T03:04Z" ); // String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
             jo.put( "sampleStartDate", "2016-07-28T00:00Z" );
             jo.put( "sampleEndDate", "2016-07-29T00:00Z" );
         } else if ( id.equals("Spectrum") ) {
             jo.put( "firstDate",  "2016-07-28T00:00Z"  );
-            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
+            jo.put( "lastDate",  "2016-10-13T03:04Z" ); // String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
             jo.put( "sampleStartDate", "2016-07-28T00:00Z" );
             jo.put( "sampleEndDate", "2016-07-29T00:00Z" );
         }
