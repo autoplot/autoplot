@@ -43,7 +43,7 @@
             <li>2016-10-11: put in HAPI extension longDescription.</li>
             <li>2016-10-13: finish off support for streaming.</li>
             <li>2016-10-14: add a noStream version of one of the datasets, so that Autoplot can be used to compare.</li>
-            <li>2016-10-16: add capabilities page.</li>
+            <li>2016-10-16: add capabilities page.  Properly handle empty datasets from readers.</li>
         </ul>
         </small>
     </body>

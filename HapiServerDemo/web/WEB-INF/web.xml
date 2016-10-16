@@ -15,6 +15,11 @@
         <servlet-name>InfoServlet</servlet-name>
         <servlet-class>org.autoplot.hapiserver.InfoServlet</servlet-class>
     </servlet>
+    <servlet>
+        <description>Shows the capabilities of the HAPI server</description>
+        <servlet-name>CapabilitiesServlet</servlet-name>
+        <servlet-class>org.autoplot.hapiserver.CapabilitiesServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CatalogServlet</servlet-name>
         <url-pattern>/hapi/catalog</url-pattern>
@@ -26,6 +31,10 @@
     <servlet-mapping>
         <servlet-name>InfoServlet</servlet-name>
         <url-pattern>/hapi/info</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CapabilitiesServlet</servlet-name>
+        <url-pattern>/hapi/capabilities</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
