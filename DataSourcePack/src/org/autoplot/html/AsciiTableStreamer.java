@@ -259,4 +259,9 @@ public class AsciiTableStreamer implements Iterator<QDataSet> {
         return result;
     }
 
+    @Override
+    public void remove() {
+        
+    }
+
 }
