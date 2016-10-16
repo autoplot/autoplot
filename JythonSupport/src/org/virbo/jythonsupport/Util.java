@@ -592,7 +592,27 @@ public class Util {
         return result.toArray( new String[result.size()] );
 
     }
-        
+    
+    /**
+     * return true if the file exists.  
+     * This is introduced to avoid imports of java.io.File.
+     * @param file
+     * @return 
+     */
+    public static boolean fileExists( String file ) {
+        return new File(file).exists();
+    }
+    
+    /**
+     * return true if the file can be read.
+     * This is introduced to avoid imports of java.io.File.
+     * @param file the file or directory.
+     * @return true if the file can be read.
+     */
+    public static boolean fileCanRead( String file ) {
+        return new File(file).canRead();
+    }
+    
     /**
      * return a list of completions.  This is useful in the IDL context
      * as well as Jython scripts.  This will perform the completion for where the carot is
