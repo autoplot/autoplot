@@ -102,6 +102,11 @@ public class StreamingCapability implements Streaming {
             currentIndex++;
             return result;
         }
+
+        @Override
+        public void remove() {
+            
+        }
         
     }
 }
