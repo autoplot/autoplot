@@ -40,9 +40,10 @@
             <li>2016-10-04: add sample time range.</li>
             <li>2016-10-05: add power meter image spectrograms.</li>
             <li>2016-10-09: digits spectrogram is 27 channel spectrogram.</li>
-            <li>2016-10-11: put in extension longDescription.</li>
+            <li>2016-10-11: put in HAPI extension longDescription.</li>
             <li>2016-10-13: finish off support for streaming.</li>
             <li>2016-10-14: add a noStream version of one of the datasets, so that Autoplot can be used to compare.</li>
+            <li>2016-10-16: add capabilities page.</li>
         </ul>
         </small>
     </body>
