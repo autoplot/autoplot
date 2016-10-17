@@ -286,8 +286,10 @@ public class FSTreeModel implements TreeModel {
                 ff = lff.toArray(new File[lff.size()]);
             }
 
-            logger.log(Level.FINER, "sorting by comparator: {0}", comparator);
-            Arrays.sort(ff, comparator );
+            if ( comparator!=null ) {
+                logger.log(Level.FINER, "sorting by comparator: {0}", comparator);
+                Arrays.sort(ff, comparator );
+            }
             listings.put(f, ff);
         }
         return ff.length;
