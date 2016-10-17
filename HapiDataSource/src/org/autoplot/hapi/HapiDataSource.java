@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -372,9 +373,12 @@ public class HapiDataSource extends AbstractDataSource {
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
         
         HttpURLConnection connection= (HttpURLConnection)url.openConnection();
+        connection.setRequestProperty( "Accept-Encoding", "gzip" );
         connection.connect();
         
-        try ( BufferedReader in= new BufferedReader( new InputStreamReader( connection.getInputStream() ) ) ) {
+        boolean gzip= "gzip".equals( connection.getContentEncoding() );
+        
+        try ( BufferedReader in= new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( connection.getInputStream() ) : connection.getInputStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
                 String[] ss= line.split(",");
