@@ -1121,7 +1121,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         jTable1.scrollRectToVisible(rect);
         firePropertyChange(PROP_FIRST_ROW, oldRow, row);
     }
-    protected String column = "field0";
+    protected String column = "";
     public static final String PROP_COLUMN = "column";
 
     public String getColumn() {
@@ -1321,7 +1321,10 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                 if ( false && isRichHeader ) { // This doesn't work because reject expects column https://sourceforge.net/p/autoplot/bugs/1490/
                     params.put( URISplit.PARAM_ARG_0, getColumn());
                 } else {
-                    params.put("column", getColumn());
+                    String s= getColumn();
+                    if ( s.trim().length()>0 ) {
+                        params.put("column", s);
+                    }
                 }
             }
             params.remove("rank2");
