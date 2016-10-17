@@ -87,7 +87,7 @@ public class FSTreeModel implements TreeModel {
     }
     DiskUsageModel model;
     File root;
-    Map<File, File[]> listings = new HashMap<File, File[]>();
+    Map<File, File[]> listings = new HashMap<>();
     Comparator comparator;
 
 //    private Object getTreeNodeFor( int i ) {
@@ -124,13 +124,17 @@ public class FSTreeModel implements TreeModel {
         this.root = root;
         Preferences prefs= Preferences.userNodeForPackage( FSTreeModel.class );
         String sort= prefs.get( "fsTreeSort", "size" );
-        if ( sort.equals("size") ) {
-            this.comparator= fileSizeComparator;
-        } else if ( sort.equals("alpha" ) ) {
-            this.comparator= alphaComparator;
-        } else {
-            System.err.println("bad fsTreeSort value: "+sort);
-            this.comparator= fileSizeComparator;
+        switch (sort) {
+            case "size":
+                this.comparator= fileSizeComparator;
+                break;
+            case "alpha":
+                this.comparator= alphaComparator;
+                break;
+            default:
+                System.err.println("bad fsTreeSort value: "+sort);
+                this.comparator= fileSizeComparator;
+                break;
         }
     }
     
@@ -147,7 +151,7 @@ public class FSTreeModel implements TreeModel {
                 logger.log(Level.SEVERE, ex.getMessage(), ex);
             }
             System.err.println("reset comparator to "+c );
-            listings = new HashMap<File, File[]>();
+            listings = new HashMap<>();
             fireTreeStructureChanged();
         }
     }
