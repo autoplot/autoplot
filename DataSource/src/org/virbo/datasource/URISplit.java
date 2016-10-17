@@ -885,7 +885,7 @@ public class URISplit {
             result= result + split.params;
         } else if ( split.file!=null ) {
             result= result + split.file;
-            if (split.params != null && split.params.length()>0 ) {
+            if (split.params != null ) { //&& split.params.length()>0 ) {  This is needed for completions.
                 result += "?" + split.params;
             }
         } else if ( split.surl!=null ) {
