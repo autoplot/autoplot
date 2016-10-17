@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.qstream.AsciiTimeTransferType;
 import org.virbo.qstream.DoubleTransferType;
 import org.virbo.qstream.TransferType;
 
@@ -40,7 +41,7 @@ public class BinaryDataFormatter implements DataFormatter {
             Units u= (Units)d.property(QDataSet.UNITS);
             if ( u==null ) u= Units.dimensionless;
             if ( UnitsUtil.isTimeLocation(u) ) {
-                transferTypes[i]= new DoubleTransferType();
+                transferTypes[i]= new AsciiTimeTransferType(24,Units.us2000);
             } else {
                 transferTypes[i]= new DoubleTransferType();
             }
