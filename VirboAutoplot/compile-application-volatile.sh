@@ -16,11 +16,15 @@
 #
 # set JAVA_HOME 
 if [ "" = "$JAVA_HOME" ]; then
-    JAVA_HOME=/usr/local/jdk1.7.0_80/
+    JAVA_HOME=/usr/local/jdk1.7.0_80
 fi
 
-JAVAC=$JAVA_HOME/bin/javac
-JAR=$JAVA_HOME/bin/jar
+if [[ "$JAVA_HOME" != */ ]]; then    # check for no trailing slash
+    JAVA_HOME=$JAVA_HOME/
+fi
+
+JAVAC=${JAVA_HOME}bin/javac
+JAR=${JAVA_HOME}bin/jar
 
 if [ "" = "$TAG" ]; then
     if [ "" = "$AP_VERSION" ]; then
@@ -233,8 +237,8 @@ for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceE
 done
 
 # NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:.. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/netCDF/AbstractIOSP.java; then hasErrors=1; fi
-if ! ${JAVA_HOME}bin/javac -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:.. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:.. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/netCDF/AbstractIOSP.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.7 -source 1.7 -cp ../temp-volatile-classes:../AutoplotStable.jar:.. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
 
 cd ..
 echo "done compile sources."
