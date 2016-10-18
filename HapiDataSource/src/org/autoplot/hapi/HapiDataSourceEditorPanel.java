@@ -512,7 +512,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             maxLen= Math.max( maxLen,300 );
             jSplitPane1.setDividerLocation(maxLen);
             
-            if ( !server.equals(currentServer) ) {
+            if ( !server.toString().equals(currentServer.toString()) ) { // avoid name resolution.  Thanks Findbugs!
                 idsList2.setSelectedIndex(0);
                 currentServer= server;
                 idsList2.ensureIndexIsVisible(0);
