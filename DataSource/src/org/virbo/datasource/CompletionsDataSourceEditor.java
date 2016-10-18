@@ -70,12 +70,18 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         return split.file==null || split.file.equals("") || split.file.equals("file:///");
     }
     
+    /**
+     * prepare the completion context object.
+     * @param surl1 the uri.
+     * @param carotPos the position of the carot.
+     * @return the completion context object.
+     */
     private CompletionContext prepareContext( String surl1, int carotPos ) {
 
         CompletionContext cc = new CompletionContext();
 
         int qpos = surl1.lastIndexOf('?', carotPos);
-        if ( qpos==-1 && carotPos==surl1.length() ) {
+        if ( qpos==-1 && carotPos==surl1.length() ) { // note qpos will never equal -1 because of calling code.
             int icolon= surl1.indexOf(":");
             if ( suriNoFile ) {
                 surl1= surl1.substring(0,icolon)+":?"+surl1.substring(icolon+1);
@@ -91,9 +97,6 @@ public class CompletionsDataSourceEditor extends javax.swing.JPanel implements D
         cc.surlpos = carotPos; //resourceUriCarotPos
 
         if ( qpos != -1 && qpos < carotPos ) { // in query section
-            if (qpos == -1) {
-                qpos = surl1.length();
-            }
 
             int eqpos = surl1.lastIndexOf('=', carotPos - 1);
             int amppos = surl1.lastIndexOf('&', carotPos - 1);
