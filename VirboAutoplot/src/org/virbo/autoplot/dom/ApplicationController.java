@@ -44,6 +44,7 @@ import org.das2.graph.AnchorPosition;
 import org.das2.graph.AnchorType;
 import org.das2.graph.ColumnColumnConnector;
 import org.das2.graph.DasAnnotation;
+import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasColorBar;
@@ -2067,7 +2068,20 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             c.controller.getDasCanvas().removeBottomDecorators();
             c.controller.getDasCanvas().removeTopDecorators();
+            
+            List<DasCanvasComponent> extraCC= new ArrayList<>();
+            for ( DasCanvasComponent cc: c.controller.getDasCanvas().getCanvasComponents() ) {
+                if ( cc instanceof DasPlot || cc instanceof DasAxis
+                        || cc instanceof ColumnColumnConnector || cc instanceof DasAnnotation ) {
                     
+                } else {
+                    extraCC.add( cc );
+                }
+            }
+            for ( DasCanvasComponent cc : extraCC ) {
+                c.controller.getDasCanvas().remove(cc);
+            }    
+            
             // reset das2 stuff which may be in a bad state.  This must be done on the event thread.
             Runnable run= new Runnable() {
                 @Override
