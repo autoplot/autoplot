@@ -2016,7 +2016,8 @@ public class PlotElementController extends DomNodeController {
             peleCopy.setLegendLabelAutomatically((String) legendLabel);
         }
 
-        if ( spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ) {
+        if ( spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram 
+                || spec==RenderType.stackedHistogram ) {
             if ( (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
                 plotDefaults.getZaxis().setLog(v.equals("log"));
             }
