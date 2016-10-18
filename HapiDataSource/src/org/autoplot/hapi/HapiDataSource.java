@@ -505,7 +505,7 @@ public class HapiDataSource extends AbstractDataSource {
                             pds[i].size= new int[] { Integer.parseInt( (String)o ) };
                             logger.log( Level.WARNING, "size should be an int array, found String: {0}", name);
                         } else {
-                            throw new IllegalArgumentException( String.format( "size should be an int array: {0}", name ) );
+                            throw new IllegalArgumentException( String.format( "size should be an int array: %s", name ) );
                         }
                     } else {
                         JSONArray a= (JSONArray)o;
