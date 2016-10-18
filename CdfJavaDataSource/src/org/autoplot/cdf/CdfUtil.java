@@ -158,8 +158,6 @@ public class CdfUtil {
                 result.put(temp);
                 temp.flip();
             }
-        } else if ( qube.length<3 ) {
-            return byteBuffer;
         } else {
             throw new IllegalArgumentException("number of dimensions must be less than 5: "+qube.length );
         }
