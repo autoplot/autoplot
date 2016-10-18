@@ -4952,7 +4952,7 @@ APSplash.checkTime("init 240");
     /**
      * update the current icon and tooltip text on the event thread.
      */
-    private Runnable updateIconRunnable= new Runnable() {
+    private transient Runnable updateIconRunnable= new Runnable() {
         @Override
         public void run() {
             statusLabel.setToolTipText(currentIconTooltip);
