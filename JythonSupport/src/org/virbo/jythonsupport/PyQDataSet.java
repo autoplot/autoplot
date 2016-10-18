@@ -1010,4 +1010,10 @@ public class PyQDataSet extends PyJavaInstance {
     public String toString() {
         return "" + rods.toString() + " (pyqds)";
     }
+
+    @Override
+    public boolean isNumberType() {
+        return this.rods.rank()==0;
+    }
+
 }
