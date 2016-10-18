@@ -834,28 +834,28 @@ public abstract class Bookmark {
 
     }
 
-    public static void main(String[] args) throws Exception {
-        //String data = "<!-- note title is not supported yet --><bookmark-list>    <bookmark>        <title>demo autoplot</title>        <url>http://autoplot.org/autoplot.vap</url>    </bookmark>    <bookmark>        <title>Storm Event</title>        <url>http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density</url>    </bookmark></bookmark-list>";
-
-        //Reader in = new BufferedReader(new StringReader(data));
-
-        Reader in = new FileReader("/home/jbf/CDAWebShort.xml");
-
-        DocumentBuilder builder;
-        builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        InputSource source = new InputSource(in);
-        Document document = builder.parse(source);
-
-        List<Bookmark> bs= parseBookmarks(document.getDocumentElement());
-        for ( Bookmark b: bs ) {
-            System.err.println("bookmark: "+ b); // logger okay
-            if ( b instanceof Bookmark.Folder ) {
-                System.err.println(" -->" + ((Bookmark.Folder)b).getBookmarks()); // logger okay
-            } else {
-
-            }
-        }
-    }
+//    public static void main(String[] args) throws Exception {
+//        //String data = "<!-- note title is not supported yet --><bookmark-list>    <bookmark>        <title>demo autoplot</title>        <url>http://autoplot.org/autoplot.vap</url>    </bookmark>    <bookmark>        <title>Storm Event</title>        <url>http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density</url>    </bookmark></bookmark-list>";
+//
+//        //Reader in = new BufferedReader(new StringReader(data));
+//
+//        Reader in = new FileReader("/home/jbf/CDAWebShort.xml");
+//
+//        DocumentBuilder builder;
+//        builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+//        InputSource source = new InputSource(in);
+//        Document document = builder.parse(source);
+//
+//        List<Bookmark> bs= parseBookmarks(document.getDocumentElement());
+//        for ( Bookmark b: bs ) {
+//            System.err.println("bookmark: "+ b); // logger okay
+//            if ( b instanceof Bookmark.Folder ) {
+//                System.err.println(" -->" + ((Bookmark.Folder)b).getBookmarks()); // logger okay
+//            } else {
+//
+//            }
+//        }
+//    }
 
     private static int seq= 0;
 
