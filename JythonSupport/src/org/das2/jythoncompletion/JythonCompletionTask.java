@@ -11,8 +11,13 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -1070,6 +1075,53 @@ public class JythonCompletionTask implements CompletionTask {
         }  
     }
     
+    /**
+     * sorts all the lists by the first list.  
+     * See http://stackoverflow.com/questions/15400514/syncronized-sorting-between-two-arraylists/24688828#24688828
+     * Note the key list must be repeated for it to be sorted as well!
+     * @param <T> the list type
+     * @param key the list used to sort
+     * @param lists the lists to be sorted, often containing the key as well.
+     */
+    public static <T extends Comparable<T>> void keySort(
+                                        final List<T> key, List<?>... lists){
+        // Create a List of indices
+        List<Integer> indices = new ArrayList<>();
+        for(int i = 0; i < key.size(); i++) {
+            indices.add(i);
+        }
+        
+        // Sort the indices list based on the key
+        Collections.sort(indices, new Comparator<Integer>(){
+            @Override public int compare(Integer i, Integer j) {
+                return key.get(i).compareTo(key.get(j));
+            }
+        });
+
+        // Create a mapping that allows sorting of the List by N swaps.
+        // Only swaps can be used since we do not know the type of the lists
+        Map<Integer,Integer> swapMap = new HashMap<>(indices.size());
+        List<Integer> swapFrom = new ArrayList<>(indices.size()),
+                      swapTo   = new ArrayList<>(indices.size());
+        for(int i = 0; i < key.size(); i++){
+            int k = indices.get(i);
+            while(i != k && swapMap.containsKey(k)) {
+                k = swapMap.get(k);
+            }
+            swapFrom.add(i);
+            swapTo.add(k);
+            swapMap.put(i, k);
+        }
+
+        // use the swap order to sort each list by swapping elements
+        for(List<?> list : lists) {
+            for(int i = 0; i < list.size(); i++) {
+                Collections.swap(list, swapFrom.get(i), swapTo.get(i));
+            }
+        }
+
+    }
+
     public static List<DefaultCompletionItem> getLocalsCompletions(PythonInterpreter interp, CompletionContext cc) {
         
         List<DefaultCompletionItem> result= new ArrayList();
@@ -1122,8 +1174,12 @@ public class JythonCompletionTask implements CompletionTask {
                 } else {
                     logger.fine("");
                 }
+                    
+                keySort( signatures, signatures, labels, argss );
                 
                 if ( !signatures.isEmpty() ) {
+                    signatures.sort(null);
+                    
                     for ( int jj= 0; jj<signatures.size(); jj++ ) {
                         signature= signatures.get(jj);
                         label= labels.get(jj);
