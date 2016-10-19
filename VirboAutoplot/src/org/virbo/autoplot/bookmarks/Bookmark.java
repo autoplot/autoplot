@@ -504,7 +504,7 @@ public abstract class Bookmark {
                 }
             
             } else {
-                if ( remoteUrlNode==null ) remoteStatus= Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL;
+                remoteStatus= Bookmark.Folder.REMOTE_STATUS_SUCCESSFUL;
                 
             }
             
