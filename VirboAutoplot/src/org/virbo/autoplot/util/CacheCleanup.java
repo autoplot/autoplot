@@ -129,7 +129,11 @@ public class CacheCleanup {
     
     public static void deleteOldVersions() throws ParseException, IOException  {
         String[] oldversions = findOldVersions();
-        logger.warning( "deleteOldVersions not implemented");
+        logger.warning( "deleteOldVersions not implemented ");
+        System.err.println("oldversions:");
+        for ( String s : oldversions ) {
+            System.err.println("  "+s);
+        }
     }
 }
     
