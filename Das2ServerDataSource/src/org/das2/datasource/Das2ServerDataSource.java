@@ -520,7 +520,6 @@ class Das2ServerDataSource extends AbstractDataSource {
                         }
                     }
                 } else {
-                    if ( das2ds==null ) throw new IllegalArgumentException("no such plane, looking for " + item  );
                     result= DataSetAdapter.create( das2ds ); // fragile
                 }
             }
@@ -545,9 +544,6 @@ class Das2ServerDataSource extends AbstractDataSource {
             result1= result;
 
         }
-
-
-        if ( timeRange==null ) timeRange= new DatumRange( Units.us2000.parse( params2.get("start_time") ), Units.us2000.parse( params2.get("end_time") ) );
 
         logger.fine("  done. ");
 

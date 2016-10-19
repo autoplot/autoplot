@@ -612,7 +612,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }
     
-    private final ListCellRenderer myListCellRenderer= new IconCellRenderer();
+    private transient final ListCellRenderer myListCellRenderer= new IconCellRenderer();
     
     private List<String> listPeers( String suri ) {
 
@@ -724,7 +724,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             public void run() {
                 for ( String s: fd2ss1 ) {
                     Icon i= iconFor( s, true ); // force load of icon off the event thread.
-                    i.getIconHeight();                      
+                    logger.log(Level.FINER, "iconHeight={0}", i.getIconHeight());
                 }
             };
         };
