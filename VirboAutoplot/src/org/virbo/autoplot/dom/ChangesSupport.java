@@ -139,7 +139,7 @@ public final class ChangesSupport {
     /**
      * the change is complete, and as far as the client is concerned, the canvas
      * is valid.  This will decrement the count of how many times the change ought to occur.
-     * @param lockObject
+     * @param lockObject object identifying the change.
      */
     synchronized void changePerformed( Object client, Object lockObject ) {
         logger.log( Level.FINE, "clearPendingChange {0} by {1}  in {2}", new Object[]{lockObject, client, parent});
@@ -186,7 +186,7 @@ public final class ChangesSupport {
 
     /**
      * allow check for particular change.
-     * @param lockObject
+     * @param lockObject object identifying the change.
      * @return true if that particular change is pending.
      */
     public boolean isPendingChanges( Object lockObject ) {
