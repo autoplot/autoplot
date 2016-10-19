@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>More fun with fonts and reading digits of a power meter.
+        <p><small>Reviewing Voyager 2 Products
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,13 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-10-14 r19655):</p>
-        <ul>
+        <p>Bugfixes (2016-10-18 r19695):</p>
+        <ul> 
+            <li>Added ability for each plane in a TableDataSet to have its own properties.  Thanks, Chris!</li>
+            <li>bugfix: stackedHistogram labels were not set properly for doInterpretMetadata.  Thanks, Chris!</li>
+            <li>1691: rank &gt;0 datasets treated as number type, implying that __float__ could be called.</li>
+            <li>begin a round of findbugs cleanup.</li>
+            <li>1686: always enter the editor for the open local action, so that Overplot or Plot Below could be selected.<li>
             <li>Digital renderer properly sets the font.  Unify rank2 and rank1 code for consistent behavior.</li>
             <li>DafaultTimeSeriesBrowse improves error feedback by checking for null uri.</li>
             <li>finally figure out why vertical axis sometimes clips the top tick.</li>
@@ -77,6 +82,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>If annotation bubble text is "", then don't draw the bubble, to provide some way one label can have multiple arrows.</li>
+            <li>Demo HAPI server supports gzipped responses and binary responses.</li>
             <li>DigitalRenderer has plotSymbol property to locate the text precisely.</li>
             <li>embed Google fonts Roboto and ArchitectsDaughter so that all platforms have these fonts.</li>
             <li>rfe529: support for the HAPI Server.  Make the unrecognized metadata available.</li>
