@@ -1178,7 +1178,6 @@ public class JythonCompletionTask implements CompletionTask {
                 keySort( signatures, signatures, labels, argss );
                 
                 if ( !signatures.isEmpty() ) {
-                    signatures.sort(null);
                     
                     for ( int jj= 0; jj<signatures.size(); jj++ ) {
                         signature= signatures.get(jj);
