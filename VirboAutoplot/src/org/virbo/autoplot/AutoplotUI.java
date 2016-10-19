@@ -205,13 +205,13 @@ public final class AutoplotUI extends javax.swing.JFrame {
     public static final String CARD_TIME_RANGE_SELECTOR = "timeCard";
 
     TearoffTabbedPane tabs;
-    ApplicationModel applicationModel;
+    transient ApplicationModel applicationModel;
     Application dom;
-    PersistentStateSupport stateSupport;
-    final UndoRedoSupport undoRedoSupport;
+    transient PersistentStateSupport stateSupport;
+    final transient UndoRedoSupport undoRedoSupport;
     TickleTimer tickleTimer;
-    GuiSupport support;
-    LayoutListener autoLayout;
+    transient GuiSupport support;
+    transient LayoutListener autoLayout;
     private boolean dsSelectTimerangeBound= false; // true if there is a binding between the app timerange and the dataSetSelector.
 
     /**
@@ -249,12 +249,12 @@ public final class AutoplotUI extends javax.swing.JFrame {
     private LogConsole logConsole;
     private JScrollPane logConsolePanel;
     private JPanel jythonScriptPanel;
-    private RequestListener rlistener;
+    private transient RequestListener rlistener;
     private JDialog fontAndColorsDialog = null;
     private BookmarksManager bookmarksManager = null;
     private BookmarksManager toolsManager = null;
     private AutoplotHelpSystem helpSystem;
-    private UriDropTargetListener dropListener;
+    private transient UriDropTargetListener dropListener;
 
     private static final String RESOURCES= "/org/virbo/autoplot/resources/";
     
@@ -302,7 +302,7 @@ public final class AutoplotUI extends javax.swing.JFrame {
     private List<JComponent> expertMenuItems= new ArrayList(); // list of items to hide
     private JMenu expertMenu;
 
-    private Timer apbusy= new Timer("apbusy", true);
+    private transient Timer apbusy= new Timer("apbusy", true);
             
     /**
      * utility for mucking around with the guis to figure out why it can't shrink.  It was because the JComboBox on the
