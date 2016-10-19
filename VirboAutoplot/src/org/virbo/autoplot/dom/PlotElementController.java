@@ -1857,6 +1857,9 @@ public class PlotElementController extends DomNodeController {
                     logger.log( Level.WARNING, null, ex );
                     return;
                 }
+                if ( fillDs==null ) {
+                    throw new IllegalArgumentException("processDataSet resulted in null result: "+comp);
+                }
                 props= processProperties( comp, props ); //TODO: support components
                 if ( props.isEmpty() ) { // many of the filters drop the properties
                   props= AutoplotUtil.extractProperties(fillDs);
@@ -1913,25 +1916,23 @@ public class PlotElementController extends DomNodeController {
 
                 TimeSeriesBrowse tsb= dsc.getTsb();
                 if ( tsb!=null ) {
-                    if ( fillDs!=null ) {
-                        if ( fillDs.rank()==0 ) {
-                            logger.fine("data is rank 0, no autoranging needs to be done.");
+                    if ( fillDs.rank()==0 ) {
+                        logger.fine("data is rank 0, no autoranging needs to be done.");
+                    } else {
+                        QDataSet xds= SemanticOps.xtagsDataSet(fillDs);
+                        Units xunits;
+                        if ( xds.rank()<=1 ) {
+                            xunits= (Units)xds.property(QDataSet.UNITS);
                         } else {
-                            QDataSet xds= SemanticOps.xtagsDataSet(fillDs);
-                            Units xunits;
-                            if ( xds.rank()<=1 ) {
-                                xunits= (Units)xds.property(QDataSet.UNITS);
-                            } else {
-                                //JOIN dataset
-                                xunits= (Units)xds.property(QDataSet.UNITS,0);
+                            //JOIN dataset
+                            xunits= (Units)xds.property(QDataSet.UNITS,0);
+                        }
+                        if ( xunits!=null && UnitsUtil.isTimeLocation( xunits ) ) {
+                            DatumRange tr= tsb.getTimeRange();
+                            if ( tr==null ) {
+                                logger.fine( "tsb contains no timerange");
                             }
-                            if ( xunits!=null && UnitsUtil.isTimeLocation( xunits ) ) {
-                                DatumRange tr= tsb.getTimeRange();
-                                if ( tr==null ) {
-                                    logger.fine( "tsb contains no timerange");
-                                }
-                                peleCopy.getPlotDefaults().getXaxis().setRange( tr );
-                            }
+                            peleCopy.getPlotDefaults().getXaxis().setRange( tr );
                         }
                     }
                 }
