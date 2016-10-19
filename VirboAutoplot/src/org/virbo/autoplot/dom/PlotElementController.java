@@ -103,6 +103,7 @@ public class PlotElementController extends DomNodeController {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom.pec" );
 
+    private static final String PENDING_CREATE_DAS_PEER = "createDasPeer";
     private static final String PENDING_RESET_RANGE = "resetRanges";
     private static final String PENDING_SET_DATASET= "setDataSet";
     private static final String PENDING_COMPONENT_OP= "componentOp";
@@ -1810,7 +1811,7 @@ public class PlotElementController extends DomNodeController {
      *   <li>listening plot may invoke its resetZoom method.
      * </ul>
      */
-    private synchronized void doResetRanges() {
+    private void doResetRanges() {
 
         setStatus("busy: do autorange");
 
@@ -2700,7 +2701,9 @@ public class PlotElementController extends DomNodeController {
      * another type.
      * postconditions: The correct renderer is installed in the plot.
      */
-    protected synchronized void maybeCreateDasPeer(){
+    protected void maybeCreateDasPeer(){
+        
+        changesSupport.performingChangeBlock(this, PENDING_CREATE_DAS_PEER );                    
         
         final Renderer oldRenderer = getRenderer();
 
@@ -2746,159 +2749,163 @@ public class PlotElementController extends DomNodeController {
             Runnable run = new Runnable() {
                 @Override
                 public void run() {
-                    DasPlot plot = getDasPlot();
-                    if ( plot==null ) {
-                        System.err.println("pec2326: brace yourself for crash, plot is null!");
-                        plot = getDasPlot(); // for debugging  Spectrogram->Series
-                        if ( oldRenderer==null && dom.controller.isValueAdjusting() ) { // I think this is an undo, and the plot has already been deleted.
-
-                        }
+                    try {
+                        DasPlot plot = getDasPlot();
                         if ( plot==null ) {
-                            throw new IllegalStateException("getDasPlot() result was null.");
-                        }
-                    }
+                            System.err.println("pec2326: brace yourself for crash, plot is null!");
+                            plot = getDasPlot(); // for debugging  Spectrogram->Series
+                            if ( oldRenderer==null && dom.controller.isValueAdjusting() ) { // I think this is an undo, and the plot has already been deleted.
 
-                    DasPlot oldPlot=null;
-                    if (oldRenderer != null) {
-                        oldPlot= oldRenderer.getParent();
-                        if ( oldPlot!=null && oldPlot!=getDasPlot() ) oldRenderer.getParent().removeRenderer(oldRenderer);
-                        if ( oldRenderer!=newRenderer ) plot.removeRenderer(oldRenderer);
-                    }
-                    if ( oldPlot==null || oldRenderer!=newRenderer ) {
-                        synchronized ( dom ) {
-                            if ( newRenderer instanceof SpectrogramRenderer ) {
-                                plot.addRenderer(0,newRenderer);
-                                MouseModule mm= plot.getDasMouseInputAdapter().getModuleByLabel("Horizontal Slice");
-                                final HorizontalSlicerMouseModule hmm= ((HorizontalSlicerMouseModule)mm);
-                                if ( hmm!=null ) { // for example in headless mode
-                                    hmm.getSlicer().addAction( new AbstractAction("Plot Below") {
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            org.das2.util.LoggerManager.logGuiEvent(e);
-                                            final QDataSet ds= hmm.getSlicer().getDataSet();
-                                            final Datum y= hmm.getSlicer().getSliceY();
-                                            RequestProcessor.invokeLater( new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    addPlotBelow(ds,y);
-                                                }
-                                            });
-                                        }
-                                    });
-                                    hmm.getSlicer().addAction( new AbstractAction("Export Data") {
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            org.das2.util.LoggerManager.logGuiEvent(e);
-                                            final QDataSet ds= hmm.getSlicer().getDataSet();
-                                            ExportDataPanel p= new ExportDataPanel();
-                                            p.setDataSet(ds);
-                                            if ( AutoplotUtil.showConfirmDialog2( parent, p, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                                                final String f= p.getFilename();
-                                                String ext= p.getExtension();
-                                                final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
-                                                if (format == null) {
-                                                    JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
-                                                    return;
-                                                }
-                                                try {
-                                                    format.formatData( f, ds, DasProgressPanel.createFramed("export slice data") );
-                                                    JPanel panel= new JPanel();
-                                                    panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
-                                                    panel.add( new JLabel( "<html>Data formatted to<br>" + f ) );
-                                                    panel.add( new JButton( new AbstractAction("Copy filename to clipboard") {
-                                                        @Override
-                                                        public void actionPerformed(ActionEvent e) {
-                                                            StringSelection stringSelection = new StringSelection( f );
-                                                            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                                                            clipboard.setContents(stringSelection, new ClipboardOwner() {
-                                                                @Override
-                                                                public void lostOwnership(Clipboard clipboard, Transferable contents) {
-                                                                }
-                                                            } );
-                                                        }
-                                                    } ) );
-                                                    JOptionPane.showMessageDialog(parent, panel );
-                                                } catch (Exception ex) {
-                                                    JOptionPane.showMessageDialog(parent, "Exception while formatting: " + ex.getMessage() );
-                                                }
-                                            }
-                                        }
-                                    });                                    
-                                }
-                                mm= plot.getDasMouseInputAdapter().getModuleByLabel("Vertical Slice");
-                                final VerticalSlicerMouseModule vmm= ((VerticalSlicerMouseModule)mm);
-                                if ( vmm!=null ) { // for example in headless mode
-                                    vmm.getSlicer().addAction( new AbstractAction("Export Data") {
-                                        @Override
-                                        public void actionPerformed(ActionEvent e) {
-                                            org.das2.util.LoggerManager.logGuiEvent(e);
-                                            final QDataSet ds= vmm.getSlicer().getDataSet();
-                                            ExportDataPanel p= new ExportDataPanel();
-                                            p.setDataSet(ds);
-                                            if ( AutoplotUtil.showConfirmDialog2( parent, p, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                                                final String f= p.getFilename();
-                                                String ext= p.getExtension();
-                                                final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
-                                                if (format == null) {
-                                                    JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
-                                                    return;
-                                                }
-                                                try {
-                                                    format.formatData( f, ds, DasProgressPanel.createFramed("export slice data") );
-                                                    JPanel panel= new JPanel();
-                                                    panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
-                                                    panel.add( new JLabel( "<html>Data formatted to<br>" + f ) );
-                                                    panel.add( new JButton( new AbstractAction("Copy filename to clipboard") {
-                                                        @Override
-                                                        public void actionPerformed(ActionEvent e) {
-                                                            StringSelection stringSelection = new StringSelection( f );
-                                                            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                                                            clipboard.setContents(stringSelection, new ClipboardOwner() {
-                                                                @Override
-                                                                public void lostOwnership(Clipboard clipboard, Transferable contents) {
-                                                                }
-                                                            } );
-                                                        }
-                                                    } ) );
-                                                    JOptionPane.showMessageDialog(parent, panel );
-                                                } catch (Exception ex) {
-                                                    JOptionPane.showMessageDialog(parent, "Exception while formatting: " + ex.getMessage() );
-                                                }
-                                            }
-                                        }
-                                    });                                
-                                }
-                            } else {
-                                Renderer[] rends= plot.getRenderers();
-                                int best=-1;
-                                int myPos= -1;
-                                for ( int i=0; i<dom.getPlotElements().length; i++ ) {
-                                    if ( dom.getPlotElements(i)==plotElement ) myPos= i;
-                                }
-
-                                List<Renderer> arends= Arrays.asList(rends);
-
-                                Renderer lastRend= null;
-                                int i;
-                                for ( i=0; i<myPos; i++ ) {
-                                    if ( i>best && i<myPos
-                                            && dom.getPlotElements(i).getPlotId().equals(plotElement.getPlotId())
-                                            && arends.contains( dom.getPlotElements(i).getController().getRenderer() ) ) lastRend= dom.getPlotElements(i).getController().getRenderer();
-                                }
-
-                                // find the index of the renderer that is just underneath this one.
-                                int indexUnder= -1;
-                                for ( int j=0; j<rends.length; j++ ) {
-                                    if ( rends[j]==lastRend ) indexUnder= j;
-                                }
-
-                                plot.addRenderer(indexUnder+1,newRenderer);
+                            }
+                            if ( plot==null ) {
+                                throw new IllegalStateException("getDasPlot() result was null.");
                             }
                         }
 
-                    }
-                    logger.log(Level.FINEST, "plot.addRenderer {0} {1}", new Object[]{plot, newRenderer});
+                        DasPlot oldPlot=null;
+                        if (oldRenderer != null) {
+                            oldPlot= oldRenderer.getParent();
+                            if ( oldPlot!=null && oldPlot!=getDasPlot() ) oldRenderer.getParent().removeRenderer(oldRenderer);
+                            if ( oldRenderer!=newRenderer ) plot.removeRenderer(oldRenderer);
+                        }
+                        if ( oldPlot==null || oldRenderer!=newRenderer ) {
+                            synchronized ( dom ) {
+                                if ( newRenderer instanceof SpectrogramRenderer ) {
+                                    plot.addRenderer(0,newRenderer);
+                                    MouseModule mm= plot.getDasMouseInputAdapter().getModuleByLabel("Horizontal Slice");
+                                    final HorizontalSlicerMouseModule hmm= ((HorizontalSlicerMouseModule)mm);
+                                    if ( hmm!=null ) { // for example in headless mode
+                                        hmm.getSlicer().addAction( new AbstractAction("Plot Below") {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                org.das2.util.LoggerManager.logGuiEvent(e);
+                                                final QDataSet ds= hmm.getSlicer().getDataSet();
+                                                final Datum y= hmm.getSlicer().getSliceY();
+                                                RequestProcessor.invokeLater( new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        addPlotBelow(ds,y);
+                                                    }
+                                                });
+                                            }
+                                        });
+                                        hmm.getSlicer().addAction( new AbstractAction("Export Data") {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                org.das2.util.LoggerManager.logGuiEvent(e);
+                                                final QDataSet ds= hmm.getSlicer().getDataSet();
+                                                ExportDataPanel p= new ExportDataPanel();
+                                                p.setDataSet(ds);
+                                                if ( AutoplotUtil.showConfirmDialog2( parent, p, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                                                    final String f= p.getFilename();
+                                                    String ext= p.getExtension();
+                                                    final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
+                                                    if (format == null) {
+                                                        JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
+                                                        return;
+                                                    }
+                                                    try {
+                                                        format.formatData( f, ds, DasProgressPanel.createFramed("export slice data") );
+                                                        JPanel panel= new JPanel();
+                                                        panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+                                                        panel.add( new JLabel( "<html>Data formatted to<br>" + f ) );
+                                                        panel.add( new JButton( new AbstractAction("Copy filename to clipboard") {
+                                                            @Override
+                                                            public void actionPerformed(ActionEvent e) {
+                                                                StringSelection stringSelection = new StringSelection( f );
+                                                                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                                                                clipboard.setContents(stringSelection, new ClipboardOwner() {
+                                                                    @Override
+                                                                    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+                                                                    }
+                                                                } );
+                                                            }
+                                                        } ) );
+                                                        JOptionPane.showMessageDialog(parent, panel );
+                                                    } catch (Exception ex) {
+                                                        JOptionPane.showMessageDialog(parent, "Exception while formatting: " + ex.getMessage() );
+                                                    }
+                                                }
+                                            }
+                                        });                                    
+                                    }
+                                    mm= plot.getDasMouseInputAdapter().getModuleByLabel("Vertical Slice");
+                                    final VerticalSlicerMouseModule vmm= ((VerticalSlicerMouseModule)mm);
+                                    if ( vmm!=null ) { // for example in headless mode
+                                        vmm.getSlicer().addAction( new AbstractAction("Export Data") {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                org.das2.util.LoggerManager.logGuiEvent(e);
+                                                final QDataSet ds= vmm.getSlicer().getDataSet();
+                                                ExportDataPanel p= new ExportDataPanel();
+                                                p.setDataSet(ds);
+                                                if ( AutoplotUtil.showConfirmDialog2( parent, p, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                                                    final String f= p.getFilename();
+                                                    String ext= p.getExtension();
+                                                    final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext); //OKAY
+                                                    if (format == null) {
+                                                        JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
+                                                        return;
+                                                    }
+                                                    try {
+                                                        format.formatData( f, ds, DasProgressPanel.createFramed("export slice data") );
+                                                        JPanel panel= new JPanel();
+                                                        panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+                                                        panel.add( new JLabel( "<html>Data formatted to<br>" + f ) );
+                                                        panel.add( new JButton( new AbstractAction("Copy filename to clipboard") {
+                                                            @Override
+                                                            public void actionPerformed(ActionEvent e) {
+                                                                StringSelection stringSelection = new StringSelection( f );
+                                                                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                                                                clipboard.setContents(stringSelection, new ClipboardOwner() {
+                                                                    @Override
+                                                                    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+                                                                    }
+                                                                } );
+                                                            }
+                                                        } ) );
+                                                        JOptionPane.showMessageDialog(parent, panel );
+                                                    } catch (Exception ex) {
+                                                        JOptionPane.showMessageDialog(parent, "Exception while formatting: " + ex.getMessage() );
+                                                    }
+                                                }
+                                            }
+                                        });                                
+                                    }
+                                } else {
+                                    Renderer[] rends= plot.getRenderers();
+                                    int best=-1;
+                                    int myPos= -1;
+                                    for ( int i=0; i<dom.getPlotElements().length; i++ ) {
+                                        if ( dom.getPlotElements(i)==plotElement ) myPos= i;
+                                    }
 
+                                    List<Renderer> arends= Arrays.asList(rends);
+
+                                    Renderer lastRend= null;
+                                    int i;
+                                    for ( i=0; i<myPos; i++ ) {
+                                        if ( i>best && i<myPos
+                                                && dom.getPlotElements(i).getPlotId().equals(plotElement.getPlotId())
+                                                && arends.contains( dom.getPlotElements(i).getController().getRenderer() ) ) lastRend= dom.getPlotElements(i).getController().getRenderer();
+                                    }
+
+                                    // find the index of the renderer that is just underneath this one.
+                                    int indexUnder= -1;
+                                    for ( int j=0; j<rends.length; j++ ) {
+                                        if ( rends[j]==lastRend ) indexUnder= j;
+                                    }
+
+                                    plot.addRenderer(indexUnder+1,newRenderer);
+                                }
+                            }
+
+                        }
+                        logger.log(Level.FINEST, "plot.addRenderer {0} {1}", new Object[]{plot, newRenderer});
+                    } finally {
+                        changesSupport.changePerformed( PlotElementController.this, PENDING_CREATE_DAS_PEER );
+                    }
+                    
                 }
             };
             if ( SwingUtilities.isEventDispatchThread() ) {
@@ -2916,6 +2923,10 @@ public class PlotElementController extends DomNodeController {
                 // when we change renderType on vector dataset, this is called.
                 //setDataSet( getDataSourceFilter().controller.getFillDataSet(), false );
             //}
+        } else {
+            // no changes needed.
+            changesSupport.changePerformed( PlotElementController.this, PENDING_CREATE_DAS_PEER );
+            
         }
 
     }
