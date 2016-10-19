@@ -2463,7 +2463,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 logger.fine("deleteBinding still needs attention.");
             }
         }
-        bindingContexts.get(binding.dstId);
+        logger.log( Level.FINER, "dstId binding={0}", String.valueOf( bindingContexts.get(binding.dstId) ) );
         
         List<BindingModel> bindings = DomUtil.asArrayList(application.getBindings());
         bindings.remove(binding);
