@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.autoplot.util;
 
@@ -50,6 +46,7 @@ public abstract class RunLaterListener implements PropertyChangeListener, Runnab
         
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         invocationCount++;
         if ( invocationCount>1 ) {
@@ -71,6 +68,7 @@ public abstract class RunLaterListener implements PropertyChangeListener, Runnab
         
     }
 
+    @Override
     public abstract void run();
 
 }
