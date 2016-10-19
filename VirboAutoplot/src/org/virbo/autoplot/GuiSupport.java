@@ -943,8 +943,9 @@ public class GuiSupport {
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
             @Override
             public boolean accept(File f) {
-                if ( f.toString()==null ) return false;
-                return f.isDirectory() || f.getName().endsWith(".xml");
+                String s= f.toString();
+                if ( s==null ) return false;
+                return f.isDirectory() || s.endsWith(".xml");
             }
             @Override
             public String getDescription() {
@@ -971,8 +972,9 @@ public class GuiSupport {
         return new FileFilter() {
             @Override
             public boolean accept(File f) {
-                if ( f.toString()==null ) return false;
-                return f.isDirectory() || f.toString().endsWith(ext);
+                String s= f.toString();
+                if ( s==null ) return false;
+                return f.isDirectory() || s.endsWith(ext);
             }
             @Override
             public String getDescription() {
@@ -2009,8 +2011,9 @@ public class GuiSupport {
 
             @Override
             public boolean accept(File f) {
-                if ( f.toString()==null ) return false;
-                return f.toString().endsWith(".vap") || f.isDirectory();
+                String s= f.toString();
+                if ( s==null ) return false; // Old Windows bug.
+                return s.endsWith(".vap") || f.isDirectory();
             }
 
             @Override
