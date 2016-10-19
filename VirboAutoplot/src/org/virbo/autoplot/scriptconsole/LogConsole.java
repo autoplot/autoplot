@@ -709,17 +709,17 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 if ( f.toString().endsWith(".xml") ) {
                     LogConsoleUtil.serializeLogRecords(copy, fo);
                 } else {
-                    BufferedWriter write= new BufferedWriter( new OutputStreamWriter(fo) );
-                    if ( copy.size()>0 ) {
-                        long t= copy.get(copy.size()-1).getMillis();
-                        for ( LogRecord rec: copy ) {
-                            if (rec.getLevel().intValue() >= level) {        
-                                String recMsg= getRecMsg(t,rec);
-                                recMsg += "\n";
-                                write.write( recMsg );
+                    try ( BufferedWriter write= new BufferedWriter( new OutputStreamWriter(fo) ) ) {
+                        if ( copy.size()>0 ) {
+                            long t= copy.get(copy.size()-1).getMillis();
+                            for ( LogRecord rec: copy ) {
+                                if (rec.getLevel().intValue() >= level) {        
+                                    String recMsg= getRecMsg(t,rec);
+                                    recMsg += "\n";
+                                    write.write( recMsg );
+                                }
                             }
                         }
-                        write.close();
                     }
                 }
             } catch (FileNotFoundException ex) {
