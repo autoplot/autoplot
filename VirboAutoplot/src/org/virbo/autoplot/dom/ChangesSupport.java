@@ -135,40 +135,6 @@ public final class ChangesSupport {
         logger.log( Level.FINE, "performingChange {0} by {1}  in {2}", new Object[]{lockObject, client, parent});
     }
 
-    /**
-     * performingChange tells that the change is about to be performed, and
-     * this will block until all other threads have performed this change.  This
-     * is a place holder in case we use a mutator lock, but currently does
-     * nothing.  If the change has not been registered, it will be registered implicitly.
-     * This will increment the internal count of how many times the change
-     * ought to occur.
-     * @param client the object that is mutating the bean.
-     * @param lockObject an object identifying the change.  
-     */
-    synchronized void performingChangeBlock( Object client, Object lockObject ) {
-        Object ownerClient= changesPending.get(lockObject);
-        if ( ownerClient==null || ownerClient!=client ) {
-            if ( ownerClient!=null && ownerClient!=client ) {
-                logger.log(Level.INFO, "performingChange by client object is not owner {0}", client );
-            }
-            registerPendingChange( client, lockObject );
-        }
-        Integer count= changeCount.get(lockObject);
-        if ( count==null ) {
-            changeCount.put( lockObject, 1 );
-        } else {
-            while ( ( count= changeCount.get(lockObject) ) !=null ) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ex) {
-                    logger.log(Level.SEVERE, null, ex);
-                }
-            }
-            changeCount.put( lockObject, 1 );
-        }
-
-        logger.log( Level.FINE, "performingChange {0} by {1}  in {2}", new Object[]{lockObject, client, parent});
-    }
     
     /**
      * the change is complete, and as far as the client is concerned, the canvas
@@ -218,6 +184,15 @@ public final class ChangesSupport {
         return changesPending.size() > 0;
     }
 
+    /**
+     * allow check for particular change.
+     * @param lockObject
+     * @return true if that particular change is pending.
+     */
+    public boolean isPendingChanges( Object lockObject ) {
+        return changesPending.containsKey(lockObject);
+    }
+    
     /**
      * return a map listing the pending changes.  This is a thread-safe
      * read-only copy.
