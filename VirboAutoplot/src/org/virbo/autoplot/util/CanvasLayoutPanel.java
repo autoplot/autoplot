@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot.util;
 
 import java.awt.BasicStroke;
@@ -44,8 +41,8 @@ import org.das2.graph.Renderer;
 import org.das2.util.ClassMap;
 
 /**
- * This is the small GUI in the upper left corner of the layout tab.
- * this shows more abstractly where plots sit in relation to one another, for
+ * This is the small GUI in the upper left corner of the layout tab, which
+ * shows abstractly where plots sit in relation to one another, for
  * reference.
  * 
  * @author jbf
@@ -59,8 +56,9 @@ public class CanvasLayoutPanel extends JLabel {
     Rectangle cursor= null; // initial click for range select.
 
     public CanvasLayoutPanel() {
-        types = new ClassMap<Color>();
+        types = new ClassMap<>();
         timer= new Timer(100,new ActionListener(){
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 repaint();
             }
@@ -441,7 +439,7 @@ public class CanvasLayoutPanel extends JLabel {
         
     }
     
-    transient ComponentListener componentListener = new ComponentListener() {
+    private final transient ComponentListener componentListener = new ComponentListener() {
         @Override
         public void componentResized(ComponentEvent e) {
             timer.restart();
@@ -460,7 +458,7 @@ public class CanvasLayoutPanel extends JLabel {
         }
     };
             
-    private final PropertyChangeListener repaintListener = new PropertyChangeListener() {
+    private final transient PropertyChangeListener repaintListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( itsme ) {
