@@ -268,18 +268,18 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         public Component getTableCellRendererComponent(JTable table, Object lvalue, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c=  delegate.getTableCellRendererComponent(
                     table, lvalue, isSelected, hasFocus, row, column);
-            if ( row % 2 != 0 ) {
-                if ( isSelected ) {
-                    c.setBackground( slightlyDarker(table.getSelectionBackground()) );
-                } else {
-                    c.setBackground( slightlyDarker(table.getBackground()) );
-                }
-            } else {
+            if ( row % 2 == 0 ) {
                 if ( isSelected ) {
                     c.setBackground( table.getSelectionBackground() );
                 } else {
                     c.setBackground( table.getBackground() );
                 }                
+            } else {
+                if ( isSelected ) {
+                    c.setBackground( slightlyDarker(table.getSelectionBackground()) );
+                } else {
+                    c.setBackground( slightlyDarker(table.getBackground()) );
+                }
             }
             return c;
         }
@@ -347,18 +347,18 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
             Component c=  delegate.getTableCellRendererComponent(
                     table, value, isSelected, hasFocus, row, column);
-            if ( row % 2 != 0 ) {
-                if ( isSelected ) {
-                    c.setBackground( slightlyDarker(table.getSelectionBackground()) );
-                } else {
-                    c.setBackground( slightlyDarker(table.getBackground()) );
-                }
-            } else {
+            if ( row % 2 == 0 ) {
                 if ( isSelected ) {
                     c.setBackground( table.getSelectionBackground() );
                 } else {
                     c.setBackground( table.getBackground() );
                 }                
+            } else {
+                if ( isSelected ) {
+                    c.setBackground( slightlyDarker(table.getSelectionBackground()) );
+                } else {
+                    c.setBackground( slightlyDarker(table.getBackground()) );
+                }
             }
             return c;
         }
