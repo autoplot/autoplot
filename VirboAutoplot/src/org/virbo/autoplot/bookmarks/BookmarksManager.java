@@ -1764,13 +1764,13 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
 
         List<Bookmark> bookmarks= model.getList();
 
-        bookmarksMenu.getMenuComponentCount();
+        int n= bookmarksMenu.getMenuComponentCount();
                 
         int idx= -1;
         if ( afterName==null ) {
             idx= 0;
         } else {
-            for ( int i=0; i<bookmarksMenu.getMenuComponentCount(); i++ ) {
+            for ( int i=0; i<n; i++ ) {
                 if ( afterName.equals(bookmarksMenu.getMenuComponent(i).getName()) ) {
                     idx= i; 
                     break;
@@ -1784,7 +1784,7 @@ private void reloadMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GE
         if ( idx==0 ) {
             bookmarksMenu.removeAll();
         } else {
-            int n= bookmarksMenu.getMenuComponentCount();
+            n= bookmarksMenu.getMenuComponentCount();
             for ( int i=n-1; i>idx; i-- ) {
                 try {
                     bookmarksMenu.remove(i);
