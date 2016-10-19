@@ -389,7 +389,7 @@ public class CreatePngWalk {
                 ff.println( "batchUri=" + params.batchUri );
                 build.append("--batchUri=").append(params.batchUri).append( " ");
             }
-            if ( params.batchUriName!=null && !params.batchUriName.equals("") ) {
+            if ( !params.batchUriName.equals("") ) {
                 ff.println( "batchUriName=" + params.batchUri );
                 build.append("--batchUriName=").append(params.batchUri).append( " ");
             }
@@ -829,7 +829,7 @@ public class CreatePngWalk {
             bw.write(htmlClose1);
             bw.write(htmlClose2);
             bw.write(htmlClose3);
-        } catch(Exception e){
+        } catch (IOException e) {
             logger.log( Level.WARNING, e.getMessage(), e );
         }
     }
