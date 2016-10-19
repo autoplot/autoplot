@@ -80,7 +80,7 @@ public class AnnotationController extends DomNodeController {
 
     private void bindTo( final DasAnnotation p ) {
         ApplicationController ac = dom.controller;
-        p.setFontSize( new Float(0.));
+        p.setFontSize( 0.f );
         
         String plotId= annotation.getPlotId();
         if ( plotId!=null && plotId.length()>0 ) {
