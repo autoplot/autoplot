@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
+import org.das2.datum.LoggerManager;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.datasource.AutoplotSettings;
@@ -23,6 +25,8 @@ import org.virbo.datasource.URISplit;
  * @author mmclouth
  */
 public class CacheCleanup {
+    
+    private static final Logger logger= LoggerManager.getLogger("autoplot");
     
     /**
      * this should not be instantiated
@@ -120,12 +124,12 @@ public class CacheCleanup {
         }
         FileSystem.settings().setOffline(false); // turn off web access
         
-    return result;
+        return result;
     }
     
     public static void deleteOldVersions() throws ParseException, IOException  {
         String[] oldversions = findOldVersions();
-        
+        logger.warning( "deleteOldVersions not implemented");
     }
 }
     
