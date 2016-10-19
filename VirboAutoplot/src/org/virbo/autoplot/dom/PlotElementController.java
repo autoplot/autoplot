@@ -2703,7 +2703,7 @@ public class PlotElementController extends DomNodeController {
      */
     protected void maybeCreateDasPeer(){
         
-        changesSupport.performingChangeBlock(this, PENDING_CREATE_DAS_PEER );                    
+        changesSupport.performingChange(this, PENDING_CREATE_DAS_PEER );                    
         
         final Renderer oldRenderer = getRenderer();
 
