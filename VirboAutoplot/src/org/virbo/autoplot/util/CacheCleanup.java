@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.autoplot.util;
 
@@ -18,13 +13,13 @@ import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.URISplit;
-import javax.swing.JPanel;
-import javax.swing.JCheckBox;
 
 
 
 /**
- *
+ * This was intended to provide a mechanism to remove old files from
+ * an enduser's cache, where version number updates result in files which
+ * will never be seen.
  * @author mmclouth
  */
 public class CacheCleanup {
@@ -36,6 +31,16 @@ public class CacheCleanup {
 
     }
     
+    private static int numberOfLines( File filePath ) throws IOException {
+        int numOfLines= 0;
+        try ( BufferedReader bf= new BufferedReader( new FileReader(filePath)) ) {
+            while ( bf.readLine() != null)  { // this is a nice bit of code that avoids two calls to readLine!
+                numOfLines++;
+            }
+        }
+        return numOfLines;
+    }
+    
     /**
      * find aggregations within the user's history.  This currently looks for $Y, but aggregations
      * can also be $y, etc.
@@ -45,40 +50,32 @@ public class CacheCleanup {
      */
     public static String[] findAggs() throws IOException {
         File filePath= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) + "/bookmarks/history.txt" );
-        FileReader fr = new FileReader(filePath);
-        BufferedReader bf = new BufferedReader(fr);
         
-        String aLine;
         ArrayList<String> result= new ArrayList(100);
         boolean hasAgg;
-        int numOfLines = 0;
-        
-        while ((aLine = bf.readLine()) != null)  { // this is a nice bit of code that avoids two calls to readLine!
-            numOfLines++;
-        }
-        
-        fr = new FileReader(filePath);
-        bf = new BufferedReader(fr);
+        int numOfLines = numberOfLines( filePath );
+                
         int i;
         String[] data = new String[numOfLines];
-        String[] parts = new String[2];
+        String[] parts;
         
-        for (i=0 ; i<numOfLines ; i++) {
-            data[i] = bf.readLine();
-            hasAgg = data[i].contains("$Y");
-            if (hasAgg == true) {
-            
-                int iq= data[i].indexOf("?"); 
-                int iy= data[i].indexOf("$Y"); 
-                if ( iq==-1 || iq>iy ) {
-                    parts = data[i].split("\\s+"); 
-                    if (parts.length > 1)  {
-                        result.add(parts[1]);
+        try ( BufferedReader bf= new BufferedReader( new FileReader(filePath)) ) {
+            for (i=0 ; i<numOfLines ; i++) {
+                data[i] = bf.readLine();
+                hasAgg = data[i].contains("$Y");
+                if (hasAgg == true) {
+
+                    int iq= data[i].indexOf("?"); 
+                    int iy= data[i].indexOf("$Y"); 
+                    if ( iq==-1 || iq>iy ) {
+                        parts = data[i].split("\\s+"); 
+                        if (parts.length > 1)  {
+                            result.add(parts[1]);
+                        }
                     }
                 }
             }
         }
-        bf.close();
 
         return result.toArray( new String[result.size()] );
     }
@@ -97,10 +94,6 @@ public class CacheCleanup {
         for (String agg : aggs) {
             URI fileagguri = URISplit.parse(agg).resourceUri;
             String fileagg= fileagguri.toString();
-            System.err.println(fileagg);
-            if ( fileagg.contains("rbspa_def_MagEphem_OP77Q" ) ) { 
-                System.err.println("stop here");
-            }
             int i = FileStorageModel.splitIndex( fileagg );
             String constantPart= fileagg.substring(0,i);
             String templatePart= fileagg.substring(i);
