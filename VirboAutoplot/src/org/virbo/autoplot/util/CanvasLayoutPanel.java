@@ -49,11 +49,11 @@ import org.das2.util.ClassMap;
  */
 public class CanvasLayoutPanel extends JLabel {
 
-    JComponent target;
-    ClassMap<Color> types;
-    Timer timer;
+    private JComponent target;
+    private ClassMap<Color> types;
+    private Timer timer;
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.layout");
-    Rectangle cursor= null; // initial click for range select.
+    private Rectangle cursor= null; // initial click for range select.
 
     public CanvasLayoutPanel() {
         types = new ClassMap<>();
@@ -79,10 +79,10 @@ public class CanvasLayoutPanel extends JLabel {
         addMouseListener(mouseListener);
     }
 
-    BufferedImage canvasImage= null;
+    private transient BufferedImage canvasImage= null;
     
-    boolean itsme= false;
-    Timer getCanvasImageTimer;
+    private boolean itsme= false;
+    private Timer getCanvasImageTimer;
     
     private boolean rectEdgeClicked( Rectangle r, int x, int y ) {
         boolean e0= Math.abs( r.getX() - x ) < 10 ;
@@ -92,9 +92,9 @@ public class CanvasLayoutPanel extends JLabel {
         return ( e0 || e1 || e2 || e3 ) && r.intersects( x-10, y-10, x+20, y+20);
     }
 
-    transient boolean handlingEvent= false;
+    private transient boolean handlingEvent= false;
     
-    transient MouseListener mouseListener = new MouseAdapter() {
+    private final transient MouseListener mouseListener = new MouseAdapter() {
 
         @Override
         public void mouseClicked(MouseEvent e) {
