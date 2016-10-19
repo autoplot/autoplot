@@ -920,21 +920,25 @@ public final class AutoplotUI extends javax.swing.JFrame {
                     case ApplicationModel.PROPERTY_RECENT:
                         final List<Bookmark> recent = applicationModel.getRecent();
                         SwingUtilities.invokeLater(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        org.virbo.autoplot.bookmarks.Util.setRecent( dataSetSelector, recent );
-                                        //dataSetSelector.setRecent(urls);
-                                    }
-                                } );break;
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    org.virbo.autoplot.bookmarks.Util.setRecent( dataSetSelector, recent );
+                                    //dataSetSelector.setRecent(urls);
+                                }
+                            } );
+                        break;
                     case ApplicationModel.PROPERTY_BOOKMARKS:
                         SwingUtilities.invokeLater(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        updateBookmarks();
-                            }
-                    } );break;
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    updateBookmarks();
+                                }
+                            } );
+                        break;
+                    default:
+                        logger.finer( "no action needed near line 940: "+evt.getPropertyName() );
                 }
             }
         });
@@ -4136,7 +4140,8 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
                             String.format( TAB_TOOLTIP_LAYOUT, TABS_TOOLTIP ), idx+1 );
                 } else {
                     if ( layoutPanel!=null ) tabs.remove(layoutPanel.getParent().getParent());
-                }   break;
+                }
+                break;
             case Options.PROP_DATAVISIBLE:
                 if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
                     if ( dataPanel == null ) {
@@ -4150,13 +4155,17 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
                             String.format( TAB_TOOLTIP_DATA, TABS_TOOLTIP ), idx );
                 } else {
                     if ( dataPanel!=null ) tabs.remove(dataPanel.getParent().getParent());
-                }   break;
+                }
+                break;
             case Options.PROP_USE_TIME_RANGE_EDITOR:
                 if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
                     setEditorCard( CARD_TIME_RANGE_SELECTOR );
                 } else {
                     setEditorCard( CARD_DATA_SET_SELECTOR );
-            }   break;
+                }
+                break;
+            default:
+                logger.log(Level.FINER, "option requires no action: {0}", ev.getPropertyName());
         }
     }
 };
@@ -4407,6 +4416,8 @@ private void updateFrameTitle() {
                             AutoplotUI ui2= app.newApplication();
                             ui2.plotUri(suri);
                             break;
+                        default:
+                            throw new IllegalArgumentException("One of [New Window, Replace,  Add Plot] expected: " + action );
                     }
                 } else {
                     raise= true;
