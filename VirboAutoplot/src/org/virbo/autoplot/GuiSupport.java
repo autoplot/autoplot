@@ -1045,6 +1045,8 @@ public class GuiSupport {
                                                     case "centimeters":
                                                         mant= mant * 72 / 2.54;
                                                         break;
+                                                    default:
+                                                        throw new IllegalArgumentException("implementation error: "+units);
                                                 }
                                                 double aspect= canvas.getHeight() / (double)canvas.getWidth();
                                                 go.setSize( canvas.getWidth(), canvas.getHeight() );
@@ -1060,6 +1062,8 @@ public class GuiSupport {
                                     case "svg":
                                         canvas.writeToSVG(ffname);
                                         break;
+                                    default:
+                                        throw new IllegalArgumentException("implementation error: "+ext);
                                 }
                                 app.getController().setStatus("wrote to " + ffname);
                             } catch (java.io.IOException ioe) {
