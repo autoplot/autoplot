@@ -113,7 +113,8 @@ public class AutoplotServer {
                     writeToPng( System.out );
                 } else {
                     writeToPng( outfile, width, height );
-                }   break;
+                }
+                break;
             case "pdf":
                 if ( outfile.equals("-") ) {
                     model.getCanvases(0).setWidth(width);
@@ -123,7 +124,10 @@ public class AutoplotServer {
                     model.getCanvases(0).setWidth(width);
                     model.getCanvases(0).setHeight(height);
                     writeToPdf( outfile );
-            }   break;
+                }   
+                break;
+            default:
+                throw new IllegalArgumentException("only pdf and png are supported: "+format);
         }
 
         logger.fine("about to exit");
