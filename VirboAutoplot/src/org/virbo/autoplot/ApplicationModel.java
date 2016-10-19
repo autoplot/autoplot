@@ -609,9 +609,7 @@ public class ApplicationModel {
         }
 
         final File f3 = new File( f2, "exceptions.txt" );
-        FileWriter out3=null;
-        try {
-            out3 = new FileWriter( f3, true );
+        try ( FileWriter out3= new FileWriter( f3, true ) ) {
             TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
             Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
             out3.append( "=== " + tp.format( now, null) + " ===\n" );
@@ -621,15 +619,9 @@ public class ApplicationModel {
             exx.printStackTrace(pw);
             out3.append( sw.toString() );
             out3.append("\n");
-            out3.close();
 
         } catch ( IOException ex ) {
             logger.log( Level.SEVERE, "exception: "+surl, ex );
-            if ( out3!=null ) try {
-                out3.close();
-            } catch (IOException ex1) {
-                logger.log(Level.SEVERE, "exception: "+ex1.getMessage(), ex1);
-            }
         }
 
     }
@@ -737,9 +729,7 @@ public class ApplicationModel {
         
             // always tack on the URI to history.dat file
             final File f3 = new File( f2, "history.txt");
-            FileWriter out3=null;
-            try {
-                out3 = new FileWriter( f3, true );                
+            try ( FileWriter out3= new FileWriter( f3, true ) ) {
                 TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
                 long lnow= System.currentTimeMillis();
                 if ( lastRecent!=null && lastRecentCount>1 ) {
@@ -751,14 +741,8 @@ public class ApplicationModel {
                 lastRecentCount= 1;
                 Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
                 out3.append( tp.format( now, null) + "\t" + suri + "\n" );
-                out3.close();
             } catch ( IOException ex ) {
-                logger.log(Level.SEVERE,ex.getMessage(),ex);
-                if ( out3!=null ) try {
-                    out3.close();
-                } catch (IOException ex1) {
-                    logger.log(Level.SEVERE, ex1.getMessage(), ex1);
-                }
+                logger.log( Level.WARNING, ex.getMessage(), ex );
             }
         }
 
