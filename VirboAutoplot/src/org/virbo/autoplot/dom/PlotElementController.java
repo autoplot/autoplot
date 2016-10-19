@@ -6,7 +6,6 @@ package org.virbo.autoplot.dom;
 
 import java.awt.Color;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
@@ -81,7 +80,6 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -609,37 +607,40 @@ public class PlotElementController extends DomNodeController {
                 return rendererAcceptsData( DataSetOps.slice0(fillDs,0) );
             } else {
                 return fillDs.rank()==2;
-            } 
+            }
         } else if ( getRenderer() instanceof SeriesRenderer) {
-            if ( fillDs.rank()==1 ) {
-                return true;
-            } else if ( fillDs.rank()==2 ) {
-                return SemanticOps.isBundle(fillDs) || SemanticOps.isRank2Waveform(fillDs);
-            } else if ( fillDs.rank()==3 ) {
-                return SemanticOps.isJoin(fillDs) && SemanticOps.isRank2Waveform(fillDs.slice(0));
-            } else {
-                return false;
+            switch (fillDs.rank()) {
+                case 1:
+                    return true;
+                case 2:
+                    return SemanticOps.isBundle(fillDs) || SemanticOps.isRank2Waveform(fillDs);
+                case 3:
+                    return SemanticOps.isJoin(fillDs) && SemanticOps.isRank2Waveform(fillDs.slice(0));
+                default:
+                    return false;
             }
         } else if ( getRenderer() instanceof ImageVectorDataSetRenderer ) {
-            if ( fillDs.rank()==1 ) {
-                return true;
-            } else if ( fillDs.rank()==2 ) {
-                return SemanticOps.isBundle(fillDs) ||  SemanticOps.isRank2Waveform(fillDs);
-            } else if ( fillDs.rank()==3 ) {
-                return SemanticOps.isJoin(fillDs) && SemanticOps.isRank2Waveform(fillDs.slice(0));
-            } else {
-                return false;
+            switch (fillDs.rank()) {
+                case 1:
+                    return true;
+                case 2:
+                    return SemanticOps.isBundle(fillDs) ||  SemanticOps.isRank2Waveform(fillDs);
+                case 3:
+                    return SemanticOps.isJoin(fillDs) && SemanticOps.isRank2Waveform(fillDs.slice(0));
+                default:
+                    return false;
             }
         } else if ( getRenderer() instanceof RGBImageRenderer ) {
-            if ( fillDs.rank()==2 ) {
-                return !SemanticOps.isBundle(fillDs);
-            } else if ( fillDs.rank()==3 ) {
-                return fillDs.length(0,0) < 5;
-            } else {
-                return false;
+            switch (fillDs.rank()) {
+                case 2:
+                    return !SemanticOps.isBundle(fillDs);
+                case 3:
+                    return fillDs.length(0,0) < 5;
+                default:
+                    return false;
             }
         } else {
-            return true;
+                return true;
         }
     }
 
@@ -862,31 +863,34 @@ public class PlotElementController extends DomNodeController {
                 renderControl= srenderType.substring(i+1);
                 srenderType= srenderType.substring(0,i);
             }
-            if ( srenderType.equals("time_series") ) {
-                if (fillds.length() > SERIES_SIZE_LIMIT) {
+            switch (srenderType) {
+                case "time_series":
+                    if (fillds.length() > SERIES_SIZE_LIMIT) {
+                        renderType = RenderType.hugeScatter;
+                    } else {
+                        renderType = RenderType.series;
+                    }
+                    break;
+                case "waveform":
                     renderType = RenderType.hugeScatter;
-                } else {
-                    renderType = RenderType.series;
-                }
-            } else if ( srenderType.equals("waveform" ) ) {
-                renderType = RenderType.hugeScatter;
-            } else {
-                if ( srenderType.equals("spectrogram") ) {
+                    break;
+                case "spectrogram":
                     RenderType specPref= RenderType.spectrogram;
                     Options o= new Options();
                     Preferences prefs= Preferences.userNodeForPackage( o.getClass() );  //TODO: because this is static?
                     boolean nn= prefs.getBoolean(Options.PROP_NEARESTNEIGHBOR,o.isNearestNeighbor());
                     if ( nn ) {
                         specPref = RenderType.nnSpectrogram;
-                    } 
+                    }
                     renderType= specPref;
-                } else {
+                    break;
+                default:
                     try {
                         renderType= RenderType.valueOf(srenderType);
                     } catch ( IllegalArgumentException ex ) {
                         renderType= AutoplotUtil.guessRenderType(fillds);
                     }
-                }
+                    break;
             }
         } else {
             renderType = AutoplotUtil.guessRenderType(fillds);
@@ -1261,17 +1265,18 @@ public class PlotElementController extends DomNodeController {
     }
 
     private boolean isLastDimBundle( QDataSet ds ) {
-        if ( ds.rank()==1 ) {
-            return ds.property(QDataSet.BUNDLE_0)!=null;
-        } else if ( ds.rank()==2 ) {
-            return ds.property(QDataSet.BUNDLE_1)!=null;
-        } else if ( ds.rank()==3 ) {
-            boolean result= ds.property(QDataSet.BUNDLE_1,0)!=null;
-            QDataSet dep1= (QDataSet) ds.property(QDataSet.DEPEND_1,0);
-            if ( dep1!=null && ( dep1.property(QDataSet.UNITS) instanceof EnumerationUnits ) ) result=true;
-            return result;
-        } else {
-            return false;
+        switch (ds.rank()) {
+            case 1:
+                return ds.property(QDataSet.BUNDLE_0)!=null;
+            case 2:
+                return ds.property(QDataSet.BUNDLE_1)!=null;
+            case 3:
+                boolean result= ds.property(QDataSet.BUNDLE_1,0)!=null;
+                QDataSet dep1= (QDataSet) ds.property(QDataSet.DEPEND_1,0);
+                if ( dep1!=null && ( dep1.property(QDataSet.UNITS) instanceof EnumerationUnits ) ) result=true;
+                return result;
+            default:
+                return false;
         }
     }
 
@@ -2609,49 +2614,56 @@ public class PlotElementController extends DomNodeController {
      */
     private static void setupStyle( PlotElement ele ) {
         PlotElementStyle s= ele.getStyle();
-        if ( ele.getRenderType()==RenderType.colorScatter ) {
-            s.setPlotSymbol( DefaultPlotSymbol.CIRCLES );
-            s.setSymbolConnector(PsymConnector.NONE);
-            s.setFillToReference(false);
-        } else if ( ele.getRenderType()==RenderType.series ) {
-            s.setSymbolConnector(PsymConnector.SOLID);
-            int size= 0;
-            if ( ele.controller!=null ) { // kludge to turn off plot symbols for large datasets.
-                QDataSet processDataSet= ele.controller.processDataSet;
-                QDataSet dataSet= ele.controller.dataSet;
-                if ( processDataSet!=null ) {
-                    size= processDataSet.length();   
-                } else if ( dataSet!=null ) {
-                    size= dataSet.rank()>0 ? dataSet.length() : 1;
-                }
-            }
-            if ( size>SYMSIZE_DATAPOINT_COUNT ) {
-                s.setPlotSymbol( DefaultPlotSymbol.NONE );
-            } else {
+        if ( null!=ele.getRenderType() ) switch (ele.getRenderType()) {
+            case colorScatter:
                 s.setPlotSymbol( DefaultPlotSymbol.CIRCLES );
-            }
-            s.setFillToReference(false);
-        } else if ( ele.getRenderType()==RenderType.scatter ) {
-            s.setSymbolConnector(PsymConnector.NONE);
-            s.setPlotSymbol(DefaultPlotSymbol.CIRCLES);
-            s.setFillToReference(false);
-        } else if ( ele.getRenderType()==RenderType.stairSteps ) {
-            s.setSymbolConnector(PsymConnector.SOLID);
-            s.setPlotSymbol(DefaultPlotSymbol.NONE);
-            s.setFillToReference(true);
-        } else if ( ele.getRenderType()==RenderType.fillToZero ) {
-            s.setSymbolConnector(PsymConnector.SOLID);
-            s.setFillToReference(true);
-        } else if ( ele.getRenderType()==RenderType.nnSpectrogram ) {
-            SpectrogramRenderer.RebinnerEnum r;
-            if ( "true".equals( System.getProperty("useLanlNearestNeighbor","false") ) ) {
-                r= SpectrogramRenderer.RebinnerEnum.lanlNearestNeighbor;
-            } else {
-                r= SpectrogramRenderer.RebinnerEnum.nearestNeighbor;
-            }
-            s.setRebinMethod( r );
-        } else if ( ele.getRenderType()==RenderType.spectrogram ) {
-            s.setRebinMethod( SpectrogramRenderer.RebinnerEnum.binAverage );
+                s.setSymbolConnector(PsymConnector.NONE);
+                s.setFillToReference(false);
+                break;
+            case series:
+                s.setSymbolConnector(PsymConnector.SOLID);
+                int size= 0;
+                if ( ele.controller!=null ) { // kludge to turn off plot symbols for large datasets.
+                    QDataSet processDataSet= ele.controller.processDataSet;
+                    QDataSet dataSet= ele.controller.dataSet;
+                    if ( processDataSet!=null ) {
+                        size= processDataSet.length();
+                    } else if ( dataSet!=null ) {
+                        size= dataSet.rank()>0 ? dataSet.length() : 1;
+                    }
+                }   if ( size>SYMSIZE_DATAPOINT_COUNT ) {
+                    s.setPlotSymbol( DefaultPlotSymbol.NONE );
+                } else {
+                    s.setPlotSymbol( DefaultPlotSymbol.CIRCLES );
+                }   s.setFillToReference(false);
+                break;
+            case scatter:
+                s.setSymbolConnector(PsymConnector.NONE);
+                s.setPlotSymbol(DefaultPlotSymbol.CIRCLES);
+                s.setFillToReference(false);
+                break;
+            case stairSteps:
+                s.setSymbolConnector(PsymConnector.SOLID);
+                s.setPlotSymbol(DefaultPlotSymbol.NONE);
+                s.setFillToReference(true);
+                break;
+            case fillToZero:
+                s.setSymbolConnector(PsymConnector.SOLID);
+                s.setFillToReference(true);
+                break;
+            case nnSpectrogram:
+                SpectrogramRenderer.RebinnerEnum r;
+                if ( "true".equals( System.getProperty("useLanlNearestNeighbor","false") ) ) {
+                    r= SpectrogramRenderer.RebinnerEnum.lanlNearestNeighbor;
+                } else {
+                    r= SpectrogramRenderer.RebinnerEnum.nearestNeighbor;
+                }   s.setRebinMethod( r );
+                break;
+            case spectrogram:
+                s.setRebinMethod( SpectrogramRenderer.RebinnerEnum.binAverage );
+                break;
+            default:
+                break;
         }
     }
 
