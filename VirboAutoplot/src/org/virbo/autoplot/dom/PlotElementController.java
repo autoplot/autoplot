@@ -1938,7 +1938,7 @@ public class PlotElementController extends DomNodeController {
                 }
 
                 Renderer newRenderer = getRenderer();
-                if (newRenderer instanceof SeriesRenderer && fillDs != null) {
+                if (newRenderer instanceof SeriesRenderer) {
                     QDataSet d = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
                     if (d != null) {
                         ((SeriesRenderer) newRenderer).setCadenceCheck((d.property(QDataSet.CADENCE) != null));
