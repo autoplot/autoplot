@@ -9,7 +9,6 @@ package org.virbo.autoplot.scriptconsole;
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EventObject;
@@ -28,10 +27,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import org.das2.datum.LoggerManager;
-import org.das2.util.Entities;
-import org.das2.util.awt.PdfGraphicsOutput;
 import org.virbo.autoplot.AutoplotUtil;
-import static org.virbo.autoplot.GuiSupport.setFont;
 
 /**
  * Settings GUI for the Log Console dialog. The log console is more complex than
@@ -73,6 +69,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             this.logger = logger;
         }
 
+        @Override
         public void setSelectedItem(Object anItem) {
             Level level = (Level) anItem;
             logger.setLevel(level);
@@ -271,7 +268,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         public Component getTableCellRendererComponent(JTable table, Object lvalue, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c=  delegate.getTableCellRendererComponent(
                     table, lvalue, isSelected, hasFocus, row, column);
-            if ( row % 2 == 1 ) {
+            if ( row % 2 != 0 ) {
                 if ( isSelected ) {
                     c.setBackground( slightlyDarker(table.getSelectionBackground()) );
                 } else {
@@ -350,7 +347,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
             Component c=  delegate.getTableCellRendererComponent(
                     table, value, isSelected, hasFocus, row, column);
-            if ( row % 2 == 1 ) {
+            if ( row % 2 != 0 ) {
                 if ( isSelected ) {
                     c.setBackground( slightlyDarker(table.getSelectionBackground()) );
                 } else {
@@ -714,10 +711,12 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         LoggerManager.getLogger("qdataset.second");
         LoggerManager.getLogger("qdataset.second").setLevel(Level.FINE);
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 LogConsole console = new LogConsole();
                 LogConsoleSettingsDialog dialog = new LogConsoleSettingsDialog(new javax.swing.JFrame(), true, console);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
