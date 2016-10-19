@@ -27,7 +27,7 @@ public abstract class RunLaterListener implements PropertyChangeListener, Runnab
     boolean immediatelyAfter;
 
     int invocationCount=0;
-    private static int instanceCount=0;
+    //private static int instanceCount=0;
 
     /**
      *
@@ -36,7 +36,7 @@ public abstract class RunLaterListener implements PropertyChangeListener, Runnab
      * @param immediatelyAfter run this on the change notification thread.  If false, a new thread is used to run this.
      */
     public RunLaterListener( String propertyName, PropertyChange node, boolean immediatelyAfter ) {
-        instanceCount++;
+        //instanceCount++;
 
         this.node= node;
         this.propertyName= propertyName;
