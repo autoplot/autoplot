@@ -218,6 +218,22 @@ public class LogConsole extends javax.swing.JPanel {
         firePropertyChange(PROP_SEARCHTEXT, oldSearchText, searchText);
     }
 
+    private boolean showOnlyHighlited = false;
+
+    public static final String PROP_SHOWONLYHIGHLITED = "showOnlyHighlited";
+
+    public boolean isShowOnlyHighlited() {
+        return showOnlyHighlited;
+    }
+
+    public void setShowOnlyHighlited(boolean showOnlyHighlited) {
+        boolean oldShowOnlyHighlited = this.showOnlyHighlited;
+        this.showOnlyHighlited = showOnlyHighlited;
+        update();
+        firePropertyChange(PROP_SHOWONLYHIGHLITED, oldShowOnlyHighlited, showOnlyHighlited);
+    }
+
+    
 
     public void setShowLoggerId(boolean selected) {
         this.showLoggerId= selected;
@@ -519,7 +535,13 @@ public class LogConsole extends javax.swing.JPanel {
                     try {
                         //buf.append(recMsg).append("\n");
                         recMsg += "\n";
-                        doc.insertString(doc.getLength(), recMsg, attr); // There's a deadlock here.   
+                        if ( showOnlyHighlited && st!=null ) {
+                            if ( attr!=null ) {
+                                doc.insertString( doc.getLength(), recMsg, null );
+                            }
+                        } else {
+                            doc.insertString(doc.getLength(), recMsg, attr); // There's a deadlock here.   
+                        }
                     } catch (BadLocationException ex) {
                         logger.log(Level.SEVERE, ex.getMessage(), ex);
                     }
@@ -665,7 +687,7 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     LoggerManager.logGuiEvent(evt);        
     if ((evt.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
         JFileChooser chooser = new JFileChooser();
-        chooser.addChoosableFileFilter( new FileFilter() {
+        chooser.addChoosableFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {
                 return f.toString().endsWith(".xml");
@@ -692,7 +714,7 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         }
     } else {
         JFileChooser chooser = new JFileChooser();
-        chooser.addChoosableFileFilter( new FileFilter() {
+        chooser.addChoosableFileFilter(new FileFilter() {
             @Override
             public boolean accept(File f) {
                 return f.toString().endsWith(".xml") || f.toString().endsWith(".txt");
