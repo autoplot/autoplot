@@ -202,12 +202,26 @@ public class LogConsole extends javax.swing.JPanel {
         return searchText;
     }
 
+    private boolean isRegex( String s ) {
+        try {
+            Pattern.compile(s);
+            return true;
+        } catch ( PatternSyntaxException ex ) {
+            return false;
+        }
+    }
+    
     public void setSearchText(String searchText) {
         String oldSearchText = this.searchText;
         this.searchText = searchText;
         if ( searchText != null && searchText.length()>0 ) {
             try {
-                searchTextPattern = Pattern.compile(Pattern.quote(searchText));
+                if ( isRegex( searchText ) ) {
+                    searchTextPattern = Pattern.compile(searchText);
+                    
+                } else {
+                    searchTextPattern = Pattern.compile(Pattern.quote(searchText));
+                }
             } catch ( PatternSyntaxException ex ) {
                 //searchTextPattern = Pattern.compile(Pattern.quote(searchText));
             }

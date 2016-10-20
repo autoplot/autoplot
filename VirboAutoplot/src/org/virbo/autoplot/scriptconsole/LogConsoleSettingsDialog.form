@@ -28,7 +28,7 @@
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="jScrollPane2" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                      <Component id="highliteLinesLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="searchForTextField" min="-2" pref="172" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -75,7 +75,7 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="highliteLinesLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="searchForTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="showOnlyHighlitedCB" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -119,7 +119,7 @@
         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Autoplot uses Java Logging, which allows messages to be sent to named channels with a verbosity level.   Set verbosity to finer levels to see messages intended for developers."/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel2">
+    <Component class="javax.swing.JLabel" name="highliteLinesLabel">
       <Properties>
         <Property name="text" type="java.lang.String" value="Highlite Lines Matching:"/>
         <Property name="toolTipText" type="java.lang.String" value="Enter a regular expression.  Lines containing this will be highlited."/>

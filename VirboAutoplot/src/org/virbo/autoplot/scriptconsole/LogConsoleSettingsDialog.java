@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import javax.swing.*;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
@@ -497,6 +499,12 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     private void updateSearchText() {
         console.setSearchText(searchForTextField.getText());
         console.setShowOnlyHighlited(showOnlyHighlitedCB.isSelected());
+        try {
+            Pattern.compile(searchForTextField.getText());
+            highliteLinesLabel.setText( "Highlite Lines Matching:" );
+        } catch ( PatternSyntaxException ex ) {
+            highliteLinesLabel.setText( "Highlite Lines Containing:" );
+        }
     }
 
     /**
@@ -512,7 +520,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         timeStampsCheckBox = new javax.swing.JCheckBox();
         logLevelCheckBox = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        highliteLinesLabel = new javax.swing.JLabel();
         searchForTextField = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         threadsCB = new javax.swing.JCheckBox();
@@ -550,8 +558,8 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         jLabel1.setText("Verbosity of the log channels:");
         jLabel1.setToolTipText("<html>Autoplot uses Java Logging, which allows messages to be sent to named channels with a verbosity level.   Set verbosity to finer levels to see messages intended for developers.");
 
-        jLabel2.setText("Highlite Lines Matching:");
-        jLabel2.setToolTipText("Enter a regular expression.  Lines containing this will be highlited.");
+        highliteLinesLabel.setText("Highlite Lines Matching:");
+        highliteLinesLabel.setToolTipText("Enter a regular expression.  Lines containing this will be highlited.");
 
         searchForTextField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
@@ -615,7 +623,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(jScrollPane2)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                        .add(jLabel2)
+                        .add(highliteLinesLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 172, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -654,7 +662,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                     .add(consoleFontButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel2)
+                    .add(highliteLinesLabel)
                     .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jButton1)
                     .add(showOnlyHighlitedCB))
@@ -744,9 +752,9 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton consoleFontButton;
+    private javax.swing.JLabel highliteLinesLabel;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
     private javax.swing.JCheckBox logLevelCheckBox;
