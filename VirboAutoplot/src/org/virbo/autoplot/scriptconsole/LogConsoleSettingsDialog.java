@@ -496,6 +496,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
     private void updateSearchText() {
         console.setSearchText(searchForTextField.getText());
+        console.setShowOnlyHighlited(showOnlyHighlitedCB.isSelected());
     }
 
     /**
@@ -518,6 +519,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         consoleFontButton = new javax.swing.JButton();
+        showOnlyHighlitedCB = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -551,14 +553,14 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         jLabel2.setText("Highlite Lines Matching:");
         jLabel2.setToolTipText("Enter a regular expression.  Lines containing this will be highlited.");
 
-        searchForTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                searchForTextFieldActionPerformed(evt);
-            }
-        });
         searchForTextField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 searchForTextFieldFocusLost(evt);
+            }
+        });
+        searchForTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                searchForTextFieldActionPerformed(evt);
             }
         });
 
@@ -597,6 +599,13 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
         });
 
+        showOnlyHighlitedCB.setText("Show only these lines");
+        showOnlyHighlitedCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showOnlyHighlitedCBActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -609,7 +618,9 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                         .add(jLabel2)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 172, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 397, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(showOnlyHighlitedCB)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 223, Short.MAX_VALUE)
                         .add(jButton1))
                     .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
@@ -645,7 +656,8 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
                     .add(searchForTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jButton1))
+                    .add(jButton1)
+                    .add(showOnlyHighlitedCB))
                 .addContainerGap())
         );
 
@@ -700,6 +712,10 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         } 
     }//GEN-LAST:event_consoleFontButtonActionPerformed
 
+    private void showOnlyHighlitedCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showOnlyHighlitedCBActionPerformed
+        updateSearchText();
+    }//GEN-LAST:event_showOnlyHighlitedCBActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -736,6 +752,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox logLevelCheckBox;
     private javax.swing.JCheckBox loggerIDCheckBox;
     private javax.swing.JTextField searchForTextField;
+    private javax.swing.JCheckBox showOnlyHighlitedCB;
     private javax.swing.JCheckBox threadsCB;
     private javax.swing.JCheckBox timeStampsCheckBox;
     // End of variables declaration//GEN-END:variables
