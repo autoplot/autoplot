@@ -47,7 +47,7 @@
                               <Component id="logLevelCheckBox" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="threadsCB" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="consoleFontButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -88,7 +88,7 @@
   <SubComponents>
     <Component class="javax.swing.JCheckBox" name="loggerIDCheckBox">
       <Properties>
-        <Property name="text" type="java.lang.String" value="logger ID"/>
+        <Property name="text" type="java.lang.String" value="logger name"/>
         <Property name="toolTipText" type="java.lang.String" value="identifies the logger posting the message"/>
       </Properties>
       <Events>
@@ -115,7 +115,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Verbosity of the log channels:"/>
+        <Property name="text" type="java.lang.String" value="Verbosity of the logger channels:"/>
         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Autoplot uses Java Logging, which allows messages to be sent to named channels with a verbosity level.   Set verbosity to finer levels to see messages intended for developers."/>
       </Properties>
     </Component>

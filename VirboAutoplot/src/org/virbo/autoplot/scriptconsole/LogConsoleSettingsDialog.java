@@ -531,7 +531,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        loggerIDCheckBox.setText("logger ID");
+        loggerIDCheckBox.setText("logger name");
         loggerIDCheckBox.setToolTipText("identifies the logger posting the message");
         loggerIDCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -555,7 +555,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel1.setText("Verbosity of the log channels:");
+        jLabel1.setText("Verbosity of the logger channels:");
         jLabel1.setToolTipText("<html>Autoplot uses Java Logging, which allows messages to be sent to named channels with a verbosity level.   Set verbosity to finer levels to see messages intended for developers.");
 
         highliteLinesLabel.setText("Highlite Lines Matching:");
@@ -641,7 +641,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
                                 .add(logLevelCheckBox)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(threadsCB)
-                                .add(29, 29, 29)
+                                .add(18, 18, 18)
                                 .add(consoleFontButton)))
                         .add(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
