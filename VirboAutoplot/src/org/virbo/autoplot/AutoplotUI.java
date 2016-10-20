@@ -1995,6 +1995,8 @@ APSplash.checkTime("init 52.9");
         //Logger.getLogger("gui").setLevel(Level.INFO);                 //TODO: this doesn't seem right.  Can't we just set it for ""?
         Logger.getLogger("gui").addHandler(h);
 
+        Logger.getLogger("").addHandler(h);
+        
         setMessage("log console added");
        // tabs.addTab("console", null, logConsole,
        //         String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
