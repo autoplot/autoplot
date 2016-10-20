@@ -24,11 +24,14 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-10-18 r19695):</p>
+        <p>Bugfixes (2016-10-20 r19739):</p>
         <ul> 
-            <li>Bookmarks demo1 changed to CDAWEB, after years of problems with the openDap URIs.</li>
+            <li>properly register the LogConsole as the handler for log messages, so that LoggerManager.getLogger("myanalysis") is handled.</li>
+            <li>jython completions are sorted</li>
+            <li>Round of findbugs code cleanup (no visible bugs found).</li>
+            <li>Bookmarks demo1 changed to CDAWEB, after years of problems with the OpenDap URIs.</li>
             <li>Added ability for each plane in a TableDataSet to have its own properties.  Thanks, Chris!</li>
-            <li>bugfix: stackedHistogram labels were not set properly for doInterpretMetadata.  Thanks, Chris!</li>
+            <li>stackedHistogram labels were not set properly for doInterpretMetadata.  Thanks, Chris!</li>
             <li>1691: rank &gt;0 datasets treated as number type, implying that __float__ could be called.</li>
             <li>begin a round of findbugs cleanup.</li>
             <li>1686: always enter the editor for the open local action, so that Overplot or Plot Below could be selected.<li>
@@ -83,7 +86,8 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>If annotation bubble text is "", then don't draw the bubble, to provide some way one label can have multiple arrows.</li>
+            <li>checkbox in the console shows only the filtered log records.  Thanks, Ivar!</li>
+            <li>If annotation bubble text is "", then don't draw the bubble, to provide some way one label can have multiple arrows.  Thanks, Sebastian!</li>
             <li>Demo HAPI server supports gzipped responses and binary responses.</li>
             <li>DigitalRenderer has plotSymbol property to locate the text precisely.</li>
             <li>embed Google fonts Roboto and ArchitectsDaughter so that all platforms have these fonts.</li>
