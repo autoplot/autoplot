@@ -22,13 +22,13 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +50,6 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.tree.TreeCellRenderer;
@@ -58,6 +57,7 @@ import javax.swing.tree.TreeNode;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.util.LoggerManager;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.python.parser.ast.Assign;
 import org.python.parser.ast.Attribute;
 import org.python.parser.ast.Call;
@@ -69,10 +69,9 @@ import org.python.parser.ast.exprType;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AutoplotSettings;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.DataSourceRegistry;
-import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
@@ -600,17 +599,29 @@ public class DataMashUp extends javax.swing.JPanel {
                 Matcher m= p.matcher(s);
                 if ( m.matches() ) {
                     ids.add(m.group(1));
-                    String uri= m.group(2);
-                    uris.add(uri);
-                    DataSourceFactory dsf= DataSourceRegistry.getInstance().getSource(uri);
-                    if ( dsf!=null ) {
+                    String suri= m.group(2);
+                    URI uri;
+                    try {
+                        uri= new URI(suri);
+                    } catch (URISyntaxException ex) {
+                        uri= null;
+                    }
+                    uris.add(suri);
+                    if ( uri!=null ) {
                         try {
-                            DataSource dss= dsf.getDataSource(new URI(uri));
-                            TimeSeriesBrowse tsb= dss.getCapability( TimeSeriesBrowse.class );
-                            if ( tsb!=null ) {
-                                timerange= tsb.getTimeRange().toString();
+                            DataSourceFactory dsf= DataSetURI.getDataSourceFactory(uri,new NullProgressMonitor());
+                            if ( dsf!=null ) {
+                                try {
+                                    DataSource dss= dsf.getDataSource(new URI(suri));
+                                    TimeSeriesBrowse tsb= dss.getCapability( TimeSeriesBrowse.class );
+                                    if ( tsb!=null ) {
+                                        timerange= tsb.getTimeRange().toString();
+                                    }
+                                } catch (Exception ex) {
+                                    logger.log(Level.SEVERE, null, ex);
+                                }
                             }
-                        } catch (Exception ex) {
+                        } catch (IOException | IllegalArgumentException | URISyntaxException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }
                     }
