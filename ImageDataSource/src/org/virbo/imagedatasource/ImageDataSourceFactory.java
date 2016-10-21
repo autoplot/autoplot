@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.imagedatasource;
 
 import java.net.URI;
@@ -18,13 +15,15 @@ import org.virbo.datasource.DataSourceFactory;
  */
 public class ImageDataSourceFactory implements DataSourceFactory {
 
-    public DataSource getDataSource(URI uri) throws Exception {
+    @Override
+    public DataSource getDataSource(URI uri) throws Exception { 
         return new ImageDataSource(uri);
     }
 
+    @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
 
-        List<CompletionContext> result = new ArrayList<CompletionContext>();
+        List<CompletionContext> result = new ArrayList<>();
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "channel=", "channel to extract"));
@@ -33,27 +32,40 @@ public class ImageDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "fog=", "apply overlapping white translucent fog percent opaque"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "xaxis=", "apply a linear transform to label each column of the image [valmin,pixmin,valmax,pixmax]"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "yaxis=", "apply a linear transform to label each column of the image [valmin,pixmin,valmax,pixmax]"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "plotInfo=", "read the rich png metadata to get axes.  http://autoplot.org/developer.richPng"));
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
-            if (paramName.equals("channel")) {
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "red" ) );
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "green" ) );
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "blue" ) );
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "alpha" ) );
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "greyscale" ) );
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "hue" ) );
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "saturation" ) );
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "value" ) );
-            } else if ( paramName.equals("rotate") ) {
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0", "rotate image clockwise in degrees" ) );
-            } else if ( paramName.equals("blur") ) {
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "5", "apply boxcar blur square kernel"));
-            } else if ( paramName.equals("fog") ) {
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "100", "apply fog with this opacity percent, based on 0,0 color"));
-            } else if ( paramName.equals("xaxis") ) {
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
-            } else if ( paramName.equals("yaxis") ) {
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
+            switch (paramName) {
+                case "channel":
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "red" ) );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "green" ) );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "blue" ) );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "alpha" ) );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "greyscale" ) );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "hue" ) );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "saturation" ) );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "value" ) );
+                    break;
+                case "rotate":
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0", "rotate image clockwise in degrees" ) );
+                    break;
+                case "blur":
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "5", "apply boxcar blur square kernel"));
+                    break;
+                case "fog":
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "100", "apply fog with this opacity percent, based on 0,0 color"));
+                    break;
+                case "xaxis":
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
+                    break;
+                case "yaxis":
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "[valmin,pixmin,valmax,pixmax]", "add labels for each bin"));
+                    break;
+                case "plotInfo":
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "0", "read the rich png metadata to get axes") );
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -61,10 +73,12 @@ public class ImageDataSourceFactory implements DataSourceFactory {
 
     }
 
+    @Override
     public boolean reject(String surl, List<String> problems, ProgressMonitor mon) {
         return false;
     }
 
+    @Override
     public <T> T getCapability(Class<T> clazz) {
         return null;
     }
