@@ -103,6 +103,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ushort") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ubyte") );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "nybble", "four-bit integers") );
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "time24", "ISO8601 time in 24 ASCII characters") );
                     return result;
                 }
