@@ -21,7 +21,13 @@ import java.awt.dnd.DropTargetListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +49,7 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.tree.TreeCellRenderer;
@@ -60,6 +67,7 @@ import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.exprType;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.AutoplotSettings;
 
 /**
  * GUI for specifying mashups, where a number of 
@@ -181,6 +189,13 @@ public class DataMashUp extends javax.swing.JPanel {
         String data = "ds";
         TreePath tp= new TreePath( ( (DefaultMutableTreeNode) jTree1.getModel().getRoot() ).getPath() );
         doDrop(data,tp);
+        
+        Runnable run= new Runnable() {
+            public void run() {
+                backFromFile();
+            }
+        };
+        new Thread(run).start();
     }
 
     private boolean isInfix( String op ) {
@@ -684,6 +699,9 @@ public class DataMashUp extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPopupMenu1 = new javax.swing.JPopupMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         jSplitPane1 = new javax.swing.JSplitPane();
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel4 = new javax.swing.JPanel();
@@ -702,7 +720,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jPanel5 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList3 = new javax.swing.JList();
-        jPanel6 = new javax.swing.JPanel();
+        myFunctionsPanel = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         scratchList = new javax.swing.JList();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -711,6 +729,22 @@ public class DataMashUp extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         timeRangeLabel = new javax.swing.JLabel();
         timeRangeTextField = new javax.swing.JTextField();
+
+        jMenuItem1.setText("Add function...");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(jMenuItem1);
+
+        jMenuItem2.setText("Delete Item");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(jMenuItem2);
 
         jSplitPane1.setDividerLocation(100);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -810,20 +844,31 @@ public class DataMashUp extends javax.swing.JPanel {
         jTabbedPane1.addTab("filters", jPanel5);
 
         scratchList.setToolTipText("scratch is a list for storing expressions");
+        scratchList.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                scratchListMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                scratchListMouseReleased(evt);
+            }
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                scratchListMouseClicked(evt);
+            }
+        });
         jScrollPane5.setViewportView(scratchList);
 
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout myFunctionsPanelLayout = new javax.swing.GroupLayout(myFunctionsPanel);
+        myFunctionsPanel.setLayout(myFunctionsPanelLayout);
+        myFunctionsPanelLayout.setHorizontalGroup(
+            myFunctionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
         );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        myFunctionsPanelLayout.setVerticalGroup(
+            myFunctionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
         );
 
-        jTabbedPane1.addTab("my functions", jPanel6);
+        jTabbedPane1.addTab("my functions", myFunctionsPanel);
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
@@ -955,6 +1000,57 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jTree1MouseClicked
 
+    private void scratchListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMouseClicked
+        if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
+            if ( evt.isPopupTrigger() ) {
+                jPopupMenu1.show( evt.getComponent(), evt.getX(), evt.getY() );
+            }
+        }
+    }//GEN-LAST:event_scratchListMouseClicked
+
+    private void scratchListMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMousePressed
+        if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
+            if ( evt.isPopupTrigger() ) {
+                jPopupMenu1.show( evt.getComponent(), evt.getX(), evt.getY() );
+            }
+        }
+    }//GEN-LAST:event_scratchListMousePressed
+
+    private void scratchListMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMouseReleased
+        if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
+            if ( evt.isPopupTrigger() ) {
+                jPopupMenu1.show( evt.getComponent(), evt.getX(), evt.getY() );
+            }
+        }
+    }//GEN-LAST:event_scratchListMouseReleased
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        String s= JOptionPane.showInputDialog( this, "Add function" );
+        if ( !( s.trim().length()==0 ) ) {
+            addToScratch( s.trim() );
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        int i= scratchList.getSelectedIndex();
+        removeFromScratch(i);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void removeFromScratch( int index ) {
+        ListModel lm= scratchList.getModel();
+        DefaultListModel dlm;
+        if ( lm instanceof DefaultListModel ) {
+            dlm= (DefaultListModel)lm;
+        } else {
+            dlm= new DefaultListModel();
+            for ( int i=0; i<lm.getSize(); i++ ) {
+                dlm.add(i,lm.getElementAt(i));
+            }
+        }
+        dlm.remove(index);
+        scratchList.setModel(dlm);
+    }
+    
     /**
      * add the expression to the scratch list.
      * @param expression 
@@ -970,8 +1066,66 @@ public class DataMashUp extends javax.swing.JPanel {
                 dlm.add(i,lm.getElementAt(i));
             }
         }
+        int remove= -1;
+        for ( int i=0; i<dlm.size(); i++ ) {
+            if ( dlm.get(i).toString().equals(expression) ) {
+                remove= i;
+            }
+        }
+        if ( remove>-1 ) dlm.removeElementAt(remove);
         dlm.add( dlm.getSize(), expression );
+        
         scratchList.setModel(dlm);
+        Runnable run= new Runnable() {
+            public void run() {
+                backToFile();
+            }
+        };
+        new Thread( run ).start();
+        
+    }
+    
+    private void backToFile( ) {
+        try {
+            ListModel m= scratchList.getModel();
+            File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA) );
+            File f1= new File( f, "bookmarks" );
+            File f2= new File( f1, "mashup.myfunctions.txt" );
+            try ( PrintWriter w = new PrintWriter( new FileWriter(f2) ) ) {
+                for ( int i=0; i<m.getSize(); i++ ) {
+                    w.println(m.getElementAt(i).toString());
+                }
+            }
+        } catch ( IOException ex ) {
+            logger.log( Level.WARNING, ex.getMessage(), ex );
+        }
+    }
+    
+    private void backFromFile() {
+        final DefaultListModel dlm= new DefaultListModel();
+        try {
+            File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA) );
+            File f1= new File( f, "bookmarks" );
+            File f2= new File( f1, "mashup.myfunctions.txt" );
+            if ( f2.exists() ) {
+                try ( BufferedReader r = new BufferedReader( new FileReader( f2 ) ) ) {
+                    String s;
+                    while ( ( s= r.readLine() )!=null ) { 
+                        dlm.addElement(s);
+                    }
+                }
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        scratchList.setModel(dlm);
+                    }
+                };
+                SwingUtilities.invokeLater(run);
+            }
+            
+        } catch ( IOException ex ) {
+            logger.log( Level.WARNING, ex.getMessage(), ex );
+        }
     }
     
     final DropTargetListener createTreeDropTargetListener() {
@@ -1121,13 +1275,15 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JList jList1;
     private javax.swing.JList jList2;
     private javax.swing.JList jList3;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1138,6 +1294,7 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTree jTree1;
+    private javax.swing.JPanel myFunctionsPanel;
     private org.virbo.jythonsupport.ui.NamedURIListTool namedURIListTool1;
     private javax.swing.JList scratchList;
     private javax.swing.JLabel timeRangeLabel;
