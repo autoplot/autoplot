@@ -28,6 +28,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,6 +69,11 @@ import org.python.parser.ast.exprType;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AutoplotSettings;
+import org.virbo.datasource.DataSource;
+import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
  * GUI for specifying mashups, where a number of 
@@ -594,7 +600,20 @@ public class DataMashUp extends javax.swing.JPanel {
                 Matcher m= p.matcher(s);
                 if ( m.matches() ) {
                     ids.add(m.group(1));
-                    uris.add(m.group(2));
+                    String uri= m.group(2);
+                    uris.add(uri);
+                    DataSourceFactory dsf= DataSourceRegistry.getInstance().getSource(uri);
+                    if ( dsf!=null ) {
+                        try {
+                            DataSource dss= dsf.getDataSource(new URI(uri));
+                            TimeSeriesBrowse tsb= dss.getCapability( TimeSeriesBrowse.class );
+                            if ( tsb!=null ) {
+                                timerange= tsb.getTimeRange().toString();
+                            }
+                        } catch (Exception ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
                 } else {
                      if ( s.substring(0,i).trim().equals("timerange") ) {
                         timerange= s.substring(i+1).trim();
