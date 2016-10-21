@@ -26,6 +26,8 @@
         
         <p>Bugfixes (2016-10-20 r19739):</p>
         <ul> 
+            <li>1693: ephemeris/tca forces $Y-$m-$d when $Y-$j should be shown.</li>
+            <li>StackedHistogram allows inconvertible units.</li>            
             <li>properly register the LogConsole as the handler for log messages, so that LoggerManager.getLogger("myanalysis") is handled.</li>
             <li>jython completions are sorted</li>
             <li>Round of findbugs code cleanup (no visible bugs found).</li>
@@ -34,7 +36,7 @@
             <li>stackedHistogram labels were not set properly for doInterpretMetadata.  Thanks, Chris!</li>
             <li>1691: rank &gt;0 datasets treated as number type, implying that __float__ could be called.</li>
             <li>begin a round of findbugs cleanup.</li>
-            <li>1686: always enter the editor for the open local action, so that Overplot or Plot Below could be selected.<li>
+            <li>1686: always enter the editor for the open local action, so that Overplot or Plot Below can be selected.<li>
             <li>Digital renderer properly sets the font.  Unify rank2 and rank1 code for consistent behavior.</li>
             <li>DafaultTimeSeriesBrowse improves error feedback by checking for null uri.</li>
             <li>finally figure out why vertical axis sometimes clips the top tick.</li>
