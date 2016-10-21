@@ -1049,6 +1049,12 @@ public class DataMashUp extends javax.swing.JPanel {
         }
         dlm.remove(index);
         scratchList.setModel(dlm);
+        Runnable run= new Runnable() {
+            public void run() {
+                backToFile();
+            }
+        };
+        new Thread( run ).start();
     }
     
     /**
