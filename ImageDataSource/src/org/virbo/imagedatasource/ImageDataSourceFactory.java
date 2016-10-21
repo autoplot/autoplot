@@ -83,6 +83,7 @@ public class ImageDataSourceFactory implements DataSourceFactory {
         return null;
     }
 
+    @Override
     public boolean supportsDiscovery() {
         return false;
     }
