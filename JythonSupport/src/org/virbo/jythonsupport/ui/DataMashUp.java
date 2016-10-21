@@ -300,15 +300,19 @@ public class DataMashUp extends javax.swing.JPanel {
         
         } else if ( et instanceof UnaryOp ) { // a negative number appears as a unary minus op and positive number.
             exprType et1= ((UnaryOp)et).operand;
-            if ( ((UnaryOp)et).op==4 ) {
-                fillTreeExprType( et1, m, parent, i );
-                ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject( "-"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
-            } else if ( ((UnaryOp)et).op==3 ) {
-                fillTreeExprType( et1, m, parent, i );
-                ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject( "+"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
-            } else {
-                fillTreeExprType( et1, m, parent, i );
-            }            
+            switch (((UnaryOp)et).op) {
+                case 4:
+                    fillTreeExprType( et1, m, parent, i );
+                    ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject( "-"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
+                    break;
+                case 3:
+                    fillTreeExprType( et1, m, parent, i );
+                    ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject( "+"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
+                    break;            
+                default:
+                    fillTreeExprType( et1, m, parent, i );
+                    break;
+            }
         } else {
             Call call= (Call)et;
             DefaultMutableTreeNode child= new DefaultMutableTreeNode( funcCallName( call ) );
@@ -588,8 +592,8 @@ public class DataMashUp extends javax.swing.JPanel {
             script= script.substring(11);
         }
         String[] ss= guardedSplit( script, '&', '\'', '\"' );
-        List<String> ids= new ArrayList<String>();
-        List<String> uris= new ArrayList<String>();
+        List<String> ids= new ArrayList<>();
+        List<String> uris= new ArrayList<>();
         boolean haveAllIds= false;
         String timerange= null;
         for ( String s: ss ) {
@@ -1007,6 +1011,7 @@ public class DataMashUp extends javax.swing.JPanel {
             } else {
                 if ( resolver!=null ) {
                     Runnable run= new Runnable() {
+                        @Override
                         public void run() {
                             QDataSet showMe= resolver.getDataSet( getAsJythonInline( (TreeNode)jTree1.getSelectionPath().getLastPathComponent() ) );
                             resolver.interactivePlot( showMe );
@@ -1080,6 +1085,7 @@ public class DataMashUp extends javax.swing.JPanel {
         dlm.remove(index);
         scratchList.setModel(dlm);
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 backToFile();
             }
@@ -1113,6 +1119,7 @@ public class DataMashUp extends javax.swing.JPanel {
         
         scratchList.setModel(dlm);
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 backToFile();
             }
@@ -1201,9 +1208,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
                     doDrop(data,tp);
                     
-                } catch (UnsupportedFlavorException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } catch (IOException ex) {
+                } catch (UnsupportedFlavorException | IOException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
 
@@ -1241,9 +1246,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
                     addToScratch( data );
                     
-                } catch (UnsupportedFlavorException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } catch (IOException ex) {
+                } catch (UnsupportedFlavorException | IOException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
