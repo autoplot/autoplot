@@ -130,6 +130,7 @@ import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
@@ -2009,8 +2010,16 @@ public class GuiSupport {
     }
 
     protected void doInspectVap() {
+        Preferences prefs = Preferences.userNodeForPackage( AutoplotSettings.class);
 
-        JFileChooser chooser= new JFileChooser();
+        String currentDirectory = prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, prefs.get(AutoplotSettings.PREF_LAST_OPEN_FOLDER, new File(System.getProperty("user.home")).toString() ) );
+        String lcurrentFile=  prefs.get( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, "" );
+        
+        JFileChooser chooser= new JFileChooser(currentDirectory);
+        if ( lcurrentFile.length()>0 ) {
+            chooser.setSelectedFile( new File( lcurrentFile ) );
+        }
+        
         FileFilter ff = new FileFilter() {
 
             @Override
@@ -2028,10 +2037,12 @@ public class GuiSupport {
         chooser.addChoosableFileFilter(ff);
 
         chooser.setFileFilter(ff);
-        chooser.setCurrentDirectory( new File( parent.stateSupport.getDirectory() ) );
+        
         if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog(parent) ) {
             try {
                 final File f= chooser.getSelectedFile();
+                prefs.put(AutoplotSettings.PREF_LAST_OPEN_VAP_FOLDER, f.getParent() );
+                prefs.put( AutoplotSettings.PREF_LAST_OPEN_VAP_FILE, f.toString() );
                 final Application vap = (Application) StatePersistence.restoreState( f );
                 PropertyEditor edit = new PropertyEditor(vap);
                 edit.addSaveAction( new AbstractAction("Save") {
