@@ -4065,47 +4065,40 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
                 uri= "vap+inline:ds=getDataSet('"+uri+"')";
             }
         }
-        
-        dataSetSelector.setValue(uri);
-        dataSetSelector.maybePlot( KeyEvent.ALT_MASK );
-        
-//        final DataMashUp dm= new DataMashUp();
-//        dm.setResolver(new DataMashUp.Resolver() {
-//            @Override
-//            public QDataSet getDataSet(String uri) {
-//                try {
-//                    return DataSetURI.getDataSource(uri).getDataSet( new NullProgressMonitor() );
-//                } catch (Exception ex) {
-//                    ex.printStackTrace();
-//                    return null;
-//                }
-//            }
-//
-//            @Override
-//            public BufferedImage getImage(QDataSet qds) {
-//                return AutoplotUtil.createImage( qds, 120, 60 );
-//            }
-//            
-//            @Override
-//            public void interactivePlot( QDataSet qds ) {
-//                Window w= SwingUtilities.getWindowAncestor(dm);
-//                ApplicationModel model= ScriptContext.newDialogWindow( w, qds.toString() );
-//                model.setDataSet( qds );
-//            }
-//        });
-//        
-//        try {
-//            if ( uri.length()>0 ) dm.setAsJythonInline(uri);
-//            
-//        } catch ( Exception ex ) {
-//            ex.printStackTrace();
-//            AutoplotUtil.showConfirmDialog( autoMenu, "Mash-ups cannot contain vap+inline data", "Mashup Problem", JOptionPane.OK_OPTION );
-//            return;
-//        }
-//        
-//        if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, dm, "Data Mash Up", JOptionPane.OK_CANCEL_OPTION ) ) {
-//            focus.setUri( dm.getAsJythonInline() );
-//        }
+
+        if ( uri.length()>0 ) {
+            dataSetSelector.setValue(uri);
+            dataSetSelector.maybePlot( KeyEvent.ALT_MASK );
+        } else {
+            final DataMashUp dm= new DataMashUp();
+            dm.setResolver(new DataMashUp.Resolver() {
+                @Override
+                public QDataSet getDataSet(String uri) {
+                    try {
+                        return DataSetURI.getDataSource(uri).getDataSet( new NullProgressMonitor() );
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        return null;
+                    }
+                }
+
+                @Override
+                public BufferedImage getImage(QDataSet qds) {
+                    return AutoplotUtil.createImage( qds, 120, 60 );
+                }
+
+                @Override
+                public void interactivePlot( QDataSet qds ) {
+                    Window w= SwingUtilities.getWindowAncestor(dm);
+                    ApplicationModel model= ScriptContext.newDialogWindow( w, qds.toString() );
+                    model.setDataSet( qds );
+                }
+            });
+
+            if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, dm, "Data Mash Up", JOptionPane.OK_CANCEL_OPTION ) ) {
+                focus.setUri( dm.getAsJythonInline() );
+            }
+        }
     }//GEN-LAST:event_mashDataMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
