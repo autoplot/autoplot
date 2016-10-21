@@ -24,6 +24,7 @@ import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DateTimeDatumFormatter;
+import org.das2.datum.format.TimeDatumFormatter;
 import org.das2.event.BoxZoomMouseModule;
 import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
@@ -37,6 +38,7 @@ import org.das2.graph.DasRow;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
+import org.das2.graph.TickVDescriptor;
 import org.das2.util.LoggerManager;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.AutoplotUtil;
@@ -708,6 +710,8 @@ public class PlotController extends DomNodeController {
         if ( UnitsUtil.isTimeLocation(axis.getUnits()) && !axis.getLabel().contains("%{RANGE}") ) {
             axis.setUserDatumFormatter(new DateTimeDatumFormatter(  dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 ));
         } else {
+            TickVDescriptor.setDayOfYear( dom.getController().getApplication().getOptions().isDayOfYear() );
+            axis.setTickV(null);
             axis.setUserDatumFormatter(null);
         }
     }
