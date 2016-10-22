@@ -33,6 +33,9 @@ public class InlineTimeSeriesBrowse implements TimeSeriesBrowse {
     
     private static final Logger logger= LoggerManager.getLogger("apdss.util");
     
+    protected InlineTimeSeriesBrowse() {
+    }
+    
     /**
      * create the TimeSeriesBrowse with the initial URI which may contain the
      * parameter "timerange."  The timerange may also be specified using the 
@@ -55,7 +58,9 @@ public class InlineTimeSeriesBrowse implements TimeSeriesBrowse {
         logger.log(Level.FINE, "setURI {0}", suri );
         List<String> script= new ArrayList<>();
         String tr= InlineDataSourceFactory.getScript( suri, script );
-        timeRange= DatumRangeUtil.parseTimeRange(tr.replaceAll("\\+", " "));
+        if ( tr!=null ) {
+            timeRange= DatumRangeUtil.parseTimeRange(tr.replaceAll("\\+", " "));
+        }
         this.uri= suri;
     }
 
@@ -129,7 +134,7 @@ public class InlineTimeSeriesBrowse implements TimeSeriesBrowse {
             throw new NullPointerException("uri has not been set");
         } else {
             String[] ascript= Util.guardedSplit( uri, '&', '\'', '\"' );
-            List<String> script= Arrays.asList(ascript);
+            List<String> script= new ArrayList( Arrays.asList(ascript) );
             int itr= -1; // should be the last line.
             for ( int i=0; i<script.size(); i++ ) {
                 String line= script.get(i);
@@ -137,7 +142,7 @@ public class InlineTimeSeriesBrowse implements TimeSeriesBrowse {
                     itr= i;
                 }
             }
-            script.remove(itr);
+            // script.remove(itr);  // the problem is the timerange= is what identifies this as a TSB.
             String uri1= DataSourceUtil.strjoin( script, "&" );
             return uri1;   
         }
