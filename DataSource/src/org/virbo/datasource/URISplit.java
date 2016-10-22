@@ -388,16 +388,19 @@ public class URISplit {
      * the vap scheme, since that might require interaction with the server to
      * get mime type.  This inserts the scheme "file://" when the scheme is 
      * absent.
-     * The string http://www.example.com/data/myfile.nc?myVariable is split into:
-     *   scheme, http
-     *   authority, http://www.example.com
-     *   path, the directory with http://www.example.com/data/
-     *   file, the file, http://www.example.com/data/myfile.nc
-     *   ext, the extenion, .nc
-     *   params, myVariable or null
+     * The string http://www.example.com/data/myfile.nc?myVariable is split into:<ul>
+     *   <li>scheme, http
+     *   <li>authority, http://www.example.com
+     *   <li>path, the directory with http://www.example.com/data/
+     *   <li>file, the file, http://www.example.com/data/myfile.nc
+     *   <li>ext, the extenion, .nc
+     *   <li>params, myVariable or null
+     * </ul>
+     * @param suri the uri to be parsed
+     * @return the components.
      */
-    public static URISplit parse(String surl) {
-        return parse(surl, 0, true);
+    public static URISplit parse(String suri) {
+        return parse(suri, 0, true);
     }
 
     /**
