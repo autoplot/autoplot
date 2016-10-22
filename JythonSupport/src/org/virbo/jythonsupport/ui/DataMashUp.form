@@ -8,20 +8,20 @@
         <Property name="useNullLayout" type="boolean" value="true"/>
       </Layout>
       <SubComponents>
-        <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
+        <MenuItem class="javax.swing.JMenuItem" name="addItemMenuItem">
           <Properties>
             <Property name="text" type="java.lang.String" value="Add function..."/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addItemMenuItemActionPerformed"/>
           </Events>
         </MenuItem>
-        <MenuItem class="javax.swing.JMenuItem" name="jMenuItem2">
+        <MenuItem class="javax.swing.JMenuItem" name="deleteItemsMenuItem">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Delete Item"/>
+            <Property name="text" type="java.lang.String" value="Delete Items"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem2ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="deleteItemsMenuItemActionPerformed"/>
           </Events>
         </MenuItem>
       </SubComponents>
@@ -208,24 +208,25 @@
                             <Component class="javax.swing.JList" name="jList1">
                               <Properties>
                                 <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
-                                  <StringArray count="17">
+                                  <StringArray count="18">
                                     <StringItem index="0" value="add(x,y)"/>
                                     <StringItem index="1" value="subtract(x,y)"/>
                                     <StringItem index="2" value="multiply(x,y)"/>
                                     <StringItem index="3" value="divide(x,y)"/>
                                     <StringItem index="4" value="pow(x,y)"/>
-                                    <StringItem index="5" value="sqrt(x)"/>
-                                    <StringItem index="6" value="atan2(x,y)"/>
-                                    <StringItem index="7" value="toRadians(x)"/>
-                                    <StringItem index="8" value="toDegrees(x)"/>
-                                    <StringItem index="9" value="sin(x)"/>
-                                    <StringItem index="10" value="cos(x)"/>
-                                    <StringItem index="11" value="tan(x)"/>
-                                    <StringItem index="12" value="asin(x)"/>
-                                    <StringItem index="13" value="acos(x)"/>
-                                    <StringItem index="14" value="atan2(y,x)"/>
-                                    <StringItem index="15" value="atan(x)"/>
-                                    <StringItem index="16" value=" "/>
+                                    <StringItem index="5" value="log10(x)"/>
+                                    <StringItem index="6" value="sqrt(x)"/>
+                                    <StringItem index="7" value="atan2(x,y)"/>
+                                    <StringItem index="8" value="toRadians(x)"/>
+                                    <StringItem index="9" value="toDegrees(x)"/>
+                                    <StringItem index="10" value="sin(x)"/>
+                                    <StringItem index="11" value="cos(x)"/>
+                                    <StringItem index="12" value="tan(x)"/>
+                                    <StringItem index="13" value="asin(x)"/>
+                                    <StringItem index="14" value="acos(x)"/>
+                                    <StringItem index="15" value="atan2(y,x)"/>
+                                    <StringItem index="16" value="atan(x)"/>
+                                    <StringItem index="17" value=" "/>
                                   </StringArray>
                                 </Property>
                                 <Property name="selectionMode" type="int" value="0"/>

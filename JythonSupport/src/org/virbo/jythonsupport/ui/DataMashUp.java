@@ -292,7 +292,7 @@ public class DataMashUp extends javax.swing.JPanel {
         return b.toString();
     }
     
-    private void fillTreeExprType( exprType et, DefaultTreeModel m, MutableTreeNode parent, int i ) {
+    private void fillTreeExprType( exprType et, MutableTreeNode parent, int i ) {
         if ( et instanceof Name ) {
             parent.insert( new DefaultMutableTreeNode(((Name)et).id), i );
         } else if ( et instanceof Num ) {
@@ -302,41 +302,41 @@ public class DataMashUp extends javax.swing.JPanel {
             exprType et1= ((UnaryOp)et).operand;
             switch (((UnaryOp)et).op) {
                 case 4:
-                    fillTreeExprType( et1, m, parent, i );
+                    fillTreeExprType( et1, parent, i );
                     ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject( "-"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
                     break;
                 case 3:
-                    fillTreeExprType( et1, m, parent, i );
+                    fillTreeExprType( et1, parent, i );
                     ((DefaultMutableTreeNode)parent.getChildAt(i)).setUserObject( "+"+((DefaultMutableTreeNode)parent.getChildAt(i)).getUserObject() );
                     break;            
                 default:
-                    fillTreeExprType( et1, m, parent, i );
+                    fillTreeExprType( et1, parent, i );
                     break;
             }
         } else {
             Call call= (Call)et;
             DefaultMutableTreeNode child= new DefaultMutableTreeNode( funcCallName( call ) );
             if ( call.func instanceof Attribute ) {
-                fillTreeCall( ((Attribute)call.func).value, call, m, child );
+                fillTreeCall( ((Attribute)call.func).value, call, child );
             } else {
-                fillTreeCall( call, m, child );
+                fillTreeCall( call, child );
             }
             parent.insert( child, i);
         }        
     }
     
-    private void fillTreeCall( Call c, DefaultTreeModel m, MutableTreeNode parent ) {
+    private void fillTreeCall( Call c, MutableTreeNode parent ) {
         for ( int i=0; i<c.args.length; i++ ) {
             exprType et= c.args[i];
-            fillTreeExprType( et, m, parent, i );
+            fillTreeExprType( et, parent, i );
         }
     }
     
-    private void fillTreeCall( exprType n, Call c, DefaultTreeModel m, MutableTreeNode parent ) {
-        fillTreeExprType( n, m, parent, 0 );
+    private void fillTreeCall( exprType n, Call c, MutableTreeNode parent ) {
+        fillTreeExprType( n, parent, 0 );
         for ( int i=0; i<c.args.length; i++ ) {
             exprType et= c.args[i];
-            fillTreeExprType( et, m, parent, i+1 );
+            fillTreeExprType( et, parent, i+1 );
         }
     }    
     
@@ -515,6 +515,30 @@ public class DataMashUp extends javax.swing.JPanel {
         };     
     }
     
+    private MutableTreeNode getTreeNode( String expr ) {
+        Module n= (Module)org.python.core.parser.parse( "x="+expr, "exec" );
+        
+        DefaultMutableTreeNode root;
+        Assign assign= (Assign)n.body[0];
+        if ( assign.value instanceof Name ) {
+            root= new DefaultMutableTreeNode( ((Name)assign.value).id );
+        } else if ( assign.value instanceof Num ) {
+            root= new DefaultMutableTreeNode( ((Num)assign.value).n );
+        } else {
+            root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
+            if ( assign.value instanceof Call ) {
+                Call c= (Call)assign.value;
+                if ( c.func instanceof Attribute ) {
+                    Attribute attr= (Attribute)c.func;
+                    fillTreeCall( attr.value, c, root );
+                } else {
+                    fillTreeCall( c, root );
+                }
+            }            
+        }
+        return root;
+    }
+    
     private void fillTree( String expr ) {
         Module n= (Module)org.python.core.parser.parse( "x="+expr, "exec" );
         
@@ -531,9 +555,9 @@ public class DataMashUp extends javax.swing.JPanel {
                 Call c= (Call)assign.value;
                 if ( c.func instanceof Attribute ) {
                     Attribute attr= (Attribute)c.func;
-                    fillTreeCall( attr.value, c, model, root );
+                    fillTreeCall( attr.value, c, root );
                 } else {
-                    fillTreeCall( c, model, root );
+                    fillTreeCall( c, root );
                 }
             }            
             jTree1.setModel(model);
@@ -667,42 +691,49 @@ public class DataMashUp extends javax.swing.JPanel {
         timeRangeTextField.setEnabled(true);
     }
     
-    private void doDrop( String data, final TreePath tp ) {
+    private void doDrop( String data, TreePath tp ) {
 
         DefaultTreeModel model= (DefaultTreeModel) jTree1.getModel();
 
         MutableTreeNode mtn= (MutableTreeNode)tp.getLastPathComponent();
         MutableTreeNode parent= (MutableTreeNode)mtn.getParent();
+        
+        if ( !data.startsWith("vap+") ) { //TODO: cheesy vap+ to detect URIs.
+            int index= -1;
+            if ( parent!=null ) {
+                index= parent.getIndex(mtn);
+                parent.remove(mtn);
+            } 
 
-        mtn.setUserObject(data);
-        for ( int i=mtn.getChildCount()-1; i>=0; i-- ) {
-            mtn.remove(i);
-        }
-
-        if ( !data.startsWith("vap+") && data.endsWith(")") ) { //TODO: cheesy vap+ to detect URIs.
-            int i= data.indexOf("(");
-            int j= data.length()-1;
-            String[] ss= data.substring(i+1,j).split(",",-2);
-            int n= ss.length;
-            for ( int k=0; k<n; k++ ) {
-                mtn.insert( new DefaultMutableTreeNode(ss[k]), k );
+            MutableTreeNode n= getTreeNode(data);
+            if ( parent==null ) {
+                model.setRoot(n);
+            } else {
+                parent.insert( n, index );
+                model.nodeStructureChanged(parent);
             }
+            tp= new TreePath(n);
+            
+        } else {
+            mtn.setUserObject(data);
+            model.nodeChanged(mtn);
         }
 
-        if ( parent==null ) {
-            model.setRoot( mtn );
-        } else { 
-            int index= model.getIndexOfChild( parent, mtn );
-            model.removeNodeFromParent(mtn);
-            model.insertNodeInto( mtn, parent, index );
-        }
+//        if ( parent==null ) {
+//            model.setRoot( mtn );
+//        } else { 
+//            int index= model.getIndexOfChild( parent, mtn );
+//            model.removeNodeFromParent(mtn);
+//            model.insertNodeInto( mtn, parent, index );
+//        }
 
-
-        jTree1.collapsePath(tp);
+        final TreePath ftp= tp;
+        
+        jTree1.collapsePath(ftp);
         SwingUtilities.invokeLater( new Runnable() {
             @Override
             public void run() {
-                jTree1.expandPath(tp);
+                jTree1.expandPath(ftp);
                 imaged.clear();
                 resolved.clear();
                 jTree1.treeDidChange();
@@ -734,8 +765,8 @@ public class DataMashUp extends javax.swing.JPanel {
     private void initComponents() {
 
         jPopupMenu1 = new javax.swing.JPopupMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        addItemMenuItem = new javax.swing.JMenuItem();
+        deleteItemsMenuItem = new javax.swing.JMenuItem();
         jSplitPane1 = new javax.swing.JSplitPane();
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel4 = new javax.swing.JPanel();
@@ -764,21 +795,21 @@ public class DataMashUp extends javax.swing.JPanel {
         timeRangeLabel = new javax.swing.JLabel();
         timeRangeTextField = new javax.swing.JTextField();
 
-        jMenuItem1.setText("Add function...");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        addItemMenuItem.setText("Add function...");
+        addItemMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                addItemMenuItemActionPerformed(evt);
             }
         });
-        jPopupMenu1.add(jMenuItem1);
+        jPopupMenu1.add(addItemMenuItem);
 
-        jMenuItem2.setText("Delete Item");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        deleteItemsMenuItem.setText("Delete Items");
+        deleteItemsMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                deleteItemsMenuItemActionPerformed(evt);
             }
         });
-        jPopupMenu1.add(jMenuItem2);
+        jPopupMenu1.add(deleteItemsMenuItem);
 
         jSplitPane1.setDividerLocation(100);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -815,7 +846,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jLabel2.setText("Drag functions onto the palette to the right.");
 
         jList1.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "add(x,y)", "subtract(x,y)", "multiply(x,y)", "divide(x,y)", "pow(x,y)", "sqrt(x)", "atan2(x,y)", "toRadians(x)", "toDegrees(x)", "sin(x)", "cos(x)", "tan(x)", "asin(x)", "acos(x)", "atan2(y,x)", "atan(x)", " " };
+            String[] strings = { "add(x,y)", "subtract(x,y)", "multiply(x,y)", "divide(x,y)", "pow(x,y)", "log10(x)", "sqrt(x)", "atan2(x,y)", "toRadians(x)", "toDegrees(x)", "sin(x)", "cos(x)", "tan(x)", "asin(x)", "acos(x)", "atan2(y,x)", "atan(x)", " " };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
@@ -1059,17 +1090,19 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_scratchListMouseReleased
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void addItemMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addItemMenuItemActionPerformed
         String s= JOptionPane.showInputDialog( this, "Add function" );
         if ( !( s.trim().length()==0 ) ) {
             addToScratch( s.trim() );
         }
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_addItemMenuItemActionPerformed
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        int i= scratchList.getSelectedIndex();
-        removeFromScratch(i);
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    private void deleteItemsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteItemsMenuItemActionPerformed
+        int[] indices= scratchList.getSelectedIndices();
+        for ( int i=indices.length-1; i>=0; i-- ) {
+            removeFromScratch(indices[i]);
+        }
+    }//GEN-LAST:event_deleteItemsMenuItemActionPerformed
 
     private void removeFromScratch( int index ) {
         ListModel lm= scratchList.getModel();
@@ -1308,14 +1341,14 @@ public class DataMashUp extends javax.swing.JPanel {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem addItemMenuItem;
+    private javax.swing.JMenuItem deleteItemsMenuItem;
     private javax.swing.JLabel directionsLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList jList1;
     private javax.swing.JList jList2;
     private javax.swing.JList jList3;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
