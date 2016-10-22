@@ -369,7 +369,10 @@ public class DataSetURI {
         try {
             DataSourceFactory dsf= getDataSourceFactory( new URI(value), new NullProgressMonitor() );
             TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
-            if (tsb==null ) return null;
+            if (tsb==null ) {
+                logger.fine("Unable to update the URI because factory doesn't provide TSB");
+                return null;
+            }
             tsb.setURI(value);
             tsb.setTimeResolution(null);
             return tsb.getURI();
