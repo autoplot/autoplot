@@ -195,6 +195,16 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
     }
 
     @Override
+    public <T> T getCapability(Class<T> clazz) {
+        if ( clazz==TimeSeriesBrowse.class ) {
+            return (T) new InlineTimeSeriesBrowse();
+        } else {
+            return super.getCapability(clazz); //To change body of generated methods, choose Tools | Templates.
+        }
+    }
+
+    
+    @Override
     public boolean supportsDiscovery() {
         return true;
     }
