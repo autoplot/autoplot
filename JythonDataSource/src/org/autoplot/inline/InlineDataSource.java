@@ -29,7 +29,6 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DefaultTimeSeriesBrowse;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
@@ -56,7 +55,7 @@ public class InlineDataSource extends AbstractDataSource {
         String timerange= InlineDataSourceFactory.getScript( uri.toString(), script );
         if ( timerange!=null ) {
             try {
-                tsb= DefaultTimeSeriesBrowse.create( uri.toString(),timerange );
+                tsb= InlineTimeSeriesBrowse.create( uri.toString(),timerange );
                 addCapability( TimeSeriesBrowse.class, tsb );
             } catch (ParseException ex) {
                 logger.warning(ex.toString());
