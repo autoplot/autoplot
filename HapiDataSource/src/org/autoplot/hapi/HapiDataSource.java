@@ -324,6 +324,7 @@ public class HapiDataSource extends AbstractDataSource {
         id= URLDecoder.decode( id,"UTF-8" );
 
         String pp= getParam("parameters","");
+        String format= getParam("format","csv");
         
         JSONObject doc= getDocument();
         monitor.setProgressMessage("got info");
@@ -353,6 +354,10 @@ public class HapiDataSource extends AbstractDataSource {
         
         URL url= HapiServer.getDataURL( server.toURL(), id, tr, pp );
         
+        if ( format.equals("csv") ) {
+            url= new URL( url+"&format="+format );
+        }
+        
         logger.log(Level.FINE, "getDataSet {0}", url.toString());
         
         int[] nfields= new int[nparam];
@@ -365,19 +370,32 @@ public class HapiDataSource extends AbstractDataSource {
         }
         int totalFields= DataSetUtil.sum(nfields);
 
-        DataSetBuilder builder= new DataSetBuilder(2,100,totalFields);
+        QDataSet ds;
+        ds= getDataSetViaCsv(totalFields, monitor, url, pds, tr, nparam, nfields);
         
+        if ( ds.length()==0 ) {
+            monitor.finished();
+            throw new NoDataInIntervalException("no records found");
+        }
+        
+        ds = repackage(ds,pds,null);
+        
+        monitor.setTaskProgress(100);
+        monitor.finished();
+        
+        return ds;
+        
+    }
+
+    private QDataSet getDataSetViaCsv(int totalFields, ProgressMonitor monitor, URL url, ParamDescription[] pds, DatumRange tr, int nparam, int[] nfields) throws IllegalArgumentException, Exception, IOException {
+        DataSetBuilder builder= new DataSetBuilder(2,100,totalFields);
         monitor.setProgressMessage("reading data");
         monitor.setTaskProgress(20);
-        
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
-        
         HttpURLConnection connection= (HttpURLConnection)url.openConnection();
         connection.setRequestProperty( "Accept-Encoding", "gzip" );
         connection.connect();
-        
         boolean gzip= "gzip".equals( connection.getContentEncoding() );
-        
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( connection.getInputStream() ) : connection.getInputStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
@@ -425,24 +443,9 @@ public class HapiDataSource extends AbstractDataSource {
             monitor.finished();
             throw e;
         }
-        
-        
         monitor.setTaskProgress(95);
-                
         QDataSet ds= builder.getDataSet();
-        
-        if ( ds.length()==0 ) {
-            monitor.finished();
-            throw new NoDataInIntervalException("no records found");
-        }
-        
-        ds = repackage(ds,pds,null);
-        
-        monitor.setTaskProgress(100);
-        monitor.finished();
-        
         return ds;
-        
     }
 
     private ParamDescription[] getParameterDescriptions(JSONObject doc) throws IllegalArgumentException, ParseException, JSONException {
