@@ -1053,7 +1053,8 @@ public class CdfDataSource extends AbstractDataSource {
                                 } else {
                                     result.putProperty( "DEPEND_"+idep, depDs );                                                        
                                 }
-                            }                            
+                            }   
+                            if ( idep==0 ) thisAttributes.remove("LABL_PTR_1");
                         }
 
                 }
