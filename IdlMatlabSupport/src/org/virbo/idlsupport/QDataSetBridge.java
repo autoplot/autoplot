@@ -36,6 +36,9 @@ public abstract class QDataSetBridge {
     
     String name;
     Map<String, QDataSet> datasets;
+    /**
+     * this contains the names of things that should resolve when slicing.
+     */
     Map<String, String> sliceDep;
     Map<QDataSet, String> names;
     List<Units> prefUnits; // convert to these if possible
@@ -179,6 +182,19 @@ public abstract class QDataSetBridge {
                     sliceDep.put( nameFor(depslice), "DEPEND_"+i );
                 }
             }
+            QDataSet ads;
+            int i;
+            i=0; 
+            while ( (ads=(QDataSet)ds.property( "PLANE_"+i ))!=null ) {
+                datasets.put( nameFor( ads ), ads );
+                i++;
+            }
+            i=0; 
+            while ( (ads=(QDataSet)ds.property( "PLANE_"+i, 0 ))!=null ) {
+                sliceDep.put( nameFor( ads ), "PLANE_"+i );
+                i++;
+            }
+            i=0;
         } catch ( Exception ex ) {
             this.exception= ex;
             ex.printStackTrace(); // print the exception, because Exception handling is inconsistent with Matlab and IDL.
