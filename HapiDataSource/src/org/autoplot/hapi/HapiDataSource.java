@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.hapi;
 
 import java.io.BufferedReader;
@@ -10,12 +6,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +27,6 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
-import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystemUtil;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -46,7 +43,6 @@ import org.virbo.datasource.DefaultTimeSeriesBrowse;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
-import org.virbo.dsutil.BundleBuilder;
 import org.virbo.dsutil.DataSetBuilder;
 import org.virbo.qstream.AsciiTimeTransferType;
 import org.virbo.qstream.TransferType;
@@ -360,7 +356,7 @@ public class HapiDataSource extends AbstractDataSource {
         
         URL url= HapiServer.getDataURL( server.toURL(), id, tr, pp );
         
-        if ( format.equals("csv") ) {
+        if ( !format.equals("csv") ) {
             url= new URL( url+"&format="+format );
         }
         
@@ -377,7 +373,11 @@ public class HapiDataSource extends AbstractDataSource {
         int totalFields= DataSetUtil.sum(nfields);
 
         QDataSet ds;
-        ds= getDataSetViaCsv(totalFields, monitor, url, pds, tr, nparam, nfields);
+        if ( format.equals("csv") ) {
+            ds= getDataSetViaCsv(totalFields, monitor, url, pds, tr, nparam, nfields);
+        } else {
+            ds= getDataSetViaBinary(totalFields, monitor, url, pds, tr, nparam, nfields);
+        }
         
         if ( ds.length()==0 ) {
             monitor.finished();
@@ -405,43 +405,50 @@ public class HapiDataSource extends AbstractDataSource {
         boolean gzip = "gzip".equals(connection.getContentEncoding());
 
         int recordLengthBytes = 0;
-        int fields = 0;
         TransferType[] tts = new TransferType[pds.length];
 
         for (int i = 0; i < pds.length; i++) {
             if (pds[i].type.startsWith("time")) {
                 recordLengthBytes += Integer.parseInt(pds[i].type.substring(4));
-                tts[i] = AsciiTimeTransferType.getByName(pds[i].type, Collections.singletonMap(QDataSet.UNITS, pds[i].units));
+                tts[i] = TransferType.getForName(pds[i].type, Collections.singletonMap(QDataSet.UNITS, (Object)pds[i].units));
             } else {
-                recordLengthBytes += BufferDataSet.byteCount(pds[i].type) * DataSetUtil.product(pds[i].size);
-                tts[i] = TransferType.getForName(pds[i].type, Collections.emptyMap());
+                Object type= pds[i].type;
+                recordLengthBytes += BufferDataSet.byteCount(type) * DataSetUtil.product(pds[i].size);
+                tts[i] = TransferType.getForName( type.toString(), Collections.singletonMap(QDataSet.UNITS, (Object)pds[i].units) );
             }
-
+            if ( tts[i]==null ) {
+                throw new IllegalArgumentException("unable to identify transfer type for \""+pds[i].type+"\"");
+            }
         }
-        System.err.println("recordLengthBytes=" + recordLengthBytes);
-        //throw new IllegalArgumentException("not yet implemented");
 
-        double[] result = new double[fields];
+        totalFields= DataSetUtil.sum(nfields);
+        double[] result = new double[totalFields];
 
         try (InputStream in = gzip ? new GZIPInputStream(connection.getInputStream()) : connection.getInputStream()) {
-            ByteBuffer buf = ByteBuffer.allocate(recordLengthBytes);
+            ByteBuffer buf = TransferType.allocate( recordLengthBytes,ByteOrder.LITTLE_ENDIAN );
             byte[] bytes = buf.array();
             int bytesRead = in.read(bytes);
-            int ifield = 0;
             while (bytesRead != -1) {
-                TransferType tt;
+                while ( bytesRead<recordLengthBytes ) {
+                    int b= in.read( bytes, bytesRead, recordLengthBytes-bytesRead );
+                    if ( b==-1 ) throw new InterruptedIOException("expected "+recordLengthBytes+" bytes to complete a record" );
+                    bytesRead+= b;
+                }
+                int ifield = 0;
                 for (int i = 0; i < pds.length; i++) {
-                    int nfield = DataSetUtil.product(pds[i].size);
                     for (int j = 0; j < nfields[i]; j++) {
                         result[ifield] = tts[i].read(buf);
+                        ifield++;
                     }
                 }
                 if (ifield != totalFields) {
                     logger.log(Level.WARNING, "expected {0} got {1}", new Object[]{totalFields, ifield});
                 }
 
+                // copy the data from double array into the builder.
+                ifield= 0;
                 Datum xx;
-                xx = pds[ifield].units.createDatum(result[0]);
+                xx = pds[0].units.createDatum(result[0]);
                 if (System.currentTimeMillis() - t0 > 100) {
                     monitor.setProgressMessage("reading " + xx);
                     t0 = System.currentTimeMillis();
@@ -459,6 +466,7 @@ public class HapiDataSource extends AbstractDataSource {
                 }
                 builder.nextRecord();
 
+                buf.flip();
                 bytesRead = in.read(bytes);
             }
 
@@ -565,7 +573,10 @@ public class HapiDataSource extends AbstractDataSource {
                 }
                  pds[i].units= Units.us2000;
                  pds[i].type= "time"+jsonObjecti.getInt("length");
+                pds[i].type= "time"+jsonObjecti.getInt("length");
+                
             } else {
+                pds[i].type= jsonObjecti.getString("type");
                 if ( jsonObjecti.has("units") ) {
                     String sunits= jsonObjecti.getString("units");
                     if ( sunits!=null ) {
