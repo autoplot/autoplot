@@ -16,16 +16,15 @@
         <h1>This is a HAPI Server.</h1>
         
         <h3>Some example requests:</h3>
-        <a href="catalog">Catalog</a><br>
-        <a href="capabilities">Capabilities</a><br>
-        <a href="info?id=0B000800408DD710">Info</a><br>
-        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05">Data</a><br>
-        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&format=binary">Data Binary</a><br>
-        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-10-01">Data (10 months)</a><br>
-        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-10-01&stream=false">Data (10 months no streaming, note delay)</a><br>
-        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&include=header">Data w/header</a><br>
-        <a href="data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/multiple parameters</a><br>
-        <a href="data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/subset</a><br>
+        <a href="catalog">Catalog</a> <i>Show the catalog of available data sets.</i><br>
+        <a href="capabilities">Capabilities</a> <i>Capabilities of the server. For example, can it use binary streams to transfer data?</i><br>
+        <a href="info?id=0B000800408DD710">Info</a> <i>Information about a data set, showing what parameters are contained within.</i><br>
+        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05">Data</a> <i>Example data transfer request.</i><br>
+        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&format=binary">Data Binary</a> <i>Example data request, for binary.</i><br>
+        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-10-01">Data (10 months)</a> <i>Example data request, showing long requests.</i><br>
+        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&include=header">Data w/header</a> <i>Data request, requesting header as well.</i><br>
+        <a href="data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header">Data w/multiple parameters</a> <i>Request for data with multiple parameters.</i><br>
+        <a href="data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/subset</a> <i>Request subset of the parameters.</i><br>
         
         <%
             long l= org.virbo.dataset.RecordIterator.TIME_STAMP; // load RecordIterator class first, or we'll get a negative time.
