@@ -15,12 +15,15 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.ByteBuffer;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
+import org.autoplot.bufferdataset.BufferDataSet;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -45,6 +48,8 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.BundleBuilder;
 import org.virbo.dsutil.DataSetBuilder;
+import org.virbo.qstream.AsciiTimeTransferType;
+import org.virbo.qstream.TransferType;
 
 /**
  * HAPI data source uses transactions with HAPI servers to collect data.
@@ -144,6 +149,7 @@ public class HapiDataSource extends AbstractDataSource {
         Units units= Units.dimensionless;
         String name= "";
         String description= "";
+        String type= "";
         int[] size= new int[0]; // array of scalars
         QDataSet depend1= null; // for spectrograms
         private ParamDescription( String name ) {
@@ -387,6 +393,90 @@ public class HapiDataSource extends AbstractDataSource {
         
     }
 
+    private QDataSet getDataSetViaBinary(int totalFields, ProgressMonitor monitor, URL url, ParamDescription[] pds, DatumRange tr, int nparam,
+            int[] nfields) throws IllegalArgumentException, Exception, IOException {
+        DataSetBuilder builder = new DataSetBuilder(2, 100, totalFields);
+        monitor.setProgressMessage("reading data");
+        monitor.setTaskProgress(20);
+        long t0 = System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("Accept-Encoding", "gzip");
+        connection.connect();
+        boolean gzip = "gzip".equals(connection.getContentEncoding());
+
+        int recordLengthBytes = 0;
+        int fields = 0;
+        TransferType[] tts = new TransferType[pds.length];
+
+        for (int i = 0; i < pds.length; i++) {
+            if (pds[i].type.startsWith("time")) {
+                recordLengthBytes += Integer.parseInt(pds[i].type.substring(4));
+                tts[i] = AsciiTimeTransferType.getByName(pds[i].type, Collections.singletonMap(QDataSet.UNITS, pds[i].units));
+            } else {
+                recordLengthBytes += BufferDataSet.byteCount(pds[i].type) * DataSetUtil.product(pds[i].size);
+                tts[i] = TransferType.getForName(pds[i].type, Collections.emptyMap());
+            }
+
+        }
+        System.err.println("recordLengthBytes=" + recordLengthBytes);
+        //throw new IllegalArgumentException("not yet implemented");
+
+        double[] result = new double[fields];
+
+        try (InputStream in = gzip ? new GZIPInputStream(connection.getInputStream()) : connection.getInputStream()) {
+            ByteBuffer buf = ByteBuffer.allocate(recordLengthBytes);
+            byte[] bytes = buf.array();
+            int bytesRead = in.read(bytes);
+            int ifield = 0;
+            while (bytesRead != -1) {
+                TransferType tt;
+                for (int i = 0; i < pds.length; i++) {
+                    int nfield = DataSetUtil.product(pds[i].size);
+                    for (int j = 0; j < nfields[i]; j++) {
+                        result[ifield] = tts[i].read(buf);
+                    }
+                }
+                if (ifield != totalFields) {
+                    logger.log(Level.WARNING, "expected {0} got {1}", new Object[]{totalFields, ifield});
+                }
+
+                Datum xx;
+                xx = pds[ifield].units.createDatum(result[0]);
+                if (System.currentTimeMillis() - t0 > 100) {
+                    monitor.setProgressMessage("reading " + xx);
+                    t0 = System.currentTimeMillis();
+                    double d = DatumRangeUtil.normalize(tr, xx);
+                    monitor.setTaskProgress(20 + (int) (75 * d));
+                }
+                builder.putValue(-1, ifield, xx);
+                ifield++;
+                for (int i = 1; i < nparam; i++) {  // nparam is number of parameters, which may have multiple fields.
+                    for (int j = 0; j < nfields[i]; j++) {
+                        builder.putValue(-1, ifield, result[ifield]);
+                        //TODO: fill?
+                        ifield++;
+                    }
+                }
+                builder.nextRecord();
+
+                bytesRead = in.read(bytes);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            monitor.finished();
+            throw new IOException(String.valueOf(connection.getResponseCode()) + ":" + connection.getResponseMessage());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            monitor.finished();
+            throw e;
+        }
+        monitor.setTaskProgress(95);
+        QDataSet ds = builder.getDataSet();
+        return ds;
+    }
+
     private QDataSet getDataSetViaCsv(int totalFields, ProgressMonitor monitor, URL url, ParamDescription[] pds, DatumRange tr, int nparam, int[] nfields) throws IllegalArgumentException, Exception, IOException {
         DataSetBuilder builder= new DataSetBuilder(2,100,totalFields);
         monitor.setProgressMessage("reading data");
@@ -473,7 +563,8 @@ public class HapiDataSource extends AbstractDataSource {
                 if ( !type.equals("isotime") ) {
                     logger.log(Level.WARNING, "isotime should not be capitalized: {0}", type);
                 }
-                pds[i].units= Units.us2000;
+                 pds[i].units= Units.us2000;
+                 pds[i].type= "time"+jsonObjecti.getInt("length");
             } else {
                 if ( jsonObjecti.has("units") ) {
                     String sunits= jsonObjecti.getString("units");
@@ -483,6 +574,7 @@ public class HapiDataSource extends AbstractDataSource {
                 } else {
                     pds[i].units= Units.dimensionless;
                 }
+                pds[i].type= type;
                 if ( jsonObjecti.has("fill") ) {
                     String sfill= jsonObjecti.getString("fill");
                     if ( sfill!=null ) {
