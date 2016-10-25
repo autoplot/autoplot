@@ -125,9 +125,11 @@ public class DataServlet extends HttpServlet {
             if ( include.equals("header") ) throw new IllegalArgumentException("header cannot be sent with binary");
         }
         
+        JSONObject jo;
+        
         try {
 
-            JSONObject jo= InfoServlet.getInfo( id );
+            jo= InfoServlet.getInfo( id );
 
             if ( !parameters.equals("") ) {
                 String[] pps= parameters.split(",");
@@ -173,7 +175,7 @@ public class DataServlet extends HttpServlet {
                             
                 QDataSet first= dsiter.next();
             
-                dataFormatter.initialize( out, first );
+                dataFormatter.initialize( jo, out, first );
         
                 dataFormatter.sendRecord( out, first );
                 while ( dsiter.hasNext() ) {

@@ -17,8 +17,10 @@
         
         <h3>Some example requests:</h3>
         <a href="catalog">Catalog</a><br>
+        <a href="capabilities">Capabilities</a><br>
         <a href="info?id=0B000800408DD710">Info</a><br>
         <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05">Data</a><br>
+        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&format=binary">Data Binary</a><br>
         <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-10-01">Data (10 months)</a><br>
         <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-10-01&stream=false">Data (10 months no streaming, note delay)</a><br>
         <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&include=header">Data w/header</a><br>

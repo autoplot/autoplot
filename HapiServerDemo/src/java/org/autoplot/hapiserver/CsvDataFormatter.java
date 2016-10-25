@@ -11,6 +11,7 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DatumFormatter;
 import org.das2.datum.format.TimeDatumFormatter;
+import org.json.JSONObject;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 
@@ -24,7 +25,7 @@ public class CsvDataFormatter implements DataFormatter {
     DatumFormatter[] datumFormatter;
     
     @Override
-    public void initialize(OutputStream out, QDataSet record) {
+    public void initialize( JSONObject info, OutputStream out, QDataSet record) {
         unitsFormatter= new boolean[record.length()];
         datumFormatter= new DatumFormatter[record.length()];
         for ( int i=0; i<record.length(); i++ ) {

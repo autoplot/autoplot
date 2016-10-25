@@ -4,11 +4,18 @@ package org.autoplot.hapiserver;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.autoplot.bufferdataset.BufferDataSet;
 import org.das2.datum.Units;
-import org.das2.datum.UnitsUtil;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.qstream.AsciiTimeTransferType;
-import org.virbo.qstream.DoubleTransferType;
 import org.virbo.qstream.TransferType;
 
 /**
@@ -26,28 +33,41 @@ public class BinaryDataFormatter implements DataFormatter {
     public BinaryDataFormatter( ) {
     }
         
-    /**
-     * configure the format.
-     * @param out
-     * @param record rank 1 bundle
-     */
     @Override
-    public void initialize( OutputStream out, QDataSet record  ) {
-        transferTypes= new TransferType[record.length()];
-        bufferSize= 0;
-        
-        for ( int i=0; i<record.length(); i++ ) {
-            QDataSet d= record.slice(i);
-            Units u= (Units)d.property(QDataSet.UNITS);
-            if ( u==null ) u= Units.dimensionless;
-            if ( UnitsUtil.isTimeLocation(u) ) {
-                transferTypes[i]= new AsciiTimeTransferType(24,Units.us2000);
-            } else {
-                transferTypes[i]= new DoubleTransferType();
+    public void initialize( JSONObject info, OutputStream out, QDataSet record) {
+        try {
+            transferTypes= new TransferType[record.length()];
+            bufferSize= 0;
+            
+            int totalFields= 0;
+            JSONArray parameters= info.getJSONArray("parameters");
+            for ( int i=0; i<parameters.length(); i++ ) {
+                JSONObject parameter= parameters.getJSONObject(i);
+                TransferType tt;
+                final String stype = parameter.getString("type");
+                if ( stype.equals("isotime") ) {
+                    tt= AsciiTimeTransferType.getForName( "time"+parameter.getInt("length"), Collections.singletonMap(QDataSet.UNITS,(Object)Units.us2000) );
+                } else {
+                    tt= TransferType.getForName(stype, null );
+                }
+                int nfields;
+                if ( parameter.has("size") ) {
+                    nfields= DataSetUtil.product( (int[])parameter.get("size") );
+                } else {
+                    nfields= 1;
+                }
+                for ( int j=0; j<nfields; j++ ) {
+                    transferTypes[totalFields+j]= tt;
+                }
+                totalFields+= nfields;
+                bufferSize+= nfields * tt.sizeBytes();
             }
-            bufferSize+= transferTypes[i].sizeBytes();
+
+            b= TransferType.allocate( bufferSize, ByteOrder.LITTLE_ENDIAN );
+            
+        } catch (JSONException ex) {
+            Logger.getLogger(BinaryDataFormatter.class.getName()).log(Level.SEVERE, null, ex);
         }
-        b= ByteBuffer.allocate( bufferSize );
     }
     
     @Override
