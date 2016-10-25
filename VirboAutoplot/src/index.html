@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Fun grabbing audio off the system sound card and running it through fftPower.
+        <p><small>The Data Mash Up tool is used to plot the plasma FCE by multiplying the B-Field ma.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-10-20 r19739):</p>
+        <p>Bugfixes (2016-10-25 r19781):</p>
         <ul> 
+            <li>IDL/Matlab interface supports reading PLANE_0 correlated planes.</li>
+            <li>HAPI client supports binary, when format=binary is added to URI.</li>
             <li>1695: dashup issues pointed out by Kris, including my functions persist and proper support for TSB.</li>
             <li>setDepend0Cadence no longer resets axes and plot type.  Thanks, Chris!</li>
             <li>Binary Data Source includes completion for Nybbles.</li>
