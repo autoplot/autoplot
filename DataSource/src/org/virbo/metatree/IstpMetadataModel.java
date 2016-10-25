@@ -373,7 +373,7 @@ public class IstpMetadataModel extends MetadataModel {
                 Object o = (Object) attrs.get("LABL_PTR_1");
                 if ( ! ( o instanceof QDataSet ) ) {
                     if ( o!=null ) {
-                        logger.log(Level.FINE, "LABL_PTR_1 property of {0} should be a QDataSet", name);
+                        logger.log(Level.WARNING, "LABL_PTR_1 property of {0} should be a QDataSet", name);
                     }
                 } else {
                     QDataSet lablDs= (QDataSet) attrs.get("LABL_PTR_1");
