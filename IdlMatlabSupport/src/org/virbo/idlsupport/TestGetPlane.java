@@ -12,11 +12,10 @@ package org.virbo.idlsupport;
 public class TestGetPlane {
     public static void main( String[] args ) {
         APDataSet apds  = new APDataSet();
-        apds.setDataSetURI( "/home/jbf/project/das2/qstream/joinedSpecAndStreams.qds" );
+        apds.setDataSetURI( "http://www-pw.physics.uiowa.edu/~jbf/autoplot/data/qds/joinedSpecAndStreams.qds" );
         apds.doGetDataSet();
         System.err.println( apds.toString() );
-        Object o= apds.slice("ds_2",0);
+        Object o= apds.slice("ds_4",0);
         System.err.println(o);
-        // How to get PLANE_0 of a join?
     }
 }
