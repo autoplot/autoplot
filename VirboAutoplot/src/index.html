@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The Data Mash Up tool is used to plot the plasma FCE by multiplying the B-Field ma.
+        <p><small>The Data Mash Up tool is used to plot the plasma FCE by multiplying the B-Field magnitude.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2016-10-25 r19781):</p>
         <ul> 
+            <li>Binary Data Source gets format keyword, and properly supports %c.</li>
             <li>IDL/Matlab interface supports reading PLANE_0 correlated planes.</li>
             <li>HAPI client supports binary, when format=binary is added to URI.</li>
             <li>1695: dashup issues pointed out by Kris, including my functions persist and proper support for TSB.</li>
@@ -93,6 +94,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>LookupAxis introduced, which draws additional ticks for another dataset.</li>
             <li>checkbox in the console shows only the filtered log records.  Thanks, Ivar!</li>
             <li>If annotation bubble text is "", then don't draw the bubble, to provide some way one label can have multiple arrows.  Thanks, Sebastian!</li>
             <li>Demo HAPI server supports gzipped responses and binary responses.</li>
