@@ -151,6 +151,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         setAllB = new javax.swing.JButton();
         extraInfoButton = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
+        binaryCB = new javax.swing.JCheckBox();
 
         jLabel1.setText("HAPI Server:");
 
@@ -227,7 +228,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(extraInfoButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -238,7 +239,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jScrollPane4)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(clearAllB)
@@ -250,18 +251,22 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         jLabel3.setText("jLabel3");
 
+        binaryCB.setText("Use Binary");
+        binaryCB.setToolTipText("Some servers support binary data transfers, and this will use binary to transfer data.");
+        binaryCB.setEnabled(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(serversComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(serversComboBox, 0, 1, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -270,7 +275,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 201, Short.MAX_VALUE)
+                        .addComponent(binaryCB)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -283,7 +289,9 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSplitPane1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel3)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(binaryCB))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -351,6 +359,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox binaryCB;
     private javax.swing.JButton clearAllB;
     private javax.swing.JButton extraInfoButton;
     private javax.swing.JList<String> idsList2;
@@ -465,6 +474,11 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             this.currentParameters= parameters;
             setParameters(this.currentParameters);
         }
+        if ( "binary".equals(params.get("format") ) ) {
+            this.binaryCB.setSelected(true);
+        } else {
+            this.binaryCB.setSelected(false);
+        }
         
     }
 
@@ -490,10 +504,14 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 throw new RuntimeException(ex);
             }
         }
+        String uri= "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + id + "&timerange="+timeRangeTextField.getText().replaceAll(" ","+");
+        if ( binaryCB.isSelected() && binaryCB.isEnabled() ) {
+            uri+= "&format=binary";
+        }
         if ( parameters.length()>0 ) {
-            return "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + id + "&timerange="+timeRangeTextField.getText().replaceAll(" ","+") + "&parameters="+parameters;
+            return uri + "&parameters="+parameters;
         } else {
-            return "vap+hapi:" + serversComboBox.getSelectedItem().toString() + "?id=" + id + "&timerange="+timeRangeTextField.getText().replaceAll(" ","+");
+            return uri;
         }
     }
     
@@ -520,6 +538,26 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 int i= idsList2.getSelectedIndex();
                 idsList2.ensureIndexIsVisible( i==-1 ? 0 : i );
             }
+            boolean binaryIsEnabled= false;
+            try {
+                JSONObject capabilitiesDoc= HapiServer.getCapabilities(server);
+                JSONArray capabilities= capabilitiesDoc.getJSONArray("capabilities");
+                for ( int i=0; i<capabilities.length(); i++ ) {
+                    JSONObject c= capabilities.getJSONObject(i);
+                    if ( c.has("formats") ) {
+                        JSONArray formats= c.getJSONArray("formats");
+                        for ( int j=0; j<formats.length(); j++ ) {
+                            if ( formats.getString(j).equals("binary") ) {
+                                binaryIsEnabled= true;
+                            }
+                        }
+                    }
+                }
+            } catch ( IOException ex ) {
+                logger.log( Level.WARNING, ex.getMessage(), ex );
+            }
+            binaryCB.setEnabled(binaryIsEnabled);
+            
         } catch ( IOException ex ) {
             DataSetSelector.showUserExceptionDialog( this, "Error when connecting to server", "I/O Exception", ex, JOptionPane.WARNING_MESSAGE );
         }

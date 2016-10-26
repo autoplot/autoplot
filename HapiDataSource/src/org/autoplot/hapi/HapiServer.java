@@ -245,6 +245,31 @@ public class HapiServer {
     }
     
     /**
+     * return the server capabilities document.
+     * @param server
+     * @return
+     * @throws IOException
+     * @throws JSONException 
+     */
+    protected static JSONObject getCapabilities(URL server)  throws IOException, JSONException {
+        URL url;
+        url= HapiServer.createURL( server, "capabilities" );
+        StringBuilder builder= new StringBuilder();
+        logger.log(Level.FINE, "getCatalog {0}", url.toString());
+        try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
+            String line= in.readLine();
+            while ( line!=null ) {
+                builder.append(line);
+                line= in.readLine();
+            }
+        }
+        JSONObject o= new JSONObject(builder.toString());
+        
+        return o;
+    }
+
+    
+    /**
      * return the URL by appending the text to the end of the server URL.  This
      * avoids extra slashes, etc.
      * @param server the hapi server
@@ -288,7 +313,5 @@ public class HapiServer {
             throw new IllegalArgumentException(ex);
         }
     }
-
-
     
 }
