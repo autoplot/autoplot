@@ -45,6 +45,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "units=", "indicating unit type, like cmps or TT2000.") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "byteOrder=", "endianess of the data" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "reportOffset=yes", "depend0 is byte offset into file, this is the legacy (2010) behavior"));
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "format=", "specify format"));
             return result;
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String paramName= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
@@ -148,6 +149,15 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "x,ub,ui", "skip byte, unsigned byte, unsigned int") );
                     return result;
                 }
+                case "format":
+                {
+                    List<CompletionContext> result= new ArrayList<>();
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "%d", "format as integer") );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "%c", "format as character") );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "%x", "format as hexidecimal") );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "%.1f", "format as double with one decimal") );
+                    return result;
+                }                
                 default:
                     return Collections.emptyList();
             }
