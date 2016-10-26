@@ -320,6 +320,11 @@ public class BinaryDataSource extends AbstractDataSource {
         if ( s!=null ) {
             ds.putProperty( QDataSet.UNITS, Units.lookupUnits(s) );
         }
+
+        s= params.get( "format" );
+        if ( s!=null ) {
+            ds.putProperty( QDataSet.FORMAT, s );
+        }
             
         return ds;
     }
