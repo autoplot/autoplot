@@ -64,6 +64,7 @@ import org.python.parser.ast.Call;
 import org.python.parser.ast.Module;
 import org.python.parser.ast.Name;
 import org.python.parser.ast.Num;
+import org.python.parser.ast.Str;
 import org.python.parser.ast.UnaryOp;
 import org.python.parser.ast.exprType;
 import org.virbo.dataset.DataSetUtil;
@@ -297,7 +298,8 @@ public class DataMashUp extends javax.swing.JPanel {
             parent.insert( new DefaultMutableTreeNode(((Name)et).id), i );
         } else if ( et instanceof Num ) {
             parent.insert( new DefaultMutableTreeNode( String.valueOf(((Num)et).n) ),i );
-        
+        } else if ( et instanceof Str ) {
+            parent.insert( new DefaultMutableTreeNode( "'"+String.valueOf(((Str)et).s)+"'" ),i );
         } else if ( et instanceof UnaryOp ) { // a negative number appears as a unary minus op and positive number.
             exprType et1= ((UnaryOp)et).operand;
             switch (((UnaryOp)et).op) {
