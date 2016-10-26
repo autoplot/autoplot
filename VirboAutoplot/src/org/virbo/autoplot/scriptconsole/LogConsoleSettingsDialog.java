@@ -190,6 +190,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         timeStampsCheckBox.setSelected(console.showTimeStamps);
         logLevelCheckBox.setSelected(console.showLevel);
         loggerIDCheckBox.setSelected(console.showLoggerId);
+        showOnlyHighlitedCB.setSelected(console.isShowOnlyHighlited());
     }
 
     /**
