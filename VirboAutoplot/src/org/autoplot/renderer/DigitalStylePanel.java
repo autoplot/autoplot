@@ -78,7 +78,7 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         String oldValue= this.control;
         Map<String,String> controls= new LinkedHashMap();
         controls.put( "fontSize", fontSizeTF.getText() );
-        controls.put( "format", formatTF.getText() );
+        controls.put( "format", formatCB.getSelectedItem().toString().trim() );
         controls.put( Renderer.CONTROL_KEY_COLOR, Renderer.encodeColorControl( (Color)colorEditor1.getValue() ) );
         controls.put( "align", ened.getValue().toString() );
         controls.put( "fillLabel", fillLabelTF.getText() );
@@ -90,7 +90,7 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         this.control= renderer.getControl();
         fontSizeTF.setText( renderer.getControl( "fontSize", "" ) );
         colorEditor1.setValue( renderer.getColorControl( Renderer.CONTROL_KEY_COLOR, Color.BLACK ) );
-        formatTF.setText( renderer.getControl( "format", "" ) );
+        formatCB.setSelectedItem( renderer.getControl( "format", "" ) );
         try {
             ened.setValue( DigitalRenderer.Align.valueOf( renderer.getControl( "align", "CENTER" ) ) );
         } catch ( IllegalArgumentException ex ) {
@@ -144,15 +144,16 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         colorPanel = new javax.swing.JPanel();
         fontSizeTF = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        formatTF = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         alignPanel = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         fillLabelTF = new javax.swing.JTextField();
+        formatCB = new javax.swing.JComboBox<>();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Digital"));
 
         jLabel1.setText("Font Size:");
+        jLabel1.setToolTipText("Font size relative to the plot font size, like 0.5em means half of the plot's font size.");
 
         jLabel2.setText("Color:");
 
@@ -174,17 +175,6 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         jLabel3.setText("Format:");
         jLabel3.setToolTipText("Format specifier like %9.2f");
 
-        formatTF.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                DigitalStylePanel.this.focusLost(evt);
-            }
-        });
-        formatTF.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                formatTFActionPerformed(evt);
-            }
-        });
-
         jLabel4.setText("Align:");
 
         alignPanel.setLayout(new java.awt.BorderLayout());
@@ -203,31 +193,38 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
             }
         });
 
+        formatCB.setEditable(true);
+        formatCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "", "%.2f", "%d", "%c", "%x" }));
+        formatCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                formatCBActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel2)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel5)
-                            .addGap(18, 18, 18)
-                            .addComponent(fillLabelTF, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel1)
-                                .addComponent(jLabel4)
-                                .addComponent(jLabel3))
-                            .addGap(18, 18, 18)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(alignPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(fontSizeTF)
-                                    .addComponent(formatTF, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addGap(18, 18, 18)
+                        .addComponent(fillLabelTF, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel2))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(colorPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(alignPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
+                                .addComponent(fontSizeTF, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(formatCB, 0, 1, Short.MAX_VALUE)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -247,26 +244,24 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
                         .addComponent(fontSizeTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(formatTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3))))
+                            .addComponent(jLabel3)
+                            .addComponent(formatCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(15, 15, 15)
+                        .addComponent(jLabel4))
                     .addComponent(alignPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(fillLabelTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(fillLabelTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void fontSizeTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontSizeTFActionPerformed
         update();
     }//GEN-LAST:event_fontSizeTFActionPerformed
-
-    private void formatTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatTFActionPerformed
-        update();
-    }//GEN-LAST:event_formatTFActionPerformed
 
     private void focusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_focusLost
         update();
@@ -276,6 +271,10 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
         update();
     }//GEN-LAST:event_fillLabelTFActionPerformed
 
+    private void formatCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatCBActionPerformed
+        update();
+    }//GEN-LAST:event_formatCBActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel alignPanel;
@@ -283,7 +282,7 @@ public class DigitalStylePanel extends javax.swing.JPanel implements PlotStylePa
     private javax.swing.JPanel colorPanel;
     private javax.swing.JTextField fillLabelTF;
     private javax.swing.JTextField fontSizeTF;
-    private javax.swing.JTextField formatTF;
+    private javax.swing.JComboBox<String> formatCB;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
