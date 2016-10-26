@@ -620,7 +620,12 @@ public class DataSourceController extends DomNodeController {
 
             if ( ds.rank()<=QDataSet.MAX_RANK && DataSetUtil.totalLength(ds) < 200000 && UnitsUtil.isIntervalOrRatioMeasurement(SemanticOps.getUnits(ds)) ) {
                 setStatus("busy: do statistics on the data...");
-                setHistogram(new AutoHistogram().doit(ds, null));
+                try {
+                    setHistogram(new AutoHistogram().doit(ds, null));
+                } catch ( IllegalArgumentException ex ) {
+                    logger.warning("runtime error during histogram usually means invalid data in data set.");
+                    setHistogram(null);
+                }
             } else {
                 setHistogram(null);
             }
