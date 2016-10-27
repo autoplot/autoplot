@@ -375,7 +375,7 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
             int i= s.indexOf(":");
             if ( i==-1 ) i= s.length();
             if ( s.substring(0,i).equals(t) ) {
-                tableComboBox.setSelectedIndex(i);
+                tableComboBox.setSelectedIndex(j);
             }
         }
     }
