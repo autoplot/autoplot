@@ -70,6 +70,7 @@ public class PlotCommand extends PyObject {
             + " <tr><td> ypos    </td><td>override vertical position of plot, eg. '0%+1em,25%-2em', 0 is top\n</td>"
             + " <tr><td> xdrawTickLabels</td><td>False turns off the x tick labels for the plot\n</td>"
             + " <tr><td> ydrawTickLabels</td><td>False turns off the y tick labels for the plot\n</td>"
+            + " <tr><td> xautoRangeHints</td><td>hints to the autorange, see http://autoplot.org/AxisAutoRangeHints\n</td>"
             + "</table></html>");
 
     private static QDataSet coerceIt( PyObject arg0 ) {
@@ -113,6 +114,7 @@ public class PlotCommand extends PyObject {
             "symbol",
             "isotropic", "xpos", "ypos",
             "xdrawTickLabels", "ydrawTickLabels",
+            "xautoRangeHints", "yautoRangeHints", "zautoRangeHints",
             "index"
         },
         new PyObject[] { Py.None, Py.None, Py.None, Py.None,
@@ -129,6 +131,7 @@ public class PlotCommand extends PyObject {
             Py.None,
             Py.None, Py.None, Py.None,
             Py.None, Py.None,
+            Py.None, Py.None, Py.None,
             Py.None
         } );
         
@@ -335,6 +338,12 @@ public class PlotCommand extends PyObject {
                     plot.getXaxis().setDrawTickLabels( "1".equals(sval) );
                 } else if ( kw.equals("ydrawTickLabels") ) {
                     plot.getYaxis().setDrawTickLabels( "1".equals(sval) );
+                } else if ( kw.equals("xautoRangeHints") ) {
+                    plot.getXaxis().setAutoRangeHints( sval );
+                } else if ( kw.equals("yautoRangeHints") ) {
+                    plot.getYaxis().setAutoRangeHints( sval );
+                } else if ( kw.equals("zautoRangeHints") ) {
+                    plot.getZaxis().setAutoRangeHints( sval );
                 }
             }
 
