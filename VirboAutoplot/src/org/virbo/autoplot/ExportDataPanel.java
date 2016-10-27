@@ -32,6 +32,7 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
 
@@ -452,9 +453,12 @@ public class ExportDataPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_formatDLActionPerformed
 
-    private void formatDLItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_formatDLItemStateChanged
-        String ss=  (String) evt.getItem();
-        
+    /**
+     * update the editor options popup.
+     * @param ss the extension, passed to DataSourceRegistry.getInstance().getDataSourceFormatEditorByExt(ss), etc.
+     * @param updateProcessing update the subset, etc.
+     */
+    private void updateEditorPanel( String ss, boolean updateProcessing ) {
         Object oeditorPanel= DataSourceRegistry.getInstance().getDataSourceFormatEditorByExt(ss);
         if ( oeditorPanel!=null ) {
             if ( oeditorPanel instanceof String ) {
@@ -471,7 +475,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
             editorPanel= null;
         }
 
-        if ( evt.getStateChange()==ItemEvent.SELECTED ) {
+        if (  updateProcessing ) {
             DataSourceFormat form= DataSourceRegistry.getInstance().getFormatByExt(ss);
             if ( form!=null ) {
                 originalDataB.setEnabled( originalDataSet!=null && form.canFormat( originalDataSet ) );
@@ -494,7 +498,11 @@ public class ExportDataPanel extends javax.swing.JPanel {
             additionalOptionsButton.setEnabled( editorPanel!=null );
         }
         
-
+    }
+    
+    private void formatDLItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_formatDLItemStateChanged
+        String ss=  (String) evt.getItem();
+        updateEditorPanel(ss,evt.getStateChange()==ItemEvent.SELECTED);
     }//GEN-LAST:event_formatDLItemStateChanged
 
     private void additionalOptionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_additionalOptionsButtonActionPerformed
@@ -547,6 +555,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
         if ( editorPanel!=null ) {
             editorPanel.setURI(currentFileString);
         }
+        updateEditorPanel( currentFileString, true );
     }
 
     /**

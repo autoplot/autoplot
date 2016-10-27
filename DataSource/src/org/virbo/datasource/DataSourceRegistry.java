@@ -715,11 +715,11 @@ public class DataSourceRegistry {
      * @return
      */
     public synchronized Object getDataSourceEditorByExt( String ext ) {
-        return this.dataSourceEditorByExt.get(ext);
+        return this.dataSourceEditorByExt.get(getExtension(ext));
     }
 
     public synchronized Object getDataSourceFormatEditorByExt( String ext ) {
-        return this.dataSourceFormatEditorByExt.get(ext);
+        return this.dataSourceFormatEditorByExt.get(getExtension(ext));
     }
 
     /**
