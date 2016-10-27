@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.jythonsupport.ui;
 
 import java.awt.Dimension;
@@ -156,19 +153,23 @@ public class ParametersFormPanel {
             char type= fd.typesList.get(j);
 
             if ( !value.equals(deft) || params.containsKey(name) ) {
-                if ( type=='A' ) {
-                    value= value.replaceAll("\'", "");
-                    if ( !( value.startsWith("'") && value.endsWith("'") ) ) {
-                        value=  "'" + value + "'";
-                    }
-                    params.put( name, value );
-                } else if ( type=='R' ) {
-                    if ( !( value.startsWith("'") && value.endsWith("'") ) ) {
-                        value=  "'" + value + "'";
-                    }
-                    params.put( name, value );
-                } else {
-                    params.put( name, value );
+                switch (type) {
+                    case 'A':
+                        value= value.replaceAll("\'", "");
+                        if ( !( value.startsWith("'") && value.endsWith("'") ) ) {
+                            value=  "'" + value + "'";
+                        }   
+                        params.put( name, value );
+                        break;
+                    case 'R':
+                        if ( !( value.startsWith("'") && value.endsWith("'") ) ) {
+                            value=  "'" + value + "'";
+                        }   
+                        params.put( name, value );
+                        break;
+                    default:
+                        params.put( name, value );
+                        break;
                 }
             }
         }
@@ -325,177 +326,169 @@ public class ParametersFormPanel {
                 valuePanel.setLayout( new BoxLayout( valuePanel, BoxLayout.X_AXIS ) );
                 if ( !isBool ) valuePanel.add( getSpacer() );
 
-                if ( parm.type=='R' ) {
-
-                    String val= params.get(vname);
-                    if ( val!=null ) {
-                        if ( val.startsWith("'") ) val= val.substring(1);
-                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
-                    } else {
-                        val= String.valueOf( parm.deft );
-                        params.put( vname, val );
-                    }
-
-                    final String fval= val;
-
-                    final DataSetSelector sel= new DataSetSelector();
-                    sel.setHidePlayButton(true);
-                    sel.setSuggestFiles(true);
-
-                    final JTextField tf= new JTextField();
-                    Dimension x= tf.getPreferredSize();
-                    x.width= Integer.MAX_VALUE;
-                    tf.setMaximumSize(x);
-                    tf.setUI( tf.getUI() ); // kludge to maybe avoid deadlock.
-
-                    Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/virbo/datasource/jython/file2.png"));
-                    JButton filesButton= new JButton( fileIcon );
-                    filesButton.addActionListener( new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            JFileChooser c= new JFileChooser();
-                            URISplit split2= URISplit.parse(fval);
-                            if ( split2.scheme.equals("file") ) {
-                                c.setSelectedFile( new File( split2.file.substring(7)) );
-                            }
-                            int r= c.showOpenDialog( paramsPanel );
-                            if ( r==JFileChooser.APPROVE_OPTION) {
-                                tf.setText("file://"+c.getSelectedFile().toString());
-                            }
-                        }
-                    });
-                    tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-
-                    tf.setText( val );
-                    ctf= tf;
-                    valuePanel.add( ctf );
-                    filesButton.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                    valuePanel.add( filesButton );
-                    
-                } else if ( parm.type=='U' ) {
-                    final DataSetSelector sel= new DataSetSelector();
-                    sel.setPlotItButtonVisible(false);
-                    String val;
-                    if (params.get(vname)!=null ) {
-                        val= params.get(vname);
-                        if ( val.startsWith("'") ) val= val.substring(1);
-                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
-                    } else {
-                        val= String.valueOf( parm.deft );
-                        params.put( vname, val );
-                    }
-                    sel.setRecent( DataSetSelector.getDefaultRecent() );
-                    sel.setValue( val );
-                    
-                    valuePanel.add( getSpacer(7) );  // kludge.  Set on Jeremy's home Ubuntu
-                    valuePanel.add( sel );
-                    sel.setValue( val );
-                    valuePanel.add( getSpacer(10) ); // put a little space in after the selector as well.
-                            
-                    ctf= sel;
-                    
-                } else if ( parm.type=='T' ) {
-                    String val;
-                    if ( params.get(vname)!=null ) {
-                        val= params.get(vname);
-                        if ( val.startsWith("'") ) val= val.substring(1);
-                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
-                    } else {
-                        val= String.valueOf( parm.deft );
-                        params.put( vname, val );
-                    }
-                    final JTextField tf= new JTextField();
-                    Dimension x= tf.getPreferredSize();
-                    x.width= Integer.MAX_VALUE;
-                    tf.setMaximumSize(x);
-                    tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-
-                    tf.setText( val );
-                    ctf= tf;
-                    
-                    Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/virbo/datasource/calendar.png"));
-                    JButton button= new JButton( fileIcon );
-                    button.addActionListener( new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            TimeRangeTool tt= new TimeRangeTool();
-                            tt.setSelectedRange(tf.getText());
-                            int r= WindowManager.showConfirmDialog( paramsPanel, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
-                            if ( r==JOptionPane.OK_OPTION) {
-                                tf.setText(tt.getSelectedRange());
-                            }
-                        }
-                    });
-                    button.setToolTipText("Time Range Tool");
-                    valuePanel.add( ctf );
-                    button.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                    valuePanel.add( button );
-                    
-                } else {
-                    String val;
-                    if ( params.get(vname)!=null ) {
-                        val= params.get(vname);
-                        if ( val.startsWith("'") ) val= val.substring(1);
-                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
-                    } else {
-                        val= String.valueOf( parm.deft );
-                        params.put( vname, val );
-                    }
-                    if ( parm.enums!=null && parm.enums.size()>0 ) {
-                        if ( isBoolean( parm.enums ) ) {
-                            JCheckBox jcb= new JCheckBox( label );
-                            jcb.setSelected( val.equals("T") );
-                            jcb.addActionListener( new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
-                                }
-                            });
-                            ctf= jcb;
-                        } else {
-                            JComboBox jcb= new JComboBox(parm.enums.toArray());
-                            jcb.setEditable(false);
-                            Object oval;
-                            if ( parm.deft instanceof Long ) {
-                                oval = Long.valueOf(val);
-                            } else if ( parm.deft instanceof Integer ) {
-                                oval = Integer.valueOf(val);
-                            } else if ( parm.deft instanceof Double ) {
-                                oval = Double.valueOf(val);
-                            } else if ( parm.deft instanceof Float ) {
-                                oval = Float.valueOf(val);
+                switch (parm.type) {
+                    case 'R':
+                        {
+                            String val= params.get(vname);
+                            if ( val!=null ) {
+                                if ( val.startsWith("'") ) val= val.substring(1);
+                                if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
                             } else {
-                                oval = val;
-                            }
-                            jcb.setSelectedItem(oval);
-                            if ( !jcb.getSelectedItem().equals(oval) ) {
-                                logger.fine("uh-oh.");
-                            }
-                            ctf= jcb;
-                            jcb.addActionListener( new ActionListener() {
+                                val= String.valueOf( parm.deft );
+                                params.put( vname, val );
+                            }       final String fval= val;
+                            final DataSetSelector sel= new DataSetSelector();
+                            sel.setHidePlayButton(true);
+                            sel.setSuggestFiles(true);
+                            final JTextField tf= new JTextField();
+                            Dimension x= tf.getPreferredSize();
+                            x.width= Integer.MAX_VALUE;
+                            tf.setMaximumSize(x);
+                            tf.setUI( tf.getUI() ); // kludge to maybe avoid deadlock.
+                            Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/virbo/datasource/jython/file2.png"));
+                            JButton filesButton= new JButton( fileIcon );
+                            filesButton.addActionListener( new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
+                                    JFileChooser c= new JFileChooser();
+                                    URISplit split2= URISplit.parse(fval);
+                                    if ( split2.scheme.equals("file") ) {
+                                        c.setSelectedFile( new File( split2.file.substring(7)) );
+                                    }
+                                    int r= c.showOpenDialog( paramsPanel );
+                                    if ( r==JFileChooser.APPROVE_OPTION) {
+                                        tf.setText("file://"+c.getSelectedFile().toString());
+                                    }
                                 }
-                            });
-                            Dimension x= ctf.getPreferredSize();
-                            x.width= Integer.MAX_VALUE;
-                            ctf.setMaximumSize(x);
-                            ctf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                            });     tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                            tf.setText( val );
+                            ctf= tf;
+                            valuePanel.add( ctf );
+                            filesButton.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                            valuePanel.add( filesButton );
+                            break;
                         }
-
-                    } else {
-                        JTextField tf= new JTextField();
-                        Dimension x= tf.getPreferredSize();
-                        x.width= Integer.MAX_VALUE;
-                        tf.setMaximumSize(x);
-                        tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-
-                        tf.setText( val );
-                        ctf= tf;
-                    }
-                    
-                    valuePanel.add( ctf );
+                    case 'U':
+                        {
+                            final DataSetSelector sel= new DataSetSelector();
+                            sel.setPlotItButtonVisible(false);
+                            String val;
+                            if (params.get(vname)!=null ) {
+                                val= params.get(vname);
+                                if ( val.startsWith("'") ) val= val.substring(1);
+                                if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                            } else {
+                                val= String.valueOf( parm.deft );
+                                params.put( vname, val );
+                            }       sel.setRecent( DataSetSelector.getDefaultRecent() );
+                            sel.setValue( val );
+                            valuePanel.add( getSpacer(7) );  // kludge.  Set on Jeremy's home Ubuntu
+                            valuePanel.add( sel );
+                            sel.setValue( val );
+                            valuePanel.add( getSpacer(10) ); // put a little space in after the selector as well.
+                            ctf= sel;
+                            break;
+                        }
+                    case 'T':
+                        {
+                            String val;
+                            if ( params.get(vname)!=null ) {
+                                val= params.get(vname);
+                                if ( val.startsWith("'") ) val= val.substring(1);
+                                if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                            } else {
+                                val= String.valueOf( parm.deft );
+                                params.put( vname, val );
+                            }       final JTextField tf= new JTextField();
+                            Dimension x= tf.getPreferredSize();
+                            x.width= Integer.MAX_VALUE;
+                            tf.setMaximumSize(x);
+                            tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                            tf.setText( val );
+                            ctf= tf;
+                            Icon fileIcon= new javax.swing.ImageIcon( Util.class.getResource("/org/virbo/datasource/calendar.png"));
+                            JButton button= new JButton( fileIcon );
+                            button.addActionListener( new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    TimeRangeTool tt= new TimeRangeTool();
+                                    tt.setSelectedRange(tf.getText());
+                                    int r= WindowManager.showConfirmDialog( paramsPanel, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
+                                    if ( r==JOptionPane.OK_OPTION) {
+                                        tf.setText(tt.getSelectedRange());
+                                    }
+                                }
+                            });     button.setToolTipText("Time Range Tool");
+                            valuePanel.add( ctf );
+                            button.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                            valuePanel.add( button );
+                            break;
+                        }
+                    default:
+                        {
+                            String val;
+                            if ( params.get(vname)!=null ) {
+                                val= params.get(vname);
+                                if ( val.startsWith("'") ) val= val.substring(1);
+                                if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                            } else {
+                                val= String.valueOf( parm.deft );
+                                params.put( vname, val );
+                            }       if ( parm.enums!=null && parm.enums.size()>0 ) {
+                                if ( isBoolean( parm.enums ) ) {
+                                    JCheckBox jcb= new JCheckBox( label );
+                                    jcb.setSelected( val.equals("T") );
+                                    jcb.addActionListener( new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
+                                        }
+                                    });
+                                    ctf= jcb;
+                                } else {
+                                    JComboBox jcb= new JComboBox(parm.enums.toArray());
+                                    jcb.setEditable(false);
+                                    Object oval;
+                                    if ( parm.deft instanceof Long ) {
+                                        oval = Long.valueOf(val);
+                                    } else if ( parm.deft instanceof Integer ) {
+                                        oval = Integer.valueOf(val);
+                                    } else if ( parm.deft instanceof Double ) {
+                                        oval = Double.valueOf(val);
+                                    } else if ( parm.deft instanceof Float ) {
+                                        oval = Float.valueOf(val);
+                                    } else {
+                                        oval = val;
+                                    }
+                                    jcb.setSelectedItem(oval);
+                                    if ( !jcb.getSelectedItem().equals(oval) ) {
+                                        logger.fine("uh-oh.");
+                                    }
+                                    ctf= jcb;
+                                    jcb.addActionListener( new ActionListener() {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            redoVariables( env, src, ParametersFormPanel.this.params, zparamsPanel );
+                                        }
+                                    });
+                                    Dimension x= ctf.getPreferredSize();
+                                    x.width= Integer.MAX_VALUE;
+                                    ctf.setMaximumSize(x);
+                                    ctf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                                }
+                                
+                            } else {
+                                JTextField tf= new JTextField();
+                                Dimension x= tf.getPreferredSize();
+                                x.width= Integer.MAX_VALUE;
+                                tf.setMaximumSize(x);
+                                tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                                
+                                tf.setText( val );
+                                ctf= tf;
+                            }       valuePanel.add( ctf );
+                            break;
+                        }
                 }
 
                 boolean shortLabel= ( parm.type=='R' || String.valueOf(parm.deft).length()>22 ) ;
