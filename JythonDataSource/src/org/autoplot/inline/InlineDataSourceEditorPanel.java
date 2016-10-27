@@ -20,8 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.util.LoggerManager;
@@ -433,14 +431,21 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         examples.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if ( examples.getSelectedIndex()==0 ) {
-                    tf1.setText(t1);
-                } else if ( examples.getSelectedIndex()==1 ) {
-                    tf1.setText(t2);
-                } else if ( examples.getSelectedIndex()==2 ) {
-                    tf1.setText(t3);
-                } else if ( examples.getSelectedIndex()==3 ) {
-                    tf1.setText(t4);
+                switch (examples.getSelectedIndex()) {
+                    case 0:
+                        tf1.setText(t1);
+                        break;
+                    case 1:
+                        tf1.setText(t2);
+                        break;
+                    case 2:
+                        tf1.setText(t3);
+                        break;
+                    case 3:
+                        tf1.setText(t4);
+                        break;
+                    default:
+                        break;
                 }
             }
         } );
@@ -642,11 +647,6 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         TableModel ltm= tm;
         initComponents();
 
-        if ( false && !"true".equals( System.getProperty("enableDashup") ) ) {
-            jTabbedPane1.remove(2); // remove dashup tab
-            mashupUri= null;
-        }
-        
         if ( program!=null ) {
             editorTextPane1.setContentType("text/python");
             editorTextPane1.setText(program);
@@ -667,6 +667,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
         } else if ( mashupUri!=null ) {
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     dataMashUp1.setAsJythonInline(mashupUri);
                 }
@@ -686,46 +687,51 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     @Override
     public String getURI() {
-        if ( jTabbedPane1.getSelectedIndex()==0 ) {
-            StringBuilder s= new StringBuilder( "vap+inline:" );
-            if ( scheme==SCHEME_EVENT_LIST_COLORS ) {
-                for ( int i=0; i<tm.getRowCount(); i++ ) {
-                    if ( i==0 ) {
-                        s.append( String.format( "ds=createEvent('%s/%s',%s,'%s')", tm.getValueAt(i,0), tm.getValueAt(i,1),  tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
-                    } else {
-                        s.append( String.format( "&ds=createEvent(ds,'%s/%s',%s,'%s')", tm.getValueAt(i,0), tm.getValueAt(i,1),  tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
-                    }
-                }
-                s.append("&ds");
-            } else {
-                for ( int i=0; i<tm.getRowCount(); i++ ) {
-                    if ( tm.getColumnCount()>1 ) {
-                        for ( int j=0; j<tm.getColumnCount();j++ ) {
-                            if ( j>0 ) s.append(",");
-                            s.append(tm.getValueAt(i,j));
+        switch (jTabbedPane1.getSelectedIndex()) {
+            case 0:
+            {
+                StringBuilder s= new StringBuilder( "vap+inline:" );
+                if ( scheme.equals(SCHEME_EVENT_LIST_COLORS) ) {
+                    for ( int i=0; i<tm.getRowCount(); i++ ) {
+                        if ( i==0 ) {
+                            s.append( String.format( "ds=createEvent('%s/%s',%s,'%s')", tm.getValueAt(i,0), tm.getValueAt(i,1),  tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
+                        } else {
+                            s.append( String.format( "&ds=createEvent(ds,'%s/%s',%s,'%s')", tm.getValueAt(i,0), tm.getValueAt(i,1),  tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
                         }
-                        s.append(";");
-                    } else {
-                        if ( i>0 ) s.append(",");
-                        s.append(tm.getValueAt(i,0));
+                    }
+                    s.append("&ds");
+                } else {
+                    for ( int i=0; i<tm.getRowCount(); i++ ) {
+                        if ( tm.getColumnCount()>1 ) {
+                            for ( int j=0; j<tm.getColumnCount();j++ ) {
+                                if ( j>0 ) s.append(",");
+                                s.append(tm.getValueAt(i,j));
+                            }
+                            s.append(";");
+                        } else {
+                            if ( i>0 ) s.append(",");
+                            s.append(tm.getValueAt(i,0));
+                        }
                     }
                 }
+                if ( tm.getColumnCount()==1 ) {
+                    s.append("&RENDER_TYPE=eventsBar");
+                }
+                return s.toString();
             }
-            if ( tm.getColumnCount()==1 ) {
-                s.append("&RENDER_TYPE=eventsBar");
+            case 1:
+            {
+                StringBuilder s= new StringBuilder( "vap+inline:" );
+                String t= editorTextPane1.getText();
+                String[] ss= t.split("\n");
+                for ( int i=0; i<ss.length; i++ ) {
+                    if ( i>0 ) s.append("&");
+                    s.append(ss[i]);
+                }
+                return s.toString();
             }
-            return s.toString();
-        } else if ( jTabbedPane1.getSelectedIndex()==1 ) {
-            StringBuilder s= new StringBuilder( "vap+inline:" );
-            String t= editorTextPane1.getText();
-            String[] ss= t.split("\n");
-            for ( int i=0; i<ss.length; i++ ) {
-                if ( i>0 ) s.append("&");
-                s.append(ss[i]);
-            }
-            return s.toString();
-        } else {
-            return dataMashUp1.getAsJythonInline();
+            default:
+                return dataMashUp1.getAsJythonInline();
         }
     }
     
