@@ -608,7 +608,12 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             table.setRowHeight( cellHeight );
 
         } else if ( mashupUri!=null ) {
-            dataMashUp1.setAsJythonInline(mashupUri);
+            Runnable run= new Runnable() {
+                public void run() {
+                    dataMashUp1.setAsJythonInline(mashupUri);
+                }
+            };
+            new Thread( run ).start();
             if ( needTimeRange ) {
                 dataMashUp1.enableTimeRange();
             }
