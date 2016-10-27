@@ -42,8 +42,9 @@ public class MoveCacheDialog extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         newDir = new javax.swing.JTextField();
         pickButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
 
-        jLabel1.setText("From:");
+        jLabel1.setText("From current location, which is:");
 
         oldDir.setEditable(false);
         oldDir.setText("jTextField1");
@@ -59,28 +60,34 @@ public class MoveCacheDialog extends javax.swing.JPanel {
             }
         });
 
+        jLabel3.setText("<html>This will permanently move the files found in the data cache to the new folder.  For example, this can be used to move data to a larger disk.  The disk should be local to the machine Autoplot runs on for optimal performance.");
+        jLabel3.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 400, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(oldDir, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                    .add(jLabel1)
-                    .add(jLabel2)
+                    .add(oldDir)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(newDir, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
+                        .add(newDir, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 358, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(pickButton)))
+                        .add(pickButton))
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel2)
+                            .add(jLabel1))
+                        .add(0, 0, Short.MAX_VALUE))
+                    .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 130, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
+                .add(jLabel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 74, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(oldDir, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -107,6 +114,7 @@ public class MoveCacheDialog extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JTextField newDir;
     private javax.swing.JTextField oldDir;
     private javax.swing.JButton pickButton;

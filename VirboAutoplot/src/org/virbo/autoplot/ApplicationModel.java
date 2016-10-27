@@ -1231,7 +1231,7 @@ public class ApplicationModel {
         ProgressMonitor mon1= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(getCanvas()), "Moving Cache..." );
         mon1.started();
         
-        boolean y= Util.copyFileTree( local, n );
+        boolean y= Util.copyFileTree( local, n, 0, mon1 );
         mon1.finished();
         if ( y ) {
             //y= Util.deleteFileTree(local);

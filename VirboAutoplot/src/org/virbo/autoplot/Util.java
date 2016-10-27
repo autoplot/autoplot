@@ -29,6 +29,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.AboutUtil;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -203,6 +205,29 @@ public class Util {
      * @return true if successful.
      */
     public static boolean copyFileTree( File root, File dst ) {
+        return copyFileTree(root, dst, 0, new NullProgressMonitor() );
+    }
+
+    /**
+     * copy a branch of files and folders.
+     * @param root root folder.
+     * @param dst destination folder.
+     * @param mon progress monitor, or null.
+     * @return true if successful.
+     */
+    public static boolean copyFileTree( File root, File dst, ProgressMonitor mon ) {
+        return copyFileTree(root, dst, 0, mon );
+    }
+    
+    /**
+     * copy a branch of files and folders.
+     * @param root root folder.
+     * @param dst destination folder.
+     * @param depth so that progress depth can be limited.
+     * @param mon progress monitor, or null.
+     * @return true if successful.
+     */
+    public static boolean copyFileTree( File root, File dst, int depth, ProgressMonitor mon ) {
         try {
             String roots= root.getCanonicalPath()+"/";
             String dsts= dst.getCanonicalPath()+"/";
@@ -227,24 +252,38 @@ public class Util {
         if ( !dst.exists() && !dst.mkdirs() ) {
             throw new IllegalArgumentException( "unable to make directory "+dst );
         }
-        for (int i = 0; i < children.length; i++) {
-            if (children[i].isDirectory()) {
-                success = success && copyFileTree( children[i],new File(dst,children[i].getName()) );
+        
+        if ( mon!=null ) mon.setTaskSize(children.length*10);
+        int i=0;
+        for (File child : children) {
+            if ( mon!=null ) {
+                mon.setTaskProgress(i);
+                if ( mon.isCancelled() ) return false;
+            }
+            if (child.isDirectory()) {
+                if ( depth<3 && mon!=null ) {
+                    success = success && copyFileTree( child, new File(dst, child.getName()), depth+1, 
+                            mon.getSubtaskMonitor(i*10,(i+1)*10,child.getName()));
+                } else {
+                    success = success && copyFileTree( child, new File(dst, child.getName()), depth+1, 
+                            null );
+                }
                 if (!success) {
-                    copyFileTree( children[i],new File(dst,children[i].getName()) );
-                    throw new IllegalArgumentException("unable to move file " + children[i]);
+                    copyFileTree(child, new File(dst, child.getName()));
+                    throw new IllegalArgumentException("unable to move file " + child);
                 }
             } else {
                 try {
-                    success = success && Util.copyFile( children[i], new File( dst, children[i].getName() ) );
+                    success = success && Util.copyFile(child, new File(dst, child.getName()));
                     if (!success) {
-                        throw new IllegalArgumentException("unable to move file " + children[i]);
+                        throw new IllegalArgumentException("unable to move file " + child);
                     }
-                } catch ( IOException ex ) {
-                    IllegalArgumentException ex2= new IllegalArgumentException("unable to move file " + children[i],ex);
+                } catch (IOException ex) {
+                    IllegalArgumentException ex2 = new IllegalArgumentException("unable to move file " + child, ex);
                     throw ex2;
                 }
             }
+            i=i+1;
         }
         return success;
     }
