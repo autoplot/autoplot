@@ -407,6 +407,9 @@
                       <Dimension value="[100, 100]"/>
                     </Property>
                   </Properties>
+                  <Events>
+                    <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="namedURIListTool1FocusLost"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>

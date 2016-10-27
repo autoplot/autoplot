@@ -149,6 +149,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jTree1.treeDidChange();
         jTree1.revalidate();
         jTree1.repaint();
+        checkForTSB();
     }
 
     /**
@@ -965,6 +966,11 @@ public class DataMashUp extends javax.swing.JPanel {
         jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.Y_AXIS));
 
         namedURIListTool1.setMinimumSize(new java.awt.Dimension(100, 100));
+        namedURIListTool1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                namedURIListTool1FocusLost(evt);
+            }
+        });
         jPanel2.add(namedURIListTool1);
 
         jScrollPane1.setViewportView(jPanel2);
@@ -1106,6 +1112,50 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_deleteItemsMenuItemActionPerformed
 
+    private void namedURIListTool1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_namedURIListTool1FocusLost
+        // check for TSB when a TSB URI is found.
+        checkForTSB();
+    }//GEN-LAST:event_namedURIListTool1FocusLost
+
+    private void checkForTSB() {
+        String[] suris= namedURIListTool1.getUris();
+        String timerange= null;
+        for ( String suri: suris ) {
+            URI uri;
+            try {
+                uri= new URI(suri);
+            } catch (URISyntaxException ex) {
+                uri= null;
+            }
+            if ( uri!=null ) {
+                try {
+                    DataSourceFactory dsf= DataSetURI.getDataSourceFactory(uri,new NullProgressMonitor());
+                    if ( dsf!=null ) {
+                        try {
+                            DataSource dss= dsf.getDataSource(new URI(suri));
+                            TimeSeriesBrowse tsb= dss.getCapability( TimeSeriesBrowse.class );
+                            if ( tsb!=null ) {
+                                timerange= tsb.getTimeRange().toString();
+                            }
+                        } catch (Exception ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                    }
+                } catch (IOException | IllegalArgumentException | URISyntaxException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        if ( timerange!=null ) {
+            timeRangeTextField.setEnabled(true);
+            timeRangeLabel.setEnabled(true);
+            timeRangeTextField.setText( timerange );
+        } else {
+            timeRangeTextField.setEnabled(false);
+            timeRangeLabel.setEnabled(false);
+        }
+    }
+    
     private void removeFromScratch( int index ) {
         ListModel lm= scratchList.getModel();
         DefaultListModel dlm;
