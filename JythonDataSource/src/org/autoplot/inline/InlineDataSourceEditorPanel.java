@@ -20,6 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.util.LoggerManager;
@@ -47,6 +49,12 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     public InlineDataSourceEditorPanel() {
     }
 
+    private static final String SCHEME_EVENT_LIST= "eventList";
+    private static final String SCHEME_Y_VS_T= "y_vs_t";
+    private static final String SCHEME_EVENT_LIST_COLORS= "eventListColors";
+    
+    private String scheme= SCHEME_EVENT_LIST;
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -82,7 +90,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             }
         });
 
-        schemeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Event List", "Y(X)" }));
+        schemeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Event List", "Event List w/Colors", "Y(X)" }));
         schemeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 schemeComboBoxActionPerformed(evt);
@@ -203,7 +211,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(examplesButton)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("jython", jPanel2);
@@ -212,7 +220,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(dataMashUp1, javax.swing.GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE)
+            .addComponent(dataMashUp1, javax.swing.GroupLayout.PREFERRED_SIZE, 616, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -233,17 +241,50 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private static ComboBoxModel getExamplesComboBoxModel( int icol ) {
-        if ( icol==0 ) {
-            return new DefaultComboBoxModel( new String[] { 
-                "2014-01-01T01:01Z",
-                "2014-01-01T01:01:01.000Z",
-                "1.23"
-            } );
+    private static ComboBoxModel getExamplesComboBoxModel( int icol, String scheme ) {
+        if ( scheme.equals(SCHEME_EVENT_LIST_COLORS) ) {
+            ComboBoxModel m;
+            switch ( icol ) {
+                case 0:
+                    m= new DefaultComboBoxModel( new String[] { 
+                        "2014-01-01T01:01Z",
+                        "2014-01-01T01:01:01.000Z",
+                    } );
+                    break;
+                case 1:
+                    m= new DefaultComboBoxModel( new String[] { 
+                        "2014-01-01T01:01Z",
+                        "2014-01-01T01:01:01.000Z",
+                    } );
+                    break;
+                case 2:
+                    m= new DefaultComboBoxModel( new String[] {
+                        "0x000000", "0xA0A0A0", "0xFFFFFF", "0xFF0000", "0x00FF00", "0x0000FF" 
+                    } );
+                    break;
+                case 3:
+                    m= new DefaultComboBoxModel( new String[] { 
+                        "okay",
+                        "error",
+                    } );
+                    break;
+                default:
+                    throw new IllegalArgumentException("bad column.");
+            }
+            return m;
+                
         } else {
-            return new DefaultComboBoxModel( new String[] {
-                "1.23"
-            });
+            if ( icol==0 ) {
+                return new DefaultComboBoxModel( new String[] { 
+                    "2014-01-01T01:01Z",
+                    "2014-01-01T01:01:01.000Z",
+                    "1.23"
+                } );            
+            } else {
+                return new DefaultComboBoxModel( new String[] {
+                    "1.23"
+                });
+            }
         }
     }
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
@@ -254,7 +295,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         for ( int i=0; i<tm.getColumnCount(); i++ ) {  // load up the last record so it can be edited to make new record
             JComboBox cb1= new JComboBox();
             cb1.setToolTipText("Examples");
-            cb1.setModel( getExamplesComboBoxModel( i ) );
+            cb1.setModel( getExamplesComboBoxModel( i, scheme ) );
             cb1.setEditable(true);
             JTextField tf1= ((JTextField)cb1.getEditor().getEditorComponent());
             tf1.setColumns(20);
@@ -353,12 +394,24 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     }//GEN-LAST:event_jTabbedPane1StateChanged
 
     private void initializeScheme() {
-        if ( schemeComboBox.getSelectedIndex()==0 ) {
-            tm= toTableModel( new String[0] );
-            directionsLabel.setText("<html><i>Enter a list of times or points</i></html>");
-        } else if ( schemeComboBox.getSelectedIndex()==1 ) {
-            tm= toTableModel( 0, 2 );
-            directionsLabel.setText("<html><i>Enter a list X and Y values</i></html>");
+        switch ( schemeComboBox.getSelectedIndex() ) {
+            case 0:
+                tm= toTableModel( new String[0] );
+                directionsLabel.setText("<html><i>Enter a list of times or points</i></html>");
+                scheme= SCHEME_EVENT_LIST;
+                break;
+            case 1:
+                tm= toTableModel( 0, 4 );
+                directionsLabel.setText("<html><i>Enter a list of times, colors, and labels</i></html>");
+                scheme= SCHEME_EVENT_LIST_COLORS;
+                break;
+            case 2:
+                tm= toTableModel( 0, 2 );
+                directionsLabel.setText("<html><i>Enter a list X and Y values</i></html>");
+                scheme= SCHEME_Y_VS_T;
+                break;
+            default:
+                throw new IllegalArgumentException("whoops");
         }
         table.setModel( tm );
     }
@@ -510,34 +563,39 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         return tm;
     }
     
+    /**
+     * create one-column table.
+     * @param s array of all the values.
+     * @return 
+     */
     private static TableModel toTableModel( final String[] s ) {
-         TableModel   tm= new AbstractTableModel() {
+         TableModel tm= new AbstractTableModel() {
 
-                @Override
-                public int getRowCount() {
-                    return s.length;
-                }
+            @Override
+            public int getRowCount() {
+                return s.length;
+            }
 
-                @Override
-                public int getColumnCount() {
-                    return 1;
-                }
+            @Override
+            public int getColumnCount() {
+                return 1;
+            }
 
-                @Override
-                public Object getValueAt(int rowIndex, int columnIndex) {
-                    return s[rowIndex];
-                }
-                
-                @Override
-                public boolean isCellEditable( int row, int col ) {
-                    return true;
-                }
-                
-                @Override
-                public void setValueAt( Object v, int row, int col ) {
-                    s[row]= String.valueOf(v).replaceAll(",","");
-                }
-            };
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                return s[rowIndex];
+            }
+
+            @Override
+            public boolean isCellEditable( int row, int col ) {
+                return true;
+            }
+
+            @Override
+            public void setValueAt( Object v, int row, int col ) {
+                s[row]= String.valueOf(v).replaceAll(",","");
+            }
+        };
         return tm;
     }
     
@@ -630,16 +688,27 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     public String getURI() {
         if ( jTabbedPane1.getSelectedIndex()==0 ) {
             StringBuilder s= new StringBuilder( "vap+inline:" );
-            for ( int i=0; i<tm.getRowCount(); i++ ) {
-                if ( tm.getColumnCount()>1 ) {
-                    for ( int j=0; j<tm.getColumnCount();j++ ) {
-                        if ( j>0 ) s.append(",");
-                        s.append(tm.getValueAt(i,j));
+            if ( scheme==SCHEME_EVENT_LIST_COLORS ) {
+                for ( int i=0; i<tm.getRowCount(); i++ ) {
+                    if ( i==0 ) {
+                        s.append( String.format( "ds=createEvent('%s/%s',%s,'%s')", tm.getValueAt(i,0), tm.getValueAt(i,1),  tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
+                    } else {
+                        s.append( String.format( "&ds=createEvent(ds,'%s/%s',%s,'%s')", tm.getValueAt(i,0), tm.getValueAt(i,1),  tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
                     }
-                    s.append(";");
-                } else {
-                    if ( i>0 ) s.append(",");
-                    s.append(tm.getValueAt(i,0));
+                }
+                s.append("&ds");
+            } else {
+                for ( int i=0; i<tm.getRowCount(); i++ ) {
+                    if ( tm.getColumnCount()>1 ) {
+                        for ( int j=0; j<tm.getColumnCount();j++ ) {
+                            if ( j>0 ) s.append(",");
+                            s.append(tm.getValueAt(i,j));
+                        }
+                        s.append(";");
+                    } else {
+                        if ( i>0 ) s.append(",");
+                        s.append(tm.getValueAt(i,0));
+                    }
                 }
             }
             if ( tm.getColumnCount()==1 ) {
