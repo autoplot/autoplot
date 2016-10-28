@@ -56,7 +56,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
-            List<CompletionContext> result = new ArrayList<CompletionContext>();
+            List<CompletionContext> result = new ArrayList<>();
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "skipLines=", "the number of lines to skip before attempting to parse"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recCount=", "the number of records to read in"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column=", "the column to read in"));
@@ -102,7 +102,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             if (paramName.equals("skip") || paramName.equals("skipLines")) {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "the number of lines to skip before attempting to parse."));
             } else if ( paramName.equals("headerDelim") ) {
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<string>" ) );
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "#####" ));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "DATA_UNTIL", "Cluster CEF uses these"));
@@ -110,7 +110,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             } else if (paramName.equals("recCount")) {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "limit number of records to parse."));
             } else if (paramName.equals("rank2")) {
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns"));
@@ -118,7 +118,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, ":", "all columns"));
                 return result;
             } else if (paramName.equals("bundle")) {
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "Bx-Bz", "three named columns"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
@@ -126,18 +126,18 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns"));
                 return result;
             } else if (paramName.equals("depend1Labels")) {
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "labels for each column"));
                 return result;
             } else if (paramName.equals("depend1Values")) {
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "values for each column"));
                 return result;
             } else if (paramName.equals("column")) {
                 List<CompletionContext> result = getFieldNames(cc, mon);
                 return result;
             } else if (paramName.equals("units")) {
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "nT", "units for the data"));
                 return result;
             } else if (paramName.equals("fixedColumns")) {
@@ -146,7 +146,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 List<CompletionContext> result = getFieldNames(cc, mon);
                 return result;
             } else if (paramName.equals("intervalTag")) {
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "start","tag values indicate the start of measurement interval"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "center", "tag values indicate the start of measurement interval."));
                 return result;
@@ -154,12 +154,12 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 List<CompletionContext> result = getFieldNames(cc, mon);
                 return result;
             } else if (paramName.equals("depend0Units")) {
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ms", "units for the x tags"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "hours+since+2015-01-01T00:00", "units for the x tags"));
                 return result;
             } else if (paramName.equals("timeFormat")) {
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "$Y+$j+$H+$M","times can span multiple fields"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ISO8601", "parse ISO8601 times in one field."));
                 return result;
@@ -176,7 +176,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 if ( result.size()>2 ) result= result.subList( 2, result.size() );
                 return result;
             } else if (paramName.equals("where")) { // TODO: a fun project would be to make completions for this that look in the file...
-                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                List<CompletionContext> result = new ArrayList<>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field17.gt(1)","where the double value in field17 is greater than 17 "));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field5.eq(off)", "where the nominal data in field5 is equal to \"off\""));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field0.le(2000-01-01T00:00)", "where the nominal data in field5 is equal to \"off\""));
@@ -258,7 +258,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
 
         if ( params.containsKey("eventListColumn") ) {
             int i= parser.getFieldIndex(params.get("eventListColumn"));
-            if ( i!=-1 ) parser.setUnits( i, new EnumerationUnits("events") );;
+            if ( i!=-1 ) parser.setUnits( i, new EnumerationUnits("events") );
         }
         String line= parser.readFirstParseableRecord(file.toString());
         if ( line==null ) {
@@ -270,7 +270,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         dp.splitRecord( line, fields );
 
         String[] columns = parser.getFieldNames();
-        List<CompletionContext> result = new ArrayList<CompletionContext>();
+        List<CompletionContext> result = new ArrayList<>();
 
         for ( int i=0; i<columns.length; i++ ) {
             String s= columns[i];
