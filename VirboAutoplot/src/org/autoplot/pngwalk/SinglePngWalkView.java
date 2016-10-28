@@ -28,7 +28,7 @@ public class SinglePngWalkView extends PngWalkView {
 
     Rectangle imageLocation= null;
     
-    ClickDigitizer clickDigitizer;
+    transient ClickDigitizer clickDigitizer;
     int clickDigitizerSelect= -1;
     
     public SinglePngWalkView(WalkImageSequence s) {

@@ -29,11 +29,11 @@ import org.virbo.datasource.DataSetURI;
 
 /**
  *
- * @author ed
+ * @author Ed Jackson
  */
 public class QualityControlPanel extends javax.swing.JPanel {
-    private JRadioButton nullRadioButton;
-    private QualityControlRecord qcRecord;
+    private final JRadioButton nullRadioButton;
+    private transient QualityControlRecord qcRecord;
     public static final String KEY_QUALITY_CONTROL_URI = "QualityControlURI";
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
@@ -47,6 +47,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         nullRadioButton = new JRadioButton();
         statusButtonGroup.add(nullRadioButton);  //add to button group, but not to UI
         nullRadioButton.addItemListener(new ItemListener() {
+            @Override
             public void itemStateChanged(ItemEvent e) {
                 if ( qcRecord==null || e.getStateChange() == ItemEvent.SELECTED ) {
                     okButton.setEnabled(false);
@@ -60,7 +61,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
     }
 
     transient PropertyChangeListener pc= new PropertyChangeListener() {
-
+        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getPropertyName().equals( WalkImageSequence.PROP_BADGE_CHANGE ) ) {
                 int i= (Integer) evt.getNewValue();
@@ -424,7 +425,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
 
     }//GEN-LAST:event_ignoreRadioButtonActionPerformed
 
-    protected WalkImageSequence walkImageSequence = null;
+    protected transient WalkImageSequence walkImageSequence = null;
 
     public synchronized WalkImageSequence getWalkImageSequece() {
         return walkImageSequence;
@@ -453,6 +454,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         if ( walkImageSequence!=null ) {
             loginButton.setEnabled(false);
             Runnable run= new Runnable() {
+                @Override
                 public void run() {
                     initQualitySequeuce();
                     URI uri= walkImageSequence.getQCFolder();

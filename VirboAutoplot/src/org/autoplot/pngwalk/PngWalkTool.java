@@ -1377,7 +1377,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         setting= false;
     }
     
-    private QDataSet mousePressLocation = null;
+    private transient QDataSet mousePressLocation = null;
 
     public static final String PROP_MOUSEPRESSLOCATION = "mousePressLocation";
 
@@ -1391,7 +1391,7 @@ public final class PngWalkTool extends javax.swing.JPanel {
         firePropertyChange(PROP_MOUSEPRESSLOCATION, oldMousePressLocation, mousePressLocation);
     }
 
-    private QDataSet mouseReleaseLocation = null;
+    private transient QDataSet mouseReleaseLocation = null;
 
     public static final String PROP_MOUSERELEASELOCATION = "mouseReleaseLocation";
 
