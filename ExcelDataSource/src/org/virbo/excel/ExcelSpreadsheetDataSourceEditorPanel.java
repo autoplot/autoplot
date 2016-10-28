@@ -462,7 +462,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
 
             resetFirstRow();
 
-            int firstRow = params.get(PROP_FIRST_ROW) == null ? 1 : Integer.valueOf(params.get(PROP_FIRST_ROW));
+            int firstRow = params.get(PROP_FIRST_ROW) == null ? 1 : Integer.parseInt(params.get(PROP_FIRST_ROW));
             Rectangle rect = jTable1.getCellRect(firstRow, 0, true);
             jTable1.scrollRectToVisible(rect);
 
