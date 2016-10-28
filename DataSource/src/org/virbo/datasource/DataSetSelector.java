@@ -752,6 +752,8 @@ public class DataSetSelector extends javax.swing.JPanel {
     public void browseSourceType( final List<String> problems ) {
         String surl = ((String) dataSetSelector.getEditor().getItem()).trim();
 
+        logger.log(Level.FINE, "browseSourceType {0}", surl);
+        
         // hooks for browsing, such as "vap+internal"
         for (String browseTriggerRegex : browseTriggers.keySet()) {
             if (Pattern.matches(browseTriggerRegex, surl )) {
@@ -852,6 +854,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                             logger.log( Level.SEVERE, ex.getMessage(), ex );
                         }
                     }
+                   
+                    logger.log(Level.FINER, "browseSourceType after TSB {0}", surl);
+                    
                     boolean proceed;
                     try {
                         proceed = fedit.prepare(surl, window, getMonitor("download file", "downloading file and preparing editor"));
