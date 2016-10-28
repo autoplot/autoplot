@@ -62,10 +62,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
     public boolean reject( String url ) throws IOException, URISyntaxException {
         split = URISplit.parse(url);
         FileSystem fs = FileSystem.create( DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI() );
-        if ( fs.isDirectory( split.file.substring(split.path.length()) ) ) {
-            return true;
-        }
-        return false;
+        return fs.isDirectory( split.file.substring(split.path.length()) );
     }
     
     @Override
@@ -105,7 +102,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
         });
 
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getValueIsAdjusting()) {
                     return;
@@ -435,11 +432,11 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
         }
         String column= (String) columnsComboBox.getSelectedItem();
         String dep0= (String) dep0Columns.getSelectedItem();
-        List<String> colValues= new ArrayList<String>(columns.values());
+        List<String> colValues= new ArrayList<>(columns.values());
         colValues.add(0,"");
         columnsComboBox.setModel(new DefaultComboBoxModel(colValues.toArray()));
 
-        List<String> dep0Values = new ArrayList<String>(columns.values());
+        List<String> dep0Values = new ArrayList<>(columns.values());
         dep0Values.add(0, "");
         dep0Columns.setModel(new DefaultComboBoxModel(dep0Values.toArray()));
 
@@ -513,7 +510,7 @@ private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FI
 
         maybeInitializeWorkBook();
 
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (int i = 0; i < wb.getNumberOfSheets(); i++) {
             String s = wb.getSheetName(i);
             result.add(s);
