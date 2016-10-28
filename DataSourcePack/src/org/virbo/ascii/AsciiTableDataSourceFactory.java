@@ -173,7 +173,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>"));
             } else if (paramName.equals("eventListColumn")) {
                 List<CompletionContext> result = getFieldNames(cc, mon);
-                if ( result.size()>2 ) result.subList( 2, result.size() );
+                if ( result.size()>2 ) result= result.subList( 2, result.size() );
                 return result;
             } else if (paramName.equals("where")) { // TODO: a fun project would be to make completions for this that look in the file...
                 List<CompletionContext> result = new ArrayList<CompletionContext>();
