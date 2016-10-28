@@ -99,90 +99,120 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             return result;
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
-            if (paramName.equals("skip") || paramName.equals("skipLines")) {
-                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "the number of lines to skip before attempting to parse."));
-            } else if ( paramName.equals("headerDelim") ) {
-                List<CompletionContext> result = new ArrayList<>();
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<string>" ) );
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "#####" ));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "DATA_UNTIL", "Cluster CEF uses these"));
-                return result;
-            } else if (paramName.equals("recCount")) {
-                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "limit number of records to parse."));
-            } else if (paramName.equals("rank2")) {
-                List<CompletionContext> result = new ArrayList<>();
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns"));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns"));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, ":", "all columns"));
-                return result;
-            } else if (paramName.equals("bundle")) {
-                List<CompletionContext> result = new ArrayList<>();
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "Bx-Bz", "three named columns"));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns"));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns"));
-                return result;
-            } else if (paramName.equals("depend1Labels")) {
-                List<CompletionContext> result = new ArrayList<>();
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "labels for each column"));
-                return result;
-            } else if (paramName.equals("depend1Values")) {
-                List<CompletionContext> result = new ArrayList<>();
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "values for each column"));
-                return result;
-            } else if (paramName.equals("column")) {
-                List<CompletionContext> result = getFieldNames(cc, mon);
-                return result;
-            } else if (paramName.equals("units")) {
-                List<CompletionContext> result = new ArrayList<>();
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "nT", "units for the data"));
-                return result;
-            } else if (paramName.equals("fixedColumns")) {
-                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "Hint at the number of columns to expect, then use fast parser that assumes fixed columns."));
-            } else if (paramName.equals("time")) {
-                List<CompletionContext> result = getFieldNames(cc, mon);
-                return result;
-            } else if (paramName.equals("intervalTag")) {
-                List<CompletionContext> result = new ArrayList<>();
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "start","tag values indicate the start of measurement interval"));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "center", "tag values indicate the start of measurement interval."));
-                return result;
-            } else if (paramName.equals("depend0")) {
-                List<CompletionContext> result = getFieldNames(cc, mon);
-                return result;
-            } else if (paramName.equals("depend0Units")) {
-                List<CompletionContext> result = new ArrayList<>();
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ms", "units for the x tags"));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "hours+since+2015-01-01T00:00", "units for the x tags"));
-                return result;
-            } else if (paramName.equals("timeFormat")) {
-                List<CompletionContext> result = new ArrayList<>();
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "$Y+$j+$H+$M","times can span multiple fields"));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ISO8601", "parse ISO8601 times in one field."));
-                return result;
-            } else if (paramName.equals("fill")) {
-                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
-            } else if (paramName.equals("validMin")) {
-                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
-            } else if (paramName.equals("validMax")) {
-                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
-            } else if (paramName.equals("tail")) {
-                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>"));
-            } else if (paramName.equals("eventListColumn")) {
-                List<CompletionContext> result = getFieldNames(cc, mon);
-                if ( result.size()>2 ) result= result.subList( 2, result.size() );
-                return result;
-            } else if (paramName.equals("where")) { // TODO: a fun project would be to make completions for this that look in the file...
-                List<CompletionContext> result = new ArrayList<>();
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field17.gt(1)","where the double value in field17 is greater than 17 "));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field5.eq(off)", "where the nominal data in field5 is equal to \"off\""));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field0.le(2000-01-01T00:00)", "where the nominal data in field5 is equal to \"off\""));
-                return result;
-            } else {
-                return Collections.emptyList();
+            switch (paramName) {
+                case "skip":
+                case "skipLines":
+                    return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "the number of lines to skip before attempting to parse."));
+                case "headerDelim":
+                {
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<string>" ) );
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "#####" ));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "DATA_UNTIL", "Cluster CEF uses these"));
+                    return result;
+                }
+                case "recCount":
+                    return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "limit number of records to parse."));
+                case "rank2":
+                {
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, ":", "all columns"));
+                    return result;
+                }
+                case "bundle":
+                {
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "Bx-Bz", "three named columns"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns"));
+                    return result;
+                }
+                case "depend1Labels":
+                {
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "labels for each column"));
+                    return result;
+                }
+                case "depend1Values":
+                {
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "values for each column"));
+                    return result;
+                }
+                case "column":
+                {
+                    List<CompletionContext> result = getFieldNames(cc, mon);
+                    return result;
+                }
+                case "units":
+                {
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "nT", "units for the data"));
+                    return result;
+                }
+                case "fixedColumns":
+                    return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "Hint at the number of columns to expect, then use fast parser that assumes fixed columns."));
+                case "time":
+                {
+                    List<CompletionContext> result = getFieldNames(cc, mon);
+                    return result;
+                }
+                case "intervalTag":
+                {
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "start","tag values indicate the start of measurement interval"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "center", "tag values indicate the start of measurement interval."));
+                    return result;
+                }
+                case "depend0":
+                {
+                    List<CompletionContext> result = getFieldNames(cc, mon);
+                    return result;
+                }
+                case "depend0Units":
+                {
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ms", "units for the x tags"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "hours+since+2015-01-01T00:00", "units for the x tags"));
+                    return result;
+                }
+                case "timeFormat":
+                {
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "$Y+$j+$H+$M","times can span multiple fields"));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ISO8601", "parse ISO8601 times in one field."));
+                    return result;
+                }
+                case "fill":
+                    return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
+                case "validMin":
+                    return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
+                case "validMax":
+                    return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
+                case "tail":
+                    return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>"));
+                case "eventListColumn":
+                {
+                    List<CompletionContext> result = getFieldNames(cc, mon);
+                    if ( result.size()>2 ) result= result.subList( 2, result.size() );
+                    return result;
+                }
+                case "where":
+                { // TODO: a fun project would be to make completions for this that look in the file...
+                    List<CompletionContext> result = new ArrayList<>();
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field17.gt(1)","where the double value in field17 is greater than 17 "));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field5.eq(off)", "where the nominal data in field5 is equal to \"off\""));
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "field0.le(2000-01-01T00:00)", "where the nominal data in field5 is equal to \"off\""));
+                    return result;
+                }
+                default:
+                    return Collections.emptyList();
             }
         } else {
             return Collections.emptyList();
