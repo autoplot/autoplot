@@ -106,11 +106,16 @@ public class AsciiTableMaker {
         }
         for (int i = 0; i < fieldCount; i++) {
             String field = values.get(i).trim();
+            Units u= units.get(i);
             if ( field.trim().length()==0 ) {
-                builder.putValue(-1, i, builder.getFillValue() );
+                if ( u instanceof EnumerationUnits ) {
+                    double d= ((EnumerationUnits)u).createDatum(field).doubleValue(u);
+                    builder.putValue(-1, i, d);
+                } else {
+                    builder.putValue(-1, i, builder.getFillValue() );
+                }
             } else {
-                try {
-                    Units u= units.get(i);
+                try {        
                     double d;
                     if ( u instanceof EnumerationUnits ) {
                         d= ((EnumerationUnits)u).createDatum(field).doubleValue(u);
