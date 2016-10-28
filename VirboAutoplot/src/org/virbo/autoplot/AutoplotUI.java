@@ -1692,7 +1692,7 @@ APSplash.checkTime("init 270");
                         try {
                             String uri = "vap+" + fext + ":";
                             String refuri= (String) dataSetSelector.getValue();
-                            if ( refuri.startsWith(uri) ) {
+                            if ( refuri.toLowerCase().startsWith(uri) ) {
                                 addToDiscoveryUseSoon(refuri);
                                 dataSetSelector.browseSourceType();
                             } else {
