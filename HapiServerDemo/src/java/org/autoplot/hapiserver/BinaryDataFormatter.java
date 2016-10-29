@@ -15,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.qstream.AsciiTimeTransferType;
 import org.virbo.qstream.TransferType;
 
@@ -45,10 +46,11 @@ public class BinaryDataFormatter implements DataFormatter {
                 JSONObject parameter= parameters.getJSONObject(i);
                 TransferType tt;
                 final String stype = parameter.getString("type");
+                Units u= SemanticOps.getUnits(record.slice(i));
                 if ( stype.equals("isotime") ) {
-                    tt= AsciiTimeTransferType.getForName( "time"+parameter.getInt("length"), Collections.singletonMap(QDataSet.UNITS,(Object)Units.us2000) );
+                    tt= AsciiTimeTransferType.getForName( "time"+parameter.getInt("length"), Collections.singletonMap(QDataSet.UNITS,(Object)u) );
                 } else {
-                    tt= TransferType.getForName(stype, null );
+                    tt= TransferType.getForName(stype, Collections.singletonMap(QDataSet.UNITS,(Object)u) );
                 }
                 int nfields;
                 if ( parameter.has("size") ) {
