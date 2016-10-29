@@ -46,6 +46,7 @@
             <li>2016-10-14: add a noStream version of one of the datasets, so that Autoplot can be used to compare.</li>
             <li>2016-10-16: add capabilities page.  Properly handle empty datasets from readers.</li>
             <li>2016-10-25: add support for binary transfer</li>
+            <li>2016-10-29: bugfix: binary assumed that times were in us2000.</li>
         </ul>
         </small>
     </body>
