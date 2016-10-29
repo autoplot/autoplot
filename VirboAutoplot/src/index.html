@@ -24,8 +24,15 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-10-25 r19781):</p>
+        <p>Bugfixes (2016-10-29 r19837):</p>
         <ul> 
+            <li>html data source would fail with http://www-pw.physics.uiowa.edu/~jbf/autoplot/users/jeremy/20161027/cubs.html, because wrong index was used.</li>
+            <li>eventsBar last color used was used for the gantt label colors, instead of the color property.</li>
+            <li>vap+das2Server and vap+das2server were not treated as equivalent, causing "add plot from" initialization feature to fail.</li>
+            <li>1699: noise on FiltersChainPanel dialog. </li>
+            <li>launcher script for jumbojars would insert a space, causing --help to fail</li>
+            <li>more findbugs cleanup (nothing serious)</li>
+            <li>Move local data cache has progress bar and allows cancel.</li>
             <li>Binary Data Source gets format keyword, and properly supports %c.</li>
             <li>IDL/Matlab interface supports reading PLANE_0 correlated planes.</li>
             <li>HAPI client supports binary, when format=binary is added to URI.</li>
@@ -41,7 +48,6 @@
             <li>Added ability for each plane in a TableDataSet to have its own properties.  Thanks, Chris!</li>
             <li>stackedHistogram labels were not set properly for doInterpretMetadata.  Thanks, Chris!</li>
             <li>1691: rank &gt;0 datasets treated as number type, implying that __float__ could be called.</li>
-            <li>begin a round of findbugs cleanup.</li>
             <li>1686: always enter the editor for the open local action, so that Overplot or Plot Below can be selected.</li>
             <li>Digital renderer properly sets the font.  Unify rank2 and rank1 code for consistent behavior.</li>
             <li>DafaultTimeSeriesBrowse improves error feedback by checking for null uri.</li>
@@ -94,6 +100,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>HAPI Server has checkbox to request binary transfers, when they are available.</li>
+            <li>Script plot command gets yautoRangeHints switch, like yautoRangeHints="includeZero=T"</li>
             <li>LookupAxis introduced, which draws additional ticks for another dataset.</li>
             <li>checkbox in the console shows only the filtered log records.  Thanks, Ivar!</li>
             <li>If annotation bubble text is "", then don't draw the bubble, to provide some way one label can have multiple arrows.  Thanks, Sebastian!</li>
