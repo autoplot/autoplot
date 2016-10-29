@@ -391,7 +391,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         try {
             ids= HapiServer.getCatalog(new URL(split.file));
         } catch ( IOException ex ) {
-            
+            jLabel3.setText("Unable to connect to server");
         }
         return true;
     }
