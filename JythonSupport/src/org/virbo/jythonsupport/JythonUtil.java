@@ -102,6 +102,11 @@ public class JythonUtil {
                 } else {
                     logger.log(Level.WARNING, "Couldn''t find jar containing {0}.  See https://sourceforge.net/p/autoplot/bugs/576/", pysrc);
                 }
+            } else if ( pysrc.equals("autoplotapp.py" ) ) {
+                String f= getLocalJythonAutoplotAppLib();
+                if ( !pySys.path.contains( new PyString(f) ) ) {
+                    pySys.path.insert(0,new PyString(f) );
+                }    
             } else {
                 String f= getLocalJythonAutoplotLib();
                 if ( !pySys.path.contains( new PyString(f) ) ) {
@@ -278,11 +283,68 @@ public class JythonUtil {
                 }
             }
         }
-        
+
         logger.fine("   ...done");
         return ff3.toString();
     }
+      
+    /**
+     * copy all the app stuff to autoplot_data/jython without going to web again.  
+     * @return the item to add to the python search path.
+     * @throws IOException 
+     */
+    private static String getLocalJythonAutoplotAppLib() throws IOException {
+        File ff2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA ) );
+        File ff3= new File( ff2.toString() + "/jython" );
+        File ff4= new File( ff3.toString(), "pylistingapp.txt" );
+        if ( ff4.exists() ) {
+            return ff3.toString();
+        }
+        synchronized ( JythonUtil.class ) {
+            if ( !ff3.exists() ) {
+                if ( !ff3.mkdirs() ) {
+                    throw new IOException("Unable to mkdirs "+ff3);
+                }
+            }
+        }
         
+        if ( JythonUtil.class.getResource("/pylistingapp.txt")==null ) {
+            logger.info( "unable to find pylisting.txt in application, assuming this is not the Autoplot client application.");
+        } else {
+            logger.log(Level.FINE, "unpacking jython codes in {0}", JythonUtil.class.getResourceAsStream("/pylistingapp.txt"));
+            
+            try ( BufferedReader r= new BufferedReader( new InputStreamReader( JythonUtil.class.getResourceAsStream("/pylistingapp.txt") ) ) ) {
+                String s= r.readLine();
+                while ( s!=null ) {
+                    File ff5= new File( ff3, s );
+                    logger.log(Level.FINER, "copy to local folder python code: {0}", s);
+                    InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
+                    if ( in==null ) {
+                        throw new IllegalArgumentException("unable to find jython code which should be embedded in application: "+s);
+                    }
+                    if ( s.contains("/") ) {
+                        if ( !makeHomeFor( ff5 ) ) {
+                            throw new IOException("Unable to makeHomeFor "+ff5);
+                        }
+                    }
+                    try (FileOutputStream out = new FileOutputStream( ff5 ) ) {
+                        transferStream(in,out);
+                    } finally {
+                        in.close();
+                        if ( new File( ff3, s ).setReadOnly()==false ) {
+                            logger.log( Level.FINER, "set read-only on file {0} failed", s );
+                        }
+                        if ( new File( ff3, s ).setWritable( true, true )==false ) {
+                            logger.log( Level.FINER, "set write for user only on file {0} failed", s );
+                        }
+                    }
+                    s= r.readLine();
+                }
+            }
+        }
+        return ff3.toString();
+    }
+    
     /**
      * copy the two python files specific to Autoplot into the user's autoplot_data/jython folder.
      * This reads the version from the first line of the autoplot.py.
