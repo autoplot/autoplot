@@ -623,10 +623,7 @@ public class HapiDataSource extends AbstractDataSource {
                     if ( jsonObjecti.has("bins") ) {
                         QDataSet dep1= getJSONBins(jsonObjecti.getJSONObject("bins"));
                         pds[i].depend1= dep1;
-                    } else if ( jsonObjecti.has("binning") ) { // Jon's server
-                        QDataSet dep1= getJSONBins(jsonObjecti.getJSONObject("binning"));
-                        pds[i].depend1= dep1;
-                    }
+                    } 
                 }
             }
         }
