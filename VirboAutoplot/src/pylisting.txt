@@ -1,8 +1,6 @@
 aifc.py
 anydbm.py
 atexit.py
-autoplotapp.py
-autoplot.py
 base64.py
 BaseHTTPServer.py
 bdb.py
@@ -173,8 +171,6 @@ netrc.py
 nntplib.py
 ntpath.py
 nturl2path.py
-org/virbo/jythonsupport/imports.py
-org/virbo/autoplot/appContextImports.py
 pawt/swing.py
 pawt/__init__.py
 pawt/colors.py
@@ -197,7 +193,6 @@ repr.py
 re.py
 rfc822.py
 sched.py
-scripts/tests/childApplication.py
 select.py
 setsfactory.py
 sgmllib.py
@@ -264,3 +259,8 @@ xmllib.py
 xmlrpclib.py
 zipfile.py
 zlib.py
+autoplotapp.py
+autoplot.py
+org/virbo/jythonsupport/imports.py
+org/virbo/autoplot/appContextImports.py
+scripts/tests/childApplication.py
