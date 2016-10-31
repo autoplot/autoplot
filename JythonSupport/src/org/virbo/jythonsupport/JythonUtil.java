@@ -245,24 +245,27 @@ public class JythonUtil {
             }
         }
         if ( JythonUtil.class.getResource("/pylisting.txt")==null ) {
-            throw new IllegalArgumentException("unable to find pylisting.txt, which is needed to install Jython codes.");
+            throw new IllegalArgumentException("unable to find pylisting.txt in application, which is needed to install Jython codes.");
         } else {
+            logger.log(Level.FINE, "unpacking jython codes in {0}", JythonUtil.class.getResourceAsStream("/pylisting.txt"));
+            
             try ( BufferedReader r= new BufferedReader( new InputStreamReader( JythonUtil.class.getResourceAsStream("/pylisting.txt") ) ) ) {
                 String s= r.readLine();
                 while ( s!=null ) {
                     File ff5= new File( ff3, s );
                     logger.log(Level.FINER, "copy to local folder python code: {0}", s);
                     InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
+                    if ( in==null ) {
+                        throw new IllegalArgumentException("unable to find jython code which should be embedded in application: "+s);
+                    }
                     if ( s.contains("/") ) {
                         if ( !makeHomeFor( ff5 ) ) {
                             throw new IOException("Unable to makeHomeFor "+ff5);
                         }
                     }
-                    FileOutputStream out= new FileOutputStream( ff5 ); // TODO: test this on Windows.
-                    try {
+                    try (FileOutputStream out = new FileOutputStream( ff5 ) ) {
                         transferStream(in,out);
                     } finally {
-                        out.close();
                         in.close();
                         if ( new File( ff3, s ).setReadOnly()==false ) {
                             logger.log( Level.FINER, "set read-only on file {0} failed", s );
