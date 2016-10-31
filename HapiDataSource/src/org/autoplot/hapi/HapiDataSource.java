@@ -44,7 +44,6 @@ import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
-import org.virbo.qstream.AsciiTimeTransferType;
 import org.virbo.qstream.TransferType;
 
 /**
@@ -151,6 +150,7 @@ public class HapiDataSource extends AbstractDataSource {
         private ParamDescription( String name ) {
             this.name= name;
         }
+        @Override
         public String toString() {
             return this.name;
         }
@@ -199,11 +199,11 @@ public class HapiDataSource extends AbstractDataSource {
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( httpConnect.getInputStream() ) ) ) {
             String line= in.readLine();
             lineNum++;
-            if ( System.currentTimeMillis()-t0 > 100 ) {
-                monitor.setProgressMessage("reading line "+lineNum);
-                t0= System.currentTimeMillis();
-            }
             while ( line!=null ) {
+                if ( System.currentTimeMillis()-t0 > 100 ) {
+                    monitor.setProgressMessage("reading line "+lineNum);
+                    t0= System.currentTimeMillis();
+                }
                 builder.append(line);
                 line= in.readLine();
             }
@@ -471,12 +471,12 @@ public class HapiDataSource extends AbstractDataSource {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
             throw new IOException(String.valueOf(connection.getResponseCode()) + ":" + connection.getResponseMessage());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
             throw e;
         }
@@ -532,12 +532,12 @@ public class HapiDataSource extends AbstractDataSource {
                 line= in.readLine();
             }
         } catch ( IOException e ) {
-            e.printStackTrace();
+            logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
             throw new IOException( String.valueOf(connection.getResponseCode())+": "+connection.getResponseMessage() );
             
         } catch ( Exception e ) {
-            e.printStackTrace();
+            logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
             throw e;
         }
