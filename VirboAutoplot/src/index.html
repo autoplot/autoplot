@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2016-10-29 r19837):</p>
         <ul> 
+            <li>demo HAPI server had Jython library issues, where it was assumed that VirboAutoplot was on the path.</li>
             <li>html data source would fail with http://www-pw.physics.uiowa.edu/~jbf/autoplot/users/jeremy/20161027/cubs.html, because wrong index was used.</li>
             <li>eventsBar last color used was used for the gantt label colors, instead of the color property.</li>
             <li>vap+das2Server and vap+das2server were not treated as equivalent, causing "add plot from" initialization feature to fail.</li>
