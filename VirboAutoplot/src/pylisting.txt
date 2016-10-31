@@ -259,8 +259,4 @@ xmllib.py
 xmlrpclib.py
 zipfile.py
 zlib.py
-autoplotapp.py
 autoplot.py
-org/virbo/jythonsupport/imports.py
-org/virbo/autoplot/appContextImports.py
-scripts/tests/childApplication.py
