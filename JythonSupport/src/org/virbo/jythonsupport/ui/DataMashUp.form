@@ -420,7 +420,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
-                          <Component id="namedURIListTool1" pref="100" max="32767" attributes="0"/>
+                          <Component id="namedURIListTool1" min="-2" pref="82" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="synchronizeCB" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -441,7 +441,7 @@
                 </Component>
                 <Component class="javax.swing.JCheckBox" name="synchronizeCB">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="synchronize timetags, interpolating data to the first dataset&apos;s time tags"/>
+                    <Property name="text" type="java.lang.String" value="synchronize data by timetags, interpolating data to the first dataset&apos;s time tags"/>
                   </Properties>
                 </Component>
               </SubComponents>

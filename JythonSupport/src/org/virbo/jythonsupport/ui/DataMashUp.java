@@ -989,7 +989,7 @@ public class DataMashUp extends javax.swing.JPanel {
             }
         });
 
-        synchronizeCB.setText("synchronize timetags, interpolating data to the first dataset's time tags");
+        synchronizeCB.setText("synchronize data by timetags, interpolating data to the first dataset's time tags");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -1009,7 +1009,7 @@ public class DataMashUp extends javax.swing.JPanel {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(7, 7, 7)
-                .addComponent(namedURIListTool1, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                .addComponent(namedURIListTool1, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(synchronizeCB)
                 .addContainerGap())
@@ -1419,8 +1419,10 @@ public class DataMashUp extends javax.swing.JPanel {
             }
             @Override
             public BufferedImage getImage(QDataSet qds) {
-                BufferedImage result= new BufferedImage(64,64,BufferedImage.TYPE_4BYTE_ABGR);
-                result.getGraphics().drawString( eu.createDatum(qds.value()).toString(), 2, 40 );
+                BufferedImage result= new BufferedImage(128,32,BufferedImage.TYPE_4BYTE_ABGR);
+                Graphics2D g= (Graphics2D)result.getGraphics();
+                g.setColor( Color.DARK_GRAY );
+                g.drawString( eu.createDatum(qds.value()).toString(), 2, 10 );
                 return result;
             }
             @Override
