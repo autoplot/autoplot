@@ -13,6 +13,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -428,7 +430,7 @@ public class NamedURIListTool extends JPanel {
         c.weighty= 0.0;
         int i;
         for ( i=0; i<this.uris.size(); i++ ) {
-            JCheckBox cb= new JCheckBox( this.ids.get(i) );
+            final JCheckBox cb= new JCheckBox( this.ids.get(i) );
             if ( this.ids.get(i).equals(id) ) cb.setSelected(true);
             butts[i]= cb;
             c.gridy= i;
@@ -437,6 +439,12 @@ public class NamedURIListTool extends JPanel {
             dsSelector.add( cb, c );
             
             JLabel label=  new JLabel( this.uris.get(i) );
+            label.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    cb.setSelected(true);
+                }
+            });
             c.gridx= 2;            
             c.weightx= 1.0;
             dsSelector.add( label, c );
