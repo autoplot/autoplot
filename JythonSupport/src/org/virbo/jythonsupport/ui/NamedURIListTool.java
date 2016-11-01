@@ -5,7 +5,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -20,14 +19,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -43,7 +40,6 @@ import org.jdesktop.beansbinding.Bindings;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
-import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.WindowManager;
 import org.virbo.filters.FiltersChainPanel;
 
@@ -232,8 +228,8 @@ public class NamedURIListTool extends JPanel {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     org.das2.util.LoggerManager.logGuiEvent(e);
-                    List<String> ids= new ArrayList<String>(NamedURIListTool.this.ids);
-                    List<String> uris= new ArrayList<String>(NamedURIListTool.this.uris);
+                    List<String> ids= new ArrayList<>(NamedURIListTool.this.ids);
+                    List<String> uris= new ArrayList<>(NamedURIListTool.this.uris);
                     String newName= makeupName( ids );
                     ids.add(newName);
                     uris.add("");
@@ -375,12 +371,12 @@ public class NamedURIListTool extends JPanel {
     }
 
     public void setIds( List<String> ids ) {
-        this.ids= new ArrayList<String>(ids);
+        this.ids= new ArrayList<>(ids);
         if ( uris.size()==ids.size() ) refresh();
     }
     
     public void setUris( List<String> uris ) {
-        this.uris= new ArrayList<String>(uris);
+        this.uris= new ArrayList<>(uris);
         if ( uris.size()==ids.size() ) refresh();
     }
     
