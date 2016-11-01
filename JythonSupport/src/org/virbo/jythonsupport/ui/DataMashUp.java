@@ -121,9 +121,7 @@ public class DataMashUp extends javax.swing.JPanel {
     public void rename( String oldName, String newName ) {
         DefaultTreeModel tm= (DefaultTreeModel) jTree1.getModel();
         renameImpl( tm, tm.getRoot(), oldName, newName );
-        jTree1.treeDidChange();
-        jTree1.revalidate();
-        jTree1.repaint();
+        tm.reload();
     }
             
     private void renameImpl( DefaultTreeModel tm, Object parent, String oldName, String newName ) {
