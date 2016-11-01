@@ -373,6 +373,8 @@ public class EditorContextMenu {
 
             fragmentsMenu.add( createInsertMenuItem( "raise exception", "if ( ds.length()==0 ):\n  raise Exception('Dataset is empty')") );
 
+            fragmentsMenu.add( createInsertMenuItem( "raise NoDataInIntervalException", "from org.das2.dataset import NoDataInIntervalException\nraise NoDataInIntervalException('no files found')") );
+
             fragmentsMenu.add( createInsertMenuItem( "documentation block", "# title: the one-line title\n# label: terse label") );
 
             fragmentsMenu.add( createInsertMenuItem( "multi-argument procedure", "# return a set of datasets which are synchronized to the same timetags.\n" +
