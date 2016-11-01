@@ -258,11 +258,12 @@ public class DataMashUp extends javax.swing.JPanel {
     public String getAsJythonInline() {
         StringBuilder b= new StringBuilder("vap+inline:");
         b.append( namedURIListTool1.getAsJythonInline() );
+
+        b.append( getJythonSynchronize("&") );
         
         DefaultTreeModel m= (DefaultTreeModel) jTree1.getModel();
         
         b.append( getJython( m, m.getRoot() ) );
-        b.append( getJythonSynchronize("&") );
         String timerange= timeRangeTextField.getText();
         if ( timeRangeTextField.isEnabled() ) {
             b.append("&timerange=").append(timerange.trim().replaceAll(" ","+") );
@@ -637,6 +638,7 @@ public class DataMashUp extends javax.swing.JPanel {
         boolean haveAllIds= false;
         String timerange= null;
         for ( String s: ss ) {
+            if ( s.trim().length()==0 ) continue;
             int i= s.indexOf("=");
             if ( i>-1 ) {
                 Pattern p= Pattern.compile("(.+)=getDataSet\\('(.*)'\\)");
