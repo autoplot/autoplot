@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import org.das2.datum.Datum;
@@ -368,6 +369,9 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jLabel9 = new javax.swing.JLabel();
         startTextField = new javax.swing.JTextField();
         stopTextField = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
+        nextIntervalButton = new javax.swing.JButton();
+        prevIntervalButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         scComboBox = new javax.swing.JComboBox();
@@ -427,11 +431,34 @@ public class TimeRangeTool extends javax.swing.JPanel {
             }
         });
 
+        jButton1.setText("Copy");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        nextIntervalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/nextNext.png"))); // NOI18N
+        nextIntervalButton.setText("Next Interval");
+        nextIntervalButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nextIntervalButtonActionPerformed(evt);
+            }
+        });
+
+        prevIntervalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/prevPrev.png"))); // NOI18N
+        prevIntervalButton.setText("Previous Interval");
+        prevIntervalButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                prevIntervalButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
+            .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -440,17 +467,28 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(12, 12, 12)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 457, Short.MAX_VALUE)
+                            .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 483, Short.MAX_VALUE)
                             .add(jPanel1Layout.createSequentialGroup()
                                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(jLabel8)
-                                    .add(jLabel9))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(stopTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
-                                    .add(startTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE))))))
+                                    .add(jPanel1Layout.createSequentialGroup()
+                                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(jLabel8)
+                                            .add(jLabel9))
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                            .add(stopTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 371, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                            .add(startTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 390, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                                    .add(jPanel1Layout.createSequentialGroup()
+                                        .add(prevIntervalButton)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(nextIntervalButton)))
+                                .add(0, 0, Short.MAX_VALUE)
+                                .add(jButton1)))))
                 .addContainerGap())
         );
+
+        jPanel1Layout.linkSize(new java.awt.Component[] {startTextField, stopTextField}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
@@ -464,12 +502,17 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel8)
-                    .add(startTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(startTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jButton1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel9)
                     .add(stopTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(200, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(nextIntervalButton)
+                    .add(prevIntervalButton))
+                .addContainerGap(159, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Calendar", jPanel1);
@@ -532,7 +575,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                                 .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 107, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .add(18, 18, 18)
                                 .add(scComboBox, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel10, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE))))
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel10, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -567,10 +610,10 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
+            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
             .add(jPanel3Layout.createSequentialGroup()
                 .add(12, 12, 12)
-                .add(nrtComboBox, 0, 462, Short.MAX_VALUE)
+                .add(nrtComboBox, 0, 495, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -600,7 +643,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(recentTimesListSP, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+            .add(recentTimesListSP, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -615,7 +658,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 494, Short.MAX_VALUE)
+            .add(jTabbedPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -703,6 +746,43 @@ public class TimeRangeTool extends javax.swing.JPanel {
         
     }//GEN-LAST:event_recentTimesListValueChanged
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        stopTextField.setText( startTextField.getText() );
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void nextIntervalButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextIntervalButtonActionPerformed
+        try {
+            String min= startTextField.getText();
+            String max= stopTextField.getText();
+            Datum tmin= TimeUtil.create(min);
+            Datum tmax= TimeUtil.create(max);
+            DatumRange dr= new DatumRange( tmin, tmax );
+            dr= dr.next();
+            startTextField.setText(dr.min().toString());
+            stopTextField.setText(dr.max().toString());
+            timeRangeTextField.setText( dr.toString() );
+        } catch (ParseException ex) {
+            Logger.getLogger(TimeRangeTool.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_nextIntervalButtonActionPerformed
+
+    private void prevIntervalButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevIntervalButtonActionPerformed
+        try {
+            String min= startTextField.getText();
+            String max= stopTextField.getText();
+            Datum tmin= TimeUtil.create(min);
+            Datum tmax= TimeUtil.create(max);
+            DatumRange dr= new DatumRange( tmin, tmax );
+            dr= dr.previous();
+            startTextField.setText(dr.min().toString());
+            stopTextField.setText(dr.max().toString());
+            timeRangeTextField.setText( dr.toString() );
+        } catch (ParseException ex) {
+            Logger.getLogger(TimeRangeTool.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_prevIntervalButtonActionPerformed
+
     /**
      * shows the orbit timerange, clipping off text past the first colon.
      * @param sorbit like "172: 2012-11-02 07:00 to 11:20"
@@ -734,6 +814,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel feedbackLabel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
@@ -750,9 +831,11 @@ public class TimeRangeTool extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JButton nextIntervalButton;
     private javax.swing.JComboBox nrtComboBox;
     private javax.swing.JLabel orbitFeedbackLabel;
     private javax.swing.JList orbitList;
+    private javax.swing.JButton prevIntervalButton;
     private javax.swing.JList recentTimesList;
     private javax.swing.JScrollPane recentTimesListSP;
     private javax.swing.JComboBox scComboBox;
