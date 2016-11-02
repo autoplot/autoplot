@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The Data Mash Up tool is used to plot the electron gyrofrequency by multiplying the B-Field magnitude by 28.
+        <p><small>The Chicago Cubs are one game away from winning the World Series, which they have not done in 108 years.  The "W" flags, which before television were flown on Wrigley stadium to indicate a win, will be flying today!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2016-10-29 r19837):</p>
         <ul> 
+            <li>reducex supports rank 2 bundle without DEPEND_0, and independent tags in the first column.<li>
             <li>demo HAPI server had Jython library issues, where it was assumed that VirboAutoplot was on the path.</li>
             <li>html data source would fail with http://www-pw.physics.uiowa.edu/~jbf/autoplot/users/jeremy/20161027/cubs.html, because wrong index was used.</li>
             <li>eventsBar last color used was used for the gantt label colors, instead of the color property.</li>
@@ -101,6 +102,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>538: Introduce synchronize checkbox to vap+line mash-up scripts, which interpolates all data to the same timetags.</li>
+            <li>TimeRangeEditor had next/previous buttons and button to copy start time to end time.</li>
             <li>HAPI Server has checkbox to request binary transfers, when they are available.</li>
             <li>Script plot command gets yautoRangeHints switch, like yautoRangeHints="includeZero=T"</li>
             <li>LookupAxis introduced, which draws additional ticks for another dataset.</li>
