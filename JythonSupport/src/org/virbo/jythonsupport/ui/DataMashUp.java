@@ -275,11 +275,13 @@ public class DataMashUp extends javax.swing.JPanel {
         StringBuilder b= new StringBuilder();
         String[] ids= namedURIListTool1.getIds();
         if ( synchronizeCB.isSelected() && ids.length>1 ) {
-            StringBuilder list=new StringBuilder(ids[0]);
-            for ( int i=1; i<ids.length; i++ ) {
+            StringBuilder list=new StringBuilder("(");
+            list.append(ids[1]);
+            for ( int i=2; i<ids.length; i++ ) {
                 list.append(",").append(ids[i]);
             }
-            b.append( "(" ).append( list ).append( ")=synchronize(").append(ids[0]).append(",").append(list).append(")").append(delim);
+            list.append(")");
+            b.append( list ).append( "=synchronize(").append(ids[0]).append(",").append(list).append(")").append(delim);
         }
         return b;
     }
@@ -300,7 +302,7 @@ public class DataMashUp extends javax.swing.JPanel {
         
         String timerange= timeRangeTextField.getText();
         if ( timeRangeTextField.isEnabled() ) {
-            b.append("&timerange=").append(timerange.trim().replaceAll(" ","+") );
+            b.append("&timerange=\'").append(timerange.trim().replaceAll(" ","+")).append("\'");
         }
         
         return b.toString();
