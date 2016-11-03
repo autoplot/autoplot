@@ -119,13 +119,13 @@ public class Test017 {
 
         "008 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/mari_mag/1994/cn_k0_mari_19940122_v01.cdf?Epoch",
         "009 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/bars/%Y/cn_k0_bars_%Y%m%d_v...cdf?E_vel&timerange=1993-01-02+through+1993-01-14",
-        "010 CC ftp://cdaweb.gsfc.nasa.gov/pub/data/imp/imp8/mag_15sec/1973/i8_15sec_mag_19731030_v02.cdf",
+        "010 CC ftp://cdaweb.gsfc.nasa.gov/pub/data/imp/imp8/mag/mag_15sec_cdaweb/1973/i8_15sec_mag_19731030_v03.cdf",
         //No data is drawn:
         //this data no longer exists: "011 ftp://cdaweb.gsfc.nasa.gov/pub/data/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse",
         //IndexOutOfBoundsException:
         "012 http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/cis/2003/c2_pp_cis_20030104_v02.cdf?N_p__C2_PP_CIS",
         //Suspect problem identifying valid data: "" +
-        "013 http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/fgm/2003/c2_pp_fgm_20030114_v01.cdf?Epoch__C2_PP_FGM",
+        //"013 http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c2/pp/fgm/2003/c2_pp_fgm_20030114_v01.cdf?Epoch__C2_PP_FGM",
         //Fails to guess cadence:
         "014 ftp://cdaweb.gsfc.nasa.gov/pub/data/imp/imp8/mag/mag_15sec_cdaweb/2000/i8_15sec_mag_20000101_v03.cdf?F1_Average_B_15s",
         //Strange message:
@@ -235,12 +235,12 @@ public class Test017 {
 
         //It would be nice to support plus notation with excel spreadsheets. Also, this shows an issue with the excel data source which
 
-        "042 file:///Documents%20and%20Settings/sklemuk/Desktop/UCSF%20Voice%20Conference%202008/Product%20Summary.xls?sheet=nist%20lo&column=H",
+        "042 file:///c:/documents and settings/Jeremy Faden/Desktop/Product Summary.xls?sheet=nist+lo&column=H",
         //This works:
-        "043 file:///c:/Documents+and+Settings/jbf/Desktop/Product+Summary.xls?sheet=nist+lo&column=H",
+        //"043 file:///c:/Documents+and+Settings/jbf/Desktop/Product+Summary.xls?sheet=nist+lo&column=H",
         //<message>go file:///Documents%20and%20Settings/sklemuk/Desktop/UCSF%20Voice%20Conference%202008/Product%20Summary.xls?sheet=nist%20lo&column=H</message>
         //<message>java.lang.NullPointerException
-        "044 file:///Documents%20and%20Settings/sklemuk/Desktop/UCSF%20Voice%20Conference%202008/Product%20Summary.xls?sheet=nist%20lo&column=H",
+        "044 file:///c:/documents%20and%20settings/Jeremy Faden/Desktop/Product%20Summary.xls?sheet=nist%20lo&column=H",
         //at org.virbo.excel.ExcelSpreadsheetDataSource.getDataSet(ExcelSpreadsheetDataSource.java:89) at org.virbo.autoplot.ApplicationModel.loadDataSet(ApplicationModel.java:1322) at org.virbo.autoplot.ApplicationModel.updateImmediately(ApplicationModel.java:1260) at org.virbo.autoplot.ApplicationModel.access$600(ApplicationModel.java:112) at org.virbo.autoplot.ApplicationModel$8.run(ApplicationModel.java:1293) at org.das2.system.RequestProcessor$Runner.run(RequestProcessor.java:201) at java.lang.Thread.run(Unknown Source)
         //TEST DATA SOURCE TYPE: 13 Miscellaneous URIs
 
