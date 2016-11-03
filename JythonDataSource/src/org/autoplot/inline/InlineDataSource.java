@@ -82,14 +82,18 @@ public class InlineDataSource extends AbstractDataSource {
         } else if ( result instanceof PyTuple && ((PyTuple)result).size()<3 ) {
             //JythonOps.coerce(result);  too bad coerce doesn't do this already.
             PyTuple tres= (PyTuple)result;
-            if ( tres.size()==2 ) {
-                res= Ops.link( (QDataSet)tres.get(0), (QDataSet)tres.get(1) );
-            } else if ( tres.size()==3 ) {
-                res= Ops.link( (QDataSet)tres.get(0), (QDataSet)tres.get(1), (QDataSet)tres.get(2) );
-            } else if ( tres.size()==1 ) {
-                res= (QDataSet)tres.get(0); // how did this happen?  Might as well support it
-            } else {
-                throw new ParseException( "unable to parse command: "+c, 0 );
+            switch (tres.size()) {
+                case 2:
+                    res= Ops.link( (QDataSet)tres.get(0), (QDataSet)tres.get(1) );
+                    break;
+                case 3:
+                    res= Ops.link( (QDataSet)tres.get(0), (QDataSet)tres.get(1), (QDataSet)tres.get(2) );
+                    break;
+                case 1:
+                    res= (QDataSet)tres.get(0); // how did this happen?  Might as well support it
+                    break;
+                default:
+                    throw new ParseException( "unable to parse command: "+c, 0 );
             }
         } else {
             res = (QDataSet) result.__tojava__(QDataSet.class);
@@ -445,8 +449,13 @@ public class InlineDataSource extends AbstractDataSource {
     private boolean isAssignment(String arg) {
         int i= arg.indexOf("=");
         if ( i==-1 ) return false;
+        String varNames= arg.substring(0,i);
         Pattern p= Pattern.compile("[a-zA-Z_][a-zA-Z_0-9]*\\s*");
-        return p.matcher(arg.substring(0,i)).matches();
+        if ( p.matcher(varNames).matches() ) {
+            return true;
+        } 
+        Pattern p2= Pattern.compile("\\(([a-zA-Z_][a-zA-Z_0-9]*)(\\,[a-zA-Z_][a-zA-Z_0-9]*)*\\)");
+        return p2.matcher(varNames).matches();
     }
 
 }
