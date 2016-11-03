@@ -213,7 +213,7 @@ public class Test017 {
         //"035 vap+txt:file:///opt/project/galileo/data/lrsudr/g7/eden/pws$y$j.data?timeRange=1997-049",
         //Though "Dec 2004" is requested, "Nov 2004 through Jan 2005" is loaded:
 
-        "036 vap+dat:http://goes.ngdc.noaa.gov/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&fill=32700&timerange=Dec+2004",
+        "036 vap+dat:http://vmo.igpp.ucla.edu/data1/GOES/GOES10/SEM/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&fill=32700&timerange=Dec+2004",
         //TEST DATA SOURCE TYPE: 9 File System Completions
 
         //fails:
@@ -246,7 +246,7 @@ public class Test017 {
 
         //Demonstrates problem with AutoHistogram:
 
-        "045 http://goes.ngdc.noaa.gov/data/avg/2004/A1050402.TXT",
+        "045 http://vmo.igpp.ucla.edu/data1/GOES/GOES10/SEM/2004/A1050402.TXT",
         //TEST DATA SOURCE TYPE: 14 VAPs in the wild
 
         //VAP files are Autoplot configuration files, an xml version of the DOM tree. I'd expect these to be very fragile right now, but I'll try to support them:
