@@ -140,9 +140,9 @@ public class Test017 {
         "016 ftp://cdaweb.gsfc.nasa.gov/pub/data/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse", // This is corrected and will be released soon. The problem was the "COMPONENT_0" conventions used for Themis lead to the timetags being interpretted as invalid.
 
         //Vectors plotted as spectrogram:
-        "017 ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/def_or/1995/ge_or_def_19950101_v02.cdf?GSE_POS",
+        "017 ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/orbit/def_or/1995/ge_or_def_19950101_v02.cdf?GSE_POS",
         //Works fine, but nicely demonstrates AutoHistogram's robust statistics and the potential to indentify fill values automatically:
-        "018 ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/mgf/1998/ge_k0_mgf_19980102_v01.cdf?IB",
+        "018 ftp://cdaweb.gsfc.nasa.gov/pub/data/geotail/mgf/mgf_k0/1998/ge_k0_mgf_19980102_v01.cdf?IB",
         //TEST DATA SOURCE TYPE: 4 OpenDAP
 
         //Rank 2 spectrogram over OpenDAP:
@@ -154,7 +154,7 @@ public class Test017 {
         //This fails because negative CADENCE and MONOTONIC=true.
 
         // This shows that I'm doing something wrong with fits files.  Using FITS liberator it looks good, with AP it is distorted.
-        "020 http://www.spacetelescope.org/static/projects/fits_liberator/datasets/m42/m42_40min_red.zip/m42_40min_red.fits",
+        "020 https://www.spacetelescope.org/static/projects/fits_liberator/datasets/m42/m42_40min_red.zip/m42_40min_red.fits",
         //"020 vap:http://www.astro.princeton.edu/~frei/Gcat_htm/Catalog/Fits/n4013_lR.fits",
 
         //TEST DATA SOURCE TYPE: 6 ASCII
