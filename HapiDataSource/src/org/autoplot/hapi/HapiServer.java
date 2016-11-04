@@ -72,7 +72,9 @@ public class HapiServer {
     }
     
     /**
-     * add the default known servers, plus the ones we know about.
+     * add the default known servers, plus the ones we know about.  
+     * The zeroth server will be the last server used.
+     * 
      * @return list of servers
      */
     public static List<String> listHapiServers() {
@@ -111,7 +113,7 @@ public class HapiServer {
                 d2ssDiscoveryList.addAll(d2ss1);
                 d2ss1= d2ssDiscoveryList; // put the most recently used ones at the front of the list
                 
-                logger.log( Level.FINE, "read extra das2servers in {0} millis\n", (System.currentTimeMillis()-t0) );
+                logger.log( Level.FINE, "read extra hapi servers in {0} millis\n", (System.currentTimeMillis()-t0) );
             } catch ( IOException ex ) {
                 
             } finally {
