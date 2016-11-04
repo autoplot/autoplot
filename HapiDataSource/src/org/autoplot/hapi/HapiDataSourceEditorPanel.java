@@ -101,7 +101,14 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         parametersPanel.setLayout( new BoxLayout( parametersPanel, BoxLayout.Y_AXIS ) );
 
-        serversComboBox.setModel( new DefaultComboBoxModel<>( HapiServer.listHapiServersArray() ));
+        String[] servers= HapiServer.listHapiServersArray();
+        serversComboBox.setModel( new DefaultComboBoxModel<>( servers ));
+        try {
+            defaultServer= new URL(servers[0]); //TODO: sometimes server is URL sometimes a string.  How annoying...
+        } catch (MalformedURLException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+        serversComboBox.setSelectedIndex(0);
         idsList2.addListSelectionListener( new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
