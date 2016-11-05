@@ -9,8 +9,12 @@ from org.virbo.dataset import DDataSet
 
 from java.io import File
 from java.io import FileInputStream
+from java.lang.Integer import parseInt
 
-fil= File( '/home/jbf/20100309_1400.xml' )  # from http://forecast.weather.gov/
+# wget -O /tmp/weatherFile.xml http://forecast.weather.gov/MapClick.php?lat=41.67000&lon=-91.55000&FcstType=digitalDWML
+resourceURI= getParam( 'resourceURI', 'file:/tmp/weatherFile.xml', 'example file to load' )
+fil= downloadResourceAsTempFile( URL(resourceURI), monitor )
+
 myin= FileInputStream( fil )
 
 builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
@@ -21,12 +25,12 @@ factory= XPathFactory.newInstance()
 xpath= factory.newXPath()
 
  # // is anywhere, / is root.
-temps= xpath.evaluate( '/dwml/data/parameters/temperature[@type="wind chill"]/value', initialDocument, XPathConstants.NODESET )
+temps= xpath.evaluate( '/dwml/data/parameters/temperature[@type="hourly"]/value', initialDocument, XPathConstants.NODESET )
 ttemps= DDataSet.createRank1( temps.getLength() )
 for i in range( temps.getLength() ):
    value = xpath.evaluate('text()', temps.item(i), XPathConstants.STRING)
    if value:
-      ttemps.putValue( i, java.lang.Integer.parseInt( value ) )
+      ttemps.putValue( i, parseInt( value ) )
    else:
       ttemps.putValue( i, -1e31 )
 ttemps.putProperty( QDataSet.FILL_VALUE, -1e31 )
@@ -45,5 +49,6 @@ ttimes.putProperty( QDataSet.UNITS, Units.us2000 )
 
 ttemps.putProperty( QDataSet.DEPEND_0, ttimes )
 
-plot( 0, ttemps )
-plot( 1, ttimes )
+result= ttemps
+#plot( 0, ttemps )
+#plot( 1, ttimes )
