@@ -273,15 +273,21 @@ public class DataMashUp extends javax.swing.JPanel {
     
     private StringBuilder getJythonSynchronize(String delim) {
         StringBuilder b= new StringBuilder();
-        String[] ids= namedURIListTool1.getIds();
-        if ( synchronizeCB.isSelected() && ids.length>1 ) {
-            StringBuilder list=new StringBuilder("(");
-            list.append(ids[1]);
-            for ( int i=2; i<ids.length; i++ ) {
-                list.append(",").append(ids[i]);
+        if ( synchronizeCB.isSelected() ) {
+            String[] ids= namedURIListTool1.getIds();
+            if ( ids.length>2 ) {
+                StringBuilder list=new StringBuilder("(");
+                list.append(ids[1]);
+                for ( int i=2; i<ids.length; i++ ) {
+                    list.append(",").append(ids[i]);
+                }
+                list.append(")");
+                b.append( list ).append( "=synchronize(").append(ids[0]).append(",").append(list).append(")").append(delim);
+            } else if ( ids.length==2 ) {
+                StringBuilder list=new StringBuilder("");
+                list.append(ids[1]);
+                b.append( list ).append( "=synchronizeOne(").append(ids[0]).append(",").append(list).append(")").append(delim);
             }
-            list.append(")");
-            b.append( list ).append( "=synchronize(").append(ids[0]).append(",").append(list).append(")").append(delim);
         }
         return b;
     }
@@ -673,6 +679,8 @@ public class DataMashUp extends javax.swing.JPanel {
                     }
                 } else if ( s.contains("synchronize(") ) {
                     synchronizeCB.setSelected(true);
+                } else if ( s.contains("synchronizeOne(") ) {
+                    synchronizeCB.setSelected(true);                    
                 } else {
                      if ( s.substring(0,i).trim().equals("timerange") ) {
                         timerange= s.substring(i+1).trim();
