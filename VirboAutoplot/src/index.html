@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The Chicago Cubs are one game away from winning the World Series, which they have not done in 108 years.  The "W" flags, which before television were flown on Wrigley stadium to indicate a win, will be flying today! <a href="cubsWins.vap.jy">script</a> <a href="http://www.baseball-reference.com/teams/CHC/">data</a>
+        <p><small>The Chicago Cubs have won the World Series, which they had not done in 108 years.  The "W" flags, which before television were flown on Wrigley stadium to indicate a win, will be flying today! <a href="cubsWins.vap.jy">script</a> <a href="http://www.baseball-reference.com/teams/CHC/">data</a>
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,16 +24,19 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-11-01 r19866):</p>
+        <p>Bugfixes (2016-11-05 r19889):</p>
         <ul> 
-            <li>reducex supports rank 2 bundle without DEPEND_0, and independent tags in the first column.<li>
-            <li>demo HAPI server had Jython library issues, where it was assumed that VirboAutoplot was on the path.</li>
-            <li>html data source would fail with http://www-pw.physics.uiowa.edu/~jbf/autoplot/users/jeremy/20161027/cubs.html, because wrong index was used.</li>
-            <li>eventsBar last color used was used for the gantt label colors, instead of the color property.</li>
-            <li>vap+das2Server and vap+das2server were not treated as equivalent, causing "add plot from" initialization feature to fail.</li>
-            <li>1699: noise on FiltersChainPanel dialog. </li>
-            <li>launcher script for jumbojars would insert a space, causing --help to fail</li>
-            <li>more findbugs cleanup (nothing serious)</li>
+            <li>rte_1741708130: rendering of rank 3 waveform would fail w/NullPointerException when within one packet.  Thanks, Nhan!
+            <li>slightly tighten the check for JSON headed-ascii files by looking for a colon between the braces.
+            <li>Use last HAPI server by default.  Jon's elasticbeanstalk is the default server.
+            <li>reducex supports rank 2 bundle without DEPEND_0, and independent tags in the first column.
+            <li>demo HAPI server had Jython library issues, where it was assumed that VirboAutoplot was on the path.
+            <li>html data source would fail with http://www-pw.physics.uiowa.edu/~jbf/autoplot/users/jeremy/20161027/cubs.html, because wrong index was used.
+            <li>eventsBar last color used was used for the gantt label colors, instead of the color property.
+            <li>vap+das2Server and vap+das2server were not treated as equivalent, causing "add plot from" initialization feature to fail.
+            <li>1699: noise on FiltersChainPanel dialog.
+            <li>launcher script for jumbojars would insert a space, causing --help to fail
+            <li>more findbugs cleanup (nothing serious)
             <li>Move local data cache has progress bar and allows cancel.</li>
             <li>Binary Data Source gets format keyword, and properly supports %c.</li>
             <li>IDL/Matlab interface supports reading PLANE_0 correlated planes.</li>
@@ -65,7 +68,7 @@
             <li>1679: HAPI JSON would confuse Rich ASCII support.</li>
             <li>improve feedback for qstreams when values are found in both the packet descriptor and in the packets.</li>
             <li>applyIndex supports BUNDLE_i.</li>
-            <li>Series renderer plotSymbols would show when units were inconvertable, but then connectors would refuse to paint.  Now both will paint with a warning.</li>
+            <li>Series renderer plotSymbols would show when units were inconvertible, but then connectors would refuse to paint.  Now both will paint with a warning.</li>
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
@@ -102,8 +105,9 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>541: Need for BIN_MAX and BIN_MIN properties to state extent in the same units as the data.</li>
-            <li>538: Introduce synchronize checkbox to vap+line mash-up scripts, which interpolates all data to the same timetags.</li>
+            <li>541: Need for BIN_MAX and BIN_MIN properties to state extent in the same units as the data.  Thanks, Chris!</li>
+            <li>538: Introduce synchronize checkbox to vap+line mash-up scripts, which interpolates all data to the same timetags.  Thanks Kristoff!</li>
+            <lI>537: show progress and allow cancel on move cache.  Thanks, Dan!</li>
             <li>TimeRangeEditor had next/previous buttons and button to copy start time to end time.</li>
             <li>HAPI Server has checkbox to request binary transfers, when they are available.</li>
             <li>Script plot command gets yautoRangeHints switch, like yautoRangeHints="includeZero=T"</li>
