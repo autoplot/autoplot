@@ -4055,9 +4055,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
     private void mashDataMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mashDataMenuItemActionPerformed
         org.das2.util.LoggerManager.logGuiEvent(evt);
         
-        DataSourceFilter focus= dom.getController().getDataSourceFilter();
-        
-        String uri= focus.getUri();
+        String uri= dataSetSelector.getValue();
         
         if ( uri.trim().length()>0 ) {
             URISplit split= URISplit.parse(uri);
@@ -4096,7 +4094,8 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
             });
 
             if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( this, dm, "Data Mash Up", JOptionPane.OK_CANCEL_OPTION ) ) {
-                focus.setUri( dm.getAsJythonInline() );
+                dataSetSelector.setValue(dm.getAsJythonInline());
+                dataSetSelector.maybePlot(0);
             }
         }
     }//GEN-LAST:event_mashDataMenuItemActionPerformed
