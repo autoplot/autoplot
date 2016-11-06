@@ -138,6 +138,10 @@ for i in $( find * -name 'pylisting.txt' ); do   # support for python on LANL wh
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
+for i in $( find * -name 'pylistingapp.txt' ); do   # support for python on LANL where listing of autoplot.org cannot be done.
+   mkdir -p $(dirname ../temp-classes/$i)
+   cp $i ../temp-classes/$i
+done
 for i in $( find * -name 'packagelist.txt' ); do  
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
