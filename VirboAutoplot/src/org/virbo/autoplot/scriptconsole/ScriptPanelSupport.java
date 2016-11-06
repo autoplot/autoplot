@@ -563,7 +563,7 @@ public class ScriptPanelSupport {
                     otraceback= traceback.tb_next;
                 } else { // typical
                     String fn= traceback.tb_frame.f_code.co_filename;
-                    if ( fn!=null && ( fn.equals("<iostream>") || fn.equals("<string>") || fn.equals( file.getName() ) ) ) { 
+                    if ( fn!=null && ( fn.equals("<iostream>") || fn.equals("<string>") || ( file!=null && fn.equals( file.getName() ) ) ) ) { 
                         annotationsSupport.annotateLine(offset + traceback.tb_lineno, "error", ex.toString(),interp);
                         line=  traceback.tb_lineno-1;
                         otraceback= traceback.tb_next;
