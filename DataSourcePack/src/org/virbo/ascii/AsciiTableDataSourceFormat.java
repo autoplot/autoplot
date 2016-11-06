@@ -676,11 +676,11 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             for (  i = 0; i < dep1.length()-1; i++) {
                 Datum d= dep1units.createDatum(dep1.value(i));
                 String s= d.toString().replaceAll("\\s+","");
-                out.print(dep1units == null ? "" + dep1.value(i) : s + delim );
+                out.print( s + delim );
             }
             Datum d= dep1units.createDatum(dep1.value(i));
             String s= d.toString().replaceAll("\\s+","");
-            out.println(dep1units == null ? "" + dep1.value(i) : s );
+            out.println( s );
         }
 
         Units u0 = null;
