@@ -309,7 +309,7 @@ public class JythonUtil {
         }
         
         if ( JythonUtil.class.getResource("/pylistingapp.txt")==null ) {
-            logger.info( "unable to find pylisting.txt in application, assuming this is not the Autoplot client application.");
+            logger.info( "unable to find pylistingapp.txt in application, assuming this is not the Autoplot client application.");
         } else {
             logger.log(Level.FINE, "unpacking jython codes in {0}", JythonUtil.class.getResourceAsStream("/pylistingapp.txt"));
             
