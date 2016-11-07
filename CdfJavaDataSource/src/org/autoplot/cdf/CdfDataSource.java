@@ -78,7 +78,7 @@ public class CdfDataSource extends AbstractDataSource {
 
     private static final int FILE_CACHE_SIZE_LIMIT= 2;
     protected static final LinkedHashMap<String,CDFReader> openFiles= new LinkedHashMap();
-    private static final Map<CDFReader,String> openFilesRev= new HashMap();
+    protected static final Map<CDFReader,String> openFilesRev= new HashMap();
     protected static final Map<String,Long> openFilesFresh= new HashMap();
     protected static final Object lock= new Object();
 
