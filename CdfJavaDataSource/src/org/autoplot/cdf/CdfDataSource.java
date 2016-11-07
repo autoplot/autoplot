@@ -70,7 +70,7 @@ public class CdfDataSource extends AbstractDataSource {
     protected static final String PARAM_SLICE1 = "slice1";
     
     private static final Logger logger= LoggerManager.getLogger("apdss.cdf");
-    Map<String, Object> attributes;
+    private Map<String, Object> attributes;
 
     public CdfDataSource( URI uri ) {
         super(uri);
@@ -78,14 +78,14 @@ public class CdfDataSource extends AbstractDataSource {
 
     private static final int FILE_CACHE_SIZE_LIMIT= 2;
     protected static final LinkedHashMap<String,CDFReader> openFiles= new LinkedHashMap();
-    protected static final Map<CDFReader,String> openFilesRev= new HashMap();
+    private static final Map<CDFReader,String> openFilesRev= new HashMap();
     protected static final Map<String,Long> openFilesFresh= new HashMap();
     protected static final Object lock= new Object();
 
     private static final int DS_CACHE_SIZE_LIMIT= 2;
-    protected static final LinkedHashMap<String,MutablePropertyDataSet> dsCache= new LinkedHashMap();
-    protected static final HashMap<String,Long> dsCacheFresh= new HashMap();
-    protected static final Object dslock= new Object();
+    private static final LinkedHashMap<String,MutablePropertyDataSet> dsCache= new LinkedHashMap();
+    private static final HashMap<String,Long> dsCacheFresh= new HashMap();
+    private static final Object dslock= new Object();
 
     private static void cdfCacheUnload( String fileName, boolean unloadDs ) {
         synchronized (lock) {logger.log(Level.FINER, "cdfCacheUnload cdf file {0} from cache: unloadDs={1}", new Object[] { fileName, unloadDs } );            
