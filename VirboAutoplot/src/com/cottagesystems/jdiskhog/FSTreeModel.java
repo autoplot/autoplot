@@ -281,9 +281,13 @@ public class FSTreeModel implements TreeModel {
         if (!f.exists()) {
             return 0;
         }
+        if ( f.isFile() ) {
+            return 0;
+        }
         File[] ff = listings.get(f);
         if (ff == null) {
             ff = f.listFiles();
+            assert ff!=null;
             if (hideListingFile) {
                 List<File> lff = new ArrayList(Arrays.asList(ff));
                 lff.remove(new File(f, ".listing"));
