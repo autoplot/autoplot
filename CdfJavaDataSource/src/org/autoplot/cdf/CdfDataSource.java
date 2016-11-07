@@ -985,7 +985,7 @@ public class CdfDataSource extends AbstractDataSource {
                         thisAttributes.remove("LABL_PTR_" + sidep);
                     }
                     if ( lablDs!=null && lablDs.length()<4 && displayType==null ) {
-                        logger.log(Level.FINER, "setting null displayType to time_series", displayType);
+                        logger.log(Level.FINER, "setting null displayType to time_series" );
                         displayType= "time_series";
                     }
                 }
