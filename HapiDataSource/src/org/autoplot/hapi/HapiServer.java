@@ -138,7 +138,7 @@ public class HapiServer {
      * @throws java.io.IOException
      * @throws org.json.JSONException
      */
-    public static List<String> getCatalog( URL server ) throws IOException, JSONException {
+    public static List<String> getCatalogIds( URL server ) throws IOException, JSONException {
         URL url;
         url= HapiServer.createURL( server, "catalog" );
         StringBuilder builder= new StringBuilder();
@@ -157,6 +157,30 @@ public class HapiServer {
             result.add( i,catalog.getJSONObject(i).getString("id") );
         }
         return result;
+    }
+     
+    /**
+     * return the list of datasets available at the server
+     * @param server the root of the server, which should should contain "catalog"
+     * @return list of dataset ids
+     * @throws java.io.IOException
+     * @throws org.json.JSONException
+     */
+    public static JSONArray getCatalog( URL server ) throws IOException, JSONException {
+        URL url;
+        url= HapiServer.createURL( server, "catalog" );
+        StringBuilder builder= new StringBuilder();
+        logger.log(Level.FINE, "getCatalog {0}", url.toString());
+        try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
+            String line= in.readLine();
+            while ( line!=null ) {
+                builder.append(line);
+                line= in.readLine();
+            }
+        }
+        JSONObject o= new JSONObject(builder.toString());
+        JSONArray catalog= o.getJSONArray("catalog");
+        return catalog;
     }
     
     /**
@@ -215,7 +239,7 @@ public class HapiServer {
         }
     }
 
-    public static JSONArray getCatalog(URL server, String id) throws IOException, JSONException {
+    public static JSONArray getParameters(URL server, String id) throws IOException, JSONException {
         JSONObject o= getInfo( server, id );
         JSONArray catalog= o.getJSONArray("parameters");
         return catalog;
