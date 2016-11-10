@@ -55,7 +55,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
     private static final Logger logger= LoggerManager.getLogger("apdss.hapi");
     
-    List<String> ids;
+    JSONArray idsJSON;
     
     URL defaultServer;
     
@@ -157,6 +157,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         clearAllB = new javax.swing.JButton();
         setAllB = new javax.swing.JButton();
         extraInfoButton = new javax.swing.JButton();
+        titleLabel = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         binaryCB = new javax.swing.JCheckBox();
 
@@ -189,6 +190,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jSplitPane1.setDividerLocation(210);
 
         jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        jScrollPane2.setMinimumSize(new java.awt.Dimension(100, 22));
 
         idsList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane2.setViewportView(idsList2);
@@ -201,11 +203,11 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         parametersPanel.setLayout(parametersPanelLayout);
         parametersPanelLayout.setHorizontalGroup(
             parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 308, Short.MAX_VALUE)
+            .addGap(0, 469, Short.MAX_VALUE)
         );
         parametersPanelLayout.setVerticalGroup(
             parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 195, Short.MAX_VALUE)
+            .addGap(0, 197, Short.MAX_VALUE)
         );
 
         jScrollPane4.setViewportView(parametersPanel);
@@ -231,22 +233,27 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             }
         });
 
+        titleLabel.setText(" ");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(extraInfoButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(clearAllB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(setAllB))
+            .addComponent(titleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
+                .addComponent(titleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(clearAllB)
@@ -277,7 +284,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(timeRangeTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
+                        .addComponent(timeRangeTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
@@ -294,7 +301,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     .addComponent(jLabel1)
                     .addComponent(serversComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -382,6 +389,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private javax.swing.JComboBox<String> serversComboBox;
     private javax.swing.JButton setAllB;
     private javax.swing.JTextField timeRangeTextField;
+    private javax.swing.JLabel titleLabel;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -396,7 +404,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             split.file= defaultServer.toString();
         }  
         try {
-            ids= HapiServer.getCatalogIds(new URL(split.file));
+            idsJSON= HapiServer.getCatalog(new URL(split.file));
         } catch ( IOException ex ) {
             jLabel3.setText("Unable to connect to server");
         }
@@ -524,12 +532,12 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     
     private void resetServer( URL server ) throws IOException, JSONException {
         try {
-            JSONArray ids= HapiServer.getCatalog(server);
+            idsJSON= HapiServer.getCatalog(server);
             DefaultListModel model= new DefaultListModel();
-            for ( JSONObject id: new JSONArrayIterator(ids) ) model.addElement( id.getString("id") );
+            for ( JSONObject id: new JSONArrayIterator(idsJSON) ) model.addElement( id.getString("id") );
             idsList2.setModel( model );
             int maxLen=0;
-            for ( JSONObject id: new JSONArrayIterator(ids) ) {
+            for ( JSONObject id: new JSONArrayIterator(idsJSON) ) {
                 maxLen= Math.max( id.getString("id").length(), maxLen );
             }
             maxLen= maxLen*8; // pixels per character
@@ -598,6 +606,18 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private void resetVariable( URL server, String id ) {
         try {
             JSONObject info= HapiServer.getInfo( server, id );
+            for ( JSONObject item : new JSONArrayIterator(idsJSON) ) {
+                if ( item.getString("id").equals(id) ) {
+                    if ( item.has("title") ) {
+                        String title= item.getString("title");
+                        titleLabel.setText(title);
+                        titleLabel.setToolTipText(title);
+                        titleLabel.setMinimumSize(new Dimension(100,titleLabel.getFont().getSize()));
+                    } else {
+                        titleLabel.setText(id);
+                    }
+                }
+            }
             JSONArray parameters= info.getJSONArray("parameters");
             
             StringBuilder extra= new StringBuilder();
