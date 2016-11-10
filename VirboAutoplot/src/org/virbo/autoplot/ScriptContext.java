@@ -49,10 +49,18 @@ import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.datum.InconvertibleUnitsException;
+import org.das2.event.BoxRenderer;
+import org.das2.event.BoxSelectionEvent;
+import org.das2.event.BoxSelectionListener;
+import org.das2.event.BoxSelectorMouseModule;
+import org.das2.event.MouseModule;
+import org.das2.graph.DasPlot;
 import org.das2.util.AboutUtil;
 import org.das2.util.awt.SvgGraphicsOutput;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
+import org.python.core.Py;
+import org.python.core.PyFunction;
 import org.virbo.autoplot.ApplicationModel.ResizeRequestListener;
 import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.DomUtil;
@@ -730,6 +738,28 @@ public class ScriptContext extends PyJavaInstance {
             }
         }
         return newChNum;
+    }
+    
+    /**
+     * add code that will respond to mouse events.  This will receive an 
+     * event following the mouse release when a box is dragged out.
+     * @param plot
+     * @param label
+     * @param listener
+     * @return 
+     */
+    public static MouseModule addMouseModule( Plot plot, String label, final PyFunction listener ) {
+        DasPlot p= plot.getController().getDasPlot();
+        BoxSelectorMouseModule mm= new BoxSelectorMouseModule( p, p.getXAxis(), p.getYAxis(), null, new BoxRenderer(p), label );
+        BoxSelectionListener bsl= new BoxSelectionListener() {
+            @Override
+            public void BoxSelected(BoxSelectionEvent e) {
+                listener.__call__(Py.java2py(e));
+            }
+        };
+        mm.addBoxSelectionListener(bsl);
+        p.getDasMouseInputAdapter().setPrimaryModule(mm);
+        return mm;
     }
     
     /**
