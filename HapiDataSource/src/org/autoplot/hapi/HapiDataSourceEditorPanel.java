@@ -121,6 +121,14 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                         currentParameters= null;
                     }
                     currentId= idsList2.getSelectedValue();
+                    if ( currentId!=null ) {
+                        titleLabel.setText("Retrieving info for "+currentId+"...");
+                    } else {
+                        titleLabel.setText(" ");
+                    }
+                    parametersPanel.removeAll();
+                    parametersPanel.revalidate();
+                    parametersPanel.repaint();
                     resetVariableTimer.tickle();
                 }
             }
@@ -565,7 +573,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             this.currentParameters= parameters;
             setParameters(this.currentParameters);
         }
-        if ( "binary".equals(params.get("format") ) ) {
+        if ( HAPI_BINARY.equals(params.get("format") ) ) {
             this.binaryCB.setSelected(true);
         } else {
             this.binaryCB.setSelected(false);
@@ -620,8 +628,11 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 if ( filter.length()>0 ) {
                     Pattern p= Pattern.compile(filter,Pattern.CASE_INSENSITIVE);
                     String id= catalogEntry.getString("id");
-                    String title= catalogEntry.getString("title");
-                    if ( p.matcher(id).find() || p.matcher(title).find() ) {
+                    String title= null;
+                    if ( catalogEntry.has(HAPI_TITLE) ) {
+                        title= catalogEntry.getString(HAPI_TITLE);
+                    }
+                    if ( p.matcher(id).find() || ( title!=null && p.matcher(title).find() ) ) {
                         model.addElement( catalogEntry.getString("id") );
                         maxCharacters= Math.max( catalogEntry.getString("id").length(), maxCharacters );
                     }
@@ -650,10 +661,10 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 JSONArray capabilities= capabilitiesDoc.getJSONArray("capabilities");
                 for ( int i=0; i<capabilities.length(); i++ ) {
                     JSONObject c= capabilities.getJSONObject(i);
-                    if ( c.has("formats") ) {
-                        JSONArray formats= c.getJSONArray("formats");
+                    if ( c.has(HAPI_FORMATS) ) {
+                        JSONArray formats= c.getJSONArray(HAPI_FORMATS);
                         for ( int j=0; j<formats.length(); j++ ) {
-                            if ( formats.getString(j).equals("binary") ) {
+                            if ( formats.getString(j).equals(HAPI_BINARY) ) {
                                 binaryIsEnabled= true;
                             }
                         }
@@ -669,6 +680,18 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         }
 
     }
+    
+    
+    protected static final String HAPI_FORMATS = "formats";
+    
+    
+    protected static final String HAPI_BINARY = "binary";
+    
+    /**
+     * some HAPI servers have optional title for IDs.
+     */
+    protected static final String HAPI_TITLE = "title";
+    
     /**
      * 
      * @param server
@@ -714,8 +737,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             JSONObject info= HapiServer.getInfo( server, id );
             for ( JSONObject item : new JSONArrayIterator(idsJSON) ) {
                 if ( item.getString("id").equals(id) ) {
-                    if ( item.has("title") ) {
-                        String title= item.getString("title");
+                    if ( item.has(HAPI_TITLE) ) {
+                        String title= item.getString(HAPI_TITLE);
                         titleLabel.setText(title);
                         titleLabel.setToolTipText(title);
                         titleLabel.setMinimumSize(new Dimension(100,titleLabel.getFont().getSize()));
