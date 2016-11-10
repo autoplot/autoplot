@@ -35,11 +35,7 @@ public class CatalogServlet extends HttpServlet {
         JSONObject jo= new JSONObject();
         jo.put("HAPI","1.0");
         jo.put("x-deployedAt", deployedAt );
-        JSONArray catalog= new JSONArray();
-        List<String> ids= HapiServerSupport.getCatalog();
-        for ( int i=0; i<ids.size(); i++ ) {
-            catalog.put( i, new JSONObject().put( "id", ids.get(i) ) );
-        }
+        JSONArray catalog= HapiServerSupport.getCatalog();
         jo.put("catalog",catalog);
         return jo;
     }

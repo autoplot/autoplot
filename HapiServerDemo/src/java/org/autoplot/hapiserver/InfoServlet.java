@@ -61,7 +61,7 @@ public class InfoServlet extends HttpServlet {
             jo.put( "sampleEndDate", "2016-07-29T00:00Z" );
         }
         
-        if ( !HapiServerSupport.getCatalog().contains(id) ){
+        if ( !HapiServerSupport.getCatalogIds().contains(id) ){
             throw new IllegalArgumentException("invalid parameter id: \""+id+"\" is not known.");
         }
         
