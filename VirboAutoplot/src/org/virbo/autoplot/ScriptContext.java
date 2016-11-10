@@ -743,10 +743,13 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * add code that will respond to mouse events.  This will receive an 
      * event following the mouse release when a box is dragged out.
-     * @param plot
-     * @param label
-     * @param listener
-     * @return 
+     * 
+     * @param plot the plot which will receive the events.
+     * @param label a label for the mouse module.
+     * @param listener the PyFunction to call with new events.
+     * @return the mouse module.  
+     * @see org.das2.event.MouseModule#setDragRenderer(org.das2.event.DragRenderer) 
+     * 
      */
     public static MouseModule addMouseModule( Plot plot, String label, final PyFunction listener ) {
         DasPlot p= plot.getController().getDasPlot();
