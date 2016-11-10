@@ -201,7 +201,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         parametersPanel.setLayout(parametersPanelLayout);
         parametersPanelLayout.setHorizontalGroup(
             parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 208, Short.MAX_VALUE)
+            .addGap(0, 308, Short.MAX_VALUE)
         );
         parametersPanelLayout.setVerticalGroup(
             parametersPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -277,12 +277,12 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(timeRangeTextField)
+                        .addComponent(timeRangeTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 201, Short.MAX_VALUE)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(binaryCB)))
                 .addContainerGap())
         );
@@ -396,7 +396,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             split.file= defaultServer.toString();
         }  
         try {
-            ids= HapiServer.getCatalog(new URL(split.file));
+            ids= HapiServer.getCatalogIds(new URL(split.file));
         } catch ( IOException ex ) {
             jLabel3.setText("Unable to connect to server");
         }
@@ -524,13 +524,13 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     
     private void resetServer( URL server ) throws IOException, JSONException {
         try {
-            List<String> ids= HapiServer.getCatalog(server);
+            JSONArray ids= HapiServer.getCatalog(server);
             DefaultListModel model= new DefaultListModel();
-            for ( String id: ids ) model.addElement( id );
+            for ( JSONObject id: new JSONArrayIterator(ids) ) model.addElement( id.getString("id") );
             idsList2.setModel( model );
             int maxLen=0;
-            for ( String s: ids ) {
-                maxLen= Math.max( s.length(), maxLen );
+            for ( JSONObject id: new JSONArrayIterator(ids) ) {
+                maxLen= Math.max( id.getString("id").length(), maxLen );
             }
             maxLen= maxLen*8; // pixels per character
             maxLen= Math.min( maxLen,600 );

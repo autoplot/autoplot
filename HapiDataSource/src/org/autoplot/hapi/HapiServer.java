@@ -162,7 +162,7 @@ public class HapiServer {
     /**
      * return the list of datasets available at the server
      * @param server the root of the server, which should should contain "catalog"
-     * @return list of dataset ids
+     * @return list of catalog entries, which have "id" and "title" tags.
      * @throws java.io.IOException
      * @throws org.json.JSONException
      */

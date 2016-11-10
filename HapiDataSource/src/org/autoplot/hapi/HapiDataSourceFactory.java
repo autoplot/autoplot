@@ -59,7 +59,7 @@ public class HapiDataSourceFactory extends AbstractDataSourceFactory {
             if (paramName.equals("id")) {
                 URI uri= cc.resourceURI;
                 if ( uri==null ) throw new IllegalArgumentException("expected das2server location");
-                List<String> dss= HapiServer.getCatalog(uri.toURL()); 
+                List<String> dss= HapiServer.getCatalogIds(uri.toURL()); 
                 for ( String ds: dss ) {
                     if ( ds.startsWith(cc.completable) ) {
                         result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ds ) );
