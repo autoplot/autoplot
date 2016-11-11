@@ -24,8 +24,9 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-11-05 r19889):</p>
+        <p>Bugfixes (2016-11-11 r19933):</p>
         <ul> 
+            <li>data set selector component setValue would add "%20" when there was an extra space at the end when cut-n-paste URIs.
             <li>rte_1741708130: rendering of rank 3 waveform would fail w/NullPointerException when within one packet.  Thanks, Nhan!
             <li>slightly tighten the check for JSON headed-ascii files by looking for a colon between the braces.
             <li>Use last HAPI server by default.  Jon's elasticbeanstalk is the default server.
