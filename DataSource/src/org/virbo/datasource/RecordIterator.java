@@ -153,7 +153,6 @@ public class RecordIterator implements Iterator<QDataSet>  {
             } else {
                 this.src= ds;
             }
-            constrainDepend0(timeRange);
             
         }
     }
