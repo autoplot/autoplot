@@ -125,13 +125,14 @@ public class URISplit {
     /**
      * make the URI colloquial, e.g. removing "vap+cdf:" from "vap+cdf:file:///tmp/x.cdf"
      * URIs that do not have a resource URI are left alone.
-     * @param suri
-     * @return
+     * @param suri a URI 
+     * @return the URI, more colloquial and readable.
      */
     public static String makeColloquial(String suri) {
         logger.log(Level.FINEST, "makeColloquial {0}", suri);
         if ( suri==null ) return null;
-        if ( suri.trim().equals("") ) return "";
+        suri= suri.trim();
+        if ( suri.equals("") ) return "";
         URISplit split= URISplit.parse(suri);
         if ( split.vapScheme!=null ) {
             if ( split.ext!=null && split.ext.length()>1 && split.vapScheme.equals("vap+"+split.ext.substring(1) ) ) {
