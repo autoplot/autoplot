@@ -101,6 +101,8 @@ public class DataServlet extends HttpServlet {
         try {
             if ( id.equals("Iowa City Conditions") ) { // TODO: 
                 dsiter= new RecordIterator( "vap+jyds:file:///home/jbf/public_html/1wire/ictemp/readTemperaturesMulti.jyds", dr, allowStream );
+            } else if ( id.equals("Iowa City Forecast") ) {
+                dsiter= new RecordIterator( "vap+jyds:file:///home/jbf/ct/autoplot/script/weatherForecast.jyds", dr, allowStream );
             } else if ( id.equals("Spectrum") ) {
                 dsiter= new RecordIterator( "vap+cdaweb:ds=RBSP-A_HFR-SPECTRA_EMFISIS-L2&id=HFR_Spectra", dr , allowStream);
             } else if ( id.equals("PowerWheel") ) {
@@ -117,7 +119,11 @@ public class DataServlet extends HttpServlet {
             throw new IllegalArgumentException("Exception thrown by data read", ex);
         }
         
-        dsiter.constrainDepend0(dr);
+        try {
+            dsiter.constrainDepend0(dr);
+        } catch ( IllegalArgumentException ex ) {
+            response.setHeader( "X-WARNING", "data is not monotonic in time, sending everything." );
+        }
         
         OutputStream out = response.getOutputStream();
         

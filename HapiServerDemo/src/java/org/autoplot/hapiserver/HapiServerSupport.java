@@ -25,6 +25,7 @@ public class HapiServerSupport {
         result.add( "610008002FE00410" );
         result.add( "AC00080040250510" );
         result.add( "Iowa City Conditions" );
+        result.add( "Iowa City Forecast" );
         result.add( "Spectrum" );
         result.add( "PowerWheel");
         result.add( "PowerOnesDigitSegments");
@@ -39,6 +40,7 @@ public class HapiServerSupport {
         array.put( new JSONObject().put("id","610008002FE00410").put("title","Sensor 61") );
         array.put( new JSONObject().put("id","AC00080040250510").put("title","Sensor AC") );
         array.put( new JSONObject().put("id","Iowa City Conditions").put("title","Iowa City Conditions") );
+        array.put( new JSONObject().put("id","Iowa City Forecast").put("title","Iowa City Forecast") );
         array.put( new JSONObject().put("id","Spectrum").put("title","Example Spectrum") );
         array.put( new JSONObject().put("id","PowerWheel").put("title","Spinning Wheel on Power Meter") );
         return array;

@@ -29,6 +29,9 @@ public class InfoServlet extends HttpServlet {
         if ( id.equals("Iowa City Conditions") ) {
             jo.put( "firstDate", "2012-05-25T00:00Z" );
             jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
+        } else if ( id.equals("Iowa City Forecast") ) {
+            jo.put( "firstDate", "2012-05-25T00:00Z" );
+            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
         } else if ( id.equals("0B000800408DD710") ) {
             jo.put( "firstDate", "2012-01-09T00:00Z" );
             jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
@@ -127,6 +130,14 @@ public class InfoServlet extends HttpServlet {
             parameter.put( "fill", "-1e31" );
             parameter.put( "description", "Precipitation" );
             parameters.put( 8, parameter );
+        } else if ( id.equals("Iowa City Forecast") ) {
+            parameter= new JSONObject();
+            parameter.put( "name", "Temperature" );
+            parameter.put( "type", "double" );
+            parameter.put( "units", "deg F" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Air Temperature" );
+            parameters.put( 1, parameter );
                  
         } else if ( id.equals("Spectrum") ) {
             parameter= new JSONObject();
