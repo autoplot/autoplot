@@ -1825,11 +1825,13 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     }
 
     /**
-     * Set the current value for the editor.  This does not fire an event, so call maybePlot() to accept the value.
-     * @param value New value of property value.
+     * Set the current value for the editor.  This does not fire an event, 
+     * so call maybePlot() to accept the value.
+     * @param value the new URI.
      */
     public void setValue(String value) {
         logger.log(Level.FINE, "setValue to \"{0}\"", value);
+        if ( value!=null ) value= value.trim();
         //String oldvalue= this.editor.getText();
         this.lastValue= value;
         if (value == null) {
