@@ -12,6 +12,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.capability.Streaming;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -161,6 +162,7 @@ public class RecordIterator implements Iterator<QDataSet>  {
      * limit the data returned such that only data within the datum range
      * provided are returned.
      * @param dr the timerange.
+     * @throws IllegalArgumentException if the data has a depend0 which is not monotonic.
      */
     public final void constrainDepend0( DatumRange dr ) {
         if ( this.src==null ) {
@@ -172,11 +174,15 @@ public class RecordIterator implements Iterator<QDataSet>  {
         index= 0;
         lastIndex= src.length();
         QDataSet dep0= Ops.slice1( this.src, 0 );
-        QDataSet findeces= Ops.findex( dep0, dr );
-        this.index= (int)Math.ceil( findeces.value(0) );
-        this.lastIndex= (int)Math.ceil( findeces.value(1) );
-        this.index= Math.max(0,this.index);
-        this.lastIndex= Math.min(src.length(),this.lastIndex);
+        if ( DataSetUtil.isMonotonic(dep0) ) {
+            QDataSet findeces= Ops.findex( dep0, dr );
+            this.index= (int)Math.ceil( findeces.value(0) );
+            this.lastIndex= (int)Math.ceil( findeces.value(1) );
+            this.index= Math.max(0,this.index);
+            this.lastIndex= Math.min(src.length(),this.lastIndex);
+        } else {
+            throw new IllegalArgumentException("data dep0 is not monotonic");
+        }
     }
     
     /**
