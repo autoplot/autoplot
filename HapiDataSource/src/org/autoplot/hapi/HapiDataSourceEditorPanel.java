@@ -843,5 +843,5 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         }
                 
     }
-    private static final int MAX_LENGTH_CHARACTERS = 3410;
+    private static final int MAX_LENGTH_CHARACTERS = 10000;
 }
