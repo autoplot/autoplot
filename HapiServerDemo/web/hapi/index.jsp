@@ -49,7 +49,7 @@
             <li>2016-10-29: bugfix: binary assumed that times were in us2000.</li>
             <li>2016-10-31: bugfix: running app under different user showed that pylisting.txt was not available.</li>
             <li>2016-11-10: add titles to each item</li>
-            <li>2016-11-11: bugfix: properly handle no granules of data found</li>
+            <li>2016-11-11: bugfix: properly handle no granules of data found.  Add forecast, which includes non-monotonic data.</li>
         </ul>
         </small>
     </body>
