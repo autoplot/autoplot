@@ -212,7 +212,7 @@ public class HapiDataSource extends AbstractDataSource {
             FileSystemUtil.copyStream( httpConnect.getErrorStream(), baos, new NullProgressMonitor() );
             String s= baos.toString("UTF-8");
             if ( s.contains("No data available") ) {
-                logger.fine( s );
+                logger.log(Level.FINE, "No data available, server responded with {0}: {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
                 throw new NoDataInIntervalException("No data available");
             } else {
                 if ( s.length()<256 ) {
