@@ -62,6 +62,10 @@ public class StreamingCapability implements Streaming {
         
         private void loadNext() throws Exception {
             
+            if ( granules.length==0 ) {
+                return;
+            }
+            
             String scompUrl = dss.getFsm().getFileSystem().getRootURI().toString() + granules[igranule];
             if (!dss.getSParams().equals("")) {
                 scompUrl += "?" + dss.getSParams();
@@ -82,6 +86,7 @@ public class StreamingCapability implements Streaming {
         
         @Override
         public boolean hasNext() {
+            if ( currentDataSet==null ) return false;
             if ( currentIndex==currentDataSet.length() ) {
                 igranule++;
                 if ( igranule==granules.length ) {
