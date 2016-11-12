@@ -789,6 +789,15 @@ public class ScriptContext extends PyJavaInstance {
         JOptionPane.showMessageDialog( view, m, "Message", messageType );
         dom.getController().setStatus("warning: "+m);
     }
+    
+    /**
+     * show a popup to the scientist, which they must acknowledge before this
+     * returns.
+     * @param message, possibly containing HTML.
+     */
+    public static void showMessageDialog( String message ) {
+        JOptionPane.showMessageDialog( view, message );
+    }
 
     /**
      * add a tab to the running application.  A new tab will be added with the
