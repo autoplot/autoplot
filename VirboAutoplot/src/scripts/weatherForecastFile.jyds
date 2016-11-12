@@ -1,3 +1,6 @@
+# This reads hourly weather forecast files from weather.gov.
+
+# wget -O /tmp/weatherFile.xml http://forecast.weather.gov/MapClick.php?lat=41.67000&lon=-91.55000&FcstType=digitalDWML
 from javax.xml.parsers import ParserConfigurationException
 from javax.xml.parsers import DocumentBuilderFactory
 from javax.xml.xpath import XPath
@@ -46,6 +49,8 @@ tp.parse( times.item(0).nodeValue[0:19] ).getTime( Units.us2000 )
 for i in range( times.getLength() ):
    ttimes.putValue( i, tp.parse( times.item(i).nodeValue[0:19] ).getTime( Units.us2000 ) )
 ttimes.putProperty( QDataSet.UNITS, Units.us2000 )
+
+ttimes= ttimes + dataset('5hr')
 
 ttemps.putProperty( QDataSet.DEPEND_0, ttimes )
 
