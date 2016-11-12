@@ -28,6 +28,9 @@
         <ul> 
             <li>1708: digitizer component fails when the first column was not time, because code assumed times with timeFormatter.
             <li>data set selector component setValue would add "%20" when there was an extra space at the end when cut-n-paste URIs.
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>rte_1741708130: rendering of rank 3 waveform would fail w/NullPointerException when within one packet.  Thanks, Nhan!
             <li>slightly tighten the check for JSON headed-ascii files by looking for a colon between the braces.
             <li>Use last HAPI server by default.  Jon's elasticbeanstalk is the default server.
@@ -72,40 +75,10 @@
             <li>applyIndex supports BUNDLE_i.</li>
             <li>Series renderer plotSymbols would show when units were inconvertible, but then connectors would refuse to paint.  Now both will paint with a warning.</li>
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>blurTsbUri would fail when a data source was removed, but one of its URIs was still in the history.</li>
-            <li>1677: interpolate2D should allow interpolation along edges when the opposite edge contains fill</li>
-            <li>interpolate2D with two rank 0 datasets for xx and yy would cause RTE.</li>
-            <li>1672: layout panel was failing to repaint when plots were added.</li>
-            <li>1636: if statements in Jython scripts could mess up code that would extract the getParam calls to create GUI.  Thanks Ivar!</li>
-            <li>1671: contour insert fill values but property is not set</li>
-            <li>1670: spectrogram averaging code assumed that 0*NaN would be 0.  Thanks, Ivar!</li>
-            <li>1669: "common path" code, which tries to obscure local references in .vap.zip files, would use "" for data filename (and it would work, surprisingly).</li>
-            <li>add a bit of fuzz to the fill value test, after seeing a d2s with 1e31 failing to detect fill</li>
-            <li>1499: Brian's events file (two ISO8601/line) fails to parse. </li>
-            <li>1667: color icons not shown in events list tool.</li>
-            <li>rfe521: devel-release had a bug where events list couldn't be aggregated</li>
-            <li>1666: Jython ds[i,j] would return rank 1 when i was integer and j was rank 0 dataset.</li>
-            <li>rte_1104366814: format .wav "data extent is too great" message didn't consider scale.</li>
-            <li>ImageDataSource would use Datum is TYPICAL_MAX and TYPICAL_MIN, instead of Number</li>
-            <li>slices GUI formatted command that was then not supported (: vs ':')</li>
-            <li>code to repaint layout panel was triggering itself, causing unnecessary paints.</li>
-            <li>1665: new jumpiness when click-n-drag on x axis.</li>
-            <li>1661: new version of CDF library supports export to CDF using append now works on Windows.</li>
-            <li>1653: clean up "Add additional ticks" dialog.</li>            
-            <li>1662: smooth function fails when fill exists in the first boxcar.  Thanks Kristoff!</li>
-            <li>1660: Jython setItem assignment of ds[i,j] to rank 0 dataset.  Thanks Kristoff!</li>
-            <li>rte_0520679247: don't do separate check for timeSeriesBrowse part of URI, which produces confusing messages.  Thanks, Mark!</li>
-            <li>1612: recent change would cause RTE when all data was fill.</li>
-            <li>1659: "monitor finished was called twice" when reading das2stream from das2server.  Thanks Masafumi!</li>
-            <li>1658: failure to start jython because pylisting.txt, clarify error message</li>
-            <li>1633: ImageDataSet renderer recoded to extract just the visible portion</li>
-            <li>1653: add explicit "clear" button to the ephemeris dialog.</li>
-            <li>rfe499: SciPy Plasma colorbar added.  Thanks, Steve!</li>
-            <li>rfe509: maybeCreateDasPeer should check headless before adding an export data button to the horizontal and vertical slice.</li>
-        </ul>
         <p>Features:</p>
+        <ul>
+       </ul>
+        <p>Less recent features:</p>
         <ul>
             <li>541: Need for BIN_MAX and BIN_MIN properties to state extent in the same units as the data.  Thanks, Chris!</li>
             <li>538: Introduce synchronize checkbox to vap+line mash-up scripts, which interpolates all data to the same timetags.  Thanks Kristoff!</li>
@@ -127,34 +100,6 @@
             <li>The console Logger control uses a table now, and allows sorting by log level.</li>
             <li>HTML parser allows the units to be set externally.  "N/A" was causing the units to come back as ordinal units.</li>
             <li>DataPointRecorder allows the time format to be controlled.</li>
-       </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>rfe247: experiment with allowing the data source to be edited without resetting everything else.  Thanks Chris, Bob, and Bill!</li>
-            <li>Tooltips indicate description of filters in Filter Chain.  Thanks, Chris!</li>
-            <li>rfe526: add test for rank join of rank 2 waveforms, to support cases where sampling rate changes for example.</li>
-            <li>dataset index range checking flag is enabled by default now, improving error message precision.</li>
-            <li>sin,cos,atan,etc added to Mash Up tool.</li>
-            <li>add fillValue, validMin and validMax keywords to NetCDF reader.</li>
-            <li>AMDA had a .nc file where the times were 1997223000009297, so special code is added to look for this case.</li>
-            <li>script:/tmp/foo.jy, /tmp/foo.jy, are all treated as "--script /tmp/foo.jy" to support running from the command line.</li>
-            <li>BinaryDataSource has fillValue and units keywords to support PDS4.</li>
-            <li>abstract dataset trim(0,len) returns self, improving performance slightly</li> 
-            <li>unwrap function to mimic SciPy and Matlab function</li>
-            <li>add hilbertFrequency, hilbertPhase, and hilbertEnvelope filters.</li>
-            <li>hilbert function added.</li>
-            <li>unbundle supports rank 2 unbundle. </li>
-            <li>addPlot(rowSpec,columnSpec) command added</li>
-            <li>rfe523: format to wav now scales data by default.</li>
-            <li>rfe521: aggregation of images is supported with new rules for aggregation.</li>
-            <li>Improvements to applot.py, which supports plotting from C Python.</li>
-            <li>Introduce ifft, for inverse transforms, to support hilbert function.</li>
-            <li>bug1664: CDF data source URI keyword replaceLabels=T will use the channel values to label (e.g. 14eV instead of ch01).  Thanks, Cindy!</li>
-            <li>BinaryDataSource editor supports tab</li>
-            <li>trim1 which trims elements from the first dimension, not just the zeroth.</li>
-            <li>smooth1 which smooths over the first dimension, not just the zeroth.</li>
-            <li>add matplotlib plasma colorbar</li>
-            <li>rfe515: add DOTS where the dots/spacing is [0,3]</li>
         </ul>
 
         <p>Known issues:</p>
