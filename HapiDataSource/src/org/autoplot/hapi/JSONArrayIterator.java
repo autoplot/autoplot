@@ -45,7 +45,7 @@ public class JSONArrayIterator implements Iterable<JSONObject>, Iterator<JSONObj
 
     @Override
     public void remove() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // support Java 7.
     }
     
 }
