@@ -374,10 +374,16 @@ public class HapiDataSource extends AbstractDataSource {
         int totalFields= DataSetUtil.sum(nfields);
 
         QDataSet ds;
-        if ( format.equals("csv") ) {
-            ds= getDataSetViaCsv(totalFields, monitor, url, pds, tr, nparam, nfields);
-        } else {
-            ds= getDataSetViaBinary(totalFields, monitor, url, pds, tr, nparam, nfields);
+        switch (format) {
+            case "binary":
+                ds= getDataSetViaBinary(totalFields, monitor, url, pds, tr, nparam, nfields);
+                break;
+            case "json":
+                ds= getDataSetViaJSON(totalFields, monitor, url, pds, tr, nparam, nfields);
+                break;
+            default:
+                ds= getDataSetViaCsv(totalFields, monitor, url, pds, tr, nparam, nfields);
+                break;
         }
         
         if ( ds.length()==0 ) {
@@ -486,6 +492,94 @@ public class HapiDataSource extends AbstractDataSource {
         return ds;
     }
 
+    /**
+     * read data embedded within a JSON response.  This current reads in the entire JSON document,
+     * but the final version should use a streaming JSON library.
+     * @param monitor
+     * @return the dataset.
+     * @throws Exception 
+     */
+    private QDataSet getDataSetViaJSON( int totalFields, ProgressMonitor monitor, URL url, ParamDescription[] pds, DatumRange tr, int nparam, int[] nfields) throws IllegalArgumentException, Exception, IOException {
+        
+        monitor.started();
+        monitor.setProgressMessage("prepare data");
+        
+        long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
+       
+        int lineNum=0;
+        
+        StringBuilder builder= new StringBuilder();
+        logger.log(Level.FINE, "getDocument {0}", url.toString());
+        HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
+        try ( BufferedReader in= new BufferedReader( new InputStreamReader( httpConnect.getInputStream() ) ) ) {
+            String line= in.readLine();
+            lineNum++;
+            while ( line!=null ) {
+                if ( System.currentTimeMillis()-t0 > 100 ) {
+                    monitor.setProgressMessage("reading line "+lineNum);
+                    t0= System.currentTimeMillis();
+                }
+                //if ( line.startsWith("{ \"data\" :") ) { // TODO: kludge for Jon's server
+                //    in.readLine();
+                //    line= in.readLine();
+                //}
+                builder.append(line);
+                line= in.readLine();
+            }
+        } catch ( IOException ex ) {
+            ByteArrayOutputStream baos= new ByteArrayOutputStream();
+            FileSystemUtil.copyStream( httpConnect.getErrorStream(), baos, new NullProgressMonitor() );
+            String s= baos.toString("UTF-8");
+            if ( s.contains("No data available") ) {
+                logger.log(Level.FINE, "No data available, server responded with {0}: {1}", new Object[]{httpConnect.getResponseCode(), httpConnect.getResponseMessage()});
+                throw new NoDataInIntervalException("No data available");
+            } else {
+                if ( s.length()<256 ) {
+                    throw new IOException( ex.getMessage() + ": "+s );
+                } else {
+                    throw ex;
+                }
+            }
+        }
+
+        monitor.setProgressMessage("parsing data");
+                
+        JSONObject jo= new JSONObject(builder.toString());
+        JSONArray data= jo.getJSONArray("data");
+        
+        DataSetBuilder build= new DataSetBuilder( 2, data.length(), totalFields );
+                
+        for ( int i=0; i<data.length(); i++ ) {
+            
+            int ipd=0;
+            int ifield=0;
+            JSONArray record= data.getJSONArray(i);
+            
+            for ( ParamDescription pd: pds ) {
+                Units u= pd.units;
+                if ( nfields[ipd]>1 ) {
+                    JSONArray fields= record.getJSONArray(ipd);
+                    int nf= nfields[ipd];
+                    int lastField= nf+ifield;
+                    for ( ; ifield<lastField; ifield++ ) {
+                        build.putValue( -1, ifield, pd.units.parse( fields.getString(ipd) ) );
+                    }
+                } else {
+                    build.putValue( -1, ifield, pd.units.parse( record.getString(ipd) ) );
+                }
+                ifield+= nfields[ipd];
+                ipd++;
+            }
+            build.nextRecord();
+        }
+                
+        QDataSet result;
+                
+        result= build.getDataSet();
+        
+        return result;
+    }
+    
     private QDataSet getDataSetViaCsv(int totalFields, ProgressMonitor monitor, URL url, ParamDescription[] pds, DatumRange tr, int nparam, int[] nfields) throws IllegalArgumentException, Exception, IOException {
         DataSetBuilder builder= new DataSetBuilder(2,100,totalFields);
         monitor.setProgressMessage("reading data");
