@@ -42,5 +42,10 @@ public class JSONArrayIterator implements Iterable<JSONObject>, Iterator<JSONObj
     public Iterator<JSONObject> iterator() {
         return this;
     }
+
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }
