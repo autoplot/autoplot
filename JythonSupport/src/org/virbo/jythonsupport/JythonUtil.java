@@ -127,7 +127,7 @@ public class JythonUtil {
         if ( loadAutoplotStuff ) {
             maybeLoadAdapters();
             if ( Util.isLegacyImports() ) {
-                URL imports= JythonOps.class.getResource("imports.py");
+                URL imports= JythonOps.class.getResource("/imports.py");
                 if ( imports==null ) {
                     throw new RuntimeException("unable to locate imports.py on classpath");
                 } else {
@@ -139,7 +139,7 @@ public class JythonUtil {
                 logger.log( Level.FINE, simports );
                 //InputStream in = imports.openStream();
                 try {
-                    interp.execfile( new ByteArrayInputStream(bimports), "imports.py");
+                    interp.execfile( new ByteArrayInputStream(bimports), "/imports.py");
                 } finally {
                     in.close();
                 }

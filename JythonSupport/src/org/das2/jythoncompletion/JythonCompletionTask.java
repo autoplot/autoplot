@@ -896,12 +896,9 @@ public class JythonCompletionTask implements CompletionTask {
                 interp = new PythonInterpreter();
             }
             if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
-                URL imports = JythonOps.class.getResource("imports.py");
-                InputStream in= imports.openStream();
-                try {
-                    interp.execfile(in,"imports.py");
-                } finally {
-                    in.close();
+                URL imports = JythonOps.class.getResource("/imports.py");
+                try (InputStream in = imports.openStream()) {
+                    interp.execfile(in,"/imports.py");
                 }
             }
             return interp;
