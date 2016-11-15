@@ -74,11 +74,8 @@ public class JythonUtil {
         InteractiveInterpreter interp= org.virbo.jythonsupport.JythonUtil.createInterpreter(sandbox);
         if ( org.virbo.jythonsupport.Util.isLegacyImports() ) {
             if ( appContext ) {
-                InputStream in= JythonUtil.class.getResource("appContextImports.py").openStream();
-                try {
-                    interp.execfile( in, "appContextImports.py" );
-                } finally {
-                    in.close();
+                try ( InputStream in = JythonUtil.class.getResource("/appContextImports.py").openStream() ) {
+                    interp.execfile( in, "/appContextImports.py" );
                 }
             }
         }
