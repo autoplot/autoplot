@@ -3671,9 +3671,9 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         String release = AboutUtil.getReleaseTag();
         if (release != null) {
             if ( release.equals("(dev)") ) {
-                release= "dev";
+                release= "devel";
             }
-            String surl = "http:://autoplot.org/jnlp/" + release;
+            String surl = "http://autoplot.org/jnlp/" + release;
             AutoplotUtil.openBrowser(surl);
         } else {
             JOptionPane.showMessageDialog(this, "This is an untagged release.");
