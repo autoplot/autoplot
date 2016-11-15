@@ -1,9 +1,12 @@
 
 package org.virbo.datasource;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,9 +18,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.das2.datum.LoggerManager;
 
@@ -235,6 +242,7 @@ public class RecentComboBox extends JComboBox {
         
     }
 
-
-
+    public static void main( String[] args ) {
+        JOptionPane.showConfirmDialog( null, new RecentComboBox() );
+    }
 }
