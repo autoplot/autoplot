@@ -2,6 +2,7 @@
 package org.autoplot.hapi;
 
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -28,11 +29,14 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.das2.datum.Datum;
@@ -430,9 +434,25 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     }//GEN-LAST:event_setAllBActionPerformed
 
     private void extraInfoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extraInfoButtonActionPerformed
-        JLabel l= new JLabel( currentExtra );
-        
-        JScrollPane p= new JScrollPane(l);
+        JEditorPane jep= new JEditorPane();
+        jep.setContentType("text/html");
+        jep.setText( currentExtra );
+        jep.setEditable( false );
+        jep.setOpaque(false);
+        jep.addHyperlinkListener( new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent hle) { // from http://stackoverflow.com/questions/14170041/is-it-possible-to-create-programs-in-java-that-create-text-to-link-in-chrome
+                if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+                    Desktop desktop = Desktop.getDesktop();
+                    try {
+                        desktop.browse(hle.getURL().toURI());
+                    } catch (Exception ex) {
+                        logger.log( Level.WARNING, ex.getMessage(), ex );
+                    }
+                }
+            }
+        });
+        JScrollPane p= new JScrollPane(jep);
         p.setPreferredSize( new Dimension( 800,400 ) );
         p.setMaximumSize( new Dimension( 800,400 ) );
         JOptionPane.showMessageDialog( this, p, "Extra Info", JOptionPane.INFORMATION_MESSAGE );
@@ -726,6 +746,14 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 s.append("<tr valign=top><td>").append(k).append("</td><td>").append(sv).append("</td></tr>");
             }
             s.append("</table>");
+        } else if ( o instanceof String ) {
+            String so= String.valueOf(o);
+            if ( so.startsWith("spase:") ) {
+                so= "<a href=\"http://spase.info/registry/render?id="+so+"\">"+so+"</a>";
+            } else if ( so.startsWith("http://") || so.startsWith("https://") || so.startsWith("ftp://" ) ) {
+                so= "<a href=\""+so+"\">"+so+"</a>";
+            }
+            s.append(so);
         } else {
             s.append(o.toString());
         }
