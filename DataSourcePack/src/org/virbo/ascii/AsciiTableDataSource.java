@@ -459,7 +459,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
     private DDataSet doReadFile(final ProgressMonitor mon) throws NumberFormatException, IOException, FileNotFoundException {
 
         String o;
-        file = getFile(mon);
+        file = getFile(mon.getSubtaskMonitor("getFile"));
 
         if ( file.isDirectory() ) {
             throw new IOException("expected file but got directory");
