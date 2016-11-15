@@ -19,9 +19,9 @@ ah= AutoHistogram()
 ah.doit(dist)
 
 hist= ah.getHistogram()
-plot(1,'Histogram', hist)
+plot(1, hist,title='Histogram')
 
-plot(2,'Peak ID', ah.peakIds(hist) )
+plot(2,ah.peakIds(hist),title='Peak ID'  )
 
 pks= ah.peaks(hist)
 plotx(3, pks, ones( pks.length() ), title='Peaks', renderType='scatter' )
