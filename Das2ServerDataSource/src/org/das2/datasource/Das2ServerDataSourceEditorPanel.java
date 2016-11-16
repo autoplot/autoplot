@@ -34,6 +34,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -426,7 +427,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                             }
                             
                         }
-                        examples.add( 0, String.format( "<html><i>Example Time Ranges (%d)</i>", examples.size() ) );
+                        examples.add( 0, String.format( Locale.US, "<html><i>Example Time Ranges (%d)</i>", examples.size() ) );
                         DefaultComboBoxModel model= new DefaultComboBoxModel( examples.toArray( new String[examples.size()] ) );
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setModel( model );
                         Das2ServerDataSourceEditorPanel.this.examplesComboBox.setEnabled(true);
