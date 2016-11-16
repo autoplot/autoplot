@@ -56,7 +56,7 @@ import org.virbo.datasource.TimeRangeTool;
 import org.virbo.datasource.URISplit;
 
 /**
- *
+ * Swing editor for HAPI URIs
  * @author jbf
  */
 public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
