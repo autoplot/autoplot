@@ -4059,7 +4059,7 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         
         if ( uri.trim().length()>0 ) {
             URISplit split= URISplit.parse(uri);
-            if ( !split.vapScheme.equals("vap+inline") ) {
+            if ( split.vapScheme==null || !split.vapScheme.equals("vap+inline") ) {
                 uri= "vap+inline:ds=getDataSet('"+uri+"')";
             }
         }
