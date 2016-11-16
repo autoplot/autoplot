@@ -147,7 +147,10 @@ public class DataServlet extends HttpServlet {
                 JSONArray newParameters= new JSONArray();
                 int[] indexMap= new int[pps.length];
                 for ( int ip=0; ip<pps.length; ip++ ) {
-                    int i= map.get(pps[ip]);
+                    Integer i= map.get(pps[ip]);
+                    if ( i==null ) {
+                        throw new IllegalArgumentException("bad parameter: "+pps[ip]);
+                    }
                     indexMap[ip]= i;
                     newParameters.put( ip, jsonParameters.get(i) );
                 }
