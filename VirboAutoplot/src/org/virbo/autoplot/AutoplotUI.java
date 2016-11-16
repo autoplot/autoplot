@@ -4715,8 +4715,6 @@ private void updateFrameTitle() {
                 if ( ! headless ) {
                     logger.addHandler( APSplash.getInstance().getLogHandler() );
                     APSplash.showSplash();
-                } else {
-                    System.err.println("this is autoplot "+APSplash.getVersion());
                 }
 APSplash.checkTime("init -100");
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
