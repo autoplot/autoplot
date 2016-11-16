@@ -9,12 +9,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -30,11 +30,11 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
@@ -105,6 +105,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             throw new RuntimeException(ex);
         }
         initComponents();
+        filtersComboBox.setPreferenceNode("hapi.filters");
         jScrollPane4.getVerticalScrollBar().setUnitIncrement( parametersPanel.getFont().getSize() );
 
         parametersPanel.setLayout( new BoxLayout( parametersPanel, BoxLayout.Y_AXIS ) );
@@ -182,8 +183,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         idsList2 = new javax.swing.JList<>();
-        filtersComboBox = new javax.swing.JComboBox<>();
-        jButton2 = new javax.swing.JButton();
+        clearButton = new javax.swing.JButton();
+        filtersComboBox = new org.virbo.datasource.RecentComboBox();
         jLabel3 = new javax.swing.JLabel();
         binaryCB = new javax.swing.JCheckBox();
 
@@ -287,24 +288,16 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         idsList2.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane2.setViewportView(idsList2);
 
-        filtersComboBox.setEditable(true);
-        filtersComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "RBSP", "Density" }));
-        filtersComboBox.setSelectedItem("");
-        filtersComboBox.addActionListener(new java.awt.event.ActionListener() {
+        clearButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/hapi/clearTextButton.png"))); // NOI18N
+        clearButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                filtersComboBoxActionPerformed(evt);
-            }
-        });
-        filtersComboBox.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                filtersComboBoxKeyTyped(evt);
+                clearButtonActionPerformed(evt);
             }
         });
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/autoplot/hapi/clearTextButton.png"))); // NOI18N
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        filtersComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                filtersComboBoxActionPerformed(evt);
             }
         });
 
@@ -313,9 +306,9 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(filtersComboBox, 0, 176, Short.MAX_VALUE)
+                .addComponent(filtersComboBox, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2))
+                .addComponent(clearButton))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE))
         );
@@ -323,8 +316,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(filtersComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2))
+                    .addComponent(clearButton)
+                    .addComponent(filtersComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 226, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -434,7 +427,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     }//GEN-LAST:event_setAllBActionPerformed
 
     private void extraInfoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extraInfoButtonActionPerformed
-        JEditorPane jep= new JEditorPane();
+        final JEditorPane jep= new JEditorPane();
         jep.setContentType("text/html");
         jep.setText( currentExtra );
         jep.setEditable( false );
@@ -446,41 +439,43 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     Desktop desktop = Desktop.getDesktop();
                     try {
                         desktop.browse(hle.getURL().toURI());
-                    } catch (Exception ex) {
+                    } catch (URISyntaxException | IOException ex) {
                         logger.log( Level.WARNING, ex.getMessage(), ex );
                     }
                 }
             }
         });
-        JScrollPane p= new JScrollPane(jep);
+        final JScrollPane p= new JScrollPane(jep);
         p.setPreferredSize( new Dimension( 800,400 ) );
         p.setMaximumSize( new Dimension( 800,400 ) );
+        SwingUtilities.invokeLater(new Runnable() {  // Grr stupid Java.
+            @Override
+            public void run() {
+                jep.setCaretPosition(0);
+                p.getVerticalScrollBar().setValue(0);
+            }
+        });
         JOptionPane.showMessageDialog( this, p, "Extra Info", JOptionPane.INFORMATION_MESSAGE );
     }//GEN-LAST:event_extraInfoButtonActionPerformed
 
-    private void filtersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filtersComboBoxActionPerformed
-        String search= filtersComboBox.getSelectedItem().toString();
-        resetServerCatalog( currentServer, search );
-    }//GEN-LAST:event_filtersComboBoxActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
         filtersComboBox.setSelectedItem("");
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_clearButtonActionPerformed
 
-    private void filtersComboBoxKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_filtersComboBoxKeyTyped
-        String search= filtersComboBox.getSelectedItem().toString();
-        resetServerCatalog( currentServer, search );
-    }//GEN-LAST:event_filtersComboBoxKeyTyped
+    private void filtersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filtersComboBoxActionPerformed
+        String filter= filtersComboBox.getSelectedItem().toString();
+        resetServerCatalog( currentServer, filter );
+    }//GEN-LAST:event_filtersComboBoxActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox binaryCB;
     private javax.swing.JButton clearAllB;
+    private javax.swing.JButton clearButton;
     private javax.swing.JButton extraInfoButton;
-    private javax.swing.JComboBox<String> filtersComboBox;
+    private org.virbo.datasource.RecentComboBox filtersComboBox;
     private javax.swing.JList<String> idsList2;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -531,8 +526,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 if ( c instanceof JCheckBox ) {
                     String name= ((JCheckBox)c).getName();
                     ((JCheckBox)c).setSelected(false);
-                    for ( int i=0; i<ss.length; i++ ) {
-                        if ( ss[i].equals(name) ) {
+                    for (String s : ss) {
+                        if (s.equals(name)) {
                             ((JCheckBox)c).setSelected(true);
                         }
                     }
@@ -696,7 +691,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             binaryCB.setEnabled(binaryIsEnabled);
 
         } catch ( JSONException ex ) {
-            Logger.getLogger(HapiDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex );
+            logger.log(Level.SEVERE, null, ex );
         }
 
     }
@@ -864,10 +859,8 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     }
                 }
             }
-        } catch (IOException ex) {
-            Logger.getLogger(HapiDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (JSONException ex) {
-            Logger.getLogger(HapiDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | JSONException ex) {
+            logger.log(Level.SEVERE, null, ex);
         }
                 
     }
