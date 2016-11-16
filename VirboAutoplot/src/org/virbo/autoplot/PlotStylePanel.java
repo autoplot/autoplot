@@ -18,6 +18,7 @@ import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -659,12 +660,16 @@ public class PlotStylePanel extends javax.swing.JPanel {
     private void updateSize() {
         int wpixels = dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().width;
         int hpixels = dom.getCanvases(0).getController().getDasCanvas().getPreferredSize().height;
-        if (unitsCB.getSelectedIndex() == 0) {
-            sizeLabel.setText(String.format("w=%d by h=%d pixels", wpixels, hpixels));
-        } else if (unitsCB.getSelectedIndex() == 1) {
-            sizeLabel.setText(String.format("w=%.2f by h=%.2f inch", wpixels / 72., hpixels / 72.));
-        } else {
-            sizeLabel.setText(String.format("w=%.1f by h=%.1f cm", wpixels / 72 * 2.54, hpixels / 72 * 2.54));
+        switch (unitsCB.getSelectedIndex()) {
+            case 0:
+                sizeLabel.setText(String.format("w=%d by h=%d pixels", wpixels, hpixels));
+                break;
+            case 1:
+                sizeLabel.setText(String.format( Locale.US, "w=%.2f by h=%.2f inch", wpixels / 72., hpixels / 72.));
+                break;
+            default:
+                sizeLabel.setText(String.format( Locale.US, "w=%.1f by h=%.1f cm", wpixels / 72 * 2.54, hpixels / 72 * 2.54));
+                break;
         }
     }
 

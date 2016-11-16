@@ -35,6 +35,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -855,7 +856,7 @@ public class ScreenshotsTool extends EventQueue {
         reject= reject || ( (t1 - t0) < 200);
 
         try {
-            logFile.write(String.format("%09.3f %1d %5d %s\n", 
+            logFile.write(String.format( Locale.US, "%09.3f %1d %5d %s\n", 
                     dt / 1000., reject ? 0 : 1, theEvent.getID(), 
                     theEvent.getClass().getName()));
             logFile.flush();

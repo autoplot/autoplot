@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
+import java.util.Locale;
 import org.das2.graph.DasAnnotation;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasDevicePosition;
@@ -71,7 +72,7 @@ public class AnnotationController extends DomNodeController {
                     }
                     double parentSize= f.getSize2D();
                     double relativeSize= size / parentSize;
-                    return String.format( "%.2fem", relativeSize );
+                    return String.format( Locale.US, "%.2fem", relativeSize );
                 }
             }  
         };
