@@ -139,6 +139,38 @@ public class InfoServlet extends HttpServlet {
             parameter.put( "description", "Air Temperature" );
             parameters.put( 1, parameter );
                  
+            parameter= new JSONObject();
+            parameter.put( "name", "DewPoint" );
+            parameter.put( "type", "double" );
+            parameter.put( "units", "deg F" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Dew Point" );
+            parameters.put( 2, parameter );
+
+            parameter= new JSONObject();
+            parameter.put( "name", "PrecipProbabily" );
+            parameter.put( "type", "double" );
+            parameter.put( "units", "%" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Probability of Precipitation" );
+            parameters.put( 3, parameter );
+
+            parameter= new JSONObject();
+            parameter.put( "name", "WindSpeed" );
+            parameter.put( "type", "double" );
+            parameter.put( "units", "mph" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Air Temperature" );
+            parameters.put( 4, parameter );
+
+            parameter= new JSONObject();
+            parameter.put( "name", "WindDirection" );
+            parameter.put( "type", "double" );
+            parameter.put( "units", "degrees" );
+            parameter.put( "fill", "-1e31" );
+            parameter.put( "description", "Wind Direction" );
+            parameters.put( 5, parameter );
+
         } else if ( id.equals("Spectrum") ) {
             parameter= new JSONObject();
             parameter.put( "name", "Spectra" );
