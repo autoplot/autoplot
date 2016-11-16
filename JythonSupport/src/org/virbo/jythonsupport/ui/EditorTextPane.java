@@ -23,6 +23,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -424,7 +425,7 @@ public class EditorTextPane extends JEditorPane {
             } finally {
                 reader.close();
             }
-            jumpToList.add( String.format( "%d:bottom",(length) ) );
+            jumpToList.add( String.format( Locale.US, "%d:bottom",(length) ) );
             return jumpToList.toArray( new String[jumpToList.size()] );
         } catch ( IOException ex ) {
             return jumpToList.toArray( new String[jumpToList.size()] );
