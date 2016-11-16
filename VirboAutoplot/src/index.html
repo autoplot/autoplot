@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The Financial Times proposes an improved U.S. Electorial College map, without the bias issues (Results from 2012 election).  Here's <a href="https://www.ft.com/content/3685bf9e-a4cc-11e6-8b69-02899e8bd9d1"> the article</a>.
+        <p><small>RBSP/Emfisis data rendered with the Stacked Histogram mode.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2016-11-16 r19967):</p>
         <ul> 
+            <li>stacked histogram correctly handles data where points are more course than the resolution and a peaks plane is found, so show hourly averages.
             <li>rte_1736345160: improperly-localized strings caused RTE in layout tab's "make taller" and other buttons.  Thanks, Andre!
             <li>Help->"About this release" didn't point at the correct URL.
             <li>1708: digitizer component fails when the first column was not time, because code assumed times with timeFormatter.
