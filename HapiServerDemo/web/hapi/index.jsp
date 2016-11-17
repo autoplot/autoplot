@@ -13,7 +13,7 @@
         <title>HAPI Server JSP Demo</title>
     </head>
     <body>
-        <h1>This is a HAPI Server.</h1>
+        <h1>This is a HAPI Server.</h1>  More information about this type of server is found at <a href="https://github.com/hapi-server/data-specification">here</a>.
         
         <h3>Some example requests:</h3>
         <a href="catalog">Catalog</a> <i>Show the catalog of available data sets.</i><br>
@@ -50,6 +50,7 @@
             <li>2016-10-31: bugfix: running app under different user showed that pylisting.txt was not available.</li>
             <li>2016-11-10: add titles to each item</li>
             <li>2016-11-11: bugfix: properly handle no granules of data found.  Add forecast, which includes non-monotonic data.</li>
+            <li>2016-11-15: add rain to forecast</li>
         </ul>
         </small>
     </body>
