@@ -160,7 +160,7 @@ public class InfoServlet extends HttpServlet {
             parameter.put( "type", "double" );
             parameter.put( "units", "mph" );
             parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Air Temperature" );
+            parameter.put( "description", "Wind Speed" );
             parameters.put( 4, parameter );
 
             parameter= new JSONObject();
