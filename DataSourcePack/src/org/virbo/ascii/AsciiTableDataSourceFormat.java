@@ -45,7 +45,7 @@ import org.virbo.dsops.Ops;
  * <li>tformat=iso8601 use ISO8601 times (like 2015-01-01T00:00Z)
  * <li>tformat=hours+since+2015-01-01T00:00 use offsets. (timeformat and tformat are aliases)
  * <li>tformat=day
- * <li>format=%f5.2 use this formatter for data.
+ * <li>format=%5.2f use this formatter for data.
  * </ul>
  * @author jbf
  */
