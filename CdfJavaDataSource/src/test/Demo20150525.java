@@ -4,6 +4,7 @@ package test;
 import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import gov.nasa.gsfc.spdf.cdfj.ReaderFactory;
 import java.nio.ByteBuffer;
+import java.util.Locale;
 import org.autoplot.bufferdataset.BufferDataSet;
 
 /**
@@ -47,7 +48,7 @@ public class Demo20150525 {
         System.err.println("cdf.getBuffer WBD_Mag = "+buff);
         
         BufferDataSet bds= BufferDataSet.makeDataSet( 1, 8, 0, 16465368+1, 1, 1, 1, buff, BufferDataSet.DOUBLE );
-        System.err.println( String.format( "%f %f", bds.value(695420), bds.value(bds.length()-1) ) );
+        System.err.println( String.format(  Locale.US, "%f %f", bds.value(695420), bds.value(bds.length()-1) ) );
         
         ByteBuffer buff2= cdf.getBuffer( "Epoch", "double", new int[] { 0, 16465368 }, true );
         System.err.println("cdf.getBuffer Epoch = "+buff2);
