@@ -20,6 +20,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -200,7 +201,7 @@ public class Util {
         metadataSurl= suri;
 
         if ( logger.isLoggable( Level.FINER ) ) {
-            logger.finer( String.format( "read in %9.2f sec: ", (System.currentTimeMillis()-t0)/1000. ) );
+            logger.finer( String.format(  Locale.US, "read in %9.2f sec: ", (System.currentTimeMillis()-t0)/1000. ) );
             logger.finer( String.format( "  uri: %s", suri ) );
             logger.finer( String.format( "  ds: %s", String.valueOf(rds) ) );
             if ( logger.isLoggable( Level.FINEST ) ) {
@@ -255,7 +256,7 @@ public class Util {
         metadataSurl= suri;
 
         if ( logger.isLoggable( Level.FINER ) ) {
-            logger.finer( String.format( "read in %9.2f sec: ", (System.currentTimeMillis()-t0)/1000. ) );
+            logger.finer( String.format( Locale.US,  "read in %9.2f sec: ", (System.currentTimeMillis()-t0)/1000. ) );
             logger.finer( String.format( "  uri: %s", suri ) );
             logger.finer( String.format( "  ds: %s", String.valueOf(rds) ) );
             if ( logger.isLoggable( Level.FINEST ) ) {
