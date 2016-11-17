@@ -369,6 +369,26 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         });
         panelContextMenu.add(item);
+        
+        item = new JMenuItem(new AbstractAction("Move Plot Element Above Others") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                org.das2.util.LoggerManager.logGuiEvent(e);     
+                List<PlotElement> pes= new ArrayList<>();
+                Object[] os= plotElementListComponent.getSelectedValues();
+                for ( Object o : os ) {
+                    PlotElement element = (PlotElement) o;
+                    pes.add(element);
+                }
+                for ( PlotElement pe: pes ) {
+                    Plot p= dom.getController().getPlotFor(pe);
+                    p.getController().toTop(pe);
+                }
+                
+            }
+        });
+        panelContextMenu.add(item);
+        
 
         contextMenus.put( plotElementListComponent, panelContextMenu );
         contextMenus.put( bindingListComponent, bindingActionsMenu );

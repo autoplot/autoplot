@@ -1196,6 +1196,18 @@ public class PlotController extends DomNodeController {
         pp.removeRenderer(r);
         pp.addRenderer(0,r);
     }
+
+    /**
+     * move the plot element to the top.
+     * @param p the plot element
+     */
+    public void toTop( PlotElement p ) {
+        moveToStackTop(p);
+        DasPlot pp= p.getController().getDasPlot();
+        Renderer r= p.getController().getRenderer();
+        pp.removeRenderer(r);
+        pp.addRenderer(r);
+    }
     
     /**
      * move the plot element to the top of the stack, or the highest index in the dom.
