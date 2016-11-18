@@ -194,13 +194,14 @@ public class JythonUtil {
     /**
      * show the script and the variables (like we have always done with jyds scripts), and offer to run the script.
      * @param parent parent GUI to follow 
+     * @param env 
      * @param file file containing the script.
      * @param fvars parameters for the script.
      * @param makeTool the dialog is always shown and the user can have the script installed as a tool.
      * @param resourceUri when the user decides to make a tool, we need the source location.
      * @return JOptionPane.OK_OPTION or JOptionPane.CANCEL_OPTION if the user cancels.
      */
-    private static int showScriptDialog( Component parent, Map<String,Object> env, File file, Map<String,String> fvars, boolean makeTool, final URI resourceUri ) throws IOException {
+    public static int showScriptDialog( Component parent, Map<String,Object> env, File file, Map<String,String> fvars, boolean makeTool, final URI resourceUri ) throws IOException {
         
         if ( !EventQueue.isDispatchThread() ) {
             System.err.println("*** called from off of event thread!!!");
