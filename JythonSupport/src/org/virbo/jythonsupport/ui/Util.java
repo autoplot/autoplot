@@ -84,7 +84,7 @@ public class Util {
      * @return list of parameters.
      * @throws IOException 
      */
-    protected static Map<String,JythonUtil.Param> getParams( Map<String,Object> env, String src, Map<String,String> params, ProgressMonitor mon ) throws IOException {
+    public static Map<String,JythonUtil.Param> getParams( Map<String,Object> env, String src, Map<String,String> params, ProgressMonitor mon ) throws IOException {
         logger.finer("enter getParams");
         List<JythonUtil.Param> r2= JythonUtil.getGetParams( env, src, params );
 
