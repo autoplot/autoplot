@@ -24,10 +24,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-11-16 r19967):</p>
+        <p>Bugfixes (2016-11-17 r19967):</p>
         <ul> 
-            <li>stacked histogram correctly handles data where points are more course than the resolution and a peaks plane is found, so show hourly averages.
+            <li>old nbproject areas (ant build) rebuilt from scratch, reducing incremental build time from 20sec to 5sec.
             <li>rte_1736345160: improperly-localized strings caused RTE in layout tab's "make taller" and other buttons.  Thanks, Andre!
+            <li>rte_0095613254: if the vap+cdf: was missing from the URI, Tool->"Mash Data" would fail.
+            <li>stacked histogram correctly handles data where points are more course than the resolution and a peaks plane is found, so show hourly averages.
             <li>Help->"About this release" didn't point at the correct URL.
             <li>1708: digitizer component fails when the first column was not time, because code assumed times with timeFormatter.
             <li>data set selector component setValue would add "%20" when there was an extra space at the end when cut-n-paste URIs.
@@ -80,7 +82,10 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>HAPI data source makes spase link clickable.
+            <li>20000th SVN revision!
+            <li>layout tab has "move to top" menu item
+            <li>lookupAxis supports horizontal axis.
+            <li>HAPI data source makes SPASE link clickable.
             <li>543: support for time zone offsets in ISO8601 strings.
             <li>HAPI data source supports JSON data response.
        </ul>
