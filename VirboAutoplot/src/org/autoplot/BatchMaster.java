@@ -2,6 +2,7 @@
 package org.autoplot;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,14 +13,21 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -77,6 +85,56 @@ public class BatchMaster extends javax.swing.JPanel {
                 }
             }
         });
+        
+        dataSetSelector1.registerActionTrigger( "(.*)\\.jy(\\?.*)?", new AbstractAction( "Review Script" ) {
+            @Override
+            public void actionPerformed( ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);                    
+                try {
+                    String scriptName= dataSetSelector1.getValue();
+                    if ( !scriptName.endsWith(".jy") ) {
+                        JOptionPane.showMessageDialog( BatchMaster.this, "script must end in .jy: "+scriptName );
+                        return;
+                    }
+
+                    URISplit split= URISplit.parse(scriptName);
+                    pwd= split.path;
+
+                    Map<String,String> params= URISplit.parseParams(split.params);
+                    Map<String,Object> env= new HashMap<>();
+
+                    DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(BatchMaster.this), "download script");
+                    File scriptFile= DataSetURI.getFile( split.file, monitor );
+                    String script= readScript( scriptFile );
+
+                    Map<String,org.virbo.jythonsupport.JythonUtil.Param> parms= Util.getParams( env, script, URISplit.parseParams(split.params), new NullProgressMonitor() );
+
+                    String[] items= new String[parms.size()+1];
+                    int i=0;
+                    items[0]="";
+                    for ( Entry<String,org.virbo.jythonsupport.JythonUtil.Param> p: parms.entrySet() ) {
+                        items[i+1]= p.getKey();
+                        i=i+1;
+                    }
+                    ComboBoxModel m1= new DefaultComboBoxModel(Arrays.copyOfRange(items,1,items.length));
+                    param1NameCB.setModel(m1);
+                    ComboBoxModel m2= new DefaultComboBoxModel(items);
+                    param2NameCB.setModel(m2);
+                } catch (IOException ex) {
+                    Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        
+        dataSetSelector1.setPromptText("Enter the name of a Jython script");
+        dataSetSelector1.setRecent( Collections.singletonList("http://autoplot.org/data/script/examples/parameters.jy") );
+        
+        Map<String,String> recentJy= dom.getController().getApplicationModel().getRecent("*.jy",20);
+        List<String> recentUris= new ArrayList<>(recentJy.size());
+        for ( Entry<String,String> recentItem : recentJy.entrySet() ) {
+            recentUris.add( recentItem.getKey() );
+        }
+        dataSetSelector1.setRecent( recentUris );
     }
 
     /**
@@ -90,8 +148,6 @@ public class BatchMaster extends javax.swing.JPanel {
 
         jScrollPane2 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList<>();
-        param1Name = new javax.swing.JTextField();
-        param2Name = new javax.swing.JTextField();
         goButton = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         param1Values = new javax.swing.JTextArea();
@@ -101,6 +157,8 @@ public class BatchMaster extends javax.swing.JPanel {
         jButton2 = new javax.swing.JButton();
         messageLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
+        param1NameCB = new javax.swing.JComboBox<>();
+        param2NameCB = new javax.swing.JComboBox<>();
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -135,18 +193,22 @@ public class BatchMaster extends javax.swing.JPanel {
 
         jLabel1.setText("<html>This is an experiment to see if a tool can be developed to generate inputs for scripts.  Specify the parameter name and values to assign, and likewise with a second parameter, if desired.");
 
+        param1NameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
+
+        param2NameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3)
-                    .addComponent(param1Name))
+                    .addComponent(param1NameCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(param2Name)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
+                    .addComponent(param2NameCB, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
             .addComponent(dataSetSelector1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
@@ -163,13 +225,13 @@ public class BatchMaster extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(dataSetSelector1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(param2Name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(param1Name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(param1NameCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(param2NameCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
@@ -200,9 +262,9 @@ public class BatchMaster extends javax.swing.JPanel {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         dataSetSelector1.setValue("http://autoplot.org/data/script/examples/parameters.jy");
-        param1Name.setText("ii");
+        param1NameCB.setSelectedItem("ii");
         param1Values.setText("2\n4\n8\n");
-        param2Name.setText("ff");
+        param2NameCB.setSelectedItem("ff");
         param2Values.setText("1.\n2.\n3.\n4.\n5.\n6.\n7.\n8.\n9.\n10.\n");
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -311,18 +373,24 @@ public class BatchMaster extends javax.swing.JPanel {
                     monitor.setProgressMessage(f1);
                     if ( monitor.isCancelled() ) break;
                     monitor.setTaskProgress(monitor.getTaskProgress()+1);
+                    if ( f1.trim().length()==0 ) continue;
                     interp.set( "monitor", monitor.getSubtaskMonitor(f1) );
-                    String paramName= param1Name.getText();
-                    
+                    String paramName= param1NameCB.getSelectedItem().toString();
+                    if ( !parms.containsKey(paramName) ) {
+                        if ( paramName.trim().length()==0 ) {
+                            throw new IllegalArgumentException("param1Name not set");
+                        }
+                    }
                     setParam( interp, parms.get(paramName), paramName, f1 );
                     
-                    if ( param2Name.getText().trim().length()==0 ) {
+                    if ( param2NameCB.getSelectedItem().toString().trim().length()==0 ) {
                         interp.execfile( new FileInputStream(scriptFile), scriptFile.getName() );
                     } else {
                         String[] ff2= param2Values.getText().split("\n");
                         int i2=0;
                         for ( String f2: ff2 ) {
-                            paramName= param2Name.getText();
+                            if ( f2.trim().length()==0 ) continue;
+                            paramName= param2NameCB.getSelectedItem().toString();
                             setParam( interp, parms.get(paramName), paramName, f2 );
                             interp.execfile( new FileInputStream(scriptFile), scriptFile.getName() );
                             i2=i2+f2.length()+1;
@@ -345,7 +413,7 @@ public class BatchMaster extends javax.swing.JPanel {
         dia.setResizable(true);
         BatchMaster mmm= new BatchMaster(new Application());
         dia.setContentPane( mmm );
-        mmm.param1Name.setText("ie");
+        mmm.param1NameCB.setSelectedItem("ie");
         mmm.dataSetSelector1.setValue("/home/jbf/ct/autoplot/script/demos/paramTypes.jy");
         mmm.param1Values.setText("1\n2\n3\n");
         dia.pack();
@@ -362,9 +430,9 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JLabel messageLabel;
-    private javax.swing.JTextField param1Name;
+    private javax.swing.JComboBox<String> param1NameCB;
     private javax.swing.JTextArea param1Values;
-    private javax.swing.JTextField param2Name;
+    private javax.swing.JComboBox<String> param2NameCB;
     private javax.swing.JTextArea param2Values;
     // End of variables declaration//GEN-END:variables
 }
