@@ -45,12 +45,12 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane3" max="32767" attributes="0"/>
+                  <Component id="jScrollPane3" pref="323" max="32767" attributes="0"/>
                   <Component id="param1NameCB" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" pref="264" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" pref="365" max="32767" attributes="0"/>
                   <Component id="param2NameCB" max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -60,9 +60,8 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jLabel1" pref="0" max="32767" attributes="0"/>
                   <Component id="messageLabel" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Component id="jButton2" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       <Component id="goButton" min="-2" pref="62" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -90,10 +89,7 @@
               <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
               <Component id="messageLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="goButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jButton2" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
+              <Component id="goButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -139,14 +135,6 @@
       </SubComponents>
     </Container>
     <Component class="org.virbo.datasource.DataSetSelector" name="dataSetSelector1">
-    </Component>
-    <Component class="javax.swing.JButton" name="jButton2">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Test1"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="messageLabel">
       <Properties>
