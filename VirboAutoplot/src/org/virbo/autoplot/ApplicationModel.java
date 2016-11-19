@@ -756,7 +756,7 @@ public class ApplicationModel {
      * last element is the more recently used.
      * @param filter String like "*.jy"
      * @param limit maximum number of items to return
-     * @return 
+     * @return LinkedHashMap, ordered by time, mapping URI to time.
      */
     public Map<String,String> getRecent( String filter, final int limit ) {
         File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
