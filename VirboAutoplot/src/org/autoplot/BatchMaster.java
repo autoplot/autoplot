@@ -99,7 +99,6 @@ public class BatchMaster extends javax.swing.JPanel {
         param2Values = new javax.swing.JTextArea();
         dataSetSelector1 = new org.virbo.datasource.DataSetSelector();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
         messageLabel = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
@@ -132,16 +131,9 @@ public class BatchMaster extends javax.swing.JPanel {
             }
         });
 
-        jButton3.setText("Test2");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-
         messageLabel.setText("Load up those parameters and hit Go!");
 
-        jLabel1.setText("<html>This is an experiment to see if a tool can be developed to generate inputs for scripts.");
+        jLabel1.setText("<html>This is an experiment to see if a tool can be developed to generate inputs for scripts.  Specify the parameter name and values to assign, and likewise with a second parameter, if desired.");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -159,14 +151,10 @@ public class BatchMaster extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(messageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(goButton, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -191,8 +179,7 @@ public class BatchMaster extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(goButton)
-                    .addComponent(jButton2)
-                    .addComponent(jButton3))
+                    .addComponent(jButton2))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -212,31 +199,12 @@ public class BatchMaster extends javax.swing.JPanel {
     }//GEN-LAST:event_goButtonActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        param1Name.setText("ie");
-        dataSetSelector1.setValue("/home/jbf/ct/autoplot/script/demos/paramTypes.jy");
-        param1Values.setText("1\n2\n3\n");
+        dataSetSelector1.setValue("http://autoplot.org/data/script/examples/parameters.jy");
+        param1Name.setText("ii");
+        param1Values.setText("2\n4\n8\n");
+        param2Name.setText("ff");
+        param2Values.setText("1.\n2.\n3.\n4.\n5.\n6.\n7.\n8.\n9.\n10.\n");
     }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        try {
-            dataSetSelector1.setValue("file:/home/jbf/ct/autoplot/userlog/20161116/reduceUserLogs.jy");
-            param1Name.setText("resourceURI");
-            StringBuilder sb= new StringBuilder();
-            FileSystem fs= FileSystem.create("file:/home/jbf/ct/autoplot/userlog/20161116/");
-            String[] ss= fs.listDirectory( "/", "access.autoplot.log.*.gz" ); 
-            Arrays.sort(ss);
-            for ( String s: ss ) {
-                sb.append(s).append("\n");
-            }
-            param1Values.setText(sb.toString());            
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * TODO: this is not complete!
@@ -388,7 +356,6 @@ public class BatchMaster extends javax.swing.JPanel {
     private org.virbo.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JButton goButton;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JList<String> jList2;
     private javax.swing.JScrollPane jScrollPane1;
