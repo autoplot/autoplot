@@ -120,6 +120,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.DefaultEditorKit;
 import javax.xml.parsers.ParserConfigurationException;
+import org.autoplot.BatchMaster;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.autoplot.pngwalk.CreatePngWalk;
 import org.autoplot.pngwalk.PngWalkTool;
@@ -2588,6 +2589,7 @@ APSplash.checkTime("init 52.9");
         jSeparator3 = new javax.swing.JSeparator();
         pngWalkMenuItem = new javax.swing.JMenuItem();
         createPngWalkMenuItem = new javax.swing.JMenuItem();
+        runBatchMenuItem = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         jMenuItem6 = new javax.swing.JMenuItem();
         fixLayoutMenuItem = new javax.swing.JMenuItem();
@@ -3109,6 +3111,14 @@ APSplash.checkTime("init 52.9");
             }
         });
         toolsMenu.add(createPngWalkMenuItem);
+
+        runBatchMenuItem.setText("Run Batch...");
+        runBatchMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                runBatchMenuItemActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(runBatchMenuItem);
         toolsMenu.add(jSeparator2);
 
         jMenuItem6.setText("Events List");
@@ -4099,6 +4109,15 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
             }
         }
     }//GEN-LAST:event_mashDataMenuItemActionPerformed
+
+    private void runBatchMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runBatchMenuItemActionPerformed
+        BatchMaster mmm= new BatchMaster(dom);
+        JDialog dia= new JDialog( SwingUtilities.getWindowAncestor(this) );
+        dia.setContentPane(mmm);
+        dia.pack();
+        dia.setLocationRelativeTo(this);
+        dia.setVisible(true);
+    }//GEN-LAST:event_runBatchMenuItemActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     @Override
@@ -5249,6 +5268,7 @@ APSplash.checkTime("init 240");
     private javax.swing.JMenuItem resetZMenuItem;
     private javax.swing.JMenu resetZoomMenu;
     private javax.swing.JMenuItem resetZoomMenuItem;
+    private javax.swing.JMenuItem runBatchMenuItem;
     private javax.swing.JCheckBoxMenuItem scriptPanelMenuItem;
     private javax.swing.JMenuItem searchToolTipsMenuItem;
     private javax.swing.JCheckBoxMenuItem serverCheckBoxMenuItem;
