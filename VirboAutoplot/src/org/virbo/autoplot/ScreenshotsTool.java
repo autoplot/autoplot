@@ -337,8 +337,7 @@ public class ScreenshotsTool extends EventQueue {
         Color c= new Color( 255,255,255,255 );
         g.setColor(c);
 
-        Rectangle r= g.getDeviceConfiguration().getBounds();
-        r= new Rectangle(0,0,r.width,r.height);
+        Rectangle r= new Rectangle(0,0,b.width,b.height);
 
         Area s= new Area(r);
 
@@ -349,6 +348,7 @@ public class ScreenshotsTool extends EventQueue {
             if ( frame.isVisible() ) {
                 if( frame.getExtendedState() != Frame.ICONIFIED ) {
                     Rectangle rect= frame.getBounds();
+                    logger.log(Level.FINER, "showing {0} {1}", new Object[]{rect, frame.getTitle()});
                     if ( rect.contains(p) ) containsPointer=true;
                     rect.translate( -b.x, -b.y );
                     s.subtract( new Area( rect ) );
@@ -362,6 +362,7 @@ public class ScreenshotsTool extends EventQueue {
             if ( window.isVisible() ) {
                 if ( window.isShowing() ) {
                     Rectangle rect= window.getBounds();
+                    logger.log(Level.FINER, "showing {0} {1}", new Object[]{rect, window.getType()});
                     if ( rect.contains(p) ) containsPointer=true;
                     rect.translate( -b.x, -b.y );
                     s.subtract( new Area( rect ) );
