@@ -558,9 +558,22 @@ public class ScreenshotsTool extends EventQueue {
         PointerInfo info= MouseInfo.getPointerInfo();
         Point mousePointerLocation= info.getLocation();
         bounds= gs[i].getDefaultConfiguration().getBounds();
-        Rectangle b= bounds;
+        Rectangle b= new Rectangle(bounds);
         try {
+            logger.log(Level.FINE, "getting screenshot from screen {0}.", i);
             screenshot = new Robot(gs[i]).createScreenCapture(bounds);
+            boolean allBlack= true;
+            if ( bounds.x>0 ) {
+                for ( int ii=0; ii<screenshot.getWidth(); ii++ ) {
+                    for ( int jj=0; jj<screenshot.getHeight(); jj++ ) {
+                        if ( screenshot.getRGB(ii,jj)>0 ) allBlack= false;
+                    }
+                }
+                if ( allBlack ) {
+                    bounds.translate(-bounds.x,-bounds.y);
+                    screenshot = new Robot(gs[i]).createScreenCapture(bounds);
+                }
+            }
         } catch (AWTException ex) {
             logger.log(Level.SEVERE, ex.getMessage(), ex);
             screenshot = new BufferedImage( gs[i].getDisplayMode().getWidth(), gs[i].getDisplayMode().getHeight(), BufferedImage.TYPE_INT_ARGB );
