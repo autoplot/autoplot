@@ -268,6 +268,7 @@ public class BatchMaster extends javax.swing.JPanel {
         }
         switch (paramDescription.type) {
             case 'U':
+            case 'R':
                 URI uri;
                 try {
                     URISplit split= URISplit.parse(f1);
