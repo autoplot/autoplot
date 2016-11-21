@@ -51,6 +51,7 @@
             <li>2016-11-10: add titles to each item</li>
             <li>2016-11-11: bugfix: properly handle no granules of data found.  Add forecast, which includes non-monotonic data.</li>
             <li>2016-11-15: add rain to forecast</li>
+            <li>2016-11-21: new capabilities scheme</li>
         </ul>
         </small>
     </body>

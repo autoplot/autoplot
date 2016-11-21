@@ -61,14 +61,10 @@ public class CapabilitiesServlet extends HttpServlet {
         try {
             JSONObject jo= new JSONObject();
             jo.put("HAPI","1.0");
-            JSONArray capabilities= new JSONArray();
-            JSONObject capabilityContainer= new JSONObject();
-            JSONArray formats= new JSONArray();
-            formats.put( 0, "csv" );
-            formats.put( 1, "binary" );
-            capabilityContainer.put( "formats", formats );
-            capabilities.put( 0, capabilityContainer );
-            jo.put( "capabilities", capabilities );
+            JSONArray outputFormats= new JSONArray();
+            outputFormats.put( 0, "csv" );
+            outputFormats.put( 1, "binary" );
+            jo.put( "outputFormats", outputFormats );
             out.write( jo.toString(4) );
             
         } catch ( JSONException ex ) {
