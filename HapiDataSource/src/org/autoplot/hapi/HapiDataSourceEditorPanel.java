@@ -673,14 +673,23 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
             boolean binaryIsEnabled= false;
             try {
                 JSONObject capabilitiesDoc= HapiServer.getCapabilities(server);
-                JSONArray capabilities= capabilitiesDoc.getJSONArray("capabilities");
-                for ( int i=0; i<capabilities.length(); i++ ) {
-                    JSONObject c= capabilities.getJSONObject(i);
-                    if ( c.has(HAPI_FORMATS) ) {
-                        JSONArray formats= c.getJSONArray(HAPI_FORMATS);
-                        for ( int j=0; j<formats.length(); j++ ) {
-                            if ( formats.getString(j).equals(HAPI_BINARY) ) {
-                                binaryIsEnabled= true;
+                if ( capabilitiesDoc.has( HAPI_OUTPUT_FORMATS ) ) { // new 2016-11-21.  Other is deprecated.
+                    JSONArray outputFormats= capabilitiesDoc.getJSONArray( HAPI_OUTPUT_FORMATS );
+                    for ( int i=0; i<outputFormats.length(); i++ ) {
+                        if ( outputFormats.getString(i).equals(HAPI_BINARY) ) {
+                            binaryIsEnabled= true;
+                        }
+                    }                    
+                } else {
+                    JSONArray capabilities= capabilitiesDoc.getJSONArray("capabilities"); // deprecated.
+                    for ( int i=0; i<capabilities.length(); i++ ) {
+                        JSONObject c= capabilities.getJSONObject(i);
+                        if ( c.has(HAPI_FORMATS) ) {
+                            JSONArray formats= c.getJSONArray(HAPI_FORMATS);
+                            for ( int j=0; j<formats.length(); j++ ) {
+                                if ( formats.getString(j).equals(HAPI_BINARY) ) {
+                                    binaryIsEnabled= true;
+                                }
                             }
                         }
                     }
@@ -699,6 +708,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     
     protected static final String HAPI_FORMATS = "formats";
     
+    protected static final String HAPI_OUTPUT_FORMATS= "outputFormats";
     
     protected static final String HAPI_BINARY = "binary";
     
