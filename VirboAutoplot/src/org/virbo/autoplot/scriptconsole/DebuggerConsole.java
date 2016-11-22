@@ -53,7 +53,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
     
     static {
         try {
-            queue= new LinkedBlockingQueue<String>();
+            queue= new LinkedBlockingQueue<>();
             Runnable run= new Runnable() {
                 @Override
                 public void run() {
@@ -185,7 +185,10 @@ public class DebuggerConsole extends javax.swing.JPanel {
         jTextArea1.append(s);
         String ss= getCharsForState( s, state );
         jTextArea2.append(ss);
-        if ( s.endsWith("\n") ) jTextArea2.append("\n");
+        if ( s.endsWith("\n") ) {
+            jTextArea2.append("\n");
+            jTextArea1.setCaretPosition( jTextArea1.getDocument().getLength());
+        }
     }
     
     /**
@@ -206,8 +209,10 @@ public class DebuggerConsole extends javax.swing.JPanel {
         jTextArea2 = new javax.swing.JTextArea();
         stepButton = new javax.swing.JButton();
         pdbInput = new javax.swing.JTextField();
+        continueButton = new javax.swing.JButton();
 
         nextButton.setText("Next");
+        nextButton.setToolTipText("step to the next line, stepping over called function");
         nextButton.setEnabled(false);
         nextButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -216,6 +221,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         });
 
         upButton.setText("Up");
+        upButton.setToolTipText("Continue until returning to the caller");
         upButton.setEnabled(false);
         upButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -248,6 +254,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         jSplitPane1.setRightComponent(jScrollPane2);
 
         stepButton.setText("Step");
+        stepButton.setToolTipText("Execute the current line stepping to the next line or into a function.");
         stepButton.setEnabled(false);
         stepButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -255,9 +262,19 @@ public class DebuggerConsole extends javax.swing.JPanel {
             }
         });
 
+        pdbInput.setToolTipText("Enter expression, return will evaluate");
         pdbInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 pdbInputActionPerformed(evt);
+            }
+        });
+
+        continueButton.setText("Continue");
+        continueButton.setToolTipText("Continue execution until breakpoint is hit");
+        continueButton.setEnabled(false);
+        continueButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                continueButtonActionPerformed(evt);
             }
         });
 
@@ -274,7 +291,9 @@ public class DebuggerConsole extends javax.swing.JPanel {
                 .addComponent(upButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(whereButton)
-                .addGap(74, 74, 74)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(continueButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pdbInput))
             .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 586, Short.MAX_VALUE)
         );
@@ -286,18 +305,19 @@ public class DebuggerConsole extends javax.swing.JPanel {
                     .addComponent(upButton)
                     .addComponent(whereButton)
                     .addComponent(stepButton)
-                    .addComponent(pdbInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pdbInput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(continueButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
-        queue.add("next\n");
+        next();
     }//GEN-LAST:event_nextButtonActionPerformed
 
     private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButtonActionPerformed
-        queue.add("up\n");
+        up();
     }//GEN-LAST:event_upButtonActionPerformed
 
     private void whereButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_whereButtonActionPerformed
@@ -312,7 +332,12 @@ public class DebuggerConsole extends javax.swing.JPanel {
         queue.add(pdbInput.getText()+"\n");
     }//GEN-LAST:event_pdbInputActionPerformed
 
+    private void continueButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_continueButtonActionPerformed
+        continu();
+    }//GEN-LAST:event_continueButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton continueButton;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
@@ -331,6 +356,10 @@ public class DebuggerConsole extends javax.swing.JPanel {
     
     public void up() {
         queue.add("up\n");
+    }
+    
+    public void continu() {
+        queue.add("continue\n");
     }
     
     /**
@@ -371,6 +400,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         nextButton.setEnabled(false);
         upButton.setEnabled(false);
         whereButton.setEnabled(false);
+        continueButton.setEnabled(false);
         pdbInput.setEnabled(false);
     }
     
@@ -379,6 +409,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         nextButton.setEnabled(true);
         upButton.setEnabled(true);
         whereButton.setEnabled(true);
+        continueButton.setEnabled(true);
         pdbInput.setEnabled(true);
     }
 }

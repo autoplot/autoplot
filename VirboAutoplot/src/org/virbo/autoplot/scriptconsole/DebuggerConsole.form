@@ -25,7 +25,9 @@
               <Component id="upButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="whereButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="74" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="continueButton" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="pdbInput" max="32767" attributes="0"/>
           </Group>
           <Component id="jSplitPane1" pref="586" max="32767" attributes="0"/>
@@ -40,6 +42,7 @@
                   <Component id="whereButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="stepButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="pdbInput" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="continueButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jSplitPane1" pref="267" max="32767" attributes="0"/>
@@ -51,6 +54,7 @@
     <Component class="javax.swing.JButton" name="nextButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Next"/>
+        <Property name="toolTipText" type="java.lang.String" value="step to the next line, stepping over called function"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
@@ -60,6 +64,7 @@
     <Component class="javax.swing.JButton" name="upButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Up"/>
+        <Property name="toolTipText" type="java.lang.String" value="Continue until returning to the caller"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
@@ -133,6 +138,7 @@
     <Component class="javax.swing.JButton" name="stepButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Step"/>
+        <Property name="toolTipText" type="java.lang.String" value="Execute the current line stepping to the next line or into a function."/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
@@ -140,8 +146,21 @@
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="pdbInput">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="Enter expression, return will evaluate"/>
+      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pdbInputActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="continueButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Continue"/>
+        <Property name="toolTipText" type="java.lang.String" value="Continue execution until breakpoint is hit"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="continueButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
