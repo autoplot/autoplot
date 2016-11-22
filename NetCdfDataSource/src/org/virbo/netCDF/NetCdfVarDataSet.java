@@ -1,11 +1,3 @@
-/*
- * NetCdfVarDataSet.java
- *
- * Created on April 4, 2007, 12:22 PM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 
 package org.virbo.netCDF;
 
@@ -20,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.regex.Pattern;
 import org.das2.datum.LoggerManager;
 import org.das2.datum.TimeParser;
 import org.das2.datum.UnitsConverter;
@@ -30,6 +21,7 @@ import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.MetadataModel;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.IstpMetadataModel;
 import ucar.ma2.DataType;
@@ -37,11 +29,10 @@ import ucar.ma2.InvalidRangeException;
 import ucar.ma2.Range;
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
-import ucar.nc2.Structure;
 import ucar.nc2.dataset.NetcdfDataset;
 
 /**
- * wraps a netCDF variable to present it as a QDataSet.
+ * wraps a netCDF variable (or HDF5 variable) to present it as a QDataSet.
  *
  * @author jbf
  */
@@ -55,15 +46,15 @@ public class NetCdfVarDataSet extends AbstractDataSet {
 
     public static NetCdfVarDataSet create( Variable variable, String constraint, NetcdfDataset ncfile, ProgressMonitor mon ) throws IOException {
         NetCdfVarDataSet result = new NetCdfVarDataSet(  );
-        result.read( variable, ncfile, constraint, mon );
+        result.read( variable, ncfile, constraint, null, mon );
         return result;
     }
-
+    
     private NetCdfVarDataSet(  )  {
         putProperty(QDataSet.QUBE, Boolean.TRUE);
     }
 
-    public static String sliceConstraints( String constraints, int i ) {
+    private static String sliceConstraints( String constraints, int i ) {
         if ( constraints==null ) {
             return null;
         } else {
@@ -168,17 +159,29 @@ public class NetCdfVarDataSet extends AbstractDataSet {
      
     /**
      * Read the NetCDF data.
-     * @param variable
-     * @param ncfile
+     * @param variable the NetCDF variable.
+     * @param ncfile the NetCDF file.
      * @param constraints null, or string like "[0:10]"  Note it's allowed for the constraint to not have [] because this is called recursively.
+     * @param mm if non-null, a metadata model, like IstpMetadataModel, is asserted.  If null, then any variable containing DEPEND_0 implies IstpMetadataModel.
      * @param mon
      * @throws IOException
      */
-    private void read( Variable variable, NetcdfDataset ncfile, String constraints, ProgressMonitor mon )  throws IOException {
+    private void read( Variable variable, NetcdfDataset ncfile, String constraints, MetadataModel mm, ProgressMonitor mon )  throws IOException {
         this.v= variable;
         if ( !mon.isStarted() ) mon.started(); //das2 bug: monitor blinks if we call started again here
         mon.setProgressMessage( "reading "+v.getNameAndDimensions() );
 
+        if ( mm==null ) {
+            long t0= System.currentTimeMillis();
+            List<Variable> vvs=ncfile.getVariables();
+            for ( Variable vv: vvs ) {
+                if ( vv.findAttribute("DEPEND_0" )!=null ) {
+                    mm= new IstpMetadataModel();
+                }
+            }
+            logger.log(Level.FINER, "look for DEPEND_0 (ms):{0}", (System.currentTimeMillis()-t0));
+        }
+                
         logger.finer("v.getShape()");
         shape= v.getShape();
         boolean[] slice= new boolean[shape.length];
@@ -257,6 +260,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                     logger.log(Level.FINER, "ncfile.findVariable({0})", d.getName());
                     Variable cv = ncfile.findVariable(d.getName());
                     if ((cv != null) && cv.isCoordinateVariable()) {
+                        logger.log(Level.FINE, "dimension '{0}' is coordinate variable, adding DEPEND", cv.getName());
                         Variable dv= cv;
                         if ( dv!=variable && dv.getRank()==1 ) {
                             mon.setProgressMessage( "reading "+dv.getNameAndDimensions() );
@@ -359,9 +363,11 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         }
 
 
-        if ( attributes.containsKey("VAR_TYPE") || attributes.containsKey("DEPEND_0") ) { // LANL want to create HDF5 files with ISTP metadata
-            properties.put( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
-            Map<String,Object> istpProps= new IstpMetadataModel().properties(attributes);
+        if ( ( mm!=null && mm instanceof IstpMetadataModel ) ||  attributes.containsKey("VAR_TYPE") || attributes.containsKey("DEPEND_0") ) { // LANL want to create HDF5 files with ISTP metadata
+            logger.log(Level.FINE, "variable '{0}' has VAR_TYPE or DEPEND_0 attribute, use ISTP metadata", v.getName());
+            properties.put( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );            
+            mm= new IstpMetadataModel();
+            Map<String,Object> istpProps= mm.properties(attributes);
             if ( properties.get( QDataSet.UNITS )==Units.us2000 ) {
                 UnitsConverter uc= UnitsConverter.getConverter(Units.cdfEpoch, Units.us2000 );
                 if ( istpProps.containsKey(QDataSet.VALID_MIN) ) istpProps.put( QDataSet.VALID_MIN, uc.convert( (Number)istpProps.get(QDataSet.VALID_MIN ) ) );
@@ -378,7 +384,11 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                     logger.log(Level.FINER, "ncfile.findVariable({0})" , s );
                     Variable dv= ncfile.findVariable(s);
                     if ( dv!=null && dv!=variable ) {
-                        QDataSet dependi= create( dv,  sliceConstraints(constraints,ir), ncfile, new NullProgressMonitor() ); // TODO: slice constaint
+                        
+                        NetCdfVarDataSet result1 = new NetCdfVarDataSet(  );
+                        result1.read( dv, ncfile, sliceConstraints(constraints,ir), mm, new NullProgressMonitor() );
+                        QDataSet dependi= result1;
+                        
                         properties.put( "DEPEND_"+(ir-sliceCount(slice,ir)), dependi );
                     }
                 }
