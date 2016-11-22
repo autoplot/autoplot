@@ -72,16 +72,19 @@ public class BatchMaster extends javax.swing.JPanel {
                 try {
                     URISplit split= URISplit.parse(s);        //bug 1408--note runScript doesn't account for changes made to the GUI.
                     args= URISplit.parseParams(split.params);
-                    Map<String,String> env= new HashMap<>();
+                    Map<String,Object> env= new HashMap<>();
+                    env.put( "dom", dom );
+                    env.put( "PWD", split.path );
                     File scriptFile= DataSetURI.getFile(s,new NullProgressMonitor());
                     if ( JOptionPane.OK_OPTION==JythonUtil.showScriptDialog( 
                             BatchMaster.this, 
-                            new HashMap<String, Object>(), 
+                            env, 
                             scriptFile, 
                             args, 
                             enabled, 
                             split.resourceUri ) ) {
-                        // do nothing.
+                        split.params= URISplit.formatParams(args);
+                        dataSetSelector1.setValue( URISplit.format( split ) );
                         
                     }
                 } catch ( IOException ex ) { 
@@ -162,6 +165,7 @@ public class BatchMaster extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         param1NameCB = new javax.swing.JComboBox<>();
         param2NameCB = new javax.swing.JComboBox<>();
+        jLabel2 = new javax.swing.JLabel();
 
         jList2.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -193,6 +197,8 @@ public class BatchMaster extends javax.swing.JPanel {
 
         param2NameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));
 
+        jLabel2.setText("Note parameters not set below will be assigned the default values.  This is a bug.");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -215,6 +221,7 @@ public class BatchMaster extends javax.swing.JPanel {
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(goButton, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
+            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -224,12 +231,14 @@ public class BatchMaster extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(dataSetSelector1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(param1NameCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(param2NameCB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
                     .addComponent(jScrollPane1))
                 .addGap(9, 9, 9)
                 .addComponent(messageLabel)
@@ -329,7 +338,11 @@ public class BatchMaster extends javax.swing.JPanel {
         ProgressMonitor monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(this), "batchMaster");
         try {
             String scriptName= dataSetSelector1.getValue();
-            if ( !scriptName.endsWith(".jy") ) {
+            
+            URISplit split= URISplit.parse(scriptName);
+            pwd= split.path;
+            
+            if ( !split.file.endsWith(".jy") ) {
                 JOptionPane.showMessageDialog( this, "script must end in .jy: "+scriptName );
                 return;
             }
@@ -338,9 +351,6 @@ public class BatchMaster extends javax.swing.JPanel {
 
             monitor.setTaskSize(ff1.length);
             monitor.started();
-            
-            URISplit split= URISplit.parse(scriptName);
-            pwd= split.path;
             
             Map<String,String> params= URISplit.parseParams(split.params);
             Map<String,Object> env= new HashMap<>();
@@ -412,6 +422,7 @@ public class BatchMaster extends javax.swing.JPanel {
     private org.virbo.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JButton goButton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jList2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
