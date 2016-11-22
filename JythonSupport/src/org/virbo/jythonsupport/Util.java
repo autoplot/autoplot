@@ -28,10 +28,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.JTextComponent;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.TimeParser;
 import org.das2.fsm.FileStorageModel;
 import org.das2.graph.DataLoader;
+import org.das2.jythoncompletion.Utilities;
 import org.das2.system.RequestProcessor;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
@@ -728,6 +731,20 @@ public class Util {
         return ss;
     }
 
+    public static String popString( String line ) {
+        boolean doubleQuotes= line.indexOf("\"")==0 && line.lastIndexOf("\"")==line.length()-1;
+        boolean singleQuotes;
+        if ( !doubleQuotes ) {
+            singleQuotes= line.indexOf("'")==0 && line.lastIndexOf("'")==line.length()-1;
+        } else {
+            singleQuotes= false;
+        }
+        if ( line.length()>1 && ( doubleQuotes || singleQuotes ) ) {
+            return line.substring(1,line.length()-1);
+        } else {
+            return line;
+        }
+    }
     
     public static void main( String[] args ) throws Exception {
         DataSetURI.init();
