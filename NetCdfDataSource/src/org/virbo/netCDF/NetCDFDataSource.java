@@ -230,7 +230,7 @@ public class NetCDFDataSource extends AbstractDataSource {
                 dataset= NcMLReader.readNcML( location, null );
             } else {
                 NetCDFDataSourceFactory.checkMatlab(location);
-                logger.log(Level.FINER, "NetcdfFile.open( {0} )", location);
+                logger.log(Level.FINE, "NetcdfFile.open( {0} )", location);
                 NetcdfFile f= NetcdfFile.open( location );
                 dataset= new NetcdfDataset( f );
             }
@@ -311,7 +311,7 @@ public class NetCDFDataSource extends AbstractDataSource {
                 return null;
             } // transient state
 
-            Map<String,Object> result= new LinkedHashMap<String, Object>();
+            Map<String,Object> result= new LinkedHashMap<>();
             for (Object attr1 : attr) {
                 Attribute at = (Attribute) attr1;
                 result.put( at.getName(), at.getStringValue() );
