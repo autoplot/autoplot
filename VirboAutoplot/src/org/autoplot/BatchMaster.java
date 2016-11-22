@@ -104,7 +104,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     URISplit split= URISplit.parse(scriptName);
                     pwd= split.path;
 
-                    Map<String,String> params= URISplit.parseParams(split.params);
+                    Map<String,String> params= URISplit.parseParams(split.params);  //TODO: support these.
                     Map<String,Object> env= new HashMap<>();
 
                     DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(BatchMaster.this), "download script");
@@ -326,7 +326,7 @@ public class BatchMaster extends javax.swing.JPanel {
     }
     
     public synchronized void doIt() throws IOException {
-        ProgressMonitor monitor= DasProgressPanel.createFramed("batchMaster");
+        ProgressMonitor monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(this), "batchMaster");
         try {
             String scriptName= dataSetSelector1.getValue();
             if ( !scriptName.endsWith(".jy") ) {
