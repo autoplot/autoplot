@@ -8,7 +8,6 @@ import java.nio.ByteOrder;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.autoplot.bufferdataset.BufferDataSet;
 import org.das2.datum.Units;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,8 +23,8 @@ import org.virbo.qstream.TransferType;
  * @author jbf
  */
 public class BinaryDataFormatter implements DataFormatter {
-    
-    private static final String FORMAT_BINARY="binary";
+  
+    private static final Logger logger= Logger.getLogger("hapi");    
     
     TransferType[] transferTypes;
     ByteBuffer b;
@@ -68,7 +67,7 @@ public class BinaryDataFormatter implements DataFormatter {
             b= TransferType.allocate( bufferSize, ByteOrder.LITTLE_ENDIAN );
             
         } catch (JSONException ex) {
-            Logger.getLogger(BinaryDataFormatter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.SEVERE, null, ex);
         }
     }
     
