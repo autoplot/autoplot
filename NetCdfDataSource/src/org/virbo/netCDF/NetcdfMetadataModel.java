@@ -16,7 +16,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.MetadataModel;
 
 /**
- *
+ * This was once used to implement scale_factor and add_offset, but is no longer used.
  * @author jbf
  */
 public class NetcdfMetadataModel extends MetadataModel {
@@ -25,6 +25,7 @@ public class NetcdfMetadataModel extends MetadataModel {
     public NetcdfMetadataModel() {
     }
 
+    @Override
     public Map<String, Object> properties( Map<String,Object> meta) {
         Map<String,Object> result= new HashMap<String, Object>();
         if (meta.containsKey("valid_range")) {
@@ -37,7 +38,7 @@ public class NetcdfMetadataModel extends MetadataModel {
     public static Map<String, Object> interpretProps(Map map) {
         HashMap<String, Object> result = new HashMap<String, Object>();
         if (map.containsKey("units")) {
-            result.put(QDataSet.UNITS, Units.t1970);
+            result.put(QDataSet.UNITS, Units.t1970); //TODO: study this.  Surely this is too loose.
         }
         if (map.containsKey("add_offset")) {
             result.put( "add_offset", (Double) map.get("add_offset") );
