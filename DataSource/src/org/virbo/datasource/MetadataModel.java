@@ -1,11 +1,3 @@
-/*
- * MetadataModel.java
- *
- * Created on November 7, 2007, 6:49 AM
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
- */
 
 package org.virbo.datasource;
 
@@ -26,13 +18,16 @@ public abstract class MetadataModel {
     
     public static MetadataModel createNullModel() {
         return new MetadataModel() {
+            @Override
             public Map<String, Object> properties(Map<String,Object> meta) {
-                return new HashMap<String,Object>();
+                return new HashMap<>();
             }  
         };
     }
     /**
      * method for copying tree when the tree does not provide random access.
+     * @param src
+     * @return 
      */
     public static TreeModel copyTree( TreeModel src ) {
         MutableTreeNode destPos= new DefaultMutableTreeNode( src.getRoot() );
@@ -73,6 +68,9 @@ public abstract class MetadataModel {
     
     /**
      * drills down through the Maps.  This returns value.
+     * @param tree
+     * @param path
+     * @return 
      */
     public static String getNodeValue( Map<String,Object> tree, String[] path ) {
 
@@ -89,6 +87,9 @@ public abstract class MetadataModel {
 
     /**
      * drills down through the Maps.  This returns value.
+     * @param tree
+     * @param path
+     * @return 
      */
     public static Object getNode( Map<String,Object> tree, String[] path ) {
 
@@ -105,6 +106,9 @@ public abstract class MetadataModel {
     
     /**
      * assumes the leaves of the tree are "name=value" pairs.  This returns value.
+     * @param tree
+     * @param path
+     * @return the node value.
      */
     public static String getNodeValue( TreeModel tree, String[] path ) {
         
@@ -137,7 +141,7 @@ public abstract class MetadataModel {
     
     /**
      * Derive QDataSet properties from inspection of the metadata tree.
-     * DEPEND_0, etc are Map<String,Object>.
+     * DEPEND_0, etc are Map&lt;String,Object&gt;.
      * @param meta model provided by DataSource
      * @return Map with properties such as QDataSet.TITLE
      */
