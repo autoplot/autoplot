@@ -1011,7 +1011,7 @@ public class ScriptPanelSupport {
                     state= STATE_OPEN;
                 }
             } else if ( state==STATE_PDB ) { // the beginning of the currentLine is (Pdb) and we want a terminator
-                Pattern p= Pattern.compile("\\(Pdb\\) (.*)> .*\\.jy\\((\\d+)\\)\\?\\(\\)\\s*");
+                Pattern p= Pattern.compile("\\(Pdb\\) (.*)> .*\\.jy\\((\\d+)\\).*\\(\\)\\s*"); // TODO: replace ).* with more precise value.
                 Pattern p2= Pattern.compile("\\(Pdb\\) (.*)--Return--.*");
                 
                 int l= currentLine.length();
