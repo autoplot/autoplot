@@ -190,7 +190,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         String dims= longName.substring(parameter.length());
         
-        List<String> varnames= new ArrayList<String>();
+        List<String> varnames= new ArrayList<>();
         for ( Entry<String,String> ps : parameters.entrySet() ) {
             String v= ps.getValue();
             int i= v.indexOf("[");
@@ -255,10 +255,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         }
         
         FileSystem fs = FileSystem.create( DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI() );
-        if ( fs.isDirectory( split.file.substring(split.path.length()) ) ) {
-            return true;
-        }
-        return false;
+        return fs.isDirectory( split.file.substring(split.path.length()) );
     }
 
     @Override
@@ -431,7 +428,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 parameter= parameter.replaceAll("%3D", "=");
             }
             
-            List<String> varnames= new ArrayList<String>();
+            List<String> varnames= new ArrayList<>();
             for ( Variable v: vars ) {
                 varnames.add(v.getName());
             }
@@ -451,13 +448,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 whereCB.setSelected(false);
             }
             
-        } catch (IOException ex) {
-            DasExceptionHandler.handle( ex );
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IllegalArgumentException ex) {
-            DasExceptionHandler.handle( ex );
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (Exception ex) {
+        } catch (IOException | IllegalArgumentException | NullPointerException ex) {
             DasExceptionHandler.handle( ex );
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
@@ -466,7 +457,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
     @Override
     public void markProblems(List<String> problems) {
-        System.err.println(problems);
+        logger.log(Level.FINE, "markProblems: {0}", problems.toString());
     }
 
     @Override

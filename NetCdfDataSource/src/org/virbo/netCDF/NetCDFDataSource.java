@@ -344,7 +344,7 @@ public class NetCDFDataSource extends AbstractDataSource {
                 try {
                     readData(new NullProgressMonitor()); // sometimes we come in here from MetadataPanel.updateProperties before reading the data
                 } catch (IOException ex) {
-                    System.err.println("exception when trying to readData to test for ISTP props, returning null model");
+                    logger.info("exception when trying to readData to test for ISTP props, returning null model");
                     return MetadataModel.createNullModel();
                 }
             }

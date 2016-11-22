@@ -256,7 +256,7 @@ public class HDF5DataSourceFormat extends AbstractDataSourceFormat {
                 v.getShape();
                 logger.log(Level.FINER, "v.read()" );
                 Array a= v.read();
-                System.err.println(a);
+                logger.log(Level.FINE, "a={0}", a);
                 dataStore.put( v.getName(), a );
                 //logger.log(Level.FINER, "ncfile.write({0},a)", v.getName());
                 //ncfile.write( v.getName(), a );
