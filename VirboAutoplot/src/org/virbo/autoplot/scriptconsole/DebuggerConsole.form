@@ -74,6 +74,7 @@
     <Component class="javax.swing.JButton" name="whereButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Where"/>
+        <Property name="toolTipText" type="java.lang.String" value="Refresh the debug position (Currently not functional)"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
@@ -156,7 +157,7 @@
     <Component class="javax.swing.JButton" name="continueButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Continue"/>
-        <Property name="toolTipText" type="java.lang.String" value="Continue execution until breakpoint is hit"/>
+        <Property name="toolTipText" type="java.lang.String" value="Continue execution until breakpoint is hit.  (Currently not functional)"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>

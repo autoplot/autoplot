@@ -188,6 +188,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         if ( s.endsWith("\n") ) {
             jTextArea2.append("\n");
             jTextArea1.setCaretPosition( jTextArea1.getDocument().getLength());
+            jTextArea2.setCaretPosition( jTextArea2.getDocument().getLength());
         }
     }
     
@@ -230,6 +231,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         });
 
         whereButton.setText("Where");
+        whereButton.setToolTipText("Refresh the debug position (Currently not functional)");
         whereButton.setEnabled(false);
         whereButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -270,7 +272,7 @@ public class DebuggerConsole extends javax.swing.JPanel {
         });
 
         continueButton.setText("Continue");
-        continueButton.setToolTipText("Continue execution until breakpoint is hit");
+        continueButton.setToolTipText("Continue execution until breakpoint is hit.  (Currently not functional)");
         continueButton.setEnabled(false);
         continueButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
