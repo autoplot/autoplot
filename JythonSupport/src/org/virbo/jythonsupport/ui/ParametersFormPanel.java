@@ -88,7 +88,10 @@ public class ParametersFormPanel {
         /**
          * Convert the parameter to Jython types.
          *<blockquote><pre>
-         * T (TimeRange), A (String), F (Double or Integer), or R (URI)
+         * T (TimeRange)
+         * A (String)
+         * F (Double or Integer)
+         * R (URI)
          * D Datum
          * S DatumRange
          * </pre></blockquote>
@@ -115,6 +118,9 @@ public class ParametersFormPanel {
                         } catch (URISyntaxException ex) {
                             throw new ParseException( "URI is not formed properly",0);
                         }
+                    } else if ( typesList.get(i).equals('A') ) {
+                        value= org.virbo.jythonsupport.Util.popString(value);
+                        paramsDictionary.__setitem__( param, Py.java2py( value ) );
                     } else {
                         interp.exec( String.format("params['%s']=%s", param, value ) ); // TODO: nasty/clever code handles float vs int.
                     }
