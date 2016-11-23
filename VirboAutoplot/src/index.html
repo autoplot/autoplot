@@ -24,9 +24,11 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-11-22 r20038):</p>
+        <p>Bugfixes (2016-11-23 r20038):</p>
         <ul> 
-            <li>1714 Brian showed where HDF5 variable was ISTP, but its DEPEND datasets were not.
+            <li>test002 showed where -INFs were getting into Autohistogram and causing unnecessary warnings.
+            <li>1714: slice function of NetCDF (and HDF) result didn't handle DEPEND metadataset property. 
+            <li>1714: Brian showed where HDF5 variable was ISTP, but its DEPEND datasets were not.
             <li>something changed on Mint Linux display (or java version) and get screenshot didn't work on one of the screens.
             <li>old nbproject areas (ant build) rebuilt from scratch, reducing incremental build time from 20sec to 5sec.
             <li>rte_1736345160: improperly-localized strings caused RTE in layout tab's "make taller" and other buttons.  Thanks, Andre!
