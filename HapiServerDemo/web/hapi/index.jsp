@@ -52,6 +52,7 @@
             <li>2016-11-11: bugfix: properly handle no granules of data found.  Add forecast, which includes non-monotonic data.</li>
             <li>2016-11-15: add rain to forecast</li>
             <li>2016-11-21: new capabilities scheme</li>
+            <li>2016-11-23: corrections to bugs found by Scott, <a href='https://sourceforge.net/p/autoplot/bugs/1717/'>1717</a>, like parameters=Spectra</li>
         </ul>
         </small>
     </body>
