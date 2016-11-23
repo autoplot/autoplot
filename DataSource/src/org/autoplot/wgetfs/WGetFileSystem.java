@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
@@ -20,9 +21,7 @@ import java.util.regex.Pattern;
 import org.das2.datum.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.HtmlUtil;
-import org.das2.util.filesystem.WebFileObject;
 import org.das2.util.filesystem.WebFileSystem;
-import org.das2.util.filesystem.WebProtocol;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.ProgressMonitor;
 
@@ -40,11 +39,11 @@ public class WGetFileSystem extends WebFileSystem {
         if ( WGetFileSystemFactory.exe==null ) {
             throw new IllegalArgumentException("This must be constructed with the factory.");
         }        
-        
-    }
-
-    public WebProtocol getProtocol() {
-        return new WGetWebProtocol( getRootURL() ); 
+        try { 
+            this.protocol= new WGetWebProtocol( root.toURL() );
+        } catch (MalformedURLException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
     }
     
     public static WGetFileSystem createWGetFileSystem( URI root ) {
