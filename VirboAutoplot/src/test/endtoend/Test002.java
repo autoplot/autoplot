@@ -37,8 +37,9 @@ public class Test002 {
     static long t0 = System.currentTimeMillis();
 
     public static void xxx(String id) {
-        System.err.println("\n\n-- timer -- " + id + " --: " + (System.currentTimeMillis() - t0));
+        System.err.println("-- timer -- " + id + " --: " + (System.currentTimeMillis() - t0));
         t0 = System.currentTimeMillis();
+        System.err.println("\n\n");
     }
 
     private static void doTest(final String s, final String label) throws IOException, InterruptedException, Exception {
