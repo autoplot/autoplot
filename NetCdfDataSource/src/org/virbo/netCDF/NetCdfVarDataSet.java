@@ -482,17 +482,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
 
     @Override
     public QDataSet slice(int i) {
-        if ( this.rank()>1 ) {
-            NetCdfVarDataSet result= new NetCdfVarDataSet();
-            result.shape= Arrays.copyOfRange( this.shape, 1, this.shape.length );
-            int recLength= DataSetUtil.product(result.shape);
-            result.data= Arrays.copyOfRange( this.data, recLength*i, recLength*(i+1) ); // TODO: introduce offset so we don't need to copy.
-            result.properties.putAll( DataSetUtil.sliceProperties( this, i, null ) );
-            if ( result.rank()>1 ) result.properties.put( QDataSet.QUBE, Boolean.TRUE );
-            return result;
-        } else {
-            return DataSetOps.slice0( this, i );
-        }
+        return super.slice(i);
     }
     
     
