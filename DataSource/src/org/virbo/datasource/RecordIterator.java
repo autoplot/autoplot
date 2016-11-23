@@ -241,7 +241,7 @@ public class RecordIterator implements Iterator<QDataSet>  {
                 }
             }
             if ( this.sortDataSet!=null ) {
-                nextRecord= DataSetOps.applyIndex( src, 1, sortDataSet, true );
+                nextRecord= DataSetOps.applyIndex( nextRecord, 0, sortDataSet, true );
             }
             recordCount++;
             return nextRecord;
