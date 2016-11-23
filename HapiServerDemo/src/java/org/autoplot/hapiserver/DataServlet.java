@@ -19,6 +19,8 @@ import org.das2.datum.Units;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
 
@@ -146,6 +148,7 @@ public class DataServlet extends HttpServlet {
                 }
                 JSONArray newParameters= new JSONArray();
                 int[] indexMap= new int[pps.length];
+                int[] lengths= new int[pps.length];
                 boolean hasTime= false;
                 for ( int ip=0; ip<pps.length; ip++ ) {
                     Integer i= map.get(pps[ip]);
@@ -157,13 +160,52 @@ public class DataServlet extends HttpServlet {
                         hasTime= true;
                     }
                     newParameters.put( ip, jsonParameters.get(i) );
+                    lengths[ip]= 1;
+                    if ( jsonParameters.getJSONObject(i).has("size") ) {
+                        int[] isize= (int[])jsonParameters.getJSONObject(i).get("size");
+                        for ( int k=0; k<isize.length; k++ ) {
+                            lengths[ip]*= isize[k];
+                        }
+                    }
                 }
+                
+                // add time if it was missing.  This demonstrates a feature that is burdensome to implementors, I believe.
                 if ( !hasTime ) {
                     int[] indexMap1= new int[1+indexMap.length];
+                    int[] lengths1= new int[1+lengths.length];
                     indexMap1[0]= 0;
                     System.arraycopy( indexMap, 0, indexMap1, 1, indexMap.length );
+                    lengths1[0]= 1;
+                    System.arraycopy( lengths, 0, lengths1, 1, indexMap.length );
+                    indexMap= indexMap1;
+                    lengths= lengths1;
+                    for ( int k=newParameters.length()-1; k>=0; k-- ) {
+                        newParameters.put( k+1, newParameters.get(k) );
+                    }
+                    newParameters.put(0,jsonParameters.get(0));
+                }
+                
+                // unpack the resort where the lengths are greater than 1.
+                int[] indexMap1= new int[ DataSetUtil.sum(lengths) ];
+                int c= 0;
+                if ( indexMap1.length>indexMap.length ) {
+                    for ( int k=0; k<lengths.length; k++ ) {
+                        if ( lengths[k]==1 ) {
+                            indexMap1[c]= indexMap[k];
+                            c++;
+                        } else {
+                            for ( int l=0; l<lengths[k]; l++ ) { //TODO: there's a bug here if there is anything after the spectrogram, but I'm hungry for turkey...
+                                indexMap1[c]= indexMap[k]+l;
+                                c++;
+                            }
+                            if ( k<lengths.length-1 ) {
+                                throw new IllegalArgumentException("not properly implemented");
+                            }
+                        }
+                    }
                     indexMap= indexMap1;
                 }
+                
                 dsiter.resortFields( indexMap );
                 jsonParameters= newParameters;
                 jo.put( "parameters", jsonParameters );
