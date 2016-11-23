@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.wgetfs;
 
 import java.awt.EventQueue;
@@ -17,11 +14,15 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.datum.LoggerManager;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.HtmlUtil;
+import org.das2.util.filesystem.WebFileObject;
 import org.das2.util.filesystem.WebFileSystem;
+import org.das2.util.filesystem.WebProtocol;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.ProgressMonitor;
 
@@ -32,8 +33,18 @@ import org.das2.util.monitor.ProgressMonitor;
  */
 public class WGetFileSystem extends WebFileSystem {
     
+    private static final Logger logger= LoggerManager.getLogger("das2.filesystem.wget" );
+    
     public WGetFileSystem(URI root, File localRoot) {
         super(root, localRoot);
+        if ( WGetFileSystemFactory.exe==null ) {
+            throw new IllegalArgumentException("This must be constructed with the factory.");
+        }        
+        
+    }
+
+    public WebProtocol getProtocol() {
+        return new WGetWebProtocol( getRootURL() );
     }
     
     public static WGetFileSystem createWGetFileSystem( URI root ) {
@@ -111,12 +122,11 @@ public class WGetFileSystem extends WebFileSystem {
             cmd= new String[] { WGetFileSystemFactory.exe, "-O", partfile.toString(), getRootURL().toString() + filename };
         }
         
+        logger.log(Level.FINE, "cmd: {0} {1} {2} {3}", new Object[]{cmd[0], cmd[1], cmd[2], cmd[3]});
         ProcessBuilder pb= new ProcessBuilder( Arrays.asList(cmd) );
         Process p= pb.start();
         
-        BufferedReader err= new BufferedReader( new InputStreamReader( p.getErrorStream() ) );
-        
-        try {
+        try (BufferedReader err = new BufferedReader( new InputStreamReader( p.getErrorStream() ) )) {
             String line= err.readLine();
             while ( line!=null ) {
                 interpretProgress( line, filename, monitor );
@@ -144,7 +154,6 @@ public class WGetFileSystem extends WebFileSystem {
         } catch ( InterruptedException ex ) {
             throw new IOException(ex);
         } finally {
-            err.close();
             monitor.finished();
         }
 
@@ -247,6 +256,8 @@ public class WGetFileSystem extends WebFileSystem {
             cmd= new String[] { WGetFileSystemFactory.exe, "-O", listingFile.toString(), getRootURL().toString() + directory };
         }
         
+        logger.log(Level.FINE, "cmd: {0} {1} {2} {3}", new Object[]{cmd[0], cmd[1], cmd[2], cmd[3]});
+        
         ProcessBuilder pb= new ProcessBuilder( Arrays.asList(cmd) );
         Process p= pb.start();
         
@@ -266,8 +277,7 @@ public class WGetFileSystem extends WebFileSystem {
         result= new LinkedHashMap();
         try {
             if ( WGetFileSystemFactory.useCurl && getRootURL().getProtocol().equals("ftp") ) {            
-                BufferedReader bin= new BufferedReader( new InputStreamReader(in) );
-                try {
+                try (BufferedReader bin = new BufferedReader( new InputStreamReader(in) )) {
                     String line= bin.readLine();
                     while ( line!=null ) {
                         String[] ss= line.split("\\s+");
@@ -286,9 +296,8 @@ public class WGetFileSystem extends WebFileSystem {
                         }
                         line= bin.readLine();
                     }
-                } finally {
-                    bin.close();
                 }
+                //System.err.println(result);
                 //System.err.println(result);
             } else {
 
