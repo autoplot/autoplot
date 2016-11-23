@@ -146,13 +146,23 @@ public class DataServlet extends HttpServlet {
                 }
                 JSONArray newParameters= new JSONArray();
                 int[] indexMap= new int[pps.length];
+                boolean hasTime= false;
                 for ( int ip=0; ip<pps.length; ip++ ) {
                     Integer i= map.get(pps[ip]);
                     if ( i==null ) {
                         throw new IllegalArgumentException("bad parameter: "+pps[ip]);
                     }
                     indexMap[ip]= i;
+                    if ( i==0 ) {
+                        hasTime= true;
+                    }
                     newParameters.put( ip, jsonParameters.get(i) );
+                }
+                if ( !hasTime ) {
+                    int[] indexMap1= new int[1+indexMap.length];
+                    indexMap1[0]= 0;
+                    System.arraycopy( indexMap, 0, indexMap1, 1, indexMap.length );
+                    indexMap= indexMap1;
                 }
                 dsiter.resortFields( indexMap );
                 jsonParameters= newParameters;
