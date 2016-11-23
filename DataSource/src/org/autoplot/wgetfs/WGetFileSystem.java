@@ -44,7 +44,7 @@ public class WGetFileSystem extends WebFileSystem {
     }
 
     public WebProtocol getProtocol() {
-        return new WGetWebProtocol( getRootURL() );
+        return new WGetWebProtocol( getRootURL() ); 
     }
     
     public static WGetFileSystem createWGetFileSystem( URI root ) {
