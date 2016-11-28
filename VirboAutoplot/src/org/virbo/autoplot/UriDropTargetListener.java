@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
  */
 public class UriDropTargetListener implements DropTargetListener {
     
-    private static final Logger logger= LoggerManager.getLogger("autoplot.gui");
+    private static final Logger logger= LoggerManager.getLogger("autoplot.gui.droptarget");
     
     DataSetSelector dss;
     ApplicationModel model;
@@ -77,6 +77,11 @@ public class UriDropTargetListener implements DropTargetListener {
             boolean haveAcceptedDrop= false;
             Bookmark item = null;
             List<Bookmark> items = null;
+            if ( logger.isLoggable(Level.FINE) ) {
+                for ( DataFlavor df: dtde.getCurrentDataFlavors() ) {
+                    logger.log(Level.FINE, "drop data flavor: {0} {1}", new Object[]{df.getMimeType(), df.getHumanPresentableName()});
+                }
+            }
             if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 if ( !haveAcceptedDrop ) {
                     dtde.acceptDrop(DnDConstants.ACTION_COPY);
@@ -116,7 +121,7 @@ public class UriDropTargetListener implements DropTargetListener {
                         }
                     }
                 } catch (ClassNotFoundException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                    logger.log(Level.FINE, "class not found for flavor, wrong platform");
                 }
                 try {
                     df = new DataFlavor("application/x-java-file-list;class=java.util.List");
