@@ -673,6 +673,10 @@ public abstract class QDataSetBridge {
             System.err.println("reading values for dataset " + name );
         }
         QDataSet ds1 = datasets.get(name);
+        if ( ds1==null ) {
+            throw new IllegalArgumentException("No datasets with the name: "+name);
+        }
+        
         UnitsConverter uc= maybeGetConverter(ds1);
         
         if ( ds1 instanceof FDataSet || ds1 instanceof FloatDataSet ) {
