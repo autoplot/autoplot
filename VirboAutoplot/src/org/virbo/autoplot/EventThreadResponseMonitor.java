@@ -161,7 +161,7 @@ public final class EventThreadResponseMonitor {
                     //System.err.printf( "current event queue clear time: %5.3f sec\n", levelms/1000. );
                 }
                 pleasePostEvent= true;
-                
+                logger.log(Level.FINER, "eventQueue clear time: {0}", levelms);
                 //pending= dumpPendingEvents();
                 //TODO: this would be the correct time to dumpPendingEvents.
             }
