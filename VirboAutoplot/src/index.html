@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Comparing weather forecasts of temperature to observed temperature.
+        <p><small>A small Jython script is used to create a convenient check list.  This was used to keep track as the source for each Autoplot component was cleaned up.  Here's <a href='makeCheckList.jy'>the script</a>.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,7 +24,7 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-11-23 r20038):</p>
+        <p>Bugfixes (2016-11-28 r20061):</p>
         <ul> 
             <li>1718: LANL NN with log-spaced x-tags.
             <li>test002 showed where -INFs were getting into Autohistogram and causing unnecessary warnings.
@@ -87,6 +87,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>update internal orbits, and include 2017 leap second.</li>
             <li>"run batch" feature allows jython scripts to be run for a series of inputs.</li>
             <li>20000th SVN revision!
             <li>layout tab has "move to top" menu item
