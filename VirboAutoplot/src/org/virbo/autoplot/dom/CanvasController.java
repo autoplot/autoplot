@@ -725,8 +725,8 @@ public class CanvasController extends DomNodeController {
 
         if ( !dasCanvas.isShowing() ) return;
 
-        final List<Shape> sel= new ArrayList<Shape>();
-        final List<Rectangle> clip= new ArrayList<Rectangle>();
+        final List<Shape> sel= new ArrayList<>();
+        final List<Rectangle> clip= new ArrayList<>();
 
         final long t1= System.currentTimeMillis();
 
@@ -743,6 +743,7 @@ public class CanvasController extends DomNodeController {
             currentSelectionBirthtime= t1;
         }
 
+        logger.log(Level.FINER,"get highlite area");
         for ( Object o: selectedItems ) {
             if ( o instanceof Plot ) {
                 DasPlot p= ((Plot)o).getController().getDasPlot();
@@ -766,6 +767,7 @@ public class CanvasController extends DomNodeController {
                     logger.warning("reducePath contract broken by renderer that returns null.");
                 }
             }
+            logger.log(Level.FINER,"got highlite area in {0} millis", (System.currentTimeMillis()-t1));
         }
         
         
@@ -819,10 +821,12 @@ public class CanvasController extends DomNodeController {
                             logger.log(Level.FINEST, "rm decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
                             dasCanvas.removeTopDecorator( p );
                             currentSelectionItems= null;
+                            logger.log(Level.FINER, "done rm decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
                         }
                     });
                     clearSelectionTimer.setRepeats(false);
                     clearSelectionTimer.restart();
+                    logger.log(Level.FINER, "done add decorator {0} {1}", new Object[]{p, System.currentTimeMillis()-t1});
                 }
             };
             SwingUtilities.invokeLater( run );
