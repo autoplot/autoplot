@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot.bookmarks;
 
 import java.awt.datatransfer.DataFlavor;
@@ -108,13 +105,7 @@ public class BookmarksManagerTransferrable {
                         model.addBookmarks(items, context, true);
                     }
 
-                } catch (UnsupportedFlavorException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } catch (BookmarksException ex ) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } catch (IOException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } catch (SAXException ex) {
+                } catch (UnsupportedFlavorException | BookmarksException | IOException | SAXException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
 
@@ -144,7 +135,7 @@ public class BookmarksManagerTransferrable {
                         dge.startDrag(null, new BookmarkTransferable((Bookmark.Folder) b, remoteUrl.length()==0 ));
                     }
                 } else {
-                    List<Bookmark> books= new ArrayList<Bookmark>();
+                    List<Bookmark> books= new ArrayList<>();
                     TreePath[] tps= jTree1.getSelectionPaths();
                     if ( tps==null ) return;
                     for ( TreePath tp: tps ) {
