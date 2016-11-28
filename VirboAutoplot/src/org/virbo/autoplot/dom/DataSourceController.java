@@ -1594,7 +1594,12 @@ public class DataSourceController extends DomNodeController {
     public void setDataSet(QDataSet dataSet) {
         QDataSet oldDataSet = this.dataSet;
         this.dataSet = dataSet;
-        propertyChangeSupport.firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
+        try {
+            propertyChangeSupport.firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
+        } catch ( NullPointerException ex ) {
+            logger.log( Level.WARNING, null, ex ); // See rte_0031957296
+            throw ex;
+        }
     }
     /**
      * fill dataset is a copy of the loaded dataset, with fill data applied. If
