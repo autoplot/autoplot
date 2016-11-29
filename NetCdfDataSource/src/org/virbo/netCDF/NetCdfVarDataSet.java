@@ -46,7 +46,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
 
     public static NetCdfVarDataSet create( Variable variable, String constraint, NetcdfDataset ncfile, ProgressMonitor mon ) throws IOException {
         NetCdfVarDataSet result = new NetCdfVarDataSet(  );
-        result.read( variable, ncfile, constraint, null, mon );
+        result.read(variable, ncfile, constraint, null, false, mon );
         return result;
     }
     
@@ -166,7 +166,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
      * @param mon
      * @throws IOException
      */
-    private void read( Variable variable, NetcdfDataset ncfile, String constraints, MetadataModel mm, ProgressMonitor mon )  throws IOException {
+    private void read( Variable variable, NetcdfDataset ncfile, String constraints, MetadataModel mm, boolean isDepend, ProgressMonitor mon)  throws IOException {
         this.v= variable;
         if ( !mon.isStarted() ) mon.started(); //das2 bug: monitor blinks if we call started again here
         mon.setProgressMessage( "reading "+v.getNameAndDimensions() );
@@ -386,13 +386,38 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                     if ( dv!=null && dv!=variable ) {
                         
                         NetCdfVarDataSet result1 = new NetCdfVarDataSet(  );
-                        result1.read( dv, ncfile, sliceConstraints(constraints,ir), mm, new NullProgressMonitor() );
+                        result1.read( dv, ncfile, sliceConstraints(constraints,ir), mm, true, new NullProgressMonitor() );
                         QDataSet dependi= result1;
                         
                         properties.put( "DEPEND_"+(ir-sliceCount(slice,ir)), dependi );
                     }
                 }
             }
+            
+                String[] vvs= new String[] { "DELTA_PLUS_VAR", "DELTA_MINUS_VAR" };
+                for ( String vv: vvs ) {
+                    if ( attributes.containsKey(vv ) ) {
+                        
+                        String s= (String)attributes.get(vv);
+                        logger.log(Level.FINER, "{0} ({1})" , new Object[] { vv, s } );
+
+                        Variable dv= ncfile.findVariable(s);
+                        if ( dv!=null && dv!=variable ) {
+                            String[] ss= vv.split("_");
+                            NetCdfVarDataSet result1 = new NetCdfVarDataSet(  );
+                            result1.read( dv, ncfile, sliceConstraints(constraints,0), mm, true, new NullProgressMonitor() );
+                            QDataSet dependi= result1;
+
+                            String qdatasetPropName;
+                            if ( isDepend ) {
+                                qdatasetPropName= "BIN_"+ss[1];
+                            } else {
+                                qdatasetPropName= "DELTA_"+ss[1];
+                            }
+                            properties.put( qdatasetPropName, dependi );
+                        }
+                    }
+                }
         }
 
         // perform the slices
