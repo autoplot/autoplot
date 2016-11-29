@@ -179,7 +179,7 @@ public abstract class QDataSetBridge {
                 if (dep != null) datasets.put(nameFor(dep), dep);
                 QDataSet depslice= (QDataSet) ds.property("DEPEND_" + i, 0 );
                 if ( depslice!=null ) {
-                    sliceDep.put( nameFor(depslice), "DEPEND_"+i );
+                    sliceDep.put( nameFor(depslice,true), "DEPEND_"+i );
                 }
             }
             QDataSet ads;
@@ -191,7 +191,7 @@ public abstract class QDataSetBridge {
             }
             i=0; 
             while ( (ads=(QDataSet)ds.property( "PLANE_"+i, 0 ))!=null ) {
-                sliceDep.put( nameFor( ads ), "PLANE_"+i );
+                sliceDep.put( nameFor( ads,true ), "PLANE_"+i );
                 i++;
             }
             i=0;
@@ -292,21 +292,40 @@ public abstract class QDataSetBridge {
         }
     }
 
+    /**
+     * return the name used to refer to the dataset.  
+     * This may add to the list of datasets.
+     * @param dep0 the dataset
+     * @return the name for the dataset.
+     */
     public synchronized String nameFor(QDataSet dep0) {
+        return nameFor( dep0, false );
+    }
+
+    /**
+     * return the name used to refer to the dataset.  
+     * This may add to the list of datasets.
+     * @param dep0 the dataset
+     * @return the name for the dataset.
+     */
+    private synchronized String nameFor(QDataSet dep0, boolean onlySlice ) {
         String name1 = names.get(dep0);
 
-        if (name1 == null) {
+        if ( name1==null ) {
             name1 = (String) dep0.property(QDataSet.NAME);
+            if ( name1 == null || datasets.containsKey(name1) ) {
+                name1 = "ds_" + names.size();
+            }
+            names.put(dep0, name1);
+            if ( datasets.containsKey(name1) ) {
+                throw new IllegalArgumentException("dataset name is already taken: "+name1 );
+            }
+            if ( !onlySlice ) datasets.put( name1, dep0 );
         }
-        if (name1 == null) {
-            name1 = "ds_" + names.size();
-        }
-
-        names.put(dep0, name1);
 
         return name1;
     }
-
+    
     /**
      * implementations should provide this method for making the data accessible.
      * @param mon
@@ -1069,10 +1088,11 @@ public abstract class QDataSetBridge {
     /**
      * get the properties for the named dataset
      * @param name
+     * @param i the index
      * @return
      */
     public Map<String, Object> properties(String name,int i) {
-        LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(DataSetUtil.getProperties(datasets.get(name).slice(i))); //TODO: strange implementation
+        LinkedHashMap<String, Object> result = new LinkedHashMap<>(DataSetUtil.getProperties(datasets.get(name).slice(i))); //TODO: strange implementation
         for (String s : result.keySet()) {
             result.put(s, property(name, s,i));
         }
@@ -1153,11 +1173,11 @@ public abstract class QDataSetBridge {
 
     /**
      * returns one of String, int, double, float, int[], double, float[]
-     * @param name
-     * @param propname
-     * @return
+     * @param propname the property name
+     * @param i the slice index
+     * @return the name of the qdataset, or the value.
      */
-    public Object property(String propname,int i) {
+    public Object property(String propname, int i) {
         Object prop = datasets.get(name).property(propname,i);
         if (prop instanceof QDataSet) {
             return nameFor((QDataSet) prop);
