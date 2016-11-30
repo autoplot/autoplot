@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A small Jython script is used to create a convenient check list.  This was used to keep track as the source for each Autoplot component was cleaned up.  Here's <a href='makeCheckList.jy'>the script</a>.
+        <p><small>experiments with using Autoplot to teach optimization.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,11 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-11-28 r20061):</p>
+        <p>Bugfixes (2016-11-29 r20074:</p>
         <ul> 
+            <li>IDL/Matlab interface provides access to more datasets in qstreams.
+            <li>1722: qstreams with arbitraty qdataset properties.
+            <li>1718: HDF5 supports DELTA_PLUS_VAR, DELTA_MINUS_VAR metadata.
             <li>1718: LANL NN with log-spaced x-tags.
             <li>test002 showed where -INFs were getting into Autohistogram and causing unnecessary warnings.
             <li>1714: slice function of NetCDF (and HDF) result didn't handle DEPEND metadataset property. 
