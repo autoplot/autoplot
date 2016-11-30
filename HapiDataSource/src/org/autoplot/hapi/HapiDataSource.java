@@ -86,7 +86,7 @@ public class HapiDataSource extends AbstractDataSource {
                     min.putValue(j,o.getDouble("min"));
                 }
                 if ( hasMax || o.has("max") ) {
-                    hasMin= true;
+                    hasMax= true;
                     min.putValue(j,o.getDouble("max"));
                 }
             } catch (JSONException ex) {
@@ -718,7 +718,7 @@ public class HapiDataSource extends AbstractDataSource {
                     if ( jsonObjecti.has("bins") ) {
                         QDataSet dep1= getJSONBins(jsonObjecti.getJSONObject("bins"));
                         pds[i].depend1= dep1;
-                    } 
+                    }
                 }
             }
         }
