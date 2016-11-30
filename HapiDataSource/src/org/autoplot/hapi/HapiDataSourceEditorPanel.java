@@ -792,7 +792,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     Object v= info.get(k);
                     extra.append("<tr valign=top><td>").append(k).append("</td><td>");
                     String s= getHtmlFor(v);
-                    if ( s.length()>MAX_LENGTH_CHARACTERS ) {
+                    if ( v.toString().length()>MAX_LENGTH_CHARACTERS ) {
                         extra.append("<i>(").append(v.toString().length()).append(" characters)</i>");
                         //extra.append( s ) ; //v.toString() );
                     } else {
@@ -874,5 +874,5 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         }
                 
     }
-    private static final int MAX_LENGTH_CHARACTERS = 10000;
+    private static final int MAX_LENGTH_CHARACTERS = 100000;
 }
