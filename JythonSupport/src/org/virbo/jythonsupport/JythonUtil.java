@@ -333,6 +333,8 @@ public class JythonUtil {
                         in.close();
                         continue;
                     }
+                    //Re https://sourceforge.net/p/autoplot/bugs/1724/:
+                    //Really each file should be copied and then renamed.
                     
                     try (FileOutputStream out = new FileOutputStream( ff5 ) ) {
                         transferStream(in,out);
