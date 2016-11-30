@@ -4,6 +4,7 @@ package org.virbo.jythonsupport;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -327,6 +328,12 @@ public class JythonUtil {
                             throw new IOException("Unable to makeHomeFor "+ff5);
                         }
                     }
+                    if ( ff5.exists() ) {
+                        logger.fine("already have file, skip...");
+                        in.close();
+                        continue;
+                    }
+                    
                     try (FileOutputStream out = new FileOutputStream( ff5 ) ) {
                         transferStream(in,out);
                     } finally {
