@@ -201,7 +201,7 @@ public class LabelConverter extends Converter {
         }
         
         if ( multiplePEWarning && ! title.equals(value) ) {
-            logger.log(Level.INFO, "multiple plot elements found, using first to resolve: {0}", value);
+            logger.log(Level.FINE, "multiple plot elements found, using first to resolve: {0}", value);
         }
         
         return title;
