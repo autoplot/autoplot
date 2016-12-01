@@ -319,10 +319,6 @@ public class JythonUtil {
                 while ( s!=null ) {
                     File ff5= new File( ff3, s );
                     logger.log(Level.FINER, "copy to local folder python code: {0}", s);
-                    InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
-                    if ( in==null ) {
-                        throw new IllegalArgumentException("unable to find jython code which should be embedded in application: "+s);
-                    }
                     if ( s.contains("/") ) {
                         if ( !makeHomeFor( ff5 ) ) {
                             throw new IOException("Unable to makeHomeFor "+ff5);
@@ -330,9 +326,13 @@ public class JythonUtil {
                     }
                     if ( ff5.exists() ) {
                         logger.fine("already have file, skip...");
-                        in.close();
+                        s= r.readLine();
                         continue;
                     }
+                    InputStream in= JythonUtil.class.getResourceAsStream("/"+s);
+                    if ( in==null ) {
+                        throw new IllegalArgumentException("unable to find jython code which should be embedded in application: "+s);
+                    }                                        
                     //Re https://sourceforge.net/p/autoplot/bugs/1724/:
                     //Really each file should be copied and then renamed.
                     
