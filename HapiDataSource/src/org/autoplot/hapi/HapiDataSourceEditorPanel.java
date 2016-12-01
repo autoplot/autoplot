@@ -840,6 +840,12 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     }
                     
                 });
+                if ( parameter.has("description") ) {
+                    String d= parameter.getString("description");
+                    //parametersPanel.add( new javax.swing.JLabel( d ) );
+                    cb.setToolTipText(d);
+                    cb.setText( cb.getName()+": "+d);
+                }
                 parametersPanel.add( cb );
             }
             parametersPanel.setToolTipText("shift-click will select range");
