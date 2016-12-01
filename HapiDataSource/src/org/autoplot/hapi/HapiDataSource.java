@@ -187,7 +187,7 @@ public class HapiDataSource extends AbstractDataSource {
         url= new URL( url.toString()+"&include=header" );
         
         monitor.started();
-        monitor.setProgressMessage("prepare data");
+        monitor.setProgressMessage("server is preparing data");
          
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
        
@@ -502,7 +502,7 @@ public class HapiDataSource extends AbstractDataSource {
     private QDataSet getDataSetViaJSON( int totalFields, ProgressMonitor monitor, URL url, ParamDescription[] pds, DatumRange tr, int nparam, int[] nfields) throws IllegalArgumentException, Exception, IOException {
         
         monitor.started();
-        monitor.setProgressMessage("prepare data");
+        monitor.setProgressMessage("server is preparing data");
         
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
        
@@ -666,9 +666,13 @@ public class HapiDataSource extends AbstractDataSource {
                 if ( !type.equals("isotime") ) {
                     logger.log(Level.WARNING, "isotime should not be capitalized: {0}", type);
                 }
-                 pds[i].units= Units.us2000;
-                 pds[i].type= "time"+jsonObjecti.getInt("length");
-                pds[i].type= "time"+jsonObjecti.getInt("length");
+                pds[i].units= Units.us2000;
+                if ( jsonObjecti.has("length") ) {
+                    pds[i].type= "time"+jsonObjecti.getInt("length");
+                } else {
+                    logger.log(Level.FINE, "server doesn''t report length for \"{0}\", assuming 24 characters, and that it doesn''t matter", name);
+                    pds[i].type= "time24";
+                }
                 
             } else {
                 pds[i].type= jsonObjecti.getString("type");
