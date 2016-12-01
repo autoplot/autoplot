@@ -313,7 +313,10 @@ public class HapiDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor monitor) throws Exception {
         URI server = this.resourceURI;
         
-        if ( server.toString().contains("http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi") ) {
+        String format= getParam("format","csv");
+        
+        if ( format.equals("json1") ||
+                server.toString().contains("http://cdaweb.sci.gsfc.nasa.gov/registry/hdp/hapi") ) {
             return getDataSetCDAWeb(monitor);
         }
         
@@ -327,7 +330,6 @@ public class HapiDataSource extends AbstractDataSource {
         id= URLDecoder.decode( id,"UTF-8" );
 
         String pp= getParam("parameters","");
-        String format= getParam("format","csv");
         
         JSONObject doc= getDocument();
         monitor.setProgressMessage("got info");
