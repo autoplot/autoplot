@@ -184,7 +184,7 @@ public class HapiDataSource extends AbstractDataSource {
         tr= tsb.getTimeRange();
         
         URL url= HapiServer.getDataURL( server.toURL(), id, tr, pp );
-        url= new URL( url.toString()+"&include=header" );
+        url= new URL( url.toString()+"&include=header&format=json1" );
         
         monitor.started();
         monitor.setProgressMessage("server is preparing data");
@@ -315,9 +315,12 @@ public class HapiDataSource extends AbstractDataSource {
         
         String format= getParam("format","csv");
         
-        if ( format.equals("json1") ||
-                server.toString().contains("http://cdaweb.sci.gsfc.nasa.gov/registry/hdp/hapi") ) {
-            return getDataSetCDAWeb(monitor);
+        {
+            String serverStr= server.toString();
+            if ( format.equals("json1") ||
+                    ( serverStr.startsWith("http://cdaweb") && serverStr.endsWith( "gsfc.nasa.gov/registry/hdp/hapi") ) )  {
+                return getDataSetCDAWeb(monitor);
+            }
         }
         
         monitor.setTaskSize(100);
