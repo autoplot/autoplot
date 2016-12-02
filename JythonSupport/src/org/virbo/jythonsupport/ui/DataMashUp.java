@@ -119,7 +119,7 @@ public class DataMashUp extends javax.swing.JPanel {
      * @param newName 
      */
     public void rename( String oldName, String newName ) {
-        DefaultTreeModel tm= (DefaultTreeModel) jTree1.getModel();
+        DefaultTreeModel tm= (DefaultTreeModel) expressionTree.getModel();
         renameImpl( tm, tm.getRoot(), oldName, newName );
         tm.reload();
     }
@@ -144,9 +144,9 @@ public class DataMashUp extends javax.swing.JPanel {
     protected void refresh() {
         resolved.clear();
         imaged.clear();
-        jTree1.treeDidChange();
-        jTree1.revalidate();
-        jTree1.repaint();
+        expressionTree.treeDidChange();
+        expressionTree.revalidate();
+        expressionTree.repaint();
         checkForTSB();
     }
 
@@ -171,7 +171,7 @@ public class DataMashUp extends javax.swing.JPanel {
             logger.log(Level.SEVERE, null, ex);
         }
         
-        jTree1.setDropTarget(dropTarget);
+        expressionTree.setDropTarget(dropTarget);
         
         DropTarget listDropTarget= new DropTarget();
         try {
@@ -181,7 +181,7 @@ public class DataMashUp extends javax.swing.JPanel {
         }
         scratchList.setDropTarget(listDropTarget);
 
-        dragSource.createDefaultDragGestureRecognizer( jTree1, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
+        dragSource.createDefaultDragGestureRecognizer(expressionTree, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
         
         // add all jLists
         dragSource.createDefaultDragGestureRecognizer( jList1, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
@@ -192,7 +192,7 @@ public class DataMashUp extends javax.swing.JPanel {
         dragSource.createDefaultDragGestureRecognizer( namedURIListTool1, DnDConstants.ACTION_COPY_OR_MOVE, createDragGestureListener() );
 
         String data = "ds";
-        TreePath tp= new TreePath( ( (DefaultMutableTreeNode) jTree1.getModel().getRoot() ).getPath() );
+        TreePath tp= new TreePath( ( (DefaultMutableTreeNode) expressionTree.getModel().getRoot() ).getPath() );
         doDrop(data,tp);
         
         Runnable run= new Runnable() {
@@ -259,7 +259,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
         b.append( getJythonSynchronize("&") );
         
-        DefaultTreeModel m= (DefaultTreeModel) jTree1.getModel();
+        DefaultTreeModel m= (DefaultTreeModel) expressionTree.getModel();
         
         b.append( getJython( m, m.getRoot() ) );
         String timerange= timeRangeTextField.getText();
@@ -301,7 +301,7 @@ public class DataMashUp extends javax.swing.JPanel {
         StringBuilder b= new StringBuilder("vap+inline:");
         b.append( namedURIListTool1.getAsJythonInline() );
         
-        DefaultTreeModel m= (DefaultTreeModel) jTree1.getModel();
+        DefaultTreeModel m= (DefaultTreeModel) expressionTree.getModel();
         
         b.append( getJython( m, tn ) );
         b.append( getJythonSynchronize("&") );
@@ -394,7 +394,7 @@ public class DataMashUp extends javax.swing.JPanel {
     
     public void setResolver( Resolver r ) {
         this.directionsLabel.setText(LABEL_DIRECTIONS);
-        this.jTree1.setRowHeight(0);
+        this.expressionTree.setRowHeight(0);
         this.resolver= r;
     }
     
@@ -427,7 +427,7 @@ public class DataMashUp extends javax.swing.JPanel {
                     @Override
                     public void run() {
                         getDataSet( value ); // call back on a different thread.
-                        jTree1.treeDidChange();
+                        expressionTree.treeDidChange();
                     }
                 };
                 new Thread(run).start(); 
@@ -445,12 +445,12 @@ public class DataMashUp extends javax.swing.JPanel {
                         if ( qds==null ) qds= NULL_DS;
                         resolved.put( uri, qds );
                         resolvePending.remove( uri );
-                        jTree1.treeDidChange();
+                        expressionTree.treeDidChange();
                         logger.log(Level.FINE, "done resolving URI in {0} ms: {1}", new Object[]{System.currentTimeMillis()-t0, uri });
                     } catch ( Exception ex  ) {
                         resolved.put( uri, ERROR_DS );
                         resolvePending.remove( uri );
-                        jTree1.treeDidChange();
+                        expressionTree.treeDidChange();
                     }
                 }
                 return qds;
@@ -475,7 +475,7 @@ public class DataMashUp extends javax.swing.JPanel {
                     public void run() {
                         if ( qds!=null ) {
                             getImage( qds );
-                            jTree1.treeDidChange();
+                            expressionTree.treeDidChange();
                         }
                     }
                 };
@@ -496,7 +496,7 @@ public class DataMashUp extends javax.swing.JPanel {
                         g.drawRect(0,0,im.getWidth()-1,im.getHeight()-1);
                         imaged.put( qds, im );
                         imagePending.remove( qds );
-                        jTree1.treeDidChange();
+                        expressionTree.treeDidChange();
                         logger.log(Level.FINE, "done rendering dataset in {0} ms: {1}",  new Object[]{System.currentTimeMillis()-t0,qds.toString()} );
                     }
                 }
@@ -581,8 +581,8 @@ public class DataMashUp extends javax.swing.JPanel {
         if ( assign.value instanceof Name ) {
             DefaultMutableTreeNode root= new DefaultMutableTreeNode( ((Name)assign.value).id );
             DefaultTreeModel model= new DefaultTreeModel( root );
-            jTree1.setModel(model);
-            jTree1.setCellRenderer( getCellRenderer() );
+            expressionTree.setModel(model);
+            expressionTree.setCellRenderer( getCellRenderer() );
         } else {
             DefaultMutableTreeNode root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
             DefaultTreeModel model= new DefaultTreeModel( root );
@@ -595,11 +595,11 @@ public class DataMashUp extends javax.swing.JPanel {
                     fillTreeCall( c, root );
                 }
             }            
-            jTree1.setModel(model);
-            for (int i = 0; i < jTree1.getRowCount(); i++) {
-                jTree1.expandRow(i);
+            expressionTree.setModel(model);
+            for (int i = 0; i < expressionTree.getRowCount(); i++) {
+                expressionTree.expandRow(i);
             }
-            jTree1.setCellRenderer( getCellRenderer() );            
+            expressionTree.setCellRenderer( getCellRenderer() );            
         }
     }
     
@@ -733,7 +733,7 @@ public class DataMashUp extends javax.swing.JPanel {
     
     private void doDrop( String data, TreePath tp ) {
 
-        DefaultTreeModel model= (DefaultTreeModel) jTree1.getModel();
+        DefaultTreeModel model= (DefaultTreeModel) expressionTree.getModel();
 
         MutableTreeNode mtn= (MutableTreeNode)tp.getLastPathComponent();
         MutableTreeNode parent= (MutableTreeNode)mtn.getParent();
@@ -769,14 +769,14 @@ public class DataMashUp extends javax.swing.JPanel {
 
         final TreePath ftp= tp;
         
-        jTree1.collapsePath(ftp);
+        expressionTree.collapsePath(ftp);
         SwingUtilities.invokeLater( new Runnable() {
             @Override
             public void run() {
-                jTree1.expandPath(ftp);
+                expressionTree.expandPath(ftp);
                 imaged.clear();
                 resolved.clear();
-                jTree1.treeDidChange();
+                expressionTree.treeDidChange();
             }
         });        
     }
@@ -804,15 +804,17 @@ public class DataMashUp extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPopupMenu1 = new javax.swing.JPopupMenu();
+        palettePopupMenu = new javax.swing.JPopupMenu();
         addItemMenuItem = new javax.swing.JMenuItem();
         deleteItemsMenuItem = new javax.swing.JMenuItem();
+        expressionPopupMenu = new javax.swing.JPopupMenu();
+        editMenuItem = new javax.swing.JMenuItem();
         jSplitPane1 = new javax.swing.JSplitPane();
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel4 = new javax.swing.JPanel();
         directionsLabel = new javax.swing.JLabel();
         jScrollPane6 = new javax.swing.JScrollPane();
-        jTree1 = new javax.swing.JTree();
+        expressionTree = new javax.swing.JTree();
         jPanel7 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
@@ -842,7 +844,7 @@ public class DataMashUp extends javax.swing.JPanel {
                 addItemMenuItemActionPerformed(evt);
             }
         });
-        jPopupMenu1.add(addItemMenuItem);
+        palettePopupMenu.add(addItemMenuItem);
 
         deleteItemsMenuItem.setText("Delete Items");
         deleteItemsMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -850,7 +852,15 @@ public class DataMashUp extends javax.swing.JPanel {
                 deleteItemsMenuItemActionPerformed(evt);
             }
         });
-        jPopupMenu1.add(deleteItemsMenuItem);
+        palettePopupMenu.add(deleteItemsMenuItem);
+
+        editMenuItem.setText("Edit");
+        editMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editMenuItemActionPerformed(evt);
+            }
+        });
+        expressionPopupMenu.add(editMenuItem);
 
         jSplitPane1.setDividerLocation(100);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -860,12 +870,18 @@ public class DataMashUp extends javax.swing.JPanel {
 
         directionsLabel.setText("Double-click on the name to set the variable or constant argument.");
 
-        jTree1.addMouseListener(new java.awt.event.MouseAdapter() {
+        expressionTree.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                expressionTreeMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                expressionTreeMouseReleased(evt);
+            }
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jTree1MouseClicked(evt);
+                expressionTreeMouseClicked(evt);
             }
         });
-        jScrollPane6.setViewportView(jTree1);
+        jScrollPane6.setViewportView(expressionTree);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -1100,11 +1116,11 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_timeRangeTextFieldActionPerformed
 
-    private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
+    private void expressionTreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_expressionTreeMouseClicked
         if ( evt.isShiftDown() ) {
-            TreePath tp= jTree1.getClosestPathForLocation( evt.getX(), evt.getY() );
-            jTree1.setSelectionPath(tp);
-            QDataSet showMe= resolved.get( getAsJythonInline( (TreeNode)jTree1.getSelectionPath().getLastPathComponent() ));
+            TreePath tp= expressionTree.getClosestPathForLocation( evt.getX(), evt.getY() );
+            expressionTree.setSelectionPath(tp);
+            QDataSet showMe= resolved.get( getAsJythonInline( (TreeNode)expressionTree.getSelectionPath().getLastPathComponent() ));
             if ( showMe!=null ) {
                 resolver.interactivePlot( showMe );
             } else {
@@ -1112,7 +1128,7 @@ public class DataMashUp extends javax.swing.JPanel {
                     Runnable run= new Runnable() {
                         @Override
                         public void run() {
-                            QDataSet showMe= resolver.getDataSet( getAsJythonInline( (TreeNode)jTree1.getSelectionPath().getLastPathComponent() ) );
+                            QDataSet showMe= resolver.getDataSet( getAsJythonInline( (TreeNode)expressionTree.getSelectionPath().getLastPathComponent() ) );
                             resolver.interactivePlot( showMe );
                         }
                     };
@@ -1121,23 +1137,23 @@ public class DataMashUp extends javax.swing.JPanel {
             }
 
         } else if ( evt.getClickCount()==2 ) {
-            TreePath tp= jTree1.getClosestPathForLocation( evt.getX(), evt.getY() );
-            if ( !jTree1.getModel().isLeaf(tp.getLastPathComponent()) ) {
+            TreePath tp= expressionTree.getClosestPathForLocation( evt.getX(), evt.getY() );
+            if ( !expressionTree.getModel().isLeaf(tp.getLastPathComponent()) ) {
                 return;
             }
-            jTree1.setSelectionPath(tp);
+            expressionTree.setSelectionPath(tp);
             String currentId= tp.getLastPathComponent().toString();
             String s= namedURIListTool1.selectDataId(currentId);
             if ( s!=null ) {
                 doDrop(s,tp);
             }
         }
-    }//GEN-LAST:event_jTree1MouseClicked
+    }//GEN-LAST:event_expressionTreeMouseClicked
 
     private void scratchListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMouseClicked
         if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
             if ( evt.isPopupTrigger() ) {
-                jPopupMenu1.show( evt.getComponent(), evt.getX(), evt.getY() );
+                palettePopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );
             }
         }
     }//GEN-LAST:event_scratchListMouseClicked
@@ -1145,7 +1161,7 @@ public class DataMashUp extends javax.swing.JPanel {
     private void scratchListMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMousePressed
         if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
             if ( evt.isPopupTrigger() ) {
-                jPopupMenu1.show( evt.getComponent(), evt.getX(), evt.getY() );
+                palettePopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );
             }
         }
     }//GEN-LAST:event_scratchListMousePressed
@@ -1153,7 +1169,7 @@ public class DataMashUp extends javax.swing.JPanel {
     private void scratchListMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMouseReleased
         if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
             if ( evt.isPopupTrigger() ) {
-                jPopupMenu1.show( evt.getComponent(), evt.getX(), evt.getY() );
+                palettePopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );
             }
         }
     }//GEN-LAST:event_scratchListMouseReleased
@@ -1176,6 +1192,28 @@ public class DataMashUp extends javax.swing.JPanel {
         // check for TSB when a TSB URI is found.
         checkForTSB();
     }//GEN-LAST:event_namedURIListTool1FocusLost
+
+    private void expressionTreeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_expressionTreeMousePressed
+        if ( evt.isPopupTrigger() ) {
+            expressionPopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );
+        }
+    }//GEN-LAST:event_expressionTreeMousePressed
+
+    private void editMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editMenuItemActionPerformed
+        TreePath tp= expressionTree.getSelectionPath();
+        expressionTree.setSelectionPath(tp);
+        String currentId= tp.getLastPathComponent().toString();
+        String s= namedURIListTool1.selectDataId(currentId);
+        if ( s!=null ) {
+            doDrop(s,tp);
+        }
+    }//GEN-LAST:event_editMenuItemActionPerformed
+
+    private void expressionTreeMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_expressionTreeMouseReleased
+        if ( evt.isPopupTrigger() ) {
+            expressionPopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );   
+        }
+    }//GEN-LAST:event_expressionTreeMouseReleased
 
     private void checkForTSB() {
         String[] suris= namedURIListTool1.getUris();
@@ -1328,8 +1366,8 @@ public class DataMashUp extends javax.swing.JPanel {
 
             @Override
             public void dragOver(DropTargetDragEvent dtde) {
-                TreePath tp= jTree1.getClosestPathForLocation( dtde.getLocation().x, dtde.getLocation().y );
-                jTree1.setSelectionPath(tp);
+                TreePath tp= expressionTree.getClosestPathForLocation( dtde.getLocation().x, dtde.getLocation().y );
+                expressionTree.setSelectionPath(tp);
             }
 
             @Override
@@ -1345,10 +1383,10 @@ public class DataMashUp extends javax.swing.JPanel {
                 try {
                     String data = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
 
-                    TreePath tp= jTree1.getClosestPathForLocation( dtde.getLocation().x, dtde.getLocation().y );
+                    TreePath tp= expressionTree.getClosestPathForLocation( dtde.getLocation().x, dtde.getLocation().y );
 
                     DefaultMutableTreeNode n= (DefaultMutableTreeNode)tp.getLastPathComponent();
-                    String old= getJython( (DefaultTreeModel)jTree1.getModel(), n );
+                    String old= getJython( (DefaultTreeModel)expressionTree.getModel(), n );
                     addToScratch( old );
 
                     doDrop(data,tp);
@@ -1408,11 +1446,11 @@ public class DataMashUp extends javax.swing.JPanel {
                 
                 if ( dge.getComponent() instanceof JList ) {
                     s= (String)((JList)dge.getComponent()).getSelectedValue();
-                } else if  ( dge.getComponent()==jTree1 ) {
-                    if ( jTree1.getSelectionCount()==1 ) {
-                        TreePath tp= jTree1.getSelectionPath();
+                } else if  ( dge.getComponent()==expressionTree ) {
+                    if ( expressionTree.getSelectionCount()==1 ) {
+                        TreePath tp= expressionTree.getSelectionPath();
                         DefaultMutableTreeNode n= (DefaultMutableTreeNode)tp.getLastPathComponent();
-                        s= getJython( (DefaultTreeModel)jTree1.getModel(), n );
+                        s= getJython( (DefaultTreeModel)expressionTree.getModel(), n );
                     }
                 } else if  ( dge.getComponent()==namedURIListTool1 ) {
                     System.err.println("herehere");
@@ -1458,6 +1496,9 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JMenuItem addItemMenuItem;
     private javax.swing.JMenuItem deleteItemsMenuItem;
     private javax.swing.JLabel directionsLabel;
+    private javax.swing.JMenuItem editMenuItem;
+    private javax.swing.JPopupMenu expressionPopupMenu;
+    private javax.swing.JTree expressionTree;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList jList1;
@@ -1469,7 +1510,6 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -1479,9 +1519,9 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTree jTree1;
     private javax.swing.JPanel myFunctionsPanel;
     private org.virbo.jythonsupport.ui.NamedURIListTool namedURIListTool1;
+    private javax.swing.JPopupMenu palettePopupMenu;
     private javax.swing.JList scratchList;
     private javax.swing.JCheckBox synchronizeCB;
     private javax.swing.JLabel timeRangeLabel;
