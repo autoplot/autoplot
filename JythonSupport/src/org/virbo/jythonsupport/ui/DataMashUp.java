@@ -809,6 +809,7 @@ public class DataMashUp extends javax.swing.JPanel {
         deleteItemsMenuItem = new javax.swing.JMenuItem();
         expressionPopupMenu = new javax.swing.JPopupMenu();
         editMenuItem = new javax.swing.JMenuItem();
+        plotMenuItem = new javax.swing.JMenuItem();
         jSplitPane1 = new javax.swing.JSplitPane();
         jSplitPane2 = new javax.swing.JSplitPane();
         jPanel4 = new javax.swing.JPanel();
@@ -861,6 +862,14 @@ public class DataMashUp extends javax.swing.JPanel {
             }
         });
         expressionPopupMenu.add(editMenuItem);
+
+        plotMenuItem.setText("Plot");
+        plotMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                plotMenuItemActionPerformed(evt);
+            }
+        });
+        expressionPopupMenu.add(plotMenuItem);
 
         jSplitPane1.setDividerLocation(100);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -1116,25 +1125,34 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_timeRangeTextFieldActionPerformed
 
+    /**
+     * use the resolver to get the QDataSet, then plot it.
+     */
+    private void plotExpr( ) {
+        QDataSet showMe= resolved.get( getAsJythonInline( (TreeNode)expressionTree.getSelectionPath().getLastPathComponent() ));
+        if ( showMe!=null ) {
+            resolver.interactivePlot( showMe );
+        } else {
+            if ( resolver!=null ) {
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        QDataSet showMe= resolver.getDataSet( getAsJythonInline( (TreeNode)expressionTree.getSelectionPath().getLastPathComponent() ) );
+                        resolver.interactivePlot( showMe );
+                    }
+                };
+                new Thread(run).start();
+            } else {
+                logger.info("resolver is not set.");
+            }
+        }
+    }
+    
     private void expressionTreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_expressionTreeMouseClicked
         if ( evt.isShiftDown() ) {
             TreePath tp= expressionTree.getClosestPathForLocation( evt.getX(), evt.getY() );
             expressionTree.setSelectionPath(tp);
-            QDataSet showMe= resolved.get( getAsJythonInline( (TreeNode)expressionTree.getSelectionPath().getLastPathComponent() ));
-            if ( showMe!=null ) {
-                resolver.interactivePlot( showMe );
-            } else {
-                if ( resolver!=null ) {
-                    Runnable run= new Runnable() {
-                        @Override
-                        public void run() {
-                            QDataSet showMe= resolver.getDataSet( getAsJythonInline( (TreeNode)expressionTree.getSelectionPath().getLastPathComponent() ) );
-                            resolver.interactivePlot( showMe );
-                        }
-                    };
-                    new Thread(run).start();
-                }
-            }
+            plotExpr();
 
         } else if ( evt.getClickCount()==2 ) {
             TreePath tp= expressionTree.getClosestPathForLocation( evt.getX(), evt.getY() );
@@ -1195,6 +1213,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
     private void expressionTreeMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_expressionTreeMousePressed
         if ( evt.isPopupTrigger() ) {
+            plotMenuItem.setEnabled( resolver!=null );
             expressionPopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );
         }
     }//GEN-LAST:event_expressionTreeMousePressed
@@ -1214,6 +1233,12 @@ public class DataMashUp extends javax.swing.JPanel {
             expressionPopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );   
         }
     }//GEN-LAST:event_expressionTreeMouseReleased
+
+    private void plotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotMenuItemActionPerformed
+        TreePath tp= expressionTree.getSelectionPath();
+        expressionTree.setSelectionPath(tp);
+        plotExpr();
+    }//GEN-LAST:event_plotMenuItemActionPerformed
 
     private void checkForTSB() {
         String[] suris= namedURIListTool1.getUris();
@@ -1522,6 +1547,7 @@ public class DataMashUp extends javax.swing.JPanel {
     private javax.swing.JPanel myFunctionsPanel;
     private org.virbo.jythonsupport.ui.NamedURIListTool namedURIListTool1;
     private javax.swing.JPopupMenu palettePopupMenu;
+    private javax.swing.JMenuItem plotMenuItem;
     private javax.swing.JList scratchList;
     private javax.swing.JCheckBox synchronizeCB;
     private javax.swing.JLabel timeRangeLabel;
