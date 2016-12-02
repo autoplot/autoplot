@@ -277,11 +277,13 @@ public class ScriptPanelSupport {
                     file = new File(file.toString() + ".jy");
                 }
             }
-            if ( cb.isSelected() && !oldFile.equals(file) ) {
-                if ( ! oldFile.delete() ) {
-                    JOptionPane.showMessageDialog( panel, "unable to delete old file: "+oldFile );
+            if ( oldFile!=null ) {
+                if ( cb.isSelected() && !oldFile.equals(file) ) {
+                    if ( ! oldFile.delete() ) {
+                        JOptionPane.showMessageDialog( panel, "unable to delete old file: "+oldFile );
+                    }
                 }
-            }            
+            }
         }
         return r;
     }
