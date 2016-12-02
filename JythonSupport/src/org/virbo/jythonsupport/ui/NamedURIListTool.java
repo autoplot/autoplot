@@ -474,15 +474,20 @@ public class NamedURIListTool extends JPanel {
             }
         } );
         
-        try {
-            Double.parseDouble(id);
-            if ( id.length()<20 ) {
-                id= String.format( "%20s", id );
-            }
+        if ( id.startsWith("'") || id.startsWith("\"") ) { // string literals
             literalTF.setText( id );
             butts[i].setSelected(true);
-        } catch ( NumberFormatException ex ) {
-            // do nothing
+        } else {
+            try {
+                Double.parseDouble(id);
+                if ( id.length()<20 ) {
+                    id= String.format( "%s", id );
+                }
+                literalTF.setText( id );
+                butts[i].setSelected(true);
+            } catch ( NumberFormatException ex ) {
+                // do nothing
+            }
         }
         dsSelector.add( literalTF, c );
         
