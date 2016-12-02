@@ -406,7 +406,7 @@ public class NamedURIListTool extends JPanel {
     
     /**
      * return null if nothing is selected, the URI otherwise.
-     * @param id the current selection
+     * @param id the current selection, which can be an identifier, QDataSet.UNITS, or 10.0.
      * @return null if nothing is selected, the URI otherwise.
      */
     public String selectDataId( String id ) {
@@ -455,8 +455,8 @@ public class NamedURIListTool extends JPanel {
         dsSelector.add( cb, c );
         
         final JTextField literalTF= new JTextField("0.0");
-        literalTF.setMinimumSize( new Dimension(100,literalTF.getFont().getSize()*2) );
-        literalTF.setPreferredSize( new Dimension(100,literalTF.getFont().getSize()*2) );
+        literalTF.setMinimumSize( new Dimension(120,literalTF.getFont().getSize()*2) );
+        literalTF.setPreferredSize( new Dimension(120,literalTF.getFont().getSize()*2) );
         
         c.gridx= 2;
         c.weightx= 1.0;
@@ -474,19 +474,22 @@ public class NamedURIListTool extends JPanel {
             }
         } );
         
-        if ( id.startsWith("'") || id.startsWith("\"") ) { // string literals
-            literalTF.setText( id );
-            butts[i].setSelected(true);
-        } else {
-            try {
-                Double.parseDouble(id);
-                if ( id.length()<20 ) {
-                    id= String.format( "%s", id );
-                }
+        if ( !isValidIdentifier(id) ) {
+            if ( id.startsWith("'") || id.startsWith("\"") ) { // string literals
                 literalTF.setText( id );
                 butts[i].setSelected(true);
-            } catch ( NumberFormatException ex ) {
-                // do nothing
+            } else {
+                try {
+                    Double.parseDouble(id);
+                    if ( id.length()<20 ) {
+                        id= String.format( "%s", id );
+                    }
+                    literalTF.setText( id );
+                    butts[i].setSelected(true);
+                } catch ( NumberFormatException ex ) {
+                    literalTF.setText( id );
+                    butts[i].setSelected(true);
+                }
             }
         }
         dsSelector.add( literalTF, c );
