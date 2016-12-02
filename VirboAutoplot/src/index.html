@@ -26,13 +26,15 @@
         
         <p>Bugfixes (2016-11-30 r20084):</p>
         <ul> 
+            <li>setXAxis of DasPlot was incorrect.  Thanks, James!
+            <li>corrections to HAPI support for CDAWeb.
             <li>1724: autoplotapp.py is constantly rewritten, causing occasional "File not found" popups.
             <li>IDL/Matlab interface provides access to more datasets in qstreams.
-            <li>1722: qstreams with arbitraty qdataset properties.
+            <li>1722: qstreams with arbitrary qdataset properties.
             <li>1718: HDF5 supports DELTA_PLUS_VAR, DELTA_MINUS_VAR metadata.
             <li>1718: LANL NN with log-spaced x-tags.
             <li>test002 showed where -INFs were getting into Autohistogram and causing unnecessary warnings.
-            <li>1714: slice function of NetCDF (and HDF) result didn't handle DEPEND metadataset property. 
+            <li>1714: slice function of NetCDF (and HDF) result didn't handle DEPEND meta dataset property. 
             <li>1714: Brian showed where HDF5 variable was ISTP, but its DEPEND datasets were not.
             <li>something changed on Mint Linux display (or java version) and get screenshot didn't work on one of the screens.
             <li>old nbproject areas (ant build) rebuilt from scratch, reducing incremental build time from 20sec to 5sec.
@@ -91,6 +93,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>HAPI shows descriptions if available.
             <li>metadata tab allows access to the metadata for each bundled dataset.
             <li>update internal orbits, and include 2017 leap second.
             <li>"run batch" feature allows jython scripts to be run for a series of inputs.
