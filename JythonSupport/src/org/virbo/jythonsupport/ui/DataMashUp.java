@@ -547,6 +547,13 @@ public class DataMashUp extends javax.swing.JPanel {
             root= new DefaultMutableTreeNode( ((Name)assign.value).id );
         } else if ( assign.value instanceof Num ) {
             root= new DefaultMutableTreeNode( ((Num)assign.value).n );
+        } else if ( assign.value instanceof Str ) {
+            String s= ((Str)assign.value).s;
+            if ( s.contains("'") ) { // check for existing single quotes and use double quotes in this case.
+                root= new DefaultMutableTreeNode( "\"" + ((Str)assign.value).s + "\"" );
+            } else {
+                root= new DefaultMutableTreeNode( "\'" + ((Str)assign.value).s + "\'" );
+            }
         } else {
             root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
             if ( assign.value instanceof Call ) {
@@ -1148,7 +1155,7 @@ public class DataMashUp extends javax.swing.JPanel {
 
     private void addItemMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addItemMenuItemActionPerformed
         String s= JOptionPane.showInputDialog( this, "Add function" );
-        if ( !( s.trim().length()==0 ) ) {
+        if ( s!=null && !( s.trim().length()==0 ) ) {
             addToScratch( s.trim() );
         }
     }//GEN-LAST:event_addItemMenuItemActionPerformed
