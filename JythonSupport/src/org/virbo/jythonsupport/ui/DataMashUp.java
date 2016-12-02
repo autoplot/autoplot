@@ -321,6 +321,14 @@ public class DataMashUp extends javax.swing.JPanel {
             parent.insert( new DefaultMutableTreeNode( String.valueOf(((Num)et).n) ),i );
         } else if ( et instanceof Str ) {
             parent.insert( new DefaultMutableTreeNode( "'"+String.valueOf(((Str)et).s)+"'" ),i );
+        } else if ( et instanceof Attribute ) {
+            exprType vv= ((Attribute)et).value;
+            if ( vv instanceof Name ) {
+                parent.insert( new DefaultMutableTreeNode( ((Name)vv).id + "." + ((Attribute)et).attr), i );
+            } else {
+                logger.fine("expected Name at "+(et).toString() );
+                parent.insert( new DefaultMutableTreeNode( "." + ((Attribute)et).attr), i );
+            }
         } else if ( et instanceof UnaryOp ) { // a negative number appears as a unary minus op and positive number.
             exprType et1= ((UnaryOp)et).operand;
             switch (((UnaryOp)et).op) {
@@ -548,12 +556,9 @@ public class DataMashUp extends javax.swing.JPanel {
         } else if ( assign.value instanceof Num ) {
             root= new DefaultMutableTreeNode( ((Num)assign.value).n );
         } else if ( assign.value instanceof Str ) {
-            String s= ((Str)assign.value).s;
-            if ( s.contains("'") ) { // check for existing single quotes and use double quotes in this case.
-                root= new DefaultMutableTreeNode( "\"" + ((Str)assign.value).s + "\"" );
-            } else {
-                root= new DefaultMutableTreeNode( "\'" + ((Str)assign.value).s + "\'" );
-            }
+            root= new DefaultMutableTreeNode( expr );
+        } else if ( assign.value instanceof Attribute ) {
+            root= new DefaultMutableTreeNode( expr );
         } else {
             root= new DefaultMutableTreeNode( funcCallName( (Call)assign.value ) );
             if ( assign.value instanceof Call ) {
@@ -903,7 +908,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jTabbedPane1.addTab("mathematics", jPanel1);
 
         jList2.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "link(x,y)", "link(x,y,z)", "slice1(ds,0)", "smooth(ds,5)" };
+            String[] strings = { "link(x,y)", "link(x,y,z)", "slice1(ds,0)", "smooth(ds,5)", "putProperty(ds,QDataSet.UNITS,'s')", " " };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
@@ -980,7 +985,7 @@ public class DataMashUp extends javax.swing.JPanel {
                 .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE))
+                .addComponent(jTabbedPane1))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
