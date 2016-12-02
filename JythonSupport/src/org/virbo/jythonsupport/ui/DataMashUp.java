@@ -204,17 +204,21 @@ public class DataMashUp extends javax.swing.JPanel {
     }
 
     private boolean isInfix( String op ) {
-        return op.equals("or") || op.equals("and");
+        return op.equals("add") || op.equals("multiply");
     }
     
     // this is not-trivial because of parentheses.
-//    private String getOverloaded( String op ) {
-//        if ( op.equals("add") ) {
-//            return "+";
-//        } else {
-//            return null;
-//        }
-//    }
+    // Shouldn't  this be getInline
+    private String getInline( String op ) {
+        switch (op) {
+            case "add":
+                return "+";
+            case "multiply":
+                return "*";
+            default:
+                return null;
+        }
+    }
     
     /**
      * return the jython expression for this tree.
@@ -230,13 +234,13 @@ public class DataMashUp extends javax.swing.JPanel {
             int iparen= sn.indexOf("(");
             if ( iparen>-1 ) sn= sn.substring(0,iparen);
             int nchild= m.getChildCount(n);
-            if ( isInfix(sn) && nchild==2 ) {
-                //String alt= null; //getOverloaded(sn);
-                //if ( alt!=null ) {
-                //    return getJython( m, m.getChild( n, 0 ) ) + alt + getJython( m, m.getChild(n,1) ) ;
-                //} else {
+            if ( false && isInfix(sn) && nchild==2 ) {
+                String alt= getInline(sn);
+                if ( alt!=null ) {
+                    return "("+ getJython( m, m.getChild( n, 0 ) ) + alt + getJython( m, m.getChild(n,1) ) + ")" ;
+                } else {
                     return getJython( m, m.getChild( n, 0 ) ) + "."+sn+"("+ getJython( m, m.getChild(n,1) ) +")" ;
-                //}
+                }
             } else {
                 StringBuilder t= new StringBuilder( sn + "(" );
                 for ( int i=0; i<nchild; i++ ) {
