@@ -93,14 +93,22 @@ public class HapiDataSource extends AbstractDataSource {
                 logger.warning("expected array of JSONObjects for bins.");
             }
         }
+        String sunits= binsObject.getString("units");
+        if ( sunits!=null ) {
+            Units u= Units.lookupUnits(sunits);
+            result.putProperty( QDataSet.UNITS, u );
+            if ( hasMin && hasMax ) {
+                min.putProperty( QDataSet.UNITS, u );
+                max.putProperty( QDataSet.UNITS, u );
+            }
+        }
+        
         if ( hasMin && hasMax ) {
             result.putProperty( QDataSet.BIN_PLUS, Ops.subtract( max, result ) );
             result.putProperty( QDataSet.BIN_MINUS, Ops.subtract( result, min ) );
         } else if ( hasMin || hasMax ) {
             logger.warning("need both min and max for bins.");
         }
-        String sunits= binsObject.getString("units");
-        if ( sunits!=null ) result.putProperty( QDataSet.UNITS, Units.lookupUnits(sunits) );
         
         return result;
     }
