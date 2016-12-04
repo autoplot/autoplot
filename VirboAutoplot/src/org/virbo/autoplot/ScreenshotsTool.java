@@ -570,8 +570,12 @@ public class ScreenshotsTool extends EventQueue {
                     }
                 }
                 if ( allBlack ) {
-                    bounds.translate(-bounds.x,-bounds.y);
-                    screenshot = new Robot(gs[i]).createScreenCapture(bounds);
+                    if ( gs.length==2 ) {
+                        screenshot = new Robot(gs[1-i]).createScreenCapture(bounds);
+                    } else {
+                        bounds.translate(-bounds.x,-bounds.y);
+                        screenshot = new Robot(gs[i]).createScreenCapture(bounds);
+                    }
                 }
             }
         } catch (AWTException ex) {
