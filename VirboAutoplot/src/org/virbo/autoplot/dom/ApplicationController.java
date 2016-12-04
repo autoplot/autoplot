@@ -71,6 +71,7 @@ import org.virbo.autoplot.LayoutListener;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.RunLaterListener;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
  * The ApplicationController, one per dom, is in charge of managing the 
@@ -445,10 +446,23 @@ public class ApplicationController extends DomNodeController implements RunLater
                     }
                     dstPlot.getXaxis().setLog(false);
                     bind( dstPlot.getXaxis(), Axis.PROP_RANGE, dom, Application.PROP_TIMERANGE );
+                    
+                    // we have to find some x-axis to listen to.
+                    DataSourceFilter dsf= getDataSourceFilterFor(pele);
+                    TimeSeriesBrowseController tsbc= dsf.getController().getTimeSeriesBrowseController();
+                    if ( tsbc!=null ) {
+                        if ( tsbc.isListeningToAxis() && tsbc.getPlot()==domPlot ) {
+                            tsbc.release();
+                            tsbc.setupAxis( dstPlot, dstPlot.getXaxis() );
+                        }
+                    }
                 }
                 ApplicationController.this.deletePlot(domPlot);
                 org.virbo.autoplot.dom.DomOps.newCanvasLayout(dom);
+                
             }
+            
+            
         } finally {
             lock.unlock();
             clock.unlock();
