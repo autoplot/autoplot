@@ -236,6 +236,10 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 if ( arg_0.equals("rank2") || arg_0.equals("bundle") ) return false;
             }
 
+            if ( split.resourceUri==null ) {
+                return true;
+            }
+            
             File file = DataSetURI.getFile(split.resourceUri, mon);
             if ( !file.isFile() ) return true;
             
