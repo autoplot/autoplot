@@ -188,6 +188,24 @@ public class TimeSeriesBrowseController {
     }
 
     /**
+     * have this start listening to the axis.
+     * @param plot 
+     * @param axis 
+     */
+    protected void setupAxis( Plot plot, Axis axis ) {
+        if ( this.xAxis!=null ) {
+            throw new IllegalArgumentException("release old axis before binding to this new axis");
+        }
+        if ( axis!=plot.getXaxis() ) {
+            throw new IllegalArgumentException("axis must be the x-axis for now.");
+        }
+        this.xAxis= axis.getController().getDasAxis();
+        this.dasPlot= plot.getController().getDasPlot();
+        this.domPlot= plot;
+        setup(true);
+    }
+            
+    /**
      * it's a little shocking that after all these years, there isn't a trivial
      * way to see the time and property that was are listening to.
      * @param node
@@ -246,6 +264,7 @@ public class TimeSeriesBrowseController {
 
     /**
      * initialize the TSB to be listening to a time axis.
+     * TODO: this contains inconsistent use of xAxis and this.domPlot.getXaxis().
      * @param valueWasAdjusting true if we are loading a vap or the application is locked.
      */
     protected void setup( boolean valueWasAdjusting ) {
