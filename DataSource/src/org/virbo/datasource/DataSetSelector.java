@@ -771,8 +771,12 @@ public class DataSetSelector extends javax.swing.JPanel {
         try {
             edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel(DataSetURI.getURIValid(surl));
             if ( edit!=null && edit.reject(surl) ) {
+                // See https://sourceforge.net/p/autoplot/bugs/1729/
+                //setCursor( Cursor.getDefaultCursor() );
+                //JOptionPane.showMessageDialog( this, "<html>Unable to create editor for URI:<br>"+surl );
+                //return;
                 edit= null;
-                wasRejected= true;
+                wasRejected= true;                
             }
             if ( edit!=null ) {
                 try {
@@ -784,8 +788,10 @@ public class DataSetSelector extends javax.swing.JPanel {
             } else {
                 URISplit split= URISplit.parse(surl);
                 if ( !".vap".equals(split.ext) ) { //TODO: kludge, .vap should be a browseTrigger
-                    //experiment with GUI based on completions.
-                    edit= new CompletionsDataSourceEditor();
+                    if ( split.ext!=null ) {
+                        //experiment with GUI based on completions.
+                        edit= new CompletionsDataSourceEditor();
+                    }
                 } else {
                     if ( split.path.startsWith("file:") ) {
                         String result= DataSetSelectorSupport.browseLocalVap(this, surl);
