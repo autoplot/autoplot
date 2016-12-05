@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>experiments with using Autoplot to teach optimization.
+        <p><small>Script uses Java logging, and Autoplot provides a menu for controlling logger verbosity.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-12-02 r20098):</p>
+        <p>Bugfixes (2016-12-05 r20106):</p>
         <ul> 
+            <li>1731: get screenshot for second display.
+            <li>rte_2095724092: don't go into the completions editor when there is no extension. 
+            <li>1727: break into stack of plots reconnects time series browse to new x-axis.
+            <li>units on bin_plus and bin_minus in HAPI client.
             <li>rte_2071759301: rename file when old file wasn't set caused NullPointerException.
             <li>in data mash up, handle cancel in "add function" dialog.
             <li>setXAxis of DasPlot was incorrect.  Thanks, James!
