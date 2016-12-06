@@ -5799,7 +5799,13 @@ APSplash.checkTime("init 240");
                         if ( factory.reject( furi, problems, new NullProgressMonitor() )) {
                             sel.maybePlot( KeyEvent.ALT_MASK ); // this should enter the editor as before
                         } else {
-                            support.addPlotElementFromBookmark( "Add Bookmarked URI", furi ); 
+                            Runnable run= new Runnable() {
+                                public void run() {
+                                    support.addPlotElementFromBookmark( "Add Bookmarked URI", furi ); 
+                                }
+                            };
+                            SwingUtilities.invokeLater(run);
+                            
                             //uri= DataSourceUtil.setTimeRange(uri,dom.getTimeRange(),mon);
                             //enterAddPlotElementDialog(); // fall back, make the user deal with bad uri
                         }
