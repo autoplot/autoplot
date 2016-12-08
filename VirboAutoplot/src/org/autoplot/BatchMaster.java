@@ -18,13 +18,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.StringJoiner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
@@ -34,9 +38,11 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.util.InteractiveInterpreter;
 import org.virbo.autoplot.JythonUtil;
+import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.URISplit;
+import org.virbo.jythonsupport.JythonUtil.Param;
 import org.virbo.jythonsupport.ui.ParametersFormPanel;
 import org.virbo.jythonsupport.ui.Util;
 
@@ -153,6 +159,15 @@ public class BatchMaster extends javax.swing.JPanel {
 
         jScrollPane2 = new javax.swing.JScrollPane();
         jList2 = new javax.swing.JList<>();
+        jPopupMenu1 = new javax.swing.JPopupMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        timeRangesPanel = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        timeRangeComboBox = new javax.swing.JComboBox<>();
+        timeFormatComboBox = new javax.swing.JComboBox<>();
+        jLabel3 = new javax.swing.JLabel();
+        jPopupMenu2 = new javax.swing.JPopupMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
         goButton = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         param1Values = new javax.swing.JTextArea();
@@ -171,6 +186,61 @@ public class BatchMaster extends javax.swing.JPanel {
         });
         jScrollPane2.setViewportView(jList2);
 
+        jMenuItem1.setText("Generate...");
+        jMenuItem1.setToolTipText("Generate items for list");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(jMenuItem1);
+
+        jLabel2.setText("Time Range:");
+
+        timeRangeComboBox.setEditable(true);
+        timeRangeComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Jun 2000", "2000", "2000-01-01/03-01", "2000-2016" }));
+
+        timeFormatComboBox.setEditable(true);
+        timeFormatComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "$Y-$m-$d", "$Y", "$Y-$(m,span=3)", "$Y-$m", "$Y_$j", "$Y-$m-$dT$H/PT1H", "$Y-$m-$dT$H$M/PT1M", "$Y-$m-$dT$H$M$S/PT1S", " " }));
+
+        jLabel3.setText("Time Format:");
+
+        javax.swing.GroupLayout timeRangesPanelLayout = new javax.swing.GroupLayout(timeRangesPanel);
+        timeRangesPanel.setLayout(timeRangesPanelLayout);
+        timeRangesPanelLayout.setHorizontalGroup(
+            timeRangesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(timeRangesPanelLayout.createSequentialGroup()
+                .addGroup(timeRangesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(timeRangeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(timeRangesPanelLayout.createSequentialGroup()
+                        .addGroup(timeRangesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel2))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(timeFormatComboBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, 220, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        timeRangesPanelLayout.setVerticalGroup(
+            timeRangesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(timeRangesPanelLayout.createSequentialGroup()
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(timeRangeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(timeFormatComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jMenuItem2.setText("Generate...");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jPopupMenu2.add(jMenuItem2);
+
         goButton.setText("Go!");
         goButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -180,10 +250,32 @@ public class BatchMaster extends javax.swing.JPanel {
 
         param1Values.setColumns(20);
         param1Values.setRows(5);
+        param1Values.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                param1ValuesMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                param1ValuesMouseReleased(evt);
+            }
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                param1ValuesMouseClicked(evt);
+            }
+        });
         jScrollPane3.setViewportView(param1Values);
 
         param2Values.setColumns(20);
         param2Values.setRows(5);
+        param2Values.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                param2ValuesMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                param2ValuesMouseReleased(evt);
+            }
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                param2ValuesMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(param2Values);
 
         messageLabel.setText("Load up those parameters and hit Go!");
@@ -254,6 +346,125 @@ public class BatchMaster extends javax.swing.JPanel {
         new Thread(run).start();
     }//GEN-LAST:event_goButtonActionPerformed
 
+    private void param1ValuesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_param1ValuesMouseClicked
+        if ( evt.isPopupTrigger() ) {
+            jPopupMenu1.show( evt.getComponent(), evt.getX(), evt.getY() );
+        }
+    }//GEN-LAST:event_param1ValuesMouseClicked
+
+    private void param1ValuesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_param1ValuesMousePressed
+        if ( evt.isPopupTrigger() ) {
+            jPopupMenu1.show( evt.getComponent(), evt.getX(), evt.getY() );
+        }
+    }//GEN-LAST:event_param1ValuesMousePressed
+
+    private void param1ValuesMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_param1ValuesMouseReleased
+        if ( evt.isPopupTrigger() ) {
+            jPopupMenu1.show( evt.getComponent(), evt.getX(), evt.getY() );
+        }
+    }//GEN-LAST:event_param1ValuesMouseReleased
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        doGenerate( param1NameCB, param1Values );
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void param2ValuesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_param2ValuesMouseClicked
+        if ( evt.isPopupTrigger() ) {
+            jPopupMenu2.show( evt.getComponent(), evt.getX(), evt.getY() );
+        }
+    }//GEN-LAST:event_param2ValuesMouseClicked
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        doGenerate( param2NameCB, param2Values );
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void param2ValuesMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_param2ValuesMousePressed
+        if ( evt.isPopupTrigger() ) {
+            jPopupMenu2.show( evt.getComponent(), evt.getX(), evt.getY() );
+        }
+    }//GEN-LAST:event_param2ValuesMousePressed
+
+    private void param2ValuesMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_param2ValuesMouseReleased
+        if ( evt.isPopupTrigger() ) {
+            jPopupMenu2.show( evt.getComponent(), evt.getX(), evt.getY() );
+        }
+    }//GEN-LAST:event_param2ValuesMouseReleased
+
+    private void doGenerate( JComboBox cb, JTextArea ta ) {
+        String p= cb.getSelectedItem().toString();
+        p= p.trim();
+        if ( p.length()>0 ) {
+            try {
+                org.virbo.jythonsupport.JythonUtil.Param pd= getParamDescription( p );
+                String[] ss=null; // will be generated values
+                if ( pd.type=='T' ) {
+                    try {
+                        if ( JOptionPane.showConfirmDialog( this, timeRangesPanel, "Generate Time Ranges", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                            ss= ScriptContext.generateTimeRanges( timeFormatComboBox.getSelectedItem().toString(), timeRangeComboBox.getSelectedItem().toString() );
+                        }
+                    } catch (ParseException ex) {
+                        Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else if ( pd.enums!=null ) {
+                    ss= pd.enums.toArray( new String[pd.enums.size()] );
+                } else if ( pd.type=='R' ) {
+                    JFileChooser cf= new JFileChooser();
+                    cf.setMultiSelectionEnabled(true);
+                    if ( cf.showOpenDialog(this)==JFileChooser.APPROVE_OPTION ) {
+                        File[] ff= cf.getSelectedFiles();
+                        ss= new String[ff.length];
+                        for ( int i=0; i<ff.length; i++ ) {
+                            ss[i]= "file:"+ff[i].toString();
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog( this, "Parameter type doesn't support type." );
+                    return;
+                }
+                if ( ss!=null ) {
+                    StringBuilder b= new StringBuilder();
+                    for ( String s: ss ) b.append(s).append("\n");
+                    ta.setText( b.toString() );
+                }
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog( this, "bad parameter name" );
+            }
+        }        
+    }
+    /**
+     * return null or the parameter.
+     * @param name the name
+     * @return the Param or null.
+     * @throws IOException 
+     */
+    private org.virbo.jythonsupport.JythonUtil.Param getParamDescription( String name ) throws IOException {
+        
+        String scriptName= dataSetSelector1.getValue();
+        if ( !scriptName.endsWith(".jy") ) {
+            JOptionPane.showMessageDialog( BatchMaster.this, "script must end in .jy: "+scriptName );
+            return null;
+        }
+
+        URISplit split= URISplit.parse(scriptName);
+        pwd= split.path;
+
+        Map<String,String> params= URISplit.parseParams(split.params);  //TODO: support these.
+        Map<String,Object> env= new HashMap<>();
+
+        DasProgressPanel monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(BatchMaster.this), "download script");
+        File scriptFile= DataSetURI.getFile( split.file, new NullProgressMonitor() );
+        String script= readScript( scriptFile );
+        
+        env.put("dom",this.dom);
+                                
+        Map<String,Param> parms= Util.getParams( env, script, params, new NullProgressMonitor() );
+
+        Param p= parms.get(name);
+        
+        return p;        
+        
+    }
+    
     /**
      * TODO: this is not complete!
      * @param interp
@@ -424,7 +635,13 @@ public class BatchMaster extends javax.swing.JPanel {
     private org.virbo.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JButton goButton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JList<String> jList2;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JPopupMenu jPopupMenu1;
+    private javax.swing.JPopupMenu jPopupMenu2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -433,5 +650,8 @@ public class BatchMaster extends javax.swing.JPanel {
     private javax.swing.JTextArea param1Values;
     private javax.swing.JComboBox<String> param2NameCB;
     private javax.swing.JTextArea param2Values;
+    private javax.swing.JComboBox<String> timeFormatComboBox;
+    private javax.swing.JComboBox<String> timeRangeComboBox;
+    private javax.swing.JPanel timeRangesPanel;
     // End of variables declaration//GEN-END:variables
 }
