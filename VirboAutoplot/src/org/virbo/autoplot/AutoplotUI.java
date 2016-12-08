@@ -695,6 +695,36 @@ public final class AutoplotUI extends javax.swing.JFrame {
             }
         });
         
+        dataSetSelector.registerActionTrigger( "http.*/hapi", new AbstractAction( "hapiServer") {
+            @Override
+            public void actionPerformed( final ActionEvent ev ) { 
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
+                final String value= dataSetSelector.getValue();
+                Runnable run= new Runnable() {
+                    public void run() {
+                        dataSetSelector.setValue("vap+hapi:"+value);
+                        dataSetSelector.maybePlot( ev.getModifiers() );
+                    }
+                };
+                SwingUtilities.invokeLater(run);
+            }
+        });  
+        
+        dataSetSelector.registerBrowseTrigger( "http.*/hapi", new AbstractAction( "hapiServer") {
+            @Override
+            public void actionPerformed( final ActionEvent ev ) {
+                org.das2.util.LoggerManager.logGuiEvent(ev);                
+                final String value= dataSetSelector.getValue();
+                Runnable run= new Runnable() {
+                    public void run() {
+                        dataSetSelector.setValue("vap+hapi:"+value);
+                        dataSetSelector.maybePlot( ev.getModifiers() );
+                    }
+                };
+                SwingUtilities.invokeLater(run);
+            }
+        });  
+                
         dataSetSelector.registerActionTrigger( "(.*)\\.jy(\\?.*)?", new AbstractAction( TAB_SCRIPT) {
             @Override
             public void actionPerformed( ActionEvent ev ) {
