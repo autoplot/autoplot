@@ -26,6 +26,10 @@
         
         <p>Bugfixes (2016-12-05 r20106):</p>
         <ul> 
+            <li>1735: correct synchronization errors which would lead to occasional errors when loading .vap files
+            <li>1734: noisy "alarming extrapolation in findex" warning is more lax.
+            <li>1728: change color to black from custom
+            <li>1732: Bookmarks when a single plot is already plotted
             <li>1731: get screenshot for second display.
             <li>rte_2095724092: don't go into the completions editor when there is no extension. 
             <li>1727: break into stack of plots reconnects time series browse to new x-axis.
@@ -100,7 +104,7 @@
         <p>Features:</p>
         <ul>
             <li>HAPI shows descriptions if available.
-            <li>data mash-up tool supports string arguments and constants like QDataSet.UNITS
+            <li>data mash-up tool supports string arguments and constants like QDataSet.UNITS.  Thanks, Kristoff!
             <li>metadata tab allows access to the metadata for each bundled dataset.
             <li>update internal orbits, and include 2017 leap second.
             <li>"run batch" feature allows jython scripts to be run for a series of inputs.
