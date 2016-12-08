@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -121,6 +122,13 @@ public class ParametersFormPanel {
                     } else if ( typesList.get(i).equals('A') ) {
                         value= org.virbo.jythonsupport.Util.popString(value);
                         paramsDictionary.__setitem__( param, Py.java2py( value ) );
+                    } else if ( typesList.get(i).equals('R') ) {
+                        value= org.virbo.jythonsupport.Util.popString(value);
+                        try {                        
+                            paramsDictionary.__setitem__( param, Py.java2py( new URI(value) ) );
+                        } catch (URISyntaxException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
                     } else {
                         interp.exec( String.format("params['%s']=%s", param, value ) ); // TODO: nasty/clever code handles float vs int.
                     }
