@@ -25,10 +25,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.FileSystemUtil;
 
 /**
  * Format the QDataSet into CDF tables, using Nand Lal's library.
+ * Datasets will be assigned names if they don't have a NAME property.
+ * If the append=T parameter is set, then variables should have names.
  *
  * @author jbf
  */
