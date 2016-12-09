@@ -327,7 +327,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         jSplitPane1.setLeftComponent(jPanel1);
 
-        jLabel3.setText("jLabel3");
+        jLabel3.setText(" ");
 
         binaryCB.setText("Use Binary");
         binaryCB.setToolTipText("Some servers support binary data transfers, and this will use binary to transfer data.");
@@ -367,9 +367,9 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSplitPane1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(binaryCB))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(binaryCB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
