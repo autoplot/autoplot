@@ -392,12 +392,15 @@ public class DataSetSelector extends javax.swing.JPanel {
                 showCompletions(surl, carotpos);
                 
             } else if (file.endsWith("/..")) { // pop up one directory
+                logger.fine("jump to parent directory");
                 int carotpos = surl.lastIndexOf("/..");
                 carotpos = surl.lastIndexOf("/", carotpos - 1);
                 if (carotpos != -1) {
-                    setValue(surl.substring(0, carotpos + 1));
-                    dataSetSelector.getEditor().setItem(surl.substring(0, carotpos + 1));
+                    String sval= surl.substring(0, carotpos + 1);
+                    dataSetSelector.getEditor().setItem(sval);
+                    dataSetSelector.setSelectedItem(sval);
                     editor.setCaretPosition(carotpos+1);
+                    setTextInternal(sval);
                     maybePlotImmediately();
                 }
             } else {
@@ -549,6 +552,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      */
     private void maybePlotImmediately() {
         final String surl = getValue();
+        logger.log(Level.FINE, "maybePlotImmediately({0})", surl);
         if (surl.equals("") ) { 
             logger.finest("empty value, returning");
             return;
