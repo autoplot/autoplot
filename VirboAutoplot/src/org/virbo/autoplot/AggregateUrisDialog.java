@@ -273,7 +273,8 @@ public class AggregateUrisDialog extends javax.swing.JPanel {
     private void addressBarUriButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addressBarUriButtonActionPerformed
         final Application dom2= (Application)dom.copy();
         DataSourceFilter dsf= dom.getController().getDataSourceFilter();
-        String newUri= previewDataSetSelector.getEditor().getText();
+        //String newUri= previewDataSetSelector.getEditor().getText();
+        String newUri= previewDataSetSelector.getValue();
         int f= -1;
         DataSourceFilter[] dsfs= dom.getDataSourceFilters();
         for ( int i=0; i<dsfs.length; i++ ){
