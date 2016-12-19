@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Script uses Java logging, and Autoplot provides a menu for controlling logger verbosity.
+        <p><small>Renderers now allow additional drawing commands to be added.  See <a href="the ticket">https://sourceforge.net/p/autoplot/feature-requests/548/</a>
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2016-12-05 r20106):</p>
         <ul> 
+            <li>1738: sequence using ".." in URI completions, fix unstable code.
             <li>1735: correct synchronization errors which would lead to occasional errors when loading .vap files
             <li>1734: noisy "alarming extrapolation in findex" warning is more lax.
             <li>1728: change color to black from custom
@@ -103,11 +104,12 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>"run batch" feature allows jython scripts to be run for a series of inputs, and has methods for generating inputs.
+            <li>Das2 Renderers have a decorator object to allow additional drawing code.
             <li>HAPI shows descriptions if available.
             <li>data mash-up tool supports string arguments and constants like QDataSet.UNITS.  Thanks, Kristoff!
             <li>metadata tab allows access to the metadata for each bundled dataset.
             <li>update internal orbits, and include 2017 leap second.
-            <li>"run batch" feature allows jython scripts to be run for a series of inputs.
             <li>20000th SVN revision!
             <li>layout tab has "move to top" menu item
             <li>lookupAxis supports horizontal axis.
