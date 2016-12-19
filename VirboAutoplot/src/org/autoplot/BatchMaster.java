@@ -1,6 +1,7 @@
 
 package org.autoplot;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,13 +22,18 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
@@ -139,12 +145,14 @@ public class BatchMaster extends javax.swing.JPanel {
         dataSetSelector1.setPromptText("Enter the name of a Jython script");
         dataSetSelector1.setRecent( Collections.singletonList("http://autoplot.org/data/script/examples/parameters.jy") );
         
-        Map<String,String> recentJy= dom.getController().getApplicationModel().getRecent("*.jy",20);
-        List<String> recentUris= new ArrayList<>(recentJy.size());
-        for ( Entry<String,String> recentItem : recentJy.entrySet() ) {
-            recentUris.add( recentItem.getKey() );
+        if ( dom.getController()!=null ) { // support testing.
+            Map<String,String> recentJy= dom.getController().getApplicationModel().getRecent("*.jy",20);
+            List<String> recentUris= new ArrayList<>(recentJy.size());
+            for ( Entry<String,String> recentItem : recentJy.entrySet() ) {
+                recentUris.add( recentItem.getKey() );
+            }
+            dataSetSelector1.setRecent( recentUris );
         }
-        dataSetSelector1.setRecent( recentUris );
     }
 
     /**
@@ -396,6 +404,7 @@ public class BatchMaster extends javax.swing.JPanel {
         if ( p.length()>0 ) {
             try {
                 org.virbo.jythonsupport.JythonUtil.Param pd= getParamDescription( p );
+                if ( pd==null ) return; // shouldn't happen
                 String[] ss=null; // will be generated values
                 if ( pd.type=='T' ) {
                     try {
@@ -406,7 +415,68 @@ public class BatchMaster extends javax.swing.JPanel {
                         Logger.getLogger(BatchMaster.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } else if ( pd.enums!=null ) {
-                    ss= pd.enums.toArray( new String[pd.enums.size()] );
+                    JPanel panel= new JPanel();
+                    panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+                    String label= pd.label;
+                    if ( pd.doc!=null ) label= "<html>"+label+", <i>"+pd.doc+"</i>";
+                    panel.add( new JLabel( label ) );
+                    for ( int i=0; i<pd.enums.size(); i++ ) {
+                        JCheckBox checkBox= new JCheckBox(pd.enums.get(i).toString());
+                        checkBox.setSelected(true);
+                        panel.add( checkBox );
+                    }
+                    if ( JOptionPane.showConfirmDialog( this, panel, "Select from Values", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                        List<String> theList= new ArrayList<>();
+                        for ( Component c: panel.getComponents() ) {
+                            if ( c instanceof JCheckBox ) {
+                                if ( ( (JCheckBox) c).isSelected() ) {
+                                    theList.add(((JCheckBox)c).getText());
+                                }
+                            }
+                        }
+                        ss= theList.toArray( new String[theList.size()] );
+                    }
+                } else if ( pd.type=='F' ) {
+                    JPanel panel= new JPanel();
+                    panel.setLayout( new BoxLayout( panel, BoxLayout.Y_AXIS ) );
+                    String label= pd.label;
+                    if ( pd.doc!=null ) label= "<html>"+label+", <i>"+pd.doc+"</i>";
+                    panel.add( new JLabel( label ) );
+                    JTextField min= new JTextField( "" );
+                    JTextField max= new JTextField( "" );
+                    JTextField step= new JTextField( "" );
+                    boolean isInt;
+                    min.setText( String.valueOf( pd.deft ) );
+                    if ( pd.deft instanceof Integer ) {
+                        max.setText( String.valueOf( ((Integer)pd.deft) + 4 ) );
+                        step.setText( "1" ); 
+                        isInt= true;
+                    } else {
+                        max.setText( String.valueOf( ((Number)pd.deft).doubleValue() + 10. ) );
+                        step.setText( "0.1" ); 
+                        isInt= false;
+                    }
+                    panel.add( new JLabel( "Minimum: " ) );
+                    panel.add( min );
+                    panel.add( new JLabel( "Maximum: " ) );
+                    panel.add( max );
+                    panel.add( new JLabel( "Step Size: " ) );
+                    panel.add( step );
+                    while ( JOptionPane.showConfirmDialog( this, panel, "Select range", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                        List<String> theList= new ArrayList<>();
+                        double dmin= Double.parseDouble(min.getText());
+                        double dmax= Double.parseDouble(max.getText());
+                        double dstep= Double.parseDouble(step.getText());
+                        if ( dstep<=0 ) continue;
+                        if ( dmax<dmin ) continue;
+                        int ni= (int)(Math.round((dmax-dmin)/dstep))+1;
+                        for ( int i=0; i<ni; i++ ) {
+                            double x= dmin + dstep * i;
+                            theList.add( isInt ? String.valueOf( (int)Math.round(x) ) : String.valueOf(x) );
+                        }
+                        ss= theList.toArray( new String[theList.size()] );
+                        break;
+                    }
                 } else if ( pd.type=='R' ) {
                     JFileChooser cf= new JFileChooser();
                     cf.setMultiSelectionEnabled(true);
