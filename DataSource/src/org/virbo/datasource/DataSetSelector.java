@@ -215,7 +215,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     Runnable completionsRunnable = null;
     ProgressMonitor completionsMonitor = null;
     JPopupMenu completionsPopupMenu = null;
-    JTextField editor;
+    private JTextField editor;
     DataSetSelectorSupport support = new DataSetSelectorSupport(this);
     public static final String PROPERTY_MESSAGE = "message";
     static final Logger logger = LoggerManager.getLogger("apdss.gui.dss");
@@ -228,7 +228,8 @@ public class DataSetSelector extends javax.swing.JPanel {
     /**
      * provide direct access to the editor component.
      * This should not be used, because it makes it more difficult to 
-     * control and define the state.
+     * control and define the state.  
+     * Use this to add listeners for example, but do not modify the value.
      * @return the text editor
      */
     public JTextField getEditor() {
