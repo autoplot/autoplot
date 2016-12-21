@@ -1327,7 +1327,7 @@ public class ScriptContext extends PyJavaInstance {
     public static void bind( Object src, String srcProp, Object dst, String dstProp ) {
         bind( src, srcProp, dst, dstProp, null );
     }
-
+    
     /**
      * binds two bean properties together.  Bindings are bidirectional, but
      * the initial copy is from src to dst.  In MVC terms, src should be the model
@@ -1355,23 +1355,43 @@ public class ScriptContext extends PyJavaInstance {
             if ( src instanceof DomNode && dom.getController().getElementById(((DomNode)src).getId())==src ) {
                 DomNode srcNode= (DomNode)src;
                 dom.getController().bind( srcNode, srcProp, dst, dstProp, c );
-                return;
+            } else {
+                BeanProperty srcbp= BeanProperty.create(srcProp);
+                Object value= srcbp.getValue(src);
+                if ( value==null ) {
+                    System.err.println("warning: src property "+srcProp+ " of "+src+" is null");
+                }
+                BeanProperty dstbp= BeanProperty.create(dstProp);
+                dstbp.setValue(dst, value );
+                dstbp.getValue(dst);
+                Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, srcbp, dst, dstbp );
+                if ( c!=null ) b.setConverter(c);
+                b.bind();
             }
-            BeanProperty srcbp= BeanProperty.create(srcProp);
-            Object value= srcbp.getValue(src);
-            if ( value==null ) {
-                System.err.println("warning: src property "+srcProp+ " of "+src+" is null");
-            }
-            BeanProperty dstbp= BeanProperty.create(dstProp);
-            dstbp.setValue(dst, value );
-            dstbp.getValue(dst);
-            Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, srcbp, dst, dstbp );
-            if ( c!=null ) b.setConverter(c);
-            b.bind();
         } else {
             System.err.println("bindings disabled in applet environment");
         }
     }
+    
+    /**
+     * unbind the property
+     * @param src 
+     */
+    public static void unbind( DomNode src ) {
+        dom.getController().unbind(src);
+    }
+
+    /**
+     * unbind the property
+     * @param src 
+     * @param srcProp 
+     * @param dst 
+     * @param dstProp 
+     */
+    public static void unbind( DomNode src, String srcProp, DomNode dst, String dstProp ) {
+        dom.getController().unbind(src,srcProp,dst,dstProp);
+    }
+    
 
     /**
      * binds two bean properties together.  Bindings are bidirectional, but
