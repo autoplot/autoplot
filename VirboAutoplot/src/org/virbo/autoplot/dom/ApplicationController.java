@@ -1375,15 +1375,18 @@ public class ApplicationController extends DomNodeController implements RunLater
             final Column fcol= domColumn;
             final Row frow= domRow;
 
-            Runnable run= new Runnable() { public void run() {
-                new PlotController(application, domPlot).createDasPeer(c, frow ,fcol );
-            } };
+            Runnable run= new Runnable() { 
+                @Override
+                public void run() {
+                    new PlotController(application, domPlot).createDasPeer(c, frow ,fcol );
+                } 
+            };
             if ( SwingUtilities.isEventDispatchThread() ) {
                 run.run();
             } else {
                 try {
                     SwingUtilities.invokeAndWait(run);
-                } catch ( Exception ex ) {
+                } catch ( InterruptedException | InvocationTargetException ex ) {
                     logger.log( Level.WARNING, ex.getMessage(), ex );
                 }
             }
@@ -2383,7 +2386,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     
     /**
      * unbind the object, removing any binding to this node.  For example, when the object is about to be deleted.
-     * @param src
+     * @param src the node
      */
     public void unbind(DomNode src) {
         BindingGroup bc;
@@ -2453,7 +2456,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     /**
      * unbind all implementation bindings associated with the dom node.
-     * @param src
+     * @param src the node
      */
     protected void unbindImpl( DomNode src ) {
         bindingSupport.unbind(src);
@@ -2488,10 +2491,10 @@ public class ApplicationController extends DomNodeController implements RunLater
     /**
      * Find the binding, if it exists.  All bindingImpls are symmetric, so the src and dst order is ignored in this
      * search.  
-     * @param src
-     * @param srcProp
-     * @param dst
-     * @param dstProp
+     * @param src the node (e.g. an Axis)
+     * @param srcProp the property name (e.g. "range")
+     * @param dst the other node
+     * @param dstProp the other node's property name (e.g. "range")
      * @return the BindingModel or null if it doesn't exist.
      */
     public BindingModel findBinding(DomNode src, String srcProp, DomNode dst, String dstProp) {
@@ -3113,7 +3116,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                     return true;
                 }
             } else {
-                logger.fine("bad dataset id for plot: "+p.getId() );
+                logger.log(Level.FINE, "bad dataset id for plot: {0}", p.getId());
             }
         }
         return false;
