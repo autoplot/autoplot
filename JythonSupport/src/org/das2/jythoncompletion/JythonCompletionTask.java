@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1154,7 +1155,23 @@ public class JythonCompletionTask implements CompletionTask {
                         PyJavaClassPeeker peek= new PyJavaClassPeeker((PyJavaClass)po);
                         Class jclass= peek.getProxyClass();
                         String n= jclass.getCanonicalName();
-                        doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
+                        boolean allStatic= true;
+                        Method[] mm= jclass.getMethods();
+                        for ( Method m: mm ) {
+                            if ( !m.getDeclaringClass().equals(Object.class) ) {
+                                if ( !Modifier.isStatic(m.getModifiers()) ) {
+                                    allStatic= false;
+                                }
+                            }
+                        }
+                        if ( allStatic ) {
+                            doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
+                            for ( int i1=0; i1<argss.size(); i1++ ) {
+                                argss.set(i1,"");
+                            }
+                        } else {
+                            doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
+                        }
                         //signature=  join( n.split("\\."), "/") + ".html#"+ jclass.getSimpleName() + "()";
                     } else if ( po.getType().getFullName().equals("javapackage")  ) {
                         label = ss;
