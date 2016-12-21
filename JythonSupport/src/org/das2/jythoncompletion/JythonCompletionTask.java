@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -85,9 +84,7 @@ public class JythonCompletionTask implements CompletionTask {
                 try {
                     Method m = dc.getMethod(methodName);
                     return m;
-                } catch ( NoSuchMethodException ex2 ) {
-                    return null;
-                } catch ( SecurityException ex2 ) {
+                } catch ( NoSuchMethodException | SecurityException ex2 ) {
                     return null;
                 }
             }
@@ -127,19 +124,28 @@ public class JythonCompletionTask implements CompletionTask {
     public int doQuery( CompletionContext cc, CompletionResultSet arg0 ) {
         int c=0;
         try {
-            if (cc.contextType.equals(CompletionContext.MODULE_NAME)) {
-                c= queryModules(cc, arg0);
-            } else if (cc.contextType.equals(CompletionContext.PACKAGE_NAME)) {
-                c= queryPackages(cc, arg0);
-            } else if (cc.contextType.equals(CompletionContext.DEFAULT_NAME)) {
-                c= queryNames(cc, arg0);
-            } else if (cc.contextType.equals(CompletionContext.METHOD_NAME)) {
-                c= queryMethods(cc, arg0);
-            } else if (cc.contextType.equals(CompletionContext.STRING_LITERAL_ARGUMENT)) {
-                c= queryStringLiteralArgument(cc, arg0);
-            } else if (cc.contextType.equals(CompletionContext.COMMAND_ARGUMENT)) {
-                c= queryCommandArgument(cc, arg0);
-                c+= queryNames(cc, arg0);
+            switch (cc.contextType) {
+                case CompletionContext.MODULE_NAME:
+                    c= queryModules(cc, arg0);
+                    break;
+                case CompletionContext.PACKAGE_NAME:
+                    c= queryPackages(cc, arg0);
+                    break;
+                case CompletionContext.DEFAULT_NAME:
+                    c= queryNames(cc, arg0);
+                    break;
+                case CompletionContext.METHOD_NAME:
+                    c= queryMethods(cc, arg0);
+                    break;
+                case CompletionContext.STRING_LITERAL_ARGUMENT:
+                    c= queryStringLiteralArgument(cc, arg0);
+                    break;
+                case CompletionContext.COMMAND_ARGUMENT:
+                    c= queryCommandArgument(cc, arg0);
+                    c+= queryNames(cc, arg0);
+                    break;
+                default:
+                    break;
             }
         } catch ( BadLocationException ex ) {
             logger.log( Level.WARNING, null, ex );
@@ -277,8 +283,7 @@ public class JythonCompletionTask implements CompletionTask {
                     Field f = null;
                     try {
                         f = dc.getField(label);
-                    } catch (NoSuchFieldException ex) {
-                    } catch (SecurityException ex) {
+                    } catch (NoSuchFieldException | SecurityException ex) {
                     }
                     if (f == null) {
                         continue;
@@ -707,7 +712,7 @@ public class JythonCompletionTask implements CompletionTask {
         StringBuilder sig = new StringBuilder();
 
         sig.append(LPAREN);
-        List<String> sargs = new ArrayList<String>();
+        List<String> sargs = new ArrayList<>();
 
         for (Class arg : classes ) {
             sargs.add(arg.getSimpleName());
@@ -728,7 +733,7 @@ public class JythonCompletionTask implements CompletionTask {
      */
     private static String constructorSignatureNew( Constructor c ) {
         String n= c.getName();
-        String[] ss= n.split("\\.");
+        //String[] ss= n.split("\\.");
         String javadocPath = join( n.split("\\."), "/") + ".html";
 
         StringBuilder sig = new StringBuilder(javadocPath);
@@ -769,8 +774,7 @@ public class JythonCompletionTask implements CompletionTask {
         String SPACE = " "; // "%20";
 
         sig.append("#").append(javaMethod.getName()).append(LPAREN);
-        List<String> sargs = new ArrayList<String>();
-
+        List<String> sargs = new ArrayList<>();
 
         for (Class arg : javaMethod.getParameterTypes()) {
             sargs.add(arg.getCanonicalName());
@@ -939,18 +943,27 @@ public class JythonCompletionTask implements CompletionTask {
         Matcher m= p.matcher(label);
         while ( m.find() ) {
             String s= m.group(1);
-            if ( s.equals("org.virbo.dataset.QDataSet") ) {
-                m.appendReplacement(build,"QDataSet");
-            } else if ( s.equals("java.lang.String") ) {
-                m.appendReplacement(build,"String");
-            } else if ( s.equals("java.lang.Object") ) {
-                m.appendReplacement(build,"Object");
-            } else if ( s.equals("org.das2.util.monitor.ProgressMonitor") ) {
-                m.appendReplacement(build,"Monitor");
-            } else if ( s.equals("org.das2.datum.DatumRange") ) {
-                m.appendReplacement(build,"DatumRange");
-            } else if ( s.equals("org.das2.datum.Datum") ) {
-                m.appendReplacement(build,"Datum");
+            switch (s) {
+                case "org.virbo.dataset.QDataSet":
+                    m.appendReplacement(build,"QDataSet");
+                    break;
+                case "java.lang.String":
+                    m.appendReplacement(build,"String");
+                    break;
+                case "java.lang.Object":
+                    m.appendReplacement(build,"Object");
+                    break;
+                case "org.das2.util.monitor.ProgressMonitor":
+                    m.appendReplacement(build,"Monitor");
+                    break;
+                case "org.das2.datum.DatumRange":
+                    m.appendReplacement(build,"DatumRange");
+                    break;
+                case "org.das2.datum.Datum":
+                    m.appendReplacement(build,"Datum");
+                    break;
+                default:
+                    break;
             }
         }
         m.appendTail(build);
@@ -1057,19 +1070,19 @@ public class JythonCompletionTask implements CompletionTask {
     }
     
     private static void doConstructors( Constructor[] constructors, List<String> labels, List<String> signatures, String ss, List<String> argss ) {
-        for ( int jj=0; jj<constructors.length; jj++ ) {
-            String signature = constructorSignatureNew(constructors[jj]);
+        for (Constructor constructor : constructors) {
+            String signature = constructorSignatureNew(constructor);
             int j= signature.indexOf("#");
             String label= ss + "() JAVA";
-            if ( j>-1 ) {
+            if (j>-1) {
                 label= signature.substring(j+1);
                 label= hideJavaPaths( label );
-                Class ret= constructors[jj].getDeclaringClass();
+                Class ret = constructor.getDeclaringClass();
                 label= label + "->" + hideJavaPaths( ret.getCanonicalName() );
             }
             signatures.add(signature);
             labels.add(label);
-            argss.add( argsList( constructors[jj].getParameterTypes() ) );
+            argss.add(argsList(constructor.getParameterTypes()));
         }  
     }
     
@@ -1150,38 +1163,41 @@ public class JythonCompletionTask implements CompletionTask {
                     signature= makeInlineSignature( po, doc );
                     
                 } else if (po.isNumberType()) {
-                    if ( po.getType().getFullName().equals("javaclass")  ) {
-                        label = ss;
-                        PyJavaClassPeeker peek= new PyJavaClassPeeker((PyJavaClass)po);
-                        Class jclass= peek.getProxyClass();
-                        String n= jclass.getCanonicalName();
-                        boolean allStatic= true;
-                        Method[] mm= jclass.getMethods();
-                        for ( Method m: mm ) {
-                            if ( !m.getDeclaringClass().equals(Object.class) ) {
-                                if ( !Modifier.isStatic(m.getModifiers()) ) {
-                                    allStatic= false;
-                                }
-                            }
-                        }
-                        if ( allStatic ) {
-                            doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
-                            for ( int i1=0; i1<argss.size(); i1++ ) {
-                                argss.set(i1,"");
-                            }
-                        } else {
-                            doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
-                        }
-                        //signature=  join( n.split("\\."), "/") + ".html#"+ jclass.getSimpleName() + "()";
-                    } else if ( po.getType().getFullName().equals("javapackage")  ) {
-                        label = ss;
-                    } else { //TODO: check for PyFloat, etc.
-                        String sss= po.toString();
-                        if ( sss.contains("<") ) { // it's not what I think it is, a number
+                    switch (po.getType().getFullName()) {
+                        case "javaclass":
                             label = ss;
-                        } else {
-                            label = ss + " = " + sss;
-                        }
+                            PyJavaClassPeeker peek= new PyJavaClassPeeker((PyJavaClass)po);
+                            Class jclass= peek.getProxyClass();
+                            String n= jclass.getCanonicalName();
+                            boolean allStatic= true;
+                            Method[] mm= jclass.getMethods();
+                            for ( Method m: mm ) {
+                                if ( !m.getDeclaringClass().equals(Object.class) ) {
+                                    if ( !Modifier.isStatic(m.getModifiers()) ) {
+                                        allStatic= false;
+                                    }
+                                }
+                            }   if ( allStatic ) {
+                                doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
+                                for ( int i1=0; i1<argss.size(); i1++ ) {
+                                    argss.set(i1,"");
+                                }
+                            } else {
+                                doConstructors(jclass.getConstructors(),labels,signatures,n,argss);
+                            }
+                            //signature=  join( n.split("\\."), "/") + ".html#"+ jclass.getSimpleName() + "()";
+                            break;
+                        case "javapackage":
+                            label = ss;
+                            break;
+                        default:
+                            //TODO: check for PyFloat, etc.
+                            String sss= po.toString();
+                            if ( sss.contains("<") ) { // it's not what I think it is, a number
+                                label = ss;
+                            } else {
+                                label = ss + " = " + sss;
+                            }   break;
                     }
                 } else if ( po instanceof PyJavaClass ) {
                     
