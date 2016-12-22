@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Renderers now allow additional drawing commands to be added.  See <a href="https://sourceforge.net/p/autoplot/feature-requests/548/">the ticket</a>
+        <p><small>Happy Holidays!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-12-05 r20106):</p>
+        <p>Bugfixes (2016-12-22 r20138):</p>
         <ul> 
+            <li>1739: include the scientist's home directory in the list of completions.
+            <li>scripting had bind command, but no unbind.
+            <li>corrections to ELEMENT_DIMENSIONS property for bundles
+            <li>Jython completions detect static helper classes and don't complete to argument-less constructor, like Schemes()
             <li>1738: sequence using ".." in URI completions, fix unstable code.
             <li>1735: correct synchronization errors which would lead to occasional errors when loading .vap files
             <li>1734: noisy "alarming extrapolation in findex" warning is more lax.
