@@ -1039,7 +1039,8 @@ public class DataSetSelector extends javax.swing.JPanel {
             showTypesCompletions( surl, carotpos );
         
         } else if ( carotpos<6 && !shortFsCompletion  ) {
-            String[] types= new String[] { "ftp://", "http://", "https://", "file:/", "sftp://" };
+            String home= "file://"+FileSystem.toCanonicalFolderName( System.getProperty("user.home") );
+            String[] types= new String[] { "ftp://", "http://", "https://", "sftp://", "file:/", home };
             List<CompletionResult> result= new ArrayList<>();
             for (String type : types) {
                 if (type.length() >= carotpos && surl.substring(0, carotpos).equals(type.substring(0, carotpos))) {

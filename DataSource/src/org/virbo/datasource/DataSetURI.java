@@ -1927,6 +1927,8 @@ public class DataSetURI {
         if ( "http://".startsWith(prefix) ) completions.add( new CompletionResult( "http://", null, prefix, true ) );
         if ( "ftp://".startsWith(prefix) ) completions.add( new CompletionResult( "ftp://", null, prefix, true ) );
         if ( "file://".startsWith(prefix) ) completions.add( new CompletionResult( "file:///", null, prefix, true ) );
+        String home= "file://"+FileSystem.toCanonicalFolderName( System.getProperty("user.home") );
+        if ( home.startsWith(prefix) ) completions.add( new CompletionResult( home, null, prefix, true ) );
 
         return completions;
     }
