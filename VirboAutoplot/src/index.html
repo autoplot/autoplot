@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Happy Holidays!
+        <p><small>Happy Holidays!  
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -60,6 +60,21 @@
             <li>1708: digitizer component fails when the first column was not time, because code assumed times with timeFormatter.
             <li>data set selector component setValue would add "%20" when there was an extra space at the end when cut-n-paste URIs.
         </ul>
+        <p>Features:</p>
+        <ul>
+            <li>HAPI data source makes SPASE link and DOI links clickable.
+            <li>"run batch" feature allows jython scripts to be run for a series of inputs, and has methods for generating inputs.
+            <li>rfe 548: Das2 Renderers have a decorator object to allow additional drawing code.
+            <li>HAPI shows descriptions if available.
+            <li>data mash-up tool supports string arguments and constants like QDataSet.UNITS.  Thanks, Kristoff!
+            <li>metadata tab allows access to the metadata for each bundled dataset.
+            <li>update internal orbits, and include 2017 leap second.
+            <li>20000th SVN revision!
+            <li>layout tab has "move to top" menu item
+            <li>lookupAxis supports horizontal axis.
+            <li>543: support for time zone offsets in ISO8601 strings.
+            <li>HAPI data source supports JSON data response.
+       </ul>
         <p>Older Bugfixes:</p>
         <ul>
             <li>rte_1741708130: rendering of rank 3 waveform would fail w/NullPointerException when within one packet.  Thanks, Nhan!
@@ -106,21 +121,6 @@
             <li>applyIndex supports BUNDLE_i.</li>
             <li>Series renderer plotSymbols would show when units were inconvertible, but then connectors would refuse to paint.  Now both will paint with a warning.</li>
         </ul>
-        <p>Features:</p>
-        <ul>
-            <li>"run batch" feature allows jython scripts to be run for a series of inputs, and has methods for generating inputs.
-            <li>rfe 548: Das2 Renderers have a decorator object to allow additional drawing code.
-            <li>HAPI shows descriptions if available.
-            <li>data mash-up tool supports string arguments and constants like QDataSet.UNITS.  Thanks, Kristoff!
-            <li>metadata tab allows access to the metadata for each bundled dataset.
-            <li>update internal orbits, and include 2017 leap second.
-            <li>20000th SVN revision!
-            <li>layout tab has "move to top" menu item
-            <li>lookupAxis supports horizontal axis.
-            <li>HAPI data source makes SPASE link clickable.
-            <li>543: support for time zone offsets in ISO8601 strings.
-            <li>HAPI data source supports JSON data response.
-       </ul>
         <p>Less recent features:</p>
         <ul>
             <li>541: Need for BIN_MAX and BIN_MIN properties to state extent in the same units as the data.  Thanks, Chris!</li>
