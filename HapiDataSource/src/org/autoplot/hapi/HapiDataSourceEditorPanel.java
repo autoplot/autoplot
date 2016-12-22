@@ -757,7 +757,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 so= "<a href=\"http://spase.info/registry/render?id="+so+"\">"+so+"</a>";
             } else if ( so.startsWith("http://") || so.startsWith("https://") || so.startsWith("ftp://" ) ) {
                 so= "<a href=\""+so+"\">"+so+"</a>";
-            } else if ( so.startsWith("doi:") ) {
+            } else if ( so.startsWith("doi:") || so.startsWith("DOI:") ) {
                 so= "<a href=\"https://doi.org/"+so.substring(4)+"\">"+so+"</a>";
             } else if ( so.startsWith("10.") && so.length()>7 ) {
                 Pattern p= Pattern.compile("(10[.][0-9]{3,}[^\\s\"/<>]*/[^\\s\"<>]+)");
