@@ -1,19 +1,11 @@
-# Set ds to a data set that is rank 1 signal that is a function of time.  The
-# dataset will be plotted in the top plot, and the fft spectrum timeseries will
-# be plotted below.  Draw a box to hear the waveform within the selected time.
-#
-# Note this would make a fine example for invokeLater, because it blocks the event thread.
-#
 
 import org.das2.graph
 
-ds= getDataSet( 'http://autoplot.org/data/wav/chickadeesong.wav' )
-#ds= getDataSet( 'vap+jyds:file:///home/jbf/project/autoplot/jyds/auralizeHfwr.jyds' )
-#ds= getDataSet('vap:file:/media/mini/eg/content/wav/20090818 204141.wav')
-
-plot( 0, ds )
-plot( 1, fftWindow( ds, 256 ) )
-dom.plots[1].zaxis.log=True
+loadData= getParam('loadData','F','Load example data',['T','F'] )
+if ( loadData=='T' ):
+    ds= getDataSet( 'http://autoplot.org/data/wav/chickadeesong.wav' )
+    plot( 0, ds )
+    plot( 1, fftWindow( ds, 256 ) )
 
 def boxSelected(event):
     ds= dom.plotElements[0].controller.dataSet
@@ -27,12 +19,11 @@ def boxSelected(event):
     imin= DataSetUtil.closest( dep0, tmin, -1 )
     imax= DataSetUtil.closest( dep0, tmax, imin )
 
-    play= DataSetOps.trim( ds, imin, imax-imin )
+    play= DataSetOps.trim( ds, imin, max(1,imax-imin) )
 
     a= org.das2.graph.Auralizor( play )
 
     a.playSound()
-    #formatDataSet( play, 'file:/tmp/auralizeTool.wav' )
     
 plot= dom.plots[0].controller.dasPlot
 from org.das2.event import BoxSelectorMouseModule
@@ -40,8 +31,4 @@ mm= BoxSelectorMouseModule.create( plot, 'Auralize' )
 mm.BoxSelected=boxSelected
 plot.dasMouseInputAdapter.primaryModule=mm
 
-plot= dom.plots[1].controller.dasPlot
-from org.das2.event import BoxSelectorMouseModule
-mm= BoxSelectorMouseModule.create( plot, 'Auralize' )
-mm.BoxSelected=boxSelected
-plot.dasMouseInputAdapter.primaryModule=mm
+showMessageDialog("Drag a box to play the sound")
