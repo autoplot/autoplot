@@ -813,7 +813,8 @@ public class DomUtil {
                 i= template.indexOf("%{"+root+".",i);
             }
         } catch ( Exception ex ) {
-            logger.log( Level.WARNING, ex.getMessage(), ex );
+            logger.log(Level.INFO, "unable to resolve template: {0}", template);
+            logger.log(Level.FINE,null,ex);
         }
         return template;
     }
