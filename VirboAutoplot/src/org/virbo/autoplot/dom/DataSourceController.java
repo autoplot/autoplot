@@ -1285,7 +1285,7 @@ public class DataSourceController extends DomNodeController {
             }
 
             // add the cadence property to each dimension of the dataset, so that
-            // the plot element doesn't have to worry about it.
+            // the plot element doesn't have to worry about it.  TODO: review this
             for (int i = 0; i < fillDs.rank(); i++) {
                 QDataSet dep = (QDataSet) fillDs.property("DEPEND_" + i);
                 if (dep != null) {
@@ -1324,6 +1324,11 @@ public class DataSourceController extends DomNodeController {
             if (fillDs == ds) { //kludge to force reset renderer, because QDataSet is mutable.
                 this.fillDataSet = null;
             }
+                        
+            if ( fillDs instanceof MutablePropertyDataSet ) { // https://sourceforge.net/p/autoplot/bugs/1743/
+                ((MutablePropertyDataSet)fillDs).makeImmutable();
+            }
+            
             setFillDataSet(fillDs);
         } finally {
             changesSupport.changePerformed(this, PENDING_FILL_DATASET);
@@ -1464,7 +1469,7 @@ public class DataSourceController extends DomNodeController {
 
                 @Override
                 public String toString() {
-                    return "load " + String.valueOf(getDataSource());
+                    return "load " + String.valueOf(dataSource);
                 }
             };
 
