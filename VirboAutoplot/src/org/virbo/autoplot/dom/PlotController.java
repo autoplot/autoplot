@@ -5,6 +5,7 @@ import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,6 +81,8 @@ public class PlotController extends DomNodeController {
      * the plot elements we listen to for autoranging.
      */
     public List<PlotElement> pdListen= new LinkedList();
+
+    private static final String PENDING_ADD_DAS_PEER = "addDasPeer";
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger( "autoplot.dom.plotcontroller" );
 
@@ -464,8 +467,27 @@ public class PlotController extends DomNodeController {
      * @param domRow the row indicating the vertical position
      * @param domColumn the column indicating the horizontal position
      */
-    protected void createDasPeer( Canvas canvas, Row domRow ,Column domColumn) {
+    protected void createDasPeer( final Canvas canvas, final Row domRow, final Column domColumn) {
 
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                createDasPeerImmediately( canvas, domRow, domColumn );
+            }
+        };
+        if ( SwingUtilities.isEventDispatchThread() ) {
+            run.run();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(run);
+            } catch (InterruptedException | InvocationTargetException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
+    private void createDasPeerImmediately( Canvas canvas, Row domRow, Column domColumn ) {
+                
         Application application= dom;
 
         DatumRange x = this.plot.xaxis.range;
@@ -1129,7 +1151,6 @@ public class PlotController extends DomNodeController {
                 needsColorbar = true;
             }
         }
-        dasColorBar.setVisible(needsColorbar);
         plot.getZaxis().setVisible(needsColorbar);
     }
 
