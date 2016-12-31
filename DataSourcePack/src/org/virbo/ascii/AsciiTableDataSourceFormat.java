@@ -44,6 +44,7 @@ import org.virbo.dsops.Ops;
  * <li>header=none don't include any headers.
  * <li>tformat=iso8601 use ISO8601 times (like 2015-01-01T00:00Z)
  * <li>tformat=hours+since+2015-01-01T00:00 use offsets. (timeformat and tformat are aliases)
+ * <li>tformat=$Y+$J+$H+$M+$S. (separate into columns for each component)
  * <li>tformat=day
  * <li>format=%5.2f use this formatter for data.
  * </ul>
@@ -96,6 +97,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             if ( tformat.startsWith("$") ) { // provide convenient URI-friendly spec
                 tformat= tformat.replaceAll("\\$", "%");
             }
+            tformat= tformat.replaceAll("\\+",getDelim());
             try {
                 timeFormatter = new TimeDatumFormatter(tformat);
             } catch (ParseException ex) {
@@ -413,6 +415,10 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         }
     }
     
+    /**
+     * return " " or ", "
+     * @return the delimiter.
+     */
     private String getDelim( ) {
         String head= getParam( "header", "" ); // could be "rich"
         String delim = "rich".equals(head) ? " " : ", ";
