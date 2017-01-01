@@ -24,9 +24,11 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2016-12-22 r20138):</p>
-        <ul> 
+        <p>Bugfixes (2017-01-01 r20155):</p>
+        <ul>
+            <li>dep0units can be used to explicitly set the units, and does this correctly for times now as well.
             <li>1739: include the scientist's home directory in the list of completions.
+            <li>bug 1743: make sure all datasets entering Autoplot are immutable.
             <li>scripting had bind command, but no unbind.
             <li>corrections to ELEMENT_DIMENSIONS property for bundles
             <li>Jython completions detect static helper classes and don't complete to argument-less constructor, like Schemes()
@@ -62,6 +64,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>add example values for depend0units and timeFormat parameters in ascii editor panel.
+            <li>ascii table data source format supports "+" in tformat parameter, to output multiple columns
+            <li>tweaks to the ASCII editor panel, improving tooltips and providing examples.
             <li>HAPI data source makes SPASE link and DOI links clickable.
             <li>"run batch" feature allows jython scripts to be run for a series of inputs, and has methods for generating inputs.
             <li>rfe 548: Das2 Renderers have a decorator object to allow additional drawing code.
