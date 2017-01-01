@@ -709,12 +709,12 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel12.setToolTipText("units for the data");
 
         jLabel13.setText("Depend Units:");
-        jLabel13.setToolTipText("The units for the x tags");
+        jLabel13.setToolTipText("Units of the depend0 column (typically x-axis), such as \"seconds\" or \"nanoseconds since 2000-01-01T12:00\"  Droplist shows examples.");
 
         depend0unitsCB.setEditable(true);
         depend0unitsCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "seconds since 2010-01-01T00:00", "nanoseconds since 2000-01-01T12:00", "seconds" }));
         depend0unitsCB.setSelectedIndex(-1);
-        depend0unitsCB.setToolTipText("Units of the depend0 column, such as \"seconds\" or \"nanoseconds since 2000-01-01T12:00\"  Droplist shows examples.");
+        depend0unitsCB.setToolTipText("");
 
         org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);

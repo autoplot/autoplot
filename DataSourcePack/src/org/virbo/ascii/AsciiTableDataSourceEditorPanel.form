@@ -690,7 +690,7 @@
             <Component class="javax.swing.JLabel" name="jLabel13">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Depend Units:"/>
-                <Property name="toolTipText" type="java.lang.String" value="The units for the x tags"/>
+                <Property name="toolTipText" type="java.lang.String" value="Units of the depend0 column (typically x-axis), such as &quot;seconds&quot; or &quot;nanoseconds since 2000-01-01T12:00&quot;  Droplist shows examples."/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="unitsTF">
@@ -706,7 +706,7 @@
                   </StringArray>
                 </Property>
                 <Property name="selectedIndex" type="int" value="-1"/>
-                <Property name="toolTipText" type="java.lang.String" value="Units of the depend0 column, such as &quot;seconds&quot; or &quot;nanoseconds since 2000-01-01T12:00&quot;  Droplist shows examples."/>
+                <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
