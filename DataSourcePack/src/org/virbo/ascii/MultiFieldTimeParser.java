@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.ascii;
 
@@ -42,12 +38,16 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
     }
 
     private boolean isNumber( String spec ) {
-        if ( spec.equals("$(ignore)") || spec.equals("$x") || spec.equals("$X") ) {
-            return false;
-        } else if ( spec.equals("$b") ) { //TODO: $-1{b}, etc.
-            return false;
-        } else {
-            return fieldCount( spec )==1;
+        switch (spec) {
+            case "$(ignore)":
+            case "$x":
+            case "$X":
+                return false;
+            case "$b":
+                //TODO: $-1{b}, etc.
+                return false;
+            default:
+                return fieldCount( spec )==1;
         }
     }
 
@@ -115,6 +115,7 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
      * @return 0 or the value for the time unit if it's the last field.
      * @throws ParseException
      */
+    @Override
     public double parseField(String field, int columnIndex) throws ParseException {
         double d;
         if ( isNumber[columnIndex-firstColumn] ) {
