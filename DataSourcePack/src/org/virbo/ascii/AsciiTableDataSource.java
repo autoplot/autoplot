@@ -293,7 +293,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 if ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(dep0) ) && UnitsUtil.isTimeLocation(newDep0Units) ) {
                     dep0= ArrayDataSet.maybeCopy( Ops.convertUnitsTo( dep0, newDep0Units ) );
                 } else {
-                    dep0.putProperty( QDataSet.UNITS, dep0Units );
+                    dep0.putProperty( QDataSet.UNITS, newDep0Units );
                 }
             }
         }
