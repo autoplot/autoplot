@@ -23,9 +23,9 @@
           <Component id="jTabbedPane1" alignment="0" max="32767" attributes="0"/>
           <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
-                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="347" max="32767" attributes="0"/>
                   <Component id="jLayeredPane1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="347" max="32767" attributes="0"/>
               </Group>
           </Group>
       </Group>
@@ -33,9 +33,9 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="jTabbedPane1" min="-2" pref="106" max="-2" attributes="0"/>
+              <Component id="jTabbedPane1" min="-2" pref="112" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="360" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="354" max="32767" attributes="0"/>
           </Group>
           <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
@@ -97,7 +97,7 @@
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="commentComboBox" min="-2" pref="109" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="568" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="544" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -135,6 +135,7 @@
             <Component class="javax.swing.JFormattedTextField" name="skipLinesTextField">
               <Properties>
                 <Property name="text" type="java.lang.String" value="11"/>
+                <Property name="toolTipText" type="java.lang.String" value=""/>
               </Properties>
               <Events>
                 <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="skipLinesTextFieldFocusGained"/>
@@ -202,7 +203,7 @@
                           <Group type="102" attributes="0">
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="timeFormatTextField" min="-2" pref="221" max="-2" attributes="0"/>
+                              <Component id="timeFormatCB" min="-2" pref="353" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="timeFormatFieldsComboBox" min="-2" pref="167" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -211,7 +212,7 @@
                               <Component id="guessTimeFormatToggleButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="140" max="32767" attributes="0"/>
+                      <EmptySpace pref="57" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -222,11 +223,11 @@
                       <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="timeFormatTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="timeFormatFieldsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="timeFormatToggleButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="guessTimeFormatToggleButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="timeFormatCB" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="timesStatusLabel" min="-2" pref="15" max="-2" attributes="0"/>
@@ -235,12 +236,10 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JTextField" name="timeFormatTextField">
-            </Component>
             <Component class="javax.swing.JLabel" name="jLabel2">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Time Format:"/>
-                <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Specify the format of time strings, such as &quot;%Y %m %d.&quot;&lt;br&gt;&#xa;Pluses join adjectent fields, and the droplist to the right&lt;br&gt;&#xa;can be used to select field types.  The Guess button attempts &lt;br&gt;&#xa;to guess the format of selected fields.&lt;/html&gt;&#xa;"/>
+                <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Specify the format of time strings, such as &quot;%Y %m %d.&quot;&lt;br&gt;&#xa;Pluses join adjacent fields, and the droplist to the right&lt;br&gt;&#xa;can be used to select field types.  The Guess button attempts &lt;br&gt;&#xa;to guess the format of selected fields.&lt;/html&gt;&#xa;"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JComboBox" name="timeFormatFieldsComboBox">
@@ -283,7 +282,7 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel9">
               <Properties>
-                <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;i&gt;Specify time format (e.g. $Y$m+$d) when times are not iso8601 or span multiple fields.&lt;/i&gt;&lt;/html&gt;"/>
+                <Property name="text" type="java.lang.String" value="&lt;html&gt;&lt;i&gt;Specify time format (e.g. $Y$m+$d) when times are not ISO8601 or span multiple fields.&lt;/i&gt;&lt;/html&gt;"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JToggleButton" name="guessTimeFormatToggleButton">
@@ -302,6 +301,23 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value=" "/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JComboBox" name="timeFormatCB">
+              <Properties>
+                <Property name="editable" type="boolean" value="true"/>
+                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                  <StringArray count="4">
+                    <StringItem index="0" value="$Y$m+$d"/>
+                    <StringItem index="1" value="$Y+$m+$S"/>
+                    <StringItem index="2" value="$Y-$j+$H:$M:$S"/>
+                    <StringItem index="3" value="ISO8601"/>
+                  </StringArray>
+                </Property>
+                <Property name="selectedIndex" type="int" value="-1"/>
+              </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>
@@ -357,8 +373,8 @@
                               </Group>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="fillValueTextField" alignment="0" pref="69" max="32767" attributes="0"/>
-                                  <Component id="validMinTextField" alignment="0" pref="69" max="32767" attributes="0"/>
+                                  <Component id="fillValueTextField" alignment="0" pref="94" max="32767" attributes="0"/>
+                                  <Component id="validMinTextField" alignment="0" pref="94" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -607,15 +623,15 @@
                           <Group type="102" attributes="0">
                               <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="depend0unitsTF" min="-2" pref="234" max="-2" attributes="0"/>
+                              <Component id="depend0unitsCB" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Component id="jLabel12" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="unitsTF" min="-2" pref="73" max="-2" attributes="0"/>
+                              <Component id="unitsTF" min="-2" pref="150" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="59" max="32767" attributes="0"/>
+                      <EmptySpace pref="24" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -637,7 +653,7 @@
                           </Group>
                           <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                               <Component id="jLabel13" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="depend0unitsTF" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="depend0unitsCB" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="32767" attributes="0"/>
@@ -649,11 +665,13 @@
             <Component class="javax.swing.JLabel" name="jLabel10">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Title:"/>
+                <Property name="toolTipText" type="java.lang.String" value="Title for the data."/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel11">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Label:"/>
+                <Property name="toolTipText" type="java.lang.String" value="Short label for the data"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="titleTextField">
@@ -677,7 +695,22 @@
             </Component>
             <Component class="javax.swing.JTextField" name="unitsTF">
             </Component>
-            <Component class="javax.swing.JTextField" name="depend0unitsTF">
+            <Component class="javax.swing.JComboBox" name="depend0unitsCB">
+              <Properties>
+                <Property name="editable" type="boolean" value="true"/>
+                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                  <StringArray count="3">
+                    <StringItem index="0" value="seconds since 2010-01-01T00:00"/>
+                    <StringItem index="1" value="nanoseconds since 2000-01-01T12:00"/>
+                    <StringItem index="2" value="seconds"/>
+                  </StringArray>
+                </Property>
+                <Property name="selectedIndex" type="int" value="-1"/>
+                <Property name="toolTipText" type="java.lang.String" value="Units of the depend0 column, such as &quot;seconds&quot; or &quot;nanoseconds since 2000-01-01T12:00&quot;  Droplist shows examples."/>
+              </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+              </AuxValues>
             </Component>
           </SubComponents>
         </Container>
