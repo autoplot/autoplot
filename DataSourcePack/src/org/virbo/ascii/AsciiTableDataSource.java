@@ -44,6 +44,7 @@ import org.das2.util.ByteBufferInputStream;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSourceUtil;
 //import org.virbo.datasource.ReferenceCache;
 import org.virbo.dsops.Ops;
@@ -288,7 +289,12 @@ public class AsciiTableDataSource extends AbstractDataSource {
             String dep0Units= getParam( "depend0Units", null );
             if ( dep0Units!=null ) {
                 dep0Units= dep0Units.replaceAll("\\+"," ");
-                dep0.putProperty( QDataSet.UNITS, Units.lookupUnits(dep0Units) );
+                Units newDep0Units= Units.lookupUnits(dep0Units);
+                if ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(dep0) ) && UnitsUtil.isTimeLocation(newDep0Units) ) {
+                    dep0= ArrayDataSet.maybeCopy( Ops.convertUnitsTo( dep0, newDep0Units ) );
+                } else {
+                    dep0.putProperty( QDataSet.UNITS, dep0Units );
+                }
             }
         }
 
