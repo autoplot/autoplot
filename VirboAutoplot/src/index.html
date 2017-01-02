@@ -26,7 +26,10 @@
         
         <p>Bugfixes (2017-01-01 r20155):</p>
         <ul>
+            <li>improvements to ASCII editor, including examples and improved guessing.
+            <li>demo 14 now uses https.
             <li>dep0units can be used to explicitly set the units, and does this correctly for times now as well.
+            <li>1746: dasPlot created off event thread would occasionally cause RTE 11148*.
             <li>1739: include the scientist's home directory in the list of completions.
             <li>bug 1743: make sure all datasets entering Autoplot are immutable.
             <li>scripting had bind command, but no unbind.
@@ -50,7 +53,7 @@
             <li>1722: qstreams with arbitrary qdataset properties.
             <li>1718: HDF5 supports DELTA_PLUS_VAR, DELTA_MINUS_VAR metadata.
             <li>1718: LANL NN with log-spaced x-tags.
-            <li>test002 showed where -INFs were getting into Autohistogram and causing unnecessary warnings.
+            <li>test002 showed where -INFs were getting into AutoHistogram and causing unnecessary warnings.
             <li>1714: slice function of NetCDF (and HDF) result didn't handle DEPEND meta dataset property. 
             <li>1714: Brian showed where HDF5 variable was ISTP, but its DEPEND datasets were not.
             <li>something changed on Mint Linux display (or java version) and get screenshot didn't work on one of the screens.
