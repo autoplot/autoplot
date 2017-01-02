@@ -108,12 +108,12 @@ public class BatchMaster extends javax.swing.JPanel {
                 org.das2.util.LoggerManager.logGuiEvent(ev);                    
                 try {
                     String scriptName= dataSetSelector1.getValue();
-                    if ( !scriptName.endsWith(".jy") ) {
+                    URISplit split= URISplit.parse(scriptName);
+                    if ( !split.file.endsWith(".jy") ) {
                         JOptionPane.showMessageDialog( BatchMaster.this, "script must end in .jy: "+scriptName );
                         return;
                     }
 
-                    URISplit split= URISplit.parse(scriptName);
                     pwd= split.path;
 
                     Map<String,String> params= URISplit.parseParams(split.params);  //TODO: support these.
@@ -512,12 +512,12 @@ public class BatchMaster extends javax.swing.JPanel {
     private org.virbo.jythonsupport.JythonUtil.Param getParamDescription( String name ) throws IOException {
         
         String scriptName= dataSetSelector1.getValue();
-        if ( !scriptName.endsWith(".jy") ) {
+        URISplit split= URISplit.parse(scriptName);
+        if ( !split.file.endsWith(".jy") ) {
             JOptionPane.showMessageDialog( BatchMaster.this, "script must end in .jy: "+scriptName );
             return null;
         }
 
-        URISplit split= URISplit.parse(scriptName);
         pwd= split.path;
 
         Map<String,String> params= URISplit.parseParams(split.params);  //TODO: support these.
