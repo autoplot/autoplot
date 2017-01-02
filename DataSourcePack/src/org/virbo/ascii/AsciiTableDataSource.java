@@ -164,7 +164,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
 //        try {
 
         ds = doReadFile(mon);
-
+        
         if ( mon.isCancelled() ) {
             throw new CancelledOperationException("cancelled data read");
         }
@@ -252,6 +252,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if (validMin != Double.NEGATIVE_INFINITY) {
                 vds.putProperty(QDataSet.VALID_MIN, validMin);
             }
+        } else if ( eventListColumn!=null ) {
+            EnumerationUnits eu= EnumerationUnits.create("events");
+            vds= ArrayDataSet.maybeCopy( Ops.replicate( DataSetUtil.asDataSet(eu.createDatum("event")), ds.length() ) );
         }
 
         if (depend0 != null) {
@@ -790,6 +793,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 eventListColumn= "field"+(parser.getFieldLabels().length-1);
             } else {
                 eventListColumn= "";
+                depend0= null;
+                column= null;
             }
         }
         
