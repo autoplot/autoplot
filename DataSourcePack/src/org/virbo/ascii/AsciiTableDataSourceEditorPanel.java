@@ -884,10 +884,14 @@ private boolean isIso8601TimeField0() {
 private int guessTimeFormatColumn( String example, int column, int current, StringBuilder template ) {
     int i= getSkipLines();
     int nl= this.jTable1.getRowCount();
+    int step=1;
+    
+    if ( nl>10000 ) nl=10000;
+    
     int digits=0;
     int max=-999999999;
     int min=999999999;
-    for ( ; i<nl; i++ ) {
+    for ( ; i<nl; i+=step ) {
         String s= String.valueOf( this.jTable1.getValueAt( i, column ) );
         if ( s.length()>digits ) digits= s.length();
         try {
@@ -1370,12 +1374,12 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         setParam( params, "title", titleTextField.getText() );
         setParam( params, "label", labelTextField.getText() );
         setParam( params, "units", unitsTF.getText() );
-        if ( depend0unitsCB.getSelectedIndex()>-1 ) {
+        if ( depend0unitsCB.getSelectedItem()!=null ) {
             setParam( params, "depend0Units", depend0unitsCB.getSelectedItem().toString() );
         } else {
             params.remove("depend0Units");
         }
-        if ( timeFormatCB.getSelectedIndex()>-1 ) {
+        if ( timeFormatCB.getSelectedItem()!=null ) {
             if ( !timeFormatCB.getSelectedItem().toString().equals("ISO8601") ) {
                 setParam( params, "timeFormat", timeFormatCB.getSelectedItem().toString() );
             } else {
