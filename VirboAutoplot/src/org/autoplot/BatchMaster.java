@@ -287,7 +287,7 @@ public class BatchMaster extends javax.swing.JPanel {
 
         messageLabel.setText("Load up those parameters and hit Go!");
 
-        jLabel1.setText("<html>This tool generates inputs for scripts, running through a series of inputs.  Specify the parameter name and values to assign, and likewise with a second parameter, if desired.  Each value of the second parameter is run for each value of the first.  Use the inspect button to set values for any other parameters.");
+        jLabel1.setText("<html>This tool generates inputs for scripts, running through a series of inputs.  Specify the parameter name and values to assign, and optionally a second parameter.  Each value of the second parameter is run for each value of the first.  Use the inspect button to set values for any other parameters. ");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         param1NameCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " " }));

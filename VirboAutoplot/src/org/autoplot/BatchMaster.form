@@ -275,7 +275,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;This tool generates inputs for scripts, running through a series of inputs.  Specify the parameter name and values to assign, and likewise with a second parameter, if desired.  Each value of the second parameter is run for each value of the first.  Use the inspect button to set values for any other parameters."/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;This tool generates inputs for scripts, running through a series of inputs.  Specify the parameter name and values to assign, and optionally a second parameter.  Each value of the second parameter is run for each value of the first.  Use the inspect button to set values for any other parameters. "/>
         <Property name="verticalAlignment" type="int" value="1"/>
       </Properties>
     </Component>
