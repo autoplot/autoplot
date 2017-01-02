@@ -47,7 +47,7 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
     int lineNumber;
     int recCount;
     int fieldCount=12;
-    private final static int LINE_BUFFER_COUNT=100;
+    private final static int LINE_BUFFER_COUNT=1000;
 
     public AsciiTableTableModel() {
         lines = null;
