@@ -149,7 +149,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                 int row= jTable1.getSelectedRow();
                 String val= (String) jTable1.getModel().getValueAt(row, col);
                 timeFormatCB.setSelectedItem(val);
-                guessTimeFormatButtonAP();
+                guessTimeFormatButtonAP(row,col,col);
             } else if ( tool==Tool.FILLVALUE ) {
                 int row= jTable1.getSelectedRow();
                 String val= (String) jTable1.getModel().getValueAt(row, col);
@@ -199,7 +199,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                 timeFormatCB.setSelectedItem(val.toString());
                 dep0timeCheckBox.setSelected(true);
                 setDep0(columns.get(first));
-                guessTimeFormatButtonAP();
+                guessTimeFormatButtonAP(row,first,last);
             }
         }
         Tool oldTool= tool;
@@ -874,104 +874,125 @@ private boolean isIso8601TimeField0() {
     return !text1.equals(text2) && TimeParser.isIso8601String(text1) && TimeParser.isIso8601String(text2);
 }
 
-private void guessTimeFormatButtonAP( ) {
-    String text= timeFormatCB.getSelectedItem().toString().trim();
-    String[] ss= text.split("\\+");
+/**
+ * 
+ * @param column the table column
+ * @param current TimeUtil.YEAR, etc.
+ * @param template the template where we add $Y etc.
+ * @return the new digit we are looking for.
+ */
+private int guessTimeFormatColumn( String example, int column, int current, StringBuilder template ) {
+    int i= getSkipLines();
+    int nl= this.jTable1.getRowCount();
+    int digits=0;
+    int max=-999999999;
+    int min=999999999;
+    for ( ; i<nl; i++ ) {
+        String s= String.valueOf( this.jTable1.getValueAt( i, column ) );
+        if ( s.length()>digits ) digits= s.length();
+        try {
+            int value= (int)Double.parseDouble(s);
+            if ( value>max ) max= value;
+            if ( value<min ) min= value;
+        } catch ( NumberFormatException ex ) {
+        }
+    }
+    if ( current==TimeUtil.YEAR ) {
+        if ( digits==2 ) {
+            template.append("$y");
+            return TimeUtil.MONTH;
+        } else if ( digits==4 ) {
+            template.append("$Y");
+            return TimeUtil.MONTH;
+        } else if ( digits==5 ) {
+            template.append("$Y$j");
+            return TimeUtil.HOUR;
+        } else if ( digits==6 ) {
+            template.append("$y$m$d");
+            return TimeUtil.HOUR;
+        } else if ( digits==8 ) {
+            if ( !Character.isDigit( example.charAt(4) ) ) {
+                template.append("$Y").append(example.charAt(4)).append("$j");
+                return TimeUtil.HOUR;                
+            } else {
+                template.append("$Y$m$d");
+                return TimeUtil.HOUR;
+            }
+        } else {
+            template.append("$X");
+            return current;
+        }
+    } else if ( current==TimeUtil.MONTH ) {
+        if ( min==999999999 ) {
+            template.append("$b");
+            return TimeUtil.DAY;
+        } else if ( max<=12 ) {
+            template.append("$m");
+            return TimeUtil.DAY;
+        } else if ( max<=366 ) {
+            template.append("$j");
+            return TimeUtil.HOUR;
+        } else {
+            template.append("$x");
+            return current;
+        }
+    } else if ( current==TimeUtil.DAY ) {
+        if ( max<=31 ) {
+            template.append("$d");
+            return TimeUtil.HOUR;
+        } else {
+            template.append("$x");
+            return current;
+        }
+    } else if ( current==TimeUtil.HOUR ) {
+        if ( digits<3 && max<25 ) {
+            template.append("$H");
+            return TimeUtil.MINUTE;
+        } else if ( digits==4 ) {
+            template.append("$H$M");
+            return TimeUtil.SECOND;
+        } else if ( digits==5 && !Character.isDigit(example.charAt(2)) ) {
+            template.append("$H").append(example.charAt(2)).append("$M");
+            return TimeUtil.SECOND;
+        } else if ( digits==6 ) {
+            template.append("$H$M$S");
+            return TimeUtil.MILLI;
+        } else if ( digits==7 && !Character.isDigit(example.charAt(2)) ) {
+            template.append("$H").append(example.charAt(2)).append("$M").append(example.charAt(5)).append("$S");
+            return TimeUtil.MILLI;
+        }
+    } else if ( current==TimeUtil.MINUTE ) {
+        template.append("$M");
+        return TimeUtil.SECOND;
+    } else if ( current==TimeUtil.SECOND ) {
+        template.append("$S");
+        return TimeUtil.MILLI;
+    } else if ( current==TimeUtil.MILLI ) {
+        template.append("$(milli)");
+        return TimeUtil.MICRO;
+    }
+    template.append("$X");
+    return current;
+}
+
+private void guessTimeFormatButtonAP( int row, int first, int last ) {
     int curr= TimeUtil.YEAR;
     StringBuilder template= new StringBuilder();
-    boolean giveUp= false;
-    if ( ss.length==1 ) {
-        if ( TimeParser.isIso8601String(ss[0]) ) {
-            timeFormatCB.setSelectedItem("ISO8601");
-            return;
+    if ( first==last ) {
+        String example= String.valueOf( jTable1.getValueAt(row,first) );
+        if ( TimeParser.isIso8601String(example) ) {
+           timeFormatCB.setSelectedItem("ISO8601");
+           return; 
         } else {
             logger.fine( "time does not appear to be ISO8601" );
         }
     }
-    for ( int i=0; i<ss.length; i++ ) {
-        String s= ss[i];
-        boolean isInt= true;
-        int intVal=-1;
-        try {
-            intVal= Integer.parseInt(s);
-        } catch ( NumberFormatException ex ) {
-            isInt= false;
+    for ( int i=first; i<=last; i++ ) {
+        String example= String.valueOf( jTable1.getValueAt(row,i) );
+        curr= guessTimeFormatColumn( example, i, curr, template );
+        if ( i<last ) {
+            template.append("+");
         }
-        int slen= s.length();
-        int ocurr= curr;
-        if ( s.startsWith("$" ) ) {
-            giveUp= true;
-        }
-        if ( giveUp ) {
-            // do nothing
-        } else if ( curr==TimeUtil.YEAR ) {
-            if ( slen==4 ) {
-                template.append("$Y");
-                curr= TimeUtil.MONTH;
-            } else if ( slen==2 ) {
-                template.append("$y");
-                curr= TimeUtil.MONTH;
-            } else if ( slen==8 ) {
-                if ( Character.isDigit( s.charAt(4) ) ) {
-                    template.append("$Y$m$d");
-                    curr= TimeUtil.HOUR;
-                } else {
-                    template.append("$Y").append(s.charAt(4)).append("$j");
-                    curr= TimeUtil.HOUR;
-                }
-            } else if ( slen==10 ) {
-                template.append("$Y").append(s.substring(4,5)).append("$m").append(s.substring(7,8)).append("$d");
-                curr= TimeUtil.HOUR;
-            } else if ( slen==7 ) {
-                template.append("$Y$j");
-                curr= TimeUtil.HOUR;
-            }
-        } else if ( curr==TimeUtil.MONTH ) {
-            if ( slen<=2 && isInt && intVal<=12 ) {
-                template.append("$m");
-                curr= TimeUtil.DAY;
-            } else if ( slen==3 ) {
-                if ( Character.isDigit( s.charAt(0) ) ) {
-                    template.append("$j");
-                    curr= TimeUtil.HOUR;
-                } else {
-                    template.append("$b");
-                    curr= TimeUtil.DAY;
-                }
-            } else if ( isInt && intVal>12 ) {
-                template.append("$j");
-                curr= TimeUtil.HOUR;
-            }
-        } else if ( curr==TimeUtil.DAY ) {
-            if ( slen<=2 ) {
-                template.append("$d");
-                curr= TimeUtil.HOUR;
-            }
-        } else if ( curr==TimeUtil.HOUR ) {
-            if ( slen<=2 ) {
-                template.append("$H");
-                curr= TimeUtil.MINUTE;
-            } else if ( slen==5 ) {
-                template.append("$H").append(s.substring(2,3)).append("$M");
-                curr= TimeUtil.SECOND;
-            } else if ( slen==8 ) {
-                template.append("$H").append(s.substring(2,3)).append("$M").append(s.substring(5,6)).append("$S");
-                curr= TimeUtil.MILLI;
-            }
-        } else if ( curr==TimeUtil.MINUTE ) {
-            if ( slen<=2 ) {
-                template.append("$M");
-                curr= TimeUtil.SECOND;
-            }
-        } else if ( curr==TimeUtil.SECOND ) {
-            template.append("$S");
-            curr= TimeUtil.MILLI;
-        }
-        if ( curr==ocurr ) {
-            template.append(s);
-            giveUp= true;
-        }
-        if ( i<ss.length-1 ) template.append("+");
     }
     timeFormatCB.setSelectedItem(template.toString());
 }
