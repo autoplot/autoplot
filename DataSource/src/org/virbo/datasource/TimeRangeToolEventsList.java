@@ -125,7 +125,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
             }
         } else {
             int offset= tsb==null ? 0 : 1;
-            tm= new DefaultTableModel( new String[] { "Range", "Label" }, currentDataSet.length()+2 );
+            tm= new DefaultTableModel( new String[] { "Range", "Label" }, currentDataSet.length()+offset*2 );
             if ( tsb!=null ) {
                 tm.setValueAt( "Load Previous Set...", 0, 0 );
                 tm.setValueAt( "", 0, 1 );
