@@ -162,26 +162,30 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane3" pref="323" max="32767" attributes="0"/>
-                  <Component id="param1NameCB" max="32767" attributes="0"/>
-              </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" pref="365" max="32767" attributes="0"/>
-                  <Component id="param2NameCB" max="32767" attributes="0"/>
-              </Group>
-          </Group>
-          <Component id="dataSetSelector1" alignment="1" max="32767" attributes="0"/>
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jLabel1" pref="0" max="32767" attributes="0"/>
-                  <Component id="messageLabel" max="32767" attributes="0"/>
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                      <Component id="goButton" min="-2" pref="62" max="-2" attributes="0"/>
+                  <Component id="jLabel1" alignment="1" pref="0" max="32767" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="messageLabel" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <Component id="goButton" min="-2" pref="62" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <Component id="dataSetSelector1" alignment="1" pref="682" max="32767" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="param1NameCB" max="32767" attributes="0"/>
+                          <Component id="jScrollPane3" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jScrollPane1" alignment="0" max="32767" attributes="0"/>
+                          <Component id="param2NameCB" max="32767" attributes="0"/>
+                      </Group>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -191,7 +195,6 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel1" min="-2" pref="63" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="dataSetSelector1" min="-2" max="-2" attributes="0"/>
@@ -202,8 +205,8 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" pref="228" max="32767" attributes="0"/>
-                  <Component id="jScrollPane3" max="32767" attributes="0"/>
+                  <Component id="jScrollPane3" pref="240" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="messageLabel" min="-2" max="-2" attributes="0"/>
@@ -272,7 +275,8 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;This is an experiment to see if a tool can be developed to generate inputs for scripts.  Specify the parameter name and values to assign, and likewise with a second parameter, if desired."/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;This tool generates inputs for scripts, running through a series of inputs.  Specify the parameter name and values to assign, and likewise with a second parameter, if desired.  Each value of the second parameter is run for each value of the first.  Use the inspect button to set values for any other parameters."/>
+        <Property name="verticalAlignment" type="int" value="1"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JComboBox" name="param1NameCB">
