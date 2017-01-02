@@ -419,7 +419,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jLabel5)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(commentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 109, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(0, 544, Short.MAX_VALUE)))
+                        .add(0, 532, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -499,7 +499,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(timeFormatToggleButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(guessTimeFormatToggleButton)))
-                .addContainerGap(57, Short.MAX_VALUE))
+                .addContainerGap(45, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -640,22 +640,25 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                                 .add(jLabel7)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(fillValueTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
-                            .add(validMinTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))
+                            .add(fillValueTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
+                            .add(validMinTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 94, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .add(17, 17, 17)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jPanel1Layout.createSequentialGroup()
-                                .add(jLabel8)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(validMaxTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 69, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(jPanel1Layout.createSequentialGroup()
                                 .add(jToggleButton4)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(guessFillButton)))
-                        .add(70, 70, 70))
+                                .add(guessFillButton))
+                            .add(jPanel1Layout.createSequentialGroup()
+                                .add(jLabel8)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(validMaxTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 87, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 28, Short.MAX_VALUE))
                     .add(dataStatusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
+
+        jPanel1Layout.linkSize(new java.awt.Component[] {validMaxTextField, validMinTextField}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
@@ -741,7 +744,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jLabel12)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(unitsTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 150, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -765,8 +768,6 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         jTabbedPane1.addTab("labels", jPanel4);
 
-        jTabbedPane1.setSelectedIndex(2);
-
         org.jdesktop.layout.GroupLayout jLayeredPane1Layout = new org.jdesktop.layout.GroupLayout(jLayeredPane1);
         jLayeredPane1.setLayout(jLayeredPane1Layout);
         jLayeredPane1Layout.setHorizontalGroup(
@@ -783,12 +784,12 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jScrollPane1)
-            .add(jTabbedPane1)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 782, Short.MAX_VALUE)
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(layout.createSequentialGroup()
-                    .add(0, 347, Short.MAX_VALUE)
+                    .add(0, 341, Short.MAX_VALUE)
                     .add(jLayeredPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(0, 347, Short.MAX_VALUE)))
+                    .add(0, 341, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -803,22 +804,6 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(0, 0, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-private void columnsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_columnsComboBoxItemStateChanged
-    setColumn((String) columnsComboBox.getSelectedItem());
-}//GEN-LAST:event_columnsComboBoxItemStateChanged
-
-private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dep0ColumnsItemStateChanged
-    setDep0((String) dep0Columns.getSelectedItem());
-}//GEN-LAST:event_dep0ColumnsItemStateChanged
-
-private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_columnsComboBoxFocusGained
-    focusDep0 = false;
-}//GEN-LAST:event_columnsComboBoxFocusGained
-
-private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dep0ColumnsFocusGained
-    focusDep0 = true;
-}//GEN-LAST:event_dep0ColumnsFocusGained
 
 private void skipLinesTextFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_skipLinesTextFieldFocusGained
 }//GEN-LAST:event_skipLinesTextFieldFocusGained
@@ -880,59 +865,6 @@ private int[] getDataColumns() {
     }
     return result;
 }
-
-private void guessFillButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guessFillButtonActionPerformed
-    fillValueTextField.setText( "moment..." );
-    guessFillButton.setEnabled(false);
-    Runnable run= new Runnable() {
-        @Override
-        public void run() {
-            ProgressMonitor mon= null;
-            try {
-                DataSetBuilder builder= new DataSetBuilder( 1, 100 );
-
-                int[] cols= getDataColumns();
-
-                mon= new NullProgressMonitor();
-    //            mon= DasProgressPanel.createFramed("parsing file");
-
-                mon.setTaskSize(model.getRowCount());
-                mon.started();
-                for ( int i=0; i<model.getRowCount(); i++ ) {
-                    mon.setTaskProgress(i);
-                    for ( int j=cols[0]; j<=cols[1]; j++ ) {
-                        try {
-                            builder.putValue(-1, Double.parseDouble(String.valueOf(model.getValueAt(i, j))));
-                            builder.nextRecord();
-                        } catch (NumberFormatException numberFormatException) {
-                        }
-                    }
-                }
-                mon.finished();
-
-                AutoHistogram ah= new AutoHistogram();
-                QDataSet hist= ah.doit(builder.getDataSet());
-
-                Map<Double,Integer> outliers= (Map<Double, Integer>) DataSetUtil.getUserProperty( hist, AutoHistogram.USER_PROP_OUTLIERS );
-                if ( outliers!=null &&  outliers.size()==1 ) {
-                    fillValueTextField.setText( String.valueOf(outliers.keySet().iterator().next()) );
-                } else {
-                    fillValueTextField.setText( "" );
-                }
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            } finally {
-                if ( mon!=null ) mon.finished();
-                guessFillButton.setEnabled(true);
-            }
-        }
-    };
-    new Thread(run).start();
-}//GEN-LAST:event_guessFillButtonActionPerformed
-
-private void validMaxTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_validMaxTextFieldActionPerformed
-    // TODO add your handling code here:
-}//GEN-LAST:event_validMaxTextFieldActionPerformed
 
 private boolean isIso8601TimeField0() {
     int i= getSkipLines();
@@ -1045,20 +977,6 @@ private void guessTimeFormatButtonAP( ) {
 }
 
 
-private void fillValueTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fillValueTextFieldFocusLost
-    String val= fillValueTextField.getText();
-    if ( val.trim().length()>0 ) {
-        try {
-            double d= Double.parseDouble(val);
-            if ( val.contains("+") ) {
-                fillValueTextField.setText(String.valueOf(d));
-            }
-        } catch (NumberFormatException ex ) {
-            JOptionPane.showMessageDialog(this,"Only enter numbers here.  Non-numbers are treated as fill.");
-        }
-    }
-}//GEN-LAST:event_fillValueTextFieldFocusLost
-
 private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guessTimeFormatToggleButtonActionPerformed
     if ( jTable1.getSelectedColumn()==-1 ) {
         timesStatusLabel.setText("select time columns, and the time format is guessed (4 digits implies $Y, 3 implies $j, etc)");
@@ -1092,6 +1010,89 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         headerLabel.setText("select the first column of data or column headings");
     }//GEN-LAST:event_jToggleButton1ActionPerformed
+
+    private void guessFillButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guessFillButtonActionPerformed
+        fillValueTextField.setText( "moment..." );
+        guessFillButton.setEnabled(false);
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                ProgressMonitor mon= null;
+                try {
+                    DataSetBuilder builder= new DataSetBuilder( 1, 100 );
+
+                    int[] cols= getDataColumns();
+
+                    mon= new NullProgressMonitor();
+                    //            mon= DasProgressPanel.createFramed("parsing file");
+
+                    mon.setTaskSize(model.getRowCount());
+                    mon.started();
+                    for ( int i=0; i<model.getRowCount(); i++ ) {
+                        mon.setTaskProgress(i);
+                        for ( int j=cols[0]; j<=cols[1]; j++ ) {
+                            try {
+                                builder.putValue(-1, Double.parseDouble(String.valueOf(model.getValueAt(i, j))));
+                                builder.nextRecord();
+                            } catch (NumberFormatException numberFormatException) {
+                            }
+                        }
+                    }
+                    mon.finished();
+
+                    AutoHistogram ah= new AutoHistogram();
+                    QDataSet hist= ah.doit(builder.getDataSet());
+
+                    Map<Double,Integer> outliers= (Map<Double, Integer>) DataSetUtil.getUserProperty( hist, AutoHistogram.USER_PROP_OUTLIERS );
+                    if ( outliers!=null &&  outliers.size()==1 ) {
+                        fillValueTextField.setText( String.valueOf(outliers.keySet().iterator().next()) );
+                    } else {
+                        fillValueTextField.setText( "" );
+                    }
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                } finally {
+                    if ( mon!=null ) mon.finished();
+                    guessFillButton.setEnabled(true);
+                }
+            }
+        };
+        new Thread(run).start();
+    }//GEN-LAST:event_guessFillButtonActionPerformed
+
+    private void validMaxTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_validMaxTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_validMaxTextFieldActionPerformed
+
+    private void fillValueTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_fillValueTextFieldFocusLost
+        String val= fillValueTextField.getText();
+        if ( val.trim().length()>0 ) {
+            try {
+                double d= Double.parseDouble(val);
+                if ( val.contains("+") ) {
+                    fillValueTextField.setText(String.valueOf(d));
+                }
+            } catch (NumberFormatException ex ) {
+                JOptionPane.showMessageDialog(this,"Only enter numbers here.  Non-numbers are treated as fill.");
+            }
+        }
+    }//GEN-LAST:event_fillValueTextFieldFocusLost
+
+    private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_columnsComboBoxFocusGained
+        focusDep0 = false;
+    }//GEN-LAST:event_columnsComboBoxFocusGained
+
+    private void columnsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_columnsComboBoxItemStateChanged
+        setColumn((String) columnsComboBox.getSelectedItem());
+    }//GEN-LAST:event_columnsComboBoxItemStateChanged
+
+    private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dep0ColumnsFocusGained
+        focusDep0 = true;
+    }//GEN-LAST:event_dep0ColumnsFocusGained
+
+    private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dep0ColumnsItemStateChanged
+        setDep0((String) dep0Columns.getSelectedItem());
+    }//GEN-LAST:event_dep0ColumnsItemStateChanged
 
     URISplit split = null;
     Map<String,String> params;
@@ -1348,9 +1349,17 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         setParam( params, "title", titleTextField.getText() );
         setParam( params, "label", labelTextField.getText() );
         setParam( params, "units", unitsTF.getText() );
-        setParam( params, "depend0Units", depend0unitsCB.getSelectedItem().toString() );
-        if ( !timeFormatCB.getSelectedItem().toString().equals("ISO8601") ) {
-            setParam( params, "timeFormat", timeFormatCB.getSelectedItem().toString() );
+        if ( depend0unitsCB.getSelectedIndex()>-1 ) {
+            setParam( params, "depend0Units", depend0unitsCB.getSelectedItem().toString() );
+        } else {
+            params.remove("depend0Units");
+        }
+        if ( timeFormatCB.getSelectedIndex()>-1 ) {
+            if ( !timeFormatCB.getSelectedItem().toString().equals("ISO8601") ) {
+                setParam( params, "timeFormat", timeFormatCB.getSelectedItem().toString() );
+            } else {
+                params.remove("timeFormat");
+            }
         } else {
             params.remove("timeFormat");
         }
