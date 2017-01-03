@@ -216,6 +216,7 @@ if ! $JAVAC $JAVAARGS org/autoplot/wgetfs/WGetFileSystemFactory.java; then echo 
 if ! $JAVAC $JAVAARGS org/das2/fsm/FileStorageModelNew.java; then echo "*****"; hasErrors=1; fi  # some scripts use this old name.
 if ! $JAVAC $JAVAARGS org/das2/math/filter/*.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/components/DataPointRecorderNew.java; then echo "*****"; hasErrors=1; fi  
+if ! $JAVAC $JAVAARGS org/das2/components/AngleSpectrogramSlicer.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/graph/Auralizor.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/virbo/qstream/*.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/qstream/filter/*.java; then echo "*****"; hasErrors=1; fi

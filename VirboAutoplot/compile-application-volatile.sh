@@ -216,6 +216,7 @@ if ! $JAVAC $JAVAARGS org/qstream/filter/*.java; then hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/virbo/autoplot/ScreenshotsTool.java; then hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/autoplot/wgetfs/WGetFileSystemFactory.java; then hasErrors=1; fi
 if ! $JAVAC $JAVAARGS org/das2/components/DataPointRecorderNew.java; then hasErrors=1; fi  # some scripts use this old name.
+if ! $JAVAC $JAVAARGS org/das2/components/AngleSpectrogramSlicer.java; then echo "*****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/graph/Auralizor.java; then hasErrors=1; fi 
 if ! $JAVAC $JAVAARGS org/das2/datum/Ratio.java; then echo "****"; hasErrors=1; fi  
 if ! $JAVAC $JAVAARGS org/das2/datum/RationalNumber.java; then echo "****"; hasErrors=1; fi  
