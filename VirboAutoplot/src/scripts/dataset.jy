@@ -1,5 +1,0 @@
-ds= dindgen( 200, 5 )+6*randn(200,5)
-ds.putProperty( QDataSet.DEPEND_0, timegen( "2000-001T00:00", "5 s", 200 ) )
-ds.putProperty( QDataSet.DEPEND_1, labels( ["mean", "var", "min", "max", "count"], "stats" ) )
-
-plot(ds)

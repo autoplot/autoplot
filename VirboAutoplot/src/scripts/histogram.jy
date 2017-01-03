@@ -1,4 +1,0 @@
-surl= params['arg_0']
-ds= getDataSet( surl, monitor )
-
-result= histogram( ds, 100 )

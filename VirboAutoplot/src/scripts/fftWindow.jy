@@ -1,4 +1,0 @@
-ds= getDataSet('http://www.burninwave.com/download/freq20-20000-10s.wav')
-ds2= fftWindow( ds, 128 )
-
-plot(ds2)
