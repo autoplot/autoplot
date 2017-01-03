@@ -4,7 +4,6 @@
 # This also demonstrates positional arguments, which are rarely used and need more testing.
 
 print params
-print autoplot.params
 
 vap= getParam( 0, 'http://autoplot.org/data/autoplot.vap', 'product file to load' )
 range= getParam( 1, '2000-01-08', 'range to load' )
