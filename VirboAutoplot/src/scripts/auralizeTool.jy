@@ -1,3 +1,4 @@
+# send data to the system sound card.  
 
 import org.das2.graph
 

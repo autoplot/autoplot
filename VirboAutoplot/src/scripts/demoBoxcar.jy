@@ -1,5 +1,6 @@
 # demonstrates  org.virbo.dsutil.BinAverage.boxcar.  Note
 # it passes the data without filtering at the ends.
+# This shows how arbitary Java code can be called from Jython.
 
 from org.virbo.dsutil.BinAverage import boxcar
 

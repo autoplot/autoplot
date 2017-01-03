@@ -2,7 +2,7 @@ from org.virbo.dataset import DataSetOps
 
 ds= getDataSet( 'http://autoplot.org/data/2010_061_17_41_40.txt?rank2=field6-field8' )
 
-g= DataSetOps.grid( ds )
+g= grid( ds )
 
 g.property( QDataSet.DEPEND_1 ).putProperty( QDataSet.UNITS, Units.degrees )
 

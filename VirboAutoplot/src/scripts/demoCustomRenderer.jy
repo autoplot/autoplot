@@ -1,5 +1,6 @@
 # demo custom renderer.  This takes a ds[n,4] and plots dots
 # with each record: [x,y,rad,color]
+# Note, the plan is to redo how custom renderers are done, so this may change.
 
 from org.virbo.dataset import SemanticOps
 from org.das2.graph import Renderer
@@ -47,4 +48,6 @@ r= MyRend()
 r.setDataSet(ds)
 
 dom.plots[0].controller.dasPlot.addRenderer( r )
-
+dom.plots[0].xaxis.range= DatumRangeUtil.parseDatumRange('-5 to 5')
+dom.plots[0].yaxis.range= DatumRangeUtil.parseDatumRange('-5 to 5')
+dom.plots[0].zaxis.range= DatumRangeUtil.parseDatumRange('0 to 3')

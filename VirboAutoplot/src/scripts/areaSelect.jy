@@ -1,4 +1,8 @@
+# this is like the addDigitizer, but records the range.
+
 from org.das2.components import DataPointRecorder
+import java.util.HashMap
+
 dpr= DataPointRecorder()
 
 addTab( 'digitizer', dpr )
@@ -18,7 +22,10 @@ def boxSelected( event ):
    x['dy']= event.getYRange().width()
    x['key']= event.getPlane('keyChar')
    dpr.addDataPoint( event.getXRange().min(), event.getYRange().min(), x )
+   setStatus('range added to digitizer tab: '+event.getXRange().toString() + ' ' + event.getYRange().toString() )
 
 mm.BoxSelected=boxSelected
 
-plot.addMouseModule(mm)
+plot.getDasMouseInputAdapter().setPrimaryModule(mm)
+
+showMessageDialog('drag a box and press a key to select the box.')

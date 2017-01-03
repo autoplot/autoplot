@@ -1,12 +1,14 @@
 # DOM monitor.  This writes a VAP every time the DOM changes.
+# Note, this doesn't trigger on dom.plots.xaxis.range, which may indicate a bug
+# elsewhere in the system.
 
 from java.lang import System
 t= System.currentTimeMillis()
-save( '/tmp/%15.15d.vap' % t )
+save( '/tmp/ap/%15.15d.vap' % t )
 
 def propertyChange( ev ):
    print 'DOM PROPERTY CHANGE: ', ev.propertyName, ev.newValue
    t= System.currentTimeMillis()
-   save( '/tmp/%15.15d.vap' % t )
+   save( '/tmp/ap/%15.15d.vap' % t )
 
 dom.propertyChange= propertyChange

@@ -1,4 +1,6 @@
-# show how iText library can be used to write a report.  This still needs work!
+# show how iText library can be used to write a report.  
+# See https://coderanch.com/how-to/javadoc/itext-2.1.7/
+# This still needs work, for example, it would be nice to let itext add a rectange to the text so we don't have to position it manually.
 
 from com.itextpdf.text import Document,Rectangle,Paragraph
 from com.itextpdf.awt import PdfGraphics2D
@@ -19,19 +21,18 @@ document.open()
 p1= Paragraph( 'This is my first PDF in Jython' )
 document.add( p1 )
 
-document.add( Rectangle( 6*72., 4*72. ));
+rectangle= Rectangle( 6*72., 4*72. )
+document.add( rectangle );
 
 p1= Paragraph( "Call createGraphics to get a graphics context onto which Autoplot can print." )
 document.add( p1 )
 
 cb = writer.getDirectContent()
-pt= cb.createTemplate(6*72,4*72)
+pt= cb.createTemplate(rectangle.width,rectangle.height)
 posX=0*72
 posY=(11-5)*72
 
 cb.saveState()
-
-graphics = pt.createGraphics( 6*72., 4*72. )
 
 # this must be free to set the canvas size, so it must not be
 # fitted.
@@ -40,9 +41,11 @@ ds= getDataSet( 'http://autoplot.org/data/annotations/circleIllumn.jyds' )
 plot(0,ds)
 ds= getDataSet( 'vap+inline:ripples(5,5)' )
 plot(1,ds)
+dom.plots[0].isotropic= True
 
 getApplicationModel().getDocumentModel().getCanvases(0).fitted= False
-getApplicationModel().getCanvas().prepareForOutput( 6*72, 4*72 )
+graphics = pt.createGraphics( rectangle.width,rectangle.height )
+getApplicationModel().getCanvas().prepareForOutput( int(rectangle.width),int(rectangle.height) ) 
 getApplicationModel().getCanvas().print(graphics) 
 graphics.dispose()
 

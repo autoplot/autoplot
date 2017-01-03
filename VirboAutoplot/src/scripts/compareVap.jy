@@ -1,15 +1,15 @@
-# this changes Autoplot's state to load the two vaps
-load("/home/jbf/ct/hudson/vap/ace_sis_level2_data_server.vap");
-app1= dom.copy();
-load("/home/jbf/ct/hudson/vap/ace_sis_level2_data_server_v1.03.vap");
-app2= dom.copy();
+# create two .vap files to compare.
 
-# this loads the vaps directly but is more complex
-#from org.virbo.autoplot.state import StatePersistence
-#from java.io import File
+reset()
+load( 'http://autoplot.org/data/autoplot.vap' )
+save("/tmp/vap1.vap")
+dom.plots[0].xaxis.range= dom.plots[0].xaxis.range.rescale(0.4,1.4) # pan slightly
+dom.plots[1].xaxis.range= dom.plots[1].xaxis.range.rescale(-0.1,1.1) # zoom out slightly
+save("/tmp/vap2.vap")
 
-#app1= StatePersistence.restoreState(File("/home/jbf/ct/hudson/vap/ace_sis_level2_data_server.vap"));
-#app2= StatePersistence.restoreState(File("/home/jbf/ct/hudson/vap/ace_sis_level2_data_server_v1.03.vap"));
+# load the two vaps and compare.
+app1=loadVap("/tmp/vap1.vap");
+app2=loadVap("/tmp/vap2.vap");
 
 diffs= app1.diffs(app2)
 for d in diffs:
