@@ -9,12 +9,18 @@ from org.virbo.dataset import DDataSet
 
 from java.io import File
 from java.io import FileInputStream
+import java.lang.Integer
 
-for j in [0,1,2,3,4,5]: 
-  str= 0 + j*400;
-  ss= '/home/jbf/tmp/data/20100305_%04d.xml' % str 
+for j in xrange(4): 
+  
+  ss= 'http://autoplot.org/data/xml/weather.gov/forecast_201205%02d.xml' % (j+27)  # from http://forecast.weather.gov/
+  
+  try:
+      file= getFile( URI(ss), monitor.getSubtaskMonitor( j,j+1,ss) )
+  except:
+      continue  # jump back to next in loop
+      
   print ss
-  file= File( '/home/jbf/tmp/data/20100305_%04d.xml' % str )  # from http://forecast.weather.gov/
   myin= FileInputStream( file )
 
   builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()

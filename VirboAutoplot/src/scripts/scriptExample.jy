@@ -1,20 +1,24 @@
-# example script for autoplot.  This should be called with APScript.
+# example script for autoplot.  
 # for this example:
+#   java -Djava.awt.headless=true -cp AutoplotAll.jar
+# This also demonstrates positional arguments, which are rarely used and need more testing.
 
-# $JAVA_HOME/bin/java -Djava.awt.headless=true -Djava.library.path=/home/jbf/ct/hudson/x86_32/:.  -cp  $JAR  test.endtoend.Test012
-#   java -Djava.awt.headless=true -Djava.library.path=/home/jbf/ct/hudson/x86_32/:. -cp AutoplotAll.jar
+print params
+print autoplot.params
 
-vap= getParam( 0, 'http://autoplot.org/vap/hydra_two_panel.vap', 'product file to load' )
+vap= getParam( 0, 'http://autoplot.org/data/autoplot.vap', 'product file to load' )
 range= getParam( 1, '2000-01-08', 'range to load' )
-frmt= getParam( 2, 'png', 'png or pdf' )
+frmt= getParam( 2, 'png', 'png or pdf', ['png','pdf'] )
 loc= getParam( 3, '/tmp/autoplot', 'filename to record' )
 
+ff= loc + '/output.'+frmt
+
 load( vap )
-dom.timeRange= range
+dom.timeRange= DatumRangeUtil.parseTimeRange(range)
 
 if ( frmt.index('png')>-1):
-   writeToPng( file )
+   writeToPng( ff )
 elif ( frmt.index('pdf')>-1 ):
-   writeToPdf( file )
+   writeToPdf( ff )
 else:
    print 'bad format, only png and pdf supported: '+frmt

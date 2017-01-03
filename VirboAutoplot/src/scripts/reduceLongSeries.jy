@@ -1,6 +1,8 @@
 # title: hourly averages demo shows how to take hourly averages over a long interval
 # label: hourly averages
 
+import java.util.LinkedHashMap
+
 uri= 'http://sarahandjeremy.net/~jbf/1wire/data/$Y/$m/$d/610008002FE00410.$Y$m$d.d2s?timerange=%s'
 dr= DatumRangeUtil.parseTimeRange('2012-09-01')     
 endt= DatumRangeUtil.parseTimeRange('2012-09-26' )  
