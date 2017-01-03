@@ -7,6 +7,7 @@ from org.apache.commons.math.analysis.interpolation import SplineInterpolator
 x= dataset( [ 2., 3., 4., 5., 6., 7. ] )
 y= dataset( [ 1,  3,  4,  3,  5,  3, ] )
 #y= (x-3)**2
+plot( 0, x, y, title='Original Data' )
 
 si= SplineInterpolator()
 psf= si.interpolate( x, y )
@@ -16,6 +17,7 @@ yy= fltarr(100)
 for i in range(100):
    yy[i]= psf.value(xx[i].value())
 
-plot( 0, xx, yy )
-plot( 1, x, y )
+plot( 1, xx, yy, title='Spline Interpolation' )
 
+bind( dom.plots[0].xaxis, 'range', dom.plots[1].xaxis, 'range' ) 
+bind( dom.plots[0].yaxis, 'range', dom.plots[1].yaxis, 'range' ) 

@@ -1,8 +1,0 @@
-from org.virbo.autoplot.scriptconsole import GuiExceptionHandler
-geh= GuiExceptionHandler()
-
-re= java.lang.RuntimeException("Help!")
-
-geh.handleUncaught(re)
-
-

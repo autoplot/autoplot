@@ -1,3 +1,5 @@
-d= Units.degrees.createDatum(180)
+# das2 has an enumeration of units.  Many of these also
+# register conversions from one to another.
 
+d= Units.degrees.createDatum(180)
 print d.convertTo(Units.radians)

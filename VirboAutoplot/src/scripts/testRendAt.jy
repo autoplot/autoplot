@@ -1,3 +1,4 @@
+# demonstrates how das2 findRendererAt locates the renderer at each pixel position.
 dom= getDocumentModel()
 
 canvas= dom.controller.canvas
