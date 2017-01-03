@@ -1,6 +1,6 @@
 #setDataSourceURL('/home/jbf/ct/polar/multiPanelExample.vap')
 
-uri= 'vap:http://www.sarahandjeremy.net/jeremy/1wire/data/$Y/0D0008004437CF10.$Y$m$d.d2s'
+uri= 'http://www.sarahandjeremy.net/jeremy/1wire/data/$Y/0D0008004437CF10.$Y$m$d.d2s'
 outputFolder= '/home/jbf/temp/'
 times= getTimeRangesFor( uri, '2007', '%Y-%m-%d' )
 

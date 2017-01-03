@@ -5,8 +5,8 @@ from org.virbo.datasource import DataSourceRegistry
 
 reg= DataSourceRegistry.getInstance()
 
-myurl= URL( 'file:/home/jbf/nbProjects2/autoplot/WavDataSource/dist/WavDataSource.jar' )
+myurl= URL( 'http://autoplot.org/data/build/lib/WavDataSource.jar' )
 
 reg.registerDataSourceJar('qqq', myurl)
 
-load( 'vap+qqq:file:///home/jbf/foo.wav' )
+load( 'vap+qqq:http://autoplot.org/data/trainMono.wav' )

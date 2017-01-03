@@ -1,4 +1,4 @@
-file= 'http://cdaweb.gsfc.nasa.gov//tmp/noaa08_meped1mins_sem_19851013110000_19851014121800.cdf?'
+file= 'http://cdaweb.sci.gsfc.nasa.gov/sp_phys/data/noaa/noaa08/1985/noaa08_meped1min_sem_19851014_v01.cdf?'
 
 from org.virbo.datasource import DataSetURI
 completions = DataSetURI.getCompletions( file, len(file), monitor );
@@ -7,22 +7,4 @@ for i in completions:
   if ( i.completion[-1]!='=' ):
      print '== ' + i.completion + ' =='
      ds= getDataSet( i.completion )
-     print ds.property(QDataSet.UNITS)
-
-file= 'vap+cdfj:http://cdaweb.gsfc.nasa.gov//tmp/noaa08_meped1mins_sem_19851013110000_19851014121800.cdf?'
-
-from org.virbo.datasource import DataSetURI
-completions = DataSetURI.getCompletions( file, len(file), monitor );
-
-n= len( file )
-
-#with the GUI, add 7 col and 2 rows of plots.
-j=0
-for i in completions:
-  if ( i.completion[-1]!='=' ):
-     print '== ' + i.completion + ' =='
-     ds= getDataSet( i.completion )
-     print ds.property(QDataSet.UNITS)
-     plotx( j, ds, ytitle=i.completion[n:] )
-     j=j+1
-
+     print ds.property(QDataSet.UNITS), extent(ds)
