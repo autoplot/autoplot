@@ -53,6 +53,7 @@
             <li>2016-11-15: add rain to forecast</li>
             <li>2016-11-21: new capabilities scheme</li>
             <li>2016-11-23: corrections to bugs found by Scott, <a href='https://sourceforge.net/p/autoplot/bugs/1717/'>1717</a>, like parameters=Spectra</li>
+            <li>2017-01-04: add support for DOI and SPASE references in extra info.</li>
         </ul>
         </small>
     </body>
