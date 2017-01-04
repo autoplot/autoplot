@@ -23,19 +23,22 @@ public interface DataSource {
      * retrieve the dataset.  This allowed to be sub-interactive or batch time scale, and will block
      * until the dataset is produced.
      *
-     * This may return null when no data is available.
+     * This may return null when no data is available, or NoDataInIntervalException can be thrown.
      *
      * If the user cancelled the operation, then java.io.InterrupedIOExcaption or
      * better yet org.das2.CancelledOperationException should be called.  These will
      * simply display "cancelled" (or similar) on the status bar.
      *
+     * @param mon
+     * @return the DataSet for the URI, or null if no data is available.
+     * @throws java.lang.Exception
      */
     QDataSet getDataSet( ProgressMonitor mon ) throws Exception;
     
     /**
      *loading the data is slow, so load the data asynchronously (on a separate thread).  This
      *should return true if getDataSet will take more than 100 milliseconds (interactive time).
-     * Note this is currently ignored, and may be indefinately ignored.
+     * Note this is currently ignored, and may be indefinitely ignored.
      */
     boolean asynchronousLoad();
     
@@ -52,6 +55,10 @@ public interface DataSource {
      * Note the order of the properties may be controlled by using LinkedHashMap for the
      * implementation.  Even though this takes a monitor, it will be called after getDataSet,
      * and the monitor may be safely ignored.
+     * This should return new HashMap() if no metadata is found.
+     * @param mon
+     * @return 
+     * @throws java.lang.Exception 
      */
     Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception ;
 
@@ -65,6 +72,7 @@ public interface DataSource {
      * discovery properties for the dataset.  These should follow the QDataSet conventions, such as
      * TITLE, LABEL, etc, and should mirror the structure of the dataset.  Note
      * getMetadataModel().getProperties( getMetaData() ) should return the same thing.
+     * @return the properties.
      */
     Map<String,Object> getProperties();
    
