@@ -235,8 +235,7 @@ public class Test140 {
     }
     
     private static int doHtml( URL url, int iid, Map<String,Exception> exceptions, Map<String,Integer> exceptionNumbers ) throws IOException, CancelledOperationException {
-        InputStream in = url.openStream();
-        try {
+        try (InputStream in = url.openStream()) {
             URL[] urls= HtmlUtil.getDirectoryListing(url,in,false);
             List<URL> result= new ArrayList();
             for ( URL url1: urls ) {
@@ -256,8 +255,6 @@ public class Test140 {
                 }
             }
             return iid;        
-        } finally {
-            in.close();
         }
     }
     
@@ -270,9 +267,7 @@ public class Test140 {
      * @throws IOException 
      */
     private static int doHistory( File f, int iid, Map<String,Exception> exceptions, Map<String,Integer> exceptionNumbers ) throws IOException {
-        BufferedReader read= null;
-        try {
-            read= new BufferedReader( new FileReader(f) );
+        try (BufferedReader read = new BufferedReader( new FileReader(f) )) {
             String s= read.readLine();
             while ( s!=null ) {
                 int i= s.indexOf("#");
@@ -298,8 +293,6 @@ public class Test140 {
                 s= read.readLine();
             }
             return iid;
-        } finally {
-            if ( read!=null ) read.close();
         }
     }
 
