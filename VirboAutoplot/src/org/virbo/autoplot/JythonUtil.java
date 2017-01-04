@@ -137,6 +137,12 @@ public class JythonUtil {
                 String snam= s.substring(0,ieq).trim();
                 if ( DataSourceUtil.isJavaIdentifier(snam) ) {
                     String sval= s.substring(ieq+1).trim();
+//                    if ( snam.equals("resourceURI") ) {  // check to see if pwd can be inserted
+//                        URISplit split= URISplit.parse(sval);
+//                        if ( split.path==null ) {
+//                            sval= pwd + sval;
+//                        }
+//                    }
                     interp.exec("autoplot.params['" + snam + "']='" + sval+"'");
                 } else {
                     if ( snam.startsWith("-") ) {
