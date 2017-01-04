@@ -40,7 +40,7 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 public class AggregatingDataSourceFactory implements DataSourceFactory {
     public static final String PROB_NO_TIMERANGE_PROVIDED = "no timerange provided";
     public static final String PROB_PARSE_ERROR_IN_TIMERANGE = "parse error in timeRange";
-
+    
     private static final Logger logger= LoggerManager.getLogger("apdss.agg");
     
     private DataSourceFactory delegateFactory=null;

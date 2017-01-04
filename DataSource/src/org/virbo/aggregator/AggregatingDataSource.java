@@ -81,6 +81,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
      */
     public static final String MSG_NO_FILES_FOUND = "No files in interval";
 
+    public static final String PARAM_AVAIL= "avail";
 
     private FileStorageModel fsm;
     DataSourceFactory delegateDataSourceFactory;
@@ -793,6 +794,8 @@ public final class AggregatingDataSource extends AbstractDataSource {
 
     /**
      * returns the metadata provided by the first delegate dataset.
+     * @return 
+     * @throws java.lang.Exception 
      */
     @Override
     public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
@@ -800,7 +803,16 @@ public final class AggregatingDataSource extends AbstractDataSource {
             mon.setTaskSize(10);
             mon.started();
             try {
+
+                URISplit split= URISplit.parse( getURI() );
+                Map<String,String> params1= URISplit.parseParams(split.params);
                 
+                String avail= params1.get( PARAM_AVAIL );
+                
+                if ( avail!=null && avail.equals("T") ) {
+                    return new HashMap<>();
+                }
+                                
                 // bug 1453: arbitrary file is picked from the file storage model, which could be a downloaded file but isn't.
                 String scompUrl;
                 DatumRange vr= getViewRange();
@@ -812,7 +824,7 @@ public final class AggregatingDataSource extends AbstractDataSource {
                 if (!sparams.equals("")) {
                     scompUrl += "?" + sparams;
                 }
-                
+                                
                 URI delegateUri= DataSetURI.getURIValid(scompUrl);
                 DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(delegateUri);
                 metadata = delegateDataSource.getMetadata(mon.getSubtaskMonitor(5,10,"get metadata"));
