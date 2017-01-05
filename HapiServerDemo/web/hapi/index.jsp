@@ -13,7 +13,7 @@
         <title>HAPI Server JSP Demo</title>
     </head>
     <body>
-        <h1>This is a HAPI Server.</h1>  More information about this type of server is found at <a href="https://github.com/hapi-server/data-specification">here</a>.
+        <h1>This is a HAPI Server.</h1>  More information about this type of server is found at <a href="https://github.com/hapi-server/data-specification">github</a>.
         
         <h3>Some example requests:</h3>
         <a href="catalog">Catalog</a> <i>Show the catalog of available data sets.</i><br>
@@ -29,7 +29,7 @@
         <%
             long l= org.virbo.dataset.RecordIterator.TIME_STAMP; // load RecordIterator class first, or we'll get a negative time.
         %>
-        <br><small>deployed <%= Util.getDurationForHumans( System.currentTimeMillis() - org.virbo.dataset.RecordIterator.TIME_STAMP ) %> ago</small>
+        <br><small>deployed <%= Util.getDurationForHumans( System.currentTimeMillis() - l ) %> ago</small>
         
         <small>
         <ul>
