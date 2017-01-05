@@ -382,9 +382,9 @@ public class NamedURIListTool extends JPanel {
     
     /**
      * return the Jython code that gets these.
-     * @return 
+     * @return the Jython code that gets these.
      */
-    String getAsJython() {
+    protected String getAsJython() {
         StringBuilder b= new StringBuilder();
         for ( int i=0; i<this.uris.size(); i++ ) {
             b.append( this.ids.get(i) ).append( "=" ).append( "getDataSet('").append( this.uris.get(i) ).append("')\n");
@@ -394,12 +394,16 @@ public class NamedURIListTool extends JPanel {
 
     /**
      * return the Jython code that gets these, to prefix vap+inline:...
-     * @return 
+     * Note, IDs with empty URIs are ignored.
+     * @return jython code for loading each URI into a variable.
      */
-    String getAsJythonInline() {
+    protected String getAsJythonInline() {
         StringBuilder b= new StringBuilder();
         for ( int i=0; i<this.uris.size(); i++ ) {
-            b.append( this.ids.get(i) ).append( "=" ).append( "getDataSet('").append( this.uris.get(i) ).append("')&");
+            String uri= this.uris.get(i);
+            if ( uri.trim().length()>0 ) {
+                b.append( this.ids.get(i) ).append( "=" ).append( "getDataSet('").append( this.uris.get(i) ).append("')&");
+            }
         }
         return b.toString();
     }

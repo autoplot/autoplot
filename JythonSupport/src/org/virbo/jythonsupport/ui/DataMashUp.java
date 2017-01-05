@@ -196,6 +196,7 @@ public class DataMashUp extends javax.swing.JPanel {
         doDrop(data,tp);
         
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 backFromFile();
             }
@@ -937,7 +938,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jTabbedPane1.addTab("mathematics", jPanel1);
 
         jList2.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "link(x,y)", "link(x,y,z)", "slice1(ds,0)", "smooth(ds,5)", "putProperty(ds,QDataSet.UNITS,'s')", " " };
+            String[] strings = { "link(x,y)", "link(x,y,z)", "slice1(ds,0)", "smooth(ds,5)", "putProperty(ds,QDataSet.UNITS,'s')", "getProperty(ds,QDataSet.DEPEND_0)", "unbundle(ds,0)" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
