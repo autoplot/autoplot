@@ -29,7 +29,7 @@ import org.json.JSONObject;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
- * Utility methods for interacting with HAPI servers.
+ * Utility methods for interacting with HAPI servers.  
  * @author jbf
  */
 public class HapiServer {
@@ -37,7 +37,7 @@ public class HapiServer {
     protected final static Logger logger= Logger.getLogger("apdss.hapi");
     
     /**
-     * get known servers.  The das2server scrapes through the user's history 
+     * get known servers.  This scrapes through the user's history 
      * to find servers as well, but we might have a more transparent method
      * for doing this.
      * @return known servers
@@ -75,8 +75,9 @@ public class HapiServer {
     /**
      * add the default known servers, plus the ones we know about.  
      * The zeroth server will be the last server used.
+     * This should not be called from the event thread.
      * 
-     * @return list of servers
+     * @return list of server URLs.
      */
     public static List<String> listHapiServers() {
         if ( EventQueue.isDispatchThread() ) {
@@ -136,7 +137,8 @@ public class HapiServer {
     }
     
     /**
-     * return the list of datasets available at the server
+     * return the list of datasets available at the server.
+     * This should not be called from the event thread.
      * @param server the root of the server, which should should contain "catalog"
      * @return list of dataset ids
      * @throws java.io.IOException
@@ -149,7 +151,7 @@ public class HapiServer {
         URL url;
         url= HapiServer.createURL( server, "catalog" );
         StringBuilder builder= new StringBuilder();
-        logger.log(Level.FINE, "getCatalog {0}", url.toString());
+        logger.log(Level.FINE, "getCatalogIds {0}", url.toString());
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
@@ -167,7 +169,8 @@ public class HapiServer {
     }
      
     /**
-     * return the list of datasets available at the server
+     * return the list of datasets available at the server.  
+     * This should not be called from the event thread.
      * @param server the root of the server, which should should contain "catalog"
      * @return list of catalog entries, which have "id" and "title" tags.
      * @throws java.io.IOException
@@ -257,9 +260,10 @@ public class HapiServer {
     
     /**
      * return the info as a JSONObject.
-     * @param server
-     * @param id
-     * @return
+     * This should not be called from the event thread.
+     * @param server HAPI server.
+     * @param id the parameter id.
+     * @return JSONObject containing information.
      * @throws IOException
      * @throws JSONException 
      */
@@ -270,7 +274,7 @@ public class HapiServer {
         URL url;
         url= HapiServer.createURL( server, "info", Collections.singletonMap( "id", id ) );
         StringBuilder builder= new StringBuilder();
-        logger.log(Level.FINE, "getCatalog {0}", url.toString());
+        logger.log(Level.FINE, "getInfo {0}", url.toString());
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
@@ -285,8 +289,9 @@ public class HapiServer {
     
     /**
      * return the server capabilities document.  
-     * @param server
-     * @return
+     * This should not be called from the event thread.
+     * @param server HAPI server.
+     * @return JSONObject containing capabilities.
      * @throws IOException
      * @throws JSONException 
      */
@@ -297,7 +302,7 @@ public class HapiServer {
         URL url;
         url= HapiServer.createURL( server, "capabilities" );
         StringBuilder builder= new StringBuilder();
-        logger.log(Level.FINE, "getCatalog {0}", url.toString());
+        logger.log(Level.FINE, "getCapabilities {0}", url.toString());
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
