@@ -59,7 +59,7 @@ import org.virbo.datasource.URISplit;
  * Swing editor for HAPI URIs
  * @author jbf
  */
-public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
+public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
     private static final Logger logger= LoggerManager.getLogger("apdss.hapi");
     
@@ -110,14 +110,10 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         parametersPanel.setLayout( new BoxLayout( parametersPanel, BoxLayout.Y_AXIS ) );
 
-        String[] servers= HapiServer.listHapiServersArray();
-        serversComboBox.setModel( new DefaultComboBoxModel<>( servers ));
-        try {
-            defaultServer= new URL(servers[0]); //TODO: sometimes server is URL sometimes a string.  How annoying...
-        } catch (MalformedURLException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-        serversComboBox.setSelectedIndex(0);
+        serversComboBox.setEnabled(false);
+        serversComboBox.setModel( new DefaultComboBoxModel<>( HapiServer.getKnownServersArray() ) ); 
+        loadKnownServersSoon();
+        
         idsList2.addListSelectionListener( new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -141,8 +137,14 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         filtersComboBox.getEditor().getEditorComponent().addKeyListener( new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-                String search= (String)filtersComboBox.getEditor().getItem();
-                resetServerCatalog( currentServer, search );
+                final String search= (String)filtersComboBox.getEditor().getItem();
+                Runnable run= new Runnable() {
+                    @Override
+                    public void run() {
+                        resetServerCatalog( currentServer, search );
+                    }
+                };
+                new Thread( run,"resetServerCatalog" ).start();
             }
         } );
     }
@@ -158,6 +160,33 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
         }
     });
             
+    public void loadKnownServersImmediately() {
+        final String[] servers= HapiServer.listHapiServersArray();
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                serversComboBox.setModel( new DefaultComboBoxModel<>( servers ));
+                try {
+                    defaultServer= new URL(servers[0]); //TODO: sometimes server is URL sometimes a string.  How annoying...
+                } catch (MalformedURLException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+                serversComboBox.setSelectedIndex(0);
+                serversComboBox.setEnabled(true);
+            }
+        };
+        SwingUtilities.invokeLater(run);
+    }
+    
+    public void loadKnownServersSoon() {
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                loadKnownServersImmediately();
+            }
+        };
+        new Thread(run,"loadKnownServers").start();
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -396,10 +425,19 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
     private void serversComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serversComboBoxActionPerformed
         try {
-            resetServer( new URL( (String)serversComboBox.getSelectedItem() ) );
-        } catch (MalformedURLException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        } catch (IOException | JSONException ex) {
+            final URL url= new URL( (String)serversComboBox.getSelectedItem() );
+            Runnable run= new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        resetServer( url );
+                    } catch (IOException | JSONException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            new Thread( run, "resetServer").start();
+        } catch (MalformedURLException ex ) {
             logger.log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_serversComboBoxActionPerformed
@@ -463,8 +501,14 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     }//GEN-LAST:event_clearButtonActionPerformed
 
     private void filtersComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filtersComboBoxActionPerformed
-        String filter= filtersComboBox.getSelectedItem().toString();
-        resetServerCatalog( currentServer, filter );
+        final String filter= filtersComboBox.getSelectedItem().toString();
+        Runnable run= new Runnable() {
+            @Override
+            public void run() {
+                resetServerCatalog( currentServer, filter );
+            }
+        };
+        new Thread( run, "resetServerCatalog2" ).start();
     }//GEN-LAST:event_filtersComboBoxActionPerformed
 
 
@@ -718,7 +762,7 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
     protected static final String HAPI_TITLE = "title";
     
     /**
-     * 
+     * get the catalog of the server.  
      * @param server
      * @throws IOException
      * @throws JSONException 
@@ -888,4 +932,9 @@ public class HapiDataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 
     }
     private static final int MAX_LENGTH_CHARACTERS = 100000;
+    
+    public static void main( String[] args ) {
+        JOptionPane.showConfirmDialog( null, new HapiDataSourceEditorPanel() );
+    }
+    
 }
