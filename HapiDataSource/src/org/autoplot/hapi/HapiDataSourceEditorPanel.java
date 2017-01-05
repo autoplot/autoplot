@@ -121,7 +121,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     if ( idsList2.getSelectedValue()!=null && !idsList2.getSelectedValue().equals(currentId) ) {
                         currentParameters= null;
                     }
-                    currentId= idsList2.getSelectedValue();
+                    if ( idsList2.getSelectedValue()!=null ) {
+                        currentId= idsList2.getSelectedValue();
+                    }
                     if ( currentId!=null ) {
                         titleLabel.setText("Retrieving info for "+currentId+"...");
                     } else {
@@ -610,7 +612,13 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         URISplit split = URISplit.parse(uri);        
         if ( split.file==null || split.file.equals("file:///") ) { // use TSDS's one by default.
             split.file= defaultServer.toString();
-        }     
+        } else {
+            try {
+                currentServer= new URL(split.file);
+            } catch (MalformedURLException ex) {
+                logger.log(Level.SEVERE, null, ex);
+            }
+        }
         serversComboBox.setSelectedItem( split.file );
         Map<String,String> params= URISplit.parseParams( split.params );
         
@@ -622,6 +630,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             } catch (UnsupportedEncodingException ex) {
                 throw new RuntimeException(ex);
             }
+            currentId= id;
         }
         String timerange= params.get("timerange");
         if ( timerange!=null ) {
@@ -711,8 +720,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 currentServer= server;
                 idsList2.ensureIndexIsVisible(0);
             } else {
-                int i= idsList2.getSelectedIndex();
-                idsList2.ensureIndexIsVisible( i==-1 ? 0 : i );
+                if ( currentId!=null ) {
+                    idsList2.setSelectedValue( currentId, true );
+                } else {
+                    int i= idsList2.getSelectedIndex();
+                    idsList2.ensureIndexIsVisible( i==-1 ? 0 : i );
+                }
             }
             boolean binaryIsEnabled= false;
             try {
@@ -739,6 +752,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     }
                 }
             } catch ( IOException ex ) {
+                // this is okay, we'll just assume it doesn't support binary.
                 logger.log( Level.WARNING, ex.getMessage(), ex );
             }
             binaryCB.setEnabled(binaryIsEnabled);
