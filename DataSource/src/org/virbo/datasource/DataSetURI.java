@@ -152,7 +152,7 @@ public class DataSetURI {
     }
 
     /**
-     * get the data source for the URL.
+     * get the data source for the URI.
      * @param uri the URI.
      * @return the data source from which the data set can be retrieved.
      * @throws java.lang.Exception when the DataSourceFactory throws an Exception
@@ -169,8 +169,15 @@ public class DataSetURI {
 
     }
 
-    public static DataSource getDataSource(String surl) throws Exception {
-        return getDataSource( getURIValid(surl) );
+    /**
+     * get the data source for the URI.
+     * @param suri the URI.
+     * @return the data source from which the data set can be retrieved.
+     * @throws java.lang.Exception when the DataSourceFactory throws an Exception
+     * @throws IllegalArgumentException if the url extension is not supported.
+     */
+    public static DataSource getDataSource(String suri) throws Exception {
+        return getDataSource( getURIValid(suri) );
     }
 
     /**
@@ -441,7 +448,7 @@ public class DataSetURI {
 
     /**
      * get the datasource factory for the URL.  This has the rarely-used 
-     * logic that looks up MIME types.
+     * logic that looks up MIME types for HTTP requests.
      * @param uri the URI of the data source.
      * @param mon progress monitor
      * @return the factory that produces the data source.
