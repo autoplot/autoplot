@@ -38,8 +38,10 @@ import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.WindowManager;
 import org.virbo.filters.FiltersChainPanel;
 
@@ -275,7 +277,17 @@ public class NamedURIListTool extends JPanel {
             bindTimeRange(dss);
             
             try{
-                dss.setRecent( DataSetSelector.getDefaultRecent() );
+                List<String> recent= DataSetSelector.getDefaultRecent();
+                List<String> recentSansInline= new ArrayList<>();
+                for ( String s: recent ) {
+                    if ( !s.startsWith("vap+inline:") ) { // don't include mash-ups in the list of things to mash-up.
+                        URISplit split= URISplit.parse(s);
+                        if ( !".vap".equals(split.ext) ) {
+                            recentSansInline.add(s);
+                        }
+                    }
+                }
+                dss.setRecent( recentSansInline );
             } catch ( IllegalArgumentException ex ) {
                 
             }
