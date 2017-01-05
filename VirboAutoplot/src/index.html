@@ -24,9 +24,15 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-01-02 r20155):</p>
+        <p>Bugfixes (2017-01-05 r20192):</p>
         <ul>
-            <li>extra rows in Events List when events list is a single file
+            <li>data mashup tool ignores IDs with empty URIs.
+            <li>HAPI client was doing web interactions on the event thread, causing possible hangs
+            <li>aggregation avail=T attempted to download granule metadata when it is not used.
+            <li>render topDecorator is cleared when reset is called.
+            <li>example Jython scripts in VirboAutoplot/src/scripts updated and now work for everyone.
+            <li>Jython getParam position argument (as opposed to named argument) works again.
+            <li>remove extra rows in Events List when events list is a single file
             <li>1740: two-columns of iso8601 do not read properly as events list 
             <li>improvements to ASCII editor, including examples and improved guessing.
             <li>demo 14 now uses https.
