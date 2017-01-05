@@ -173,7 +173,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 } catch (MalformedURLException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
-                serversComboBox.setSelectedIndex(0);
+                if ( currentServer!=null ) {
+                    serversComboBox.setSelectedItem(currentServer);
+                } else {
+                    serversComboBox.setSelectedIndex(0);
+                }
                 serversComboBox.setEnabled(true);
             }
         };
