@@ -1,6 +1,7 @@
 
 package org.autoplot.hapi;
 
+import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -78,6 +79,9 @@ public class HapiServer {
      * @return list of servers
      */
     public static List<String> listHapiServers() {
+        if ( EventQueue.isDispatchThread() ) {
+            logger.warning("HAPI network call on event thread");
+        }        
         List<String> d2ss1= new ArrayList( );
         d2ss1.addAll( getKnownServers() );
 
@@ -139,6 +143,9 @@ public class HapiServer {
      * @throws org.json.JSONException
      */
     public static List<String> getCatalogIds( URL server ) throws IOException, JSONException {
+        if ( EventQueue.isDispatchThread() ) {
+            logger.warning("HAPI network call on event thread");
+        }        
         URL url;
         url= HapiServer.createURL( server, "catalog" );
         StringBuilder builder= new StringBuilder();
@@ -167,6 +174,9 @@ public class HapiServer {
      * @throws org.json.JSONException
      */
     public static JSONArray getCatalog( URL server ) throws IOException, JSONException {
+        if ( EventQueue.isDispatchThread() ) {
+            logger.warning("HAPI network call on event thread");
+        }        
         URL url;
         url= HapiServer.createURL( server, "catalog" );
         StringBuilder builder= new StringBuilder();
@@ -254,6 +264,9 @@ public class HapiServer {
      * @throws JSONException 
      */
     public static JSONObject getInfo( URL server, String id) throws IOException, JSONException {
+        if ( EventQueue.isDispatchThread() ) {
+            logger.warning("HAPI network call on event thread");
+        }
         URL url;
         url= HapiServer.createURL( server, "info", Collections.singletonMap( "id", id ) );
         StringBuilder builder= new StringBuilder();
@@ -271,13 +284,16 @@ public class HapiServer {
     }
     
     /**
-     * return the server capabilities document.
+     * return the server capabilities document.  
      * @param server
      * @return
      * @throws IOException
      * @throws JSONException 
      */
     protected static JSONObject getCapabilities(URL server)  throws IOException, JSONException {
+        if ( EventQueue.isDispatchThread() ) {
+            logger.warning("HAPI network call on event thread");
+        }
         URL url;
         url= HapiServer.createURL( server, "capabilities" );
         StringBuilder builder= new StringBuilder();
