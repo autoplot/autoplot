@@ -44,6 +44,7 @@ public class InfoServlet extends HttpServlet {
         } else if ( id.equals("610008002FE00410") ) {
             jo.put( "firstDate", "2012-01-09T00:00Z" );
             jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
+            jo.put( "label", "attic" );
         } else if ( id.equals("AC00080040250510") ) {
             jo.put( "firstDate", "2012-01-09T00:00Z" );
             jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
@@ -257,7 +258,17 @@ public class InfoServlet extends HttpServlet {
             parameter.put( "type", "float" );
             parameter.put( "units", "deg F" );
             parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "temperature at sensor " + id );
+            if ( id.equals("610008002FE00410")) {
+                parameter.put( "description", "temperature in attic" );
+            } else if ( id.equals("0B000800408DD710")) {
+                parameter.put( "description", "temperature in garage, car" );
+            } else if ( id.equals("8500080044259C10")) {
+                parameter.put( "description", "temperature in garage, far" );
+            } else if ( id.equals("AC00080040250510")) {
+                parameter.put( "description", "temperature at thermostate" );
+            } else {
+                parameter.put( "description", "temperature at sensor " + id );
+            }
             parameters.put( 1, parameter );
         }
         
