@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The Events List GUI is used to select burst data from RBSP.
+        <p><small>The drawing of the orbit plot ticks is improved.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,7 @@
         
         <p>Bugfixes (2017-01-05 r20192):</p>
         <ul>
+            <li>improve drawing of orbit plot ticks.
             <li>data mashup tool ignores IDs with empty URIs.
             <li>HAPI client was doing web interactions on the event thread, causing possible hangs
             <li>aggregation avail=T attempted to download granule metadata when it is not used.
@@ -75,6 +76,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>mouse modules (crosshair,etc) allow up,down,right,left keys for precise control.
             <li>add example values for depend0units and timeFormat parameters in ascii editor panel.
             <li>ascii table data source format supports "+" in tformat parameter, to output multiple columns
             <li>tweaks to the ASCII editor panel, improving tooltips and providing examples.
