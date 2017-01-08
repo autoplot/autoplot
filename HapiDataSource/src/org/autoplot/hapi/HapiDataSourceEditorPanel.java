@@ -174,7 +174,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     logger.log(Level.SEVERE, null, ex);
                 }
                 if ( currentServer!=null ) {
-                    serversComboBox.setSelectedItem(currentServer);
+                    serversComboBox.setSelectedItem(currentServer.toString());
                 } else {
                     serversComboBox.setSelectedIndex(0);
                 }
