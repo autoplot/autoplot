@@ -941,7 +941,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 }
                 parametersPanel.add( cb );
             }
-            parametersPanel.setToolTipText("shift-click will select range");
+            parametersPanel.setToolTipText("shift-click will select range of parameters");
             parametersPanel.revalidate();
             parametersPanel.repaint();
             if ( currentParameters!=null ) {
@@ -951,13 +951,15 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             if ( range==null ) {
                 jLabel3.setText( "range is not provided" );
             } else {
+				DatumRange landing;
 				if ( range.max().ge( myValidTime ) ) {
 					jLabel3.setText( range.min().toString() + " to ?" );
+					landing= new DatumRange( range.min(), range.min().add( 1, Units.days ) );
 				} else {
 					jLabel3.setText( range.toString() );
+					Datum end= TimeUtil.prevMidnight(range.max());
+					landing= new DatumRange( end.subtract( 1, Units.days ), end );
 				}
-                Datum end= TimeUtil.prevMidnight(range.max());
-                DatumRange landing= new DatumRange( end.subtract( 1, Units.days ), end );
                 String currentTimeRange= timeRangeTextField.getText().trim();
                 if ( currentTimeRange.length()==0 ) {
                     timeRangeTextField.setText( landing.toString() );
