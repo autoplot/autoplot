@@ -27,41 +27,38 @@ public class InfoServlet extends HttpServlet {
         jo.put("createdAt",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
         
         if ( id.equals("Iowa City Conditions") ) {
-            jo.put( "firstDate", "2012-05-25T00:00Z" );
-            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
+            jo.put( "startDate", "2012-05-25T00:00Z" );
+            jo.put( "stopDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
         } else if ( id.equals("Iowa City Forecast") ) {
-            jo.put( "firstDate", "2012-05-25T00:00Z" );
-            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
+            jo.put( "startDate", "2012-05-25T00:00Z" );
+            jo.put( "stopDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
         } else if ( id.equals("0B000800408DD710") ) {
-            jo.put( "firstDate", "2012-01-09T00:00Z" );
-            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
+            jo.put( "startDate", "2012-01-09T00:00Z" );
+            jo.put( "stopDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
         } else if ( id.equals("0B000800408DD710.nostream") ) {
-            jo.put( "firstDate", "2012-01-09T00:00Z" );
-            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
+            jo.put( "startDate", "2012-01-09T00:00Z" );
+            jo.put( "stopDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
         } else if ( id.equals("8500080044259C10") ) {
-            jo.put( "firstDate", "2012-01-09T00:00Z" );
-            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
+            jo.put( "startDate", "2012-01-09T00:00Z" );
+            jo.put( "stopDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
         } else if ( id.equals("610008002FE00410") ) {
-            jo.put( "firstDate", "2012-01-09T00:00Z" );
-            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
+            jo.put( "startDate", "2012-01-09T00:00Z" );
+            jo.put( "stopDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
             jo.put( "label", "attic" );
         } else if ( id.equals("AC00080040250510") ) {
-            jo.put( "firstDate", "2012-01-09T00:00Z" );
-            jo.put( "lastDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
+            jo.put( "startDate", "2012-01-09T00:00Z" );
+            jo.put( "stopDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
         } else if ( id.equals("Spectrum") ) {
-            jo.put( "firstDate", "2012-08-30T00:00Z" );
-            jo.put( "lastDate", "2016-09-20T00:00Z" );
+            jo.put( "startDate", "2012-08-30T00:00Z" );
             jo.put( "sampleStartDate", "2016-01-01T00:00Z" );
             jo.put( "sampleEndDate", "2016-01-02T00:00Z" );
         } else if ( id.equals("PowerWheel") ) {
-            jo.put( "firstDate",  "2016-07-28T00:00Z"  );
-            jo.put( "lastDate", "2016-10-13T03:04Z" ); // String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
+            jo.put( "startDate",  "2016-07-28T00:00Z"  );
             jo.put( "sampleStartDate", "2016-07-28T00:00Z" );
             jo.put( "sampleEndDate", "2016-07-29T00:00Z" );
             jo.put( "DOI", "10.1007/s12145-010-0053-4" );
         } else if ( id.equals("PowerOnesDigitSegments") ) {
-            jo.put( "firstDate",  "2016-07-28T00:00Z"  );
-            jo.put( "lastDate",  "2016-10-13T03:04Z" ); // String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
+            jo.put( "startDate",  "2016-07-28T00:00Z"  );
             jo.put( "sampleStartDate", "2016-07-28T00:00Z" );
             jo.put( "sampleEndDate", "2016-07-29T00:00Z" );
         }
