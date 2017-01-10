@@ -452,6 +452,7 @@ public class PyQDataSet extends PyJavaInstance {
      * alone.  See http://autoplot.org/developer.python.indexing
      *
      * TODO: preserve metadata
+	 * TODO: verify all index types.
      * @param arg0 various python types http://autoplot.org/developer.python.indexing
      * @return element or subset of data.
      */
@@ -681,14 +682,24 @@ public class PyQDataSet extends PyJavaInstance {
             PySequence slices = (PySequence) arg0;
             QDataSet[] lists= new QDataSet[slices.__len__()];
             boolean allLists= true;
+			int[] qubedims= DataSetUtil.qubeDims(ds);
             for (int i = 0; i < slices.__len__(); i++) {
                 PyObject a = slices.__getitem__(i);
-                if ( ! ( a instanceof PyQDataSet ) && !( a instanceof PyInteger ) ) {
+                if ( ! ( a instanceof PyQDataSet ) && !( a instanceof PyInteger || a instanceof PyFloat ) ) {
                     allLists= false;
-                } else if ( a instanceof PyInteger ) {
-                    lists[i]= DataSetUtil.asDataSet( ((PyInteger)a).getValue() );
-                } else if ( a instanceof PyFloat ) {
-                    lists[i]= DataSetUtil.asDataSet( ((PyFloat)a).getValue() );
+                } else if ( a instanceof PyInteger || a instanceof PyFloat ) {
+					int idx;
+					if ( a instanceof PyInteger ) {
+						idx= ((PyInteger)a).getValue();
+					} else {
+						idx= (int)( ((PyFloat)a).getValue() );
+					}
+					if ( idx<0 ) {
+						if ( i==0 || qubedims!=null ) {
+							idx= ( i==0 ) ? ( ds.length()+idx ) : ( qubedims[i]+idx );
+						}
+					}
+                    lists[i]= DataSetUtil.asDataSet( idx );
                 } else {
                     lists[i]= ((PyQDataSet)a).rods;
                 }
@@ -773,30 +784,38 @@ public class PyQDataSet extends PyJavaInstance {
                     }
                 }
                 return;
-            }
-            for (int i = 0; i < slices.__len__(); i++) {
-                PyObject a = slices.__getitem__(i);
-                QubeDataSetIterator.DimensionIteratorFactory fit;
-                if (a instanceof PySlice) {
-                    PySlice slice = (PySlice) a; // TODO: why not the same as 75 lines prior?
-                    Integer start = (Integer) slice.start.__tojava__(Integer.class);
-                    Integer stop = (Integer) slice.stop.__tojava__(Integer.class);
-                    Integer step = (Integer) slice.step.__tojava__(Integer.class);
-                    fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
+            } else {
+				int[] qubeDims= DataSetUtil.qubeDims(ds);
+				for (int i = 0; i < slices.__len__(); i++) {
+					PyObject a = slices.__getitem__(i);
+					QubeDataSetIterator.DimensionIteratorFactory fit;
+					if (a instanceof PySlice) {
+						PySlice slice = (PySlice) a; // TODO: why not the same as 75 lines prior?
+						Integer start = (Integer) slice.start.__tojava__(Integer.class);
+						Integer stop = (Integer) slice.stop.__tojava__(Integer.class);
+						Integer step = (Integer) slice.step.__tojava__(Integer.class);
+						fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
 
-                } else if ( a.isNumberType() && ! ( a instanceof PyQDataSet ) ) {
-                    if ( a instanceof PyFloat ) throw new IllegalArgumentException("float used to index array");
-                    int idx = (Integer) a.__tojava__(Integer.class);
-                    fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
-                } else {
-                    Object o = a.__tojava__(QDataSet.class);
-                    QDataSet that = (QDataSet) o;
-                    fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
-                }
+					} else if ( a.isNumberType() && ! ( a instanceof PyQDataSet ) ) {
+						if ( a instanceof PyFloat ) throw new IllegalArgumentException("float used to index array");
+						int idx = (Integer) a.__tojava__(Integer.class);
+						if ( idx<0 ) {
+							if ( i==0 || qubeDims!=null ) {
+								idx= i==0 ? ( ds.length()+idx ) : ( qubeDims[i]+idx );
+							} else {
+								throw new IllegalArgumentException("negative index not supported for non-qube.");
+							}
+						}
+						fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
+					} else {
+						Object o = a.__tojava__(QDataSet.class);
+						QDataSet that = (QDataSet) o;
+						fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+					}
 
-                ((QubeDataSetIterator) iter).setIndexIteratorFactory(i, fit);
-            }
-
+					((QubeDataSetIterator) iter).setIndexIteratorFactory(i, fit);
+				}
+			}
         }
 
         QDataSet val = coerceDsInternal(arg1);
