@@ -807,9 +807,8 @@ public class PyQDataSet extends PyJavaInstance {
 							}
 						}
 						fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
-					} else {
-						Object o = a.__tojava__(QDataSet.class);
-						QDataSet that = (QDataSet) o;
+					} else { 
+						QDataSet that = coerce_ds(a);
 						fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
 					}
 
