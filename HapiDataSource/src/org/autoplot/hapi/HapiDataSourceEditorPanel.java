@@ -66,10 +66,12 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     JSONArray idsJSON;
     
     URL defaultServer;
-    
+	
+	Datum myValidTime;
+	
     private DatumRange getRange( JSONObject info ) {
         try {
-            if ( info.has("firstDate") && info.has("lastDate") ) {
+            if ( info.has("firstDate") && info.has("lastDate") ) { // this is deprecated behavior
                 String firstDate= info.getString("firstDate");
                 String lastDate= info.getString("lastDate");
                 if ( firstDate!=null && lastDate!=null ) {
@@ -81,7 +83,24 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         logger.warning( "firstDate and lastDate are out of order, ignoring.");
                     }
                 }
-            }
+            } else if ( info.has("startDate") ) { // note startDate is required.
+                String startDate= info.getString("startDate");
+				String stopDate;
+				if ( info.has("stopDate") ) {
+					stopDate= info.getString("stopDate");
+				} else {
+					stopDate= null;
+				}
+                if ( startDate!=null ) {
+                    Datum t1= Units.us2000.parse(startDate);
+                    Datum t2= stopDate==null ? myValidTime : Units.us2000.parse(stopDate);
+                    if ( t1.le(t2) ) {
+                        return new DatumRange( t1, t2 );
+                    } else {
+                        logger.warning( "firstDate and lastDate are out of order, ignoring.");
+                    }
+                }
+			}
         } catch ( JSONException | ParseException ex ) {
             logger.log( Level.WARNING, ex.getMessage(), ex );
         }
@@ -98,6 +117,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
      * Creates new form HapiDataSourceEditorPanel
      */
     public HapiDataSourceEditorPanel() {
+		try {
+			myValidTime= TimeUtil.create( "2200-01-01T00:00" );
+		} catch (ParseException ex) {
+			Logger.getLogger(HapiDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+		}
         try {
             List<String> servers= HapiServer.getKnownServers();
             this.defaultServer = new URL(servers.get(servers.size()-1));
@@ -927,7 +951,11 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             if ( range==null ) {
                 jLabel3.setText( "range is not provided" );
             } else {
-                jLabel3.setText( range.toString() );
+				if ( range.max().ge( myValidTime ) ) {
+					jLabel3.setText( range.min().toString() + " to ?" );
+				} else {
+					jLabel3.setText( range.toString() );
+				}
                 Datum end= TimeUtil.prevMidnight(range.max());
                 DatumRange landing= new DatumRange( end.subtract( 1, Units.days ), end );
                 String currentTimeRange= timeRangeTextField.getText().trim();
