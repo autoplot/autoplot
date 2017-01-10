@@ -814,7 +814,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             idsJSON= HapiServer.getCatalog(server);
             resetServerCatalog(server,"");
         } catch ( IOException ex ) {
-            DataSetSelector.showUserExceptionDialog( this, "Error when connecting to server", "I/O Exception", ex, JOptionPane.WARNING_MESSAGE );
+            DataSetSelector.showUserExceptionDialog( this, "<html>Error when connecting to server<br>"+server, "I/O Exception", ex, JOptionPane.WARNING_MESSAGE );
         }
     }
     
