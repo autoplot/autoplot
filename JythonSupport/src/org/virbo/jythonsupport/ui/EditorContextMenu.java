@@ -377,18 +377,18 @@ public class EditorContextMenu {
 
             fragmentsMenu.add( createInsertMenuItem( "documentation block", "# title: the one-line title\n# label: terse label") );
 
-//            fragmentsMenu.add( createInsertMenuItem( "multi-argument procedure", "# return a set of datasets which are synchronized to the same timetags.\n" +
-//"def synchronize( ds1, *dss ):\n" +
-//"    \"the first dataset's timetags are used to interpolate the list of datasets\"\n" +
-//"    tt= ds1.property( QDataSet.DEPEND_0 )\n" +
-//"    result= []\n" +
-//"    for ds in dss:\n" +
-//"        tt1= ds.property( QDataSet.DEPEND_0 )\n" +
-//"        ff= findex( tt1, tt )\n" +
-//"        ds= interpolate( ds, ff )\n" +
-//"        result.append( ds )\n" +
-//"    return result\n" +
-//"( mlat, MLT ) = synchronize( hfr_spectra, mlat, MLT )" ) );
+            fragmentsMenu.add( createInsertMenuItem( "multi-argument procedure", "# return a set of datasets which are synchronized to the same timetags.\n" +
+"def mysynchronize( ds1, *dss ):\n" +
+"    \"the first dataset's timetags are used to interpolate the list of datasets\"\n" +
+"    tt= ds1.property( QDataSet.DEPEND_0 )\n" +
+"    result= []\n" +
+"    for ds in dss:\n" +
+"        tt1= ds.property( QDataSet.DEPEND_0 )\n" +
+"        ff= findex( tt1, tt )\n" +
+"        ds= interpolate( ds, ff )\n" +
+"        result.append( ds )\n" +
+"    return result\n" +
+"( mlat, MLT ) = mysynchronize( hfr_spectra, mlat, MLT )" ) );
 
 			fragmentsMenu.add( createInsertMenuItem( "logger", "from org.das2.util import LoggerManager\n" +
 															   "from java.util.logging import Level\n" +
