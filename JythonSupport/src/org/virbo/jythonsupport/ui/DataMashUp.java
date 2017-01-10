@@ -54,6 +54,7 @@ import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeNode;
+import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.util.LoggerManager;
@@ -684,7 +685,12 @@ public class DataMashUp extends javax.swing.JPanel {
                                     DataSource dss= dsf.getDataSource(new URI(suri));
                                     TimeSeriesBrowse tsb= dss.getCapability( TimeSeriesBrowse.class );
                                     if ( tsb!=null ) {
-                                        timerange= tsb.getTimeRange().toString();
+                                        DatumRange tr= tsb.getTimeRange();
+										if ( tr!=null ) {
+											timerange= tr.toString();
+										} else {
+											timerange= "";
+										}
                                     }
                                 } catch (Exception ex) {
                                     logger.log(Level.SEVERE, null, ex);
