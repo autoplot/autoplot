@@ -55,6 +55,7 @@
             <li>2016-11-23: corrections to bugs found by Scott, <a href='https://sourceforge.net/p/autoplot/bugs/1717/'>1717</a>, like parameters=Spectra</li>
             <li>2017-01-04: add support for DOI and SPASE references in extra info.</li>
             <li>2017-01-08: add wind speed</li>
+            <li>2017-01-10: use startDate and stopDate instead of firstDate and lastDate as decided on 2017-01-10 telecon.</li>
         </ul>
         </small>
     </body>
