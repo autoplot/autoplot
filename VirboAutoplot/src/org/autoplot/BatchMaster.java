@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.format.NumberFormatUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -472,9 +474,17 @@ public class BatchMaster extends javax.swing.JPanel {
                         if ( dstep<=0 ) continue;
                         if ( dmax<dmin ) continue;
                         int ni= (int)(Math.round((dmax-dmin)/dstep))+1;
+                        int digits= (int)( Math.floor( Math.log10(dstep) ) );
+                        double dfac= 1;
+                        String spec;
+                        if ( digits<0 ) {
+                            spec= "%."+(-digits)+"f";
+                        } else {
+                            spec= "%.0f";
+                        }
                         for ( int i=0; i<ni; i++ ) {
-                            double x= dmin + dstep * i;
-                            theList.add( isInt ? String.valueOf( (int)Math.round(x) ) : String.valueOf(x) );
+                            double x= ( dmin + dstep * i ) * dfac;         
+                            theList.add( isInt ? String.valueOf( (int)Math.round(x) ) : String.format(spec,x) );
                         }
                         ss= theList.toArray( new String[theList.size()] );
                         break;
@@ -658,6 +668,7 @@ public class BatchMaster extends javax.swing.JPanel {
                     if ( f1.trim().length()==0 ) continue;
                     interp.set( "monitor", monitor.getSubtaskMonitor(f1) );
                     interp.set( "dom", this.dom );
+                    interp.set( "PWD", split.path );
                     String paramName= param1NameCB.getSelectedItem().toString();
                     if ( !parms.containsKey(paramName) ) {
                         if ( paramName.trim().length()==0 ) {
