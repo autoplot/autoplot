@@ -130,7 +130,7 @@ public class JythonUtil {
         }
 
         interp.exec("import autoplot");
-        int iargv=-1;  // skip the zeroth one, it is the name of the script
+        int iargv=0;  // skip the zeroth one, it is the name of the script
         for (String s : argv ) {
             int ieq= s.indexOf("=");
             if ( ieq>0 ) {
