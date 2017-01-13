@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>The drawing of the orbit plot ticks is improved.
+        <p><small>Two map pngs are plotted under the data.  Autoplot invocations on the left, a Barrel balloon mission on the right.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-01-05 r20192):</p>
+        <p>Bugfixes (2017-01-12 r20210):</p>
         <ul>
+            <li>spectrogram code assumed there were valid Y tags.  Thanks, Seth!
+            <li>rte_0579587635: single pipe character (|) in operations would cause RTE.  
+            <li>Hapi client had a branch that would result in class cast exception RTE popup.
+            <li>1750: ds[-1,r]=0 didn't work, where negative indeces weren't supported.  Thanks, Ivar!
             <li>improve drawing of orbit plot ticks.
             <li>data mashup tool ignores IDs with empty URIs.
             <li>HAPI client was doing web interactions on the event thread, causing possible hangs
