@@ -26,6 +26,9 @@
         
         <p>Bugfixes (2017-01-12 r20210):</p>
         <ul>
+            <li>1752: renderControl property needed to be handled after the style node when loading a file, so orbit plot settings would load properly
+            <li>1752: more corrections to the orbit plot renderer, such as rounded strokes, tick positioning, and icon
+            <li>1749: correct code that handles unnamed command-line arguments for scripts, which dropped the first argument.
             <li>spectrogram code assumed there were valid Y tags.  Thanks, Seth!
             <li>rte_0579587635: single pipe character (|) in operations would cause RTE.  
             <li>Hapi client had a branch that would result in class cast exception RTE popup.
