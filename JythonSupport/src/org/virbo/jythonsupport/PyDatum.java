@@ -35,6 +35,8 @@ public class PyDatum extends PyJavaInstance {
     public PyObject __add__(PyObject arg0) {
         if ( arg0 instanceof PyDatum ) {
             return new PyDatum( datum.add( ((PyDatum)arg0).datum ) );
+        } else if ( arg0 instanceof PyQDataSet ) {
+            return arg0.__radd__(this);
         } else if ( arg0.isNumberType() ) {
             return new PyDatum( datum.add( datum.getUnits().createDatum( arg0.__float__().getValue() ) ) );            
         } else {
@@ -51,6 +53,8 @@ public class PyDatum extends PyJavaInstance {
     public PyObject __sub__(PyObject arg0) {
         if ( arg0 instanceof PyDatum ) {
             return new PyDatum( datum.subtract(((PyDatum)arg0).datum ) );
+        } else if ( arg0 instanceof PyQDataSet ) {
+            return arg0.__rsub__(this);         
         } else if ( arg0.isNumberType() ) {
             return new PyDatum( datum.subtract( datum.getUnits().createDatum( arg0.__float__().getValue() ) ) );                        
         } else {
@@ -73,7 +77,9 @@ public class PyDatum extends PyJavaInstance {
     public PyObject __mul__(PyObject arg0) {
         if ( arg0 instanceof PyDatum ) {
             return new PyDatum( datum.multiply( ((PyDatum)arg0).datum ) );
-        } else if ( arg0.isNumberType() ) {
+        } else if ( arg0 instanceof PyQDataSet  ) {
+            return arg0.__rmul__( this );
+	    } else if ( arg0.isNumberType() ) {
             return new PyDatum( datum.multiply( Units.dimensionless.createDatum( arg0.__float__().getValue() ) ) );               
         } else {
             return new PyQDataSet( DataSetUtil.asDataSet(datum) ).__mul__(arg0);
@@ -89,6 +95,8 @@ public class PyDatum extends PyJavaInstance {
     public PyObject __div__(PyObject arg0) {
         if ( arg0 instanceof PyDatum ) {
             return new PyDatum( datum.divide( ((PyDatum)arg0).datum ) );
+        } else if ( arg0 instanceof PyQDataSet ) {
+            return arg0.__rdiv__( this );
         } else if ( arg0.isNumberType() ) {
             return new PyDatum( datum.divide( Units.dimensionless.createDatum( arg0.__float__().getValue() ) ) );               
         } else {
