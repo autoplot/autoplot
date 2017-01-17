@@ -65,7 +65,7 @@ public class CDAWebDB {
     private static final Logger logger= LoggerManager.getLogger("apdss.cdaweb");
     
     private static CDAWebDB instance=null;
-    public static final String dbloc= "http://cdaweb.gsfc.nasa.gov/pub/catalogs/all.xml";
+    public static final String dbloc= "https://cdaweb.gsfc.nasa.gov/pub/catalogs/all.xml";
 
     //private String version;
     private Document document; // should consume ~ 2 MB
@@ -247,7 +247,7 @@ public class CDAWebDB {
         InputStream ins= null;
 
         try {
-            URL url = new URL(String.format("http://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/%s/orig_data/%s,%s", spid, tstart, tstop));
+            URL url = new URL(String.format("https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/%s/orig_data/%s,%s", spid, tstart, tstop));
             logger.fine(url.toString());
             Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
             URLConnection urlc;
@@ -312,7 +312,7 @@ public class CDAWebDB {
         InputStream ins= null;
 
         try {
-            URL url = new URL(String.format("http://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/%s/data/%s,%s/ALL-VARIABLES?format=cdf", spid, tstart, tstop));
+            URL url = new URL(String.format("https://cdaweb.gsfc.nasa.gov/WS/cdasr/1/dataviews/sp_phys/datasets/%s/data/%s,%s/ALL-VARIABLES?format=cdf", spid, tstart, tstop));
             URLConnection urlc;
 
             Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
@@ -417,9 +417,9 @@ public class CDAWebDB {
 
     /**
      * returns the base URL.  FTP urls in the all.xml file are converted to HTTP by replacing
-     * "ftp://cdaweb.gsfc.nasa.gov/pub/istp/" with  "http://cdaweb.gsfc.nasa.gov/sp_phys/data/"
+     * "ftp://cdaweb.gsfc.nasa.gov/pub/istp/" with  "https://cdaweb.gsfc.nasa.gov/sp_phys/data/"
      * @param spid the id like "AC_H2_CRIS"
-     * @return the base URL like http://cdaweb.gsfc.nasa.gov/sp_phys/data/ace/cris/level_2_cdaweb/cris_h2
+     * @return the base URL like https://cdaweb.gsfc.nasa.gov/sp_phys/data/ace/cris/level_2_cdaweb/cris_h2
 
      * @throws IOException
      */
@@ -457,7 +457,7 @@ public class CDAWebDB {
             }            
             String lookfor= "ftp://cdaweb.gsfc.nasa.gov/pub/";
             if ( url.startsWith(lookfor) ) {
-                url= "http://cdaweb.gsfc.nasa.gov/pub/" + url.substring(lookfor.length());
+                url= "https://cdaweb.gsfc.nasa.gov/pub/" + url.substring(lookfor.length());
             }            
             return url;
 
@@ -569,7 +569,7 @@ public class CDAWebDB {
     }
 
     public String getMasterFile( String ds, ProgressMonitor p ) throws IOException {
-        String master= "http://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/0MASTERS/"+ds.toLowerCase()+"_00000000_v01.cdf";
+        String master= "https://cdaweb.gsfc.nasa.gov/pub/software/cdawlib/0MASTERS/"+ds.toLowerCase()+"_00000000_v01.cdf";
 
         //DasProgressPanel p= DasProgressPanel.createFramed("loading master cdf");
         p.setProgressMessage("loading master cdf");
@@ -637,10 +637,10 @@ public class CDAWebDB {
                         if ( url.startsWith( lookfor ) ) {
                             // "ftp://cdaweb.gsfc.nasa.gov/pub/istp/ace/mfi_h2"
                             //  http://cdaweb.gsfc.nasa.gov/istp_public/data/
-                            url= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + url.substring(lookfor.length());
+                            url= "https://cdaweb.gsfc.nasa.gov/sp_phys/data/" + url.substring(lookfor.length());
                         }
                         if ( url.startsWith(lookfor2) ) {
-                            url= "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" + url.substring(lookfor2.length());
+                            url= "https://cdaweb.gsfc.nasa.gov/sp_phys/data/" + url.substring(lookfor2.length());
                         }
                         return url;
                     }
@@ -732,8 +732,8 @@ public class CDAWebDB {
                              ) {
                         String url= getURL(node);
                         if ( url!=null && 
-                                ( url.startsWith( "http://cdaweb.gsfc.nasa.gov/istp_public/data/" ) ||
-                                url.startsWith( "http://cdaweb.gsfc.nasa.gov/sp_phys/data/" ) ||
+                                ( url.startsWith( "https://cdaweb.gsfc.nasa.gov/istp_public/data/" ) ||
+                                url.startsWith( "https://cdaweb.gsfc.nasa.gov/sp_phys/data/" ) ||
                                 url.startsWith("ftp://cdaweb.gsfc.nasa.gov" ) ) && !url.startsWith("/tower3/private" ) ) {
                             String filenaming= getFilenaming(node);
                             String s=attrs.getNamedItem("serviceprovider_ID").getTextContent();
