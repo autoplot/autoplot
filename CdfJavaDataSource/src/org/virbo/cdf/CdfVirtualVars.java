@@ -1,14 +1,13 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.cdf;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.Units;
+import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -25,7 +24,8 @@ import org.virbo.dsops.Ops;
  * @author jbf
  */
 public class CdfVirtualVars {
-
+    private static final Logger logger= LoggerManager.getLogger("apdss.cdf");
+    
     /**
      * Implementations of CDF virtual functions.  These are a subset of those in the CDAWeb library, plus a couple
      * extra that they will presumably add to the library at some point.
@@ -37,6 +37,7 @@ public class CdfVirtualVars {
      * @return
      */
     public static QDataSet execute( Map<String,Object> metadata, String function, List<QDataSet> args, ProgressMonitor mon ) throws IllegalArgumentException {
+        logger.log(Level.FINE, "implement virtual variable \"{0}\"", function);
         if ( function.equalsIgnoreCase("sum_values" ) ) {
             if ( args.size()<1 ) throw new IllegalArgumentException("virtual variable function sum_values expects at least one argument");
             QDataSet sum= args.get(0);
@@ -172,11 +173,18 @@ public class CdfVirtualVars {
         return result;
     }
 
+    /**
+     * return true if the function is supported.
+     * @param function the function name, such as "compute_magnitude"
+     * @return true if the function is supported.
+     */
     public static boolean isSupported(String function) {
         List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", 
                 "fftpowerdelta512", "fftpowerdelta1024", "fftpowerdelta2048",
                 "fftpower","fftPower512","fftPower1024","fftpowerdeltatranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag",
                 "sum_values" );
-        return functions.contains(function.toLowerCase());
+        boolean supported= functions.contains(function.toLowerCase());
+        logger.log(Level.FINE, "virtual variable function \"{0}\" is supported: {1}", new Object[]{function, supported});
+        return supported;
     }
 }
