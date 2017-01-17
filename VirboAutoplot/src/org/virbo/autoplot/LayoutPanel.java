@@ -79,12 +79,12 @@ public class LayoutPanel extends javax.swing.JPanel {
 
     private final static Logger logger = org.das2.util.LoggerManager.getLogger("autoplot.gui.layout");
 
-    Plot draggingPlot=null;
-    Point dragInitialClick= null;
-    Point dragLocation=null;
+    private Plot draggingPlot=null;
+    private Point dragInitialClick= null;
+    private Point dragLocation=null;
 
-    Application dom;
-    ApplicationModel applicationModel; // used for history.
+    private Application dom;
+    private ApplicationModel applicationModel; // used for history.
     
     /** Creates new form LayoutPanel */
     public LayoutPanel() {
@@ -224,9 +224,9 @@ public class LayoutPanel extends javax.swing.JPanel {
         this.applicationModel= applicationModel;
     }
     
-    Map<Component, JPopupMenu> contextMenus = null;
+    private Map<Component, JPopupMenu> contextMenus = null;
 
-    Action removeBindingsAction= new AbstractAction("Remove Bindings") {
+    private Action removeBindingsAction= new AbstractAction("Remove Bindings") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
@@ -240,7 +240,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         };
 
 
-        Action deletePlotAction= new AbstractAction("Delete Plot") {
+        private Action deletePlotAction= new AbstractAction("Delete Plot") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
@@ -268,7 +268,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         };
 
-        Action addPlotsAction= new AbstractAction("Add Plots...") {
+        private Action addPlotsAction= new AbstractAction("Add Plots...") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 org.das2.util.LoggerManager.logGuiEvent(e);                
@@ -394,7 +394,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         contextMenus.put( bindingListComponent, bindingActionsMenu );
 
     }
-    transient ListSelectionListener plotElementSelectionListener = new ListSelectionListener() {
+    private transient ListSelectionListener plotElementSelectionListener = new ListSelectionListener() {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             if ( plotElementListComponent.getValueIsAdjusting() ) return;
@@ -419,28 +419,28 @@ public class LayoutPanel extends javax.swing.JPanel {
         }
     };
     
-    transient PropertyChangeListener plotElementsListener = new PropertyChangeListener() {
+    private transient PropertyChangeListener plotElementsListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updatePlotElementList();
         }
     };
 
-    transient PropertyChangeListener bindingsListener = new PropertyChangeListener() {
+    private transient PropertyChangeListener bindingsListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updateBindingList();
         }
     };
 
-    transient PropertyChangeListener dataSourceListener = new PropertyChangeListener() {
+    private transient PropertyChangeListener dataSourceListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             dataSourceList.repaint();
         }
     };
             
-    transient PropertyChangeListener dataSourcesListener = new PropertyChangeListener() {
+    private transient PropertyChangeListener dataSourcesListener = new PropertyChangeListener() {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             updateDataSourceList();
@@ -519,7 +519,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         }
     };
 
-    void updateSelected() {
+    private void updateSelected() {
         
         int[] iindices= plotElementListComponent.getSelectedIndices();
         PlotElement[] peles=  dom.getPlotElements();
@@ -580,7 +580,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         }        
     }
 
-    ListCellRenderer myListCellRenderer=  new DefaultListCellRenderer() {
+    private ListCellRenderer myListCellRenderer=  new DefaultListCellRenderer() {
         @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             final javax.swing.JLabel label= (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
