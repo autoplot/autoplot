@@ -620,7 +620,7 @@ public class BatchMaster extends javax.swing.JPanel {
     }
     
     public synchronized void doIt() throws IOException {
-        ProgressMonitor monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(this), "batchMaster");
+        ProgressMonitor monitor= DasProgressPanel.createFramed( SwingUtilities.getWindowAncestor(this), "Run Batch");
         try {
             String scriptName= dataSetSelector1.getValue();
             
