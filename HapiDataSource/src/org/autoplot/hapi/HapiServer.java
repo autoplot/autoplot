@@ -160,10 +160,10 @@ public class HapiServer {
             }
         }
         JSONObject o= new JSONObject(builder.toString());
-        JSONArray catalog= o.getJSONArray("catalog");
+        JSONArray catalog= o.getJSONArray( HapiSpec.CATALOG );
         List<String> result= new ArrayList<>(catalog.length());
         for ( int i=0; i<catalog.length(); i++ ) {
-            result.add( i,catalog.getJSONObject(i).getString("id") );
+            result.add(i,catalog.getJSONObject(i).getString(HapiSpec.URL_PARAM_ID) );
         }
         return result;
     }
@@ -181,7 +181,7 @@ public class HapiServer {
             logger.warning("HAPI network call on event thread");
         }        
         URL url;
-        url= HapiServer.createURL( server, "catalog" );
+        url= HapiServer.createURL( server, HapiSpec.CATALOG_URL  );
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getCatalog {0}", url.toString());
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
@@ -192,7 +192,7 @@ public class HapiServer {
             }
         }
         JSONObject o= new JSONObject(builder.toString());
-        JSONArray catalog= o.getJSONArray("catalog");
+        JSONArray catalog= o.getJSONArray( HapiSpec.CATALOG );
         return catalog;
     }
     
@@ -203,7 +203,7 @@ public class HapiServer {
      * @return 
      */
     public static URL getInfoURL( URL server, String id ) {
-        URL url= HapiServer.createURL( server, "info", Collections.singletonMap("id", id) );
+        URL url= HapiServer.createURL(server, HapiSpec.INFO_URL, Collections.singletonMap(HapiSpec.URL_PARAM_ID, id) );
         return url;
     }
     
@@ -218,13 +218,13 @@ public class HapiServer {
     public static URL getDataURL( URL server, String id, DatumRange tr, String parameters ) {
         TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$SZ");
         HashMap<String,String> map= new LinkedHashMap();
-        map.put( "id", id );
-        map.put( "time.min", tp.format(tr.min()) );
-        map.put( "time.max", tp.format(tr.max()) );
+        map.put(HapiSpec.URL_PARAM_ID, id );
+        map.put(HapiSpec.URL_PARAM_TIMEMIN, tp.format(tr.min()) );
+        map.put(HapiSpec.URL_PARAM_TIMEMAX, tp.format(tr.max()) );
         if ( parameters.length()>0 ) {
-            map.put( "parameters", parameters );
+            map.put(HapiSpec.URL_PARAM_PARAMETERS, parameters );
         }
-        URL serverUrl= createURL(server, "data", map );
+        URL serverUrl= createURL(server, HapiSpec.DATA_URL, map );
         return serverUrl;
     }
         
@@ -254,7 +254,7 @@ public class HapiServer {
 
     public static JSONArray getParameters(URL server, String id) throws IOException, JSONException {
         JSONObject o= getInfo( server, id );
-        JSONArray catalog= o.getJSONArray("parameters");
+        JSONArray catalog= o.getJSONArray(HapiSpec.PARAMETERS);
         return catalog;
     }
     
@@ -272,7 +272,7 @@ public class HapiServer {
             logger.warning("HAPI network call on event thread");
         }
         URL url;
-        url= HapiServer.createURL( server, "info", Collections.singletonMap( "id", id ) );
+        url= HapiServer.createURL(server, HapiSpec.INFO_URL, Collections.singletonMap(HapiSpec.URL_PARAM_ID, id ) );
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getInfo {0}", url.toString());
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
@@ -300,7 +300,7 @@ public class HapiServer {
             logger.warning("HAPI network call on event thread");
         }
         URL url;
-        url= HapiServer.createURL( server, "capabilities" );
+        url= HapiServer.createURL(server, HapiSpec.CAPABILITIES_URL);
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getCapabilities {0}", url.toString());
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
@@ -345,7 +345,7 @@ public class HapiServer {
                         s.append("&");
                     }
                     String svalue;
-                    if ( entry.getKey().equals("time.min") || entry.getKey().equals("time.max") ) {
+                    if ( entry.getKey().equals(HapiSpec.URL_PARAM_TIMEMIN) || entry.getKey().equals(HapiSpec.URL_PARAM_TIMEMAX) ) {
                         svalue= entry.getValue();  // the colons are needed on CDAWeb server.
                     } else {
                         svalue= urlEncode( entry.getValue() );

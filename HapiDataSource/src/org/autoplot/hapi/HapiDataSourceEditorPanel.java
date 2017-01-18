@@ -63,12 +63,18 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
 
     private static final Logger logger= LoggerManager.getLogger("apdss.hapi");
     
-    JSONArray idsJSON;
+    private JSONArray idsJSON;
     
-    URL defaultServer;
+    private URL defaultServer;
 	
-	Datum myValidTime;
+	private Datum myValidTime;
 	
+    /**
+     * return the range of available data. For example, Polar/Hydra data is available
+     * from 1996-03-20 to 2008-04-15.
+     * @param info
+     * @return the range of available data.
+     */
     private DatumRange getRange( JSONObject info ) {
         try {
             if ( info.has("firstDate") && info.has("lastDate") ) { // this is deprecated behavior
@@ -669,7 +675,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             this.currentParameters= parameters;
             setParameters(this.currentParameters);
         }
-        if ( HAPI_BINARY.equals(params.get("format") ) ) {
+        if ( HapiSpec.BINARY.equals(params.get("format") ) ) {
             this.binaryCB.setSelected(true);
         } else {
             this.binaryCB.setSelected(false);
@@ -711,7 +717,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     }
     
     /**
-     * 
+     * See https://github.com/hapi-server/data-specification#catalog
      * @param filter
      * @throws IOException
      * @throws JSONException 
@@ -725,8 +731,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     Pattern p= Pattern.compile(filter,Pattern.CASE_INSENSITIVE);
                     String id= catalogEntry.getString("id");
                     String title= null;
-                    if ( catalogEntry.has(HAPI_TITLE) ) {
-                        title= catalogEntry.getString(HAPI_TITLE);
+                    if ( catalogEntry.has(HapiSpec.TITLE) ) {
+                        title= catalogEntry.getString(HapiSpec.TITLE);
                     }
                     if ( p.matcher(id).find() || ( title!=null && p.matcher(title).find() ) ) {
                         model.addElement( catalogEntry.getString("id") );
@@ -758,10 +764,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             boolean binaryIsEnabled= false;
             try {
                 JSONObject capabilitiesDoc= HapiServer.getCapabilities(server);
-                if ( capabilitiesDoc.has( HAPI_OUTPUT_FORMATS ) ) { // new 2016-11-21.  Other is deprecated.
-                    JSONArray outputFormats= capabilitiesDoc.getJSONArray( HAPI_OUTPUT_FORMATS );
+                if ( capabilitiesDoc.has(HapiSpec.OUTPUT_FORMATS ) ) { // new 2016-11-21.  Other is deprecated.
+                    JSONArray outputFormats= capabilitiesDoc.getJSONArray(HapiSpec.OUTPUT_FORMATS );
                     for ( int i=0; i<outputFormats.length(); i++ ) {
-                        if ( outputFormats.getString(i).equals(HAPI_BINARY) ) {
+                        if ( outputFormats.getString(i).equals(HapiSpec.BINARY) ) {
                             binaryIsEnabled= true;
                         }
                     }                    
@@ -769,10 +775,10 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                     JSONArray capabilities= capabilitiesDoc.getJSONArray("capabilities"); // deprecated.
                     for ( int i=0; i<capabilities.length(); i++ ) {
                         JSONObject c= capabilities.getJSONObject(i);
-                        if ( c.has(HAPI_FORMATS) ) {
-                            JSONArray formats= c.getJSONArray(HAPI_FORMATS);
+                        if ( c.has(HapiSpec.FORMATS) ) {
+                            JSONArray formats= c.getJSONArray(HapiSpec.FORMATS);
                             for ( int j=0; j<formats.length(); j++ ) {
-                                if ( formats.getString(j).equals(HAPI_BINARY) ) {
+                                if ( formats.getString(j).equals(HapiSpec.BINARY) ) {
                                     binaryIsEnabled= true;
                                 }
                             }
@@ -790,19 +796,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
 
     }
-    
-    
-    protected static final String HAPI_FORMATS = "formats";
-    
-    protected static final String HAPI_OUTPUT_FORMATS= "outputFormats";
-    
-    protected static final String HAPI_BINARY = "binary";
-    
-    /**
-     * some HAPI servers have optional title for IDs.
-     */
-    protected static final String HAPI_TITLE = "title";
-    
+        
     /**
      * get the catalog of the server.  
      * @param server
@@ -863,8 +857,8 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             JSONObject info= HapiServer.getInfo( server, id );
             for ( JSONObject item : new JSONArrayIterator(idsJSON) ) {
                 if ( item.getString("id").equals(id) ) {
-                    if ( item.has(HAPI_TITLE) ) {
-                        String title= item.getString(HAPI_TITLE);
+                    if ( item.has(HapiSpec.TITLE) ) {
+                        String title= item.getString(HapiSpec.TITLE);
                         titleLabel.setText(title);
                         titleLabel.setToolTipText(title);
                         titleLabel.setMinimumSize(new Dimension(100,titleLabel.getFont().getSize()));
@@ -949,11 +943,13 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
             DatumRange range= getRange(info);
             if ( range==null ) {
-                jLabel3.setText( "range is not provided" );
+                logger.warning("server is missing required startDate and stopDate parameters.");
+                jLabel3.setText( "range is not provided (non-compliant server)" );
             } else {
 				DatumRange landing;
-				if ( range.max().ge( myValidTime ) ) {
-					jLabel3.setText( range.min().toString() + " to ?" );
+				if ( range.max().ge( myValidTime ) ) { // Note stopDate is required since 2017-01-17.
+					logger.warning("server is missing required stopDate parameter.");
+                    jLabel3.setText( range.min().toString() + " to ?" );
 					landing= new DatumRange( range.min(), range.min().add( 1, Units.days ) );
 				} else {
 					jLabel3.setText( range.toString() );
