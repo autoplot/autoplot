@@ -259,7 +259,13 @@ public class CDAWebDataSource extends AbstractDataSource {
 
                         logger.log( Level.FINE, "loading {0}", file1);
                         CdfDataSource dataSource= (CdfDataSource)cdfFileDataSourceFactory.getDataSource( file1 );
-                        ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
+                        try {
+                            ds1= (MutablePropertyDataSet)dataSource.getDataSet( t1,metadata );
+                        } catch ( IllegalArgumentException ex ) {
+                            String p= params.get(PARAM_ID);
+                            logger.log(Level.INFO, "parameter not found for interval: {0}", p );
+                            throw new NoDataInIntervalException("parameter not found for interval: "+p );
+                        }
                         
                     }
                 } catch ( NoDataInIntervalException ex ) {
