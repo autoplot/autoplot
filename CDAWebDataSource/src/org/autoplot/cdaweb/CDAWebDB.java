@@ -42,6 +42,7 @@ import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
+import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -571,22 +572,34 @@ public class CDAWebDB {
         }
     }
 
+    /**
+     * return the name of a master file, which is used to override the metadata
+     * of the daily files.
+     * @param ds the name, like A1_K0_MPA
+     * @param p progress monitor
+     * @return the name (http://...) of the master file to use, which may be one of the data files.
+     * @throws IOException 
+     */
     public String getMasterFile( String ds, ProgressMonitor p ) throws IOException {
-        String master= CDAWeb + "pub/software/cdawlib/0MASTERS/"+ds.toLowerCase()+"_00000000_v01.cdf";
-
-        //DasProgressPanel p= DasProgressPanel.createFramed("loading master cdf");
-        p.setProgressMessage("loading master cdf");
+        logger.log(Level.FINE, "getMasterFile for {0}, looking for v02 then v01.", ds);
+        p.started();
+        String master; //= CDAWeb + "pub/software/cdawlib/0MASTERS/"+ds.toLowerCase()+"_00000000_v01.cdf";
         
-        try {
-            try {
-                //TODO: poor feedback here is caused by the directory listing taking so long.
-                
-                DataSetURI.getFile(new URI(master), p );
-            } catch (URISyntaxException ex) {
-                logger.log(Level.SEVERE, ex.getMessage(), ex);
-            }
+        FileSystem mastersFs= FileSystem.create(CDAWeb + "pub/software/cdawlib/0MASTERS/" );
+        //String s= ds.toLowerCase()+"_$x_v$v.cdf"; //FSM method takes 500+ milliseconds.
 
-        } catch ( IOException ex ) {
+        FileObject fo= mastersFs.getFileObject( ds.toLowerCase()+"_00000000_v02.cdf" );
+        if ( !fo.exists() ) fo= mastersFs.getFileObject( ds.toLowerCase()+"_00000000_v01.cdf" );
+        if ( fo.exists() ) {
+            master= mastersFs.getRootURI().toString() + fo.getNameExt();
+        } else {
+            master= null;
+        }
+        
+        if ( master!=null ) {
+            logger.log(Level.FINER, "found master file: {0}", master );
+            p.finished();
+        } else {
             // datasets don't have to have masters.  In this case we use the default timerange to grab a file as the master.
 
             String tmpl= getNaming(ds.toUpperCase());
@@ -619,7 +632,8 @@ public class CDAWebDB {
             } else {
                 master= fs.getRootURI().toString() + files[0];
             }
-
+            logger.log(Level.FINER, "using arbitary representative as master file: {0}", master );
+            p.finished();
         }
         p.setProgressMessage(" ");
         return master;
