@@ -1228,7 +1228,8 @@ public class CdfDataSource extends AbstractDataSource {
                 if ( ex instanceof IllegalArgumentException ) {
                     throw (IllegalArgumentException)ex;
                 } else {
-                    throw new IOException(ex.getMessage());
+                    ex.printStackTrace();
+                    throw ex;
                 }
             }
         }
