@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Two map pngs are plotted under the data.  Autoplot invocations on the left, a Barrel balloon mission on the right.
+        <p><small>A Jython script is used to demonstrate bug where x-axis label was clipped when ticks point inward.  Script <a href="sliderCallback.jy">here</a>.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-01-12 r20210):</p>
+        <p>Bugfixes (2017-01-20 r20230):</p>
         <ul>
+            <li>improvements to Orbit mode.
+            <li>"file not found: afile.txt.gz" when afile.txt is requested.
+            <li>POLAR_HYDRA_MOMENTS-14SEC have missing parameters in 2008 (ELECTRON_DENSITY) because v02 master files were not used.
+            <li>1753: datum/dataset now results in correct units.
             <li>1752: renderControl property needed to be handled after the style node when loading a file, so orbit plot settings would load properly
             <li>1752: more corrections to the orbit plot renderer, such as rounded strokes, tick positioning, and icon
             <li>1749: correct code that handles unnamed command-line arguments for scripts, which dropped the first argument.
@@ -83,6 +87,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>spectrogram scatter mode.  Thanks, Matt!
+            <li>cdawebHttps=true environment variable allows use of https for web transactions with CDAWeb.
+            <li>logging improvements to CDF reader.
+            <li>LinFit has getSlope and getIntercept methods, in anticipation of proper SI units library.
             <li>mouse modules (crosshair,etc) allow up,down,right,left keys for precise control.
             <li>add example values for depend0units and timeFormat parameters in ascii editor panel.
             <li>ascii table data source format supports "+" in tformat parameter, to output multiple columns
