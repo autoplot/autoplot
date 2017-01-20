@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.autoplot.cdaweb;
 
@@ -67,7 +63,16 @@ public class CDAWebDB {
     
     private static CDAWebDB instance=null;
     
-    public static final String CDAWeb= "http://cdaweb.gsfc.nasa.gov/";
+    public static final String CDAWeb;
+    static {
+        if ( System.getProperty("cdawebHttps","false").equals("false") ) {
+            CDAWeb = "http://cdaweb.gsfc.nasa.gov/";
+        } else {
+            // Note modern Javas are needed for https support.  
+            // https will be required by Spring 2017.
+            CDAWeb = "https://cdaweb.gsfc.nasa.gov/";
+        }
+    }
 
     public static final String dbloc= CDAWeb + "pub/catalogs/all.xml";
 
