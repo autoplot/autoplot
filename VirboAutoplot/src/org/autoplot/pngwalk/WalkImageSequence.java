@@ -34,10 +34,11 @@ import org.virbo.datasource.DataSetURI;
 public class WalkImageSequence implements PropertyChangeListener  {
 
     private static final Logger logger= org.das2.util.LoggerManager.getLogger("autoplot.pngwalk");
-
+ 
+    // list of all possible images, without limit.
     private List<WalkImage> existingImages;
     
-    // list of the visible images.
+    // list of the visible images, limited by "Limit range to" gui.
     private List<WalkImage> displayImages = new ArrayList();
     
     //private List<URI> locations;
@@ -47,7 +48,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
     private DatumRange timeSpan = null;
     private List<DatumRange> datumRanges = null;
+    
+    // list of ranges, including gaps between files.
     private List<DatumRange> possibleRanges = null;
+    
     private List<DatumRange> subRange = null;
 
     /**
@@ -476,7 +480,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
         return possibleRanges;
     }
 
-    /** Return the current value of the index.
+    /** Return the current value of the index, where index is that of the displayImages.
      * 
      * @return
      */
@@ -714,8 +718,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * @return the index, or -1 if the name is not found.
      */
     public int findIndex( String name ) {
-        for ( int i=0; i<existingImages.size(); i++ ) {
-            WalkImage img= existingImages.get(i);
+        for ( int i=0; i<displayImages.size(); i++ ) {
+            WalkImage img= displayImages.get(i);
             if ( img.getUri().toString().endsWith(name) ) {
                 return i;
             }
@@ -730,7 +734,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * @return the name of the selected image.
      */
     public String getSelectedName() {
-        WalkImage img= existingImages.get( getIndex() );
+        WalkImage img= displayImages.get( getIndex() );
         String surl= img.getUri().toString();
         
         int i = surl.indexOf('?');
