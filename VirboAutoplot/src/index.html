@@ -26,7 +26,9 @@
         
         <p>Bugfixes (2017-01-20 r20230):</p>
         <ul>
-            <li>improvements to Orbit mode.
+            <li>bug 1566: improper escaping meant that pngwalk tool may not have been using thumbs400 directory.
+            <li>rte_0064480313: index out of bounds in pngwalk tool when using limited range.  Thanks Laura!
+            <li>improvements to Orbit mode, for example when the last point is fill.
             <li>"file not found: afile.txt.gz" when afile.txt is requested.
             <li>POLAR_HYDRA_MOMENTS-14SEC have missing parameters in 2008 (ELECTRON_DENSITY) because v02 master files were not used.
             <li>1753: datum/dataset now results in correct units.
