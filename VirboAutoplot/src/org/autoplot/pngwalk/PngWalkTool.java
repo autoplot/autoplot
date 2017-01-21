@@ -354,7 +354,33 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         Util.loadRecent( "pngwalkRecent", tool.dataSetSelector1, deft );
 
+        Runnable run= new Runnable() {
+            public void run() {
+                addFileEnabler(tool,parent);
+            }
+        };
+        new Thread(run).start();
 
+        JFrame frame = new JFrame("PNG Walk Viewer");
+        frame.setIconImage( AutoplotUtil.getAutoplotIcon() );
+
+        frame.setJMenuBar( createMenuBar(tool,frame) );
+
+        AppManager.getInstance().addApplication(tool);
+        
+        frame.getContentPane().add(tool);
+
+        frame.addWindowListener( AppManager.getInstance().getWindowListener(tool) );
+
+        frame.pack();
+        frame.setLocationRelativeTo(parent);
+        
+        frame.setVisible(true);
+
+        return tool;
+    }
+
+    private static void addFileEnabler( final PngWalkTool tool, final Window parent ) {
         PngWalkTool.ActionEnabler enabler= new PngWalkTool.ActionEnabler() {
             @Override
             public boolean isActionEnabled(String filename) {
@@ -515,26 +541,9 @@ public final class PngWalkTool extends javax.swing.JPanel {
                 new Thread(run).start();
             }
         });
-
-        JFrame frame = new JFrame("PNG Walk Viewer");
-        frame.setIconImage( AutoplotUtil.getAutoplotIcon() );
-
-        frame.setJMenuBar( createMenuBar(tool,frame) );
-
-        AppManager.getInstance().addApplication(tool);
         
-        frame.getContentPane().add(tool);
-
-        frame.addWindowListener( AppManager.getInstance().getWindowListener(tool) );
-
-        frame.pack();
-        frame.setLocationRelativeTo(parent);
-        
-        frame.setVisible(true);
-
-        return tool;
     }
-
+    
     /**
      * copy image to the system clipboard.
      * @param parent
