@@ -140,6 +140,7 @@ public class WalkImage  {
     }
 
     private void setStatus(Status s) {
+        logger.log(Level.FINER, "setStatus {0} {1}", new Object[]{s, caption});
         Status oldStatus = status;
         status = s;
         pcs.firePropertyChange(PROP_STATUS_CHANGE, oldStatus, status);
@@ -248,6 +249,7 @@ public class WalkImage  {
      * action takes place.
      */
     public void getThumbnailImmediately( ) {
+        logger.log(Level.FINER, "getThumbnailImmediately {0}", caption);
         BufferedImage rawThumb;
         try {
             if ( haveThumbs400!=false ) {
@@ -271,6 +273,7 @@ public class WalkImage  {
             // Assume the error is that the thumbs folder doesn't exist; other errors
             // will occur again in loadImage()
             //System.err.println("Thumb dir doesn't exist; using image.");
+            logger.log(Level.FINER, "attempt to load thumbnail in thumbs400 failed, load original: {0}", caption);
             if (im == null) {
                 // Otherwise we'll have to create the thumb from the full-sized image
                 // Initiate loading and return; clients listen for prop change
@@ -453,6 +456,7 @@ public class WalkImage  {
     }
     
     private void loadImageImmediately() {
+        logger.log(Level.FINER, "loadImageImmediately {0}", this.caption);
         try {
             //System.err.println("download "+imgURI );
 
@@ -519,6 +523,7 @@ public class WalkImage  {
     }
 
     private void loadImage() {
+        logger.log(Level.FINER, "loadImage {0}", this.caption);
         if (status == Status.IMAGE_LOADING || status == Status.IMAGE_LOADED) {
             return;
         }
