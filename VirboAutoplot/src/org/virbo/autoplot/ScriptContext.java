@@ -1190,7 +1190,7 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.lang.Exception any exception thrown by the data source.
      */
     public static String[] getCompletions( String file ) throws Exception {
-        return org.virbo.jythonsupport.Util.getCompletions(file);
+        return org.virbo.jythonsupport.Util.getAllCompletions(file);
     }
     
     /**
