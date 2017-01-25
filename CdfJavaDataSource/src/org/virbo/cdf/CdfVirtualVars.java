@@ -14,6 +14,7 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
 
 /**
@@ -110,6 +111,43 @@ public class CdfVirtualVars {
                 }
             }
             return real_data;
+        } else if ( function.equalsIgnoreCase("apply_qflag" ) ) {
+            QDataSet quality_data= args.get(1);
+            QDataSet data= args.get(0);
+            String n= ((String)data.property(QDataSet.NAME)).toLowerCase();
+            int channel=0;
+            switch (n) {
+                case "flux_h":
+                case "sigma_h":
+                    channel= 0;
+                    break;
+                case "flux_o":
+                case "sigma_o":
+                    channel= 1;
+                    break;
+                case "flux_he_1":
+                case "sigma_he_1":
+                    channel= 2;
+                    break;
+                case "flux_he_2":
+                case "sigma_he_2":
+                    channel= 3;
+                    break;
+                default:
+                    break;
+            }
+            quality_data= Ops.slice1( quality_data, channel );
+            QDataSet rBad= Ops.where( Ops.ge( quality_data, 4 ) );
+            double fill= (Double)data.property(QDataSet.FILL_VALUE);
+            WritableDataSet wdata= Ops.copy(data);
+            for ( int i=0; i<rBad.length(); i++ ) {
+                for ( int j=0; j<data.length(i); j++ ) {
+                    for ( int k=0; k<data.length(i,j); k++ ) {
+                        wdata.putValue( i,j,k, fill);
+                    }
+                }
+            }
+            return wdata;
         } else if ( function.equalsIgnoreCase("apply_esa_qflag") ) {
             ArrayDataSet esa_data= ArrayDataSet.copy(args.get(0));
             QDataSet quality_data= args.get(1);
@@ -181,7 +219,9 @@ public class CdfVirtualVars {
     public static boolean isSupported(String function) {
         List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", 
                 "fftpowerdelta512", "fftpowerdelta1024", "fftpowerdelta2048",
-                "fftpower","fftPower512","fftPower1024","fftpowerdeltatranslation512", "alternate_view", "calc_p", "region_filt", "apply_esa_qflag",
+                "fftpower","fftPower512","fftPower1024","fftpowerdeltatranslation512", 
+                "alternate_view", "calc_p", "region_filt", 
+                "apply_esa_qflag", "apply_qflag",
                 "sum_values" );
         boolean supported= functions.contains(function.toLowerCase());
         logger.log(Level.FINE, "virtual variable function \"{0}\" is supported: {1}", new Object[]{function, supported});
