@@ -771,7 +771,7 @@ public class DataSetURI {
                     checkNonHtml( fz, url );
                     File tfile1= new File( fz.getPath().substring(0, fz.getPath().length() - 3) + ".temp" );
                     tfile= new File( fz.getPath().substring(0, fz.getPath().length() - 3 ) );
-                    org.das2.util.filesystem.FileSystemUtil.unzip( fz, tfile1);
+                    org.das2.util.filesystem.FileSystemUtil.gunzip( fz, tfile1);
                     if ( tfile.exists() ) {
                         if ( ! tfile.delete() ) {
                             throw new IllegalArgumentException("unable to delete "+tfile );
@@ -872,7 +872,7 @@ public class DataSetURI {
                         File tfile1= new File( fz.getPath().substring(0, fz.getPath().length() - 3) + ".temp" );
                         tfile= new File( fz.getPath().substring(0, fz.getPath().length() - 3 ) );
                         if ( !tfile.exists() ) { // another thread already unpacked it.
-                            org.das2.util.filesystem.FileSystemUtil.unzip( fz, tfile1);
+                            org.das2.util.filesystem.FileSystemUtil.gunzip( fz, tfile1);
                             if ( tfile.exists() ) {
                                 if ( ! tfile.delete() ) {
                                     throw new IllegalArgumentException("unable to delete "+tfile );

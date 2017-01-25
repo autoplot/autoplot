@@ -204,6 +204,7 @@ public class FileSystemUtil {
      * @param shouldDelete return true if the file should be deleted.
      * @throws IllegalArgumentException if it is unable to delete a file
      * @return true if the operation was successful.
+     * @see org.das2.util.filesystem.FileSystemUtil#deleteAllFiles(java.io.File, java.lang.String) 
      */
     public static boolean deleteFilesInTree( File root, Check shouldDelete ) throws IllegalArgumentException {
         if (!root.exists()) return true;
