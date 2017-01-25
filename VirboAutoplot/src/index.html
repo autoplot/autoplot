@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>A Jython script is used to demonstrate bug where x-axis label was clipped when ticks point inward.  Script <a href="sliderCallback.jy">here</a>.
+        <p><small>POLAR/Timas data is now accessible from CDAWeb.  Quite a few quanitities are available in CDAWeb which aren't supported in Autoplot, because IDL code needs to be replicated.  Requests are welcome!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-01-20 r20230):</p>
+        <p>Bugfixes (2017-01-25 r20244):</p>
         <ul>
+            <li>1759: support rank2 DEPEND_2 in expressions like ds[r,:,:]
+            <li>total supports rank 0 data.</li>
             <li>bug 1566: improper escaping meant that pngwalk tool may not have been using thumbs400 directory.
             <li>rte_0064480313: index out of bounds in pngwalk tool when using limited range.  Thanks Laura!
             <li>improvements to Orbit mode, for example when the last point is fill.
@@ -89,6 +91,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>support apply_qflag for Timas data in CDF.</li>
             <li>spectrogram scatter mode.  Thanks, Matt!
             <li>cdawebHttps=true environment variable allows use of https for web transactions with CDAWeb.
             <li>logging improvements to CDF reader.
