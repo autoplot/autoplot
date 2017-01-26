@@ -89,30 +89,38 @@ public class Util {
     }
 
     /**
-     * searches class path for META-INF/version.txt, returns nice strings
-     * @return one line per jar
+     * return the build time an an ISO8601 time, or "????" if it is unknown.
+     * Note question marks are used intentionally so sloppy codes can assume
+     * that ???? means the current version of the code built in a debugger.
+     * @return ISO8601 time or "????"
      */
-    public static List<String> getBuildInfos() throws IOException {
-        Enumeration<URL> urls = Util.class.getClassLoader().getResources("META-INF/build.txt");
-
-        List<String> result = new ArrayList<String>();
-
-        String buildTime = "???";
+    public static String getBuildTime() {
+        String buildTime = "????";
         java.net.URL buildURL = AboutUtil.class.getResource("/buildTime.txt");
         if (buildURL != null) {
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(buildURL.openStream()));
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(buildURL.openStream()))) {
                 buildTime = reader.readLine();
-                reader.close();
             } catch (IOException ex) {
                 logger.log( Level.WARNING, ex.getMessage(), ex );
             }
         }
-        if ( buildTime!=null && !buildTime.equals("???") ) {
-            result.add("build time: "+buildTime);
-        }
+        return buildTime;
+    }
+    
+    /**
+     * searches class path for META-INF/version.txt, returns nice strings
+     * @return one line per jar
+     * @throws java.io.IOException
+     */
+    public static List<String> getBuildInfos() throws IOException {
+        Enumeration<URL> urls = Util.class.getClassLoader().getResources("META-INF/build.txt");
 
-        LinkedHashMap<String, String> abbrevs = new LinkedHashMap<String, String>();
+        List<String> result = new ArrayList<>();
+
+        String buildTime= getBuildTime();
+        result.add( "build time: " + buildTime );
+                
+        LinkedHashMap<String, String> abbrevs = new LinkedHashMap<>();
 
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
@@ -156,6 +164,7 @@ public class Util {
     /**
      * deletes all files and folders below root, and root, just as "rm -r" would.
      * TODO: check links
+     * @param root the root of the tree.
      * @throws IllegalArgumentException if it is unable to delete a file
      * @return true if the operation was successful.
      */
