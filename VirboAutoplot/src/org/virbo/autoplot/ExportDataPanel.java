@@ -489,10 +489,10 @@ public class ExportDataPanel extends javax.swing.JPanel {
             if ( originalDataSet.equals(processedDataSet) ) {
                 processedDataB.setEnabled(false);
             }
-            if ( !originalDataB.isEnabled() && originalDataB.isSelected() ) {
+            if ( !originalDataB.isEnabled() && originalDataB.isSelected() && processedDataB.isEnabled() ) {
                 processedDataB.setSelected(true);
             } 
-            if ( !processedDataB.isEnabled() && processedDataB.isSelected() ) {
+            if ( !processedDataB.isEnabled() && processedDataB.isSelected() && processedWithinXRangeB.isEnabled() ) {
                 processedWithinXRangeB.setSelected(true);
             }
             additionalOptionsButton.setEnabled( editorPanel!=null );
