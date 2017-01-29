@@ -680,6 +680,16 @@ public class CdfDataSource extends AbstractDataSource {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
+            
+            o= props.get("LABL_PTR_1");
+            if ( o!=null ) {
+                try {
+                    Object v= CdfUtil.wrapCdfData( cdf,(String)o, 0, -1, 1, -1, new NullProgressMonitor() );
+                    props.put( "slice1_labels", v );
+                } catch (Exception ex) {
+                    logger.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+            }
 
             return props;
         } catch ( CDFException ex ) {

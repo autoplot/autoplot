@@ -270,7 +270,7 @@ public class IstpMetadataModel extends MetadataModel {
         }
 
         if ( title.trim().length()>0 ) properties.put( QDataSet.TITLE, title.trim() );
-
+        
         if (attrs.containsKey("DISPLAY_TYPE")) {
             String type = (String) attrs.get("DISPLAY_TYPE");
             if ( !type.equals(type.toLowerCase() ) ) logger.log(Level.WARNING, "DISPLAY_TYPE should be lower case ({0})", type);
@@ -370,13 +370,13 @@ public class IstpMetadataModel extends MetadataModel {
             String sslice1= (String) attrs.get("slice1");
             if ( sslice1!=null ) {
                 int islice= Integer.parseInt(sslice1);
-                Object o = (Object) attrs.get("LABL_PTR_1");
+                Object o = (Object) attrs.get("slice1_labels");
                 if ( ! ( o instanceof QDataSet ) ) {
                     if ( o!=null ) {
-                        logger.log(Level.WARNING, "LABL_PTR_1 property of {0} should be a QDataSet", name);
+                        logger.log(Level.WARNING, "slice1_labels property of {0} should be a QDataSet", name);
                     }
                 } else {
-                    QDataSet lablDs= (QDataSet) attrs.get("LABL_PTR_1");
+                    QDataSet lablDs= (QDataSet) attrs.get("slice1_labels");
                     if ( lablDs!=null ) { // TODO: I think this is trivially true.
                         Units u= (Units) lablDs.property(QDataSet.UNITS);
                         label= u.createDatum(lablDs.value(islice)).toString();
