@@ -1196,6 +1196,9 @@ public class PlotElementController extends DomNodeController {
 
         List<Integer> qube= new ArrayList(); // we remove elements from this one.
         int[] a= DataSetUtil.qubeDims(fillDs);
+        if ( a==null ) {
+            throw new IllegalArgumentException("expected fillDs to be a qube");
+        }
         for ( int i=0; i<rank; i++ ) {
             qube.add(a[i]);
         }
@@ -1350,7 +1353,7 @@ public class PlotElementController extends DomNodeController {
             if ( renderType==RenderType.image && fillDs.rank()==3 ) {
                 shouldSlice= false; //TODO: some how render types should indicate they can handle a slice.
             }
-
+            
             QDataSet sliceDs= fillDs; // dataset after initial slicing
             String existingComponent= plotElement.getComponent();
 
