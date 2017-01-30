@@ -365,19 +365,18 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
 
     private void loadTable( Reader f, File file ) {
-        AsciiParser parser = new AsciiParser();
-        AsciiTableTableModel model = new AsciiTableTableModel();
-        model.setParser(parser);
-        this.jTable1.setModel(model);
-        model.setFile(file);
-        jTable1.setDefaultRenderer(Object.class, new ColSpanTableCellRenderer());
-        AsciiParser.DelimParser p;
         try {
-            p = parser.setDelimParser(f, AsciiParser.DELIM_COMMA);
+            AsciiParser parser = new AsciiParser();
+            AsciiTableTableModel model = new AsciiTableTableModel();
+            model.setParser(parser);
+            this.jTable1.setModel(model);
+            model.setFile(file);
+            jTable1.setDefaultRenderer(Object.class, new ColSpanTableCellRenderer());
+            AsciiParser.DelimParser p= parser.guessSkipAndDelimParser( file.getAbsolutePath() );
             model.setRecParser(p);
-            //parser.setRecordParser(  );
+            
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, ex.getMessage(), ex);
+            Logger.getLogger(CsvDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

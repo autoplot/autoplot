@@ -5,6 +5,10 @@
 
 package org.autoplot.csv;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PushbackInputStream;
 import java.util.regex.Pattern;
 
 /**
@@ -103,5 +107,15 @@ public class TableOps {
             }
         }
         return new int[]{first, last};
+    }
+    
+    public static char getDelim( PushbackInputStream thein ) throws IOException {
+        char delimiter=',';
+        BufferedReader read= new BufferedReader(new InputStreamReader(thein));
+        String l= read.readLine();
+        if ( l.split(";",-2).length > l.split(",",-2).length ) delimiter=';';
+        thein.unread( 10 );
+        thein.unread(l.getBytes());
+        return delimiter;
     }
 }
