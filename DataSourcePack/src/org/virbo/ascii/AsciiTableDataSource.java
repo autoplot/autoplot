@@ -539,11 +539,13 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 delim= delim.replaceAll("WHITESPACE", "\\s+");
                 delim= delim.replaceAll("SPACE", " ");
                 delim= delim.replaceAll("COMMA", ",");
+                delim= delim.replaceAll("SEMICOLON", ";");
                 delim= delim.replaceAll("COLON", ":");
                 delim= delim.replaceAll("TAB", "\t");
                 delim= delim.replaceAll("whitespace", "\\s+");
                 delim= delim.replaceAll("space", " ");
                 delim= delim.replaceAll("comma", ",");
+                delim= delim.replaceAll("semicolon", ";");
                 delim= delim.replaceAll("colon", ":");
                 delim= delim.replaceAll("tab", "\t");
                 if (delim.equals("+")) {
