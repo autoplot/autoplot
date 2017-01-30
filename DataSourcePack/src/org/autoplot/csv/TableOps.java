@@ -109,6 +109,14 @@ public class TableOps {
         return new int[]{first, last};
     }
     
+    /**
+     * get the delimiter, either a comma or semicolon, by looking at the first
+     * few lines of the file.  The pushbackInputStream should be returned at 
+     * the zeroth byte.
+     * @param thein the PushbackInputStream, which will be at the zeroth byte to start and the zeroth byte when this is done.
+     * @return the delimiter.
+     * @throws IOException 
+     */
     public static char getDelim( PushbackInputStream thein ) throws IOException {
         char delimiter=',';
         BufferedReader read= new BufferedReader(new InputStreamReader(thein));
