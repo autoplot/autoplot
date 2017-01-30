@@ -5,6 +5,7 @@ import com.csvreader.CsvReader;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PushbackInputStream;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.logging.Level;
@@ -85,8 +86,11 @@ public class CsvDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         InputStream in = DataSetURI.getInputStream(uri, mon);
-
-        BufferedReader breader= new BufferedReader(new InputStreamReader(in) );
+        
+        PushbackInputStream thein= new PushbackInputStream(in,1024);        
+        char delimiter= TableOps.getDelim(thein);
+        BufferedReader breader= new BufferedReader( new InputStreamReader(thein) );        
+        
         String skip= getParam( "skipLines", "" );
         if ( skip.length()==0 ) skip= getParam( "skip", "" );
         if ( skip.length()>0 ) {
@@ -96,9 +100,9 @@ public class CsvDataSource extends AbstractDataSource {
             }
         }
 
-
         CsvReader reader= new CsvReader( breader );
-
+        if ( delimiter!=',' ) reader.setDelimiter(delimiter);
+        
         String[] headers;
 
         if ( reader.readHeaders() ) {
