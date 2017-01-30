@@ -80,6 +80,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.dataset.examples.Schemes;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -605,8 +606,14 @@ public class PlotElementController extends DomNodeController {
                 QDataSet dep0= (QDataSet) fillDs.property( QDataSet.DEPEND_0 );  // only support das2 tabledataset scheme.
                 if ( dep0!=null ) return false;
                 return rendererAcceptsData( DataSetOps.slice0(fillDs,0) );
+            } else if ( fillDs.rank()==2 ) { // && !SemanticOps.isBundle(fillDs) ) {
+                return true;
             } else {
-                return fillDs.rank()==2;
+                if ( fillDs.property(QDataSet.PLANE_0)!=null ) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         } else if ( getRenderer() instanceof SeriesRenderer) {
             switch (fillDs.rank()) {
@@ -2210,6 +2217,7 @@ public class PlotElementController extends DomNodeController {
                 zds= fillDs;
             } else {
                 zds= SemanticOps.getDependentDataSet(fillDs);
+                if ( Schemes.isLegacyXYZScatter(zds) ) zds= (QDataSet)fillDs.property(QDataSet.PLANE_0 );
             }
 
             Units xunits= SemanticOps.getUnits(xds); 
