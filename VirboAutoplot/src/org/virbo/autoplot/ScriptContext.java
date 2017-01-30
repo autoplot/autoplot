@@ -55,7 +55,6 @@ import org.das2.event.BoxSelectionListener;
 import org.das2.event.BoxSelectorMouseModule;
 import org.das2.event.MouseModule;
 import org.das2.graph.DasPlot;
-import org.das2.util.AboutUtil;
 import org.das2.util.awt.SvgGraphicsOutput;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
@@ -71,7 +70,6 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.URISplit;
-import org.virbo.dsops.Ops;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
 
@@ -188,9 +186,9 @@ public class ScriptContext extends PyJavaInstance {
         return model;
     }
     
-    private static Map<String,AutoplotUI> apps= new HashMap();
-    private static Map<String,ApplicationModel> applets= new HashMap();
-    private static Map<ApplicationModel,AutoplotUI> appLookup= new HashMap();
+    private static final Map<String,AutoplotUI> apps= new HashMap();
+    private static final Map<String,ApplicationModel> applets= new HashMap();
+    private static final Map<ApplicationModel,AutoplotUI> appLookup= new HashMap();
     
     /**
      * get or create the application identified by the name.  For example:
@@ -402,9 +400,7 @@ public class ScriptContext extends PyJavaInstance {
             } else {
                 try {
                     SwingUtilities.invokeAndWait(run);
-                } catch (InterruptedException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                } catch (InvocationTargetException ex) {
+                } catch (InterruptedException | InvocationTargetException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
             }
@@ -450,6 +446,7 @@ public class ScriptContext extends PyJavaInstance {
     public static void setCanvasSize( final int width, final int height) {
         maybeInitModel();
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 model.setCanvasSize(width, height);                
                 model.getDocumentModel().getCanvases(0).setSize(width,height);
@@ -460,9 +457,7 @@ public class ScriptContext extends PyJavaInstance {
         } else {
             try {
                 SwingUtilities.invokeAndWait(run);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
+            } catch (InterruptedException | InvocationTargetException ex) {
                 Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
             }
         }                
@@ -638,7 +633,7 @@ public class ScriptContext extends PyJavaInstance {
         } else {
             ArrayDataSet yds= y==null ? null : ArrayDataSet.copy(y);
             if ( x!=null && yds!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
-            if ( ( x!=null && yds!=null ) || renderType!=null ) yds.putProperty( QDataSet.RENDER_TYPE, renderType ); // plot command calls this with all-null arguments, and we don't when RENDER_TYPE setting to be nulled.
+            if ( ( yds!=null ) && ( x!=null || renderType!=null ) ) yds.putProperty( QDataSet.RENDER_TYPE, renderType ); // plot command calls this with all-null arguments, and we don't when RENDER_TYPE setting to be nulled.
             model.setDataSet( chNum, label, yds);
         }
         if ( !SwingUtilities.isEventDispatchThread() ) model.waitUntilIdle();
@@ -948,7 +943,7 @@ public class ScriptContext extends PyJavaInstance {
         
         BufferedImage image = model.canvas.getImage( width, height );
         
-        Map<String,String> meta= new LinkedHashMap<String, String>();
+        Map<String,String> meta= new LinkedHashMap<>();
         meta.put( DasPNGConstants.KEYWORD_SOFTWARE, "Autoplot" );
         meta.put( DasPNGConstants.KEYWORD_PLOT_INFO, model.canvas.getImageMetadata() );
         writeToPng( image, filename, meta );
@@ -1246,6 +1241,7 @@ public class ScriptContext extends PyJavaInstance {
      * 
      * @param ds
      * @param file local file name that is the target
+     * @param monitor
      * @throws java.lang.Exception
      */
     public static void formatDataSet(QDataSet ds, String file, ProgressMonitor monitor ) throws Exception {
@@ -1625,6 +1621,7 @@ public class ScriptContext extends PyJavaInstance {
      * load a vap and return the dom.
      * @param filename .vap file
      * @return Application
+     * @throws java.io.IOException
      */
     public static Application loadVap( String filename ) throws IOException {
         return (Application) StatePersistence.restoreState( new File( filename ) );
