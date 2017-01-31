@@ -26,8 +26,12 @@
         
         <p>Bugfixes (2017-01-25 r20244):</p>
         <ul>
-            <li>1759: support rank2 DEPEND_2 in expressions like ds[r,:,:]
-            <li>total supports rank 0 data.</li>
+            <li>corrections to scatterRebinner to support more data types.</li>
+            <li>1730: correct code for adding label when slice1=i is used.  Thanks, Tami!
+            <li>file:///tmp/foo.zip/Chipmunks.wav wouldn't work because wav file wasn't accessed properly within the zip file.
+            <li>check that processedData checkbox is enabled before setting it because originalData is not enabled.
+            <li>1759: support rank2 DEPEND_2 in expressions like ds[r,:,:].  Thanks, Ivar!
+            <li>total supports rank 0 data.  Thanks, Ivar!
             <li>bug 1566: improper escaping meant that pngwalk tool may not have been using thumbs400 directory.
             <li>rte_0064480313: index out of bounds in pngwalk tool when using limited range.  Thanks Laura!
             <li>improvements to Orbit mode, for example when the last point is fill.
@@ -91,6 +95,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>x(t),y(t)->z(t) (as well as x(i),y(j)->z(i,j)) supported in spectrogram renderer.
+            <li>add method for creating zip files, from within scripts.
+            <li>rfe556: support semicolon in ascii files.
+            <li>Util.getBuildTime returns the build time, if available.</li>
             <li>support apply_qflag for Timas data in CDF.</li>
             <li>spectrogram scatter mode.  Thanks, Matt!
             <li>cdawebHttps=true environment variable allows use of https for web transactions with CDAWeb.
