@@ -129,81 +129,81 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                 break;
         }
 
-        if (jTable1.getColumnModel().getSelectedColumnCount() == 0) {
+        switch (jTable1.getColumnModel().getSelectedColumnCount()) {
+            case 0:
+                break;
+            case 1:
+                int col = jTable1.getColumnModel().getSelectedColumns()[0];
+                String name=null;
+                if ( columns!=null ) {
+                    name = columns.get(col);
+                }   
+                if (name == null) name = "field" + col;
+                if ( tool==Tool.DEPEND_0 ) {
+                    setDep0(name);
+                } else if ( tool==Tool.COLUMN ) {
+                    setColumn(name);
+                } else if ( tool==Tool.TIMEFORMAT ) {
+                    int row= jTable1.getSelectedRow();
+                    String val= timeFormatCB.getSelectedItem().toString() + (String) jTable1.getModel().getValueAt(row, col);
+                    timeFormatCB.setSelectedItem(val);
+                } else if ( tool==Tool.GUESSTIMEFORMAT ) {
+                    int row= jTable1.getSelectedRow();
+                    String val= (String) jTable1.getModel().getValueAt(row, col);
+                    timeFormatCB.setSelectedItem(val);
+                    guessTimeFormatButtonAP(row,col,col);
+                } else if ( tool==Tool.FILLVALUE ) {
+                    int row= jTable1.getSelectedRow();
+                    String val= (String) jTable1.getModel().getValueAt(row, col);
+                    if ( val.contains("+") ) val= ""+Double.parseDouble(val);
+                    fillValueTextField.setText(val);
+                }   
+                break;
+            default:
+                int[] cols = jTable1.getColumnModel().getSelectedColumns();
+                int first = cols[0];
+                int last = cols[cols.length - 1];
+                String sfirst = columns.get(first);
+                if (sfirst == null) {
+                    sfirst = "" + first;
+                }   boolean haveColumnNames = true;
+                String slast = columns.get(last);
+                if (slast == null) {
+                    slast = "" + last;
+                    haveColumnNames = false;
+                }   
 
-        } else if (jTable1.getColumnModel().getSelectedColumnCount() == 1) {
-            int col = jTable1.getColumnModel().getSelectedColumns()[0];
-            String name=null;
-            if ( columns!=null ) {
-                name = columns.get(col);    
-            }
-            if (name == null) {
-                name = "field" + col;
-            }            
-            if ( tool==Tool.DEPEND_0 ) {
-                setDep0(name);
-            } else if ( tool==Tool.COLUMN ) {
-                setColumn(name);
-            } else if ( tool==Tool.TIMEFORMAT ) {
-                int row= jTable1.getSelectedRow();
-                String val= timeFormatCB.getSelectedItem().toString() + (String) jTable1.getModel().getValueAt(row, col);
-                timeFormatCB.setSelectedItem(val);
-            } else if ( tool==Tool.GUESSTIMEFORMAT ) {
-                int row= jTable1.getSelectedRow();
-                String val= (String) jTable1.getModel().getValueAt(row, col);
-                timeFormatCB.setSelectedItem(val);
-                guessTimeFormatButtonAP(row,col,col);
-            } else if ( tool==Tool.FILLVALUE ) {
-                int row= jTable1.getSelectedRow();
-                String val= (String) jTable1.getModel().getValueAt(row, col);
-                if ( val.contains("+") ) val= ""+Double.parseDouble(val);
-                fillValueTextField.setText(val);
-            }
-        } else {
-            int[] cols = jTable1.getColumnModel().getSelectedColumns();
-            int first = cols[0];
-            int last = cols[cols.length - 1];
-            String sfirst = columns.get(first);
-            if (sfirst == null) {
-                sfirst = "" + first;
-            }
-            boolean haveColumnNames = true;
-            String slast = columns.get(last);
-            if (slast == null) {
-                slast = "" + last;
-                haveColumnNames = false;
-            }
-
-            if (tool==Tool.DEPEND_0 ) {
-            } else if ( tool==Tool.COLUMN ) {
-                if (haveColumnNames) {
-                    setColumn(sfirst + "-" + slast);
-                } else {
-                    setColumn("" + first + ":" + (last + 1));
+                if (tool==Tool.DEPEND_0 ) {
+                } else if ( tool==Tool.COLUMN ) {
+                    if (haveColumnNames) {
+                        setColumn(sfirst + "-" + slast);
+                    } else {
+                        setColumn("" + first + ":" + (last + 1));
+                    }
+                } else if ( tool==Tool.TIMEFORMAT ) {
+                    int row= jTable1.getSelectedRow();
+                    StringBuilder val= new StringBuilder( timeFormatCB.getSelectedItem().toString() ); // don't clubber existing work
+                    val.append( jTable1.getModel().getValueAt(row, first) );
+                    for ( int icol= first+1; icol<=last; icol++ ) {
+                        val.append( "+" ).append( jTable1.getModel().getValueAt(row, icol) );
+                    }
+                    timeFormatCB.setSelectedItem(val.toString());
+                    dep0timeCheckBox.setSelected(true);
+                    setDep0(columns.get(first));
+                    
+                } else if ( tool==Tool.GUESSTIMEFORMAT ) {
+                    int row= jTable1.getSelectedRow();
+                    StringBuilder val= new StringBuilder(); // existing work is clubbered
+                    val.append( jTable1.getModel().getValueAt(row, first) );
+                    for ( int icol= first+1; icol<=last; icol++ ) {
+                        val.append( "+" ).append( jTable1.getModel().getValueAt(row, icol) );
+                    }
+                    timeFormatCB.setSelectedItem(val.toString());
+                    dep0timeCheckBox.setSelected(true);
+                    setDep0(columns.get(first));
+                    guessTimeFormatButtonAP(row,first,last);
                 }
-            } else if ( tool==Tool.TIMEFORMAT ) {
-                int row= jTable1.getSelectedRow();
-                StringBuilder val= new StringBuilder( timeFormatCB.getSelectedItem().toString() ); // don't clubber existing work
-                val.append( jTable1.getModel().getValueAt(row, first) );
-                for ( int icol= first+1; icol<=last; icol++ ) {
-                    val.append( "+" ).append( jTable1.getModel().getValueAt(row, icol) );
-                }
-                timeFormatCB.setSelectedItem(val.toString());
-                dep0timeCheckBox.setSelected(true);
-                setDep0(columns.get(first));
-
-            } else if ( tool==Tool.GUESSTIMEFORMAT ) {
-                int row= jTable1.getSelectedRow();
-                StringBuilder val= new StringBuilder(); // existing work is clubbered
-                val.append( jTable1.getModel().getValueAt(row, first) );
-                for ( int icol= first+1; icol<=last; icol++ ) {
-                    val.append( "+" ).append( jTable1.getModel().getValueAt(row, icol) );
-                }
-                timeFormatCB.setSelectedItem(val.toString());
-                dep0timeCheckBox.setSelected(true);
-                setDep0(columns.get(first));
-                guessTimeFormatButtonAP(row,first,last);
-            }
+                break;
         }
         Tool oldTool= tool;
         clearTool(); // otherwise we would respond to deselection event
@@ -277,6 +277,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                     clearTool(); // otherwise we would respond to deselection event
                 }
                 Runnable run= new Runnable() {
+                    @Override
                     public void run() {
                         clearTool();
                     }
@@ -904,79 +905,83 @@ private int guessTimeFormatColumn( String example, int column, int current, Stri
         } catch ( NumberFormatException ex ) {
         }
     }
-    if ( current==TimeUtil.YEAR ) {
-        if ( digits==2 ) {
-            template.append("$y");
-            return TimeUtil.MONTH;
-        } else if ( digits==4 ) {
-            template.append("$Y");
-            return TimeUtil.MONTH;
-        } else if ( digits==5 ) {
-            template.append("$Y$j");
-            return TimeUtil.HOUR;
-        } else if ( digits==6 ) {
-            template.append("$y$m$d");
-            return TimeUtil.HOUR;
-        } else if ( digits==8 ) {
-            if ( !Character.isDigit( example.charAt(4) ) ) {
-                template.append("$Y").append(example.charAt(4)).append("$j");
-                return TimeUtil.HOUR;                
-            } else {
-                template.append("$Y$m$d");
+    switch (current) {
+        case TimeUtil.YEAR:
+            if ( digits==2 ) {
+                template.append("$y");
+                return TimeUtil.MONTH;
+            } else if ( digits==4 ) {
+                template.append("$Y");
+                return TimeUtil.MONTH;
+            } else if ( digits==5 ) {
+                template.append("$Y$j");
                 return TimeUtil.HOUR;
+            } else if ( digits==6 ) {
+                template.append("$y$m$d");
+                return TimeUtil.HOUR;
+            } else if ( digits==8 ) {
+                if ( !Character.isDigit( example.charAt(4) ) ) {
+                    template.append("$Y").append(example.charAt(4)).append("$j");
+                    return TimeUtil.HOUR;
+                } else {
+                    template.append("$Y$m$d");
+                    return TimeUtil.HOUR;
+                }
+            } else {
+                template.append("$X");
+                return current;
             }
-        } else {
-            template.append("$X");
-            return current;
-        }
-    } else if ( current==TimeUtil.MONTH ) {
-        if ( min==999999999 ) {
-            template.append("$b");
-            return TimeUtil.DAY;
-        } else if ( max<=12 ) {
-            template.append("$m");
-            return TimeUtil.DAY;
-        } else if ( max<=366 ) {
-            template.append("$j");
-            return TimeUtil.HOUR;
-        } else {
-            template.append("$x");
-            return current;
-        }
-    } else if ( current==TimeUtil.DAY ) {
-        if ( max<=31 ) {
-            template.append("$d");
-            return TimeUtil.HOUR;
-        } else {
-            template.append("$x");
-            return current;
-        }
-    } else if ( current==TimeUtil.HOUR ) {
-        if ( digits<3 && max<25 ) {
-            template.append("$H");
-            return TimeUtil.MINUTE;
-        } else if ( digits==4 ) {
-            template.append("$H$M");
+        case TimeUtil.MONTH:
+            if ( min==999999999 ) {
+                template.append("$b");
+                return TimeUtil.DAY;
+            } else if ( max<=12 ) {
+                template.append("$m");
+                return TimeUtil.DAY;
+            } else if ( max<=366 ) {
+                template.append("$j");
+                return TimeUtil.HOUR;
+            } else {
+                template.append("$x");
+                return current;
+            }
+        case TimeUtil.DAY:
+            if ( max<=31 ) {
+                template.append("$d");
+                return TimeUtil.HOUR;
+            } else {
+                template.append("$x");
+                return current;
+            }
+        case TimeUtil.HOUR:
+            if ( digits<3 && max<25 ) {
+                template.append("$H");
+                return TimeUtil.MINUTE;
+            } else if ( digits==4 ) {
+                template.append("$H$M");
+                return TimeUtil.SECOND;
+            } else if ( digits==5 && !Character.isDigit(example.charAt(2)) ) {
+                template.append("$H").append(example.charAt(2)).append("$M");
+                return TimeUtil.SECOND;
+            } else if ( digits==6 ) {
+                template.append("$H$M$S");
+                return TimeUtil.MILLI;
+            } else if ( digits==7 && !Character.isDigit(example.charAt(2)) ) {
+                template.append("$H").append(example.charAt(2)).append("$M").append(example.charAt(5)).append("$S");
+                return TimeUtil.MILLI;
+            }       
+            break;
+        case TimeUtil.MINUTE:
+            template.append("$M");
             return TimeUtil.SECOND;
-        } else if ( digits==5 && !Character.isDigit(example.charAt(2)) ) {
-            template.append("$H").append(example.charAt(2)).append("$M");
-            return TimeUtil.SECOND;
-        } else if ( digits==6 ) {
-            template.append("$H$M$S");
+        case TimeUtil.SECOND:
+            template.append("$S");
             return TimeUtil.MILLI;
-        } else if ( digits==7 && !Character.isDigit(example.charAt(2)) ) {
-            template.append("$H").append(example.charAt(2)).append("$M").append(example.charAt(5)).append("$S");
-            return TimeUtil.MILLI;
-        }
-    } else if ( current==TimeUtil.MINUTE ) {
-        template.append("$M");
-        return TimeUtil.SECOND;
-    } else if ( current==TimeUtil.SECOND ) {
-        template.append("$S");
-        return TimeUtil.MILLI;
-    } else if ( current==TimeUtil.MILLI ) {
-        template.append("$(milli)");
-        return TimeUtil.MICRO;
+        case TimeUtil.MILLI:
+            template.append("$(milli)");
+            return TimeUtil.MICRO;
+        default:
+            break;
     }
     template.append("$X");
     return current;
@@ -1077,7 +1082,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                     } else {
                         fillValueTextField.setText( "" );
                     }
-                } catch (Exception ex) {
+                } catch (IllegalArgumentException ex) {
                     throw new RuntimeException(ex);
                 } finally {
                     if ( mon!=null ) mon.finished();
@@ -1143,7 +1148,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public Map<Integer, String> getColumnNames() throws IOException {
 
         String[] lcolumns = parser.getFieldNames();
-        Map<Integer, String> result = new LinkedHashMap<Integer, String>();
+        Map<Integer, String> result = new LinkedHashMap<>();
         for (int i = 0; i < lcolumns.length; i++) {
             result.put(i, lcolumns[i]);
         }
@@ -1207,10 +1212,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public boolean reject( String url ) throws IOException, URISyntaxException {
         split = URISplit.parse(url);
         FileSystem fs = FileSystem.create( DataSetURI.toUri(split.path) );
-        if ( fs.isDirectory( split.file.substring(split.path.length()) ) ) {
-            return true;
-        }
-        return false;
+        return fs.isDirectory( split.file.substring(split.path.length()) );
     }
 
     @Override
@@ -1496,10 +1498,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                     String[] columns1=  new String[p.fieldCount()];
                     for ( int i=0; i<columns1.length; i++ )  columns1[i]="";
                     AsciiHeadersParser.parseMetadata(p.header,columns1,columns1);
-                } catch (ParseException ex) {
-                    logger.log(Level.SEVERE, ex.getMessage(), ex);
-                    richHeaderWarn = ex;
-                } catch ( IllegalArgumentException ex ) {
+                } catch (ParseException | IllegalArgumentException ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                     richHeaderWarn = ex;
                 }
@@ -1549,7 +1548,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                 setColumn(lcol);
             }
 
-            List<String> dep0Values = new ArrayList<String>(list.values());
+            List<String> dep0Values = new ArrayList<>(list.values());
             String ldep0 = getDep0();
             dep0Values.add(0, "");
             dep0Columns.setModel(new DefaultComboBoxModel(dep0Values.toArray()));
