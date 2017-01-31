@@ -495,6 +495,7 @@ public class JythonUtil {
          * <li>D (Datum),
          * <li>S (DatumRange),
          * <li>U (Dataset URI),
+         * <li>L (URL),
          * <li>or R (the resource URI) 
          * </ul>
          */
@@ -541,7 +542,7 @@ public class JythonUtil {
      //there are a number of functions which take a trivial amount of time to execute and are needed for some scripts, such as the string.upper() function.
      //The commas are to guard against the id being a subset of another id ("lower," does not match "lowercase").
      //TODO: update this after Python upgrade.
-     private static final String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper,", "URI,", "DatumRangeUtil,", "TimeParser",
+     private static final String[] okay= new String[] { "range,", "xrange,", "getParam,", "lower,", "upper,", "URI,", "URL,", "DatumRangeUtil,", "TimeParser",
         "str,", "int,", "long,", "float,", "datum," };
      
      /**
@@ -1060,6 +1061,9 @@ public class JythonUtil {
          variableNames.add("long");
          variableNames.add("float");
          variableNames.add("datum");
+//         variableNames.add("datumRange");
+//         variableNames.add("URI");
+//         variableNames.add("URL");
          
          try {
              Module n= (Module)org.python.core.parser.parse( script, "exec" );
@@ -1163,6 +1167,7 @@ public class JythonUtil {
       * S DatumRange
       * 
       *}</small></pre></blockquote>
+      * note "arg_0" "arg_1" are used to refer to positional (unnamed) parameters.
       * 
       * @param env any values which may be defined already, such as "dom" and "monitor"
       * @param script any jython script.
@@ -1264,8 +1269,14 @@ public class JythonUtil {
                             pp=  ((PyJavaInstance)p.deft).__tojava__( Datum.class );
                             if ( pp==Py.NoConversion ) {
                                 pp=  ((PyJavaInstance)p.deft).__tojava__( DatumRange.class ); 
-                                p.type= 'S';
-                                p.deft= pp;
+                                if ( pp==Py.NoConversion ) {
+                                    pp=  ((PyJavaInstance)p.deft).__tojava__( URL.class ); 
+                                    p.type= 'L';
+                                    p.deft= pp;
+                                } else {
+                                    p.type= 'S';
+                                    p.deft= pp;
+                                }
                             } else {
                                 p.type= 'D';
                                 p.deft= pp;

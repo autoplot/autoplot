@@ -176,6 +176,7 @@ public class ParametersFormPanel {
                         params.put( name, value );
                         break;
                     case 'R':
+                    case 'L':
                         if ( !( value.startsWith("'") && value.endsWith("'") ) ) {
                             value=  "'" + value + "'";
                         }   
@@ -403,6 +404,27 @@ public class ParametersFormPanel {
                             ctf= sel;
                             break;
                         }
+                    case 'L':
+                        {
+                            final DataSetSelector sel= new DataSetSelector();
+                            sel.setPlotItButtonVisible(false);
+                            String val;
+                            if (params.get(vname)!=null ) {
+                                val= params.get(vname);
+                                if ( val.startsWith("'") ) val= val.substring(1);
+                                if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                            } else {
+                                val= String.valueOf( parm.deft );
+                                params.put( vname, val );
+                            }       sel.setRecent( DataSetSelector.getDefaultRecent() );
+                            sel.setValue( val );
+                            valuePanel.add( getSpacer(7) );  // kludge.  Set on Jeremy's home Ubuntu
+                            valuePanel.add( sel );
+                            sel.setValue( val );
+                            valuePanel.add( getSpacer(10) ); // put a little space in after the selector as well.
+                            ctf= sel;
+                            break;
+                        }                        
                     case 'T':
                         {
                             String val;
