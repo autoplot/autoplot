@@ -74,6 +74,8 @@
                                           <Group type="102" attributes="0">
                                               <Component id="prevIntervalButton" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="zoomOutButton" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
                                               <Component id="nextIntervalButton" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
@@ -112,6 +114,7 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="nextIntervalButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="prevIntervalButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="zoomOutButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="159" max="32767" attributes="0"/>
                   </Group>
@@ -185,6 +188,7 @@
                   <Image iconType="3" name="/org/virbo/datasource/nextNext.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Next Interval"/>
+                <Property name="toolTipText" type="java.lang.String" value="Scan to the next interval"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nextIntervalButtonActionPerformed"/>
@@ -196,9 +200,19 @@
                   <Image iconType="3" name="/org/virbo/datasource/prevPrev.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Previous Interval"/>
+                <Property name="toolTipText" type="java.lang.String" value="Scan to the previous interval"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prevIntervalButtonActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="zoomOutButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Zoom Out"/>
+                <Property name="toolTipText" type="java.lang.String" value="Zoom out, making the span three times as wide with the same center"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="zoomOutButtonActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>

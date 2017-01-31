@@ -372,6 +372,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         nextIntervalButton = new javax.swing.JButton();
         prevIntervalButton = new javax.swing.JButton();
+        zoomOutButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         scComboBox = new javax.swing.JComboBox();
@@ -440,6 +441,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
 
         nextIntervalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/nextNext.png"))); // NOI18N
         nextIntervalButton.setText("Next Interval");
+        nextIntervalButton.setToolTipText("Scan to the next interval");
         nextIntervalButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nextIntervalButtonActionPerformed(evt);
@@ -448,9 +450,18 @@ public class TimeRangeTool extends javax.swing.JPanel {
 
         prevIntervalButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/prevPrev.png"))); // NOI18N
         prevIntervalButton.setText("Previous Interval");
+        prevIntervalButton.setToolTipText("Scan to the previous interval");
         prevIntervalButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 prevIntervalButtonActionPerformed(evt);
+            }
+        });
+
+        zoomOutButton.setText("Zoom Out");
+        zoomOutButton.setToolTipText("Zoom out, making the span three times as wide with the same center");
+        zoomOutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                zoomOutButtonActionPerformed(evt);
             }
         });
 
@@ -480,6 +491,8 @@ public class TimeRangeTool extends javax.swing.JPanel {
                                             .add(startTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 390, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                                     .add(jPanel1Layout.createSequentialGroup()
                                         .add(prevIntervalButton)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(zoomOutButton)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                         .add(nextIntervalButton)))
                                 .add(0, 0, Short.MAX_VALUE)
@@ -511,7 +524,8 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(nextIntervalButton)
-                    .add(prevIntervalButton))
+                    .add(prevIntervalButton)
+                    .add(zoomOutButton))
                 .addContainerGap(159, Short.MAX_VALUE))
         );
 
@@ -783,6 +797,22 @@ public class TimeRangeTool extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_prevIntervalButtonActionPerformed
 
+    private void zoomOutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomOutButtonActionPerformed
+        try {
+            String min= startTextField.getText();
+            String max= stopTextField.getText();
+            Datum tmin= TimeUtil.create(min);
+            Datum tmax= TimeUtil.create(max);
+            DatumRange dr= new DatumRange( tmin, tmax );
+            dr= DatumRangeUtil.rescale( dr, -1.0, 2.0 );
+            startTextField.setText(dr.min().toString());
+            stopTextField.setText(dr.max().toString());
+            timeRangeTextField.setText( dr.toString() );
+        } catch (ParseException ex) {
+            Logger.getLogger(TimeRangeTool.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_zoomOutButtonActionPerformed
+
     /**
      * shows the orbit timerange, clipping off text past the first colon.
      * @param sorbit like "172: 2012-11-02 07:00 to 11:20"
@@ -842,6 +872,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
     private javax.swing.JTextField startTextField;
     private javax.swing.JTextField stopTextField;
     private javax.swing.JTextField timeRangeTextField;
+    private javax.swing.JButton zoomOutButton;
     // End of variables declaration//GEN-END:variables
 
 }
