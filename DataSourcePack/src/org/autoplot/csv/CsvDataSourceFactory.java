@@ -39,6 +39,8 @@ public class CsvDataSourceFactory implements DataSourceFactory {
                     "values less than this value are treated as fill."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "validMax=",
                     "values greater than this value are treated as fill."));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "delim=",
+                    "override the default delimiter (comma)."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "skipLines=", "skip this many lines before parsing"));
             return result;
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
@@ -50,6 +52,11 @@ public class CsvDataSourceFactory implements DataSourceFactory {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns"));
+                return result;
+            } else if ( paramName.equals("delim") ) {
+                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, ",", "force comma delimiter"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, ";", "force semicolon delimiter"));
                 return result;
             } else if (paramName.equals("column")) {
                 List<CompletionContext> result = getFieldNames(cc, mon);

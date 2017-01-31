@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.format.DatumFormatter;
@@ -26,13 +27,25 @@ import org.virbo.datasource.URISplit;
  */
 public class CsvDataSourceFormat implements DataSourceFormat {
 
+    @Override
     public void formatData(String uri, QDataSet data, ProgressMonitor mon) throws Exception {
         URISplit split = URISplit.parse( uri );
+        
+        Map<String,String> params= URISplit.parseParams(split.params);
+        
+        char delim= ',';
+        if ( params.containsKey("delim") ) {
+            String sdelimiter= params.get("delim");
+            if ( sdelimiter.equals("COMMA") ) sdelimiter= ",";
+            if ( sdelimiter.equals("SEMICOLON") ) sdelimiter= ";";
+            delim= sdelimiter.charAt(0);
+        }
+        
         File f= new File( split.resourceUri );
         FileWriter fw= new FileWriter(f);
         CsvWriter writer= null;
         try {
-            writer= new CsvWriter( fw, ',' );
+            writer= new CsvWriter( fw, delim );
             
             writer.setForceQualifier(true);
             writer.setUseTextQualifier(true);  // force quotes on header

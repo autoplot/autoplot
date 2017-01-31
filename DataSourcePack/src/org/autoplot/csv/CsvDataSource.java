@@ -88,7 +88,14 @@ public class CsvDataSource extends AbstractDataSource {
         InputStream in = DataSetURI.getInputStream(uri, mon);
         
         PushbackInputStream thein= new PushbackInputStream(in,1024);        
-        char delimiter= TableOps.getDelim(thein);
+        //char delimiter= TableOps.getDelim(thein);
+        
+        String sdelimiter= getParam("delim", ",");
+        if ( sdelimiter.equals("COMMA") ) sdelimiter= ",";
+        if ( sdelimiter.equals("SEMICOLON") ) sdelimiter= ";";
+        
+        char delimiter= sdelimiter.charAt(0);
+        
         BufferedReader breader= new BufferedReader( new InputStreamReader(thein) );        
         
         String skip= getParam( "skipLines", "" );
