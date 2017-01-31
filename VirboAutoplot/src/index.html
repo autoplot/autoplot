@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>POLAR/Timas data is now accessible from CDAWeb.  Quite a few quanitities are available in CDAWeb which aren't supported in Autoplot, because IDL code needs to be replicated.  Requests are welcome!
+        <p><small>POLAR/Timas data is now accessible from the CDAWeb plug-in.  Quite a few quantities are available in CDAWeb which aren't supported in Autoplot, because IDL code needs to be replicated.  Requests are welcome!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,8 +26,10 @@
         
         <p>Bugfixes (2017-01-25 r20244):</p>
         <ul>
+            <li>1749: GUI generated supports (kinda) positional parameters
+            <li>1763: spectrogram codes should accept X,Y->Z (rank1 X,Y,Z)
             <li>1762: add support for URL argument types.
-            <li>1760: remove "here" from rebinning code, which was accidentally left in after a debugging session, and would hang the Mac release with stdout noise.
+            <li>1760: remove "here" from rebinning code, which would hang the Mac release with stdout noise.  Thanks, Sebastian!
             <li>corrections to scatterRebinner to support more data types.</li>
             <li>1730: correct code for adding label when slice1=i is used.  Thanks, Tami!
             <li>file:///tmp/foo.zip/Chipmunks.wav wouldn't work because wav file wasn't accessed properly within the zip file.
