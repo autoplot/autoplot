@@ -133,10 +133,13 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         } else if (jTable1.getColumnModel().getSelectedColumnCount() == 1) {
             int col = jTable1.getColumnModel().getSelectedColumns()[0];
-            String name = columns.get(col);
+            String name=null;
+            if ( columns!=null ) {
+                name = columns.get(col);    
+            }
             if (name == null) {
                 name = "field" + col;
-            }
+            }            
             if ( tool==Tool.DEPEND_0 ) {
                 setDep0(name);
             } else if ( tool==Tool.COLUMN ) {
