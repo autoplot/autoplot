@@ -6,6 +6,7 @@ import org.das2.graph.RGBImageRenderer;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.dataset.examples.Schemes;
 
 public enum RenderType {
     spectrogram,
@@ -20,7 +21,7 @@ public enum RenderType {
     image,
     pitchAngleDistribution,
     eventsBar,
-    stackedHistogram, // Voyager uses these
+    stackedHistogram, // Voyager PWS uses these
     vectorPlot,
     orbitPlot,  // call-outs with time vs position
     contour;
@@ -30,7 +31,8 @@ public enum RenderType {
      * If the render type is not recognized, just return true.  This was introduced to
      * constrain the options of the user to valid entries.
      *
-     * Note this is called on the event thread and must be implemented so that evaluation takes a trivial amount of time.
+     * Note this is called on the event thread and must be implemented so that 
+     * evaluation takes a trivial amount of time.
      * 
      * @param rt
      * @param ds
@@ -39,7 +41,12 @@ public enum RenderType {
     public static boolean acceptsData( RenderType rt, QDataSet ds ) {
 
         if ( rt==spectrogram || rt==nnSpectrogram ) {
-            return SemanticOps.isTableDataSet(ds);
+            if ( SemanticOps.isTableDataSet(ds) ) {
+                return true;
+            }
+            if ( Schemes.isXYZScatter(ds) ) return true;
+            if ( Schemes.isLegacyXYZScatter(ds) ) return true;
+            return false;
         }
 
         if ( rt==hugeScatter ) {
