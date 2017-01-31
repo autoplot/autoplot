@@ -495,7 +495,7 @@ public class JythonUtil {
          * <li>D (Datum),
          * <li>S (DatumRange),
          * <li>U (Dataset URI),
-         * <li>L (URL),
+         * <li>L (URL), 
          * <li>or R (the resource URI) 
          * </ul>
          */
