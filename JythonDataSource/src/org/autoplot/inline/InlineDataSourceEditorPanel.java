@@ -535,7 +535,11 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
                 String[] sss= ss[rowIndex].split(",");
-                return sss[columnIndex];
+                if ( sss.length>columnIndex ) {
+                    return sss[columnIndex];
+                } else {
+                    return "";
+                }                
             }
 
             @Override
@@ -653,6 +657,14 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             tm= mtm;
             scheme= SCHEME_EVENT_LIST_COLORS;
             setColumnLabels();
+            String[] ss= Util.guardedSplit( uri, '&', '\'', '\"' );
+            //String[] ss= uri.split("&");
+            StringBuilder t= new StringBuilder();
+            for ( int i=0; i<ss.length; i++ ) {
+                if ( i>0 ) t.append("\n");
+                t.append(ss[i]);
+            }
+            program= t.toString(); // go ahead and set this as well.
         } else {
             String[] ss= Util.guardedSplit( uri, '&', '\'', '\"' );
             //String[] ss= uri.split("&");
