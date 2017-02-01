@@ -637,6 +637,7 @@ public class DataSetURI {
      * @return
      */
     public static String fromUri( URI uri ) {
+        //String surl= uri.getScheme() + ":" + uri.getSchemeSpecificPart();  // This is how we should do this!
         String surl= uri.toString();
         int i= surl.indexOf("?");
         String query= i==-1 ? "" : surl.substring(i);

@@ -985,6 +985,7 @@ public class URISplit {
         //surl = surl.replaceAll("\\?", "%3F" );
         surl = surl.replaceAll("\\[", "%5B"); // Windows appends these in temporary downloadf rte_1495358356
         surl = surl.replaceAll("\\]", "%5D");
+        surl = surl.replaceAll("\\^", "%5E");
 
         return surl;
     }
@@ -1016,6 +1017,7 @@ public class URISplit {
         //surl = surl.replaceAll("%3F", "?" );
         surl = surl.replaceAll("%5B", "\\[" ); // Windows appends these in temporary downloadf rte_1495358356
         surl = surl.replaceAll("%5D", "\\]" );
+        surl = surl.replaceAll("%5E", "^" );
 
         return surl;
     }
