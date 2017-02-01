@@ -559,7 +559,7 @@ public class DataSetURI {
             FileSystem fs = FileSystem.create(spath);
             FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
             if (!fo.isLocal()) {
-                logger.log(Level.INFO, "getInputStream(URL): downloading file {0} from {1}", new Object[] { fo.getNameExt(), url.toString() } );
+                logger.log(Level.FINE, "getInputStream(URL): downloading file {0} from {1}", new Object[] { fo.getNameExt(), url.toString() } );
             }
             return fo.getInputStream(mon);
 
@@ -585,7 +585,7 @@ public class DataSetURI {
             filename = DataSourceUtil.unescape(filename);
         FileObject fo = fs.getFileObject(filename);
         if (!fo.isLocal()) {
-            logger.log(Level.INFO, "getInputStream(URI): downloading file {0} from {1}/{2}", new Object[] { fo.getNameExt(), fs.getRootURI(), filename } );
+            logger.log(Level.FINE, "getInputStream(URI): downloading file {0} from {1}/{2}", new Object[] { fo.getNameExt(), fs.getRootURI(), filename } );
         }
         return fo.getInputStream(mon);
 
