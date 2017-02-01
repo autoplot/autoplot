@@ -742,6 +742,17 @@ public class DataMashUp extends javax.swing.JPanel {
         timeRangeTextField.setEnabled(true);
     }
     
+    private static boolean isChildOf( TreeNode parent, TreeNode child ) {
+        while ( child!=null ) {
+            if ( child==parent ) {
+                return true;
+            } else {
+                child= child.getParent();
+            }
+        } 
+        return false;
+    }
+    
     private void doDrop( String data, TreePath tp ) {
 
         DefaultTreeModel model= (DefaultTreeModel) expressionTree.getModel();
@@ -757,6 +768,19 @@ public class DataMashUp extends javax.swing.JPanel {
             } 
 
             MutableTreeNode n= getTreeNode(data);
+
+            if ( false ) { // my attempt to replace the first argument with the expression.
+                if ( n.getChildCount()>0 ) {
+                    if ( !isChildOf( mtn, n ) ) {
+                        String s= n.getChildAt(0).toString();
+                        if ( s.length()>0 && Character.isJavaIdentifierStart(s.charAt(0)) ) {
+                            n.remove( 0 );
+                            n.insert( mtn, 0 );                    
+                        }
+                    }
+                }
+            }
+            
             if ( parent==null ) {
                 model.setRoot(n);
             } else {
@@ -923,7 +947,7 @@ public class DataMashUp extends javax.swing.JPanel {
         jLabel2.setText("Drag functions onto the palette to the right.");
 
         jList1.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "add(x,y)", "subtract(x,y)", "multiply(x,y)", "divide(x,y)", "pow(x,y)", "log10(x)", "sqrt(x)", "atan2(x,y)", "toRadians(x)", "toDegrees(x)", "sin(x)", "cos(x)", "tan(x)", "asin(x)", "acos(x)", "atan2(y,x)", "atan(x)", " " };
+            String[] strings = { "add(x,y)", "subtract(x,y)", "multiply(x,y)", "divide(x,y)", "pow(x,y)", "log10(x)", "sqrt(x)", "abs(x)", "magnitude(x)", "atan2(x,y)", "toRadians(x)", "toDegrees(x)", "sin(x)", "cos(x)", "tan(x)", "asin(x)", "acos(x)", "atan2(y,x)", "atan(x)", " " };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
