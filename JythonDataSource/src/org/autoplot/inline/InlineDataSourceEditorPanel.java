@@ -12,6 +12,8 @@ import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.ComboBoxModel;
@@ -725,10 +727,17 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 StringBuilder s= new StringBuilder( "vap+inline:" );
                 if ( scheme.equals(SCHEME_EVENT_LIST_COLORS) ) {
                     for ( int i=0; i<tm.getRowCount(); i++ ) {
+                        String str= String.format( "%s/%s", tm.getValueAt(i,0), tm.getValueAt(i,1) );
+                        try {
+                            DatumRange drtr= DatumRangeUtil.parseTimeRange(str);
+                            str= drtr.toString().replaceAll(" ","+");
+                        } catch (ParseException ex) {
+                            // do nothing, just use the old format, which will fail and reject.
+                        }
                         if ( i==0 ) {
-                            s.append( String.format( "ds=createEvent('%s/%s',%s,'%s')", tm.getValueAt(i,0), tm.getValueAt(i,1),  tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
+                            s.append( String.format( "ds=createEvent('%s',%s,'%s')", str, tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
                         } else {
-                            s.append( String.format( "&ds=createEvent(ds,'%s/%s',%s,'%s')", tm.getValueAt(i,0), tm.getValueAt(i,1),  tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
+                            s.append( String.format( "&ds=createEvent(ds,'%s',%s,'%s')", str, tm.getValueAt(i,2), tm.getValueAt(i,3) ) );
                         }
                     }
                     s.append("&ds");
