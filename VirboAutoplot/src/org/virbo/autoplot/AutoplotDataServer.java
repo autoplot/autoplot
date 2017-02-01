@@ -174,7 +174,7 @@ public class AutoplotDataServer {
             }
         }
 
-        logger.log( Level.INFO, "time to read (ms): {0}", System.currentTimeMillis()-t0 );
+        logger.log( Level.FINE, "time to read (ms): {0}", System.currentTimeMillis()-t0 );
 
         if ( !someValid ) {
             switch (format) {
@@ -357,12 +357,8 @@ public class AutoplotDataServer {
             }
 
             File ff= new File( fcache, "testCache.empty" );
-            FileOutputStream fo=null;
-            try {
-                fo= new FileOutputStream( ff );
+            try (FileOutputStream fo = new FileOutputStream( ff )) {
                 fo.write( "AutoplotDataServer is able to write a file\n".getBytes() );
-            } finally {
-                if ( fo!=null ) fo.close();
             }
 
             FileSystem.settings().setLocalCacheDir(new File(cache));
@@ -409,7 +405,7 @@ public class AutoplotDataServer {
         ProgressMonitor mon= new NullProgressMonitor();
 
         final PrintStream out;
-        Set outEmpty= new HashSet<Object>(); // nasty kludge to prevent logger from writing first.  This is a bug: qstreams at least should support this.
+        Set outEmpty= new HashSet<>(); // nasty kludge to prevent logger from writing first.  This is a bug: qstreams at least should support this.
 
         if ( outfile.equals(DEFT_OUTFILE) ) {
              out= System.out;
@@ -427,7 +423,7 @@ public class AutoplotDataServer {
         
         doService( timeRange, suri, step, stream, format,out, ascii, outEmpty, mon );
         
-        if ( !alm.getBooleanValue("noexit") ) System.exit(0); else return;
+        if ( !alm.getBooleanValue("noexit") ) System.exit(0);
 
     }
 
