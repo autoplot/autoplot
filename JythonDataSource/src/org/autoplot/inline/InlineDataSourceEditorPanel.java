@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.util.LoggerManager;
@@ -652,8 +653,16 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             editorTextPane1.setText(program);
         }
         if ( ltm!=null ) {
-            if ( tm.getColumnCount()==2 ) {
-                this.schemeComboBox.setSelectedIndex(1);
+            switch (tm.getColumnCount()) {
+                case 2:
+                    this.schemeComboBox.setSelectedIndex(2);
+                    break;
+                case 4:
+                    this.schemeComboBox.setSelectedIndex(1);
+                    break;
+                default:
+                    this.schemeComboBox.setSelectedIndex(0);
+                    break;
             }
             tm= ltm; // kludgy way to get around goofy code.
             this.table.setModel(ltm); //schemeComboBox.setSelectedIndex resets the table.
