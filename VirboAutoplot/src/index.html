@@ -24,13 +24,15 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-01-25 r20244):</p>
+        <p>Bugfixes (2017-02-01 r20284):</p>
         <ul>
+            <li>1765: properly handle carots in URIs.  Thanks Ivar!
+            <li>vap+inline GUI with events corrected, so that you can re-enter the GUI.
             <li>1749: GUI generated supports (kinda) positional parameters
-            <li>1763: spectrogram codes should accept X,Y->Z (rank1 X,Y,Z)
+            <li>1763: spectrogram codes should accept X,Y->Z (rank1 X,Y,Z).  Thanks Babtiste and Chris!
             <li>1762: add support for URL argument types.
             <li>1760: remove "here" from rebinning code, which would hang the Mac release with stdout noise.  Thanks, Sebastian!
-            <li>corrections to scatterRebinner to support more data types.</li>
+            <li>corrections to scatterRebinner to support more data types.
             <li>1730: correct code for adding label when slice1=i is used.  Thanks, Tami!
             <li>file:///tmp/foo.zip/Chipmunks.wav wouldn't work because wav file wasn't accessed properly within the zip file.
             <li>check that processedData checkbox is enabled before setting it because originalData is not enabled.
@@ -99,9 +101,10 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>annotations allow images to be used when http, https, or file URLs are used.
             <li>x(t),y(t)->z(t) (as well as x(i),y(j)->z(i,j)) supported in spectrogram renderer.
-            <li>add method for creating zip files, from within scripts.
-            <li>rfe556: support semicolon in ascii files.
+            <li>add method for creating zip files, from within scripts.  unzip is deprecated, and it is replaced with gunzip.
+            <li>rfe556: support semicolon in ascii files and csv files.
             <li>Util.getBuildTime returns the build time, if available.</li>
             <li>support apply_qflag for Timas data in CDF.</li>
             <li>spectrogram scatter mode.  Thanks, Matt!
