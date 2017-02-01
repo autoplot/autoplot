@@ -9,8 +9,11 @@ import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
@@ -23,6 +26,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
 import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
@@ -580,6 +586,41 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         return tm;
     }
     
+    /**
+     * look for a list of createEvent calls that build up a set of events, and
+     * return the table if this is what's found, or null otherwise.
+     * @param uri
+     * @return 
+     */
+    private static DefaultTableModel detectRichEventsList( String uri ) {
+        String[] ss= Util.guardedSplit( uri, '&', '\'', '\"' );
+        DefaultTableModel mtm= new DefaultTableModel( ss.length-1, 4 );
+        Pattern p= Pattern.compile("ds=createEvent\\((ds\\,)?\\'(.*)\\'\\,(.*)\\,\\'(.*)\\'\\)");
+        for ( int i=0; i<ss.length; i++ ) {
+            if ( i<ss.length-1 ) {
+                Matcher m= p.matcher(ss[i]);
+                if ( m.matches() ) {
+                    String time= m.group(2);
+                    try {
+                        DatumRange tr= DatumRangeUtil.parseTimeRange(time);
+                        mtm.setValueAt( tr.min().toString(), i, 0 );
+                        mtm.setValueAt( tr.max().toString(), i, 1 );
+                        mtm.setValueAt( m.group(3), i, 2 );
+                        mtm.setValueAt( m.group(4), i, 3 );
+                    } catch ( ParseException ex ) {
+                        return null;
+                    }
+                }
+
+            } else if (i==ss.length-1 ) {
+                if ( !ss[i].equals("ds") ) {
+                    return null;
+                }
+            }
+        }
+        return mtm;
+    }
+    
     @Override
     public void setURI(String uri) {
         if ( uri.startsWith("vap+inline:") ) {
@@ -588,6 +629,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         if ( DataMashUp.isDataMashupJythonInline( uri ) ) {
             mashupUri= uri;
         }
+        
+        DefaultTableModel mtm= detectRichEventsList(uri);
         
         if ( uri.length()==0 || Character.isDigit( uri.charAt(0) ) ) {
             int amp= uri.indexOf("&");
@@ -598,6 +641,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             } else {
                 this.tm= toTableModel(lit, 1);
             }
+            setScheme();
+        } else if ( mtm!=null ) {
+            tm= mtm;
+            scheme= SCHEME_EVENT_LIST_COLORS;
             setScheme();
         } else {
             String[] ss= Util.guardedSplit( uri, '&', '\'', '\"' );
