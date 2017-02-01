@@ -620,6 +620,7 @@ public class DataSetURI {
                 suri = suri.replaceAll(" ", "%20");
                 suri = suri.replaceAll("\\[", "%5B"); // Windows appends these in temporary download rte_1495358356
                 suri = suri.replaceAll("\\]", "%5D");
+                suri = suri.replaceAll("\\^", "%5E");
             }
             return new URI(suri); //bug 3055130 okay
         } catch (URISyntaxException ex) {
@@ -1287,6 +1288,7 @@ public class DataSetURI {
         surl = surl.replaceAll("<", "%3C");
         surl = surl.replaceAll(">", "%3E");
         surl = surl.replaceAll(" ", "%20"); // drop the spaces are pluses in filenames.
+        surl = surl.replaceAll("\\^", "%5E"); 
         //}
         if (split.vapScheme != null) {
             if ( split.vapScheme.contains(" ") ) {
