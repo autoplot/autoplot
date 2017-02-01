@@ -4552,7 +4552,7 @@ private void updateFrameTitle() {
                 if ( !f2.canRead() ) logger.log(Level.WARNING, "Unable to read {0}", f2);
                 InputStream in=null;
                 try {
-                    logger.log(Level.INFO, "Reading {0}", f2);
+                    logger.log(Level.FINE, "Reading {0}", f2);
                     in= new FileInputStream(f2);
                     LogManager.getLogManager().readConfiguration(in);
                 } catch ( IOException ex ) {
