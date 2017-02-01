@@ -341,7 +341,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 ss[tm.getRowCount()]= sval.toString();
                 tm= toTableModel(ss);
             }
-            setScheme();
+            setColumnLabels();
             table.setModel( tm );
             
         }
@@ -389,7 +389,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         }
         int rank= tm.getColumnCount()>1 ? 2 : 1;
         tm= toTableModel(sb.toString(), rank );
-        setScheme();
+        setColumnLabels();
         table.setModel( tm );
     }//GEN-LAST:event_deleteSelectedButtonActionPerformed
 
@@ -552,7 +552,10 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         return tm;
     }
     
-    private void setScheme() {
+    /**
+     * set the column labels for the scheme.
+     */
+    private void setColumnLabels() {
         switch( scheme ) {
             case SCHEME_EVENT_LIST:
                 tm.setColumnIdentifiers( new String[] { "x" } );
@@ -640,14 +643,16 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             String lit= uri.substring(0,amp);
             if ( lit.contains(";") ) {
                 this.tm= toTableModel(lit, 2 );
+                scheme= SCHEME_Y_VS_T;
             } else {
                 this.tm= toTableModel(lit, 1);
+                scheme= SCHEME_EVENT_LIST;
             }
-            setScheme();
+            setColumnLabels();
         } else if ( mtm!=null ) {
             tm= mtm;
             scheme= SCHEME_EVENT_LIST_COLORS;
-            setScheme();
+            setColumnLabels();
         } else {
             String[] ss= Util.guardedSplit( uri, '&', '\'', '\"' );
             //String[] ss= uri.split("&");
