@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 import org.das2.jythoncompletion.ui.CompletionImpl;
@@ -27,6 +28,7 @@ import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.ui.TableRowHeader;
 import org.virbo.jythonsupport.Util;
 import org.virbo.jythonsupport.ui.DataMashUp;
 
@@ -325,14 +327,13 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 sval.append(",").append(tfs[i].getText());
             }
             if ( tm.getColumnCount()>1 ) {
-                ss[tm.getRowCount()]= sval.toString();
-                
+                ss[tm.getRowCount()]= sval.toString();                
                 tm= toTableModel( DataSourceUtil.strjoin( Arrays.asList(ss), ";" ), 2 );
-                
             } else {
                 ss[tm.getRowCount()]= sval.toString();
                 tm= toTableModel(ss);
             }
+            setScheme();
             table.setModel( tm );
             
         }
@@ -380,6 +381,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         }
         int rank= tm.getColumnCount()>1 ? 2 : 1;
         tm= toTableModel(sb.toString(), rank );
+        setScheme();
         table.setModel( tm );
     }//GEN-LAST:event_deleteSelectedButtonActionPerformed
 
@@ -398,16 +400,19 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 tm= toTableModel( new String[0] );
                 directionsLabel.setText("<html><i>Enter a list of times or points</i></html>");
                 scheme= SCHEME_EVENT_LIST;
+                tm.setColumnIdentifiers( new String[] { "x" } );
                 break;
             case 1:
                 tm= toTableModel( 0, 4 );
                 directionsLabel.setText("<html><i>Enter a list of times, colors, and labels</i></html>");
                 scheme= SCHEME_EVENT_LIST_COLORS;
+                tm.setColumnIdentifiers( new String[] { "start", "end", "color", "message" } );
                 break;
             case 2:
                 tm= toTableModel( 0, 2 );
                 directionsLabel.setText("<html><i>Enter a list X and Y values</i></html>");
                 scheme= SCHEME_Y_VS_T;
+                tm.setColumnIdentifiers( new String[] { "x", "y" } );
                 break;
             default:
                 throw new IllegalArgumentException("whoops");
@@ -483,7 +488,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 
-    TableModel tm;
+    DefaultTableModel tm;
+    
     String program;
     JTextField tf;
     String mashupUri= null;
@@ -498,24 +504,8 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
         return true;
     }
 
-    private static TableModel toTableModel( final int nr, final int nc ) {
-        TableModel   tm= new AbstractTableModel() {
-
-            @Override
-            public int getRowCount() {
-                return nr;
-            }
-
-            @Override
-            public int getColumnCount() {
-                return nc;
-            }
-
-            @Override
-            public Object getValueAt(int rowIndex, int columnIndex) {
-                return "";
-            }
-        };
+    private static DefaultTableModel toTableModel( final int nr, final int nc ) {
+        DefaultTableModel tm= new DefaultTableModel( nr, nc );
         return tm;
 
     }
@@ -525,76 +515,61 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
      * @param s the value of s
      * @param rank the value of rank
      */
-    private static TableModel toTableModel( final String s, int rank) {
+    private static DefaultTableModel toTableModel( final String s, int rank) {
         final String[] ss= s.split(";");
         if ( rank==1 ) {
             return toTableModel( s.split(",") );
         }
         final int nc= ss[0].split(",").length;
         
-        TableModel   tm= new AbstractTableModel() {
+        DefaultTableModel tm= new DefaultTableModel(ss.length,nc) {
 
-                @Override
-                public int getRowCount() {
-                    return ss.length;
-                }
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                String[] sss= ss[rowIndex].split(",");
+                return sss[columnIndex];
+            }
 
-                @Override
-                public int getColumnCount() {
-                    return nc;
+            @Override
+            public void setValueAt( Object v, int row, int col ) {
+                String[] sss= ss[row].split(",");
+                sss[col]= String.valueOf(v);
+                StringBuilder b= new StringBuilder(sss[0].replaceAll(",",""));
+                for ( int j=1; j<sss.length; j++ ) {
+                    b.append(',').append(sss[j].replaceAll(",",""));
                 }
-
-                @Override
-                public Object getValueAt(int rowIndex, int columnIndex) {
-                    String[] sss= ss[rowIndex].split(",");
-                    return sss[columnIndex];
-                }
-
-                @Override
-                public boolean isCellEditable( int row, int col ) {
-                    return true;
-                }          
-                
-                @Override
-                public void setValueAt( Object v, int row, int col ) {
-                    String[] sss= ss[row].split(",");
-                    sss[col]= String.valueOf(v);
-                    StringBuilder b= new StringBuilder(sss[0].replaceAll(",",""));
-                    for ( int j=1; j<sss.length; j++ ) {
-                        b.append(',').append(sss[j].replaceAll(",",""));
-                    }
-                    ss[row]= b.toString();
-                }
-            };
+                ss[row]= b.toString();
+            }
+        };
         return tm;
     }
     
+    private void setScheme() {
+        switch( scheme ) {
+            case SCHEME_EVENT_LIST:
+                tm.setColumnIdentifiers( new String[] { "x" } );
+                break;
+            case SCHEME_EVENT_LIST_COLORS:
+                tm.setColumnIdentifiers( new String[] { "start", "stop", "color", "message" } );
+                break;
+            case SCHEME_Y_VS_T:
+                tm.setColumnIdentifiers( new String[] { "x", "y" } );
+                break;
+            default:
+                break;
+        }
+    }
     /**
      * create one-column table.
      * @param s array of all the values.
      * @return 
      */
-    private static TableModel toTableModel( final String[] s ) {
-         TableModel tm= new AbstractTableModel() {
-
-            @Override
-            public int getRowCount() {
-                return s.length;
-            }
-
-            @Override
-            public int getColumnCount() {
-                return 1;
-            }
+    private static DefaultTableModel toTableModel( final String[] s ) {
+        DefaultTableModel tm= new DefaultTableModel( s.length, 1 ) {
 
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
                 return s[rowIndex];
-            }
-
-            @Override
-            public boolean isCellEditable( int row, int col ) {
-                return true;
             }
 
             @Override
@@ -619,10 +594,11 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             if ( amp==-1 ) amp= uri.length();
             String lit= uri.substring(0,amp);
             if ( lit.contains(";") ) {
-                this.tm= toTableModel(lit, 2);
+                this.tm= toTableModel(lit, 2 );
             } else {
                 this.tm= toTableModel(lit, 1);
             }
+            setScheme();
         } else {
             String[] ss= Util.guardedSplit( uri, '&', '\'', '\"' );
             //String[] ss= uri.split("&");
@@ -645,7 +621,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
 
     @Override
     public JPanel getPanel() {
-        TableModel ltm= tm;
+        DefaultTableModel ltm= tm;
         initComponents();
 
         if ( program!=null ) {
