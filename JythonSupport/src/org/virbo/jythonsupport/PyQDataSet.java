@@ -914,18 +914,20 @@ public class PyQDataSet extends PyJavaInstance {
         Object o = arg0.__tojava__(QDataSet.class);
         if (o == null || o == Py.NoConversion) {
             if (arg0.isNumberType()) {
-                try {
-                    double d = (Double) arg0.__tojava__(Double.class);
+                Object o2= arg0.__tojava__( Object.class );
+                if ( o2 instanceof Number ) {
+                    double d = ((Number)o2).doubleValue();
                     return DataSetUtil.asDataSet(d);
-                } catch ( RuntimeException ex ) {
-                    Object o2= arg0.__tojava__( Object.class );
+                } else {
                     QDataSet do2;
                     if ( o2 instanceof org.das2.datum.TimeUtil.TimeStruct ) {
                         do2= DataSetUtil.asDataSet( org.das2.datum.TimeUtil.toDatum( (org.das2.datum.TimeUtil.TimeStruct)o2) );
                     } else if ( o2 instanceof org.das2.datum.Datum ) {
                         do2= DataSetUtil.asDataSet( (org.das2.datum.Datum)o2 );
+                    } else if ( o2 instanceof org.das2.datum.DatumRange ) {
+                        do2= DataSetUtil.asDataSet( (org.das2.datum.DatumRange)o2 );
                     } else {
-                        throw ex;
+                        throw new ClassCastException("unable to convert: "+arg0);
                     }
                     return do2;
                 }
