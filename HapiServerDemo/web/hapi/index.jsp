@@ -56,6 +56,8 @@
             <li>2017-01-04: add support for DOI and SPASE references in extra info.</li>
             <li>2017-01-08: add wind speed</li>
             <li>2017-01-10: use startDate and stopDate instead of firstDate and lastDate as decided on 2017-01-10 telecon.</li>
+            <li>2017-02-03: add http link in info, to show support for this.</li>
+            <li>2017-02-03: add demonstration ds for rank 3 data</li>   
         </ul>
         </small>
     </body>
