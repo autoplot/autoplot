@@ -110,6 +110,14 @@ public class HapiDataSource extends AbstractDataSource {
             logger.warning("need both min and max for bins.");
         }
         
+        if ( binsObject.has("name") ) {
+            result.putProperty( QDataSet.NAME, binsObject.getString("name") );
+        }
+        
+        if ( binsObject.has("description") ) {
+            result.putProperty( QDataSet.TITLE, binsObject.getString("description") );
+        }
+        
         return result;
     }
 
@@ -154,7 +162,7 @@ public class HapiDataSource extends AbstractDataSource {
         String description= "";
         String type= "";
         int[] size= new int[0]; // array of scalars
-        QDataSet depend1= null; // for spectrograms
+        QDataSet[] depend= null;
         private ParamDescription( String name ) {
             this.name= name;
         }
@@ -607,7 +615,8 @@ public class HapiDataSource extends AbstractDataSource {
             while ( line!=null ) {
                 String[] ss= line.split(",");
                 if ( ss.length!=totalFields ) {
-                    logger.log(Level.WARNING, "expected {0} got {1}", new Object[]{totalFields, ss.length});
+                    logger.log(Level.WARNING, "expected {0} fields, got {1}", new Object[]{totalFields, ss.length});
+                    throw new IllegalArgumentException( String.format( "expected %d fields, got %d", new Object[]{totalFields, ss.length} ) );
                 }
                 int ifield=0;
                 Datum xx;
@@ -732,10 +741,21 @@ public class HapiDataSource extends AbstractDataSource {
                             pds[i].size[j]= a.getInt(j);
                         }
                     }
+                    if ( jsonObjecti.has("bins2") ) {
+                        if ( pds[i].depend==null ) pds[i].depend= new QDataSet[2];
+                        QDataSet dep= getJSONBins(jsonObjecti.getJSONObject("bins2"));
+                        pds[i].depend[1]= dep;
+                    } 
+                    if ( jsonObjecti.has("bins1") ) {
+                        if ( pds[i].depend==null ) pds[i].depend= new QDataSet[1];
+                        QDataSet dep1= getJSONBins(jsonObjecti.getJSONObject("bins1"));
+                        pds[i].depend[0]= dep1;
+                    } 
                     if ( jsonObjecti.has("bins") ) {
                         QDataSet dep1= getJSONBins(jsonObjecti.getJSONObject("bins"));
-                        pds[i].depend1= dep1;
-                    }
+                        if ( pds[i].depend==null ) pds[i].depend= new QDataSet[1];
+                        pds[i].depend[0]= dep1;
+                    } 
                 }
             }
         }
@@ -763,9 +783,11 @@ public class HapiDataSource extends AbstractDataSource {
             if ( pds[1].hasFill ) {
                 ds= Ops.putProperty( ds, QDataSet.FILL_VALUE, pds[1].fillValue );
             }
-            
         } else if ( pds.length==2 ) {
             ds= Ops.copy( Ops.trim1( ds, 1, ds.length(0) ) );
+            if ( pds[1].size.length>1 ) {
+                ds= Ops.reform( ds, ds.length(), pds[1].size );
+            }
             ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
             ds= Ops.putProperty( ds, QDataSet.NAME, Ops.safeName(pds[1].name) );
             ds= Ops.putProperty( ds, QDataSet.LABEL, pds[1].name );
@@ -774,8 +796,13 @@ public class HapiDataSource extends AbstractDataSource {
             if ( pds[1].hasFill ) {
                 ds= Ops.putProperty( ds, QDataSet.FILL_VALUE, pds[1].fillValue );
             }
-            if ( pds[1].depend1!=null ) {
-                ds= Ops.putProperty( ds, QDataSet.DEPEND_1, pds[1].depend1 );
+            //if ( pds[1].depend1!=null ) {
+            //    ds= Ops.putProperty( ds, QDataSet.DEPEND_1, pds[1].depend1 );
+            //}
+            if ( pds[1].depend!=null ) {
+                for ( int j=0; j<pds[1].size.length; j++ ) {
+                    ds= Ops.putProperty( ds, "DEPEND_"+(j+1), pds[1].depend[j] );
+                }
             }
         } else if ( pds.length==1 ) {
             return depend0;
@@ -795,8 +822,11 @@ public class HapiDataSource extends AbstractDataSource {
                     for ( int j=0; j<pds[i].size.length; j++ ) {
                         sdsb.putValue( startIndex, j, pds[i].size[j] );
                     }
-                    if ( pds[i].depend1!=null ) {
-                        sdsb.putProperty( QDataSet.DEPEND_1, startIndex, pds[i].depend1 );
+                    if ( pds[i].depend!=null ) {
+                        if ( pds[i].size.length!=pds[i].depend.length ) throw new IllegalArgumentException("pds[i].size.length!=pds[i].depend.length");
+                        for ( int j=0; j<pds[i].size.length; j++ ) {
+                            sdsb.putProperty( "DEPEND_"+(j+1), startIndex, pds[i].depend[j]);
+                        }
                     }
                     //sdsb.putValue( QDataSet.ELEMENT_DIMENSIONS, ifield-1, pds[i].size );                    
                 }
