@@ -415,7 +415,7 @@ public class DataSourceController extends DomNodeController {
                             boolean context= false;
                             for ( PlotElement pe: pes ) {
                                 DataSourceFilter dsf1= dom.controller.getDataSourceFilterFor(pe);
-                                if ( dsf1!=this.dsf ) {
+                                if ( dsf1!=null && dsf1!=this.dsf ) {
                                     TimeSeriesBrowseController tsbc= dsf1.getController().getTimeSeriesBrowseController();
                                     if ( tsbc!=null ) {
                                         if ( !tsbc.isListeningToAxis() ) context= true;
