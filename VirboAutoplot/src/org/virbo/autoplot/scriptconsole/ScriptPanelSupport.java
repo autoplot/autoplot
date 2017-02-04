@@ -418,11 +418,16 @@ public class ScriptPanelSupport {
         watcher = FileSystems.getDefault().newWatchService();
         Path fpath= file.toPath();
         Path parent= fpath.getParent();
-        parent.register( watcher, StandardWatchEventKinds.ENTRY_MODIFY,
-            StandardWatchEventKinds.ENTRY_CREATE,
-            StandardWatchEventKinds.ENTRY_DELETE );
-        //parent.register( watcher, StandardWatchEventKinds.OVERFLOW );
-        watcherRunnable( watcher, file.toPath() );
+        try {
+            parent.register( watcher, StandardWatchEventKinds.ENTRY_MODIFY,
+                StandardWatchEventKinds.ENTRY_CREATE,
+                StandardWatchEventKinds.ENTRY_DELETE );
+            //parent.register( watcher, StandardWatchEventKinds.OVERFLOW );
+            watcherRunnable( watcher, file.toPath() );
+        } catch ( ClosedWatchServiceException ex ) {
+            logger.fine("watch service was closed");
+        }
+
         logger.exiting("org.virbo.autoplot.scriptconsole", "restartWatcher {0}", file );
     }
     
@@ -448,16 +453,18 @@ public class ScriptPanelSupport {
             r = new BufferedReader(new InputStreamReader(in));
             String s = r.readLine();
             int tabWarn= 3;
+            int lineNum= 1;
             while (s != null) {
                 if ( s.contains("\t") ) {
                     panel.containsTabs= true;
                     if ( tabWarn>0 ) {
-                        logger.log(Level.FINE, "line contains tabs: {0}", s);
+                        logger.log(Level.FINE, "line {0} contains tabs: {1}", new Object[] { lineNum, s } );
                         tabWarn--;
                     }
                 }
                 buf.append(s).append("\n");
                 s = r.readLine();
+                lineNum++;
             }
             final String fs= buf.toString();
             Runnable run= new Runnable() {
