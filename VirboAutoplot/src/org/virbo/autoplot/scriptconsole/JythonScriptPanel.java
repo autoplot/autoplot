@@ -183,18 +183,21 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         AppManager.getInstance().addCloseCallback( app, "jythonScriptPanel", new AppManager.CloseCallback() {
             @Override
             public boolean checkClose() {
-                if ( isDirty() && isVisible() ) { 
+                if ( isDirty() && isVisible() && textArea.getDocument().getLength()>0 ) { 
                     int resp= JOptionPane.showConfirmDialog( JythonScriptPanel.this, "Script Editor contains unsaved changes.  Save these changes?" );
-                    if ( resp==JOptionPane.CANCEL_OPTION ) {
-                        return false;
-                    } else if ( resp==JOptionPane.OK_OPTION ) {
-                        try {
-                            return support.save() == JOptionPane.OK_OPTION;
-                        } catch ( IOException ex ) {       
+                    switch (resp) {
+                        case JOptionPane.CANCEL_OPTION:       
                             return false;
-                        }
-                    } else if ( resp==JOptionPane.NO_OPTION ) {
-                        return true;
+                        case JOptionPane.OK_OPTION:
+                            try {
+                                return support.save() == JOptionPane.OK_OPTION;
+                            } catch ( IOException ex ) {
+                                return false;
+                            }
+                        case JOptionPane.NO_OPTION:
+                            return true;
+                        default:
+                            break;
                     }
                     return false;
                 } else {
