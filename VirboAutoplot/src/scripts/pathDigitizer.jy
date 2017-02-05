@@ -7,9 +7,7 @@
 #
 
 from org.das2.components import DataPointRecorder
-from org.virbo.dataset import SemanticOps
 from org.das2.dataset import DataSetUpdateListener
-from org.das2.graph import SpectrogramRenderer
 from org.das2.graph import Painter
 from java.awt import BasicStroke,RenderingHints
 from java.awt.geom import GeneralPath
@@ -72,25 +70,17 @@ class MyUpdateListener( DataSetUpdateListener ):
 dpr.addDataSetUpdateListener( MyUpdateListener() )
 dom.canvases[0].controller.dasCanvas.addTopDecorator(updatesPainter)
 
-from org.das2.event import BoxSelectorMouseModule
-from org.das2.event import HorizontalDragRangeRenderer
-
-mm= BoxSelectorMouseModule.create( pp, 'events digitizer' )
-
 from org.virbo.dataset import DataSetUtil
 
 def boxSelected(event):
     x= event.getStartX()
     y= event.getStartY()
-    dpr.addDataPoint( x, y )
-    
-mm.BoxSelected=boxSelected
+    if ( not event.getFinishX().equals(x) ):
+        dpr.select( event.getXRange(), event.getYRange() )
+    else:
+        dpr.addDataPoint( x, y )
 
-pp.dasMouseInputAdapter.primaryModule= mm
+addMouseModule( dom.plots[0], 'path digitizer', boxSelected )    
 
-# make sure the focus is on the 0th plot element.  The 2nd will be the selected points and above that is the digitized.
-dom.controller.plotElement= dom.plotElements[0]
-
-import javax
-javax.swing.JOptionPane.showMessageDialog( getViewWindow(),'Click on drag on the plot, and it will be recorded on the digitizer tab')
+showMessageDialog( 'Click on drag on the plot, and it will be recorded on the digitizer tab')
 
