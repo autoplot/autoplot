@@ -407,7 +407,7 @@ public class ScriptPanelSupport {
                 }
             }            
         };
-        new Thread(run,"fileWatcherRunnnable").start();
+        new Thread(run,"fileWatcherRunnable").start();
     }
     
     private void restartWatcher( File file ) throws IOException {
