@@ -1,0 +1,94 @@
+# title: Add Path Digitizer
+# label: Path Digitizer
+# Click events are registered on the tab "digitizer," recording the X and Y positions.
+# This also provides feedback showing the digitized data and the data points 
+# selected in the digitizer tab using decorators, instead of another renderer,
+# which can be confusing.
+#
+
+from org.das2.components import DataPointRecorder
+from org.virbo.dataset import SemanticOps
+from org.das2.dataset import DataSetUpdateListener
+from org.das2.graph import SpectrogramRenderer
+from org.das2.graph import Painter
+from java.awt import BasicStroke,RenderingHints
+from java.awt.geom import GeneralPath
+
+import java.util.LinkedHashMap
+
+dpr= DataPointRecorder()
+dpr.setSorted(False)
+
+addTab( 'digitizer', dpr )
+
+pp= dom.plots[0].controller.dasPlot
+
+dom.canvases[0].controller.dasCanvas.removeTopDecorators()
+dom.canvases[0].controller.dasCanvas.removeBottomDecorators()
+
+class UpdatesPainter( Painter ):
+    def __init__(self,color,width):
+        self.color= color
+        self.width= width
+        self.ds= None
+    def setDs(self,ds):
+        self.ds= ds
+    def paint(self,g):
+        g.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON )
+        g.setColor(self.color)
+        g.setStroke(BasicStroke(self.width))
+        if ( self.ds!=None ):
+            np= 0
+            gp= GeneralPath()
+            for ds1 in self.ds:
+                x= int( pp.getXAxis().transform(datum(ds1.slice(0))) )
+                y= int( pp.getYAxis().transform(datum(ds1.slice(1))) )
+                if ( np==0 ):
+                    gp.moveTo( x, y )    
+                else:
+                    gp.lineTo( x, y )
+                np= np+1
+            if ( np==1 ): gp.lineTo( x,y )
+            g.draw( gp )
+                
+selectionPainter= UpdatesPainter( Color.YELLOW, 5 )
+class MySelectionListener(DataSetUpdateListener):
+   def dataSetUpdated(self,event):
+        global selectionPainter
+        ds= dpr.getSelectedDataPoints()
+        selectionPainter.setDs(ds)
+        dom.canvases[0].controller.dasCanvas.repaint()        
+dpr.addSelectedDataSetUpdateListener( MySelectionListener() )
+dom.canvases[0].controller.dasCanvas.addTopDecorator(selectionPainter)
+                
+updatesPainter= UpdatesPainter( Color.GRAY, 3 )
+class MyUpdateListener( DataSetUpdateListener ):
+    def dataSetUpdated( self, e ):
+        global updatesPainter
+        updatesPainter.setDs(dpr.getDataPoints())
+        dom.canvases[0].controller.dasCanvas.repaint()
+dpr.addDataSetUpdateListener( MyUpdateListener() )
+dom.canvases[0].controller.dasCanvas.addTopDecorator(updatesPainter)
+
+from org.das2.event import BoxSelectorMouseModule
+from org.das2.event import HorizontalDragRangeRenderer
+
+mm= BoxSelectorMouseModule.create( pp, 'events digitizer' )
+
+from org.virbo.dataset import DataSetUtil
+
+def boxSelected(event):
+    x= event.getStartX()
+    y= event.getStartY()
+    dpr.addDataPoint( x, y )
+    
+mm.BoxSelected=boxSelected
+
+pp.dasMouseInputAdapter.primaryModule= mm
+
+# make sure the focus is on the 0th plot element.  The 2nd will be the selected points and above that is the digitized.
+dom.controller.plotElement= dom.plotElements[0]
+
+import javax
+javax.swing.JOptionPane.showMessageDialog( getViewWindow(),'Click on drag on the plot, and it will be recorded on the digitizer tab')
+
