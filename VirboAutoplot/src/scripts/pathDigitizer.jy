@@ -49,9 +49,9 @@ class UpdatesPainter( Painter ):
                     gp.lineTo( x, y )
                 np= np+1
             if ( np==1 ): 
-                g.setStroke(BasicStroke(self.width*2))
-                gp.lineTo( x,y )
-            g.draw( gp )
+                g.fillOval( x-self.width, y-self.width, self.width*2+1, self.width*2+1 )
+            else:
+                g.draw( gp )
         
 selectionPainter= UpdatesPainter( Color.YELLOW, 5 )
 class MySelectionListener(DataSetUpdateListener):
