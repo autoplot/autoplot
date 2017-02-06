@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>POLAR/Timas data is now accessible from the CDAWeb plug-in.  Quite a few quantities are available in CDAWeb which aren't supported in Autoplot, because IDL code needs to be replicated.  Requests are welcome!
+        <p><small>Autoplot is used to compare path lengths around two Iowa lakes.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,13 @@
         
         <p>Bugfixes (2017-02-01 r20284):</p>
         <ul>
+            <li>1769: make sure event things happen on the event thread DataPointRecorder
+            <li>rte_1889988765: null pointer path in DataPointRecorder load
+            <li>bug 1770, catch the NullPointerException and print it to stderr
+            <li>clean up DataPointRecorder new so that it provides all the function of DataPointRecorderNew.
+            <li>rte_0809841297: Sebastian noticed this harmless runtime exception, which occurs when the last guy listening to the service was closed.
+            <li>don't warn about empty script editor which has been modified.
+            <li>Some loggers were still logging at INFO, which shows up in web logs and could cause problems.
             <li>1765: properly handle carots in URIs.  Thanks Ivar!
             <li>vap+inline GUI with events corrected, so that you can re-enter the GUI.
             <li>1749: GUI generated supports (kinda) positional parameters
@@ -101,6 +108,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>provide useful record-by-record reform command that allows reforming within each record.
+            <li>getCompletions command provides completions, so that function can be tested immediately.
             <li>annotations allow images to be used when http, https, or file URLs are used.
             <li>x(t),y(t)->z(t) (as well as x(i),y(j)->z(i,j)) supported in spectrogram renderer.
             <li>add method for creating zip files, from within scripts.  unzip is deprecated, and it is replaced with gunzip.
