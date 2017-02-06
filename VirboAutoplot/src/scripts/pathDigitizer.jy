@@ -82,9 +82,9 @@ dom.canvases[0].controller.dasCanvas.addTopDecorator(updatesPainter)
 from org.virbo.dataset import DataSetUtil
 
 def boxSelected(event):
-    x= event.getStartX()
-    y= event.getStartY()
-    if ( not event.getFinishX().equals(x) ):
+    x= event.getFinishX()
+    y= event.getFinishY()
+    if ( not event.getStartX().equals(x) ):
         dpr.select( event.getXRange(), event.getYRange() )
     else:
         dpr.addDataPoint( x, y )
