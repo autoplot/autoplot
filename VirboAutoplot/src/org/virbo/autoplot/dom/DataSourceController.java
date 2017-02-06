@@ -1602,8 +1602,7 @@ public class DataSourceController extends DomNodeController {
         try {
             propertyChangeSupport.firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
         } catch ( NullPointerException ex ) {
-            logger.log( Level.WARNING, null, ex ); // See rte_0031957296
-            throw ex;
+            logger.log( Level.WARNING, "https://sourceforge.net/p/autoplot/bugs/1770/", ex ); // See rte_0031957296, https://sourceforge.net/p/autoplot/bugs/1770/
         }
     }
     /**
