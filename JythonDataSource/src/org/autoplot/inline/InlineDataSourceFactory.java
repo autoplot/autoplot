@@ -56,7 +56,11 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             PythonInterpreter interp = JythonUtil.createInterpreter(false);
             URL imports = JythonOps.class.getResource("imports.py");
-            interp.execfile(imports.openStream(),"imports.py");
+            if ( imports!=null ) {
+                interp.execfile(imports.openStream(),"imports.py");
+            } else {
+                logger.warning("unable to find imports.py");
+            }
             String frag= cc.completable;
             org.das2.jythoncompletion.CompletionContext cc1= CompletionSupport.getCompletionContext( "x="+frag, cc.completablepos+2, 0, 0, 0 );        
             List<DefaultCompletionItem> r=  JythonCompletionTask.getLocalsCompletions( interp, cc1 );
