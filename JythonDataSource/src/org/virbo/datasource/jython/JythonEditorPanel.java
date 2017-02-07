@@ -661,6 +661,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                     split.path= ruriSplit.path;
                     split.file= ruriSplit.file;
                     if ( split.vapScheme==null ) split.vapScheme= "vap+jyds";
+                    params.put( JythonDataSource.PARAM_RESOURCE_URI, split.file  );
                 } else {
                     params.put( name, value );
                 }
