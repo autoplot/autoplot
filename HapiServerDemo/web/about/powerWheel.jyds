@@ -1,0 +1,53 @@
+# extract the ring around the needle from each image 
+# to create a spectrogram
+
+from java.lang.System import currentTimeMillis
+import java.lang.Exception
+from java.io import File
+
+tr= getParam( 'timerange', '2016-10-01T00:00/01:00', 'timerange to load' )
+drtr= DatumRangeUtil.parseTimeRange(tr)
+
+xx= 241 + linspace( 0, 257-241, 21 )
+yy= 55 + zeros( 21 )
+
+dsb= DataSetBuilder(2,1000,yy.length())
+xdsb= DataSetBuilder(1,1000)
+
+root='/home/jbf/public_html/camE/'
+tp= TimeParser.create('$Y$m$dT$H$M$S.jpg')
+dirs= generateTimeRanges('$Y/$m/$d/',tr)
+monitor.started()
+for d in dirs:
+    print root+d+'*.jpg'
+    if ( not File(root+d).exists() ):
+        continue
+    ff= listDirectory(root+d+'*.jpg')
+    print 'found files: ',len(ff)
+    monitor.setTaskSize(len(ff))
+    t0= currentTimeMillis()
+    for f in ff:
+        if ( monitor.isCancelled() ): break
+        monitor.setTaskProgress( monitor.getTaskProgress()+1 )
+        try:
+             t= tp.parse(f).getTimeDatum()
+             print t, drtr, drtr.contains(t)
+             if ( drtr.contains(t) ):
+                 print root + d + f 
+                 im= getDataSet( root + d + f + '?channel=greyscale' )
+                 print im
+                 zz= interpolate( im, xx, yy )
+                 dsb.nextRecord( zz )
+                 xdsb.nextRecord( t )
+                 print dsb
+        except java.lang.Exception, e:
+             print e
+             continue   
+print xdsb          
+dsb.putProperty( QDataSet.DEPEND_0, xdsb.getDataSet() )
+dsb.putProperty( QDataSet.DEPEND_1, putProperty( xx, QDataSet.LABEL, 'x location' ) )
+dsb.putProperty( QDataSet.VALID_MAX, 256 )
+dsb.putProperty( QDataSet.VALID_MIN, 0 )
+dsb.putProperty( QDataSet.LABEL, 'grayscale' )
+result= dsb.getDataSet()
+print result
