@@ -14,6 +14,7 @@
     </head>
     <body>
         <h1>This is a HAPI Server.</h1>  More information about this type of server is found at <a href="https://github.com/hapi-server/data-specification">github</a>.
+        More information about specific datasets served is found <a href="../about/about.html">here</a>
         
         <h3>Some example requests:</h3>
         <a href="catalog">Catalog</a> <i>Show the catalog of available data sets.</i><br>
