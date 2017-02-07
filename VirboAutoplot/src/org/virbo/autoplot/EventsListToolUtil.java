@@ -7,6 +7,8 @@
 package org.virbo.autoplot;
 
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -136,6 +138,13 @@ public class EventsListToolUtil {
                 @Override
                 public void dataRangeSelected(DataRangeSelectionEvent e) {
                     t.applicationModel.dom.setTimeRange( e.getDatumRange() );
+                }
+            });
+            
+            ll.getDataSetSelector().addActionListener( new ActionListener() {
+                @Override
+                public void actionPerformed( ActionEvent ev ) {
+                    t.getDocumentModel().setEventsListUri( ll.getDataSetSelector().getValue() );
                 }
             });
             
