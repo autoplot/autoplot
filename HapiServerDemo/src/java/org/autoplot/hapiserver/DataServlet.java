@@ -19,7 +19,6 @@ import org.das2.datum.Units;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
@@ -109,8 +108,8 @@ public class DataServlet extends HttpServlet {
                 dsiter= new RecordIterator( "vap+cdaweb:ds=RBSP-A_HFR-SPECTRA_EMFISIS-L2&id=HFR_Spectra", dr , allowStream);
             } else if ( id.equals("PowerWheel") ) {
                 dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerWheel.jyds?", dr, allowStream );
-            } else if ( id.equals("PowerWheelRank2") ) {
-                dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerWheel.jyds?", dr, allowStream );
+            } else if ( id.equals("SpectrogramRank2") ) {
+                dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/spectrogramRank2.jyds?", dr, allowStream );
             } else if ( id.equals("PowerOnesDigitSegments") ) {
                 dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerOnes.jyds?", dr, allowStream );
             } else if ( id.equals("0B000800408DD710.noStream") ) {

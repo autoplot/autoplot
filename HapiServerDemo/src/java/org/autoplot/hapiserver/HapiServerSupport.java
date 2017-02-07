@@ -28,7 +28,7 @@ public class HapiServerSupport {
         result.add( "Iowa City Forecast" );
         result.add( "Spectrum" );
         result.add( "PowerWheel");
-        result.add( "PowerWheelRank2");
+        result.add( "SpectrogramRank2");
         result.add( "PowerOnesDigitSegments");
         return result;
     }
@@ -44,7 +44,8 @@ public class HapiServerSupport {
         array.put( new JSONObject().put("id","Iowa City Forecast").put("title","Iowa City Forecast") );
         array.put( new JSONObject().put("id","Spectrum").put("title","Example Spectrum") );
         array.put( new JSONObject().put("id","PowerWheel").put("title","Spinning Wheel on Power Meter") );
-        array.put( new JSONObject().put("id","PowerWheelRank2").put("title","Spinning Wheel on Power Meter, by cell") );
+        array.put( new JSONObject().put("id","SpectrogramRank2").put("title","Example Rank 2 Spectrum") );
+        array.put( new JSONObject().put("id","PowerOnesDigitSegments").put("title","") );
         return array;
     }
     

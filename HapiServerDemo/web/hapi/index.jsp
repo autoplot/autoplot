@@ -25,7 +25,7 @@
         <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&include=header">Data w/header</a> <i>Data request, requesting header as well.</i><br>
         <a href="data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header">Data w/multiple parameters</a> <i>Request for data with multiple parameters.</i><br>
         <a href="data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/subset</a> <i>Request subset of the parameters.</i><br>
-        
+        <a href="data?id=SpectrogramRank2&time.min=2016-01-01&time.max=2016-01-02">Rank 3 Data</a> <i>High-rank data showing multiple dimensional spectrogram.</i><br>
         <%
             long l= org.virbo.dataset.RecordIterator.TIME_STAMP; // load RecordIterator class first, or we'll get a negative time.
         %>

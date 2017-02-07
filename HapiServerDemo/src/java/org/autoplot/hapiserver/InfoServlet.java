@@ -221,14 +221,14 @@ public class InfoServlet extends HttpServlet {
             parameter.put( "size", new int[] { ens.length } );
             parameter.put( "description", "The little wheel thingy that spins around." );
             parameters.put( 1, parameter );
-        } else if ( id.equals("PowerWheelRank2") ) {
+        } else if ( id.equals("SpectrogramRank2") ) {
             parameter= new JSONObject();
-            parameter.put( "name", "PowerWheelRank2" );
+            parameter.put( "name", "SpectrogramRank2" );
             parameter.put( "type", "float" );
             parameter.put( "units", "greyscale" );
             parameter.put( "size", new int[] { 7,3 } );            
             JSONObject bins= new JSONObject();
-            double[] ens1= new double[] { 1,2,3,4,5,6,7 };
+            double[] ens1= new double[] { .1,.2,.3,.4,.5,.6,.7 };
             JSONArray values= new JSONArray();
             for ( int i=0; i<ens1.length; i++ ) {
                 JSONObject en= new JSONObject();
@@ -240,7 +240,7 @@ public class InfoServlet extends HttpServlet {
             bins.put( "units", "sampleNumber" );
             parameter.put( "bins1", bins );
             bins= new JSONObject();
-            double[] ens2= new double[] { 1,2,3 };
+            double[] ens2= new double[] { 10,20,30 };
             values= new JSONArray();
             for ( int i=0; i<ens2.length; i++ ) {
                 JSONObject en= new JSONObject();
@@ -251,7 +251,7 @@ public class InfoServlet extends HttpServlet {
             bins.put( "name", "cell" );
             bins.put( "units", "cellNumber" );
             parameter.put( "bins2", bins );
-            parameter.put( "description", "The little wheel thingy that spins around." );
+            parameter.put( "description", "Example of rank 2 data." );
             parameters.put( 1, parameter );
 
         } else if ( id.equals("PowerOnesDigitSegments") ) {
@@ -289,7 +289,7 @@ public class InfoServlet extends HttpServlet {
             );
             parameters.put( 1, parameter );
                              
-        } else {
+        } else if ( Character.isDigit( id.charAt(0) ) ) {
             parameter= new JSONObject();
             parameter.put( "name", "Temperature" );
             parameter.put( "type", "float" );
@@ -307,6 +307,8 @@ public class InfoServlet extends HttpServlet {
                 parameter.put( "description", "temperature at sensor " + id );
             }
             parameters.put( 1, parameter );
+        } else {
+            throw new IllegalArgumentException("unknown id: " +id );
         }
         
         jo.put("parameters",parameters);
