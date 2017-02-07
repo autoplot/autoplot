@@ -149,6 +149,13 @@ public class RecordIterator implements Iterator<QDataSet>  {
                     for ( int i=1; i<ds.length(0); i++ ) {
                         this.src= Ops.bundle( this.src, Ops.unbundle(ds,i) );
                     }
+                } else if ( ds.rank()>2 ) { // flatten the rank>2 to rank=2.
+                    int[] qube= DataSetUtil.qubeDims(ds.slice(0));
+                    ds= Ops.reform( ds, ds.length(), new int[] { DataSetUtil.product(qube) } );
+                    this.src= Ops.bundle( dep0, Ops.slice1(ds,0) );
+                    for ( int i=1; i<ds.length(0); i++ ) {
+                        this.src= Ops.bundle( this.src, Ops.slice1(ds,i) );
+                    }
                 }
             } else {
                 this.src= ds;
