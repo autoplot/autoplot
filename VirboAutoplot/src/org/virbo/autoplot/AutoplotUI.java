@@ -1595,22 +1595,21 @@ APSplash.checkTime("init 270");
                 dom.addPropertyChangeListener( Application.PROP_EVENTSLISTURI, new PropertyChangeListener() {
                     @Override
                     public void propertyChange(PropertyChangeEvent evt) {
-                        System.err.println("here we are");
+                        logger.finer("events list URI property change");
                         final String uri = (String)evt.getNewValue();
                         if ( uri.trim().length()>0 ){
                             Runnable run= new Runnable() {
                                 @Override
                                 public void run() {
-                                    System.err.println("what the heck!!!");
+                                    logger.log(Level.FINEST, "resetting events list URI to {0}", uri);
                                     EventsListToolUtil.setEventsListURI( AutoplotUI.this, uri );
                                 }
                             };
                             if ( EventQueue.isDispatchThread() ) {
                                 run.run();
-                                System.err.println("thnking about it now now");
                             } else {
                                 SwingUtilities.invokeLater(run);
-                                System.err.println("thnking about it!");
+                                System.err.println("resetting events list URI later");
                             }
                         }
                     }
