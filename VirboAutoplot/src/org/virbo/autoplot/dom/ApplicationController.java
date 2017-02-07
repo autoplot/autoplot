@@ -2065,6 +2065,8 @@ public class ApplicationController extends DomNodeController implements RunLater
             application.getPlots(0).setTicksURI("");
             application.getPlots(0).setContext( application.getPlots(0).getXaxis().getRange() );
 
+            application.setEventsListUri("");
+            
             resetIdSequenceNumbers();
 
             //clean up controllers after seeing the junk left behind in the profiler.
