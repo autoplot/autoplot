@@ -226,7 +226,8 @@ public class InfoServlet extends HttpServlet {
             parameter.put( "name", "SpectrogramRank2" );
             parameter.put( "type", "float" );
             parameter.put( "units", "greyscale" );
-            parameter.put( "size", new int[] { 7,3 } );            
+            parameter.put( "size", new int[] { 7,3 } );   
+            JSONArray binsArray= new JSONArray();
             JSONObject bins= new JSONObject();
             double[] ens1= new double[] { .1,.2,.3,.4,.5,.6,.7 };
             JSONArray values= new JSONArray();
@@ -236,9 +237,9 @@ public class InfoServlet extends HttpServlet {
                 values.put( i,en );
             }
             bins.put( "values", values );
-            bins.put( "name", "samples" );
+            bins.put( "name", "energy" );
             bins.put( "units", "sampleNumber" );
-            parameter.put( "bins1", bins );
+            binsArray.put(0,bins);
             bins= new JSONObject();
             double[] ens2= new double[] { 10,20,30 };
             values= new JSONArray();
@@ -250,7 +251,8 @@ public class InfoServlet extends HttpServlet {
             bins.put( "values", values );
             bins.put( "name", "cell" );
             bins.put( "units", "cellNumber" );
-            parameter.put( "bins2", bins );
+            binsArray.put(1,bins);
+            parameter.put( "bins", binsArray );
             parameter.put( "description", "Example of rank 2 data." );
             parameters.put( 1, parameter );
 
