@@ -447,10 +447,16 @@ public class Application extends DomNode {
      * it is often difficult to identify the index of a plot in the plots array
      * but its id is known, and this avoids the import of DomUtil.
      * @param id an id, such as "plot_2"
-     * @return the node, or null (None) if it is not found.
+     * @return the node
+     * @throws IllegalArgumentException if the id is not found.
      * @see DomUtil#getElementById(org.virbo.autoplot.dom.DomNode, java.lang.String) 
      */
     public DomNode getElementById( String id ) {
-        return DomUtil.getElementById( this, id );
+        DomNode result= DomUtil.getElementById( this, id );
+        if ( result==null ) {
+            throw new IllegalArgumentException("unable to find node \""+id+"\"");
+        } else {
+            return result;
+        }
     }
 }
