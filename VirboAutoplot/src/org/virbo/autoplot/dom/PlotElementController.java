@@ -45,8 +45,12 @@ import org.das2.event.HorizontalSlicerMouseModule;
 import org.das2.event.MouseModule;
 import org.das2.event.VerticalSlicerMouseModule;
 import org.das2.graph.ContoursRenderer;
+import org.das2.graph.DasCanvas;
+import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasColorBar;
+import org.das2.graph.DasColumn;
 import org.das2.graph.DasPlot;
+import org.das2.graph.DasRow;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.DigitalRenderer;
 import org.das2.graph.EventsRenderer;
@@ -2051,6 +2055,17 @@ public class PlotElementController extends DomNodeController {
                 }
 
             }
+            Map m= (Map)properties.get(QDataSet.PLANE_0);
+            if ( m!=null ) {
+                v = m.get(QDataSet.LABEL);
+                if (v != null) {
+                    plotDefaults.getZaxis().setLabel((String) v);
+                }
+                v= m.get(QDataSet.TITLE);
+                if (v != null) {
+                    plotDefaults.setTitle((String) v);
+                }
+            }
         } else { // hugeScatter okay
 
             Map<String,Object> yprop, xprop=null, prop;
@@ -2095,6 +2110,10 @@ public class PlotElementController extends DomNodeController {
                 v = prop.get(QDataSet.LABEL);
                 if (v != null) {
                     plotDefaults.getZaxis().setLabel((String) v);
+                }
+                v= prop.get(QDataSet.TITLE);
+                if (v != null) {
+                    plotDefaults.setTitle((String) v);
                 }
             }
 
@@ -2771,6 +2790,19 @@ public class PlotElementController extends DomNodeController {
                 if ( oldRenderer!=null ) {
                     oldRenderer.setActive(false);
                     oldRenderer.setColorBar(null);
+                }
+                if ( newRenderer.getColorBar()==cb && cb!=null && cb.isVisible() ) {
+                    DasCanvas c= getDasPlot().getCanvas();
+                    DasCanvasComponent[] dcc=c.getCanvasComponents();
+                    boolean hasColorbarInstalled= false;
+                    for ( DasCanvasComponent dc: dcc ) {
+                        if ( dc==cb ) {
+                            hasColorbarInstalled=true;
+                        }
+                    }
+                    if ( !hasColorbarInstalled ) {
+                        c.add( cb, cb.getRow(), cb.getColumn() );
+                    }                    
                 }
             }
 
