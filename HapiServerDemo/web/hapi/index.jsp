@@ -59,6 +59,7 @@
             <li>2017-01-10: use startDate and stopDate instead of firstDate and lastDate as decided on 2017-01-10 telecon.</li>
             <li>2017-02-03: add http link in info, to show support for this.</li>
             <li>2017-02-03: add demonstration ds for rank 3 data</li>   
+            <li>2017-02-07: use bins array instead of bins1, bins2.</li>
         </ul>
         </small>
     </body>
