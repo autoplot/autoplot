@@ -1,21 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.autoplot.dom;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.Units;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -379,7 +370,7 @@ public class Application extends DomNode {
 
         Application that = (Application) node;
         
-        List<Diff> result = new ArrayList<Diff>();
+        List<Diff> result = new ArrayList<>();
 
         addArrayDiffs( "dataSourceFilters", this.getDataSourceFilters(), that.getDataSourceFilters(), result );
 
