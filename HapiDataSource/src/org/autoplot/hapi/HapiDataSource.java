@@ -135,7 +135,7 @@ public class HapiDataSource extends AbstractDataSource {
     
     public static final double FILL_VALUE= -1e38;
     
-    private JSONObject getDocument( ) throws MalformedURLException, IOException, JSONException {
+    private JSONObject getInfo( ) throws MalformedURLException, IOException, JSONException {
         URI server = this.resourceURI;
         String id= getParam("id","" );
         if ( id.equals("") ) throw new IllegalArgumentException("missing id");
@@ -145,12 +145,16 @@ public class HapiDataSource extends AbstractDataSource {
         logger.log(Level.FINE, "getDocument {0}", url.toString());
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( url.openStream() ) ) ) {
             String line= in.readLine();
-            while ( line!=null ) {
+            while ( line!=null ) {                
                 builder.append(line);
                 line= in.readLine();
             }
         }
-        JSONObject o= new JSONObject(builder.toString());
+        String s= builder.toString();
+        if ( s.length()==0 ) {
+            throw new JSONException("JSON response from info request is empty: "+url);
+        }
+        JSONObject o= new JSONObject(s);
         return o;
     }
     
@@ -350,16 +354,16 @@ public class HapiDataSource extends AbstractDataSource {
 
         String pp= getParam("parameters","");
         
-        JSONObject doc= getDocument();
+        JSONObject info= getInfo();
         monitor.setProgressMessage("got info");
         monitor.setTaskProgress(20);
         
-        ParamDescription[] pds= getParameterDescriptions(doc);
+        ParamDescription[] pds= getParameterDescriptions(info);
         
         DatumRange tr; // TSB = DatumRangeUtil.parseTimeRange(timeRange);
         tr= tsb.getTimeRange();
         
-        JSONArray parametersArray= doc.getJSONArray("parameters");
+        JSONArray parametersArray= info.getJSONArray("parameters");
         int nparam= parametersArray.length(); // this is the actual number sent.
         if ( pp.length()>0 ) {
             String[] pps= pp.split(",");
@@ -741,20 +745,20 @@ public class HapiDataSource extends AbstractDataSource {
                             pds[i].size[j]= a.getInt(j);
                         }
                     }
-                    if ( jsonObjecti.has("bins2") ) {
-                        if ( pds[i].depend==null ) pds[i].depend= new QDataSet[2];
-                        QDataSet dep= getJSONBins(jsonObjecti.getJSONObject("bins2"));
-                        pds[i].depend[1]= dep;
-                    } 
-                    if ( jsonObjecti.has("bins1") ) {
-                        if ( pds[i].depend==null ) pds[i].depend= new QDataSet[1];
-                        QDataSet dep1= getJSONBins(jsonObjecti.getJSONObject("bins1"));
-                        pds[i].depend[0]= dep1;
-                    } 
                     if ( jsonObjecti.has("bins") ) {
-                        QDataSet dep1= getJSONBins(jsonObjecti.getJSONObject("bins"));
-                        if ( pds[i].depend==null ) pds[i].depend= new QDataSet[1];
-                        pds[i].depend[0]= dep1;
+                        o= jsonObjecti.get("bins");
+                        if ( o instanceof JSONArray ) {
+                            JSONArray ja= (JSONArray)o;
+                            pds[i].depend= new QDataSet[ja.length()];
+                            for ( int j=0; j<ja.length(); j++ ) {
+                                QDataSet dep= getJSONBins(ja.getJSONObject(j));
+                                pds[i].depend[j]= dep;
+                            }
+                        } else {
+                            QDataSet dep1= getJSONBins(jsonObjecti.getJSONObject("bins"));
+                            if ( pds[i].depend==null ) pds[i].depend= new QDataSet[1];
+                            pds[i].depend[0]= dep1;
+                        }
                     } 
                 }
             }
