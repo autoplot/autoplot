@@ -21,6 +21,9 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -42,6 +45,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -51,6 +55,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.autoplot.pngwalk.PngWalkTool;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.LoggerManager;
@@ -81,6 +87,16 @@ public class ScreenshotsTool extends EventQueue {
     
     private boolean receivedEvents= false;  // so this can be used without automatic screenshots.
     
+    private static void checkFolderContents( String text, JCheckBox deleteFilesCheckBox ) {
+        File f= new File( text );
+        if ( f.exists() && f.listFiles().length>1 ) {
+            deleteFilesCheckBox.setEnabled(true);
+        } else {
+            deleteFilesCheckBox.setEnabled(false);
+            deleteFilesCheckBox.setSelected(false);
+        }
+    }
+    
     /**
      * start should be called from the event thread.
      * @param parent the device
@@ -91,9 +107,9 @@ public class ScreenshotsTool extends EventQueue {
         String s= prefs.get( "outputFolder", System.getProperty("user.home") );
 
         JPanel p= new JPanel();
-        p.setLayout( new BorderLayout() );
+        p.setLayout( new BoxLayout(p,BoxLayout.PAGE_AXIS ) );
 
-        p.add( new JLabel( "<html>This will automatically take screenshots, recording them to a folder.<br>The folder must be empty.<br>Hold Ctrl and press Shift twice to stop recording." ), BorderLayout.CENTER );
+        p.add( new JLabel( "<html>This will automatically take screenshots, recording them to a folder.<br><br>Hold Ctrl and press Shift twice to stop recording." ), JLabel.LEFT_ALIGNMENT );
 
         JPanel folderPanel= new JPanel();
         folderPanel.setLayout( new FlowLayout() );
@@ -114,21 +130,59 @@ public class ScreenshotsTool extends EventQueue {
                 }
             }
         }));
-        p.add( folderPanel, BorderLayout.SOUTH );
+        folderPanel.setAlignmentX( Component.LEFT_ALIGNMENT );
+        p.add( folderPanel );
 
+        final JCheckBox deleteFilesCheckBox= new JCheckBox("Delete contents before starting");
+        deleteFilesCheckBox.setEnabled(false);
+        deleteFilesCheckBox.setAlignmentX( Component.LEFT_ALIGNMENT );
+        checkFolderContents(tf.getText(),deleteFilesCheckBox);
+            
+        tf.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                checkFolderContents(tf.getText(),deleteFilesCheckBox);
+            }
+        } );
+        
+        tf.addFocusListener( new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                checkFolderContents(tf.getText(),deleteFilesCheckBox);
+            }
+            @Override
+            public void focusLost(FocusEvent e) {
+                checkFolderContents(tf.getText(),deleteFilesCheckBox);
+            }
+        });
+        tf.getDocument().addDocumentListener( new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                checkFolderContents(tf.getText(),deleteFilesCheckBox);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                checkFolderContents(tf.getText(),deleteFilesCheckBox);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                checkFolderContents(tf.getText(),deleteFilesCheckBox);
+            }
+        } );
+        
+        p.add( deleteFilesCheckBox );
+        
         int r= JOptionPane.showConfirmDialog( parent, p,
         "Record Screenshots",
         JOptionPane.OK_CANCEL_OPTION );
 
         if ( r==JOptionPane.OK_OPTION ) {
             File f= new File( tf.getText() );
-            if ( f.exists() && f.listFiles().length>1 ) {
-                if ( JOptionPane.OK_OPTION==AutoplotUtil.showConfirmDialog( parent,"Folder is not empty.  Delete contents before starting?", "Folder must be empty", JOptionPane.OK_CANCEL_OPTION ) ) {
-                    if ( !FileUtil.deleteFileTree(f) ) {
-                        JOptionPane.showMessageDialog(parent,"Unable to delete files");
-                    }
-                } else {
-                    return;
+            if ( f.exists() && f.listFiles().length>1 && deleteFilesCheckBox.isSelected() ) {
+                if ( !FileUtil.deleteFileTree(f) ) {
+                    JOptionPane.showMessageDialog(parent,"Unable to delete files");
                 }
             }
             try {
