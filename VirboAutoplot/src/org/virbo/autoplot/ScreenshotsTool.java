@@ -665,7 +665,7 @@ public class ScreenshotsTool extends EventQueue {
             }
         }
         
-        logger.log(Level.FINE, "got screenshot in {0} ms", (System.currentTimeMillis()-t0));
+        logger.log(Level.FINE, "got screenshot in {0}ms", (System.currentTimeMillis()-t0));
         return screenshot;
     }
 
@@ -824,8 +824,6 @@ public class ScreenshotsTool extends EventQueue {
      * take a screenshot and write it to a png file.
      * @param filename the filename for the image, without the root.
      * @param t1 the time in millis.
-     * @param dt elapsed time.
-     * @param id the event id number.
      * @param includePointer true if the pointer should be drawn.
      * @return the rectangle containing the GUI window.
      */
@@ -850,6 +848,7 @@ public class ScreenshotsTool extends EventQueue {
             logger.log( Level.WARNING, ex.getMessage(), ex );
         }
 
+        logger.log(Level.FINE, "formatted file in {0}ms", ( System.currentTimeMillis()-t0 ));
         t0= System.currentTimeMillis();
 
         return myBounds;
