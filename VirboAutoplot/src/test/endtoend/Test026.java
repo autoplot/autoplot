@@ -67,6 +67,7 @@ public class Test026 {
         testTimeRange("2001-06-08 00:00 to 2001-06-09 00:00", "2001 Jun 8 00:00 to 24:00");
         testTimeRange("2001-01-01 00:00 to 2001-01-06 00:00", "2001 Jan 01 span 5 day");
         testTimeRange("2001-01-01 05:00 to 2001-01-01 07:00", "2001 Jan 01 05:00 span 2 hr");
+        testTimeRange("2016-10-01 00:00 to 2016-11-01 00:00", "2016 October"); //  bug https://sourceforge.net/p/autoplot/bugs/1774/
         testTimeRange("2010-09-01 00:00 to 2010-09-02 00:00", "2010-244");  // day of year is three digits (001-366)
         testTimeRange("2010-03-01 00:00 to 2010-03-02 00:00", "2010-060");
         //  testTimeRange( "2001-07-01 00:00 to 2002-01-01 00:00", "July+through+Dec+2001" );  //TODO: should plus be a delimiter?  minus is, so I don't think this would hurt anything...  Autoplot often converts plus to space to make them continuous.
