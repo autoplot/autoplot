@@ -700,10 +700,10 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 //cdf.addVariableAttributeEntry( name, "VALIDMIN", CDFDataType.DOUBLE, vmin.doubleValue() );
                 //cdf.addVariableAttributeEntry( name, "VALIDMAX", CDFDataType.DOUBLE, vmax.doubleValue() );
             } else {
-                //if ( vmax==null ) vmax= 1e38;
-                //if ( vmin==null ) vmin= -1e38;
-                //cdf.addVariableAttributeEntry( name, "VALIDMIN", CDFDataType.DOUBLE, new Double[] { vmin.doubleValue() } );
-                //cdf.addVariableAttributeEntry( name, "VALIDMAX", CDFDataType.DOUBLE, new Double[] { vmax.doubleValue() } );
+                if ( vmax==null ) vmax= 1e38;
+                if ( vmin==null ) vmin= -1e38;
+                cdf.addVariableAttributeEntry( name, "VALIDMIN", CDFDataType.DOUBLE, new double[] { vmin.doubleValue() } );
+                cdf.addVariableAttributeEntry( name, "VALIDMAX", CDFDataType.DOUBLE, new double[] { vmax.doubleValue() } );
             }
         }
         Number fillval= (Number) ds.property( QDataSet.FILL_VALUE );
@@ -722,10 +722,10 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 //cdf.addVariableAttributeEntry( name,"SCALEMIN", CDFDataType.DOUBLE, smin.doubleValue() );
                 //cdf.addVariableAttributeEntry( name,"SCALEMAX", CDFDataType.DOUBLE, smax.doubleValue() );
             } else {
-                //if ( smax==null ) smax= 1e38;
-                //if ( smin==null ) smin= -1e38;
-                //cdf.addVariableAttributeEntry( name,"SCALEMIN", CDFDataType.DOUBLE, smin.doubleValue() );
-                //cdf.addVariableAttributeEntry( name,"SCALEMAX", CDFDataType.DOUBLE, smax.doubleValue() );
+                if ( smax==null ) smax= 1e38;
+                if ( smin==null ) smin= -1e38;
+                cdf.addVariableAttributeEntry( name,"SCALEMIN", CDFDataType.DOUBLE, new double[] { smin.doubleValue() } );
+                cdf.addVariableAttributeEntry( name,"SCALEMAX", CDFDataType.DOUBLE, new double[] { smax.doubleValue() } );
             }
         }
         String scaleTyp= (String) ds.property(QDataSet.SCALE_TYPE);
