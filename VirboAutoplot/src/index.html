@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Autoplot is used to compare path lengths around two Iowa lakes.
+        <p><small>Interpolating random points from a regular grid.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,11 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-02-01 r20284):</p>
+        <p>Bugfixes (2017-02-10 r20284):</p>
         <ul>
+            <li>"october 2016" now parses properly.   Thanks, Sebastian!
+            <li>995: colorbar with color scatter now appears consistently.
+            <li>corrections to labels when X,Y->Z is used.  Thanks, Babtiste!
             <li>1191: restore mousewheel behavior to the secondary mouse module.
             <li>1769: make sure event things happen on the event thread DataPointRecorder
             <li>rte_1889988765: null pointer path in DataPointRecorder load
@@ -109,6 +112,9 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>screenshots tool now uses a separate thread to save images, improving responsiveness.
+            <li>experimental support for high-rank datasets in HAPI servers
+            <li>dom.getElementById added, to remove confusion about indeces.
             <li>provide useful record-by-record reform command that allows reforming within each record.
             <li>getCompletions command provides completions, so that function can be tested immediately.
             <li>annotations allow images to be used when http, https, or file URLs are used.
