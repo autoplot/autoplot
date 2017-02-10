@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Interpolating random points from a regular grid.
+        <p><small>Interpolating random points from a regular grid.  Script <a href="http://autoplot.org/data/script/screenshots/rgbColorScatter.jy">here</a>.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,9 +24,9 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-02-10 r20284):</p>
+        <p>Bugfixes (2017-02-10 r20339):</p>
         <ul>
-            <li>"october 2016" now parses properly.   Thanks, Sebastian!
+            <li>"October 2016" now parses properly.   Thanks, Sebastian!
             <li>995: colorbar with color scatter now appears consistently.
             <li>corrections to labels when X,Y->Z is used.  Thanks, Babtiste!
             <li>1191: restore mousewheel behavior to the secondary mouse module.
@@ -38,7 +38,7 @@
             <li>don't warn about empty script editor which has been modified.
             <li>Some loggers were still logging at INFO, which shows up in web logs and could cause problems.
             <li>1765: properly handle carots in URIs.  Thanks Ivar!
-            <li>vap+inline GUI with events corrected, so that you can re-enter the GUI.
+            <li>1764: vap+inline GUI with events corrected, so that you can re-enter the GUI.
             <li>1749: GUI generated supports (kinda) positional parameters
             <li>1763: spectrogram codes should accept X,Y->Z (rank1 X,Y,Z).  Thanks Babtiste and Chris!
             <li>1762: add support for URL argument types.
@@ -112,7 +112,7 @@
         </ul>
         <p>Features:</p>
         <ul>
-            <li>screenshots tool now uses a separate thread to save images, improving responsiveness.
+            <li>559: screenshots tool now uses a separate thread to save images, improving responsiveness.
             <li>experimental support for high-rank datasets in HAPI servers
             <li>dom.getElementById added, to remove confusion about indeces.
             <li>provide useful record-by-record reform command that allows reforming within each record.
