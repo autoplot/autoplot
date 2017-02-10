@@ -37,8 +37,10 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
@@ -266,8 +268,46 @@ public class ScreenshotsTool extends EventQueue {
             }
         } );
 
+        imageRecorderThreadRunning= true;
+        
+        imageRecorderThread = new Thread( new Runnable() {
+            @Override
+            public void run() {
+                logger.log(Level.FINE, "starting imageRecorderThread" );
+                while ( imageRecorderThreadRunning || !imageQueue.isEmpty() ) {
+                    logger.log(Level.FINE, "imageRecorderThread..." );
+                
+                    while ( imageRecorderThreadRunning && imageQueue.isEmpty() ) { 
+                        //wait
+                    }
+                    while ( !imageQueue.isEmpty() ) {
+                        ImageRecord record= imageQueue.remove();
+                        logger.log(Level.FINE, "imageRecorder writing {0}", record.filename);
+                    
+                        try {
+                            if ( !record.filename.createNewFile() ) {
+                                logger.log(Level.WARNING, "failed to create new file {0}", record.filename);
+                            } else {
+                                ImageIO.write( record.image, "png", record.filename);
+                            }
+                            
+                        } catch ( Exception ex ) {
+                            logger.log( Level.WARNING, ex.getMessage(), ex );
+                        }
+
+                        logger.log(Level.FINE, "formatted file in {0}ms", ( System.currentTimeMillis()-t0 ));
+
+                    }
+                }
+                imageRecorderThreadNotDone= false;
+            };
+        } );
+        
+        imageRecorderThread.start();
+        
     }
 
+    
     /**
      * return the display that the window is within.  For single-head machines, this is 0.
      * @param parent
@@ -305,6 +345,21 @@ public class ScreenshotsTool extends EventQueue {
     long t0 = 0;
     long tb = System.currentTimeMillis();
     
+    private static class ImageRecord {
+        ImageRecord( BufferedImage image, File filename ) {
+            this.image= image;
+            this.filename= filename;
+        }
+        BufferedImage image;
+        File filename;
+    }
+    
+    ConcurrentLinkedQueue<ImageRecord> imageQueue= new ConcurrentLinkedQueue<>();
+    
+    Thread imageRecorderThread;
+            
+    boolean imageRecorderThreadRunning= false;
+    boolean imageRecorderThreadNotDone= false;
     /*
      * block>0 means decrement.  block<0 means wait.
      */
@@ -837,18 +892,8 @@ public class ScreenshotsTool extends EventQueue {
         Rectangle b= getScreenBounds(active);
         Rectangle myBounds= getMyBounds(b);
 
-        try {
-            if ( !file.createNewFile() ) {
-                logger.log(Level.WARNING, "failed to create new file {0}", file);
-            } else {
-                ImageIO.write(im, "png", file);
-            }
-
-        } catch ( Exception ex ) {
-            logger.log( Level.WARNING, ex.getMessage(), ex );
-        }
-
-        logger.log(Level.FINE, "formatted file in {0}ms", ( System.currentTimeMillis()-t0 ));
+        ImageRecord imr= new ImageRecord( im, file );
+        imageQueue.add( imr );
         t0= System.currentTimeMillis();
 
         return myBounds;
@@ -1001,6 +1046,9 @@ public class ScreenshotsTool extends EventQueue {
      */
     private void finishUp() {
 
+        imageRecorderThreadRunning= false;
+        while ( imageRecorderThreadNotDone ) {
+        }
         JPanel p= new JPanel();
         p.setLayout( new BorderLayout() );
         int count= outLocationFolder.list().length;
