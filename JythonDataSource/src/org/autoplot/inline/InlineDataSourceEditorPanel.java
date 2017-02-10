@@ -12,10 +12,9 @@ import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.BoxLayout;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
@@ -24,19 +23,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableModel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.Units;
 import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.util.LoggerManager;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceUtil;
-import org.virbo.datasource.ui.TableRowHeader;
 import org.virbo.jythonsupport.Util;
 import org.virbo.jythonsupport.ui.DataMashUp;
 
@@ -299,7 +294,11 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         LoggerManager.logGuiEvent(evt);
         JPanel p= new JPanel();
-        p.setLayout( new FlowLayout() );
+        if ( tm.getColumnCount()>3 ) {
+            p.setLayout( new BoxLayout(p,BoxLayout.Y_AXIS) );
+        } else {
+            p.setLayout( new FlowLayout() );
+        }
         JTextField[] tfs= new JTextField[tm.getColumnCount()];
         for ( int i=0; i<tm.getColumnCount(); i++ ) {  // load up the last record so it can be edited to make new record
             JComboBox cb1= new JComboBox();
@@ -307,6 +306,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
             cb1.setModel( getExamplesComboBoxModel( i, scheme ) );
             cb1.setEditable(true);
             JTextField tf1= ((JTextField)cb1.getEditor().getEditorComponent());
+            tf1.setAlignmentX(0.f);
             tf1.setColumns(20);
             //if ( i==0 ) tf1.requestFocusInWindow(); no effect on Linux, probably because of modal dialog.
             int ir= tm.getRowCount()-1;
