@@ -281,12 +281,13 @@ public class ScreenshotsTool extends EventQueue {
                         //wait
                     }
                     while ( !imageQueue.isEmpty() ) {
+                        logger.log(Level.FINER, "imageQueue length={0}", imageQueue.size());
                         ImageRecord record= imageQueue.remove();
                         logger.log(Level.FINE, "imageRecorder writing {0}", record.filename);
                     
                         try {
                             if ( !record.filename.createNewFile() ) {
-                                logger.log(Level.WARNING, "failed to create new file {0}", record.filename);
+                                logger.log(Level.FINE, "file already exists: {0}", record.filename);
                             } else {
                                 ImageIO.write( record.image, "png", record.filename);
                             }
