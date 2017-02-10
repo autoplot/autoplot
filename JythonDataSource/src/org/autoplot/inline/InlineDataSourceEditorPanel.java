@@ -412,7 +412,7 @@ public class InlineDataSourceEditorPanel extends javax.swing.JPanel implements D
                 break;
             case 1:
                 tm= toTableModel( 0, 4 );
-                directionsLabel.setText("<html><i>Enter a list of times, colors, and labels</i></html>");
+                directionsLabel.setText("<html><i>Enter a list of times, colors (0xRRGGBB), and labels</i></html>");
                 scheme= SCHEME_EVENT_LIST_COLORS;
                 tm.setColumnIdentifiers( new String[] { "start", "end", "color", "message" } );
                 break;
