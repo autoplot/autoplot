@@ -505,6 +505,7 @@ public class ScreenshotsTool extends EventQueue {
         monitor.setTaskSize(c);
         monitor.setProgressMessage( "find bounds for set");
         for ( File f : ff ) {
+            logger.log(Level.FINE, "getTrim {0}", f.getName());
             monitor.setTaskProgress( i );
             if ( f.toString().endsWith(".png") ) {
                 BufferedImage im= ImageIO.read(f);
@@ -600,6 +601,7 @@ public class ScreenshotsTool extends EventQueue {
         monitor.setTaskSize( ff.length );
         int i=0;
         for ( File f : ff ) {
+            logger.log(Level.FINER, "trim {0}", f);
             i++;
             monitor.setTaskProgress( i );
             if ( f.toString().endsWith(".png") ) {
@@ -932,6 +934,10 @@ public class ScreenshotsTool extends EventQueue {
      */
     public void requestFinish( boolean trimAll ) {
         if ( receivedEvents ) pop();
+        imageRecorderThreadRunning= false;
+        while ( imageRecorderThreadNotDone ) {
+            // wait a while.
+        }
         if ( trimAll ) {
             try {
                 trimAll( outLocationFolder, bounds, new NullProgressMonitor() );
