@@ -80,6 +80,14 @@ public class Test026 {
         doTest(id, test, ref, 0.);
     }
 
+    /**
+     * 
+     * @param id the test identifier
+     * @param test the string to parse
+     * @param ref a string which will reliably parse, containing the same value.
+     * @param diffMicros allowable difference.
+     * @throws Exception 
+     */
     public static void doTest(int id, String test, String ref, double diffMicros) throws Exception {
 
         DatumRange dr = parseTimeRange(test);
@@ -93,7 +101,7 @@ public class Test026 {
                     && d2.lt(Units.microseconds.createDatum(diffMicros))) {
                 System.err.println(id + ": " + test + "\t" + drref + "\t within " + diffMicros + " micros (" + d1 + " " + d2 + ")");
             } else {
-                System.err.println(id + ": " + test + " != " + ref + "     " + dr + " != " + drref);
+                System.err.println(id + ": " + test + " != " + ref + "\n    " + dr + " != " + drref + "\n    not within " + diffMicros + " micros (" + d1 + " " + d2 + ")"); 
                 //dr= parseTimeRange(test); // for debugging
                 //drref= parseTimeRange(ref);
                 throw new IllegalArgumentException("no parse exception, but parsed incorrectly.");
