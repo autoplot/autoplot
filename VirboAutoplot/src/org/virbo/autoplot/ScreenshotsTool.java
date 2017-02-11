@@ -33,11 +33,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -268,17 +266,17 @@ public class ScreenshotsTool extends EventQueue {
             }
         } );
 
-        imageRecorderThreadRunning= true;
+        pngWriterThreadRunning= true;
         
-        imageRecorderThread = new Thread( new Runnable() {
+        pngWriterThread = new Thread( new Runnable() {
             @Override
             public void run() {
                 try {
                     logger.log(Level.FINE, "starting imageRecorderThread" );
-                    while ( imageRecorderThreadRunning || !imageQueue.isEmpty() ) {
+                    while ( pngWriterThreadRunning || !imageQueue.isEmpty() ) {
                         logger.log(Level.FINE, "imageRecorderThread..." );
 
-                        while ( imageRecorderThreadRunning && imageQueue.isEmpty() ) { 
+                        while ( pngWriterThreadRunning && imageQueue.isEmpty() ) { 
                             synchronized ( imageQueue ) {
                                 imageQueue.wait();
                             }
@@ -303,14 +301,14 @@ public class ScreenshotsTool extends EventQueue {
 
                         }
                     }
-                    imageRecorderThreadNotDone= false;
+                    pngWriterThreadNotDone= false;
                 } catch ( InterruptedException ex ) {
                     logger.log( Level.WARNING, null, ex );
                 }
             };
         } );
         
-        imageRecorderThread.start();
+        pngWriterThread.start();
         
     }
 
@@ -366,10 +364,10 @@ public class ScreenshotsTool extends EventQueue {
     /**
      * thread responsible for converting BufferedImages into files.
      */
-    Thread imageRecorderThread;
+    Thread pngWriterThread;
             
-    boolean imageRecorderThreadRunning= false;
-    boolean imageRecorderThreadNotDone= false;
+    boolean pngWriterThreadRunning= false;
+    boolean pngWriterThreadNotDone= false;
     /*
      * block>0 means decrement.  block<0 means wait.
      */
@@ -849,7 +847,7 @@ public class ScreenshotsTool extends EventQueue {
                 ImageIO.write(im, "png", file);
             }
 
-        } catch ( Exception ex ) {
+        } catch ( IOException ex ) {
             logger.log( Level.WARNING, ex.getMessage(), ex );
         }
 
@@ -946,8 +944,8 @@ public class ScreenshotsTool extends EventQueue {
      */
     public void requestFinish( boolean trimAll ) {
         if ( receivedEvents ) pop();
-        imageRecorderThreadRunning= false;
-        while ( imageRecorderThreadNotDone ) {
+        pngWriterThreadRunning= false;
+        while ( pngWriterThreadNotDone ) {
             // wait a while.
         }
         if ( trimAll ) {
@@ -1065,8 +1063,8 @@ public class ScreenshotsTool extends EventQueue {
      */
     private void finishUp() {
 
-        imageRecorderThreadRunning= false;
-        while ( imageRecorderThreadNotDone ) {
+        pngWriterThreadRunning= false;
+        while ( pngWriterThreadNotDone ) {
         }
         JPanel p= new JPanel();
         p.setLayout( new BorderLayout() );
