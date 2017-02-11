@@ -273,34 +273,40 @@ public class ScreenshotsTool extends EventQueue {
         imageRecorderThread = new Thread( new Runnable() {
             @Override
             public void run() {
-                logger.log(Level.FINE, "starting imageRecorderThread" );
-                while ( imageRecorderThreadRunning || !imageQueue.isEmpty() ) {
-                    logger.log(Level.FINE, "imageRecorderThread..." );
-                
-                    while ( imageRecorderThreadRunning && imageQueue.isEmpty() ) { 
-                        //wait
-                    }
-                    while ( !imageQueue.isEmpty() ) {
-                        logger.log(Level.FINER, "imageQueue length={0}", imageQueue.size());
-                        ImageRecord record= imageQueue.remove();
-                        logger.log(Level.FINE, "imageRecorder writing {0}", record.filename);
-                    
-                        try {
-                            if ( !record.filename.createNewFile() ) {
-                                logger.log(Level.FINE, "file already exists: {0}", record.filename);
-                            } else {
-                                ImageIO.write( record.image, "png", record.filename);
+                try {
+                    logger.log(Level.FINE, "starting imageRecorderThread" );
+                    while ( imageRecorderThreadRunning || !imageQueue.isEmpty() ) {
+                        logger.log(Level.FINE, "imageRecorderThread..." );
+
+                        while ( imageRecorderThreadRunning && imageQueue.isEmpty() ) { 
+                            synchronized ( imageQueue ) {
+                                imageQueue.wait();
                             }
-                            
-                        } catch ( Exception ex ) {
-                            logger.log( Level.WARNING, ex.getMessage(), ex );
                         }
+                        while ( !imageQueue.isEmpty() ) {
+                            logger.log(Level.FINER, "imageQueue length={0}", imageQueue.size());
+                            ImageRecord record= imageQueue.remove();
+                            logger.log(Level.FINE, "imageRecorder writing {0}", record.filename);
 
-                        logger.log(Level.FINE, "formatted file in {0}ms", ( System.currentTimeMillis()-t0 ));
+                            try {
+                                if ( !record.filename.createNewFile() ) {
+                                    logger.log(Level.FINE, "file already exists: {0}", record.filename);
+                                } else {
+                                    ImageIO.write( record.image, "png", record.filename);
+                                }
 
+                            } catch ( IOException ex ) {
+                                logger.log( Level.WARNING, ex.getMessage(), ex );
+                            }
+
+                            logger.log(Level.FINE, "formatted file in {0}ms", ( System.currentTimeMillis()-t0 ));
+
+                        }
                     }
+                    imageRecorderThreadNotDone= false;
+                } catch ( InterruptedException ex ) {
+                    logger.log( Level.WARNING, null, ex );
                 }
-                imageRecorderThreadNotDone= false;
             };
         } );
         
@@ -355,8 +361,11 @@ public class ScreenshotsTool extends EventQueue {
         File filename;
     }
     
-    ConcurrentLinkedQueue<ImageRecord> imageQueue= new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<ImageRecord> imageQueue= new ConcurrentLinkedQueue<>();
     
+    /**
+     * thread responsible for converting BufferedImages into files.
+     */
     Thread imageRecorderThread;
             
     boolean imageRecorderThreadRunning= false;
@@ -896,7 +905,10 @@ public class ScreenshotsTool extends EventQueue {
         Rectangle myBounds= getMyBounds(b);
 
         ImageRecord imr= new ImageRecord( im, file );
-        imageQueue.add( imr );
+        synchronized ( imageQueue ) {
+            imageQueue.add( imr );
+            imageQueue.notifyAll();
+        }
         t0= System.currentTimeMillis();
 
         return myBounds;
