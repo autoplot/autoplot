@@ -86,6 +86,29 @@ public class ScreenshotsTool extends EventQueue {
     private static final Logger logger= LoggerManager.getLogger("autoplot.screenshots");
     
     private boolean receivedEvents= false;  // so this can be used without automatic screenshots.
+
+    long t0 = 0;
+    long tb = System.currentTimeMillis();
+
+    private final ConcurrentLinkedQueue<ImageRecord> imageQueue= new ConcurrentLinkedQueue<>();
+    
+    /**
+     * thread responsible for converting BufferedImages into files.
+     */
+    Thread pngWriterThread;
+            
+    boolean pngWriterThreadRunning= false;
+    boolean pngWriterThreadNotDone= false;
+    /*
+     * block>0 means decrement.  block<0 means wait.
+     */
+    int block= 0;
+
+    
+    File outLocationFolder;
+    BufferedWriter logFile;
+    TimeParser tp = TimeParser.create("$Y$m$d_$H$M$S");
+    TickleTimer tickleTimer;
     
     private static void checkFolderContents( String text, JCheckBox deleteFilesCheckBox ) {
         File f= new File( text );
@@ -346,9 +369,6 @@ public class ScreenshotsTool extends EventQueue {
         
         return b;
     }
-
-    long t0 = 0;
-    long tb = System.currentTimeMillis();
     
     private static class ImageRecord {
         ImageRecord( BufferedImage image, File filename ) {
@@ -359,20 +379,6 @@ public class ScreenshotsTool extends EventQueue {
         File filename;
     }
     
-    private final ConcurrentLinkedQueue<ImageRecord> imageQueue= new ConcurrentLinkedQueue<>();
-    
-    /**
-     * thread responsible for converting BufferedImages into files.
-     */
-    Thread pngWriterThread;
-            
-    boolean pngWriterThreadRunning= false;
-    boolean pngWriterThreadNotDone= false;
-    /*
-     * block>0 means decrement.  block<0 means wait.
-     */
-    int block= 0;
-
     static BufferedImage pnt;
     static BufferedImage pnt_b1;
     static BufferedImage pnt_b2;
@@ -399,10 +405,6 @@ public class ScreenshotsTool extends EventQueue {
     }
     static int ptrXOffset= 7;
     static int ptrYOffset= 3;
-    File outLocationFolder;
-    BufferedWriter logFile;
-    TimeParser tp = TimeParser.create("$Y$m$d_$H$M$S");
-    TickleTimer tickleTimer;
 
     /**
      * calculate the bounds we are going to keep, which will be typically by 
