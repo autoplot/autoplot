@@ -88,6 +88,8 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.help.CSH;
 import javax.jnlp.SingleInstanceListener;
 import javax.net.ssl.HostnameVerifier;
@@ -3536,8 +3538,23 @@ APSplash.checkTime("init 52.9");
             String bits= is32bit ? "32" : "64";
             String bitsWarning;
             bitsWarning= is32bit ? "(<a href=\"http://autoplot.org/32bit\">severely limiting capabilities</a>)" : "(recommended)";
+            
+            String javaVersionWarning= "";
+            Pattern p= Pattern.compile("(\\d+\\.\\d+)\\.\\d+\\_(\\d+)");
+            Matcher m= p.matcher(javaVersion);
+            if ( m.matches() ) {
+                double major= Double.parseDouble( m.group(1) );
+                int minor= Integer.parseInt( m.group(2) );
+                if ( major<1.8 || ( major==1.8 && minor<102 ) ) {
+                    javaVersionWarning= "(<a href=\"http://autoplot.org/javaVersion\">limiting access to CDAWeb</a>)";
+                } else {
+                    javaVersionWarning= "(recommended)";
+                }
+            }
+            
+                
             String aboutContent = "<ul>" +
-                "<li>Java version: " + javaVersion + 
+                "<li>Java version: " + javaVersion + " " + javaVersionWarning + 
                 memWarning +    
                 "<li>max memory (MB): " + mem + " (memory available to process)" +
                 "<li>total memory (MB): " + tmem + " (amount allocated to the process)" +
@@ -4228,6 +4245,8 @@ public static String getProcessId(final String fallback) {
 }
 
 private static final boolean is32bit;
+private static final String javaVersionWarning;
+
 static {
     String s= System.getProperty("sun.arch.data.model");
     if ( s==null ) { // GNU 1.5? 
@@ -4236,6 +4255,21 @@ static {
     } else {
         is32bit = s.equals("32");
     }     
+    String javaVersion=  System.getProperty("java.version"); // applet okay
+    
+    Pattern p= Pattern.compile("(\\d+\\.\\d+)\\.\\d+\\_(\\d+)");
+    Matcher m= p.matcher(javaVersion);
+    if ( m.matches() ) {
+        double major= Double.parseDouble( m.group(1) );
+        int minor= Integer.parseInt( m.group(2) );
+        if ( major<1.8 || ( major==1.8 && minor<102 ) ) {
+            javaVersionWarning= " (oldJRE)";
+        } else {
+            javaVersionWarning= "";
+        }
+    } else {
+        javaVersionWarning= "";
+    }
 }
 
 private void updateFrameTitle() {
@@ -4260,7 +4294,7 @@ private void updateFrameTitle() {
     String apname= this.applicationName.length()==0 ? "" : this.applicationName + " - ";
     
     if ( suri==null ) {
-        theTitle= apname + title0 + isoffline + server + s32bit;
+        theTitle= apname + title0 + isoffline + server + s32bit + javaVersionWarning;
     } else {
         URISplit split= URISplit.parse(suri);
 
