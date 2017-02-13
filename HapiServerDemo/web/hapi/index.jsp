@@ -60,6 +60,7 @@
             <li>2017-02-03: add http link in info, to show support for this.</li>
             <li>2017-02-03: add demonstration ds for rank 3 data</li>   
             <li>2017-02-07: use bins array instead of bins1, bins2.</li>
+            <li>2017-02-13: use x_about instead of about.</li>
         </ul>
         </small>
     </body>
