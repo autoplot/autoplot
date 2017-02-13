@@ -65,7 +65,7 @@ public class CDAWebDB {
     
     public static final String CDAWeb;
     static {
-        if ( System.getProperty("cdawebHttps","false").equals("false") ) {
+        if ( System.getProperty("cdawebHttps","false").equals("true") ) {
             CDAWeb = "http://cdaweb.gsfc.nasa.gov/";
         } else {
             // Note modern Javas are needed for https support.  
