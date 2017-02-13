@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Interpolating random points from a regular grid.  Script <a href="http://autoplot.org/data/script/screenshots/rgbColorScatter.jy">here</a>.
+        <p><small>Interpolating random points from a regular grid.  Note warning message (oldJRE) in title that indicates CDAWeb cannot be accessed.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -63,6 +63,27 @@
             <li>rte_0579587635: single pipe character (|) in operations would cause RTE.  
             <li>Hapi client had a branch that would result in class cast exception RTE popup.
             <li>1750: ds[-1,r]=0 didn't work, where negative indeces weren't supported.  Thanks, Ivar!
+        </ul>
+        <p>Features:</p>
+        <ul>
+            <li>559: screenshots tool now uses a separate thread to save images, improving responsiveness.
+            <li>experimental support for high-rank datasets in HAPI servers
+            <li>dom.getElementById added, to remove confusion about indeces.
+            <li>provide useful record-by-record reform command that allows reforming within each record.
+            <li>getCompletions command provides completions, so that function can be tested immediately.
+            <li>annotations allow images to be used when http, https, or file URLs are used.
+            <li>x(t),y(t)->z(t) (as well as x(i),y(j)->z(i,j)) supported in spectrogram renderer.
+            <li>add method for creating zip files, from within scripts.  unzip is deprecated, and it is replaced with gunzip.
+            <li>rfe556: support semicolon in ascii files and csv files.
+            <li>Util.getBuildTime returns the build time, if available.</li>
+            <li>support apply_qflag for Timas data in CDF.</li>
+            <li>spectrogram scatter mode.  Thanks, Matt!
+            <li>cdawebHttps=true environment variable allows use of https for web transactions with CDAWeb.
+            <li>logging improvements to CDF reader.
+            <li>LinFit has getSlope and getIntercept methods, in anticipation of proper SI units library.
+       </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>improve drawing of orbit plot ticks.
             <li>data mashup tool ignores IDs with empty URIs.
             <li>HAPI client was doing web interactions on the event thread, causing possible hangs
@@ -111,23 +132,8 @@
             <li>1708: digitizer component fails when the first column was not time, because code assumed times with timeFormatter.
             <li>data set selector component setValue would add "%20" when there was an extra space at the end when cut-n-paste URIs.
         </ul>
-        <p>Features:</p>
+        <p>Less recent features:</p>
         <ul>
-            <li>559: screenshots tool now uses a separate thread to save images, improving responsiveness.
-            <li>experimental support for high-rank datasets in HAPI servers
-            <li>dom.getElementById added, to remove confusion about indeces.
-            <li>provide useful record-by-record reform command that allows reforming within each record.
-            <li>getCompletions command provides completions, so that function can be tested immediately.
-            <li>annotations allow images to be used when http, https, or file URLs are used.
-            <li>x(t),y(t)->z(t) (as well as x(i),y(j)->z(i,j)) supported in spectrogram renderer.
-            <li>add method for creating zip files, from within scripts.  unzip is deprecated, and it is replaced with gunzip.
-            <li>rfe556: support semicolon in ascii files and csv files.
-            <li>Util.getBuildTime returns the build time, if available.</li>
-            <li>support apply_qflag for Timas data in CDF.</li>
-            <li>spectrogram scatter mode.  Thanks, Matt!
-            <li>cdawebHttps=true environment variable allows use of https for web transactions with CDAWeb.
-            <li>logging improvements to CDF reader.
-            <li>LinFit has getSlope and getIntercept methods, in anticipation of proper SI units library.
             <li>mouse modules (crosshair,etc) allow up,down,right,left keys for precise control.
             <li>add example values for depend0units and timeFormat parameters in ascii editor panel.
             <li>ascii table data source format supports "+" in tformat parameter, to output multiple columns
@@ -144,75 +150,6 @@
             <li>lookupAxis supports horizontal axis.
             <li>543: support for time zone offsets in ISO8601 strings.
             <li>HAPI data source supports JSON data response.
-       </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>rte_1741708130: rendering of rank 3 waveform would fail w/NullPointerException when within one packet.  Thanks, Nhan!
-            <li>slightly tighten the check for JSON headed-ascii files by looking for a colon between the braces.
-            <li>Use last HAPI server by default.  Jon's elasticbeanstalk is the default server.
-            <li>reducex supports rank 2 bundle without DEPEND_0, and independent tags in the first column.
-            <li>demo HAPI server had Jython library issues, where it was assumed that VirboAutoplot was on the path.
-            <li>html data source would fail with http://www-pw.physics.uiowa.edu/~jbf/autoplot/users/jeremy/20161027/cubs.html, because wrong index was used.
-            <li>eventsBar last color used was used for the gantt label colors, instead of the color property.
-            <li>vap+das2Server and vap+das2server were not treated as equivalent, causing "add plot from" initialization feature to fail.
-            <li>1699: noise on FiltersChainPanel dialog.
-            <li>launcher script for jumbojars would insert a space, causing --help to fail
-            <li>more findbugs cleanup (nothing serious)
-            <li>Move local data cache has progress bar and allows cancel.</li>
-            <li>Binary Data Source gets format keyword, and properly supports %c.</li>
-            <li>IDL/Matlab interface supports reading PLANE_0 correlated planes.</li>
-            <li>HAPI client supports binary, when format=binary is added to URI.</li>
-            <li>1695: dashup issues pointed out by Kris, including my functions persist and proper support for TSB.</li>
-            <li>setDepend0Cadence no longer resets axes and plot type.  Thanks, Chris!</li>
-            <li>Binary Data Source includes completion for Nybbles.</li>
-            <li>1693: ephemeris/tca forces $Y-$m-$d when $Y-$j should be shown.  Thanks, Chris!</li>
-            <li>StackedHistogram allows inconvertible units.</li>            
-            <li>properly register the LogConsole as the handler for log messages, so that LoggerManager.getLogger("myanalysis") is handled.</li>
-            <li>jython completions are sorted</li>
-            <li>Round of findbugs code cleanup (no visible bugs found).</li>
-            <li>Bookmarks demo1 changed to CDAWEB, after years of problems with the OpenDap URIs.</li>
-            <li>Added ability for each plane in a TableDataSet to have its own properties.  Thanks, Chris!</li>
-            <li>stackedHistogram labels were not set properly for doInterpretMetadata.  Thanks, Chris!</li>
-            <li>1691: rank &gt;0 datasets treated as number type, implying that __float__ could be called.</li>
-            <li>1686: always enter the editor for the open local action, so that Overplot or Plot Below can be selected.</li>
-            <li>Digital renderer properly sets the font.  Unify rank2 and rank1 code for consistent behavior.</li>
-            <li>DafaultTimeSeriesBrowse improves error feedback by checking for null uri.</li>
-            <li>finally figure out why vertical axis sometimes clips the top tick.</li>
-            <li>Some automatic layout actions would occur when autolayout switch was off.  Thanks, Ivar!</li>
-            <li>1687: completions on jython import package names shows javadoc</li>
-            <li>add filters dialog is resizeable.   Thanks Chris!</li>
-            <li>Ed found "hey man" debugging print statement left in code.  Now a useful message is printed.</li>
-            <li>clarify dbAboveBackgroundDim1 GUI, and allow selection of 10 or 20 factor for fields intensity or power.  Thanks Chris!</li>
-            <li>DecimalFormat, often used to display decimal numbers and in das2streams and QStreams, was using banker's rounding (HALF_EVEN), instead of HALF_UP.</li>
-            <li>various bugs with the HAPI GUI.</li>
-            <li>QStream ASCII formats used banker's rounding, so 44.5 would have been rounded to 44.0.  Now 0.5 is rounded up.</li>
-            <li>1679: HAPI JSON would confuse Rich ASCII support.</li>
-            <li>improve feedback for qstreams when values are found in both the packet descriptor and in the packets.</li>
-            <li>applyIndex supports BUNDLE_i.</li>
-            <li>Series renderer plotSymbols would show when units were inconvertible, but then connectors would refuse to paint.  Now both will paint with a warning.</li>
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>541: Need for BIN_MAX and BIN_MIN properties to state extent in the same units as the data.  Thanks, Chris!</li>
-            <li>538: Introduce synchronize checkbox to vap+line mash-up scripts, which interpolates all data to the same timetags.  Thanks Kristoff!</li>
-            <lI>537: show progress and allow cancel on move cache.  Thanks, Dan!</li>
-            <li>TimeRangeEditor had next/previous buttons and button to copy start time to end time.</li>
-            <li>HAPI Server has checkbox to request binary transfers, when they are available.</li>
-            <li>Script plot command gets yautoRangeHints switch, like yautoRangeHints="includeZero=T"</li>
-            <li>LookupAxis introduced, which draws additional ticks for another dataset.</li>
-            <li>checkbox in the console shows only the filtered log records.  Thanks, Ivar!</li>
-            <li>If annotation bubble text is "", then don't draw the bubble, to provide some way one label can have multiple arrows.  Thanks, Sebastian!</li>
-            <li>Demo HAPI server supports gzipped responses and binary responses.</li>
-            <li>DigitalRenderer has plotSymbol property to locate the text precisely.</li>
-            <li>embed Google fonts Roboto and ArchitectsDaughter so that all platforms have these fonts.</li>
-            <li>rfe529: support for the HAPI Server.  Make the unrecognized metadata available.</li>
-            <li>BinaryDataSource completions include time24, which has been available for a while.</li>
-            <li>531: Html parser has new streaming capability, to support servers</li>
-            <li>Logger control decorated with even/odd backgrounds.  Thanks, Ed!</li>
-            <li>rfe247: HAPI data streams, with HAPI JSON headers, can be read in now as a rich ascii dialect</li>
-            <li>The console Logger control uses a table now, and allows sorting by log level.</li>
-            <li>HTML parser allows the units to be set externally.  "N/A" was causing the units to come back as ordinal units.</li>
-            <li>DataPointRecorder allows the time format to be controlled.</li>
         </ul>
 
         <p>Known issues:</p>
