@@ -56,7 +56,7 @@ public class InfoServlet extends HttpServlet {
             jo.put( "startDate",  "2016-07-28T00:00Z"  );
             jo.put( "sampleStartDate", "2016-07-28T00:00Z" );
             jo.put( "sampleEndDate", "2016-07-29T00:00Z" );
-            jo.put( "about","http://jfaden.net/HapiServerDemo/about/about.html#wheelThingy");
+            jo.put( "x_about","http://jfaden.net/HapiServerDemo/about/about.html#wheelThingy");
             jo.put( "DOI", "10.1007/s12145-010-0053-4" );
         } else if ( id.equals("PowerOnesDigitSegments") ) {
             jo.put( "startDate",  "2016-07-28T00:00Z"  );
@@ -254,6 +254,7 @@ public class InfoServlet extends HttpServlet {
             binsArray.put(1,bins);
             parameter.put( "bins", binsArray );
             parameter.put( "description", "Example of rank 2 data." );
+            parameter.put( "x_about","http://jfaden.net/HapiServerDemo/about/about.html#SpectrogramRank2");
             parameters.put( 1, parameter );
 
         } else if ( id.equals("PowerOnesDigitSegments") ) {
@@ -276,8 +277,8 @@ public class InfoServlet extends HttpServlet {
             parameter.put( "bins", bins );
             parameter.put( "size", new int[] { ens.length() } );
             parameter.put( "description", "Each of the seven segments of the ones digit seven segment display" );
-            parameter.put( "longDescription", "<html><p>This returns 27 channels, where each of the seven segments has three measurements, "
-                    + "and there are two reference measurements in the centers of the segments. <ul> "
+            parameter.put( "longDescription", "<html><p>This returns 27 channels, where each of the seven segments has "
+                    + "three measurements, and there are two reference measurements in the centers of the segments. <ul> "
                     + "<li>Channels 0,1,2 are in the center of the top four segments, "
                     + "<li>Channels 24,25,26 are in the center of the bottom four segments."
                     + "<li>Channels 3,4,5 are the upper segment, typically labelled A"
