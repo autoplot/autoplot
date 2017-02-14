@@ -40,6 +40,7 @@ import org.das2.fsm.FileStorageModel;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.HtmlUtil;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -65,7 +66,7 @@ public class CDAWebDB {
     
     public static final String CDAWeb;
     static {
-        if ( System.getProperty("cdawebHttps","false").equals("true") ) {
+        if ( System.getProperty("cdawebHttps","true").equals("false") ) {
             CDAWeb = "http://cdaweb.gsfc.nasa.gov/";
         } else {
             // Note modern Javas are needed for https support.  
@@ -263,9 +264,12 @@ public class CDAWebDB {
             loggerUrl.log(Level.FINE,"openConnection {0}", url);
             urlc = url.openConnection();
             urlc.setConnectTimeout(300);
-
+            
+            urlc= HtmlUtil.checkRedirect(urlc);
+            
             loggerUrl.log(Level.FINE,"getInputStream {0}", url);
             ins= urlc.getInputStream();
+            
             InputSource source = new InputSource( ins );
 
             DocumentBuilder builder;
@@ -330,6 +334,8 @@ public class CDAWebDB {
             urlc = url.openConnection();
             urlc.setConnectTimeout(300);
 
+            urlc= HtmlUtil.checkRedirect(urlc);
+            
             loggerUrl.log(Level.FINE,"getInputStream {0}", url);
             ins= urlc.getInputStream();
             InputSource source = new InputSource( ins );

@@ -209,13 +209,13 @@ CL_JP_PCY x %Y/cl_jp_pcy_%Y%m01_?%v.cdf
 GENESIS_3DL2_GIM x %Y/genesis_3dl2_gim_%Y%m01_?%v.cdf
 HELIOS1_COHO1HR_MERGED_MAG_PLASMA x %Y/helios1_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
 HELIOS2_COHO1HR_MERGED_MAG_PLASMA x %Y/helios2_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
-I8_OR_SSC http://cdaweb.gsfc.nasa.gov/sp_phys/data/imp8/orbit/or_ssc i8_or_ssc_%Y%(m,delta=6)01_?%v.cdf
-I8_H0_GME http://cdaweb.gsfc.nasa.gov/sp_phys/data/imp8/particles_gme/gme_h0/ %Y/i8_h0_gme_%Y%(m,delta=6)01_?%v.cdf
+I8_OR_SSC https://cdaweb.gsfc.nasa.gov/sp_phys/data/imp8/orbit/or_ssc i8_or_ssc_%Y%(m,delta=6)01_?%v.cdf
+I8_H0_GME https://cdaweb.gsfc.nasa.gov/sp_phys/data/imp8/particles_gme/gme_h0/ %Y/i8_h0_gme_%Y%(m,delta=6)01_?%v.cdf
 IM_ELECTRON_DENSITY_RPI x %Y/im_electron_density_rpi_%Y%m01_?%v.cdf  # Not quite...
-OMNI_HRO_1MIN http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hro_1min/ %Y/omni_hro_1min_%Y%m01_?%v.cdf
-OMNI_HRO_5MIN http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hro_5min/ %Y/omni_hro_5min_%Y%m01_?%v.cdf
-OMNI2_H0_MRG1HR http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hourly/ %Y/omni2_h0_mrg1hr_%Y%(m,delta=6)01_?%v.cdf
-OMNI_COHO1HR_MERGED_MAG_PLASMA http://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/coho1hr_magplasma/ %Y/omni_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
+OMNI_HRO_1MIN https://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hro_1min/ %Y/omni_hro_1min_%Y%m01_?%v.cdf
+OMNI_HRO_5MIN https://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hro_5min/ %Y/omni_hro_5min_%Y%m01_?%v.cdf
+OMNI2_H0_MRG1HR https://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/hourly/ %Y/omni2_h0_mrg1hr_%Y%(m,delta=6)01_?%v.cdf
+OMNI_COHO1HR_MERGED_MAG_PLASMA https://cdaweb.gsfc.nasa.gov/sp_phys/data/omni/coho1hr_magplasma/ %Y/omni_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
 PIONEER10_COHO1HR_MERGED_MAG_PLASMA x %Y/pioneer10_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
 PIONEERVENUS_COHO1HR_MERGED_MAG_PLASMA x %Y/pioneervenus_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
 STA_COHO1HR_MERGED_MAG_PLASMA x %Y/sta_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
@@ -226,12 +226,12 @@ THB_OR_SSC x %Y/thb_or_ssc_%Y%m01_?%v.cdf
 THC_OR_SSC x %Y/thc_or_ssc_%Y%m01_?%v.cdf
 THD_OR_SSC x %Y/thd_or_ssc_%Y%m01_?%v.cdf
 THE_OR_SSC x %Y/the_or_ssc_%Y%m01_?%v.cdf
-TIMED_L3A_SEE http://cdaweb.gsfc.nasa.gov/sp_phys/data/timed/see/l3a/ %Y/%m/timed_l3a_see_%Y%m01_?%v.cdf
+TIMED_L3A_SEE https://cdaweb.gsfc.nasa.gov/sp_phys/data/timed/see/l3a/ %Y/%m/timed_l3a_see_%Y%m01_?%v.cdf
 VOYAGER1_COHO1HR_MERGED_MAG_PLASMA x %Y/voyager1_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
 VOYAGER2_COHO1HR_MERGED_MAG_PLASMA x %Y/voyager2_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
 UY_COHO1HR_MERGED_MAG_PLASMA x %Y/uy_coho1hr_merged_mag_plasma_%Y%m01_?%v.cdf
 WI_H1_SWE x %Y/wi_h1_swe_%Y%m01_?%v.cdf  # sort of
 CRRES_H0_MEA x %Y/crres_h0_mea_%Y%m%(d,delta=10)_?%v.cdf
 UY_1MIN_VHM x %Y/uy_1min_vhm_%Y%m%(d,delta=10)_?%v.cdf  # these are 10-day files...
-TIMED_L1B_SABER http://cdaweb.gsfc.nasa.gov/sp_phys/data/timed/saber/l1bv7 %Y/%m/timed_l1bv7_saber_%Y%m%d%(H,delta=4)%M_?%v.cdf
+TIMED_L1B_SABER https://cdaweb.gsfc.nasa.gov/sp_phys/data/timed/saber/l1bv7 %Y/%m/timed_l1bv7_saber_%Y%m%d%(H,delta=4)%M_?%v.cdf
 DE_VS_EICS  ftp://cdaweb.gsfc.nasa.gov/pub/data/de/de1/particles_eics/vs_eics_cdaweb %Y/%y%j_eics_de_96s_v%v.cdf
