@@ -506,7 +506,7 @@ public class Util {
      * return an array of URLs that match the spec for the time range provided.
      * For example,
      * <p><blockquote><pre>
-     *  uri= 'http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX'
+     *  uri= 'https://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX'
      *  xx= getTimeRangesFor( uri, '2000-jan', '$Y-$d-$m' )
      *  for x in xx:
      *    print x
