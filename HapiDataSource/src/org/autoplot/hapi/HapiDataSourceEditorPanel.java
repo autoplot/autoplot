@@ -479,7 +479,7 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_serversComboBoxActionPerformed
 
     private void clearAllBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearAllBActionPerformed
-        boolean first= !currentServer.toString().contains("http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi");
+        boolean first= !currentServer.toString().contains("https://cdaweb.gsfc.nasa.gov/registry/hdp/hapi");
         for ( Component c: parametersPanel.getComponents() ) {
             if ( c instanceof JCheckBox ) {
                 if ( first ) {

@@ -46,7 +46,7 @@ public class HapiServer {
         ArrayList<String> result= new ArrayList<>();
         if ( "true".equals(System.getProperty("hapiDeveloper","false")) ) {
             result.add("http://tsds.org/get/IMAGE/PT1M/hapi");
-            result.add("http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi");
+            result.add("https://cdaweb.gsfc.nasa.gov/registry/hdp/hapi");
             result.add("http://jfaden.net/HapiServerDemo/hapi");
         }            
         result.add("http://datashop.elasticbeanstalk.com/hapi");

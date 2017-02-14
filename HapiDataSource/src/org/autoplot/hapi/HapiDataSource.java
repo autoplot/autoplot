@@ -29,6 +29,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystemUtil;
+import org.das2.util.filesystem.HtmlUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
@@ -216,6 +217,7 @@ public class HapiDataSource extends AbstractDataSource {
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
         HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
+        httpConnect= (HttpURLConnection) HtmlUtil.checkRedirect( httpConnect );
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( httpConnect.getInputStream() ) ) ) {
             String line= in.readLine();
             lineNum++;
@@ -261,7 +263,7 @@ public class HapiDataSource extends AbstractDataSource {
         
         boolean[] timeVary= new boolean[pds.length];
         
-        //http://cdaweb.gsfc.nasa.gov/registry/hdp/hapi/data.xql?id=spase%3A%2F%2FVSPO%2FNumericalData%2FRBSP%2FB%2FEMFISIS%2FGEI%2FPT0.015625S&time.min=2012-10-09T00%3A00%3A00Z&time.max=2012-10-09T00%3A10%3A00Z&parameters=Magnitude
+        //https://cdaweb.gsfc.nasa.gov/registry/hdp/hapi/data.xql?id=spase%3A%2F%2FVSPO%2FNumericalData%2FRBSP%2FB%2FEMFISIS%2FGEI%2FPT0.015625S&time.min=2012-10-09T00%3A00%3A00Z&time.max=2012-10-09T00%3A10%3A00Z&parameters=Magnitude
         QDataSet result= null;
         int ipd=0;
         for ( ParamDescription pd: pds ) {       
@@ -432,6 +434,8 @@ public class HapiDataSource extends AbstractDataSource {
         monitor.setTaskProgress(20);
         long t0 = System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection= (HttpURLConnection)HtmlUtil.checkRedirect(connection);
+        
         connection.setRequestProperty("Accept-Encoding", "gzip");
         connection.connect();
         boolean gzip = "gzip".equals(connection.getContentEncoding());
@@ -536,6 +540,7 @@ public class HapiDataSource extends AbstractDataSource {
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
         HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
+        httpConnect= (HttpURLConnection) HtmlUtil.checkRedirect(httpConnect);
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( httpConnect.getInputStream() ) ) ) {
             String line= in.readLine();
             lineNum++;
@@ -612,6 +617,7 @@ public class HapiDataSource extends AbstractDataSource {
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
         HttpURLConnection connection= (HttpURLConnection)url.openConnection();
         connection.setRequestProperty( "Accept-Encoding", "gzip" );
+        connection= (HttpURLConnection)HtmlUtil.checkRedirect(connection);
         connection.connect();
         boolean gzip= "gzip".equals( connection.getContentEncoding() );
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( connection.getInputStream() ) : connection.getInputStream() ) ) ) {
