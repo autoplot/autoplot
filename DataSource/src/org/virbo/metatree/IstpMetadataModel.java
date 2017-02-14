@@ -456,7 +456,7 @@ public class IstpMetadataModel extends MetadataModel {
                 if ( o==null ) continue;
                 if ( !( o instanceof Map ) ) {
                     //new RuntimeException("String where Map was expected").printStackTrace();
-                    //TODO: track this down: vap:http://cdaweb.gsfc.nasa.gov/istp_public/data/fast/ies/1998/fa_k0_ies_19980102_v02.cdf?ion_0
+                    //TODO: track this down: vap+cdf:https://cdaweb.gsfc.nasa.gov/istp_public/data/fast/ies/1998/fa_k0_ies_19980102_v02.cdf?ion_0
                     continue;
                 }
                 Map<String, Object> props = (Map<String, Object>) o;

@@ -53,6 +53,7 @@ import org.das2.fsm.FileStorageModel;
 import org.das2.util.DasProgressMonitorInputStream;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystemSettings;
+import org.das2.util.filesystem.HtmlUtil;
 import org.das2.util.filesystem.LocalFileSystem;
 import org.das2.util.filesystem.URIException;
 import org.das2.util.filesystem.VFSFileSystemFactory;
@@ -502,6 +503,7 @@ public class DataSetURI {
             mon.setProgressMessage("doing HEAD request to find dataset type");
             try {
                 URLConnection c = url.openConnection();
+                c= HtmlUtil.checkRedirect(c);
                 c.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() );
                 c.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
                 String mime = c.getContentType();
