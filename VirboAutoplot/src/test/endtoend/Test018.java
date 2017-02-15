@@ -10,7 +10,6 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
-import org.das2.graph.DasPlot;
 import org.das2.system.DasLogger;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.PlotElement;
@@ -246,6 +245,13 @@ public class Test018 {
         boolean exit= true;
         
         DasLogger.setUpHandler("mini");
+//        try {
+//            LogManager.getLogManager().readConfiguration( new FileInputStream("/home/jbf/autoplot_data/config/logging.properties") );
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(Test018.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (IOException | SecurityException ex) {
+//            Logger.getLogger(Test018.class.getName()).log(Level.SEVERE, null, ex);
+//        }
         
         try {
 
