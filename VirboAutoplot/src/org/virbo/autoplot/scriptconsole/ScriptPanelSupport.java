@@ -368,7 +368,8 @@ public class ScriptPanelSupport {
                                 try ( InputStream in = new FileInputStream( ScriptPanelSupport.this.file ) ) {
                                     newContents= new String( FileUtil.readBytes( in ) );
                                     String currentf= panel.getEditorPanel().getText();
-                                    
+                                    currentf= currentf.trim(); // there's a strange bug where newContents has a newline at the end that current doesn't.
+                                    newContents= newContents.trim();
                                     if ( currentf.equals(newContents) ) {
                                         logger.fine("timestamp changed but contents are the same.");
                                         break;
