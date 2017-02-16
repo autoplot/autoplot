@@ -244,6 +244,9 @@ public class HapiDataSource extends AbstractDataSource {
                 }
             }
         }
+        
+        httpConnect.disconnect();
+        
         JSONObject o= new JSONObject(builder.toString());
         
         JSONObject doc= o;
@@ -515,6 +518,8 @@ public class HapiDataSource extends AbstractDataSource {
             logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
             throw e;
+        } finally {
+            connection.disconnect();
         }
         monitor.setTaskProgress(95);
         QDataSet ds = builder.getDataSet();
@@ -571,6 +576,7 @@ public class HapiDataSource extends AbstractDataSource {
                 }
             }
         }
+        httpConnect.disconnect();
 
         monitor.setProgressMessage("parsing data");
                 
@@ -667,6 +673,8 @@ public class HapiDataSource extends AbstractDataSource {
             logger.log( Level.WARNING, e.getMessage(), e );
             monitor.finished();
             throw e;
+        } finally {
+            connection.disconnect();
         }
         monitor.setTaskProgress(95);
         QDataSet ds= builder.getDataSet();
