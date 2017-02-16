@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -354,6 +355,8 @@ public class CDAWebDB {
                 Node item= set.item(i);
                 result[i]= xp.evaluate("Name/text()",item) + "|"+ xp.evaluate("StartTime/text()",item)+ "|" + xp.evaluate("EndTime/text()",item );
             }
+            
+            ((HttpURLConnection)urlc).disconnect(); // https://sourceforge.net/p/autoplot/bugs/1754/
 
             return result;
 
