@@ -418,22 +418,22 @@ public class CDAWebDataSource extends AbstractDataSource {
             return null;
         }
         if ( metadata==null ) {
-
+            mon.started();
             CDAWebDB db= CDAWebDB.getInstance();
 
-            String master= db.getMasterFile( ds.toLowerCase(), mon );
+            String master= db.getMasterFile( ds.toLowerCase(), mon.getSubtaskMonitor("getMasterFile") );
             master= master+"?"+id;
             
             DataSource cdf= getDelegateFactory().getDataSource( DataSetURI.getURI(master) );
 
-            metadata= cdf.getMetadata(mon); // note this is a strange branch, because usually we have read data first.
+            metadata= cdf.getMetadata(mon.getSubtaskMonitor("getMetadata")); // note this is a strange branch, because usually we have read data first.
 
             String slice1= getParam("slice1","" ); // kludge to grab LABL_PTR_1 when slice1 is used.
             if ( !slice1.equals("") ) {
                 metadata.remove( "LABLAXIS" );
                 String labelVar= (String)metadata.get("LABL_PTR_1");
                 if ( labelVar!=null ) {
-                    String master1= db.getMasterFile( ds.toLowerCase(), mon );
+                    String master1= db.getMasterFile( ds.toLowerCase(), mon.getSubtaskMonitor("getMasterFile") );
                     DataSource labelDss= getDelegateFactory().getDataSource( DataSetURI.getURI(master1+"?"+labelVar) );
                     QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
                     if ( labelDs!=null ) {
@@ -442,6 +442,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     }
                 }
             }
+            mon.finished();
         }
         return metadata;
     }
