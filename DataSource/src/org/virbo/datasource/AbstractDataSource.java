@@ -213,6 +213,7 @@ public abstract class AbstractDataSource implements DataSource {
      * @return the parameters from the URI.
      */
     protected Map<String,String> getParams() {
+        logger.log(Level.FINER, "getParams()");
         return new LinkedHashMap(params);
     }
 
@@ -224,7 +225,8 @@ public abstract class AbstractDataSource implements DataSource {
      * @param dflt the default, which is returned when the parameter is not found.
      * @return the parameter value, or dflt when the parameter is not found.
      */
-    protected String getParam( String name, String dflt ) {
+    protected final String getParam( String name, String dflt ) {
+        logger.log(Level.FINER, "getParam(\"{0}\")", name);
         String result= params.get(name);
         if (result!=null ) {
             return result;
