@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
@@ -522,7 +523,9 @@ public class DataSetURI {
                     }
                 }
                 if ( factory==null ) factory = DataSourceRegistry.getInstance().getSourceByMime(mime);
-                
+                if ( c instanceof HttpURLConnection ) {
+                    ((HttpURLConnection)c).disconnect();
+                }
             } finally {
                 mon.finished();
             }
@@ -898,7 +901,11 @@ public class DataSetURI {
                         if ( fs instanceof WebFileSystem && ((WebFileSystem)fs).isOffline() ) {
                             throw new FileNotFoundException( "File not found in cache of offline filesystem: "+ split.resourceUri +"\n(Offline because of \""+ ((WebFileSystem)fs).getOfflineMessage() + "\")" );
                         } else {
-                            throw new FileNotFoundException("File not found: "+ split.resourceUri );
+                            if ( fo.exists() ) {
+                                throw new IOException( "Unknown I/O Exception occurred" );
+                            } else {
+                                throw new FileNotFoundException("File not found: "+ split.resourceUri );
+                            }
                         }
                     }
                 }
