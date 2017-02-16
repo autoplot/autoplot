@@ -371,7 +371,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                     result= Ops.putProperty( result, QDataSet.DEPEND_0, dep0 );
                 }
 
-                Map<String,String> user= new HashMap<String, String>();
+                Map<String,String> user= new HashMap<>();
                 for ( int i=0; i<Math.min( files.length,10); i++ ) {
                     user.put( "delegate_"+i, files[i] );
                 }
