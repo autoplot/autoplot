@@ -271,6 +271,8 @@ public class CDAWebDataSource extends AbstractDataSource {
                 } catch ( NoDataInIntervalException ex ) {
                     // thrown by where clause...
                 }
+                
+                System.gc(); // bug https://sourceforge.net/p/autoplot/bugs/1754/ to release resources
 
                 if ( ds1!=null ) {
                     if ( result==null && accum==null ) {
