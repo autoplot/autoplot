@@ -354,7 +354,7 @@ public class LogConsole extends javax.swing.JPanel {
                         int i=0;
                     }
                     if ( searchTextPattern!=null && searchTextPattern.matcher(recMsg).find() ) {
-                        int i=0; // breakpoint here for debugging.
+                        int i=0; // breakpoint here for debugging.  Set the "Highlite Lines Matching" field of the Log Console Settings dialog to the text where this should stop.
                     }
                     LogRecord copy= new LogRecord( rec.getLevel(), recMsg ); //bug 3479791: just flatten this, so we don't have to format it each time
                     copy.setLoggerName(rec.getLoggerName());
