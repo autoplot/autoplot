@@ -262,13 +262,13 @@ public class CDAWebDB {
             logger.fine(url.toString());
             Logger loggerUrl= org.das2.util.LoggerManager.getLogger( "das2.url" );
             URLConnection urlc;
-            loggerUrl.log(Level.FINE,"openConnection {0}", url);
+
             urlc = url.openConnection();
             urlc.setConnectTimeout(300);
             
             urlc= HtmlUtil.checkRedirect(urlc);
-            
-            loggerUrl.log(Level.FINE,"getInputStream {0}", url);
+            loggerUrl.log(Level.FINE,"GET data from CDAWeb {0}", urlc.getURL() );
+
             ins= urlc.getInputStream();
             
             InputSource source = new InputSource( ins );
