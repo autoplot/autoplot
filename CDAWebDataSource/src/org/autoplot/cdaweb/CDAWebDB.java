@@ -42,6 +42,7 @@ import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.HtmlUtil;
+import org.das2.util.filesystem.HttpUtil;
 import org.das2.util.monitor.CancelledOperationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -84,12 +85,31 @@ public class CDAWebDB {
     private long refreshTime=0;
     private final Map<String,String> bases= new HashMap();
     private final Map<String,String> tmpls= new HashMap();
+    private Boolean online= null;
 
     public static synchronized CDAWebDB getInstance() {
         if ( instance==null ) {
             instance= new CDAWebDB();
         }
         return instance;
+    }
+    
+    /**
+     * returns true if the CDAWeb is on line.
+     * @return true if the CDAWeb is on line.
+     */
+    public synchronized boolean isOnline() {
+        if ( online==null ) {
+            try {
+                // get a file via http so we get a filesystem offline if we are at a hotel.
+                // Note the file is small, and if the file is already downloaded, this will only result in a head request.
+                DataSetURI.getFile( CDAWeb + "pub/software/cdawlib/AAREADME.txt", false, new NullProgressMonitor() );        
+                online= true;
+            } catch ( IOException ex ) {
+                online= false;
+            }
+        }
+        return online;
     }
 
     /**
@@ -266,7 +286,7 @@ public class CDAWebDB {
             urlc = url.openConnection();
             urlc.setConnectTimeout(300);
             
-            urlc= HtmlUtil.checkRedirect(urlc);
+            urlc= HttpUtil.checkRedirect(urlc);
             loggerUrl.log(Level.FINE,"GET data from CDAWeb {0}", urlc.getURL() );
 
             ins= urlc.getInputStream();
@@ -335,7 +355,7 @@ public class CDAWebDB {
             urlc = url.openConnection();
             urlc.setConnectTimeout(300);
 
-            urlc= HtmlUtil.checkRedirect(urlc);
+            urlc= HttpUtil.checkRedirect(urlc);
             
             loggerUrl.log(Level.FINE,"getInputStream {0}", url);
             ins= urlc.getInputStream();
