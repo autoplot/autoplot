@@ -1172,12 +1172,11 @@ public class DataSetURI {
                 mon.started();
                 logger.log(Level.FINEST,"downloadResourceAsTempFile-> transfer");
                 logger.log(Level.FINE, "reading URL {0}", url);
-                loggerUrl.log(Level.FINE,"openConnection {0}", url);
+                loggerUrl.log(Level.FINE,"GET to get data {0}", url);
                 URLConnection urlc= url.openConnection();
                 urlc.setRequestProperty("Accept-Encoding", "gzip"); // RFE
                 urlc.setConnectTimeout( FileSystem.settings().getConnectTimeoutMs() ); // Reiner describes hang at LANL
                 urlc.setReadTimeout( FileSystem.settings().getReadTimeoutMs() );
-                loggerUrl.log(Level.FINE,"getInputStream {0}", url);
                 in= urlc.getInputStream();
                 Map<String, List<String>> headers = urlc.getHeaderFields();
                 List<String> contentEncodings=headers.get("Content-Encoding");
@@ -1190,13 +1189,33 @@ public class DataSetURI {
                         }
                     }
                 }
+                long contentLength= -1;
+                List<String> contentLengths= headers.get("Content-Length");
+                if ( contentLengths.size()>0 ) {
+                    contentLength= Long.parseLong( contentLengths.get(0) );
+                }
                 if ( hasGzipHeader ) {
                     logger.fine("temp file is compressed");
                     in= new GZIPInputStream(in);
                 } else {
                     logger.fine("temp file is not compressed");
                 }
-                in= new DasProgressMonitorInputStream( in, mon.getSubtaskMonitor("loading") ); 
+                ProgressMonitor loadMonitor= mon.getSubtaskMonitor("loading");
+                if ( contentLength>-1 ) loadMonitor.setTaskSize(contentLength);
+                
+                in= new DasProgressMonitorInputStream( in, loadMonitor ); 
+                if ( urlc instanceof HttpURLConnection ) {
+                    final HttpURLConnection hurlc= (HttpURLConnection) urlc;
+                    ((DasProgressMonitorInputStream)in).addRunWhenClosedRunnable( new Runnable() {
+                        @Override
+                        public void run() {
+                            hurlc.disconnect();
+                        }
+                    });
+                }
+                if ( contentLength>-1 ) {
+                    ((DasProgressMonitorInputStream)in).setStreamLength(contentLength);
+                }
                 OutputStream out= new FileOutputStream( tempfile );
                 DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
                 fail= false;
