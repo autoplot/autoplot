@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.autoplot.scriptconsole;
 
@@ -43,11 +39,12 @@ public class CommandLineTextPane extends JTextPane {
     public CommandLineTextPane() {
         ActionMap map = getActionMap();
 
-        history= new LinkedList<String>();
+        history= new LinkedList<>();
         historyIndex=0;
         pendingEntry="";
 
         Action evalAction= new AbstractAction("eval") {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 history.add( getText() );
                 while ( history.size()>HIST_LENGTH ) history.remove(0);
@@ -65,6 +62,7 @@ public class CommandLineTextPane extends JTextPane {
         };
 
         Action histNextAction= new AbstractAction("histNext") {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 if ( historyIndex<history.size() ) {
                     historyIndex++;
@@ -78,6 +76,7 @@ public class CommandLineTextPane extends JTextPane {
         };
 
         Action histPrevAction= new AbstractAction("histPrev") {
+            @Override
             public void actionPerformed( ActionEvent e ) {
                 if ( historyIndex>0 ) { 
                    if ( historyIndex==history.size() ) {
