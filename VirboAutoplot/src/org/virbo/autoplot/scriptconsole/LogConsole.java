@@ -468,6 +468,11 @@ public class LogConsole extends javax.swing.JPanel {
         } else {
             recMsg = MessageFormat.format( msg, parms );
         }
+        if ( recMsg==null ) {
+            // recMessage was null, but we don't dare log this.
+            int i=1;
+            recMsg="null";  //  I see this when profiling.
+        }
         if ( recMsg.startsWith("ENTRY ") ) {
             entryTimes.put(recMsg.substring(6),rec.getMillis());
         } else if ( recMsg.startsWith("RETURN ") ) {
