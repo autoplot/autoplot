@@ -1191,7 +1191,7 @@ public class DataSetURI {
                 }
                 long contentLength= -1;
                 List<String> contentLengths= headers.get("Content-Length");
-                if ( contentLengths.size()>0 ) {
+                if ( contentLengths!=null && contentLengths.size()>0 ) {
                     contentLength= Long.parseLong( contentLengths.get(0) );
                 }
                 if ( hasGzipHeader ) {
