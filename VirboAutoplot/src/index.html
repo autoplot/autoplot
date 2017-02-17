@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>NASA/Goddard's new firewall shows Autoplot is too chatty and careless with network connections.
+        <p><small>NASA/Goddard's new firewall hinted that Autoplot was too chatty and careless with network connections.  
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,9 +24,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-02-13 r20348):</p>
+        <p>Bugfixes (2017-02-17 r20373):</p>
         <ul>
+            <li>DownloadResourceAsTempFile never properly indicated progress, showing progress bar with incorrect position.
             <li>Script panel would ask if you want to reload script when time stamp changed, even if the contents did not change.
+            <li>1754: explicitly close Network connections, and call System.gc while interacting with CDAWeb.
+            <li>1754: cache metadata requests so that the metadata for a given file is only retrieved once every ten seconds.
             <li>1754: corrections to 301 redirects to support old URLs pointing to CDAWeb.
             <li>1754: Use https to access CDAWeb.  Java 1.8.0r102 is now required to access CDAWeb.
             <li>"October 2016" now parses properly.   Thanks, Sebastian!
