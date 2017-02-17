@@ -111,7 +111,9 @@ public class CDAWebDataSource extends AbstractDataSource {
         {
             // get a file via http so we get a filesystem offline if we are at a hotel.
             // Note the file is small, and if the file is already downloaded, this will only result in a head request.
-            DataSetURI.getFile( CDAWebDB.CDAWeb + "pub/software/cdawlib/AAREADME.txt", false, new NullProgressMonitor() );
+            if ( !db.isOnline() ) {
+                throw new IOException("CDAWeb is not accessible.");
+            }
         }
 
         mon.started();
