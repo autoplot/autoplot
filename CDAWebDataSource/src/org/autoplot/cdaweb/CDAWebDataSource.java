@@ -190,6 +190,8 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             DatumRange range=null;
 
+            int connectionCount= 0; // sometimes we have so many connections that the CDAWeb server stops talking to us.  Request gc every 10 connections.
+            
             for ( int i=0; i<files.length; i++ ) {
                 if ( mon.isCancelled() ) break;
                 
@@ -274,7 +276,11 @@ public class CDAWebDataSource extends AbstractDataSource {
                     // thrown by where clause...
                 }
                 
-                System.gc(); // bug https://sourceforge.net/p/autoplot/bugs/1754/ to release resources
+                connectionCount++;
+                if ( connectionCount==5 ) {
+                    System.gc(); // bug https://sourceforge.net/p/autoplot/bugs/1754/ to release resources
+                    connectionCount= 0;
+                }
 
                 if ( ds1!=null ) {
                     if ( result==null && accum==null ) {
