@@ -4,9 +4,13 @@ package org.virbo.autoplot.scriptconsole;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
@@ -15,6 +19,7 @@ import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import org.das2.util.TickleTimer;
 
 /**
  * Generally-useful command line component with history and keybindings.
@@ -27,6 +32,18 @@ public class CommandLineTextPane extends JTextPane {
     String pendingEntry;
     private static final int HIST_LENGTH=20;
 
+    TickleTimer flushTimer= new TickleTimer(500, new PropertyChangeListener() {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            Preferences prefs= Preferences.userNodeForPackage( CommandLineTextPane.class );
+            try {
+                prefs.flush();
+            } catch (BackingStoreException ex) {
+                Logger.getLogger(CommandLineTextPane.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    });
+            
     private String packHistoryCommands( List<String> history ) {
         StringBuilder build= new StringBuilder();
         for ( int i=0; i<history.size(); i++ ) {
@@ -46,17 +63,15 @@ public class CommandLineTextPane extends JTextPane {
         Action evalAction= new AbstractAction("eval") {
             @Override
             public void actionPerformed( ActionEvent e ) {
-                history.add( getText() );
-                while ( history.size()>HIST_LENGTH ) history.remove(0);
+                if ( history.isEmpty() || !history.get( history.size()-1).equals(getText()) ) {
+                    history.add( getText() );
+                    while ( history.size()>HIST_LENGTH ) history.remove(0);            
+                }
                 historyIndex= history.size();
                 pendingEntry= "";
                 Preferences prefs= Preferences.userNodeForPackage( CommandLineTextPane.class );
                 prefs.put( "lastCommands", packHistoryCommands( history.subList(0,historyIndex) ) );
-                try {
-                    prefs.flush();
-                } catch ( BackingStoreException ex ) {
-                    
-                }
+                flushTimer.tickle();
                 fireActionPerformed( e );
             }
         };
