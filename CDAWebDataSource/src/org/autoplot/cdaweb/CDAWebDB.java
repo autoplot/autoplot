@@ -376,7 +376,8 @@ public class CDAWebDB {
                 result[i]= xp.evaluate("Name/text()",item) + "|"+ xp.evaluate("StartTime/text()",item)+ "|" + xp.evaluate("EndTime/text()",item );
             }
             
-            ((HttpURLConnection)urlc).disconnect(); // https://sourceforge.net/p/autoplot/bugs/1754/
+            //((HttpURLConnection)urlc).disconnect(); // https://sourceforge.net/p/autoplot/bugs/1754/
+            //Do not call after trivial calls, so that if all the data is downloaded, then the connections are reused.
 
             return result;
 
