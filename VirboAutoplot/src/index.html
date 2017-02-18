@@ -24,8 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-02-17 r20373):</p>
+        <p>Bugfixes (2017-02-18 r20373):</p>
         <ul>
+            <li>1754: Java now reuses https connections properly and garbage collection requests are not needed.
+            <li>improvements to command line history. 
             <li>DownloadResourceAsTempFile never properly indicated progress, showing progress bar with incorrect position.
             <li>Script panel would ask if you want to reload script when time stamp changed, even if the contents did not change.
             <li>1754: explicitly close Network connections, and call System.gc while interacting with CDAWeb.
