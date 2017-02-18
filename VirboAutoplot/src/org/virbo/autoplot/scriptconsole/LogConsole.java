@@ -470,7 +470,6 @@ public class LogConsole extends javax.swing.JPanel {
         }
         if ( recMsg==null ) {
             // recMessage was null, but we don't dare log this.
-            int i=1;
             recMsg="null";  //  I see this when profiling.
         }
         if ( recMsg.startsWith("ENTRY ") ) {
