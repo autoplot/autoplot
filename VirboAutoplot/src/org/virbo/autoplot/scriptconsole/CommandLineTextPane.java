@@ -63,8 +63,10 @@ public class CommandLineTextPane extends JTextPane {
         Action evalAction= new AbstractAction("eval") {
             @Override
             public void actionPerformed( ActionEvent e ) {
-                if ( history.isEmpty() || !history.get( history.size()-1).equals(getText()) ) {
-                    history.add( getText() );
+                String cmd= getText();
+                cmd= cmd.trim();
+                if ( cmd.length()>0 && ( history.isEmpty() || !history.get( history.size()-1).equals(cmd) ) ) {
+                    history.add( cmd );
                     while ( history.size()>HIST_LENGTH ) history.remove(0);            
                 }
                 historyIndex= history.size();
