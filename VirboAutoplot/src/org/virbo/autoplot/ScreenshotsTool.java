@@ -947,8 +947,14 @@ public class ScreenshotsTool extends EventQueue {
     public void requestFinish( boolean trimAll ) {
         if ( receivedEvents ) pop();
         pngWriterThreadRunning= false;
-        while ( pngWriterThreadNotDone ) {
-            // wait a while.
+        try {
+            while ( pngWriterThreadNotDone ) {
+                synchronized ( imageQueue ) {
+                    imageQueue.wait();
+                }
+            }
+        } catch ( InterruptedException ex ) {
+            throw new RuntimeException(ex);
         }
         if ( trimAll ) {
             try {
@@ -1066,7 +1072,14 @@ public class ScreenshotsTool extends EventQueue {
     private void finishUp() {
 
         pngWriterThreadRunning= false;
-        while ( pngWriterThreadNotDone ) {
+        try {
+            while ( pngWriterThreadNotDone ) {
+                synchronized ( imageQueue ) {
+                    imageQueue.wait();
+                }
+            }
+        } catch ( InterruptedException ex ) {
+            throw new RuntimeException(ex);
         }
         JPanel p= new JPanel();
         p.setLayout( new BorderLayout() );
