@@ -39,13 +39,6 @@ public class HapiServerSupport {
     
     public static JSONArray getCatalog() throws JSONException, IOException {
         JSONArray array= new JSONArray();
-        array.put( new JSONObject().put("id","0B000800408DD710.noStream").put("title","Sensor 0B (no streaming)") );
-        array.put( new JSONObject().put("id","Iowa City Conditions").put("title","Iowa City Conditions") );
-        array.put( new JSONObject().put("id","Iowa City Forecast").put("title","Iowa City Forecast") );
-        array.put( new JSONObject().put("id","Spectrum").put("title","Example Spectrum") );
-        array.put( new JSONObject().put("id","PowerWheel").put("title","Spinning Wheel on Power Meter") );
-        array.put( new JSONObject().put("id","SpectrogramRank2").put("title","Example Rank 2 Spectrum") );
-        array.put( new JSONObject().put("id","PowerOnesDigitSegments").put("title","") );
         JSONObject catalog= getCatalogNew();
         JSONArray cat= catalog.getJSONArray("catalog");
         for ( int i=0; i<cat.length(); i++ ) {

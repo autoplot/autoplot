@@ -39,12 +39,6 @@ public class InfoServlet extends HttpServlet {
         } else if ( id.equals("0B000800408DD710.nostream") ) {
             jo.put( "startDate", "2012-01-09T00:00Z" );
             jo.put( "stopDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
-        } else if ( id.equals("PowerWheel") ) {
-            jo.put( "startDate",  "2016-07-28T00:00Z"  );
-            jo.put( "sampleStartDate", "2016-07-28T00:00Z" );
-            jo.put( "sampleEndDate", "2016-07-29T00:00Z" );
-            jo.put( "x_about","http://jfaden.net/HapiServerDemo/about/about.html#wheelThingy");
-            jo.put( "DOI", "10.1007/s12145-010-0053-4" );
         } else if ( id.equals("PowerOnesDigitSegments") ) {
             jo.put( "startDate",  "2016-07-28T00:00Z"  );
             jo.put( "sampleStartDate", "2016-07-28T00:00Z" );
@@ -165,27 +159,6 @@ public class InfoServlet extends HttpServlet {
             parameter.put( "description", "Wind Direction" );
             parameters.put( 5, parameter );
 
-        } else if ( id.equals("PowerWheel") ) {
-            parameter= new JSONObject();
-            parameter.put( "name", "PowerWheel" );
-            parameter.put( "type", "float" );
-            parameter.put( "units", "greyscale" );
-            JSONObject bins= new JSONObject();
-            bins.put( "units", "" );
-            double[] ens= new double[] { 241.0, 241.8, 242.6, 243.4, 244.2, 245.0, 245.8, 246.6, 247.4, 248.2, 249.0, 249.8, 250.6, 251.4, 252.2, 253.0, 253.8, 254.6, 255.4, 256.2, 257.0 };
-            JSONArray values= new JSONArray();
-            for ( int i=0; i<ens.length; i++ ) {
-                JSONObject en= new JSONObject();
-                en.put("center",ens[i]);
-                values.put( i,en );
-            }
-            bins.put( "values", values );
-            bins.put( "name", "horizontal position" );
-            bins.put( "units", "pixels" );
-            parameter.put( "bins", bins );
-            parameter.put( "size", new int[] { ens.length } );
-            parameter.put( "description", "The little wheel thingy that spins around." );
-            parameters.put( 1, parameter );
         } else if ( id.equals("SpectrogramRank2") ) {
             parameter= new JSONObject();
             parameter.put( "name", "SpectrogramRank2" );
