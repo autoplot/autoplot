@@ -10,7 +10,6 @@ import org.das2.datum.DatumRange;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
-import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -207,7 +206,7 @@ public class RecordIterator implements Iterator<QDataSet>  {
     public boolean hasNext() {
         if ( this.streamingIterator!=null ) {
             if ( this.index>0 ) {
-                logger.finer("skipping "+this.index+" records");
+                logger.log(Level.FINER, "skipping {0} records", this.index);
                 for ( int i=0; i<this.index && this.streamingIterator.hasNext() ; i++ ) {
                     streamingIterator.next();
                 }
