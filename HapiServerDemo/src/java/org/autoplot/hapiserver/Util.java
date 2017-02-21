@@ -41,7 +41,7 @@ public class Util {
             synchronized (Util.class) {
                 _HAPI_HOME = Util.HAPI_HOME;
                 if ( _HAPI_HOME==null ) {
-                    String s= System.getProperty(HAPI_SERVER_HOME_PROPERTY,"/home/user/autoplot_data/hapi");
+                    String s= System.getProperty(HAPI_SERVER_HOME_PROPERTY,"/home/jbf/hapi");
                     if ( !s.endsWith("/") ) {
                         s= s+"/";
                     }    
