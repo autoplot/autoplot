@@ -61,6 +61,7 @@
             <li>2017-02-03: add demonstration ds for rank 3 data</li>   
             <li>2017-02-07: use bins array instead of bins1, bins2.</li>
             <li>2017-02-13: use x_about instead of about.</li>
+            <li>2017-02-21: finally make the server externally configurable.</li>
         </ul>
         </small>
     </body>
