@@ -30,13 +30,35 @@ public class Util {
     }
     
     //TODO: this needs to come from a configuration variable.
-    private static final File HAPI_HOME= new File("/home/jbf/autoplot_data/hapi/");
+    private static volatile File HAPI_HOME=null;
     
     /**
      * return the root of the HAPI server.
      * @return the root of the HAPI server.
      */
     protected static File getHapiHome() {
-        return HAPI_HOME;
+        File _HAPI_HOME = Util.HAPI_HOME;
+        if ( _HAPI_HOME==null ) {
+            synchronized (Util.class) {
+                _HAPI_HOME = Util.HAPI_HOME;
+                if ( _HAPI_HOME==null ) {
+                    String s= System.getProperty(HAPI_SERVER_HOME_PROPERTY,"/home/user/autoplot_data/hapi");
+                    if ( !s.endsWith("/") ) {
+                        s= s+"/";
+                    }    
+                    Util.HAPI_HOME= _HAPI_HOME = new File(s);
+                }
+            }
+        }
+        return _HAPI_HOME;
     }
+    
+    /**
+     * This should point to the name of the directory containing HAPI configuration.
+     * This directory should contain catalog.json, capabilities.json and a 
+     * subdirectory "info" which contains files with the name &lt;ID&gt;.json,
+     * each containing the info response.  Note these should also contain a
+     * tag "uri" which is the Autoplot URI that serves this data.
+     */
+    public static final String HAPI_SERVER_HOME_PROPERTY = "hapi.server.home";
 }
