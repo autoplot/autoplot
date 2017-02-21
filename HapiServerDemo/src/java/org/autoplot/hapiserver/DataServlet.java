@@ -103,24 +103,12 @@ public class DataServlet extends HttpServlet {
         boolean allowStream= !stream.equals("false");
 
         try {
-            if ( id.equals("Iowa City Conditions") ) { // TODO: 
-                dsiter= new RecordIterator( "vap+jyds:file:///home/jbf/public_html/1wire/ictemp/readTemperaturesMulti.jyds", dr, allowStream );
-            } else if ( id.equals("Iowa City Forecast") ) {
-                dsiter= new RecordIterator( "vap+jyds:file:///home/jbf/ct/autoplot/script/weatherForecast.jyds", dr, allowStream );
-            } else if ( id.equals("Spectrum") ) {
-                dsiter= new RecordIterator( "vap+cdaweb:ds=RBSP-A_HFR-SPECTRA_EMFISIS-L2&id=HFR_Spectra", dr , allowStream);
-            } else if ( id.equals("PowerWheel") ) {
-                dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerWheel.jyds?", dr, allowStream );
-            } else if ( id.equals("SpectrogramRank2") ) {
-                dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/spectrogramRank2.jyds?", dr, allowStream );
-            } else if ( id.equals("PowerOnesDigitSegments") ) {
-                dsiter= new RecordIterator( "file:/home/jbf/ct/autoplot/rfe/529/powerOnes.jyds?", dr, allowStream );
-            } else if ( id.equals("0B000800408DD710.noStream") ) {
-                dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
-            } else {
-                dsiter= checkAutoplotSource( id, dr, allowStream );
-                if (dsiter==null ) {
-                    dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/"+id+".$Y$m$d.d2s", dr, allowStream );
+            dsiter= checkAutoplotSource( id, dr, allowStream );
+            if ( dsiter==null ) {
+                if ( id.equals("0B000800408DD710.noStream") ) {
+                    dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
+                } else {
+                    throw new IllegalArgumentException("bad id: "+id);
                 }
             }
         } catch ( Exception ex ) {
@@ -313,9 +301,13 @@ public class DataServlet extends HttpServlet {
             }
         }
         JSONObject o= new JSONObject(builder.toString());
-        String suri= o.getString("uri");
-        RecordIterator dsiter= new RecordIterator( suri, dr, allowStream ); 
-        return dsiter;
+        if ( o.has("uri") ) {
+            String suri= o.getString("uri");
+            RecordIterator dsiter= new RecordIterator( suri, dr, allowStream ); 
+            return dsiter;
+        } else {
+            return null;
+        }
     }
 
     
