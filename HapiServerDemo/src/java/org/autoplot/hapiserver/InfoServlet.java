@@ -57,7 +57,7 @@ public class InfoServlet extends HttpServlet {
         parameter.put( "length", 24 );
         parameters.put( 0, parameter );
 
-        if ( id.equals("SpectrogramRank2") ) {
+        if ( id.equals("SpectrogramRank2") ) { 
             parameter= new JSONObject();
             parameter.put( "name", "SpectrogramRank2" );
             parameter.put( "type", "float" );
