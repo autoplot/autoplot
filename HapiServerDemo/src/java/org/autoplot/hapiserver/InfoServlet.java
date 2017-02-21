@@ -1,6 +1,9 @@
 
 package org.autoplot.hapiserver;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Calendar;
@@ -21,7 +24,7 @@ import org.virbo.dsops.Ops;
  */
 public class InfoServlet extends HttpServlet {
 
-    protected static JSONObject getInfo( String id ) throws JSONException, IllegalArgumentException {
+    protected static JSONObject getInfo( String id ) throws JSONException, IllegalArgumentException, IOException {
         JSONObject jo= new JSONObject();
         jo.put("HAPI","1.0");
         jo.put("createdAt",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
@@ -311,7 +314,23 @@ public class InfoServlet extends HttpServlet {
             }
             parameters.put( 1, parameter );
         } else {
-            throw new IllegalArgumentException("unknown id: " +id );
+            File infoFileHome= new File( Util.getHapiHome(), "info" );
+            File infoFile= new File( infoFileHome, id+".json" );
+            StringBuilder builder= new StringBuilder();
+            try ( BufferedReader in= new BufferedReader( new FileReader( infoFile ) ) ) {
+                String line= in.readLine();
+                while ( line!=null ) {
+                    builder.append(line);
+                    line= in.readLine();
+                }
+            }
+            JSONObject o= new JSONObject(builder.toString());
+            JSONArray parametersRead= o.getJSONArray("parameters");
+            for ( int i=1; i<parametersRead.length(); i++ ) {
+                parameters.put( i, parametersRead.getJSONObject(i) );
+            }
+            jo.put( "startDate", o.get("startDate") );
+            jo.put( "stopDate", o.get("stopDate") );
         }
         
         jo.put("parameters",parameters);

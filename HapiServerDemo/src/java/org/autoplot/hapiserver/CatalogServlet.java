@@ -31,7 +31,7 @@ public class CatalogServlet extends HttpServlet {
      * @return
      * @throws JSONException 
      */
-    public static JSONObject getCatalog() throws JSONException {
+    public static JSONObject getCatalog() throws JSONException, IOException {
         JSONObject jo= new JSONObject();
         jo.put("HAPI","1.0");
         jo.put("x-deployedAt", deployedAt );
@@ -52,15 +52,12 @@ public class CatalogServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        try {
+        try (PrintWriter out = response.getWriter()) {
             JSONObject jo= getCatalog();
             out.write( jo.toString(4) );
             
         } catch ( JSONException ex ) {
             throw new ServletException(ex);
-        } finally {
-            out.close();
         }
     }
 

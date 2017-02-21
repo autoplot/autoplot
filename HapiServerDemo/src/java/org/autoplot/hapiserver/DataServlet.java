@@ -1,6 +1,9 @@
 package org.autoplot.hapiserver;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -60,7 +63,7 @@ public class DataServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        Map<String,String[]> params= new HashMap<String, String[]>( request.getParameterMap() );
+        Map<String,String[]> params= new HashMap<>( request.getParameterMap() );
         String id= getParam( params,"id",null,"The identifier for the resource.", null );
         String timeMin= getParam( params, "time.min", null, "The smallest value of time to include in the response.", null );
         String timeMax= getParam( params, "time.max", null, "The largest value of time to include in the response.", null );
@@ -115,7 +118,10 @@ public class DataServlet extends HttpServlet {
             } else if ( id.equals("0B000800408DD710.noStream") ) {
                 dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
             } else {
-                dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/"+id+".$Y$m$d.d2s", dr, allowStream );
+                dsiter= checkAutoplotSource( id, dr, allowStream );
+                if (dsiter==null ) {
+                    dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/"+id+".$Y$m$d.d2s", dr, allowStream );
+                }
             }
         } catch ( Exception ex ) {
             ex.printStackTrace();
@@ -292,6 +298,25 @@ public class DataServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    private RecordIterator checkAutoplotSource(String id, DatumRange dr, boolean allowStream) throws IOException, JSONException, Exception {
+        File configFile= new File( new File( Util.getHapiHome().toString(), "info" ), id+".json" );
+        if ( !configFile.exists() ) {
+            return null;
+        }
+        StringBuilder builder= new StringBuilder();
+        try ( BufferedReader in= new BufferedReader( new FileReader( configFile ) ) ) {
+            String line= in.readLine();
+            while ( line!=null ) {
+                builder.append(line);
+                line= in.readLine();
+            }
+        }
+        JSONObject o= new JSONObject(builder.toString());
+        String suri= o.getString("uri");
+        RecordIterator dsiter= new RecordIterator( suri, dr, allowStream ); 
+        return dsiter;
+    }
 
     
 }

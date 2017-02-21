@@ -1,6 +1,7 @@
 
 package org.autoplot.hapiserver;
 
+import java.io.File;
 import java.util.Locale;
 
 /**
@@ -26,5 +27,16 @@ public class Util {
         } else {
             return String.format( Locale.US, "%.1f",dt/86400000.)+" days";
         }
+    }
+    
+    //TODO: this needs to come from a configuration variable.
+    private static final File HAPI_HOME= new File("/home/jbf/autoplot_data/hapi/");
+    
+    /**
+     * return the root of the HAPI server.
+     * @return the root of the HAPI server.
+     */
+    protected static File getHapiHome() {
+        return HAPI_HOME;
     }
 }
