@@ -57,109 +57,7 @@ public class InfoServlet extends HttpServlet {
         parameter.put( "length", 24 );
         parameters.put( 0, parameter );
 
-        if ( id.equals("Iowa City Conditions") ) {
-            parameter= new JSONObject();
-            parameter.put( "name", "Temperature" );
-            parameter.put( "type", "double" );
-            parameter.put( "units", "deg F" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Air Temperature" );
-			parameters.put( 1, parameter );
-            parameter= new JSONObject();
-            parameter.put( "name", "WindSpeed" );
-            parameter.put( "type", "double" );
-            parameter.put( "units", "mph" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Wind Speed" );
-            parameters.put( 2, parameter );
-            parameter= new JSONObject();
-            parameter.put( "name", "DewPoint" );
-            parameter.put( "type", "double" );
-            parameter.put( "units", "deg F" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Dew Point" );
-            parameters.put( 3, parameter );
-            parameter= new JSONObject();
-            parameter.put( "name", "Humidity" );
-            parameter.put( "type", "double" );
-            parameter.put( "units", "percent" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Relative Humidity" );
-            parameters.put( 4, parameter );
-            parameter= new JSONObject();
-            parameter.put( "name", "WindChill" );
-            parameter.put( "type", "double" );
-            parameter.put( "units", "deg F" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Wind Chill" );
-            parameters.put( 5, parameter );
-            parameter= new JSONObject();
-            parameter.put( "name", "HeatIndex" );
-            parameter.put( "type", "double" );
-            parameter.put( "units", "deg F" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Heat Index" );
-            parameters.put( 6, parameter );
-            parameter= new JSONObject();
-            parameter.put( "name", "Altimeter" );
-            parameter.put( "type", "double" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Altimeter" );
-            parameters.put( 7, parameter );
-            parameter= new JSONObject();
-            parameter.put( "name", "Pressure" );
-            parameter.put( "type", "double" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Barometric Pressure" );
-            parameters.put( 8, parameter );
-            parameter= new JSONObject();
-            parameter.put( "name", "Precip" );
-            parameter.put( "type", "double" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Precipitation" );
-            parameters.put( 9, parameter );
-        } else if ( id.equals("Iowa City Forecast") ) {
-            parameter= new JSONObject();
-            parameter.put( "name", "Temperature" );
-            parameter.put( "type", "double" );
-            parameter.put( "units", "deg F" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Air Temperature" );
-            parameters.put( 1, parameter );
-                 
-            parameter= new JSONObject();
-            parameter.put( "name", "DewPoint" );
-            parameter.put( "type", "double" );
-            parameter.put( "units", "deg F" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Dew Point" );
-            parameters.put( 2, parameter );
-
-            parameter= new JSONObject();
-            parameter.put( "name", "PrecipProbabily" );
-            parameter.put( "type", "double" );
-            parameter.put( "units", "%" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Probability of Precipitation" );
-            parameters.put( 3, parameter );
-
-            parameter= new JSONObject();
-            parameter.put( "name", "WindSpeed" );
-            parameter.put( "type", "double" );
-            parameter.put( "units", "mph" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Wind Speed" );
-            parameters.put( 4, parameter );
-
-            parameter= new JSONObject();
-            parameter.put( "name", "WindDirection" );
-            parameter.put( "type", "double" );
-            parameter.put( "units", "degrees" );
-            parameter.put( "fill", "-1e31" );
-            parameter.put( "description", "Wind Direction" );
-            parameters.put( 5, parameter );
-
-        } else if ( id.equals("SpectrogramRank2") ) {
+        if ( id.equals("SpectrogramRank2") ) {
             parameter= new JSONObject();
             parameter.put( "name", "SpectrogramRank2" );
             parameter.put( "type", "float" );
@@ -298,19 +196,14 @@ public class InfoServlet extends HttpServlet {
         if ( id==null ) throw new ServletException("required parameter 'id' is missing from request");
         
         response.setContentType("application/json;charset=UTF-8");        
-        PrintWriter out = response.getWriter();
-        try {
+        try (PrintWriter out = response.getWriter()) {
            
            JSONObject jo= getInfo( id );
            String s= jo.toString(4);
            out.write(s);
             
-        } catch ( JSONException ex ) {
+        } catch ( JSONException | IllegalArgumentException ex ) {
             throw new ServletException(ex);
-        } catch ( IllegalArgumentException ex ) {
-            throw new ServletException(ex);
-        } finally {
-            out.close();
         }
     }
 
