@@ -29,7 +29,6 @@ public class Util {
         }
     }
     
-    //TODO: this needs to come from a configuration variable.
     private static volatile File HAPI_HOME=null;
     
     /**
@@ -47,6 +46,7 @@ public class Util {
                         s= s+"/";
                     }    
                     Util.HAPI_HOME= _HAPI_HOME = new File(s);
+                    System.err.println("hapi.server.home="+Util.HAPI_HOME);
                 }
             }
         }
