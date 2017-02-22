@@ -153,6 +153,7 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.dom.DomNode;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
 import org.virbo.autoplot.scriptconsole.LogConsole;
@@ -4120,7 +4121,30 @@ private void resetMemoryCachesMIActionPerformed(java.awt.event.ActionEvent evt) 
         if ( uri.trim().length()>0 ) {
             URISplit split= URISplit.parse(uri);
             if ( split.vapScheme==null || !split.vapScheme.equals("vap+inline") ) {
-                uri= "vap+inline:ds=getDataSet('"+uri+"')";
+                if ( split.vapScheme.equals("vap+internal") ) {
+                    String[] ss= split.path.split(",",-2);
+                    StringBuilder urib= new StringBuilder( "vap+inline:" );
+                    for (String s : ss) {
+                        DomNode n;
+                        String uri1;
+                        try {
+                            n= dom.getElementById(s);                            
+                            if ( n instanceof DataSourceFilter ) {
+                                DataSourceFilter dsf= (DataSourceFilter)n;
+                                uri1= dsf.getUri();
+                            } else {
+                                uri1= "";
+                            }
+                        } catch ( IllegalArgumentException ex ) {
+                            uri1= "";
+                        }
+                        urib.append(s).append("=getDataSet('").append(uri1).append("')&");
+                    }
+                    urib.append("link(").append(split.path).append(")");
+                    uri= urib.toString();
+                } else {
+                    uri= "vap+inline:ds=getDataSet('"+uri+"')";
+                }
             }
         }
 
