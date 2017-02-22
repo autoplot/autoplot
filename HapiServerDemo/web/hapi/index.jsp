@@ -18,8 +18,8 @@
         <title>HAPI Server JSP Demo</title>
     </head>
     <body>
-        <h1>This is a HAPI Server.</h1>  More information about this type of server is found at <a href="https://github.com/hapi-server/data-specification">github</a>.
-        More information about specific datasets served is found <a href="../about/about.html">here</a>
+        <h1>This is a HAPI Server.</h1>  More information about this type of server is found at <a href="https://github.com/hapi-server/data-specification" target="_blank">github</a>.
+        This implementation of the HAPI server uses Autoplot URIs to load data, more information about Autoplot can be found <a href="http://autoplot.org" target="_blank">here</a>
         
         <h3>Some example requests:</h3>
         <a href="catalog">Catalog</a> <i>Show the catalog of available data sets.</i><br>
@@ -36,6 +36,10 @@
                     title= ds.getString("title");
                     if ( title.length()==0 ) {
                         title= id;
+                    } else {
+                        if ( !title.equals(id) ) {
+                            title= id + ": "+ title;
+                        }
                     }
                 } else {
                     title= id;
@@ -51,7 +55,7 @@
                     out.println( String.format("<a href=\"info?id=%s\">Info</a> <a href=\"data?id=%s&time.min=%s&time.max=%s\">Data</a>", 
                         ds.getString("id"), ds.getString("id"), exampleRange.min().toString(), exampleRange.max().toString() ) );
                 } else {
-                    out.println( String.format("<a href=\"info?id=%s\">Info</a> (Data extent not known)", 
+                    out.println( String.format("<a href=\"info?id=%s\">Info</a> Data", 
                         ds.getString("id"), ds.getString("id") ) );
                 }
                 
