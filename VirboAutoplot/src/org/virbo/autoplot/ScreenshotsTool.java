@@ -517,12 +517,16 @@ public class ScreenshotsTool extends EventQueue {
             logger.log(Level.FINE, "getTrim {0}", f.getName());
             monitor.setTaskProgress( i );
             if ( f.toString().endsWith(".png") ) {
-                BufferedImage im= ImageIO.read(f);
-                Rectangle r1= getTrim( im );
-                if ( result==null ) {
-                    result= r1;
-                } else {
-                    result= result.union(r1);
+                try {
+                    BufferedImage im= ImageIO.read(f);
+                    Rectangle r1= getTrim( im );
+                    if ( result==null ) {
+                        result= r1;
+                    } else {
+                        result= result.union(r1);
+                    }
+                } catch ( RuntimeException ex ) {
+                    throw new RuntimeException("failed to read "+f.toString(),ex);
                 }
             }
             i++;
