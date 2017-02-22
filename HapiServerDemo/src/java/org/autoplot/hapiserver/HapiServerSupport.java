@@ -84,7 +84,14 @@ public class HapiServerSupport {
             return null;
         } else {
             DatumRange landing;
-            if (range.max().ge(myValidTime)) { // Note stopDate is required since 2017-01-17.
+            if ( info.has("sampleStartDate") && info.has("sampleStopDate") ) {
+                try {
+                    landing = new DatumRange( Units.us2000.parse(info.getString("sampleStartDate")), Units.us2000.parse(info.getString("sampleStopDate")) );
+                } catch (JSONException | ParseException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                    return null;
+                }
+            } else if (range.max().ge(myValidTime)) { // Note stopDate is required since 2017-01-17.
                 logger.warning("server is missing required stopDate parameter.");
                 landing = new DatumRange(range.min(), range.min().add(1, Units.days));
             } else {
