@@ -30,6 +30,7 @@ import org.das2.datum.Units;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystemUtil;
 import org.das2.util.filesystem.HtmlUtil;
+import org.das2.util.filesystem.HttpUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
@@ -545,7 +546,7 @@ public class HapiDataSource extends AbstractDataSource {
         StringBuilder builder= new StringBuilder();
         logger.log(Level.FINE, "getDocument {0}", url.toString());
         HttpURLConnection httpConnect=  ((HttpURLConnection)url.openConnection());
-        httpConnect= (HttpURLConnection) HtmlUtil.checkRedirect(httpConnect);
+        httpConnect= (HttpURLConnection) HttpUtil.checkRedirect(httpConnect);
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( httpConnect.getInputStream() ) ) ) {
             String line= in.readLine();
             lineNum++;
@@ -623,7 +624,7 @@ public class HapiDataSource extends AbstractDataSource {
         long t0= System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
         HttpURLConnection connection= (HttpURLConnection)url.openConnection();
         connection.setRequestProperty( "Accept-Encoding", "gzip" );
-        connection= (HttpURLConnection)HtmlUtil.checkRedirect(connection);
+        connection= (HttpURLConnection)HttpUtil.checkRedirect(connection);
         connection.connect();
         boolean gzip= "gzip".equals( connection.getContentEncoding() );
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( connection.getInputStream() ) : connection.getInputStream() ) ) ) {
@@ -769,9 +770,18 @@ public class HapiDataSource extends AbstractDataSource {
                                 pds[i].depend[j]= dep;
                             }
                         } else {
-                            QDataSet dep1= getJSONBins(jsonObjecti.getJSONObject("bins"));
+                            JSONObject bins= jsonObjecti.getJSONObject("bins");
                             if ( pds[i].depend==null ) pds[i].depend= new QDataSet[1];
-                            pds[i].depend[0]= dep1;
+                            if ( bins.has("parameter") ) { // this will be implemented later.
+                                int n= DataSetUtil.product(pds[i].size);
+                                pds[i].depend[0]= Ops.findgen(n);
+                            } else if ( bins.has("values") ) {
+                                QDataSet dep1= getJSONBins(bins);
+                                pds[i].depend[0]= dep1;
+                            } else {
+                                int n= DataSetUtil.product(pds[i].size);
+                                pds[i].depend[0]= Ops.findgen(n);
+                            }
                         }
                     } 
                 }
