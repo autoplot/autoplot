@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Corrections to Autoplot's https support reduces the number of connections.
+        <p><small>IMAGE FUV/SIE CDF files viewed with Autoplot.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -26,6 +26,8 @@
         
         <p>Bugfixes (2017-02-18 r20373):</p>
         <ul>
+            <li>Experimental support for rank 2 DEPEND_1 datasets with HAPI.  HAPI uses sampleStartDate for discovery.
+            <li>check for vap+internal:data_1,data_2 when switching to mash-up
             <li>1754: Correctly support http://autoplot.org/data/AMSR_E_L3_SeaIce6km_B06_20070307.hdf.gz
             <li>1754: Java now reuses https connections properly and garbage collection requests are not needed.
             <li>improvements to command line history. 
@@ -74,6 +76,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>HAPI server allows external configuration (but it must be in /home/jbf/hapi/ for now!)
             <li>559: screenshots tool now uses a separate thread to save images, improving responsiveness.
             <li>experimental support for high-rank datasets in HAPI servers
             <li>dom.getElementById added, to remove confusion about indeces.
