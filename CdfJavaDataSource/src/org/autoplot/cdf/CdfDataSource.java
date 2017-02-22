@@ -469,7 +469,7 @@ public class CdfDataSource extends AbstractDataSource {
                     renderType=null;
                 }
             }
-            if ( renderType !=null && renderType.equals("image") ) {
+            if ( renderType !=null && renderType.startsWith("image") ) {
                 logger.fine("renderType=image not supported in CDF files");
                 renderType= null;
             }
