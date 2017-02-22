@@ -4,6 +4,10 @@
     Author     : jbf
 --%>
 
+<%@page import="org.das2.datum.DatumRange"%>
+<%@page import="org.json.JSONObject"%>
+<%@page import="org.json.JSONArray"%>
+<%@page import="org.autoplot.hapiserver.HapiServerSupport"%>
 <%@page import="org.autoplot.hapiserver.Util"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -19,14 +23,33 @@
         <h3>Some example requests:</h3>
         <a href="catalog">Catalog</a> <i>Show the catalog of available data sets.</i><br>
         <a href="capabilities">Capabilities</a> <i>Capabilities of the server. For example, can it use binary streams to transfer data?</i><br>
-        <a href="info?id=0B000800408DD710">Info</a> <i>Information about a data set, showing what parameters are contained within.</i><br>
-        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05">Data</a> <i>Example data transfer request.</i><br>
-        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&format=binary">Data Binary</a> <i>Example data request, for binary.</i><br>
-        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-10-01">Data (10 months)</a> <i>Example data request, showing long requests.</i><br>
-        <a href="data?id=0B000800408DD710&time.min=2016-01-01&time.max=2016-01-05&include=header">Data w/header</a> <i>Data request, requesting header as well.</i><br>
-        <a href="data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header">Data w/multiple parameters</a> <i>Request for data with multiple parameters.</i><br>
-        <a href="data?id=Iowa+City+Conditions&time.min=2016-01-01&time.max=2016-01-05&include=header&parameters=Time,Humidity">Data w/subset</a> <i>Request subset of the parameters.</i><br>
-        <a href="data?id=SpectrogramRank2&time.min=2016-01-01&time.max=2016-01-02">Rank 3 Data</a> <i>High-rank data showing multiple dimensional spectrogram.</i><br>
+        <br>
+        <%
+            JSONArray dss= HapiServerSupport.getCatalog();
+            for ( int i=0; i<dss.length(); i++ ) {
+                JSONObject ds= dss.getJSONObject(i);
+                String title= "";
+                if ( ds.has("title") ) {
+                    title= ds.getString("title");
+                    if ( title.length()==0 ) {
+                        title= ds.getString("id");
+                    }
+                } else {
+                    title= ds.getString("id");
+                }
+                
+                DatumRange exampleRange= HapiServerSupport.getExampleRange(ds.getString("id"));
+
+                out.println( String.format( "<p style=\"background-color: #e0e0e0;\">%s</p>", title ) );
+                if ( exampleRange!=null ) {
+                    out.println( String.format("<a href=\"info?id=%s\">Info</a> <a href=\"data?id=%s&time.min=%s&time.max=%s\">Data</a><br>", 
+                        ds.getString("id"), ds.getString("id"), exampleRange.min().toString(), exampleRange.max().toString() ) );
+                } else {
+                    out.println( String.format("<a href=\"info?id=%s\">Info</a> (Data extent not known)<br>", 
+                        ds.getString("id"), ds.getString("id") ) );
+                }
+            }
+        %>
         <%
             long l= org.virbo.dataset.RecordIterator.TIME_STAMP; // load RecordIterator class first, or we'll get a negative time.
         %>

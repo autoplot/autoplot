@@ -3,12 +3,20 @@ package org.autoplot.hapiserver;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.LoggerManager;
+import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +27,102 @@ import org.virbo.dataset.QDataSet;
  * @author jbf
  */
 public class HapiServerSupport {
+    
+    private static final Logger logger= LoggerManager.getLogger("hapi");
+    
+    private static Datum myValidTime= TimeUtil.createValid( "2200-01-01T00:00" );
+    
+    /**
+     * return the range of available data. For example, Polar/Hydra data is available
+     * from 1996-03-20 to 2008-04-15.
+     * @param info
+     * @return the range of available data.
+     */
+    public static DatumRange getRange( JSONObject info ) {
+        try {
+            
+            if ( info.has("firstDate") && info.has("lastDate") ) { // this is deprecated behavior
+                String firstDate= info.getString("firstDate");
+                String lastDate= info.getString("lastDate");
+                if ( firstDate!=null && lastDate!=null ) {
+                    Datum t1= Units.us2000.parse(firstDate);
+                    Datum t2= Units.us2000.parse(lastDate);
+                    if ( t1.le(t2) ) {
+                        return new DatumRange( t1, t2 );
+                    } else {
+                        logger.warning( "firstDate and lastDate are out of order, ignoring.");
+                    }
+                }
+            } else if ( info.has("startDate") ) { // note startDate is required.
+                String startDate= info.getString("startDate");
+				String stopDate;
+				if ( info.has("stopDate") ) {
+					stopDate= info.getString("stopDate");
+				} else {
+					stopDate= null;
+				}
+                if ( startDate!=null ) {
+                    Datum t1= Units.us2000.parse(startDate);
+                    Datum t2= stopDate==null ? myValidTime : Units.us2000.parse(stopDate);
+                    if ( t1.le(t2) ) {
+                        return new DatumRange( t1, t2 );
+                    } else {
+                        logger.warning( "firstDate and lastDate are out of order, ignoring.");
+                    }
+                }
+			}
+        } catch ( JSONException | ParseException ex ) {
+            logger.log( Level.WARNING, ex.getMessage(), ex );
+        }
+        return null;
+    }
+    
+    public static DatumRange getExampleRange(JSONObject info) {
+        DatumRange range = getRange(info);
+        if (range == null) {
+            logger.warning("server is missing required startDate and stopDate parameters.");
+            return null;
+        } else {
+            DatumRange landing;
+            if (range.max().ge(myValidTime)) { // Note stopDate is required since 2017-01-17.
+                logger.warning("server is missing required stopDate parameter.");
+                landing = new DatumRange(range.min(), range.min().add(1, Units.days));
+            } else {
+                Datum end = TimeUtil.prevMidnight(range.max());
+                landing = new DatumRange(end.subtract(1, Units.days), end);
+            }
+            return landing;
+        }
+    }
+
+    /**
+     * return the example time range for the dataset.
+     * @param id
+     * @return
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws JSONException 
+     */
+    public static DatumRange getExampleRange( String id ) throws IOException, FileNotFoundException, JSONException {
+        File infoFile= new File( new File( Util.getHapiHome(), "info" ), id+".json" );
+        JSONObject info= readJSON( infoFile );
+        DatumRange range = getRange(info);
+        if (range == null) {
+            logger.warning("server is missing required startDate and stopDate parameters.");
+            return null;
+        } else {
+            DatumRange landing;
+            if (range.max().ge(myValidTime)) { // Note stopDate is required since 2017-01-17.
+                logger.warning("server is missing required stopDate parameter.");
+                landing = new DatumRange(range.min(), range.min().add(1, Units.days));
+            } else {
+                Datum end = TimeUtil.prevMidnight(range.max());
+                landing = new DatumRange(end.subtract(1, Units.days), end);
+            }
+            return landing;
+        }
+    }
+        
     /**
      * return the list of datasets available at the server
      * @return list of dataset ids
@@ -45,6 +149,19 @@ public class HapiServerSupport {
             array.put( cat.get(i) );
         }
         return array;
+    }
+    
+    private static JSONObject readJSON( File jasonFile ) throws FileNotFoundException, IOException, JSONException {
+        StringBuilder builder= new StringBuilder();
+        try ( BufferedReader in= new BufferedReader( new FileReader( jasonFile ) ) ) {
+            String line= in.readLine();
+            while ( line!=null ) {
+                builder.append(line);
+                line= in.readLine();
+            }
+        }
+        JSONObject catalog= new JSONObject(builder.toString());
+        return catalog;
     }
     
     private static JSONObject getCatalogNew() throws IOException, JSONException {
