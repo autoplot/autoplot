@@ -4,6 +4,7 @@
     Author     : jbf
 --%>
 
+<%@page import="java.io.File"%>
 <%@page import="org.das2.datum.DatumRange"%>
 <%@page import="org.json.JSONObject"%>
 <%@page import="org.json.JSONArray"%>
@@ -28,28 +29,42 @@
             JSONArray dss= HapiServerSupport.getCatalog();
             for ( int i=0; i<dss.length(); i++ ) {
                 JSONObject ds= dss.getJSONObject(i);
+                
+                String id= ds.getString("id");
                 String title= "";
                 if ( ds.has("title") ) {
                     title= ds.getString("title");
                     if ( title.length()==0 ) {
-                        title= ds.getString("id");
+                        title= id;
                     }
                 } else {
-                    title= ds.getString("id");
+                    title= id;
                 }
                 
-                DatumRange exampleRange= HapiServerSupport.getExampleRange(ds.getString("id"));
+                File infoFile= new File( new File( Util.getHapiHome(), "info" ), id+".json" );
+                JSONObject info= HapiServerSupport.readJSON( infoFile );
+                
+                DatumRange exampleRange= HapiServerSupport.getExampleRange(info);
 
                 out.println( String.format( "<p style=\"background-color: #e0e0e0;\">%s</p>", title ) );
                 if ( exampleRange!=null ) {
-                    out.println( String.format("<a href=\"info?id=%s\">Info</a> <a href=\"data?id=%s&time.min=%s&time.max=%s\">Data</a><br>", 
+                    out.println( String.format("<a href=\"info?id=%s\">Info</a> <a href=\"data?id=%s&time.min=%s&time.max=%s\">Data</a>", 
                         ds.getString("id"), ds.getString("id"), exampleRange.min().toString(), exampleRange.max().toString() ) );
                 } else {
-                    out.println( String.format("<a href=\"info?id=%s\">Info</a> (Data extent not known)<br>", 
+                    out.println( String.format("<a href=\"info?id=%s\">Info</a> (Data extent not known)", 
                         ds.getString("id"), ds.getString("id") ) );
                 }
+                
+                out.println(" ");
+                JSONArray parameters= info.getJSONArray("parameters");
+                for ( int j=0; j<parameters.length(); j++ ) {
+                    if ( j>0 ) out.print(", ");
+                    out.print( parameters.getJSONObject(j).getString("name") );
+                }
+                
             }
         %>
+        <br><br>
         <%
             long l= org.virbo.dataset.RecordIterator.TIME_STAMP; // load RecordIterator class first, or we'll get a negative time.
         %>

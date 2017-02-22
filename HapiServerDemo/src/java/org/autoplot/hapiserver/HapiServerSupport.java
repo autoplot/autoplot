@@ -151,7 +151,7 @@ public class HapiServerSupport {
         return array;
     }
     
-    private static JSONObject readJSON( File jasonFile ) throws FileNotFoundException, IOException, JSONException {
+    public static JSONObject readJSON( File jasonFile ) throws FileNotFoundException, IOException, JSONException {
         StringBuilder builder= new StringBuilder();
         try ( BufferedReader in= new BufferedReader( new FileReader( jasonFile ) ) ) {
             String line= in.readLine();
@@ -165,16 +165,8 @@ public class HapiServerSupport {
     }
     
     private static JSONObject getCatalogNew() throws IOException, JSONException {
-        StringBuilder builder= new StringBuilder();
         File catalogFile= new File( Util.getHapiHome(), "catalog.json" );
-        try ( BufferedReader in= new BufferedReader( new FileReader( catalogFile ) ) ) {
-            String line= in.readLine();
-            while ( line!=null ) {
-                builder.append(line);
-                line= in.readLine();
-            }
-        }
-        JSONObject catalog= new JSONObject(builder.toString());
+        JSONObject catalog= readJSON(catalogFile);
         return catalog;
     }
     

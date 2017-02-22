@@ -35,7 +35,7 @@ public class Util {
      * return the root of the HAPI server.
      * @return the root of the HAPI server.
      */
-    protected static File getHapiHome() {
+    public static File getHapiHome() {
         File _HAPI_HOME = Util.HAPI_HOME;
         if ( _HAPI_HOME==null ) {
             synchronized (Util.class) {
