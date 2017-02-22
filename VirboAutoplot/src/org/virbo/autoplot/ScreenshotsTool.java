@@ -324,6 +324,8 @@ public class ScreenshotsTool extends EventQueue {
 
                         }
                     }
+                    logger.fine("sleep for a second to make sure the last image is done writing."); // test.Test_042_TwoTsb would show issue
+                    Thread.sleep(1000);
                     pngWriterThreadNotDone= false;
                 } catch ( InterruptedException ex ) {
                     logger.log( Level.WARNING, null, ex );
