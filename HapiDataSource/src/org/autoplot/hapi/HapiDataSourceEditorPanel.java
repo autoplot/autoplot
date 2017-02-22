@@ -946,18 +946,27 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 logger.warning("server is missing required startDate and stopDate parameters.");
                 jLabel3.setText( "range is not provided (non-compliant server)" );
             } else {
-				DatumRange landing;
-				if ( range.max().ge( myValidTime ) ) { // Note stopDate is required since 2017-01-17.
-					logger.warning("server is missing required stopDate parameter.");
-                    jLabel3.setText( range.min().toString() + " to ?" );
-					landing= new DatumRange( range.min(), range.min().add( 1, Units.days ) );
-				} else {
-					jLabel3.setText( range.toString() );
-					Datum end= TimeUtil.prevMidnight(range.max());
-					landing= new DatumRange( end.subtract( 1, Units.days ), end );
-				}
-                String currentTimeRange= timeRangeTextField.getText().trim();
-                if ( currentTimeRange.length()==0 ) {
+                DatumRange landing=null;
+                if ( info.has("sampleStartDate") && info.has("sampleStopDate") ) {
+                    try {
+                        landing = new DatumRange( Units.us2000.parse(info.getString("sampleStartDate")), Units.us2000.parse(info.getString("sampleStopDate")) );
+                    } catch (JSONException | ParseException ex) {
+                        logger.log(Level.SEVERE, null, ex);
+                    }
+                } 
+                if ( landing==null ) {
+                    if (range.max().ge(myValidTime)) { // Note stopDate is required since 2017-01-17.
+                        logger.warning("server is missing required stopDate parameter.");
+                        jLabel3.setText(range.min().toString() + " to ?");
+                        landing = new DatumRange(range.min(), range.min().add(1, Units.days));
+                    } else {
+                        jLabel3.setText(range.toString());
+                        Datum end = TimeUtil.prevMidnight(range.max());
+                        landing = new DatumRange(end.subtract(1, Units.days), end);
+                    }
+                }
+                String currentTimeRange = timeRangeTextField.getText().trim();
+                if (currentTimeRange.length() == 0) {
                     timeRangeTextField.setText( landing.toString() );
                 } else {
                     try {
