@@ -274,7 +274,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                 dsdfParams= map;
             }
 
-            tcaDesc=new ArrayList<String>();
+            tcaDesc=new ArrayList<>();
 
             int iplane=0;
             String label= (String)dsdfParams.get("label");
@@ -417,7 +417,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                 Throwable cause= ex.getCause();
                 if ( !mon.isFinished() ) mon.finished(); // the stream reader probably called it already.
                 if ( cause!=null && ( cause instanceof java.io.InterruptedIOException ) ) { 
-                    ex.printStackTrace();
+                    logger.log( Level.WARNING, ex.getMessage(), ex );
                     //TODO CancelledOperationException
                     throw (java.io.InterruptedIOException)ex.getCause();
                 } else if ( cause!=null && ( cause instanceof org.das2.dataset.NoDataInIntervalException )) {
@@ -573,7 +573,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                 return result2;
             }
         } catch ( IllegalArgumentException ex ) {
-            ex.printStackTrace();
+            logger.log( Level.WARNING, ex.getMessage(), ex );
         }
         
         if ( !mon.isFinished() ) mon.finished();
