@@ -480,6 +480,18 @@ public class SimpleServlet extends HttpServlet {
                 DataSource dsource;
                 try {
                     dsource = DataSetURI.getDataSource(suri);
+                    
+                    DatumRange timeRange = null;
+                    if (!stimeRange.equals("")) {
+                        timeRange = DatumRangeUtil.parseTimeRangeValid(stimeRange);
+                        TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
+                        if (tsb != null) {
+                            tsb.setTimeRange(timeRange);
+                            logit("timeSeriesBrowse got data source", t0, uniq, debug);
+                        }
+                        suri= tsb.getURI();
+                    }
+                    
                     DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.getURI(suri),new NullProgressMonitor());
                     List<String> problems= new ArrayList<>(1);
                     if ( dsf.reject(suri, problems, new NullProgressMonitor() )) {
