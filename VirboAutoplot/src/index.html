@@ -24,8 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-02-18 r20373):</p>
+        <p>Bugfixes (2017-02-23 r20425):</p>
         <ul>
+            <li>digitizer DataPointRecorder "new" operation fires dataset update event
+            <li>bugfix: vap+cdaweb:ds=IM_K0_SIE&filter=rbsp&id=SI_PIXELS had image>THUMBSIZE>50 for the RENDER_TYPE, which Autoplot doesn't support as "image"
             <li>Experimental support for rank 2 DEPEND_1 datasets with HAPI.  HAPI uses sampleStartDate for discovery.
             <li>check for vap+internal:data_1,data_2 when switching to mash-up
             <li>1754: Correctly support http://autoplot.org/data/AMSR_E_L3_SeaIce6km_B06_20070307.hdf.gz
@@ -76,6 +78,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>AutoplotServlet simpleServlet has symbolSize to support sparklines.
             <li>HAPI server allows external configuration (but it must be in /home/jbf/hapi/ for now!)
             <li>559: screenshots tool now uses a separate thread to save images, improving responsiveness.
             <li>experimental support for high-rank datasets in HAPI servers
