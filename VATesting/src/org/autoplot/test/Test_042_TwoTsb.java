@@ -110,6 +110,9 @@ public class Test_042_TwoTsb implements Scenario {
             save("Test_042_TwoTsb_4.vap");
             st.takePicture( 93, "Setting dom.timeRange to cross a day boundary loads two partial days." );
             
+            System.err.println("Sleep 10 seconds to see if that fixes last image");
+            Thread.sleep(10000);
+            
             st.requestFinish(true);
             
             return(0);
