@@ -199,6 +199,7 @@ public class SimpleServlet extends HttpServlet {
             String column = ServletUtil.getStringParameter(request, "column", "");
             String row = ServletUtil.getStringParameter(request, "row", "");
             String srenderType = ServletUtil.getStringParameter(request, "renderType", "");
+            String ssymbolSize = ServletUtil.getStringParameter(request, "symbolSize", "");
             String stimeRange = ServletUtil.getStringParameter(request, "timeRange", "");
             if ( stimeRange.length()==0 ) stimeRange= ServletUtil.getStringParameter(request, "timerange", "");
             String scolor = ServletUtil.getStringParameter(request, "color", "");
@@ -587,6 +588,10 @@ public class SimpleServlet extends HttpServlet {
                 dom.getController().getPlotElement().setRenderType(renderType);
             }
 
+            if ( !ssymbolSize.equals("") ) { 
+                dom.getController().getPlotElement().getStyle().setSymbolSize( Double.parseDouble( ssymbolSize ) );
+            }
+            
             if (!scolor.equals("")) {
                 String[] scolors= scolor.split("[,;]"); // allow for comma-delimited list.
                 if ( scolors.length==1 ) {
