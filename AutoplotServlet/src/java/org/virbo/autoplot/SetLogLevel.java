@@ -1,17 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.autoplot;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,18 +28,20 @@ public class SetLogLevel extends HttpServlet {
     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
     * @param request servlet request
     * @param response servlet response
+     * @throws javax.servlet.ServletException
+     * @throws java.io.IOException
     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        PrintWriter out= response.getWriter();
-        
-        try {
+        try (PrintWriter out = response.getWriter()) {
             
             String logger= request.getParameter("logger");
             String level= request.getParameter("level");
             String handler= request.getParameter("handler");
+            String format= request.getParameter("format");
+            
             String remoteAddr= request.getRemoteAddr();
             if ( !remoteAddr.equals("127.0.0.1" ) ) {
                 out.println("<html>");
@@ -61,6 +63,7 @@ public class SetLogLevel extends HttpServlet {
                     out.println("  logger  the logger name, autoplot.servlet is used in this servlet<br>");
                     out.println("  level   the level, FINE or FINER is used in this servlet<br>");
                     out.println("  handler if T then reset and report the handler levels as well<br>");
+                    out.println("  format  =1 for single line to millisecond.<br>");
                     out.println("</code>");
                 } else {
 
@@ -68,7 +71,7 @@ public class SetLogLevel extends HttpServlet {
                     Level lev= Level.parse(level);            
                     Logger l= Logger.getLogger(logger);
                     l.setLevel( lev );
-                    Logger.getLogger(logger).log(lev, "reset to "+level);
+                    Logger.getLogger(logger).log(lev, "reset to {0}", level);
 
                     out.println("<html>");
                     out.println("<head>");
@@ -89,6 +92,24 @@ public class SetLogLevel extends HttpServlet {
                     for ( Handler h: hh ) {
                         if ( handler!=null && lev!=null ) h.setLevel(lev);
                         out.println("  "+h+" @ "+h.getLevel()+"<br>");
+                        if ( format!=null ) {
+                            if ( format.equals("1") ) {
+                                final DateFormat df = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss.SSS");
+                                h.setFormatter( new SimpleFormatter() {
+                                    @Override
+                                    public synchronized String format(LogRecord record) {
+                                        StringBuilder builder = new StringBuilder(1000);
+                                        builder.append(df.format(new Date(record.getMillis()))).append(" - ");
+                                        builder.append("[").append(record.getSourceClassName()).append(".");
+                                        builder.append(record.getSourceMethodName()).append("] - ");
+                                        builder.append("[").append(record.getLevel()).append("] - ");
+                                        builder.append(formatMessage(record));
+                                        builder.append("\n");
+                                        return builder.toString();
+                                    }
+                                });
+                            }
+                        }
                     }
                     if ( hh.length==0 ) {
                         out.println("  (no handlers)");
@@ -101,11 +122,8 @@ public class SetLogLevel extends HttpServlet {
             out.println("</html>");
             
             
-        } catch ( Exception e ) {
+        } catch ( IllegalArgumentException | SecurityException e ) {
             throw new RuntimeException(e);
-        } finally {
-            out.close();
-            
         }
     } 
 
