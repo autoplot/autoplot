@@ -341,9 +341,11 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             }
             
         } catch (URISyntaxException | IOException e) {
+            problems.add(e.getMessage());
             logger.log( Level.SEVERE, surl, e );
             return false;
         } catch (IllegalArgumentException e) {
+            problems.add(e.getMessage());
             logger.log( Level.SEVERE, surl, e );
             return true;
         }
