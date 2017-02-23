@@ -27,7 +27,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
     <h2>Enter Autoplot URI:</h2>
 
     <form action="SimpleServlet">
-        <input name="url" value="http://www.sarahandjeremy.net/~jbf/1wire/data/2007/0B000800408DD710.$Y$m$d.d2s?timerange=20071210" size="80" type="text">
+        <input name="url" value="http://jfaden.net/~jbf/1wire/data/2007/0B000800408DD710.$Y$m$d.d2s?timerange=20071210" size="80" type="text">
         <input value="Plot" type="submit">
     </form>
 <br>
@@ -50,7 +50,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
 
     <h1>This shows all sorts of controls:</h1>
     <form action="SimpleServlet">
-        <input name="url" value="vap+tsds:http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0" size="100" type="text"><br>
+        <input name="url" value="vap+cdaweb:ds=OMNI2_H0_MRG1HR&id=DST1800" size="100" type="text"><br>
         Apply a process to the dataset after loading: <select name="process">
             <option selected></option>
             <option>histogram</option>
@@ -70,7 +70,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
         layout horiz position: <input name="column" value="5em,100%-10em"> (<a href="http://autoplot.org/help#layout">help</a>)<br>
         layout vert position: <input name="row" value="3em,100%-3em">  (<a href="http://autoplot.org/help#layout">help</a>)<br>
         <br>
-        timerange: <input name="timeRange" value="2003-mar"><br>
+        time range: <input name="timeRange" value="2003-mar"><br>
         <br>
         plot style: <select name="renderType">
             <option selected></option>
@@ -80,8 +80,9 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
             <option>stairSteps</option>
             <option>fill_to_zero</option>
         </select><br>
-        color: <input name="color" value="#0000ff"><br>
-        fillColor: <input name="fillColor" value="#aaaaff"><br>
+        color: <input name="color" value="#e0e0ff"><br>
+        symbol size: <input name="symbolSize" value=""><br>
+        fill color: <input name="fillColor" value="#aaaaff"><br>
         foreground: <input name="foregroundColor" value="#ffffff"><br>
         background: <input name="backgroundColor" value="#000000"><br>
         <input value="Plot" type="submit">
