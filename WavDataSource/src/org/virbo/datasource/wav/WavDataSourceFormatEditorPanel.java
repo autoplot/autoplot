@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /*
  * BinaryDataSourceFormatEditorPanel.java
@@ -12,7 +8,9 @@ package org.virbo.datasource.wav;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
+import org.das2.datum.LoggerManager;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 
@@ -22,6 +20,8 @@ import org.virbo.datasource.DataSourceFormatEditorPanel;
  */
 public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implements DataSourceFormatEditorPanel {
 
+    private static final Logger logger= LoggerManager.getLogger("apdss.wav");
+    
     /** Creates new form BinaryDataSourceFormatEditorPanel */
     public WavDataSourceFormatEditorPanel() {
         initComponents();
@@ -41,6 +41,8 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         scaleCB = new javax.swing.JCheckBox();
         jComboBox1 = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        timeScaleTF = new javax.swing.JTextField();
 
         scaleCB.setText("Scale data to utilize full dynamic range");
 
@@ -48,18 +50,31 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
 
         jLabel1.setText("Data Type:");
 
+        jLabel2.setText("Time scale (2.0 is twice as fast):");
+
+        timeScaleTF.setText("1.0");
+        timeScaleTF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                timeScaleTFActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                     .add(scaleCB)
                     .add(layout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 264, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 264, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel2)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(timeScaleTF)))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -71,15 +86,25 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel1))
-                .addContainerGap(235, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel2)
+                    .add(timeScaleTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(204, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void timeScaleTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeScaleTFActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_timeScaleTFActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JCheckBox scaleCB;
+    private javax.swing.JTextField timeScaleTF;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -101,29 +126,48 @@ public class WavDataSourceFormatEditorPanel extends javax.swing.JPanel implement
         Map<String,String> args= URISplit.parseParams(split.params);
 
         String s;
-        s= getParam( args,"scale","F");
+        s= getParam( args,"scale","T");
         scaleCB.setSelected( s.equals("T") );
 
+        s= getParam( args,"timeScale","1.0");
+        timeScaleTF.setText(s);
+        
         s= getParam( args,"type","short");
-        if ( s.equals("short") ) {
-            jComboBox1.setSelectedIndex(0);
-        } else if ( s.equals("ushort") ){
-            jComboBox1.setSelectedIndex(1);
-        } else if ( s.equals("int") ){
-            jComboBox1.setSelectedIndex(2);
-        } else if ( s.equals("int32") ){
-            jComboBox1.setSelectedIndex(3);
+        switch (s) {
+            case "short":
+                jComboBox1.setSelectedIndex(0);
+                break;
+            case "ushort":
+                jComboBox1.setSelectedIndex(1);
+                break;
+            case "int":
+                jComboBox1.setSelectedIndex(2);
+                break;
+            case "int32":
+                jComboBox1.setSelectedIndex(3);
+                break;
+            default:
+                break;
         }
 
         file= split.file;
     }
 
+    @Override
     public String getURI() {
         String result= file;
         Map<String,String> args= new HashMap();
 
-        if ( scaleCB.isSelected() ) {
-            args.put( "scale", "T" );
+        if ( !scaleCB.isSelected() ) {
+            args.put( "scale", "F" );
+        } 
+
+        double ts;
+        try {
+            ts= Double.parseDouble( timeScaleTF.getText() );
+            args.put( "timeScale", String.valueOf(ts) );
+        } catch ( NumberFormatException ex ) {
+            logger.warning("unable to parse timeScale");
         }
 
         String s;

@@ -313,7 +313,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 throw new IllegalArgumentException("dep0 length must be at least 2");
             }
         }
-
+        
         int channels= 1;
 
         switch (data.rank()) {
@@ -356,6 +356,13 @@ public class WavDataSourceFormat implements DataSourceFormat {
         
         boolean bigEndian= params2.get("byteOrder").equals("big");
 
+        String stimeScale= params2.get("timeScale");
+        double timeScale;
+        if ( stimeScale!=null ) {
+            timeScale= Double.parseDouble(stimeScale);
+            samplesPerSecond= (float)( samplesPerSecond*timeScale );
+        }
+                
         AudioFormat outDataFormat;
         outDataFormat= new AudioFormat((float) samplesPerSecond, (int) bytesPerField*8, channels, signed, bigEndian );
 
