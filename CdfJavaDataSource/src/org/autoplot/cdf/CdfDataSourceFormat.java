@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -24,7 +25,9 @@ import org.virbo.datasource.DataSourceFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.LoggerManager;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.dataset.examples.Schemes;
 
 /**
  * Format the QDataSet into CDF tables, using Nand Lal's library.
@@ -154,16 +157,33 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             }
         }
 
+        QDataSet bds= (QDataSet) data.property(QDataSet.BUNDLE_1);
+        if ( bds != null) {
+            if ( !append ) {
+                String name= nameFor(bds);
+                addVariableRank1NoVary(bds, name, true, new HashMap<String,String>(), new NullProgressMonitor() );
+            } else {
+                String name= nameFor(bds);
+                Map<String,String> params1= new HashMap<>();
+                try {
+                    addVariableRankN( bds, name, true, params1, mon );
+                } catch ( Exception e ) {
+                    logger.fine("CDF Exception, presumably because the variable already exists.");
+                }                
+            }
+        }
+        
         addVariableRankN(data, nameFor(data), false, params, mon );
         
         try {
             if ( dep0!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_0", CDFDataType.CHAR, nameFor(dep0) );
             if ( dep1!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_1", CDFDataType.CHAR, nameFor(dep1) );
             if ( dep2!=null ) cdf.addVariableAttributeEntry( nameFor(data), "DEPEND_2", CDFDataType.CHAR, nameFor(dep2) );
-        } catch ( Exception ex ) {
+            if ( bds!=null )  cdf.addVariableAttributeEntry( nameFor(data), "LABL_PTR_1", CDFDataType.CHAR, nameFor(bds) );
+        } catch ( CDFException.WriterError ex ) {
             logger.log( Level.WARNING, ex.getMessage() , ex );
         }
-            
+        
         write( ffile.toString() );
         
     }
@@ -186,7 +206,22 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             Object array= dataSetToArray( ds, uc, type, mon );
             logger.log(Level.FINE, "call cdf.addNRVVariable( {0},{1},{2})", new Object[]{name, logName(type), logName( new int[] { ds.length() } ), logName(array) });
             cdf.addNRVVariable( name, type, new int[] { ds.length() }, array );
-
+        } else if ( Schemes.isBundleDescriptor(ds) ) {
+            String[] array= new String[ ds.length() ];
+            String[] ss= DataSetOps.bundleNames(ds);
+            int dim=0;
+            for ( int i=0; i<ds.length(); i++ ) {
+                String s= (String)ds.property( QDataSet.LABEL, i );
+                if ( s==null ) s= (String)ds.property( QDataSet.NAME, i );
+                if ( s==null ) s= ss[i];
+                array[i]= s;
+                int l= s.length();
+                dim= dim<l ? l : dim;
+            }
+            logger.log(Level.FINE, "call cdf.addNRVVariable( {0},{1},{2})", new Object[]{name, logName(type), logName( new int[] { ds.length() } ), logName(array) });
+            
+            cdf.addNRVVariable( name, CDFDataType.CHAR, new int[] { ds.length() }, dim, array );
+            
         } else {
             throw new IllegalArgumentException("not supported!");
             
