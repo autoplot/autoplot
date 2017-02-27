@@ -226,11 +226,20 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 try {
                     vds= ArrayDataSet.copy(DataSetOps.unbundle(ds,column));
                 } catch ( IllegalArgumentException ex ) {
-                    QDataSet _vds= AsciiHeadersParser.getInlineDataSet( bundleDescriptor, column );
-                    if ( _vds==null ) {
-                        throw new IllegalArgumentException("No such dataset: " +column );
+                    int icol = parser.getFieldIndex(column);
+                    if ( icol!=-1 ) {
+                        vds = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
+                        vds.putProperty( QDataSet.CONTEXT_0, null );
+                        vds.putProperty(QDataSet.UNITS, parser.getUnits(icol));
+                        if ( column.length()>1 ) vds.putProperty( QDataSet.NAME, column );
+                        vds.putProperty( QDataSet.LABEL, parser.getFieldNames()[icol] );
                     } else {
-                        vds= ArrayDataSet.maybeCopy(_vds);
+                        QDataSet _vds= AsciiHeadersParser.getInlineDataSet( bundleDescriptor, column );
+                        if ( _vds==null ) {
+                            throw new IllegalArgumentException("No such dataset: " +column );
+                        } else {
+                            vds= ArrayDataSet.maybeCopy(_vds);
+                        }
                     }
                 }
 
