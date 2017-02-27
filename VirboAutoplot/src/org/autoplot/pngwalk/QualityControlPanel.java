@@ -14,16 +14,19 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.KeyChain;
+import org.das2.util.filesystem.WriteCapability;
 import org.das2.util.monitor.CancelledOperationException;
 import org.virbo.datasource.DataSetURI;
 
@@ -111,7 +114,12 @@ public class QualityControlPanel extends javax.swing.JPanel {
 
     public void setStatus(int numOK, int numProblem, int numIgnore, int numUnknown) {
 
-        String statustxt = String.format("%d OK | %d Prob | %d Ign | %d Unknown", numOK, numProblem, numIgnore, numUnknown);
+        String statustxt;
+        if ( walkImageSequence.getQCFolder()==null ) {
+            statustxt= " ";
+        } else {
+            statustxt= String.format("%d OK | %d Prob | %d Ign | %d Unknown", numOK, numProblem, numIgnore, numUnknown);
+        }
 
         statusLabel.setText(statustxt);
         statusLabel.setToolTipText(statustxt);
@@ -165,11 +173,24 @@ public class QualityControlPanel extends javax.swing.JPanel {
             try {
                 URI uris = KeyChain.getDefault().resolveUserInfo(uri);
                 walkImageSequence.initQualitySequence(uris);
-                for ( Enumeration<AbstractButton> e= statusButtonGroup.getElements(); e.hasMoreElements(); ) {
-                    e.nextElement().setEnabled(true);
+                try {
+                    FileSystem fs= FileSystem.create(uri);
+                    WriteCapability w= fs.getFileObject("testwrite.txt").getCapability(WriteCapability.class);
+                    if ( w!=null && w.canWrite() ) {
+                        for ( Enumeration<AbstractButton> e= statusButtonGroup.getElements(); e.hasMoreElements(); ) {
+                            e.nextElement().setEnabled(true);
+                        }
+                        okButton.setEnabled(true);
+                        loginButton.setEnabled(false);        
+                    } else {
+                        JOptionPane.showMessageDialog( QualityControlPanel.this,"<html>Unable to write to File System<br>"+fs.getRootURI() );
+                        loginButton.setEnabled(false);    
+                        okButton.setEnabled(false);
+                    }
+                } catch ( FileSystem.FileSystemOfflineException | UnknownHostException | FileNotFoundException ex) {
+                    Logger.getLogger(QualityControlPanel.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                okButton.setEnabled(true);
-                loginButton.setEnabled(false);
+                
 
             } catch (CancelledOperationException ex) {
                 return;
