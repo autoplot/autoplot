@@ -166,7 +166,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 String name= nameFor(bds);
                 Map<String,String> params1= new HashMap<>();
                 try {
-                    addVariableRankN( bds, name, true, params1, mon );
+                    addVariableRank1NoVary( bds, name, true, params1, mon );
                 } catch ( Exception e ) {
                     logger.fine("CDF Exception, presumably because the variable already exists.");
                 }                
