@@ -24,14 +24,16 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-02-27 r20431):</p>
+        <p>Bugfixes (2017-02-27 r20438):</p>
         <ul>
+            <li>log "ImageIO used to create" at less than info, to avoid clutter in server logs.
+            <li>rte_1490216564: don't throw runtime error when taskSize is zero, just ignore it.
             <li>1785: unable to format bundle to CDF.  (Append is now handled properly.)
-            <li>1789: correct feedback about writing to writable fs.  The code didn't distinguish between Read-Only and Read-Write, and assumed that local filesystems were read-write.
-            <li>rte_0147649225: fall back after failing to find "field6" in bundleDescriptor.
+            <li>1789: PngWalkTool correct feedback about writing to writable fs.  The code didn't distinguish between Read-Only and Read-Write, and assumed that local filesystems were read-write.  Thanks, Sebastian!
+            <li>rte_0147649225: fall back after failing to find "field6" in bundleDescriptor, because HAPI metadata was mistaken for Rich ASCII.
             <li>rte 0857617456: Null pointer when selecting time field type but time format column has never been set.  Thanks, Shiva!
             <li>corrections to format to .wav gui, which wasn't initialized properly to indicate automatic scaling.
-            <li>digitizer DataPointRecorder "new" operation fires dataset update event
+            <li>digitizer DataPointRecorder "new" operation fires dataset update event.  Thanks, Kris!
             <li>bugfix: vap+cdaweb:ds=IM_K0_SIE&amp;id=SI_PIXELS had image&gt;THUMBSIZE&gt;50 for the RENDER_TYPE, which Autoplot doesn't support as "image"
             <li>Experimental support for rank 2 DEPEND_1 datasets with HAPI.  HAPI uses sampleStartDate for discovery.
             <li>check for vap+internal:data_1,data_2 when switching to mash-up
