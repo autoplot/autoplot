@@ -480,6 +480,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         timeFormatCB.setEditable(true);
         timeFormatCB.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "$Y$m+$d", "$Y+$m+$S", "$Y-$j+$H:$M:$S", "ISO8601" }));
         timeFormatCB.setSelectedIndex(-1);
+        timeFormatCB.setSelectedItem("");
 
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -788,7 +789,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jScrollPane1)
-            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 782, Short.MAX_VALUE)
+            .add(jTabbedPane1)
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(layout.createSequentialGroup()
                     .add(0, 341, Short.MAX_VALUE)
