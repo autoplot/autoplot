@@ -167,8 +167,6 @@ public class CDAWebDataSource extends AbstractDataSource {
                 tresult.putProperty( QDataSet.LABEL, ds.toUpperCase()+"!cAvailability");
 
                 tresult.putProperty( QDataSet.TITLE, ds.toUpperCase()+" Availability" );
-
-                mon.finished();
                 
                 return tresult;
 
@@ -386,7 +384,7 @@ public class CDAWebDataSource extends AbstractDataSource {
                 }
             }
         } finally {
-            mon.finished();
+            if ( !mon.isFinished() ) mon.finished();
         }
 
         if ( result!=null ) {
