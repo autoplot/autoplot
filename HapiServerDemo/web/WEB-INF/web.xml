@@ -28,6 +28,10 @@
         <servlet-name>CapabilitiesServlet</servlet-name>
         <servlet-class>org.autoplot.hapiserver.CapabilitiesServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>SetLogLevel</servlet-name>
+        <servlet-class>org.virbo.autoplot.SetLogLevel</servlet-class>
+    </servlet>    
     <servlet-mapping>
         <servlet-name>CatalogServlet</servlet-name>
         <url-pattern>/hapi/catalog</url-pattern>
@@ -43,7 +47,11 @@
     <servlet-mapping>
         <servlet-name>CapabilitiesServlet</servlet-name>
         <url-pattern>/hapi/capabilities</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping>   
+    <servlet-mapping>
+        <servlet-name>SetLogLevel</servlet-name>
+        <url-pattern>/SetLogLevel</url-pattern>
+    </servlet-mapping> 
     <session-config>
         <session-timeout>
             30
