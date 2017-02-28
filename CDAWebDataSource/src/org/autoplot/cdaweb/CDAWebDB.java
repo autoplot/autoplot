@@ -284,9 +284,9 @@ public class CDAWebDB {
             URLConnection urlc;
 
             urlc = url.openConnection();
-            urlc.setConnectTimeout(300);
+            urlc.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
             
-            urlc= HttpUtil.checkRedirect(urlc);
+            //urlc= HttpUtil.checkRedirect(urlc);
             loggerUrl.log(Level.FINE,"GET data from CDAWeb {0}", urlc.getURL() );
 
             ins= urlc.getInputStream();
@@ -353,9 +353,9 @@ public class CDAWebDB {
             loggerUrl.log(Level.FINE,"openConnection {0}", url);
             
             urlc = url.openConnection();
-            urlc.setConnectTimeout(300);
+            urlc.setConnectTimeout(FileSystem.settings().getConnectTimeoutMs());
 
-            urlc= HttpUtil.checkRedirect(urlc);
+            //urlc= HttpUtil.checkRedirect(urlc);
             
             loggerUrl.log(Level.FINE,"getInputStream {0}", url);
             ins= urlc.getInputStream();
