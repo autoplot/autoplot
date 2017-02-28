@@ -104,6 +104,7 @@
             <li>2017-02-07: use bins array instead of bins1, bins2.</li>
             <li>2017-02-13: use x_about instead of about.</li>
             <li>2017-02-21: work towards make the server externally configurable. </li>
+            <li>2017-02-28: tweak the connection time for CDAWeb web services, add setLogLevel servlet. </li>
         </ul>
         </small>
     </body>
