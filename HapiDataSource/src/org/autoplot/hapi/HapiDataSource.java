@@ -23,10 +23,12 @@ import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import org.autoplot.bufferdataset.BufferDataSet;
 import org.das2.dataset.NoDataInIntervalException;
+import org.das2.datum.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
 import org.das2.util.filesystem.FileSystemUtil;
 import org.das2.util.filesystem.HtmlUtil;
@@ -38,7 +40,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.SparseDataSetBuilder;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
@@ -433,6 +437,15 @@ public class HapiDataSource extends AbstractDataSource {
         }
         
         ds = repackage(ds,pds,null);
+        
+        // install a cacheTag.  The following code assumes depend_0 is mutable.
+        QDataSet xds= (QDataSet) ds.property(QDataSet.DEPEND_0);
+        if ( xds==null && ( UnitsUtil.isTimeLocation( SemanticOps.getUnits(ds) ) ) ) {
+            xds= ds;
+        }
+        if ( xds!=null ) {
+            ((MutablePropertyDataSet)xds).putProperty(QDataSet.CACHE_TAG, new CacheTag(tr,null) );
+        }
         
         monitor.setTaskProgress(100);
         monitor.finished();
