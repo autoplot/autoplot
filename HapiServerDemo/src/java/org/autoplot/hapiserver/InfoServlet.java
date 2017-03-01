@@ -13,6 +13,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,27 +57,25 @@ public class InfoServlet extends HttpServlet {
         for ( int i=1; i<parametersRead.length(); i++ ) {
             parameters.put( i, parametersRead.getJSONObject(i) );
         }
-        if ( o.has("startDate") ) {
-            jo.put( "startDate", o.get("startDate") );
+        // support local features like "now-P3D", which are not hapi features.
+        if ( o.has("startDate") && o.has("stopDate") ) { 
+            String startDate= o.getString("startDate");
+            String stopDate= o.getString("stopDate");
+            DatumRange tr= DatumRangeUtil.parseTimeRangeValid( startDate+"/"+stopDate );
+            jo.put( "startDate", tr.min().toString() );
+            jo.put( "stopDate", tr.max().toString() );
         } else {
-            logger.warning("non-conformant server needs to have startDate");
-        }
-        if ( o.has("stopDate") ) {
-            jo.put( "stopDate", o.get("stopDate") );
-        } else {
-            logger.warning("non-conformant server needs to have stopDate");
-        }
-
-        if ( id.equals("Iowa City Conditions") ) {
-            jo.put( "stopDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
-        } else if ( id.equals("Iowa City Forecast") ) {
-            jo.put( "stopDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );
-        } else if ( id.equals("0B000800408DD710.nostream") ) {
-            jo.put( "stopDate", String.format("%tFT%<tRZ", Calendar.getInstance(TimeZone.getTimeZone("Z"))) );            
-        } else if ( id.equals("PowerOnesDigitSegments") ) {
-            jo.put( "sampleStartDate", "2016-07-28T00:00Z" );
-            jo.put( "sampleEndDate", "2016-07-29T00:00Z" );
-        }        
+            if ( o.has("startDate") ) {
+                jo.put( "startDate", o.get("startDate") );
+            } else {
+                logger.warning("non-conformant server needs to have startDate");
+            }
+            if ( o.has("stopDate") ) {
+                jo.put( "stopDate", o.get("stopDate") );
+            } else {
+                logger.warning("non-conformant server needs to have stopDate");
+            }
+        }      
         
         jo.put("parameters",parameters);
         return jo;
