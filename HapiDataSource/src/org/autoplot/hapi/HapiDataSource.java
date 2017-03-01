@@ -791,7 +791,7 @@ public class HapiDataSource extends AbstractDataSource {
                             pds[i].dependName= new String[ja.length()];
                             for ( int j=0; j<ja.length(); j++ ) {
                                 JSONObject bins= ja.getJSONObject(j);
-                                if ( bins.has("parameter") ) {
+                                if ( bins.has("parameter") ) {  // deprecated
                                     int n= DataSetUtil.product(pds[i].size);
                                     pds[i].depend[j]= Ops.findgen(n);
                                     pds[i].dependName[j]= bins.getString("parameter");
@@ -817,6 +817,19 @@ public class HapiDataSource extends AbstractDataSource {
                             } else {
                                 int n= DataSetUtil.product(pds[i].size);
                                 pds[i].depend[0]= Ops.findgen(n);
+                            }
+                        }
+                    } else if ( jsonObjecti.has("binsParameter") ) {
+                        o= jsonObjecti.get("binsParameter");
+                        if ( o instanceof JSONArray ) {
+                            JSONArray ja= (JSONArray)o;
+                            pds[i].depend= new QDataSet[ja.length()];
+                            pds[i].dependName= new String[ja.length()];
+                            for ( int j=0; j<ja.length(); j++ ) {
+                                String s= ja.getString(j);
+                                int n= DataSetUtil.product(pds[i].size);
+                                pds[i].depend[j]= Ops.findgen(n);
+                                pds[i].dependName[j]= s;
                             }
                         }
                     } 
@@ -929,7 +942,9 @@ public class HapiDataSource extends AbstractDataSource {
             start= start+length1;
             wds.putProperty( QDataSet.DEPEND_0, depend0 );
             wds.putProperty( QDataSet.BUNDLE_1, sdsbs[1].getDataSet() );
-            
+            wds.putProperty( QDataSet.TITLE, pds[1].description );
+            wds.putProperty( QDataSet.LABEL, pds[1].name );
+            wds.putProperty( QDataSet.UNITS, pds[1].units );
             for ( int i=1; i<pds.length; i++ ) { // only works for rank2!!!
                 if ( pds[i].dependName!=null ) {
                     for ( int j=0; j<pds[i].dependName.length; j++ ) {
@@ -944,12 +959,17 @@ public class HapiDataSource extends AbstractDataSource {
                                 WritableDataSet depds= Ops.copy( Ops.trim1( ds, start, start+length1 ) );
                                 depds.putProperty( QDataSet.DEPEND_0, depend0 );
                                 depds.putProperty( QDataSet.BUNDLE_1, sdsbs[k].getDataSet() );    
+                                depds.putProperty( QDataSet.TITLE, pds[k].description );
+                                depds.putProperty( QDataSet.LABEL, pds[k].name );
+                                depds.putProperty( QDataSet.UNITS, pds[k].units );
                                 start= start+length1;
                                 wds.putProperty( "DEPEND_"+i, depds );
+                                
                             }
                         }
                     }
                 }
+                
             }
             
             ds= wds;
