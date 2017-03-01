@@ -16,8 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
 
 /**
  * Info servlet returns information about parameters.
@@ -27,7 +25,7 @@ public class InfoServlet extends HttpServlet {
     private static final Logger logger= Logger.getLogger("hapi");    
     protected static JSONObject getInfo( String id ) throws JSONException, IllegalArgumentException, IOException {
         JSONObject jo= new JSONObject();
-        jo.put("HAPI","1.0");
+        jo.put("HAPI",Util.hapiVersion());
         jo.put("createdAt",String.format("%tFT%<tRZ",Calendar.getInstance(TimeZone.getTimeZone("Z"))));
         
         if ( !HapiServerSupport.getCatalogIds().contains(id) ){

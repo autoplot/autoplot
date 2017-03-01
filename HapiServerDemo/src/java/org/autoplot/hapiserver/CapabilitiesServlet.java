@@ -57,10 +57,9 @@ public class CapabilitiesServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        try {
+        try (PrintWriter out = response.getWriter()) {
             JSONObject jo= new JSONObject();
-            jo.put("HAPI","1.0");
+            jo.put("HAPI",Util.hapiVersion());
             JSONArray outputFormats= new JSONArray();
             outputFormats.put( 0, "csv" );
             outputFormats.put( 1, "binary" );
@@ -69,8 +68,6 @@ public class CapabilitiesServlet extends HttpServlet {
             
         } catch ( JSONException ex ) {
             throw new ServletException(ex);
-        } finally {
-            out.close();
         }
     }
 

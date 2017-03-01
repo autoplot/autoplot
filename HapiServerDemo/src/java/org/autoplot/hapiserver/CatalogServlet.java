@@ -33,7 +33,7 @@ public class CatalogServlet extends HttpServlet {
      */
     public static JSONObject getCatalog() throws JSONException, IOException {
         JSONObject jo= new JSONObject();
-        jo.put("HAPI","1.0");
+        jo.put("HAPI",Util.hapiVersion());
         jo.put("x-deployedAt", deployedAt );
         JSONArray catalog= HapiServerSupport.getCatalog();
         jo.put("catalog",catalog);

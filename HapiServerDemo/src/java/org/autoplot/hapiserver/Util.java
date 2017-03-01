@@ -61,4 +61,8 @@ public class Util {
      * tag "uri" which is the Autoplot URI that serves this data.
      */
     public static final String HAPI_SERVER_HOME_PROPERTY = "hapi.server.home";
+
+    public static final String hapiVersion() {
+        return "1.1";
+    }
 }
