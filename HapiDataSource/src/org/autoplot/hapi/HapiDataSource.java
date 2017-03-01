@@ -80,22 +80,30 @@ public class HapiDataSource extends AbstractDataSource {
         DDataSet min= DDataSet.createRank1(bins.length());
         boolean hasMin= false;
         boolean hasMax= false;
-        for ( int j=0; j<bins.length(); j++ ) {
-            try {
-                JSONObject o= bins.getJSONObject(j);
-                result.putValue(j,o.getDouble("center"));
-                if ( hasMin || o.has("min") ) {
-                    hasMin= true;
-                    min.putValue(j,o.getDouble("min"));
+        if ( bins.length()==0 ) {
+            throw new IllegalArgumentException("bins cannot be empty");
+        } else {
+            Object o= bins.get(0);
+            if ( o instanceof Number ) {
+                for ( int j=0; j<bins.length(); j++ ) {
+                    result.putValue( j, bins.getDouble(j) );
                 }
-                if ( hasMax || o.has("max") ) {
-                    hasMax= true;
-                    min.putValue(j,o.getDouble("max"));
+            } else if ( o instanceof JSONObject ) {
+                for ( int j=0; j<bins.length(); j++ ) {       
+                    JSONObject jo= bins.getJSONObject(j);
+                    result.putValue(j,jo.getDouble("center"));
+                    if ( hasMin || jo.has("min") ) {
+                        hasMin= true;
+                        min.putValue(j,jo.getDouble("min"));
+                    }
+                    if ( hasMax || jo.has("max") ) {
+                        hasMax= true;
+                        min.putValue(j,jo.getDouble("max"));
+                    }
                 }
-            } catch (JSONException ex) {
-                logger.warning("expected array of JSONObjects for bins.");
             }
         }
+
         String sunits= binsObject.getString("units");
         if ( sunits!=null ) {
             Units u= Units.lookupUnits(sunits);
