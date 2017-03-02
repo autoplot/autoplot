@@ -1,16 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.hapiserver;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
+import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DatumFormatter;
 import org.das2.datum.format.TimeDatumFormatter;
+import org.das2.util.NumberFormatUtil;
 import org.json.JSONObject;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -36,7 +35,13 @@ public class CsvDataFormatter implements DataFormatter {
                 datumFormatter[i]= TimeDatumFormatter.DEFAULT;
             } else {
                 unitsFormatter[i]= false;
-                datumFormatter[i]= null;
+                final DecimalFormat format= NumberFormatUtil.getDecimalFormat( "0.###E00;-#");
+                datumFormatter[i]= new DatumFormatter() {
+                    @Override
+                    public String format(Datum datum) {
+                        return format.format( datum.value() );
+                    }
+                };
             }
         }
     }
@@ -49,7 +54,7 @@ public class CsvDataFormatter implements DataFormatter {
             if ( unitsFormatter[i] ) {
                 out.write(datumFormatter[i].format( DataSetUtil.asDatum(field) ).getBytes() );
             } else {
-                out.write( String.valueOf( field.value() ).getBytes() );
+                out.write(datumFormatter[i].format( DataSetUtil.asDatum(field) ).getBytes() );
             }
             if ( i<n-1 ) out.write(',');
         }
