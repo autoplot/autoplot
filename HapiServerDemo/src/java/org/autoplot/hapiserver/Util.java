@@ -46,7 +46,7 @@ public class Util {
                         s= s+"/";
                     }    
                     Util.HAPI_HOME= _HAPI_HOME = new File(s);
-                    System.err.println("hapi.server.home="+Util.HAPI_HOME);
+                    System.err.println("HAPI_SERVER_HOME="+Util.HAPI_HOME);
                 }
             }
         }
@@ -60,7 +60,7 @@ public class Util {
      * each containing the info response.  Note these should also contain a
      * tag "uri" which is the Autoplot URI that serves this data.
      */
-    public static final String HAPI_SERVER_HOME_PROPERTY = "hapi.server.home";
+    public static final String HAPI_SERVER_HOME_PROPERTY = "HAPI_SERVER_HOME";
 
     public static final String hapiVersion() {
         return "1.1";
