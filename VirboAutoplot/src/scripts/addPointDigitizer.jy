@@ -5,35 +5,42 @@
 # This also provides feedback showing the digitized data and the data points selected in the 
 # digitizer tab.
 
-from org.das2.components import DataPointRecorderNew
+typ= getParam( 'typ', 'Click', 'Digitizer Type', ['Click','Key'] )
+
+from org.das2.components import DataPointRecorder
 from org.virbo.dataset import SemanticOps
 from org.das2.dataset import DataSetUpdateListener
 from org.das2.graph import SpectrogramRenderer
 import java.util.HashMap
 
-setLayoutOverplot(3)
+if ( len(dom.plotElements)<3 ):
+    uri= dom.dataSourceFilters[0].uri
+    setLayoutOverplot(3)
+    plot(0,uri)
 
-dpr= DataPointRecorderNew()
+dpr= DataPointRecorder()
 
 addTab( 'digitizer', dpr )
 
 class MyUpdateListener( DataSetUpdateListener ):
     def dataSetUpdated( self, e ):
-        ds= dpr.getDataSet()
+        ds= dpr.getDataPoints()
         print ds
         if ( ds!=None ):
-            plot( 2, ds[:,0], ds[:,1]  )
+            plot( 2, ds[:,0], ds[:,1], color=Color.GRAY, symbolSize=8, lineStyle='none' )  
         else:
             plot( 2, "" )
+            
 dpr.addDataSetUpdateListener( MyUpdateListener() )
 
 class MySelectionListener(DataSetUpdateListener):
    def dataSetUpdated(self,event):
-        ds= dpr.getSelectedDataSet()
+        ds= dpr.getSelectedDataPoints()
         if ( ds!=None ):
-            plotx( 1, ds[:,0], ds[:,1] , color=Color.PINK, symsize=11 )
+            plot( 1, ds[:,0], ds[:,1], color=Color.YELLOW, symbolSize=11, lineStyle='none' )  
         else:
-            plot( 1, "" )
+            plot( 1, ""  )  
+
 dpr.addSelectedDataSetUpdateListener( MySelectionListener() )
             
 pp= dom.plots[0].controller.dasPlot
@@ -44,9 +51,24 @@ from org.das2.event import CrossHairRenderer
 dprr= CrossHairRenderer( pp,None,pp.getXAxis(),pp.getYAxis() )
 mm= DataPointSelectorMouseModule( pp, None, dprr, 'digitizer' )
 
+if ( typ=='Key' ):
+    mm.setReleaseEvents(False)
+    mm.setKeyEvents(True)
+    mm.setDragEvents(False)
+else:
+    mm.setReleaseEvents(True)
+    mm.setKeyEvents(False)
+    mm.setDragEvents(False)
+        
 def dataPointSelected(event):
     x= event.getX()
     y= event.getY()
+    if ( typ=='Key' ):
+        map= java.util.HashMap()
+        map['key']= event.getPlane('keyChar')
+        dpr.addDataPoint( x, y, map )
+    else:
+        dpr.addDataPoint( x, y )
     pes= dom.controller.getPlotElementsFor(dom.plots[0])
     if ( len(pes)==0 ): 
         setStatus('no data found for plot')
@@ -55,7 +77,6 @@ def dataPointSelected(event):
     if ( ds==None ):
         setStatus('nothing plotted')
         return 
-    dpr.addDataPoint( x, y )
     
 mm.dataPointSelected=dataPointSelected
 
@@ -64,10 +85,10 @@ pp.dasMouseInputAdapter.primaryModule= mm
 # make sure the focus is on the 0th plot element.  The 2nd will be the selected points and above that is the digitized.
 dom.controller.plotElement= dom.plotElements[0]
 
-plot(0, 'vap+cdaweb:ds=PO_H0_CAM&id=H_PLUS&timerange=2000-03-16' )
-#plot(0, 'http://www.rbsp-ect.lanl.gov/data_pub/rbspa/hope/level3/PA/rbspa_rel02_ect-hope-PA-L3_20121023_v5.0.0.cdf?FEDO' )
-
-import javax
-javax.swing.JOptionPane.showMessageDialog( getViewWindow(),'Click on the plot, and it will be recorded on the digitizer tab')
+import javax.swing.JOptionPane
+if ( typ=='Key' ):
+    javax.swing.JOptionPane.showMessageDialog( getViewWindow(),'Click on the plot and press a key, and it will be recorded on the digitizer tab')
+else:
+    javax.swing.JOptionPane.showMessageDialog( getViewWindow(),'Click on the plot, and it will be recorded on the digitizer tab')
 
 dom.plots[0].yaxis.autoRange= False
