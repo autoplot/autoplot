@@ -351,7 +351,7 @@ public class CanvasLayoutPanel extends JLabel {
         if ( theight * scale > getHeight() ) {
             scale= (double) getHeight() / theight;
         }
-        g.fillRect(0, 0, mwidth, (int)( theight * scale ) );
+        g.fillRect(0, 0, (int)( twidth * scale ), (int)( theight * scale ) );
         Stroke selectedStroke= new BasicStroke( 3.f );
         Stroke normalStroke= new BasicStroke( 1.f );
 
