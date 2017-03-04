@@ -104,6 +104,20 @@ public class LayoutPanel extends javax.swing.JPanel {
                 addPlotsButton.setEnabled(plot!=null);
                 int count = getSelectedPlots().size();
                 sameHeightButton.setEnabled( count>1 );
+                String selectText;
+                switch (count) {
+                    case 1:
+                        if ( plot!=null ) {
+                            selectText= plot.getId();
+                        } else {
+                            selectText= "";
+                        }
+                        break;
+                    default:
+                        selectText= String.format( "%d plots selected", count );
+                        break;
+                }
+                selectedPlotLabel.setText(selectText);
             }
         });
         plotElementListComponent.addListSelectionListener(plotElementSelectionListener);
@@ -111,8 +125,23 @@ public class LayoutPanel extends javax.swing.JPanel {
         canvasLayoutPanel1.addPropertyChangeListener(CanvasLayoutPanel.PROP_SELECTEDCOMPONENTS, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                int count = getSelectedPlots().size();
+                List<Plot> selectedPlots= getSelectedPlots();
+                int count = selectedPlots.size();
                 sameHeightButton.setEnabled( count>1 );
+                String selectText;
+                switch (count) {
+                    case 1:
+                        if ( selectedPlots.get(0)!=null ) {
+                            selectText= selectedPlots.get(0).getId();
+                        } else {
+                            selectText= "";
+                        }
+                        break;
+                    default:
+                        selectText= String.format( "%d plots selected", count );
+                        break;
+                }
+                selectedPlotLabel.setText(selectText);
             }
         });
         
@@ -781,6 +810,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         addPlotsButton = new javax.swing.JButton();
         fixLayoutButton = new javax.swing.JButton();
         deletePlotButton = new javax.swing.JButton();
+        selectedPlotLabel = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         bindingListComponent = new javax.swing.JList();
@@ -1017,6 +1047,8 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
         });
 
+        selectedPlotLabel.setText(" ");
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -1024,23 +1056,28 @@ public class LayoutPanel extends javax.swing.JPanel {
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(tallerButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(shorterButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE))
+                    .add(shorterButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(sameHeightButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
+                    .add(sameHeightButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
                     .add(fixLayoutButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(addPlotsButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(deletePlotButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE))
+                    .add(deletePlotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))
                 .add(8, 8, 8))
             .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(selectedPlotLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 264, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(selectedPlotLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(tallerButton)
                     .add(addPlotsButton)
@@ -1458,6 +1495,7 @@ public class LayoutPanel extends javax.swing.JPanel {
     private javax.swing.JMenuItem removeBindingsMenuItem;
     private javax.swing.JButton sameHeightButton;
     private javax.swing.JMenuItem sameSizeMI;
+    private javax.swing.JLabel selectedPlotLabel;
     private javax.swing.JButton shorterButton;
     private javax.swing.JMenu sizeMenu;
     private javax.swing.JMenuItem smallerMI;

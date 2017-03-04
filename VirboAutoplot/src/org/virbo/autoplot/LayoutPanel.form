@@ -375,28 +375,34 @@
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="tallerButton" max="32767" attributes="0"/>
-                              <Component id="shorterButton" pref="90" max="32767" attributes="0"/>
+                              <Component id="shorterButton" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="sameHeightButton" pref="102" max="32767" attributes="0"/>
+                              <Component id="sameHeightButton" pref="0" max="32767" attributes="0"/>
                               <Component id="fixLayoutButton" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="addPlotsButton" max="32767" attributes="0"/>
-                              <Component id="deletePlotButton" pref="108" max="32767" attributes="0"/>
+                              <Component id="deletePlotButton" pref="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
                       </Group>
                       <Component id="canvasLayoutPanel1" alignment="0" max="32767" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="selectedPlotLabel" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="canvasLayoutPanel1" pref="274" max="32767" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="canvasLayoutPanel1" min="-2" pref="264" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Component id="selectedPlotLabel" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="tallerButton" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="addPlotsButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -474,6 +480,11 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="deletePlotButtonActionPerformed"/>
                   </Events>
+                </Component>
+                <Component class="javax.swing.JLabel" name="selectedPlotLabel">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value=" "/>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
