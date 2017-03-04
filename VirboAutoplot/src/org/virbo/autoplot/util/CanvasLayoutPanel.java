@@ -431,12 +431,12 @@ public class CanvasLayoutPanel extends JLabel {
                 }
             }
         }
-        //TODO: draw selection box.
+
         if ( rectangleSelect!=null ) {
             g.setColor( Color.GRAY );
             g.draw(rectangleSelect);
         }
-        
+
     }
     
     private final transient ComponentListener componentListener = new ComponentListener() {
