@@ -4,6 +4,7 @@
     Author     : jbf
 --%>
 
+<%@page import="java.util.Enumeration"%>
 <%@page import="java.io.File"%>
 <%@page import="org.das2.datum.DatumRange"%>
 <%@page import="org.json.JSONObject"%>
@@ -26,6 +27,10 @@
         <a href="capabilities">Capabilities</a> <i>Capabilities of the server. For example, can it use binary streams to transfer data?</i><br>
         <br>
         <%
+
+            String HAPI_SERVER_HOME= getServletContext().getInitParameter("HAPI_SERVER_HOME");
+            Util.setHapiHome( new File( HAPI_SERVER_HOME ) );
+            
             JSONArray dss= HapiServerSupport.getCatalog();
             for ( int i=0; i<dss.length(); i++ ) {
                 JSONObject ds= dss.getJSONObject(i);
