@@ -36,21 +36,25 @@ public class Util {
      * @return the root of the HAPI server.
      */
     public static File getHapiHome() {
-        File _HAPI_HOME = Util.HAPI_HOME;
-        if ( _HAPI_HOME==null ) {
-            synchronized (Util.class) {
-                _HAPI_HOME = Util.HAPI_HOME;
-                if ( _HAPI_HOME==null ) {
-                    String s= System.getProperty(HAPI_SERVER_HOME_PROPERTY,"/home/jbf/hapi");
-                    if ( !s.endsWith("/") ) {
-                        s= s+"/";
-                    }    
-                    Util.HAPI_HOME= _HAPI_HOME = new File(s);
-                    System.err.println("HAPI_SERVER_HOME="+Util.HAPI_HOME);
+        if ( Util.HAPI_HOME==null ) {
+            throw new IllegalArgumentException("Util.HAPI_HOME is not set.");
+        } else {
+            return Util.HAPI_HOME;
+        }
+    }
+    
+    public static void setHapiHome( File f ) {
+        File HAPI_HOME_ = Util.HAPI_HOME;
+        if ( HAPI_HOME_==null ) {
+            synchronized ( Util.class ) {
+                HAPI_HOME_ = Util.HAPI_HOME;
+                if ( HAPI_HOME_==null ) {
+                    Util.HAPI_HOME= HAPI_HOME_ = f;
                 }
             }
+        } else {
+            // it has been set already.
         }
-        return _HAPI_HOME;
     }
     
     /**
