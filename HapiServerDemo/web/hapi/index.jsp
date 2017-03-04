@@ -110,6 +110,7 @@
             <li>2017-02-13: use x_about instead of about.</li>
             <li>2017-02-21: work towards make the server externally configurable. </li>
             <li>2017-02-28: tweak the connection time for CDAWeb web services, add setLogLevel servlet. </li>
+            <li>2017-03-04: use web.xml to set the initial location of the servlet data.</li>
         </ul>
         </small>
     </body>
