@@ -51,10 +51,11 @@ public class CsvDataFormatter implements DataFormatter {
         int n= record.length();
         for ( int i=0; i<record.length(); i++ ) {
             QDataSet field= record.slice(i);
-            if ( unitsFormatter[i] ) {
-                out.write(datumFormatter[i].format( DataSetUtil.asDatum(field) ).getBytes() );
+            Datum fieldDatum= DataSetUtil.asDatum(field);
+            if ( fieldDatum.isFill() ) {
+                out.write( String.valueOf( field.value() ).getBytes() );
             } else {
-                out.write(datumFormatter[i].format( DataSetUtil.asDatum(field) ).getBytes() );
+                out.write( datumFormatter[i].format( fieldDatum ).getBytes() );
             }
             if ( i<n-1 ) out.write(',');
         }
