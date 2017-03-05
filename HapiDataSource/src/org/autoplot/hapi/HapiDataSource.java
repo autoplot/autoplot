@@ -849,6 +849,8 @@ public class HapiDataSource extends AbstractDataSource {
     private QDataSet repackage(QDataSet ds, ParamDescription[] pds, int[] sort ) {
         int nparameters= ds.length(0);
         
+        boolean combineRank2Depend1= pds.length==3 && pds[1].dependName!=null;
+        
         QDataSet depend0= Ops.copy( Ops.slice1( ds,0 ) ); //TODO: this will be unnecessary after debugging.
         if ( ds.length(0)==2 ) {
             ds= Ops.copy( Ops.slice1( ds, 1 ) );
@@ -884,7 +886,7 @@ public class HapiDataSource extends AbstractDataSource {
         } else if ( pds.length==1 ) {
             return depend0;
             
-        } else {
+        } else if ( combineRank2Depend1 ) {
             // we need to remove Epoch to DEPEND_0.
             SparseDataSetBuilder[] sdsbs= new SparseDataSetBuilder[pds.length];
             int ifield=1;
@@ -942,9 +944,7 @@ public class HapiDataSource extends AbstractDataSource {
             start= start+length1;
             wds.putProperty( QDataSet.DEPEND_0, depend0 );
             wds.putProperty( QDataSet.BUNDLE_1, sdsbs[1].getDataSet() );
-            wds.putProperty( QDataSet.TITLE, pds[1].description );
-            wds.putProperty( QDataSet.LABEL, pds[1].name );
-            wds.putProperty( QDataSet.UNITS, pds[1].units );
+            
             for ( int i=1; i<pds.length; i++ ) { // only works for rank2!!!
                 if ( pds[i].dependName!=null ) {
                     for ( int j=0; j<pds[i].dependName.length; j++ ) {
@@ -959,20 +959,64 @@ public class HapiDataSource extends AbstractDataSource {
                                 WritableDataSet depds= Ops.copy( Ops.trim1( ds, start, start+length1 ) );
                                 depds.putProperty( QDataSet.DEPEND_0, depend0 );
                                 depds.putProperty( QDataSet.BUNDLE_1, sdsbs[k].getDataSet() );    
-                                depds.putProperty( QDataSet.TITLE, pds[k].description );
-                                depds.putProperty( QDataSet.LABEL, pds[k].name );
-                                depds.putProperty( QDataSet.UNITS, pds[k].units );
                                 start= start+length1;
                                 wds.putProperty( "DEPEND_"+i, depds );
-                                
                             }
                         }
                     }
                 }
-                
             }
             
-            ds= wds;
+            ds= wds;            
+            
+        } else {
+            // we need to remove Epoch to DEPEND_0.
+            SparseDataSetBuilder sdsb= new SparseDataSetBuilder(2);
+            sdsb.setLength(nparameters-1);
+            int ifield=1;
+            for ( int i=1; i<pds.length; i++ ) {
+                int nfields1= DataSetUtil.product(pds[i].size);
+                int startIndex= sort==null ? ifield-1 : sort[ifield]-1;
+                if ( nfields1>1 ) {
+                    //bdsb.putProperty( QDataSet.ELEMENT_DIMENSIONS, ifield-1, pds[i].size ); // not supported yet.
+                    sdsb.putProperty( QDataSet.ELEMENT_NAME, startIndex, Ops.safeName( pds[i].name ) );
+                    sdsb.putProperty( QDataSet.ELEMENT_LABEL, startIndex, pds[i].name );        
+                    for ( int j=0; j<pds[i].size.length; j++ ) {
+                        sdsb.putValue( startIndex, j, pds[i].size[j] );
+                    }
+                    if ( pds[i].depend!=null ) {
+                        if ( pds[i].size.length!=pds[i].depend.length ) throw new IllegalArgumentException("pds[i].size.length!=pds[i].depend.length");
+                        for ( int j=0; j<pds[i].size.length; j++ ) {
+                            sdsb.putProperty( "DEPEND_"+(j+1), startIndex, pds[i].depend[j]);
+                        }
+                    }
+                    //sdsb.putValue( QDataSet.ELEMENT_DIMENSIONS, ifield-1, pds[i].size );                    
+                }
+                for ( int j=0; j<nfields1; j++ ) {
+                    if ( nfields1>1 ) {
+                        sdsb.putProperty( QDataSet.START_INDEX, startIndex + j, startIndex );
+                        sdsb.putProperty( QDataSet.LABEL, startIndex + j, pds[i].name +" ch"+j );                    
+                        sdsb.putProperty( QDataSet.NAME, startIndex + j, Ops.safeName(pds[i].name)+"_"+j );
+                    } else {
+                        sdsb.putProperty( QDataSet.LABEL, startIndex + j, pds[i].name );                    
+                        sdsb.putProperty( QDataSet.NAME, startIndex + j, Ops.safeName(pds[i].name) ); 
+                    }
+                    
+                    sdsb.putProperty( QDataSet.TITLE, startIndex + j, pds[i].description );
+                    sdsb.putProperty( QDataSet.UNITS, startIndex + j, pds[i].units );
+                    if ( pds[i].hasFill ) {
+                        sdsb.putProperty( QDataSet.FILL_VALUE, startIndex + j,  pds[i].fillValue );
+                    }
+                    if ( nfields1>1 ) {
+                        sdsb.putProperty( QDataSet.START_INDEX, startIndex + j, startIndex );
+                    }                    
+                    ifield++;
+                }
+            }
+            
+            ds= Ops.copy( Ops.trim1( ds, 1, ds.length(0) ) );
+            ds= Ops.putProperty( ds, QDataSet.DEPEND_0, depend0 );
+            ds= Ops.putProperty( ds, QDataSet.BUNDLE_1, sdsb.getDataSet() );
         }
         return ds;
     }
