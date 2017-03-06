@@ -36,7 +36,7 @@ public class HapiServerSupport {
      * return the range of available data. For example, Polar/Hydra data is available
      * from 1996-03-20 to 2008-04-15.
      * @param info
-     * @return the range of available data.
+     * @return the range of available data, or null if it is not available.
      */
     public static DatumRange getRange( JSONObject info ) {
         try {
@@ -55,22 +55,22 @@ public class HapiServerSupport {
                 }
             } else if ( info.has("startDate") ) { // note startDate is required.
                 String startDate= info.getString("startDate");
-				String stopDate;
-				if ( info.has("stopDate") ) {
-					stopDate= info.getString("stopDate");
-				} else {
-					stopDate= null;
-				}
-                if ( startDate!=null ) {
-                    Datum t1= Units.us2000.parse(startDate);
-                    Datum t2= stopDate==null ? myValidTime : Units.us2000.parse(stopDate);
-                    if ( t1.le(t2) ) {
-                        return new DatumRange( t1, t2 );
-                    } else {
-                        logger.warning( "firstDate and lastDate are out of order, ignoring.");
-                    }
+                String stopDate;
+                if (info.has("stopDate")) {
+                    stopDate = info.getString("stopDate");
+                } else {
+                    stopDate = "now";
                 }
-			}
+                DatumRange tr;
+                tr= DatumRangeUtil.parseTimeRange( startDate+"/"+stopDate );
+                Datum t1= tr.min();
+                Datum t2= tr.max();
+                if ( t1.le(t2) ) {
+                    return new DatumRange( t1, t2 );
+                } else {
+                    logger.warning( "firstDate and lastDate are out of order, ignoring.");
+                }
+            }
         } catch ( JSONException | ParseException ex ) {
             logger.log( Level.WARNING, ex.getMessage(), ex );
         }
