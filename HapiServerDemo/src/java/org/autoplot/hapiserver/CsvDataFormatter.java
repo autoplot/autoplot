@@ -39,7 +39,7 @@ public class CsvDataFormatter implements DataFormatter {
                 datumFormatter[i]= new DatumFormatter() {
                     @Override
                     public String format(Datum datum) {
-                        return format.format( datum.value() );
+                        return format.format( datum.doubleValue(datum.getUnits()) );
                     }
                 };
             }
