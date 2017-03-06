@@ -126,7 +126,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         try {
             String timeDflt= CDAWebDB.getInstance().getSampleTime(ds);
             DatumRange tr= DatumRangeUtil.parseTimeRange( timeDflt );
-            String str= timeRangeTextField.getText().trim();
+            String str= timeRangeTextField.getText();
+            if ( str!=null ) str= str.trim(); else str="";
             if ( !str.equals("") ) {
                 try {
                     DatumRange tr1 = DatumRangeUtil.parseTimeRange(str);
@@ -150,15 +151,10 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                     }
                 }
             );
-        } catch (ParseException ex) {
+        } catch (ParseException | IOException ex) {
             String t= ex.toString();
             if ( t.length()>100 ) t= t.substring(0,100)+"...";
             availableTextField.setText("<html><span color='red'>"+t);
-        } catch ( IOException ex ) {
-            String t= ex.toString();
-            if ( t.length()>100 ) t= t.substring(0,100)+"...";
-            availableTextField.setText("<html><span color='red'>"+t);
-            
         }
     }
 
@@ -373,7 +369,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 parameterPanel.validate();    
             }
         } catch ( Exception ex ) {
-            ex.printStackTrace();
+            logger.log( Level.WARNING, null, ex );
             final String msg= ex.toString();
             SwingUtilities.invokeLater( new Runnable() {
                 @Override
@@ -609,7 +605,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         org.das2.util.LoggerManager.logGuiEvent(evt);
         TimeRangeTool tt= new TimeRangeTool();
         JTextField tf= timeRangeTextField;
-        tt.setSelectedRange(tf.getText());
+        String s= tf.getText();
+        if ( s!=null ) tt.setSelectedRange(s);
         int r= JOptionPane.showConfirmDialog( this, tt, "Select Time Range", JOptionPane.OK_CANCEL_OPTION );
         if ( r==JOptionPane.OK_OPTION) {
             tf.setText(tt.getSelectedRange());
@@ -715,7 +712,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         if ( lid==null ) lid="";
         
         String timeRange= timeRangeTextField.getText();
-        if ( timeRange==null ) { // TODO: I don't think this should ever be null.
+        if ( timeRange==null ) { // TODO: I don't think this should ever be null.  Null observed 2017-03-06.
             logger.warning("here the timeRange is null");
             timeRange= "";
         }
