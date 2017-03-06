@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import org.das2.datum.Datum;
@@ -55,6 +54,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
         scComboBox.setModel( new DefaultComboBoxModel(getSpacecraft()) );
         scComboBox.setSelectedItem( "rbspa-pp" );
         Runnable run= new Runnable() {
+            @Override
             public void run() {
                 resetSpacecraft("rbspa-pp");
             }
@@ -152,48 +152,51 @@ public class TimeRangeTool extends javax.swing.JPanel {
 
     public String getSelectedRange() {
         int idx= jTabbedPane1.getSelectedIndex();
-        if ( idx==0 ) {
-            try {
-                if ( timeRangeFocus ) {
-                    String txt= timeRangeTextField.getText();
-                    return DatumRangeUtil.parseTimeRange(txt).toString();
-                } else {
-                    String min= startTextField.getText();
-                    String max= stopTextField.getText();
-                    Datum tmin= TimeUtil.create(min);
-                    Datum tmax= TimeUtil.create(max);
-                    return new DatumRange( tmin, tmax ).toString();
+        switch (idx) {
+            case 0:
+                try {
+                    if ( timeRangeFocus ) {
+                        String txt= timeRangeTextField.getText();
+                        return DatumRangeUtil.parseTimeRange(txt).toString();
+                    } else {
+                        String min= startTextField.getText();
+                        String max= stopTextField.getText();
+                        Datum tmin= TimeUtil.create(min);
+                        Datum tmax= TimeUtil.create(max);
+                        return new DatumRange( tmin, tmax ).toString();
+                    }
+                } catch ( ParseException ex ) {
+                    return timeRangeTextField.getText();
                 }
-            } catch ( ParseException ex ) {
-                return timeRangeTextField.getText();
+            case 1:
+                String sc= (String)scComboBox.getSelectedItem();
+                String orb= (String)orbitList.getSelectedValue();
+                List indexes= orbitList.getSelectedValuesList();
+                if ( indexes.size()>1 ) {
+                    StringBuilder orbits= new StringBuilder();
+                    int i= orb.indexOf(":");
+                    if ( i>-1 ) orbits.append(orb.substring(0,i)); else orbits.append(orb);
+                    orbits.append("-");
+                    orb= String.valueOf( indexes.get(indexes.size()-1) );
+                    i= orb.indexOf(":");
+                    if ( i>-1 ) orbits.append(orb.substring(0,i)); else orbits.append(orb);
+                    orb= orbits.toString();
+                } else {
+                    int i= orb.indexOf(":");
+                    if ( i>-1 ) orb= orb.substring(0,i);
+                }
+                return "orbit:"+sc+":"+orb;
+            case 2: {
+                String s= (String)nrtComboBox.getSelectedItem();
+                int i= s.indexOf(" ");
+                return s.substring(0,i);
             }
-        } else if ( idx==1 ) {
-            String sc= (String)scComboBox.getSelectedItem();
-            String orb= (String)orbitList.getSelectedValue();
-            List indexes= orbitList.getSelectedValuesList();
-            if ( indexes.size()>1 ) {
-                StringBuilder orbits= new StringBuilder();
-                int i= orb.indexOf(":");
-                if ( i>-1 ) orbits.append(orb.substring(0,i)); else orbits.append(orb);
-                orbits.append("-");
-                orb= String.valueOf( indexes.get(indexes.size()-1) );
-                i= orb.indexOf(":");
-                if ( i>-1 ) orbits.append(orb.substring(0,i)); else orbits.append(orb);
-                orb= orbits.toString();
-            } else {
-                int i= orb.indexOf(":");
-                if ( i>-1 ) orb= orb.substring(0,i);
+            case 3:  {
+                String s= (String)recentTimesList.getSelectedValue();
+                return s;
             }
-            return "orbit:"+sc+":"+orb;
-        } else if ( idx==2 ) {
-            String s= (String)nrtComboBox.getSelectedItem();
-            int i= s.indexOf(" ");
-            return s.substring(0,i);
-        } else if ( idx==3 ) {
-            String s= (String)recentTimesList.getSelectedValue();
-            return s;
-        } else {
-            throw new IllegalArgumentException("not implemented");
+            default:
+                throw new IllegalArgumentException("not implemented");
         }
     }
 
@@ -308,8 +311,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
         
         try {
             if ( recentFile.exists() ) {
-                BufferedReader r = new BufferedReader(new FileReader(recentFile));
-                try {
+                try (BufferedReader r = new BufferedReader(new FileReader(recentFile))) {
                     String s= r.readLine();
                     while ( s!=null ) {
                         if ( verifier!=null ) {
@@ -321,8 +323,6 @@ public class TimeRangeTool extends javax.swing.JPanel {
                         items.add(s);
                         s= r.readLine();
                     }
-                } finally {
-                    r.close();
                 }
             }
 
