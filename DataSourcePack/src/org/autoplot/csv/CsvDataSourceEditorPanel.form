@@ -67,12 +67,19 @@
                           <Component id="jToggleButton2" min="-2" max="-2" attributes="1"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="skipTextField" min="-2" pref="55" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="jToggleButton3" min="-2" max="-2" attributes="1"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="jToggleButton3" min="-2" max="-2" attributes="1"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
-                  <EmptySpace pref="390" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="delimComboBox" min="-2" max="-2" attributes="0"/>
+                      <Component id="skipTextField" min="-2" pref="55" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="338" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -91,6 +98,8 @@
                       <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="dep0Columns" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jToggleButton3" alignment="3" min="-2" pref="24" max="-2" attributes="0"/>
+                      <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="delimComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -175,6 +184,24 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="skipTextFieldActionPerformed"/>
             <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="skipTextFieldFocusLost"/>
           </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel2">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Delim:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="delimComboBox">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="2">
+                <StringItem index="0" value=", (comma)"/>
+                <StringItem index="1" value="; (semicolon)"/>
+              </StringArray>
+            </Property>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

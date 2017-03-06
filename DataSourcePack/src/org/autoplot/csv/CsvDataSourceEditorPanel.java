@@ -248,6 +248,8 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
         jToggleButton3 = new javax.swing.JToggleButton();
         jLabel1 = new javax.swing.JLabel();
         skipTextField = new javax.swing.JFormattedTextField();
+        jLabel2 = new javax.swing.JLabel();
+        delimComboBox = new javax.swing.JComboBox<>();
 
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jScrollPane1.setViewportView(jTable1);
@@ -306,6 +308,10 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             }
         });
 
+        jLabel2.setText("Delim:");
+
+        delimComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { ", (comma)", "; (semicolon)" }));
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -323,11 +329,16 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(jToggleButton2)
                         .add(18, 18, 18)
-                        .add(jLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(skipTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 55, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(jToggleButton3))
-                .addContainerGap(390, Short.MAX_VALUE))
+                        .add(jLabel1))
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jToggleButton3)
+                        .add(18, 18, 18)
+                        .add(jLabel2)))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(delimComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(skipTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 55, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(338, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -342,8 +353,10 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel4)
                     .add(dep0Columns, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jToggleButton3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(12, Short.MAX_VALUE))
+                    .add(jToggleButton3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 24, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel2)
+                    .add(delimComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -415,6 +428,14 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             } }
             CsvReader reader= new CsvReader( breader );
 
+            String sdelimiter= params.get("delim");
+            if ( sdelimiter==null ) sdelimiter= ",";
+            if ( sdelimiter.equals("COMMA") ) sdelimiter= ",";
+            if ( sdelimiter.equals("SEMICOLON") ) sdelimiter= ";";
+        
+            char delimiter= sdelimiter.charAt(0);
+            if ( delimiter!=',' ) reader.setDelimiter(delimiter);
+            
             reader.readHeaders();
             int ncol= reader.getHeaderCount();
 
@@ -534,6 +555,7 @@ private void skipTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:
     public static final String PROP_COLUMN = "column";
     public static final String PROP_BUNDLE = "bundle";
     public static final String PROP_DEP0 = "depend0";
+    public static final String PROP_DELIM = "delim";
 
     public JPanel getPanel() {
         return this;
@@ -552,6 +574,14 @@ private void skipTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:
             split = URISplit.parse(url);
             params = URISplit.parseParams(split.params);
 
+            if ("".equals( params.get(PROP_DELIM) ) ) params.remove(PROP_DELIM);
+            if ( params.get(PROP_DELIM)!=null ) {
+                String delim= params.get(PROP_DELIM);
+                if ( delim.equals("COMMA") ) delim=",";
+                if ( delim.equals("SEMICOLON") ) delim=";";
+                delimComboBox.setSelectedIndex( delim.equals(";") ? 1 : 0 );
+            }
+            
             File f = DataSetURI.getFile(new URL(split.file), new NullProgressMonitor());
             setFile(f);
 
@@ -562,7 +592,7 @@ private void skipTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:
             if ( params.get(PROP_COLUMN)!=null ) columnsComboBox.setSelectedItem( params.get(PROP_COLUMN) );
             if ( params.get(PROP_BUNDLE)!=null ) columnsComboBox.setSelectedItem( params.get(PROP_BUNDLE) );
             if ( params.get(PROP_DEP0)!=null ) dep0Columns.setSelectedItem( params.get(PROP_DEP0) );
-
+            
             if ( params.get("skip")!=null ) {
                 try {
                     skipTextField.setValue( Integer.parseInt(params.get("skip")) );
@@ -582,15 +612,21 @@ private void skipTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:
 
     public String getURI() {
 
+        String delim= String.valueOf( delimComboBox.getSelectedItem() );
+        if ( delim.charAt(0)==';' ) {
+            params.put("delim",delim.substring(0,1) );
+        }
         split.params = URISplit.formatParams(params);
-
+        
         return URISplit.format(split);
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JComboBox columnsComboBox;
+    public javax.swing.JComboBox<String> delimComboBox;
     public javax.swing.JComboBox dep0Columns;
     public javax.swing.JLabel jLabel1;
+    public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
     public javax.swing.JPanel jPanel1;
