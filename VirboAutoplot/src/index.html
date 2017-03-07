@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>ACE electron channels data used to verify features.
+        <p><small>NetCDF and HDF5 files now have depend0 parameter so two variables can be connected without a script.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,12 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-03-04 r20460):</p>
-        <ul>
+        <p>Bugfixes (2017-03-07 r20481):</p>
+        <ul>            
+            <li>issue a warning when das2stream units change, which can cause problems.
+            <li>where with HDF5 files containing parameters with dots in the name was never tested.
+            <li>where with HDF5 files containing structures was never tested.
+            <li>csv editor panel has selection for delimiter.
             <li>corrections to HAPI reader, which was broken after rank 2 DEPEND_1 support was added.
             <li>addDataPoint.jy script updated to use DataPointRecorder (not DataPointRecorderNew), and supports keystroke mode.
             <li>log "ImageIO used to create" at less than info, to avoid clutter in server logs.
@@ -87,6 +91,8 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>563: HDF support for depend0 switch.  Thanks Kris!
+            <li>bugfix:negative DELTA_PLUS, which is invalid, is handled.
             <li>layout tab indicates selected plot.
             <li>export-to-hapi formats catalog and info responses.
             <li>export-to-wav has timeScale parameter for scaling time tags, useful for auralizing B-Field data.
