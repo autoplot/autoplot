@@ -65,6 +65,7 @@ public class CdfDataSource extends AbstractDataSource {
 
     protected static final String PARAM_DODEP = "doDep";
     protected static final String PARAM_WHERE = "where";
+    protected static final String PARAM_DEPEND0 = "depend0";
     protected static final String PARAM_INTERPMETA = "interpMeta";
     protected static final String PARAM_ID = "id";
     protected static final String PARAM_SLICE1 = "slice1";
@@ -427,6 +428,12 @@ public class CdfDataSource extends AbstractDataSource {
             logger.log(Level.FINE, "read variable {0}?{1} got {2}", new Object[] { fileName.substring(islash), svariable, String.valueOf(result) } );
         }
         
+        String sdep= (String)map.get(PARAM_DEPEND0);
+        if ( sdep!=null && sdep.length()>0 ) {
+            QDataSet parm= wrapDataSet( cdf, sdep, constraint, false, false, null );
+            result = (MutablePropertyDataSet) Ops.link( parm, result );
+        }
+
         String w= (String)map.get( PARAM_WHERE );
         if ( w!=null && w.length()>0 ) {
             int ieq= w.indexOf(".");
@@ -434,7 +441,7 @@ public class CdfDataSource extends AbstractDataSource {
             QDataSet parm= wrapDataSet( cdf, sparm, constraint, false, false, null );
             result = doWhereFilter( w, parm, result );
         }
-
+        
         if ( !doDep ) {
             result.putProperty( QDataSet.DEPEND_0, null );
             result.putProperty( QDataSet.DEPEND_1, null );
@@ -1203,7 +1210,7 @@ public class CdfDataSource extends AbstractDataSource {
                 File cdfFile;
                 cdfFile = getFile(mon);
                 String fileName = cdfFile.toString();
-                Map map = getParams();
+                Map<String,String> map = getParams();
                 if ( map.containsKey( PARAM_SLICE1 ) ) {
                     return null;
                 }
@@ -1225,6 +1232,12 @@ public class CdfDataSource extends AbstractDataSource {
                     throw new IllegalArgumentException("No such variable \""+svariable+"\"");
                 }
                 attributes= readAttributes(cdf, svariable, 0);
+                
+                if ( map.containsKey(PARAM_DEPEND0) ) {
+                    Map<String,Object> dep0m= readAttributes(cdf, map.get(PARAM_DEPEND0), 0);
+                    attributes.put( QDataSet.DEPEND_0, dep0m );
+                }
+                
                 if ("no".equals(map.get("interpMeta") )) {
                     attributes.remove("DEPEND_0");
                     attributes.remove("DEPEND_1");

@@ -83,8 +83,6 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         selectVariableLabel = new javax.swing.JLabel();
         jSplitPane2 = new javax.swing.JSplitPane();
         jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        parameterTree = new javax.swing.JTree();
         jPanel3 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         subsetComboBox = new javax.swing.JComboBox();
@@ -96,6 +94,11 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         whereParamList = new javax.swing.JComboBox();
         whereOp = new javax.swing.JComboBox();
         whereTF = new javax.swing.JTextField();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        parameterTree = new javax.swing.JTree();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        parameterTree1 = new javax.swing.JTree();
         jScrollPane2 = new javax.swing.JScrollPane();
         paramInfo = new javax.swing.JLabel();
 
@@ -112,15 +115,6 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
         jSplitPane1.setDividerLocation(320);
         jSplitPane1.setResizeWeight(1.0);
-
-        parameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
-            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
-                parameterTreeValueChanged(evt);
-            }
-        });
-        jScrollPane3.setViewportView(parameterTree);
-
-        jSplitPane1.setLeftComponent(jScrollPane3);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Advanced"));
         jPanel3.setMaximumSize(new java.awt.Dimension(285, 32767));
@@ -192,7 +186,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(noDep))))
                     .add(whereCB))
-                .add(0, 28, Short.MAX_VALUE))
+                .add(0, 33, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -219,6 +213,26 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         );
 
         jSplitPane1.setRightComponent(jPanel3);
+
+        parameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                parameterTreeValueChanged(evt);
+            }
+        });
+        jScrollPane3.setViewportView(parameterTree);
+
+        jTabbedPane1.addTab("Data", jScrollPane3);
+
+        parameterTree1.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                parameterTree1ValueChanged(evt);
+            }
+        });
+        jScrollPane4.setViewportView(parameterTree1);
+
+        jTabbedPane1.addTab("X", jScrollPane4);
+
+        jSplitPane1.setLeftComponent(jTabbedPane1);
 
         jSplitPane2.setTopComponent(jSplitPane1);
 
@@ -277,6 +291,10 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         }
     }//GEN-LAST:event_parameterTreeValueChanged
 
+    private void parameterTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTree1ValueChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_parameterTree1ValueChanged
+
     private void updateMetadata() {
        String longName= parameterInfo.get(parameter);
        paramInfo.setText( longName );
@@ -289,12 +307,15 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JCheckBox noDep;
     private javax.swing.JCheckBox noInterpMeta;
     private javax.swing.JLabel paramInfo;
     private javax.swing.JTree parameterTree;
+    private javax.swing.JTree parameterTree1;
     private javax.swing.JLabel selectVariableLabel;
     private javax.swing.JCheckBox showAllVarTypeCB;
     private javax.swing.JComboBox subsetComboBox;
@@ -475,6 +496,10 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
             fillTree( this.parameterTree, parameterDescriptions, cdf, param, slice1 );
             
+            String depend0= params.get("depend0");
+           //TODO: check netcdf
+            fillTree( this.parameterTree1, parameterDescriptions, cdf, depend0, null );
+            
             logger.finest("close cdf");
 
             DefaultComboBoxModel cbmodel= new DefaultComboBoxModel();
@@ -566,6 +591,13 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 String p= String.valueOf( treePath.getPathComponent(1) );
                 p= p.replaceAll("=", "%3D");
                 params.put( "arg_0", p + ( subset==null ? "" : subset ) );
+            }
+            
+            TreePath depend0Path= parameterTree1.getSelectionPath();
+            if ( depend0Path!=null ) {
+                String p= String.valueOf( depend0Path.getPathComponent(1) );
+                p= p.replaceAll("=", "%3D");
+                params.put( "depend0", p );
             }
 
             if ( noDep.isSelected() ) {
