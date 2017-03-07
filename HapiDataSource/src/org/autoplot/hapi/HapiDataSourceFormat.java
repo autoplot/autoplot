@@ -47,6 +47,10 @@ public class HapiDataSourceFormat implements DataSourceFormat {
             throw new IllegalArgumentException("uri must start with file://");
         }
         int ix= s.lastIndexOf(".hapi");
+        if ( ix==-1 ) {
+            throw new IllegalArgumentException("uri must end in .hapi");
+        }
+        
         File hapiDir= new File( s.substring(0,ix) );
         
         String id= params.get("id");
@@ -104,11 +108,13 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 }                
                 parameters.put(i,j1);
             }
+            i++;
         }
         
         DatumRange dr= DataSetUtil.asDatumRange( Ops.extent(dep0) );
         jo.put( "startDate", dr.min().toString() );
         jo.put( "stopDate", dr.max().toString() );
+        jo.put( "parameters", parameters );
         
         if ( !infoFile.getParentFile().exists() ) {
             infoFile.getParentFile().mkdirs();
