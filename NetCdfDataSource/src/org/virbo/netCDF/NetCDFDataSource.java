@@ -49,20 +49,23 @@ public class NetCDFDataSource extends AbstractDataSource {
     private static final Logger logger= LoggerManager.getLogger("apdss.netcdf");
     
     protected static final String PARAM_WHERE = "where";
+    protected static final String PARAM_DEPEND0 = "depend0";
         
-    Variable variable;
+    private Variable variable;
     
     /**
      * if non-null, the variable to use for the where filter.
      */
-    Variable whereVariable;  
+    private Variable whereVariable;  
+    private Variable depend0Variable;
     
-    String sMyUrl;
-    String svariable;
-    String swhereVariable;
+    private String sMyUrl;
+    private String svariable;
+    private String swhereVariable;
+    private String sdepend0Variable;
     
-    NetcdfDataset ncfile;
-    String constraint; // null, or string like [:,:,4,5]
+    private NetcdfDataset ncfile;
+    private String constraint; // null, or string like [:,:,4,5]
 
 /*    static {
         try {
@@ -119,7 +122,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             }
             
             swhereVariable= p.get( PARAM_WHERE );  // may be null, typically is null.
-
+            sdepend0Variable= p.get( PARAM_DEPEND0 ); // may be null, typically is null.
         }
     }
     
@@ -130,7 +133,14 @@ public class NetCDFDataSource extends AbstractDataSource {
         mon.setTaskSize(20);
         try { 
             readData( mon.getSubtaskMonitor(0,15,"read data") );
-            QDataSet result= NetCdfVarDataSet.create( getVariable(), constraint, ncfile, mon.getSubtaskMonitor(15,20,"copy over ") );
+            
+            QDataSet result= NetCdfVarDataSet.create( variable, constraint, ncfile, mon.getSubtaskMonitor(15,20,"copy over ") );
+            
+            if ( sdepend0Variable!=null && sdepend0Variable.length()>0 ) {
+                NetCdfVarDataSet depend0VariableDs= NetCdfVarDataSet.create( depend0Variable, constraint, ncfile, new NullProgressMonitor() );
+                result = Ops.link( depend0VariableDs, result );
+            }
+
             String w= (String)getParam(PARAM_WHERE,"" );
             if ( w!=null && w.length()>0 ) {
                 NetCdfVarDataSet whereParm= NetCdfVarDataSet.create( whereVariable, constraint, ncfile, new NullProgressMonitor() );
@@ -253,7 +263,9 @@ public class NetCDFDataSource extends AbstractDataSource {
                     if ( v instanceof Structure ) {
                         for ( Variable v2: ((Structure) v).getVariables() ) {
                             if ( !v2.getDataType().isNumeric() ) continue;
-                            if ( v2.getName().replaceAll(" ","+").equals( svariable) ) variable= v2;
+                            if ( v2.getName().replaceAll(" ","+").equals( svariable) ) {
+                                variable= v2;
+                            }
                         }
                     } else {
                         if ( v.getName().replaceAll(" ", "+").equals( svariable ) ) { //TODO: verify this, it's probably going to cause problems now.
@@ -265,13 +277,16 @@ public class NetCDFDataSource extends AbstractDataSource {
             }
             
             if ( swhereVariable!=null ) {
-                int i= swhereVariable.indexOf(".");
+                int i= swhereVariable.lastIndexOf("(");
+                i= swhereVariable.lastIndexOf(".",i);
                 String swv= swhereVariable.substring(0,i);
                 for (Variable v : variables) {
                     if ( v instanceof Structure ) {
                         for ( Variable v2: ((Structure) v).getVariables() ) {
                             if ( !v2.getDataType().isNumeric() ) continue;
-                            if ( v2.getName().replaceAll(" ","+").equals( swv ) ) whereVariable= v;
+                            if ( v2.getName().replaceAll(" ","+").equals( swv ) ) {
+                                whereVariable= v2;
+                            }
                         }
                     } else {
                         if ( v.getName().replaceAll(" ", "+").equals( swv ) ) { //TODO: verify this, it's probably going to cause problems now.
@@ -281,14 +296,30 @@ public class NetCDFDataSource extends AbstractDataSource {
                 }
                 if ( whereVariable==null ) throw new IllegalArgumentException("No such variable: "+swv );
             }
+            
+            if ( sdepend0Variable!=null ) {
+                for (Variable v : variables) {
+                    if ( v instanceof Structure ) {
+                        for ( Variable v2: ((Structure) v).getVariables() ) {
+                            if ( !v2.getDataType().isNumeric() ) continue;
+                            if ( v2.getName().replaceAll(" ","+").equals( sdepend0Variable ) ) {
+                                depend0Variable= v2;
+                            }
+                        }
+                    } else {
+                        if ( v.getName().replaceAll(" ", "+").equals( sdepend0Variable ) ) { //TODO: verify this, it's probably going to cause problems now.
+                            depend0Variable= v;
+                        }
+                    }
+                }
+                if ( depend0Variable==null ) throw new IllegalArgumentException("No such variable: "+sdepend0Variable );
+            }
+            
         } finally {
             mon.finished();
         }
     }
-    
-    private synchronized Variable getVariable() {
-        return this.variable;
-    }
+   
     
     public static DataSourceFactory getFactory() {
         return new NetCDFDataSourceFactory();
@@ -304,7 +335,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             List attr;
             
             logger.finer("variable.getAttributes()");
-            attr= getVariable().getAttributes();
+            attr= variable.getAttributes();
 
             if ( attr==null ) {
                 logger.finer("attr was null");
@@ -340,7 +371,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         if ( true ) {
             return MetadataModel.createNullModel();
         } else {
-            if (getVariable()==null ) {
+            if ( variable==null ) {
                 try {
                     readData(new NullProgressMonitor()); // sometimes we come in here from MetadataPanel.updateProperties before reading the data
                 } catch (IOException ex) {
@@ -351,7 +382,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             MetadataModel result= MetadataModel.createNullModel();
 
             logger.finer("getVariable().getAttributes()");
-            List attr= getVariable().getAttributes();
+            List attr= variable.getAttributes();
             if ( attr==null ) return null; // transient state
             for (Object attr1 : attr) {
                 Attribute at = (Attribute) attr1;

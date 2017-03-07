@@ -68,16 +68,17 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         whereParamList = new javax.swing.JComboBox();
         whereOp = new javax.swing.JComboBox();
         whereTF = new javax.swing.JTextField();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         parameterTree = new javax.swing.JTree();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        xParameterTree = new javax.swing.JTree();
         parameterInfoLabel = new javax.swing.JLabel();
 
         selectVariableLabel.setText("Select paramater:");
 
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane2.setResizeWeight(0.5);
-
-        jSplitPane1.setResizeWeight(0.5);
 
         advancedPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Advanced"));
         advancedPanel.setMaximumSize(new java.awt.Dimension(285, 32767));
@@ -114,7 +115,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(advancedPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(whereParamList, 0, 257, Short.MAX_VALUE)
+                .addComponent(whereParamList, 0, 125, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(whereOp, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -126,7 +127,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     .addGroup(advancedPanelLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(subsetComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 231, Short.MAX_VALUE))
+                .addGap(0, 99, Short.MAX_VALUE))
         );
         advancedPanelLayout.setVerticalGroup(
             advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -146,6 +147,9 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         jSplitPane1.setRightComponent(advancedPanel);
 
+        jTabbedPane1.setToolTipText("\"plot\" selects the dependent parameter for plotting.  \"x\" allows specification of an independent parameter upon which the \"plot\" parameter depends.");
+
+        parameterTree.setRootVisible(false);
         parameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
                 parameterTreeValueChanged(evt);
@@ -153,7 +157,19 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         });
         jScrollPane1.setViewportView(parameterTree);
 
-        jSplitPane1.setLeftComponent(jScrollPane1);
+        jTabbedPane1.addTab("plot", jScrollPane1);
+
+        xParameterTree.setRootVisible(false);
+        xParameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                xParameterTreeValueChanged(evt);
+            }
+        });
+        jScrollPane3.setViewportView(xParameterTree);
+
+        jTabbedPane1.addTab("x", jScrollPane3);
+
+        jSplitPane1.setLeftComponent(jTabbedPane1);
 
         jSplitPane2.setTopComponent(jSplitPane1);
 
@@ -203,14 +219,20 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         
     }//GEN-LAST:event_parameterTreeValueChanged
 
+    private void xParameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_xParameterTreeValueChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_xParameterTreeValueChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel advancedPanel;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel parameterInfoLabel;
     private javax.swing.JTree parameterTree;
     private javax.swing.JLabel selectVariableLabel;
@@ -219,6 +241,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private javax.swing.JComboBox whereOp;
     private javax.swing.JComboBox whereParamList;
     private javax.swing.JTextField whereTF;
+    private javax.swing.JTree xParameterTree;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
@@ -250,11 +273,11 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
     public boolean reject(String uri) throws Exception {
         split = URISplit.parse(uri); 
 
-        if ( split.resourceUri.toURL()==null ) {
+        if ( split.resourceUri==null ) {
             return true;
         }
         
-        FileSystem fs = FileSystem.create( DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI() );
+        FileSystem fs = FileSystem.create( DataSetURI.toUri(split.path) );
         return fs.isDirectory( split.file.substring(split.path.length()) );
     }
 
@@ -291,7 +314,6 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         DefaultTreeModel tm= new DefaultTreeModel( root );
 
-        parameterTree.setRootVisible(false);
         parameterTree.setModel(tm);
 
         if ( selection!=null ) {
@@ -314,7 +336,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         try {
 
-            File cdfFile = DataSetURI.getFile( split.resourceUri.toURL(), new NullProgressMonitor() );
+            File cdfFile = DataSetURI.getFile( split.resourceUri, new NullProgressMonitor() );
             
             String fileName= cdfFile.toString();
 
@@ -397,6 +419,12 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             
             fillTree( this.parameterTree, parameters, param );
             
+            xParameterTree.setModel( this.parameterTree.getModel() );
+            String dep0= params.get( "depend0" );
+            if ( dep0!=null ) {
+                fillTree( this.xParameterTree, parameters, dep0 ); //TODO: tree is filled twice.
+            }
+            
             logger.finest("close hdf");
 
             DefaultComboBoxModel cbmodel= new DefaultComboBoxModel();
@@ -478,6 +506,12 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         }
         params.put( "arg_0", p );
         
+        TreePath xtp= xParameterTree.getSelectionPath();
+        if ( xtp!=null ) {
+            Object odep0= xtp.getLastPathComponent() ;
+            params.put( "depend0", odep0.toString() ); // TODO weak code assumes toString works.
+        }
+            
         if ( whereCB.isSelected() ) {
             params.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText().replaceAll(" ","+") ) );
         } else {
