@@ -769,7 +769,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         }
 
         String format= (String) ds.property( QDataSet.FORMAT );
-        if ( format!=null ) {
+        if ( format!=null && format.trim().length()>0 ) {
             addVariableAttributeEntry( name,"FORMAT",CDFDataType.CHAR,format);
         }
 

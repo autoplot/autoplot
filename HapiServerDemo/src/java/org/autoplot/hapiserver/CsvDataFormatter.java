@@ -51,7 +51,8 @@ public class CsvDataFormatter implements DataFormatter {
         int n= record.length();
         for ( int i=0; i<record.length(); i++ ) {
             QDataSet field= record.slice(i);
-            Datum fieldDatum= DataSetUtil.asDatum(field);
+            Datum fieldDatum;
+            fieldDatum= DataSetUtil.asDatum(field);
             if ( fieldDatum.isFill() ) {
                 out.write( String.valueOf( field.value() ).getBytes() );
             } else {
