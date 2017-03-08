@@ -73,6 +73,8 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         parameterTree = new javax.swing.JTree();
         jScrollPane3 = new javax.swing.JScrollPane();
         xParameterTree = new javax.swing.JTree();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        yParameterTree = new javax.swing.JTree();
         parameterInfoLabel = new javax.swing.JLabel();
 
         selectVariableLabel.setText("Select paramater:");
@@ -157,7 +159,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         });
         jScrollPane1.setViewportView(parameterTree);
 
-        jTabbedPane1.addTab("plot", jScrollPane1);
+        jTabbedPane1.addTab("select variable", jScrollPane1);
 
         xParameterTree.setRootVisible(false);
         xParameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
@@ -168,6 +170,16 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jScrollPane3.setViewportView(xParameterTree);
 
         jTabbedPane1.addTab("x", jScrollPane3);
+
+        yParameterTree.setRootVisible(false);
+        yParameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                yParameterTreeValueChanged(evt);
+            }
+        });
+        jScrollPane4.setViewportView(yParameterTree);
+
+        jTabbedPane1.addTab("y", jScrollPane4);
 
         jSplitPane1.setLeftComponent(jTabbedPane1);
 
@@ -223,6 +235,10 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         // TODO add your handling code here:
     }//GEN-LAST:event_xParameterTreeValueChanged
 
+    private void yParameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_yParameterTreeValueChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_yParameterTreeValueChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel advancedPanel;
@@ -230,6 +246,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
@@ -242,6 +259,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private javax.swing.JComboBox whereParamList;
     private javax.swing.JTextField whereTF;
     private javax.swing.JTree xParameterTree;
+    private javax.swing.JTree yParameterTree;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
@@ -425,6 +443,12 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 fillTree( this.xParameterTree, parameters, dep0 ); //TODO: tree is filled twice.
             }
             
+            yParameterTree.setModel( this.parameterTree.getModel() );
+            String sy= params.get( "y" );
+            if ( sy!=null ) {
+                fillTree( this.yParameterTree, parameters, sy ); //TODO: tree is filled twice.
+            }
+                        
             logger.finest("close hdf");
 
             DefaultComboBoxModel cbmodel= new DefaultComboBoxModel();
@@ -510,6 +534,12 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         if ( xtp!=null ) {
             Object odep0= xtp.getLastPathComponent() ;
             params.put( "depend0", odep0.toString() ); // TODO weak code assumes toString works.
+        }
+
+        TreePath ytp= yParameterTree.getSelectionPath();
+        if ( ytp!=null ) {
+            Object oy= ytp.getLastPathComponent() ;
+            params.put( "y", oy.toString() ); // TODO weak code assumes toString works.
         }
             
         if ( whereCB.isSelected() ) {

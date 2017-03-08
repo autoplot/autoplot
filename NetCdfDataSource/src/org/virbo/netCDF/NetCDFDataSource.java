@@ -23,7 +23,6 @@ import java.util.Map;
 import org.das2.datum.LoggerManager;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
@@ -50,6 +49,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     
     protected static final String PARAM_WHERE = "where";
     protected static final String PARAM_DEPEND0 = "depend0";
+    protected static final String PARAM_Y = "y";
         
     private Variable variable;
     
@@ -58,11 +58,13 @@ public class NetCDFDataSource extends AbstractDataSource {
      */
     private Variable whereVariable;  
     private Variable depend0Variable;
+    private Variable yVariable;
     
     private String sMyUrl;
     private String svariable;
     private String swhereVariable;
     private String sdepend0Variable;
+    private String syVariable;
     
     private NetcdfDataset ncfile;
     private String constraint; // null, or string like [:,:,4,5]
@@ -123,6 +125,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             
             swhereVariable= p.get( PARAM_WHERE );  // may be null, typically is null.
             sdepend0Variable= p.get( PARAM_DEPEND0 ); // may be null, typically is null.
+            syVariable= p.get( PARAM_Y ); // may be null, typically is null.
         }
     }
     
@@ -141,6 +144,11 @@ public class NetCDFDataSource extends AbstractDataSource {
                 result = Ops.link( depend0VariableDs, result );
             }
 
+            if ( syVariable!=null && syVariable.length()>0 ) {
+                NetCdfVarDataSet depend0VariableDs= NetCdfVarDataSet.create( yVariable, constraint, ncfile, new NullProgressMonitor() );
+                result = Ops.link( depend0VariableDs, result );
+            }
+            
             String w= (String)getParam(PARAM_WHERE,"" );
             if ( w!=null && w.length()>0 ) {
                 NetCdfVarDataSet whereParm= NetCdfVarDataSet.create( whereVariable, constraint, ncfile, new NullProgressMonitor() );
@@ -315,6 +323,23 @@ public class NetCDFDataSource extends AbstractDataSource {
                 if ( depend0Variable==null ) throw new IllegalArgumentException("No such variable: "+sdepend0Variable );
             }
             
+            if ( syVariable!=null ) {
+                for (Variable v : variables) {
+                    if ( v instanceof Structure ) {
+                        for ( Variable v2: ((Structure) v).getVariables() ) {
+                            if ( !v2.getDataType().isNumeric() ) continue;
+                            if ( v2.getName().replaceAll(" ","+").equals( syVariable ) ) {
+                                yVariable= v2;
+                            }
+                        }
+                    } else {
+                        if ( v.getName().replaceAll(" ", "+").equals( syVariable ) ) { //TODO: verify this, it's probably going to cause problems now.
+                            yVariable= v;
+                        }
+                    }
+                }
+                if ( yVariable==null ) throw new IllegalArgumentException("No such variable: "+syVariable );
+            }            
         } finally {
             mon.finished();
         }
