@@ -302,7 +302,7 @@ public class NetCDFDataSource extends AbstractDataSource {
                         }
                     }
                 }
-                if ( whereVariable==null ) throw new IllegalArgumentException("No such variable: "+swv );
+                if ( whereVariable==null ) throw new IllegalArgumentException("where refers to unresolved variable: "+swv );
             }
             
             if ( sdepend0Variable!=null ) {
@@ -320,7 +320,7 @@ public class NetCDFDataSource extends AbstractDataSource {
                         }
                     }
                 }
-                if ( depend0Variable==null ) throw new IllegalArgumentException("No such variable: "+sdepend0Variable );
+                if ( depend0Variable==null ) throw new IllegalArgumentException("depend0 refers to unresolved variable: "+sdepend0Variable );
             }
             
             if ( syVariable!=null ) {
@@ -338,7 +338,7 @@ public class NetCDFDataSource extends AbstractDataSource {
                         }
                     }
                 }
-                if ( yVariable==null ) throw new IllegalArgumentException("No such variable: "+syVariable );
+                if ( yVariable==null ) throw new IllegalArgumentException("y refers to unresolved variable: "+syVariable );
             }            
         } finally {
             mon.finished();
