@@ -481,8 +481,8 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             }
             
             List<String> varnames= new ArrayList<>();
-            for ( Variable v: vars ) {
-                varnames.add(v.getName());
+            for ( Entry<String,String> p: parameters.entrySet() ) {
+                varnames.add(p.getKey());
             }
             whereParamList.setModel( new DefaultComboBoxModel( varnames.toArray() ) );
             String where= params.get("where");
