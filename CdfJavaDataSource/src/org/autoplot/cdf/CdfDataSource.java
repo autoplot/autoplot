@@ -66,6 +66,7 @@ public class CdfDataSource extends AbstractDataSource {
     protected static final String PARAM_DODEP = "doDep";
     protected static final String PARAM_WHERE = "where";
     protected static final String PARAM_DEPEND0 = "depend0";
+    protected static final String PARAM_Y = "y";
     protected static final String PARAM_INTERPMETA = "interpMeta";
     protected static final String PARAM_ID = "id";
     protected static final String PARAM_SLICE1 = "slice1";
@@ -434,6 +435,12 @@ public class CdfDataSource extends AbstractDataSource {
             result = (MutablePropertyDataSet) Ops.link( parm, result );
         }
 
+        String sy= (String)map.get(PARAM_Y);
+        if ( sy!=null && sy.length()>0 ) {
+            QDataSet parm= wrapDataSet( cdf, sy, constraint, false, false, null );
+            result = (MutablePropertyDataSet) Ops.link( result.property(QDataSet.DEPEND_0), parm, result );
+        }
+        
         String w= (String)map.get( PARAM_WHERE );
         if ( w!=null && w.length()>0 ) {
             int ieq= w.indexOf(".");
@@ -482,7 +489,10 @@ public class CdfDataSource extends AbstractDataSource {
             }
             if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
                 renderType= "eventsbar";
-            }                
+            }             
+            if ( sy!=null ) {
+                renderType= null;
+            }
             String os1= (String)map.get(PARAM_SLICE1);
             if ( os1!=null && os1.length()>0 ) {
                 logger.finer("dropping render type because of slice1");
@@ -498,7 +508,7 @@ public class CdfDataSource extends AbstractDataSource {
                 }
             } else {                
                 if ( result.rank()<3 ) { // POLAR_H0_CEPPAD_20010117_V-L3-1-20090811-V.cdf?FEDU is "time_series"
-                    if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT ) { //allow time_series for [n,16]
+                    if ( result.rank()==2 && result.length()>0 && result.length(0)<QDataSet.MAX_UNIT_BUNDLE_COUNT && sy==null ) { //allow time_series for [n,16]
                         String rt= (String)istpProps.get("RENDER_TYPE" );
                         if ( rt!=null ) result.putProperty(QDataSet.RENDER_TYPE, rt );
                         if ( istpProps.get("RENDER_TYPE")==null ) { //goes11_k0s_mag
