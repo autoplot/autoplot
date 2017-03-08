@@ -58,7 +58,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     private final static Logger logger= Logger.getLogger( "apdss.cdf" );
 
     private boolean isValidCDF= false;
-
+    
     /** Creates new form AggregatingDataSourceEditorPanel */
     public CdfJavaDataSourceEditorPanel() {
         initComponents();
@@ -80,7 +80,6 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jPanel1 = new javax.swing.JPanel();
-        selectVariableLabel = new javax.swing.JLabel();
         jSplitPane2 = new javax.swing.JSplitPane();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel3 = new javax.swing.JPanel();
@@ -107,8 +106,6 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setPreferredSize(new java.awt.Dimension(615, 452));
-
-        selectVariableLabel.setText("Select CDF Variable:");
 
         jSplitPane2.setDividerLocation(230);
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -251,17 +248,17 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .add(selectVariableLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
-                .add(238, 238, 238))
-            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 599, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .add(selectVariableLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE))
+                .addContainerGap()
+                .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -272,16 +269,15 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void showAllVarTypeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showAllVarTypeCBActionPerformed
-        org.das2.util.LoggerManager.logGuiEvent(evt);
-        setURI( getURI() );
-    }//GEN-LAST:event_showAllVarTypeCBActionPerformed
+    private void parameterTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTree1ValueChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_parameterTree1ValueChanged
 
     private void parameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTreeValueChanged
         TreePath tp= evt.getPath();
@@ -291,9 +287,10 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         }
     }//GEN-LAST:event_parameterTreeValueChanged
 
-    private void parameterTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTree1ValueChanged
-        // TODO add your handling code here:
-    }//GEN-LAST:event_parameterTree1ValueChanged
+    private void showAllVarTypeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showAllVarTypeCBActionPerformed
+        org.das2.util.LoggerManager.logGuiEvent(evt);
+        setURI( getURI() );
+    }//GEN-LAST:event_showAllVarTypeCBActionPerformed
 
     private void updateMetadata() {
        String longName= parameterInfo.get(parameter);
@@ -316,7 +313,6 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     private javax.swing.JLabel paramInfo;
     private javax.swing.JTree parameterTree;
     private javax.swing.JTree parameterTree1;
-    private javax.swing.JLabel selectVariableLabel;
     private javax.swing.JCheckBox showAllVarTypeCB;
     private javax.swing.JComboBox subsetComboBox;
     private javax.swing.JCheckBox whereCB;
@@ -442,10 +438,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             }
     
             if ( cdfException!=null ) {
-                this.selectVariableLabel.setText( " " );
                 this.parameterTree.setModel( new DefaultTreeModel( new DefaultMutableTreeNode("") ) );
                 this.paramInfo.setText( "<html>Unable to read CDF file:<br>"+cdfException.getMessage() );
-                
                 return;
             }
             
@@ -473,8 +467,20 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             int numData= dataParameterInfo.size();
             int numSupport= allParameterInfo.size() - numData;
 
-            this.selectVariableLabel.setText( String.format( label, numData, numSupport ) );
-            this.selectVariableLabel.setToolTipText("ISTP metadata marks parameters as data or support_data");
+            //this.selectVariableLabel.setText( String.format( label, numData, numSupport ) );
+            if ( this.showAllVarTypeCB.isSelected() ) {
+                this.jTabbedPane1.setTitleAt( 0, String.format( "Select CDF Variable (of %d)", numData+numSupport ) );
+            } else {
+                this.jTabbedPane1.setTitleAt( 0, String.format( "Select CDF Variable (of %d)", numData ) );
+            }
+            
+            this.jTabbedPane1.setToolTipText( String.format( label, numData, numSupport ) );
+            if ( this.showAllVarTypeCB.isSelected() ) {
+                this.showAllVarTypeCB.setText("show all ("+numSupport+" support shown)");
+            } else {
+                this.showAllVarTypeCB.setText("show all ("+numSupport+" support not shown)");
+            }
+            
 
             String param= params.get("arg_0");
             String subset= null;
@@ -497,8 +503,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             fillTree( this.parameterTree, parameterDescriptions, cdf, param, slice1 );
             
             String depend0= params.get("depend0");
-           //TODO: check netcdf
-            fillTree( this.parameterTree1, parameterDescriptions, cdf, depend0, null );
+           
+            Map<String,String> parameterDescriptions2= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, false, false );
+            fillTree( this.parameterTree1, parameterDescriptions2, cdf, depend0, null );
             
             logger.finest("close cdf");
 
