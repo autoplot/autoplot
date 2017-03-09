@@ -712,6 +712,35 @@ public class DataSourceUtil {
     }
 
     /**
+     * returns the [ start, stop, stride ] or [ start, -1, -1 ] for slice, but also
+     * supports slice notations like [:,1]. This is
+     * provided to reduce code and for uniform behavior.
+     * 
+     * Examples:
+     * <ul>
+     * <li>[::1,:]
+     * <li>[:,2]
+     * </ul>
+     * @param constraint, such as "[0:100:2]" for even records between 0 and 100, non-inclusive.
+     * @param qubeDims the dimension of the data.
+     * @return the [startRecord,stopRecordExclusive,stride]
+     * @throws java.text.ParseException when the constraint cannot be parsed.
+     */
+    public static Map<Integer,long[]> parseConstraint(String constraint, long[] qubeDims ) throws ParseException {
+        if ( constraint.startsWith("[") && constraint.endsWith("]") ) {
+            constraint= constraint.substring(1,constraint.length()-1);
+        }
+        String[] ss= constraint.split("\\,",-2);
+        Map<Integer,long[]> result= new HashMap<>();
+        int ndim= Math.min(ss.length,qubeDims.length);
+        for ( int i=0; i<ndim; i++ ) {
+            long[] r= parseConstraint( ss[0], qubeDims[i] );
+            result.put( i, r );
+        }
+        return result;
+    }
+    
+    /**
      * returns [ start, stop, stride ] or [ start, -1, -1 ] for slice.  This is
      * provided to reduce code and for uniform behavior.
      * See CdfJavaDataSource, which is where this was copied from.
