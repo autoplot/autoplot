@@ -817,6 +817,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
      * shows the orbit timerange, clipping off text past the first colon.
      * @param sorbit like "172: 2012-11-02 07:00 to 11:20"
      * @return canonical orbit string like "172"
+     * TODO: this is sometimes called on the event thread, and will read files. NO NO!
      */
     private String showOrbit( String sorbit ) {
         try {
