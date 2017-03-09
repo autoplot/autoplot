@@ -57,8 +57,6 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        jScrollPane2 = new javax.swing.JScrollPane();
-        selectVariableLabel = new javax.swing.JLabel();
         jSplitPane2 = new javax.swing.JSplitPane();
         jSplitPane1 = new javax.swing.JSplitPane();
         advancedPanel = new javax.swing.JPanel();
@@ -71,13 +69,15 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         parameterTree = new javax.swing.JTree();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         xParameterTree = new javax.swing.JTree();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         yParameterTree = new javax.swing.JTree();
         parameterInfoLabel = new javax.swing.JLabel();
-
-        selectVariableLabel.setText("Select paramater:");
 
         jSplitPane2.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane2.setResizeWeight(0.5);
@@ -117,7 +117,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(advancedPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(whereParamList, 0, 125, Short.MAX_VALUE)
+                .addComponent(whereParamList, 0, 290, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(whereOp, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -129,7 +129,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     .addGroup(advancedPanelLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(subsetComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 99, Short.MAX_VALUE))
+                .addGap(0, 264, Short.MAX_VALUE))
         );
         advancedPanelLayout.setVerticalGroup(
             advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -144,7 +144,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     .addComponent(whereParamList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(whereOp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(whereTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(161, Short.MAX_VALUE))
+                .addContainerGap(225, Short.MAX_VALUE))
         );
 
         jSplitPane1.setRightComponent(advancedPanel);
@@ -161,6 +161,9 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
         jTabbedPane1.addTab("select variable", jScrollPane1);
 
+        jLabel1.setText("Override the X independent parameter");
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+
         xParameterTree.setRootVisible(false);
         xParameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
@@ -169,7 +172,26 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         });
         jScrollPane3.setViewportView(xParameterTree);
 
-        jTabbedPane1.addTab("x", jScrollPane3);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
+            .addComponent(jLabel1)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("x", jPanel1);
+
+        jPanel3.setAlignmentX(0.0F);
+
+        jLabel2.setText("Override the Y independent parameter");
 
         yParameterTree.setRootVisible(false);
         yParameterTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
@@ -179,7 +201,22 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         });
         jScrollPane4.setViewportView(yParameterTree);
 
-        jTabbedPane1.addTab("y", jScrollPane4);
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
+            .addComponent(jLabel2)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("y", jPanel3);
 
         jSplitPane1.setLeftComponent(jTabbedPane1);
 
@@ -194,17 +231,11 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(selectVariableLabel)
-                .addGap(0, 0, Short.MAX_VALUE))
             .addComponent(jSplitPane2)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(selectVariableLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane2))
+            .addComponent(jSplitPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)
         );
 
         bindingGroup.bind();
@@ -242,9 +273,12 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel advancedPanel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSplitPane jSplitPane1;
@@ -252,7 +286,6 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel parameterInfoLabel;
     private javax.swing.JTree parameterTree;
-    private javax.swing.JLabel selectVariableLabel;
     private javax.swing.JComboBox subsetComboBox;
     private javax.swing.JCheckBox whereCB;
     private javax.swing.JComboBox whereOp;
@@ -419,12 +452,13 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                 }
             }
 
-            String label= "Select Parameter (%d parameters):";
+            //String label= "Select Parameter (%d parameters):";
             
             int numData= parameters.size();
 
-            this.selectVariableLabel.setText( String.format( label, numData ) );
+            //this.selectVariableLabel.setText( String.format( label, numData ) );
 
+            this.jTabbedPane1.setTitleAt(0,"Select Variable (of "+numData+")");
             String param= params.get("arg_0");
             String subset= null;
             if ( param!=null ) {
