@@ -96,10 +96,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         parameterTree = new javax.swing.JTree();
+        jPanel2 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         parameterTree1 = new javax.swing.JTree();
+        xCheckBox = new javax.swing.JCheckBox();
+        jPanel4 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         parameterTree2 = new javax.swing.JTree();
+        yCheckBox = new javax.swing.JCheckBox();
         jScrollPane2 = new javax.swing.JScrollPane();
         paramInfo = new javax.swing.JLabel();
 
@@ -166,7 +170,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(whereParamList, 0, 112, Short.MAX_VALUE)
+                .add(whereParamList, 0, 209, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(whereOp, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 84, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -185,7 +189,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(noDep))))
                     .add(whereCB))
-                .add(0, 33, Short.MAX_VALUE))
+                .add(0, 147, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -229,7 +233,30 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         });
         jScrollPane4.setViewportView(parameterTree1);
 
-        jTabbedPane1.addTab("X", jScrollPane4);
+        xCheckBox.setText("Set Variable for X");
+        xCheckBox.setToolTipText("Specify the parameter to use for the X tags, overriding any settings found in the file.");
+        xCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                xCheckBoxActionPerformed(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(xCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+            .add(jScrollPane4)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel2Layout.createSequentialGroup()
+                .add(xCheckBox)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("X", jPanel2);
 
         parameterTree2.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
             public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
@@ -238,7 +265,25 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         });
         jScrollPane5.setViewportView(parameterTree2);
 
-        jTabbedPane1.addTab("Y", jScrollPane5);
+        yCheckBox.setText("Set Variable for Y");
+        yCheckBox.setToolTipText("Specify the parameter to use for the Y tags, overriding any settings found in the file.");
+
+        org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(yCheckBox, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
+            .add(jScrollPane5)
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel4Layout.createSequentialGroup()
+                .add(yCheckBox)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Y", jPanel4);
 
         jSplitPane1.setLeftComponent(jTabbedPane1);
 
@@ -287,7 +332,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     }// </editor-fold>//GEN-END:initComponents
 
     private void parameterTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTree1ValueChanged
-        // TODO add your handling code here:
+        xCheckBox.setSelected(true);
     }//GEN-LAST:event_parameterTree1ValueChanged
 
     private void parameterTreeValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTreeValueChanged
@@ -304,8 +349,12 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     }//GEN-LAST:event_showAllVarTypeCBActionPerformed
 
     private void parameterTree2ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_parameterTree2ValueChanged
-        // TODO add your handling code here:
+        yCheckBox.setSelected(true);
     }//GEN-LAST:event_parameterTree2ValueChanged
+
+    private void xCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_xCheckBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_xCheckBoxActionPerformed
 
     private void updateMetadata() {
        String longName= parameterInfo.get(parameter);
@@ -316,7 +365,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     private javax.swing.JLabel interpretMetadataLabel;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -336,6 +387,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     private javax.swing.JComboBox whereOp;
     private javax.swing.JComboBox whereParamList;
     private javax.swing.JTextField whereTF;
+    private javax.swing.JCheckBox xCheckBox;
+    private javax.swing.JCheckBox yCheckBox;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
