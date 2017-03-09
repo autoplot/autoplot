@@ -317,7 +317,17 @@ public class CdfDataSource extends AbstractDataSource {
                     throw new Exception("CDFException "+ex.getMessage());
                 }
 
-                long[] recs= DataSourceUtil.parseConstraint( constraint, numRec );
+                int[] dimensions = cdf.getDimensions(svariable);
+
+
+                long[] ndimensions= new long[ dimensions.length+1 ];
+                ndimensions[0]= numRec;
+                for ( i=0; i<dimensions.length; i++ ) ndimensions[i+1]= dimensions[i];
+                
+                Map<Integer,long[]> constraints= DataSourceUtil.parseConstraint( constraint, ndimensions );
+                                
+                long[] recs= constraints.get(0);
+                
                 if ( attributes==null ) {
                     attributes = readAttributes(cdf, svariable, 0);
                     if ( recs[2]==-1 ) {
@@ -815,7 +825,14 @@ public class CdfDataSource extends AbstractDataSource {
             }
         }
 
-        long[] recs = DataSourceUtil.parseConstraint(constraints, numRec);
+        int[] dimensions = cdf.getDimensions(svariable);
+        long[] ndimensions= new long[ dimensions.length+1 ];
+        ndimensions[0]= numRec;
+        for ( int i=0; i<dimensions.length; i++ ) ndimensions[i+1]= dimensions[i];
+        
+        Map<Integer,long[]> mc= DataSourceUtil.parseConstraint( constraints, ndimensions );
+        
+        long[] recs = mc.get(0);
         boolean slice= recs[1]==-1;
         MutablePropertyDataSet result;
 
@@ -837,6 +854,10 @@ public class CdfDataSource extends AbstractDataSource {
             }
             result = CdfUtil.wrapCdfData(cdf,svariable, recs[0], recCount, recs[2], slice1, dependantVariable, mon);
             //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
+            long[] slice1s= mc.get(1);
+            if ( slice1s!=null ) {
+                result= (MutablePropertyDataSet)Ops.slice1( result,(int)(slice1s[0]));
+            }
         }
         result.putProperty(QDataSet.NAME, svariable);
 
