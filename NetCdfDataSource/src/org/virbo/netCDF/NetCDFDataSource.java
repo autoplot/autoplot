@@ -145,8 +145,8 @@ public class NetCDFDataSource extends AbstractDataSource {
             }
 
             if ( syVariable!=null && syVariable.length()>0 ) {
-                NetCdfVarDataSet depend0VariableDs= NetCdfVarDataSet.create( yVariable, constraint, ncfile, new NullProgressMonitor() );
-                result = Ops.link( depend0VariableDs, result );
+                NetCdfVarDataSet yds= NetCdfVarDataSet.create( yVariable, constraint, ncfile, new NullProgressMonitor() );
+                result = Ops.link( result.property(QDataSet.DEPEND_0), yds, result );
             }
             
             String w= (String)getParam(PARAM_WHERE,"" );
