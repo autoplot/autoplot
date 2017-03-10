@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -551,6 +553,8 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 this.showAllVarTypeCB.setText("show all ("+numSupport+" support not shown)");
             }
             
+            Pattern slice1pattern= Pattern.compile("\\[\\:\\,(\\d+)\\]");
+            String slice1= params.remove("slice1"); // legacy
 
             String param= params.get("arg_0");
             String subset= null;
@@ -559,6 +563,10 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 if ( i!=-1 ) {
                     subset= param.substring(i);
                     param= param.substring(0,i);
+                    Matcher m= slice1pattern.matcher(subset);
+                    if ( m.matches() ) {
+                        slice1= m.group(1);
+                    }
                 }
             }
 
@@ -568,18 +576,39 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 }
             }
             
-            String slice1= params.remove("slice1");
-
             fillTree( this.parameterTree, parameterDescriptions, cdf, param, slice1 );
             
             Map<String,String> parameterDescriptions2= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, false, false );
-
             String xparam= params.get("depend0");
+            String xslice1= null;
             if ( xparam==null ) xparam= params.get("x");
-            fillTree( this.parameterTree1, parameterDescriptions2, cdf, xparam, null );
+            if ( xparam!=null ) {
+                int i= xparam.indexOf("[");
+                if ( i!=-1 ) {
+                    String xsubset= xparam.substring(i);
+                    xparam= xparam.substring(0,i);
+                    Matcher m= slice1pattern.matcher(xsubset);
+                    if ( m.matches() ) {
+                        xslice1= m.group(1);
+                    }
+                }
+            }
+            fillTree( this.parameterTree1, parameterDescriptions2, cdf, xparam, xslice1 );
             
             String yparam= params.get("y");
-            fillTree( this.parameterTree2, parameterDescriptions2, cdf, yparam, null );
+            String yslice1= null;
+            if ( yparam!=null ) {
+                int i= yparam.indexOf("[");
+                if ( i!=-1 ) {
+                    String ysubset= yparam.substring(i);
+                    yparam= yparam.substring(0,i);
+                    Matcher m= slice1pattern.matcher(ysubset);
+                    if ( m.matches() ) {
+                        yslice1= m.group(1);
+                    }
+                }
+            }
+            fillTree( this.parameterTree2, parameterDescriptions2, cdf, yparam, yslice1 );
             
             logger.finest("close cdf");
 
@@ -676,9 +705,17 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             
             TreePath depend0Path= parameterTree1.getSelectionPath();
             if ( depend0Path!=null ) {
-                String p= String.valueOf( depend0Path.getPathComponent(1) );
-                p= p.replaceAll("=", "%3D");
-                params.put( "x", p );
+                if ( depend0Path.getPathCount()==3 ) {
+                    String p= String.valueOf( depend0Path.getPathComponent(1) );
+                    p= p.replaceAll("=", "%3D");
+                    String val=  String.valueOf( depend0Path.getPathComponent(2) );
+                    int idx= val.indexOf(":");
+                    params.put( "x[:,"+val.substring(0,idx).trim()+"]", p );
+                } else {
+                    String p= String.valueOf( depend0Path.getPathComponent(1) );
+                    p= p.replaceAll("=", "%3D");
+                    params.put( "x", p );
+                }
             }
 
             TreePath yPath= parameterTree2.getSelectionPath();
