@@ -860,7 +860,6 @@ public class URISplit {
                     if ( key.equals( URISplit.PARAM_TIME_RANGE ) ) {
                         value= value.replaceAll("\\s+","+");
                     }
-                    value= uriEncode(value);
                     value= value.replaceAll("&", "%26");
                     result.append("&").append(key).append("=").append(value);
                 } else {
@@ -983,6 +982,9 @@ public class URISplit {
         surl = surl.replaceAll("<", "%3C");
         surl = surl.replaceAll(">", "%3E");
         //surl = surl.replaceAll("\\?", "%3F" );
+        if ( surl.contains("[") ) {
+            System.err.println("here stop");
+        }
         surl = surl.replaceAll("\\[", "%5B"); // Windows appends these in temporary downloadf rte_1495358356
         surl = surl.replaceAll("\\]", "%5D");
         surl = surl.replaceAll("\\^", "%5E");
