@@ -48,7 +48,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     private static final Logger logger= LoggerManager.getLogger("apdss.netcdf");
     
     protected static final String PARAM_WHERE = "where";
-    protected static final String PARAM_DEPEND0 = "depend0";
+    protected static final String PARAM_X = "x";
     protected static final String PARAM_Y = "y";
         
     private Variable variable;
@@ -57,13 +57,13 @@ public class NetCDFDataSource extends AbstractDataSource {
      * if non-null, the variable to use for the where filter.
      */
     private Variable whereVariable;  
-    private Variable depend0Variable;
+    private Variable xVariable;
     private Variable yVariable;
     
     private String sMyUrl;
     private String svariable;
     private String swhereVariable;
-    private String sdepend0Variable;
+    private String sxVariable;
     private String syVariable;
     
     private NetcdfDataset ncfile;
@@ -124,7 +124,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             }
             
             swhereVariable= p.get( PARAM_WHERE );  // may be null, typically is null.
-            sdepend0Variable= p.get( PARAM_DEPEND0 ); // may be null, typically is null.
+            sxVariable= p.get( PARAM_X ); // may be null, typically is null.
             syVariable= p.get( PARAM_Y ); // may be null, typically is null.
         }
     }
@@ -139,9 +139,9 @@ public class NetCDFDataSource extends AbstractDataSource {
             
             QDataSet result= NetCdfVarDataSet.create( variable, constraint, ncfile, mon.getSubtaskMonitor(15,20,"copy over ") );
             
-            if ( sdepend0Variable!=null && sdepend0Variable.length()>0 ) {
-                NetCdfVarDataSet depend0VariableDs= NetCdfVarDataSet.create( depend0Variable, constraint, ncfile, new NullProgressMonitor() );
-                result = Ops.link( depend0VariableDs, result );
+            if ( sxVariable!=null && sxVariable.length()>0 ) {
+                NetCdfVarDataSet xds= NetCdfVarDataSet.create( xVariable, constraint, ncfile, new NullProgressMonitor() );
+                result = Ops.link( xds, result );
             }
 
             if ( syVariable!=null && syVariable.length()>0 ) {
@@ -305,22 +305,22 @@ public class NetCDFDataSource extends AbstractDataSource {
                 if ( whereVariable==null ) throw new IllegalArgumentException("where refers to unresolved variable: "+swv );
             }
             
-            if ( sdepend0Variable!=null ) {
+            if ( sxVariable!=null ) {
                 for (Variable v : variables) {
                     if ( v instanceof Structure ) {
                         for ( Variable v2: ((Structure) v).getVariables() ) {
                             if ( !v2.getDataType().isNumeric() ) continue;
-                            if ( v2.getName().replaceAll(" ","+").equals( sdepend0Variable ) ) {
-                                depend0Variable= v2;
+                            if ( v2.getName().replaceAll(" ","+").equals(sxVariable ) ) {
+                                xVariable= v2;
                             }
                         }
                     } else {
-                        if ( v.getName().replaceAll(" ", "+").equals( sdepend0Variable ) ) { //TODO: verify this, it's probably going to cause problems now.
-                            depend0Variable= v;
+                        if ( v.getName().replaceAll(" ", "+").equals(sxVariable ) ) { //TODO: verify this, it's probably going to cause problems now.
+                            xVariable= v;
                         }
                     }
                 }
-                if ( depend0Variable==null ) throw new IllegalArgumentException("depend0 refers to unresolved variable: "+sdepend0Variable );
+                if ( xVariable==null ) throw new IllegalArgumentException("x refers to unresolved variable: "+sxVariable );
             }
             
             if ( syVariable!=null ) {

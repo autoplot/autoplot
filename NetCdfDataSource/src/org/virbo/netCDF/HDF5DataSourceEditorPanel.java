@@ -117,7 +117,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(advancedPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(whereParamList, 0, 290, Short.MAX_VALUE)
+                .addComponent(whereParamList, 0, 161, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(whereOp, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -129,7 +129,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
                     .addGroup(advancedPanelLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(subsetComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 264, Short.MAX_VALUE))
+                .addGap(0, 135, Short.MAX_VALUE))
         );
         advancedPanelLayout.setVerticalGroup(
             advancedPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -187,7 +187,7 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(xCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("x", jPanel1);
@@ -479,9 +479,9 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             fillTree( this.parameterTree, parameters, param );
             
             xParameterTree.setModel( this.parameterTree.getModel() );
-            String dep0= params.get( "depend0" );
-            if ( dep0!=null ) {
-                fillTree( this.xParameterTree, parameters, dep0 ); //TODO: tree is filled twice.
+            String sx= params.get( "x" );
+            if ( sx!=null ) {
+                fillTree( this.xParameterTree, parameters, sx ); //TODO: tree is filled twice.
             }
             
             yParameterTree.setModel( this.parameterTree.getModel() );
@@ -575,10 +575,10 @@ public class HDF5DataSourceEditorPanel extends javax.swing.JPanel implements Dat
             TreePath xtp= xParameterTree.getSelectionPath();
             if ( xtp!=null ) {
                 Object odep0= xtp.getLastPathComponent() ;
-                params.put( "depend0", odep0.toString() ); // TODO weak code assumes toString works.
+                params.put( "x", odep0.toString() ); // TODO weak code assumes toString works.
             }
         } else {
-            params.remove("depend0");
+            params.remove("x");
         }
 
         if ( yCheckBox.isSelected() ) {
