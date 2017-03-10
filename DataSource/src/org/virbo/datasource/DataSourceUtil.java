@@ -727,10 +727,15 @@ public class DataSourceUtil {
      * @throws java.text.ParseException when the constraint cannot be parsed.
      */
     public static Map<Integer,long[]> parseConstraint(String constraint, long[] qubeDims ) throws ParseException {
-        if ( constraint!=null && constraint.startsWith("[") && constraint.endsWith("]") ) {
-            constraint= constraint.substring(1,constraint.length()-1);
+        String[] ss;
+        if ( constraint==null ) {
+            ss= new String[] { null, null, null }; 
+        } else {
+            if ( constraint.startsWith("[") && constraint.endsWith("]") ) {
+                constraint= constraint.substring(1,constraint.length()-1);
+            }
+            ss= constraint.split("\\,",-2);
         }
-        String[] ss= constraint==null ? new String[] { null, null, null } : constraint.split("\\,",-2);
         Map<Integer,long[]> result= new HashMap<>();
         int ndim= Math.min(ss.length,qubeDims.length);
         for ( int i=0; i<ndim; i++ ) {
