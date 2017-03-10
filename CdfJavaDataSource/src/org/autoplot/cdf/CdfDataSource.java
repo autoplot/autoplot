@@ -66,6 +66,7 @@ public class CdfDataSource extends AbstractDataSource {
     protected static final String PARAM_DODEP = "doDep";
     protected static final String PARAM_WHERE = "where";
     protected static final String PARAM_DEPEND0 = "depend0";
+    protected static final String PARAM_X = "x";
     protected static final String PARAM_Y = "y";
     protected static final String PARAM_INTERPMETA = "interpMeta";
     protected static final String PARAM_ID = "id";
@@ -440,14 +441,31 @@ public class CdfDataSource extends AbstractDataSource {
         }
         
         String sdep= (String)map.get(PARAM_DEPEND0);
+        if ( sdep==null ) sdep= (String)map.get(PARAM_X);
         if ( sdep!=null && sdep.length()>0 ) {
-            QDataSet parm= wrapDataSet( cdf, sdep, constraint, false, false, null );
+            String constraint1;
+            int k = sdep.indexOf("[");
+            if (k != -1) {
+                constraint1 = sdep.substring(k);
+                sdep = sdep.substring(0, k);
+            } else {
+                constraint1 = constraint;
+            }
+            QDataSet parm= wrapDataSet( cdf, sdep, constraint1, false, false, null );
             result = (MutablePropertyDataSet) Ops.link( parm, result );
         }
 
         String sy= (String)map.get(PARAM_Y);
         if ( sy!=null && sy.length()>0 ) {
-            QDataSet parm= wrapDataSet( cdf, sy, constraint, false, false, null );
+            String constraint1;
+            int k = sy.indexOf("[");
+            if (k != -1) {
+                constraint1 = sy.substring(k);
+                sy = sy.substring(0, k);
+            } else {
+                constraint1 = constraint;
+            }            
+            QDataSet parm= wrapDataSet( cdf, sy, constraint1, false, false, null );
             result = (MutablePropertyDataSet) Ops.link( result.property(QDataSet.DEPEND_0), parm, result );
         }
         
@@ -779,7 +797,14 @@ public class CdfDataSource extends AbstractDataSource {
      * @throws CDFException
      * @throws ParseException
      */
-    private synchronized MutablePropertyDataSet wrapDataSet(final CDFReader cdf, final String svariable, final String constraints, boolean reform, boolean dependantVariable, Map<String,Object> thisAttributes, int slice1, ProgressMonitor mon) throws Exception, ParseException {
+    private synchronized MutablePropertyDataSet wrapDataSet(final CDFReader cdf, 
+            final String svariable, 
+            final String constraints, 
+            boolean reform, 
+            boolean dependantVariable, 
+            Map<String,Object> thisAttributes, 
+            int slice1, 
+            ProgressMonitor mon) throws Exception, ParseException {
 
         if ( !hasVariable(cdf, svariable) ) {
             throw new IllegalArgumentException( "No such variable: "+svariable );
@@ -832,6 +857,13 @@ public class CdfDataSource extends AbstractDataSource {
         
         Map<Integer,long[]> mc= DataSourceUtil.parseConstraint( constraints, ndimensions );
         
+        if ( mc.size()>1 ) {
+            long[] slice1s= mc.get(1);
+            if ( slice1s!=null && ( slice1s[0]!=-1 && slice1s[1]==-1 && slice1s[2]==-1 ) ) {
+                slice1= (int)(slice1s[0]);
+            }
+        }        
+        
         long[] recs = mc.get(0);
         boolean slice= recs[1]==-1;
         MutablePropertyDataSet result;
@@ -854,12 +886,6 @@ public class CdfDataSource extends AbstractDataSource {
             }
             result = CdfUtil.wrapCdfData(cdf,svariable, recs[0], recCount, recs[2], slice1, dependantVariable, mon);
             //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
-            if ( mc.size()>1 ) {
-                long[] slice1s= mc.get(1);
-                if ( slice1s!=null && ( slice1s[0]!=0 || slice1s[1]!=ndimensions[1] || slice1s[2]!=1 ) ) {
-                    result= (MutablePropertyDataSet)Ops.slice1( result,(int)(slice1s[0]));
-                }
-            }
         }
         result.putProperty(QDataSet.NAME, svariable);
 
@@ -1268,6 +1294,10 @@ public class CdfDataSource extends AbstractDataSource {
                 
                 if ( map.containsKey(PARAM_DEPEND0) ) {
                     Map<String,Object> dep0m= readAttributes(cdf, map.get(PARAM_DEPEND0), 0);
+                    attributes.put( QDataSet.DEPEND_0, dep0m );
+                }
+                if ( map.containsKey(PARAM_X) ) {
+                    Map<String,Object> dep0m= readAttributes(cdf, map.get(PARAM_X), 0);
                     attributes.put( QDataSet.DEPEND_0, dep0m );
                 }
                 
