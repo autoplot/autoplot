@@ -480,7 +480,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 throw new IllegalArgumentException("file is not a CDF file");
             }
             cdfException= null;
-        } catch ( Exception ex ) {
+        } catch ( IOException | IllegalArgumentException ex ) {
             cdfException= ex;
         }
         return true;
@@ -574,8 +574,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             
             Map<String,String> parameterDescriptions2= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, false, false );
 
-            String depend0= params.get("depend0");
-            fillTree( this.parameterTree1, parameterDescriptions2, cdf, depend0, null );
+            String xparam= params.get("depend0");
+            if ( xparam==null ) xparam= params.get("x");
+            fillTree( this.parameterTree1, parameterDescriptions2, cdf, xparam, null );
             
             String yparam= params.get("y");
             fillTree( this.parameterTree2, parameterDescriptions2, cdf, yparam, null );
@@ -677,7 +678,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             if ( depend0Path!=null ) {
                 String p= String.valueOf( depend0Path.getPathComponent(1) );
                 p= p.replaceAll("=", "%3D");
-                params.put( "depend0", p );
+                params.put( "x", p );
             }
 
             TreePath yPath= parameterTree2.getSelectionPath();
