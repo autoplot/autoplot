@@ -15,8 +15,10 @@ import gov.nasa.gsfc.spdf.cdfj.CDFReader;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -412,12 +414,17 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     JComponent delegateComponent = null;
     DataSetSelector delegateDataSetSelector=null;
     DataSourceEditorPanel delegateEditorPanel= null;
-    URISplit split;
+    
     /**
-     * URI parameters
+     * extra URI parameters that are not supported in the dialog.
      */
     Map<String,String> params;
-
+    
+    /**
+     * the location of the CDF file.
+     */
+    URI resourceUri;
+    
     /**
      * short descriptions of the parameters
      */
@@ -454,7 +461,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     
     @Override
     public boolean reject( String url ) throws IOException, URISyntaxException {
-        split = URISplit.parse(url); 
+        URISplit split = URISplit.parse(url); 
 
         if ( split.resourceUri.toURL()==null ) {
             return true;
@@ -469,7 +476,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
     @Override
     public boolean prepare( String url,  java.awt.Window parent, ProgressMonitor mon) throws Exception {
-        split= URISplit.parse(url);
+        URISplit split= URISplit.parse(url);
 
         cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), mon );
         DataSetURI.checkLength(cdfFile);
@@ -490,12 +497,13 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
     @Override
     public void setURI(String url) {
-        split= URISplit.parse(url);
-        params= URISplit.parseParams(split.params);
+        URISplit split= URISplit.parse(url);
+        Map<String,String> lparams= URISplit.parseParams(split.params);
 
         try {
-
-            cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), new NullProgressMonitor() );
+            resourceUri= split.resourceUri;
+            
+            cdfFile= DataSetURI.getFile( split.resourceUri, new NullProgressMonitor() );
             DataSetURI.checkLength(cdfFile);
             
             String fileName= cdfFile.toString();
@@ -554,9 +562,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             }
             
             Pattern slice1pattern= Pattern.compile("\\[\\:\\,(\\d+)\\]");
-            String slice1= params.remove("slice1"); // legacy
+            String slice1= lparams.remove("slice1"); // legacy
 
-            String param= params.get("arg_0");
+            String param= lparams.remove("arg_0");
             String subset= null;
             if ( param!=null ) {
                 int i= param.indexOf("[");
@@ -566,6 +574,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                     Matcher m= slice1pattern.matcher(subset);
                     if ( m.matches() ) {
                         slice1= m.group(1);
+                        subset= null;
                     }
                 }
             }
@@ -579,9 +588,9 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             fillTree( this.parameterTree, parameterDescriptions, cdf, param, slice1 );
             
             Map<String,String> parameterDescriptions2= org.autoplot.cdf.CdfUtil.getPlottable( cdf, false, QDataSet.MAX_RANK, false, false );
-            String xparam= params.get("depend0");
+            String xparam= lparams.remove("depend0");
             String xslice1= null;
-            if ( xparam==null ) xparam= params.get("x");
+            if ( xparam==null ) xparam= lparams.remove("x");
             if ( xparam!=null ) {
                 int i= xparam.indexOf("[");
                 if ( i!=-1 ) {
@@ -595,7 +604,7 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             }
             fillTree( this.parameterTree1, parameterDescriptions2, cdf, xparam, xslice1 );
             
-            String yparam= params.get("y");
+            String yparam= lparams.remove("y");
             String yslice1= null;
             if ( yparam!=null ) {
                 int i= yparam.indexOf("[");
@@ -642,16 +651,16 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             }
             parameter= param.replaceAll("%3D", "=");
 
-            if ( "no".equals( params.get("interpMeta")) ) {
+            if ( "no".equals( lparams.remove("interpMeta")) ) {
                 noInterpMeta.setSelected(true);
             }
 
-            if ( "no".equals( params.get("doDep" ) ) ) {
+            if ( "no".equals( lparams.remove("doDep" ) ) ) {
                 noDep.setSelected(true);
             }
 
             whereParamList.setModel( new DefaultComboBoxModel( whereParameterInfo.keySet().toArray() ) );
-            String where= params.get("where");
+            String where= lparams.remove("where");
             if ( where!=null && where.length()>0 ) {
                 whereCB.setSelected(true);
                 int i= where.indexOf(".");
@@ -677,15 +686,21 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             logger.log(Level.SEVERE, ex.getMessage(), ex);
         }
 
+        this.params= lparams;
+        
     }
 
     @Override
     public String getURI() {
+        
+        URISplit split= URISplit.parse(resourceUri);
+                
         String subset= subsetComboBox.getSelectedItem().toString().trim();
         if ( subset.length()>0 && subset.charAt(0)!='[' ) {
             subset= "["+subset+"]";
         }
 
+        Map<String,String> lparams= new HashMap(this.params);
         if ( isValidCDF ) {
             TreePath treePath= parameterTree.getSelectionPath();
             if ( treePath==null ) {
@@ -693,14 +708,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             } else if ( treePath.getPathCount()==3 ) {
                 String p= String.valueOf( treePath.getPathComponent(1) );
                 p= p.replaceAll("=", "%3D");
-                params.put( "arg_0", p + ( subset==null ? "" : subset ) );
+                lparams.put( "arg_0", p + ( subset==null ? "" : subset ) );
                 String val=  String.valueOf( treePath.getPathComponent(2) );
                 int idx= val.indexOf(":");
-                params.put( "slice1", val.substring(0,idx).trim() );
+                lparams.put( "slice1", val.substring(0,idx).trim() );
             } else {
                 String p= String.valueOf( treePath.getPathComponent(1) );
                 p= p.replaceAll("=", "%3D");
-                params.put( "arg_0", p + ( subset==null ? "" : subset ) );
+                lparams.put( "arg_0", p + ( subset==null ? "" : subset ) );
             }
             
             TreePath depend0Path= parameterTree1.getSelectionPath();
@@ -710,40 +725,43 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                     p= p.replaceAll("=", "%3D");
                     String val=  String.valueOf( depend0Path.getPathComponent(2) );
                     int idx= val.indexOf(":");
-                    params.put( "x[:,"+val.substring(0,idx).trim()+"]", p );
+                    lparams.put( "x", p +"[:,"+val.substring(0,idx).trim()+"]" );
                 } else {
                     String p= String.valueOf( depend0Path.getPathComponent(1) );
                     p= p.replaceAll("=", "%3D");
-                    params.put( "x", p );
+                    lparams.put( "x", p );
                 }
             }
 
             TreePath yPath= parameterTree2.getSelectionPath();
             if ( yPath!=null ) {
-                String p= String.valueOf( yPath.getPathComponent(1) );
-                p= p.replaceAll("=", "%3D");
-                params.put( "y", p );
+                if ( yPath.getPathCount()==3 ) {
+                    String p= String.valueOf( yPath.getPathComponent(1) );
+                    p= p.replaceAll("=", "%3D");
+                    String val=  String.valueOf( yPath.getPathComponent(2) );
+                    int idx= val.indexOf(":");
+                    lparams.put( "y", p +"[:,"+val.substring(0,idx).trim()+"]" );
+                } else {
+                    String p= String.valueOf( yPath.getPathComponent(1) );
+                    p= p.replaceAll("=", "%3D");
+                    lparams.put( "y", p );
+                }                
             }
             
             if ( noDep.isSelected() ) {
-                params.put("doDep","no");
-            } else {
-                params.remove("doDep");
-            }
+                lparams.put("doDep","no");
+            } 
+            
             if ( noInterpMeta.isSelected() ) {
-                params.put("interpMeta", "no");
-            } else {
-                params.remove("interpMeta");
-            }
+                lparams.put("interpMeta", "no");
+            } 
 
             if ( whereCB.isSelected() ) {
-                params.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText().replaceAll(" ","+") ) );
-            } else {
-                params.remove("where");
+                lparams.put( "where", String.format( "%s%s(%s)", whereParamList.getSelectedItem(), whereOp.getSelectedItem(), whereTF.getText().replaceAll(" ","+") ) );
             }
         }
 
-        split.params= URISplit.formatParams(params);
+        split.params= URISplit.formatParams(lparams);
         return URISplit.format(split);
     }
 
