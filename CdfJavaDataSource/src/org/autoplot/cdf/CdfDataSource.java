@@ -854,9 +854,11 @@ public class CdfDataSource extends AbstractDataSource {
             }
             result = CdfUtil.wrapCdfData(cdf,svariable, recs[0], recCount, recs[2], slice1, dependantVariable, mon);
             //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
-            long[] slice1s= mc.get(1);
-            if ( slice1s!=null ) {
-                result= (MutablePropertyDataSet)Ops.slice1( result,(int)(slice1s[0]));
+            if ( mc.size()>1 ) {
+                long[] slice1s= mc.get(1);
+                if ( slice1s!=null && ( slice1s[0]!=0 || slice1s[1]!=ndimensions[1] || slice1s[2]!=1 ) ) {
+                    result= (MutablePropertyDataSet)Ops.slice1( result,(int)(slice1s[0]));
+                }
             }
         }
         result.putProperty(QDataSet.NAME, svariable);
