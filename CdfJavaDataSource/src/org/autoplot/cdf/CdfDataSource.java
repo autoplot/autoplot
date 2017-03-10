@@ -440,18 +440,17 @@ public class CdfDataSource extends AbstractDataSource {
             logger.log(Level.FINE, "read variable {0}?{1} got {2}", new Object[] { fileName.substring(islash), svariable, String.valueOf(result) } );
         }
         
-        String sdep= (String)map.get(PARAM_DEPEND0);
-        if ( sdep==null ) sdep= (String)map.get(PARAM_X);
-        if ( sdep!=null && sdep.length()>0 ) {
+        String sx= (String)map.get(PARAM_X);
+        if ( sx!=null && sx.length()>0 ) {
             String constraint1;
-            int k = sdep.indexOf("[");
+            int k = sx.indexOf("[");
             if (k != -1) {
-                constraint1 = sdep.substring(k);
-                sdep = sdep.substring(0, k);
+                constraint1 = sx.substring(k);
+                sx = sx.substring(0, k);
             } else {
                 constraint1 = constraint;
             }
-            QDataSet parm= wrapDataSet( cdf, sdep, constraint1, false, false, null );
+            QDataSet parm= wrapDataSet( cdf, sx, constraint1, false, false, null );
             result = (MutablePropertyDataSet) Ops.link( parm, result );
         }
 
@@ -518,7 +517,7 @@ public class CdfDataSource extends AbstractDataSource {
             if ( UnitsUtil.isNominalMeasurement(SemanticOps.getUnits(result)) ) {
                 renderType= "eventsbar";
             }             
-            if ( sy!=null ) {
+            if ( sy!=null || sx!=null ) {
                 renderType= null;
             }
             String os1= (String)map.get(PARAM_SLICE1);
@@ -1292,12 +1291,11 @@ public class CdfDataSource extends AbstractDataSource {
                 }
                 attributes= readAttributes(cdf, svariable, 0);
                 
-                if ( map.containsKey(PARAM_DEPEND0) ) {
-                    Map<String,Object> dep0m= readAttributes(cdf, map.get(PARAM_DEPEND0), 0);
-                    attributes.put( QDataSet.DEPEND_0, dep0m );
-                }
                 if ( map.containsKey(PARAM_X) ) {
-                    Map<String,Object> dep0m= readAttributes(cdf, map.get(PARAM_X), 0);
+                    String s= map.get(PARAM_X);
+                    i = s.indexOf("[");
+                    if (i != -1) s = s.substring(0,i);
+                    Map<String,Object> dep0m= readAttributes(cdf, s, 0);
                     attributes.put( QDataSet.DEPEND_0, dep0m );
                 }
                 
