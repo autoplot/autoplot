@@ -65,7 +65,7 @@ public class CdfDataSource extends AbstractDataSource {
 
     protected static final String PARAM_DODEP = "doDep";
     protected static final String PARAM_WHERE = "where";
-    protected static final String PARAM_DEPEND0 = "depend0";
+    protected static final String PARAM_DEPEND0 = "depend0"; // do not use.
     protected static final String PARAM_X = "x";
     protected static final String PARAM_Y = "y";
     protected static final String PARAM_INTERPMETA = "interpMeta";
