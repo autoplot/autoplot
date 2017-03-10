@@ -62,7 +62,7 @@ public class Test002 {
             ///"002 file:///home/jbf/ct/autoplot/demos/cdaweb/ISS_DOSANL_TEPC_2_burst.vap",
             "003 file:///home/jbf/ct/hudson/vap/hydra4.vap",
             "004 file:///home/jbf/ct/hudson/vap/autoSlice.vap", // legacy vap shows adapt slice
-            "005 file:///home/jbf/ct/hudson/vap/jon-test_v1_07.vap",
+            //"005 file:///home/jbf/ct/hudson/vap/jon-test_v1_07.vap",
             "006 file:///home/jbf/ct/hudson/vap/omni_1978_v1_07.vap",
             //mem "007 file:///home/jbf/ct/hudsonvap/Cluster1_HEEA_slices.vap",
             "008 file:///home/jbf/ct/hudson/vap/lanl/lanlGeoEpDemo4.vap",
