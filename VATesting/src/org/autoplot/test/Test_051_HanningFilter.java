@@ -62,8 +62,8 @@ public class Test_051_HanningFilter implements Scenario {
         
             new JButtonOperator( hanningFrame, "Ok" ).clickMouse();      
 
-
-            Thread.sleep(1000);
+            Thread.sleep(10000);
+            
             tabs.selectPage("data");
             System.err.println("Done!");
 
