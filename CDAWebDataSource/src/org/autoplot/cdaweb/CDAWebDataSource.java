@@ -338,7 +338,8 @@ public class CDAWebDataSource extends AbstractDataSource {
                     QDataSet labelDs= (MutablePropertyDataSet)labelDss.getDataSet( new NullProgressMonitor() );
                     if ( labelDs!=null ) {
                         if ( labelDs.rank()>1 && labelDs.length()==1 ) labelDs= labelDs.slice(0);
-                        result= Ops.putProperty( result, QDataSet.DEPEND_1, labelDs );
+                        //result= Ops.putProperty( result, QDataSet.BUNDLE_1, DataSetUtil.toBundleDs(labelDs));
+                        //TODO: why doesn't this work?!?!?
                     }
                 }
             }
@@ -423,7 +424,10 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             String master= db.getMasterFile( ds.toLowerCase(), mon.getSubtaskMonitor("getMasterFile") );
             master= master+"?"+id;
-            
+            String x= getParam("x",null);
+            String y= getParam("y",null);
+            if ( x!=null ) master+="&x="+x;
+            if ( y!=null ) master+="&y="+y;
             DataSource cdf= getDelegateFactory().getDataSource( DataSetURI.getURI(master) );
 
             metadata= cdf.getMetadata(mon.getSubtaskMonitor("getMetadata")); // note this is a strange branch, because usually we have read data first.
