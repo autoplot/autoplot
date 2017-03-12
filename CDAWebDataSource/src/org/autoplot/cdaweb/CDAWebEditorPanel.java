@@ -245,6 +245,14 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                         if ( where!=null ) {
                             master= master + "&where="+where;
                         }
+                        String x= args.get("x");
+                        if ( x!=null ) {
+                            master= master + "&x="+x;
+                        }
+                        String y= args.get("y");
+                        if ( y!=null ) {
+                            master= master + "&y="+y;
+                        }
 
                         boolean status;
                         status= panel.prepare( master, SwingUtilities.getWindowAncestor(CDAWebEditorPanel.this), new NullProgressMonitor() );
@@ -699,6 +707,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         String lid=null;
         String slice1= "";
         String where= null;
+        String x= null;
+        String y= null;
         if ( paramEditor!=null ) {
             lid= paramEditor.getURI();
             URISplit split= URISplit.parse(lid);
@@ -706,6 +716,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             lid= args.get("arg_0");
             slice1= args.get("slice1");
             where= args.get("where");
+            x= args.get("x");
+            y= args.get("y");
         }
         if ( lid!=null ) this.id= lid;
         if ( lid==null && this.id!=null ) lid=this.id;
@@ -731,6 +743,12 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
         if ( availabilityCB.isSelected() ) {
             result+= "&avail=T";
+        }
+        if ( x!=null ) {
+            result+= "&x="+x;
+        }
+        if ( y!=null ) {
+            result+= "&y="+y;
         }
         return result +"&timerange="+timeRange;
     }
