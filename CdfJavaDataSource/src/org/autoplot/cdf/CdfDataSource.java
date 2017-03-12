@@ -30,9 +30,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.autoplot.bufferdataset.BufferDataSet;
 import org.das2.dataset.NoDataInIntervalException;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
@@ -71,6 +73,9 @@ public class CdfDataSource extends AbstractDataSource {
     protected static final String PARAM_INTERPMETA = "interpMeta";
     protected static final String PARAM_ID = "id";
     protected static final String PARAM_SLICE1 = "slice1";
+    
+    protected static final String ATTR_SLICE1_LABELS= "slice1_labels";
+    protected static final String ATTR_SLICE1= "slice1";
     
     private static final Logger logger= LoggerManager.getLogger("apdss.cdf");
     private Map<String, Object> attributes;
@@ -249,7 +254,7 @@ public class CdfDataSource extends AbstractDataSource {
         timer.tickle("unload cdf soon");
         return cdf;
  
-    }
+    }    
 
     @Override
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws Exception {
@@ -330,13 +335,28 @@ public class CdfDataSource extends AbstractDataSource {
                 long[] recs= constraints.get(0);
                 
                 if ( attributes==null ) {
+                    getMetadata( new NullProgressMonitor() );
                     attributes = readAttributes(cdf, svariable, 0);
-                    if ( recs[2]==-1 ) {
+                    if ( recs[2]==-1 ) { // if slice0
                         attributes= MetadataUtil.sliceProperties(attributes, 0);
                     }
                     if ( map.get(PARAM_SLICE1)!=null ) {
                         attributes.put( PARAM_SLICE1, map.get(PARAM_SLICE1) );
-                    }                
+                    }
+                    if ( constraint!=null ) {
+                        Matcher m= Pattern.compile("\\[\\:\\,(\\d+)\\]").matcher(constraint); // TODO: this should also match ds[::5,0]
+                        if ( m.matches() ) {
+                            attributes.put( PARAM_SLICE1, m.group(1) );
+                        }
+                    }
+                    if ( map.get(PARAM_X)!=null ) {
+                        Map<String,Object> xattr= readXorYAttributes( cdf, (String)map.get(PARAM_X), 0);
+                        attributes.put( QDataSet.DEPEND_0, xattr );
+                    }
+                    if ( map.get(PARAM_Y)!=null ) {
+                        Map<String,Object> yattr= readXorYAttributes( cdf, (String)map.get(PARAM_Y), 0);
+                        attributes.put( "Y", yattr );  // there's no place for this, really.
+                    }
                 }
             }
 
@@ -634,6 +654,55 @@ public class CdfDataSource extends AbstractDataSource {
         }
     }
     
+    /**
+     * read variable, which might have [:,i] for a slice
+     * @param cdf the cdf file
+     * @param var the variable name, and [:,i] if slice is expected.
+     * @param depth 
+     */
+    private Map<String,Object> readXorYAttributes( CDFReader cdf, String var, int depth ) {
+        int i= var.indexOf("[");
+        String slice=null;
+        if ( i>-1 ) {
+            Matcher m= Pattern.compile("\\[\\:\\,(\\d+)\\]").matcher(var.substring(i));
+            if ( m.matches() ) {
+                slice= m.group(1);
+            } else {
+                logger.warning("only [:,i] supported");
+            }
+            var= var.substring(0,i);
+        }
+        HashMap<String,Object> xyAttributes = readAttributes(cdf, var, depth);
+        if ( slice!=null ) {
+            String labl_ptr_1= (String)xyAttributes.get("LABL_PTR_1");
+            boolean labelsAreRead= false;
+            if ( labl_ptr_1!=null ){
+                try {
+                    MutablePropertyDataSet v= CdfUtil.wrapCdfData( cdf, labl_ptr_1, 0, -1, 1, -1, new NullProgressMonitor() );                    
+                    xyAttributes.put( ATTR_SLICE1_LABELS,v);
+                    xyAttributes.put( ATTR_SLICE1, slice );
+                    labelsAreRead= true;
+                } catch (Exception ex) {
+                    Logger.getLogger(CdfDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } 
+            if ( !labelsAreRead ) {
+                try {
+                    int[] qube= cdf.getDimensions(var);
+                    String[] labels= new String[qube[0]];
+                    for ( int j=0; j<qube[0]; j++ ) {
+                        labels[j]= "ch_"+j;
+                    }
+                    xyAttributes.put( ATTR_SLICE1_LABELS, Ops.labelsDataset(labels) );
+                    xyAttributes.put( ATTR_SLICE1, slice );
+                } catch (CDFException.ReaderError ex) {
+                    Logger.getLogger(CdfDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return xyAttributes;
+    }
+    
     /* read all the variable attributes into a Map */
     private synchronized HashMap<String, Object> readAttributes(CDFReader cdf, String var, int depth) {
         try {
@@ -729,7 +798,7 @@ public class CdfDataSource extends AbstractDataSource {
             if ( o!=null ) {
                 try {
                     Object v= CdfUtil.wrapCdfData( cdf,(String)o, 0, -1, 1, -1, new NullProgressMonitor() );
-                    props.put( "slice1_labels", v );
+                    props.put( ATTR_SLICE1_LABELS, v );
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, ex.getMessage(), ex);
                 }
