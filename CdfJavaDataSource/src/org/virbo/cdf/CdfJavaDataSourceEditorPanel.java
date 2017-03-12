@@ -718,34 +718,38 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 lparams.put( "arg_0", p + ( subset==null ? "" : subset ) );
             }
             
-            TreePath depend0Path= parameterTree1.getSelectionPath();
-            if ( depend0Path!=null ) {
-                if ( depend0Path.getPathCount()==3 ) {
-                    String p= String.valueOf( depend0Path.getPathComponent(1) );
-                    p= p.replaceAll("=", "%3D");
-                    String val=  String.valueOf( depend0Path.getPathComponent(2) );
-                    int idx= val.indexOf(":");
-                    lparams.put( "x", p +"[:,"+val.substring(0,idx).trim()+"]" );
-                } else {
-                    String p= String.valueOf( depend0Path.getPathComponent(1) );
-                    p= p.replaceAll("=", "%3D");
-                    lparams.put( "x", p );
+            if ( xCheckBox.isSelected() ) {
+                TreePath depend0Path= parameterTree1.getSelectionPath();
+                if ( depend0Path!=null ) {
+                    if ( depend0Path.getPathCount()==3 ) {
+                        String p= String.valueOf( depend0Path.getPathComponent(1) );
+                        p= p.replaceAll("=", "%3D");
+                        String val=  String.valueOf( depend0Path.getPathComponent(2) );
+                        int idx= val.indexOf(":");
+                        lparams.put( "x", p +"[:,"+val.substring(0,idx).trim()+"]" );
+                    } else {
+                        String p= String.valueOf( depend0Path.getPathComponent(1) );
+                        p= p.replaceAll("=", "%3D");
+                        lparams.put( "x", p );
+                    }
                 }
             }
 
-            TreePath yPath= parameterTree2.getSelectionPath();
-            if ( yPath!=null ) {
-                if ( yPath.getPathCount()==3 ) {
-                    String p= String.valueOf( yPath.getPathComponent(1) );
-                    p= p.replaceAll("=", "%3D");
-                    String val=  String.valueOf( yPath.getPathComponent(2) );
-                    int idx= val.indexOf(":");
-                    lparams.put( "y", p +"[:,"+val.substring(0,idx).trim()+"]" );
-                } else {
-                    String p= String.valueOf( yPath.getPathComponent(1) );
-                    p= p.replaceAll("=", "%3D");
-                    lparams.put( "y", p );
-                }                
+            if ( yCheckBox.isSelected() ) {
+                TreePath yPath= parameterTree2.getSelectionPath();
+                if ( yPath!=null ) {
+                    if ( yPath.getPathCount()==3 ) {
+                        String p= String.valueOf( yPath.getPathComponent(1) );
+                        p= p.replaceAll("=", "%3D");
+                        String val=  String.valueOf( yPath.getPathComponent(2) );
+                        int idx= val.indexOf(":");
+                        lparams.put( "y", p +"[:,"+val.substring(0,idx).trim()+"]" );
+                    } else {
+                        String p= String.valueOf( yPath.getPathComponent(1) );
+                        p= p.replaceAll("=", "%3D");
+                        lparams.put( "y", p );
+                    }                
+                }
             }
             
             if ( noDep.isSelected() ) {
