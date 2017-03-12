@@ -531,6 +531,7 @@ public class MetadataPanel extends javax.swing.JPanel {
 
         jPopupMenu1 = new javax.swing.JPopupMenu();
         copyMenuItem = new javax.swing.JMenuItem();
+        copyValueMenuItem = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         metaDataTree = new javax.swing.JTree();
 
@@ -542,6 +543,14 @@ public class MetadataPanel extends javax.swing.JPanel {
             }
         });
         jPopupMenu1.add(copyMenuItem);
+
+        copyValueMenuItem.setText("copy value");
+        copyValueMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyValueMenuItemActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(copyValueMenuItem);
 
         jScrollPane1.setViewportView(metaDataTree);
 
@@ -569,8 +578,26 @@ public class MetadataPanel extends javax.swing.JPanel {
         });
     }//GEN-LAST:event_copyMenuItemActionPerformed
 
+    private void copyValueMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyValueMenuItemActionPerformed
+        LoggerManager.logGuiEvent(evt);
+        TreePath tp= metaDataTree.getSelectionPath();
+        String s= tp.getLastPathComponent().toString();
+        int i= s.indexOf("=");
+        if ( i>-1 ) {
+            s= s.substring(i+1);
+        }
+        StringSelection stringSelection = new StringSelection( s );
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, new ClipboardOwner() {
+            @Override
+            public void lostOwnership(Clipboard clipboard, Transferable contents) {
+            }
+        });
+    }//GEN-LAST:event_copyValueMenuItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem copyMenuItem;
+    private javax.swing.JMenuItem copyValueMenuItem;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTree metaDataTree;
