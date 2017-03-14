@@ -67,6 +67,7 @@ import org.jdesktop.beansbinding.Property;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
+import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.LayoutListener;
 import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.layout.LayoutConstants;
@@ -469,7 +470,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
     }
 
-    public void fillEditPlotMenu(JMenu editPlotMenu, final Plot domPlot) {
+    public void fillEditPlotMenu( final JMenu editPlotMenu, final Plot domPlot) {
         JMenuItem item;
         item = new JMenuItem(new AbstractAction("Delete Plot") {
             @Override
@@ -528,7 +529,15 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         } );
         editPlotMenu.add(item);
-                
+
+        item= new JMenuItem( new AbstractAction("Replace Plot with Clipboard Plot") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GuiSupport.pasteClipboardIntoPlot( editPlotMenu, ApplicationController.this, domPlot );
+            }
+        } );
+        editPlotMenu.add(item);
+        
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
             @Override
             public void actionPerformed(ActionEvent e) {

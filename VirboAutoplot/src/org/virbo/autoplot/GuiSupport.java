@@ -1600,6 +1600,79 @@ public class GuiSupport {
 
     }
 
+    public static void pasteClipboardIntoPlot( Component app, ApplicationController controller, Plot newP ) throws HeadlessException {
+        try {
+            Clipboard clpbrd= Toolkit.getDefaultToolkit().getSystemClipboard();
+            String s;
+            if ( clpbrd.isDataFlavorAvailable(DataFlavor.stringFlavor) ) {
+                s= (String) clpbrd.getData(DataFlavor.stringFlavor);
+                if ( !s.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<vap") ) {
+                    JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
+                    return;
+                }
+            } else {
+                JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
+                return;
+            }
+            
+            List<PlotElement> pes= controller.getPlotElementsFor(newP);
+            for ( PlotElement pe: pes ) {
+                controller.deletePlotElement(pe);
+            }
+            
+            Application state= (Application)StatePersistence.restoreState(new ByteArrayInputStream(s.getBytes()));
+            Plot p= state.getPlots(0);
+            newP.syncTo(p,Arrays.asList("id","rowId","columnId") );
+            Map<String,String> nameMap= new HashMap<>();
+            nameMap.put( p.getId(), newP.getId() );
+            //List<DataSourceFilter> unresolved= new ArrayList<>();
+            for ( int i=0; i<state.getDataSourceFilters().length; i++ ) {
+                DataSourceFilter newDsf= controller.addDataSourceFilter();
+                DataSourceFilter stateDsf= state.getDataSourceFilters(i);
+                if ( stateDsf.getUri().startsWith("vap+internal:") ) {
+                    //unresolved.add(stateDsf);
+                } else {
+                    newDsf.syncTo(state.getDataSourceFilters(i),Collections.singletonList("id"));   
+                    state.setDataSourceFilters(i,null); // mark as done
+                }
+                nameMap.put( stateDsf.getId(), newDsf.getId() );
+            }
+            for ( int i=0; i<state.getDataSourceFilters().length; i++ ) {
+                DataSourceFilter stateDsf= state.getDataSourceFilters(i);
+                if ( stateDsf!=null ) {
+                    String uri= stateDsf.getUri();
+                    String[] children= uri.substring(13).split(",");
+                    StringBuilder sb= new StringBuilder( "vap+internal:" );
+                    for ( int j=0; j<children.length; j++ ) {
+                        if (j>0) sb.append(",");
+                        sb.append( nameMap.get(children[j]) );
+                    }
+                    stateDsf.setUri(sb.toString());
+                    DataSourceFilter newDsf= (DataSourceFilter)DomUtil.getElementById( controller.getApplication(), nameMap.get(stateDsf.getId()) );
+                    newDsf.syncTo( stateDsf,Collections.singletonList("id"));   
+                }
+            }
+            Application theApp= controller.getApplication();
+            for ( int i=0; i<state.getPlotElements().length; i++ ) {
+                PlotElement pe1= state.getPlotElements(i);
+                DataSourceFilter dsf1= 
+                        (DataSourceFilter) DomUtil.getElementById( theApp,nameMap.get(pe1.getDataSourceFilterId()) );
+                Plot plot1= (Plot) DomUtil.getElementById( theApp, nameMap.get(pe1.getPlotId()) );
+                PlotElement pe= controller.addPlotElement( plot1, dsf1 );
+                pe.syncTo( pe1, Arrays.asList( "id", "plotId", "dataSourceFilterId") );
+                if ( i==0 ) {
+                    plot1.setAutoBinding(true); // kludge
+                    plot1.getController().setAutoBinding(true); // TODO: check on why there are two autoBinding properties
+                }
+                pe.setPlotDefaults( pe1.getPlotDefaults() );
+
+            }
+
+
+        } catch (UnsupportedFlavorException | IOException ex) {
+            Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }    
     /**
      * Add items to the plot context menu, such as properties and add plot.
      * @param controller
@@ -1744,73 +1817,8 @@ public class GuiSupport {
         item = new JMenuItem( new  AbstractAction("Paste Plot From Clipboard") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    Clipboard clpbrd= Toolkit.getDefaultToolkit().getSystemClipboard();
-                    String s;
-                    if ( clpbrd.isDataFlavorAvailable(DataFlavor.stringFlavor) ) {
-                        s= (String) clpbrd.getData(DataFlavor.stringFlavor);
-                        if ( !s.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<vap") ) {
-                            JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
-                            return;
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(app,"Use \"Edit Plot\"->\"Copy Plot to Clipboard\"");
-                        return;
-                    }
-                    Application state= (Application)StatePersistence.restoreState(new ByteArrayInputStream(s.getBytes()));
-                    Plot p= state.getPlots(0);
-                    Plot newP= controller.addPlot( domPlot, LayoutConstants.BELOW );
-                    newP.syncTo(p,Arrays.asList("id","rowId","columnId") );
-                    Map<String,String> nameMap= new HashMap<>();
-                    nameMap.put( p.getId(), newP.getId() );
-                    //List<DataSourceFilter> unresolved= new ArrayList<>();
-                    for ( int i=0; i<state.getDataSourceFilters().length; i++ ) {
-                        DataSourceFilter newDsf= controller.addDataSourceFilter();
-                        DataSourceFilter stateDsf= state.getDataSourceFilters(i);
-                        if ( stateDsf.getUri().startsWith("vap+internal:") ) {
-                            //unresolved.add(stateDsf);
-                        } else {
-                            newDsf.syncTo(state.getDataSourceFilters(i),Collections.singletonList("id"));   
-                            state.setDataSourceFilters(i,null); // mark as done
-                        }
-                        nameMap.put( stateDsf.getId(), newDsf.getId() );
-                    }
-                    for ( int i=0; i<state.getDataSourceFilters().length; i++ ) {
-                        DataSourceFilter stateDsf= state.getDataSourceFilters(i);
-                        if ( stateDsf!=null ) {
-                            String uri= stateDsf.getUri();
-                            String[] children= uri.substring(13).split(",");
-                            StringBuilder sb= new StringBuilder( "vap+internal:" );
-                            for ( int j=0; j<children.length; j++ ) {
-                                if (j>0) sb.append(",");
-                                sb.append( nameMap.get(children[j]) );
-                            }
-                            stateDsf.setUri(sb.toString());
-                            DataSourceFilter newDsf= (DataSourceFilter)DomUtil.getElementById( controller.getApplication(), nameMap.get(stateDsf.getId()) );
-                            newDsf.syncTo( stateDsf,Collections.singletonList("id"));   
-                        }
-                    }
-                    Application theApp= controller.getApplication();
-                    for ( int i=0; i<state.getPlotElements().length; i++ ) {
-                        PlotElement pe1= state.getPlotElements(i);
-                        DataSourceFilter dsf1= 
-                                (DataSourceFilter) DomUtil.getElementById( theApp,nameMap.get(pe1.getDataSourceFilterId()) );
-                        Plot plot1= (Plot) DomUtil.getElementById( theApp, nameMap.get(pe1.getPlotId()) );
-                        PlotElement pe= controller.addPlotElement( plot1, dsf1 );
-                        pe.syncTo( pe1, Arrays.asList( "id", "plotId", "dataSourceFilterId") );
-                        if ( i==0 ) {
-                            plot1.setAutoBinding(true); // kludge
-                            plot1.getController().setAutoBinding(true); // TODO: check on why there are two autoBinding properties
-                        }
-                        pe.setPlotDefaults( pe1.getPlotDefaults() );
-                        
-                    }
-                    
-                            
-                } catch (UnsupportedFlavorException | IOException ex) {
-                    Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
+                Plot newP= controller.addPlot( domPlot, LayoutConstants.BELOW );
+                pasteClipboardIntoPlot(app,controller,newP);
             }
         });
         item.setToolTipText("Paste the plot in the system clipboard.");
