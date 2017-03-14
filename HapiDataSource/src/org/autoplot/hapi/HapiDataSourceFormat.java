@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.URISplit;
@@ -70,8 +71,23 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         if ( dep0!=null ) {
             dss.add(dep0);
         }
-        if ( data.property(QDataSet.DEPEND_1)==null && SemanticOps.isBundle(data) ) {
-            for ( int i=0; i<data.length(); i++ ) {
+        
+        boolean dep1IsOrdinal= false;
+        QDataSet dep1= (QDataSet)data.property(QDataSet.DEPEND_1);
+        if ( dep1!=null ) {
+            if ( UnitsUtil.isOrdinalMeasurement( SemanticOps.getUnits(dep1) ) ) {
+                dep1IsOrdinal= true;
+            } else {
+                dep1IsOrdinal= true;
+                for ( int i=0; dep1IsOrdinal && i<dep1.length(); i++ ) {
+                    if ( dep1.value(i)!=(i+1) ) { // silly vap+cdaweb:ds=THA_L1_STATE&filter=pos&id=tha_pos&timerange=2016-10-02
+                        dep1IsOrdinal= false;
+                    }
+                }
+            }
+        }
+        if ( ( dep1IsOrdinal || data.property(QDataSet.DEPEND_1)==null ) && SemanticOps.isBundle(data) ) {
+            for ( int i=0; i<data.length(0); i++ ) {
                 dss.add(Ops.unbundle(data,i));
             }
         } else {
@@ -106,6 +122,9 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 if ( f!=null ) {
                     j1.put("fill",f); //TODO: check that this is properly handled as Object.
                 }                
+                if ( ds.rank()>=2 ) {
+                    j1.put("bins", getBinsFor(ds) );
+                }
                 parameters.put(i,j1);
             }
             i++;
@@ -137,6 +156,52 @@ public class HapiDataSourceFormat implements DataSourceFormat {
             c.write( fw );
             fw.write( c.toString(4) );
         }
+        
+        File dataFile= new File( new File( hapiDir, "data" ), id+".csv" );
+        if ( !dataFile.getParentFile().exists() ) {
+            dataFile.getParentFile().mkdirs();
+        }
+        int nrec= dss.get(0).length();
+        try ( FileWriter fw = new FileWriter(dataFile) ) {
+            for ( int irec=0; irec<nrec; irec++ ) {
+                for ( QDataSet ds: dss ) {
+                    Units u= SemanticOps.getUnits(ds);
+                    boolean uIsOrdinal= UnitsUtil.isOrdinalMeasurement(u);
+                    if ( UnitsUtil.isTimeLocation(u) ) {
+                        fw.write( u.createDatum(ds.value(irec)).toString() );
+                    } else {
+                        if ( ds.rank()==1 ) {
+                            fw.write( ds.slice(irec).toString() );
+                        } else if ( ds.rank()==2 ) {
+                            for ( int j=0; j<ds.length(0); j++ ) {
+                                fw.write( "," );
+                                if ( uIsOrdinal ) {
+                                    fw.write( u.createDatum(ds.value(irec,j)).toString() );
+                                } else {
+                                    fw.write( String.valueOf( ds.value(irec,j) ) );
+                                }
+                            }
+                        } else if ( ds.rank()>2 ) {
+                            QDataSet ds1= ds.slice(irec);
+                            QubeDataSetIterator iter= new QubeDataSetIterator(ds1);
+                            while ( iter.hasNext() ) {
+                                iter.next();
+                                fw.write( "," );
+                                if ( uIsOrdinal ) {
+                                    fw.write("\"");
+                                    fw.write( u.createDatum( iter.getValue(ds1) ).toString() );
+                                    fw.write("\"");
+                                } else {
+                                    fw.write( String.valueOf( iter.getValue(ds1) ) );
+                                }
+                            }
+                        }
+                    }
+                }
+                fw.write( "\n" );
+            }
+        }
+        
     }
 
     private void updateCatalog(File hapiDir, String id, String groupTitle) throws JSONException, IOException {
@@ -195,5 +260,64 @@ public class HapiDataSourceFormat implements DataSourceFormat {
     @Override
     public String getDescription() {
         return "HAPI Info response";
+    }
+
+    private JSONArray getBinsFor(QDataSet ds) throws JSONException {
+        if ( ds.rank()!=2 ) {
+            throw new IllegalArgumentException("unsupported rank, must be 2");
+        } else {
+            JSONArray binsArray= new JSONArray();
+            int[] qube= DataSetUtil.qubeDims(ds);
+            for ( int i=1; i<ds.rank(); i++ ) {
+                QDataSet dep= (QDataSet) ds.property("DEPEND_"+i);
+                if ( dep==null ) dep= Ops.findgen(qube[i]);
+                if ( dep.rank()==2 ) {
+                    if ( SemanticOps.isBins( dep ) ) {
+                        String n= Ops.guessName(dep);
+                        Units u= SemanticOps.getUnits(dep);
+                        JSONObject jo= new JSONObject();
+                        jo.put( "name", n );
+                        jo.put( "units", u.toString() );
+                        JSONArray ranges= new JSONArray();
+                        for ( int j=0; j<qube[i]; j++ ) {
+                            JSONArray range= new JSONArray();
+                            range.put(0,dep.value(j,0));
+                            range.put(1,dep.value(j,1));
+                            ranges.put(j,range);
+                        }
+                        jo.put( "ranges", ranges );
+                        binsArray.put( i-1, jo ); // -1 is because DEPEND_0 is the streaming index.                        
+                    } else {
+                        throw new IllegalArgumentException("independent variable must be a simple 1-D array");
+                    }
+                } else {
+                    String n= Ops.guessName(dep);
+                    Units u= SemanticOps.getUnits(dep);
+                    JSONObject jo= new JSONObject();
+                    jo.put( "name", n );
+                    jo.put( "units", u.toString() );
+                    JSONArray centers= new JSONArray();
+                    for ( int j=0; j<qube[i]; j++ ) {
+                        centers.put(j,dep.value(j));
+                    }
+                    jo.put( "centers", centers );
+                    
+                    QDataSet binMax= (QDataSet) dep.property(QDataSet.BIN_MAX);
+                    QDataSet binMin= (QDataSet) dep.property(QDataSet.BIN_MIN);
+                    if ( binMin!=null && binMax!=null ) {
+                        JSONArray ranges= new JSONArray();
+                        for ( int j=0; j<qube[i]; j++ ) {
+                            JSONArray range= new JSONArray();
+                            range.put(0,binMin.value(j,0));
+                            range.put(1,binMax.value(j,1));
+                            ranges.put(j,range);
+                        }
+                        jo.put( "ranges", ranges );
+                    }
+                    binsArray.put( i-1, jo ); // -1 is because DEPEND_0 is the streaming index.
+                }
+            }
+            return binsArray;
+        }
     }
 }
