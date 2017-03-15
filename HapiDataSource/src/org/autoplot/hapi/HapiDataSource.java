@@ -27,6 +27,7 @@ import org.das2.datum.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.LoggerManager;
@@ -678,6 +679,23 @@ public class HapiDataSource extends AbstractDataSource {
         return result;
     }
     
+    /**
+     * TODO: commas within quotes.  remove extra whitespace.
+     * @param line
+     * @return 
+     */
+    private String[] lineSplit( String line ) {
+        String[] ss= line.split(",");
+        for ( int i=0; i<ss.length; i++ ) {
+            String s= ss[i].trim();
+            if ( s.startsWith("\"") && s.endsWith("\"") ) {
+                s= s.substring(1,s.length()-1);
+            }
+            ss[i]= s;
+        }
+        return ss;
+    }
+    
     private QDataSet getDataSetViaCsv(int totalFields, ProgressMonitor monitor, URL url, ParamDescription[] pds, DatumRange tr, int nparam, int[] nfields) throws IllegalArgumentException, Exception, IOException {
         DataSetBuilder builder= new DataSetBuilder(2,100,totalFields);
         monitor.setProgressMessage("reading data");
@@ -691,7 +709,7 @@ public class HapiDataSource extends AbstractDataSource {
         try ( BufferedReader in= new BufferedReader( new InputStreamReader( gzip ? new GZIPInputStream( connection.getInputStream() ) : connection.getInputStream() ) ) ) {
             String line= in.readLine();
             while ( line!=null ) {
-                String[] ss= line.split(",");
+                String[] ss= lineSplit(line);
                 if ( ss.length!=totalFields ) {
                     logger.log(Level.WARNING, "expected {0} fields, got {1}", new Object[]{totalFields, ss.length});
                     throw new IllegalArgumentException( String.format( "expected %d fields, got %d", new Object[]{totalFields, ss.length} ) );
@@ -715,7 +733,12 @@ public class HapiDataSource extends AbstractDataSource {
                 for ( int i=1; i<nparam; i++ ) {  // nparam is number of parameters, which may have multiple fields.
                     for ( int j=0; j<nfields[i]; j++ ) {
                         try {
-                            builder.putValue( -1, ifield, pds[i].units.parse(ss[ifield]) );
+                            String s= ss[ifield];
+                            if ( pds[i].units instanceof EnumerationUnits ) {
+                                builder.putValue( -1, ifield, ((EnumerationUnits)pds[i].units).createDatum(s).doubleValue(pds[i].units) );
+                            } else {
+                                builder.putValue( -1, ifield, pds[i].units.parse(s) );
+                            }
                         } catch ( ParseException ex ) {
                             builder.putValue( -1, ifield, pds[i].fillValue );
                             pds[i].hasFill= true;
@@ -752,6 +775,12 @@ public class HapiDataSource extends AbstractDataSource {
             final JSONObject jsonObjecti = parameters.getJSONObject(i);
             
             String name= jsonObjecti.getString("name"); // the name of one of the parameters.
+            
+            if ( name==null ) {
+                name="name"+i;
+                logger.log(Level.WARNING, "name not found for {0}th parameter", i );
+            }
+            
             pds[i]= new ParamDescription( name );
             
             String type;
@@ -777,7 +806,7 @@ public class HapiDataSource extends AbstractDataSource {
                 }
                 
             } else {
-                pds[i].type= jsonObjecti.getString("type");
+                pds[i].type= type;
                 if ( jsonObjecti.has("units") ) {
                     String sunits= jsonObjecti.getString("units");
                     if ( sunits!=null ) {
@@ -786,7 +815,16 @@ public class HapiDataSource extends AbstractDataSource {
                 } else {
                     pds[i].units= Units.dimensionless;
                 }
-                pds[i].type= type;
+                
+                if ( type.equals("String") ) {
+                    type="string";
+                    logger.warning("String used for type instead of string (lower case)");
+                }
+
+                if ( type.equals("string") ) {
+                    pds[i].units= EnumerationUnits.create(name);
+                }
+                
                 if ( jsonObjecti.has("fill") ) {
                     String sfill= jsonObjecti.getString("fill");
                     if ( sfill!=null ) {
