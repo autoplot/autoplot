@@ -76,7 +76,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         
         boolean dep1IsOrdinal= false;
         QDataSet dep1= (QDataSet)data.property(QDataSet.DEPEND_1);
-        if ( dep1!=null ) {
+        if ( dep1!=null && dep1.rank()==1 ) {
             if ( UnitsUtil.isOrdinalMeasurement( SemanticOps.getUnits(dep1) ) ) {
                 dep1IsOrdinal= true;
             } else {
@@ -111,7 +111,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 parameters.put(i,time);
             } else {
                 JSONObject j1= new JSONObject();
-                j1.put("name", Ops.guessName(ds) );
+                j1.put("name", Ops.guessName(ds,"data"+i) );
                 j1.put("description", ds.property( QDataSet.TITLE ) );
                 if ( u!=null && u!=Units.dimensionless ) {
                     j1.put("units", SemanticOps.getUnits(ds) );
@@ -135,6 +135,8 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         DatumRange dr= DataSetUtil.asDatumRange( Ops.extent(dep0) );
         jo.put( "startDate", dr.min().toString() );
         jo.put( "stopDate", dr.max().toString() );
+        jo.put( "sampleStartDate", dr.min().toString() );
+        jo.put( "sampleStopDate", dr.max().toString() );
         jo.put( "parameters", parameters );
         
         if ( !infoFile.getParentFile().exists() ) {
@@ -184,7 +186,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                     } else if ( ds.rank()==2 ) {
                         for ( int j=0; j<ds.length(0); j++ ) {
                             if ( ids>0 ) fw.write( delim );
-                            fw.write( df.format( u.createDatum(ds.value(irec)), u ) );
+                            fw.write( df.format( u.createDatum(ds.value(irec,j)), u ) );
                         }
                     } else if ( ds.rank()>2 ) {
                         QDataSet ds1= ds.slice(irec);
