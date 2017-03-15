@@ -14,9 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.datum.format.DatumFormatter;
 import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -161,42 +163,45 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         if ( !dataFile.getParentFile().exists() ) {
             dataFile.getParentFile().mkdirs();
         }
+        DatumFormatter[] dfs= new DatumFormatter[dss.size()];
+        for ( int ids=0; ids<dss.size(); ids++ ) {
+            QDataSet ds= dss.get(ids);
+            dfs[ids]= DataSetUtil.bestFormatter(ds);
+        }
         int nrec= dss.get(0).length();
         try ( FileWriter fw = new FileWriter(dataFile) ) {
             for ( int irec=0; irec<nrec; irec++ ) {
+                int ids=0;
+                String delim="";
                 for ( QDataSet ds: dss ) {
+                    DatumFormatter df= dfs[ids];
                     Units u= SemanticOps.getUnits(ds);
+                    if ( ids>0 ) delim=",";
                     boolean uIsOrdinal= UnitsUtil.isOrdinalMeasurement(u);
-                    if ( UnitsUtil.isTimeLocation(u) ) {
-                        fw.write( u.createDatum(ds.value(irec)).toString() );
-                    } else {
-                        if ( ds.rank()==1 ) {
-                            fw.write( ds.slice(irec).toString() );
-                        } else if ( ds.rank()==2 ) {
-                            for ( int j=0; j<ds.length(0); j++ ) {
-                                fw.write( "," );
-                                if ( uIsOrdinal ) {
-                                    fw.write( u.createDatum(ds.value(irec,j)).toString() );
-                                } else {
-                                    fw.write( String.valueOf( ds.value(irec,j) ) );
-                                }
-                            }
-                        } else if ( ds.rank()>2 ) {
-                            QDataSet ds1= ds.slice(irec);
-                            QubeDataSetIterator iter= new QubeDataSetIterator(ds1);
-                            while ( iter.hasNext() ) {
-                                iter.next();
-                                fw.write( "," );
-                                if ( uIsOrdinal ) {
-                                    fw.write("\"");
-                                    fw.write( u.createDatum( iter.getValue(ds1) ).toString() );
-                                    fw.write("\"");
-                                } else {
-                                    fw.write( String.valueOf( iter.getValue(ds1) ) );
-                                }
+                    if ( ds.rank()==1 ) {
+                        if ( ids>0 ) fw.write( delim );
+                        fw.write( df.format( u.createDatum(ds.value(irec)), u ) );
+                    } else if ( ds.rank()==2 ) {
+                        for ( int j=0; j<ds.length(0); j++ ) {
+                            if ( ids>0 ) fw.write( delim );
+                            fw.write( df.format( u.createDatum(ds.value(irec)), u ) );
+                        }
+                    } else if ( ds.rank()>2 ) {
+                        QDataSet ds1= ds.slice(irec);
+                        QubeDataSetIterator iter= new QubeDataSetIterator(ds1);
+                        while ( iter.hasNext() ) {
+                            iter.next();
+                            if ( ids>0 ) fw.write( delim );
+                            if ( uIsOrdinal ) {
+                                fw.write("\"");
+                                fw.write( df.format( u.createDatum(ds.value(irec)), u ) );
+                                fw.write("\"");
+                            } else {
+                                fw.write( df.format( u.createDatum(ds.value(irec)), u ) );
                             }
                         }
                     }
+                    ids++;
                 }
                 fw.write( "\n" );
             }
