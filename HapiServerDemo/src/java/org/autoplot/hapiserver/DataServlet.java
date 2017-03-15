@@ -1,23 +1,30 @@
 package org.autoplot.hapiserver;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.das2.datum.Datum;
 import org.virbo.datasource.RecordIterator;
 import org.das2.datum.DatumRange;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -102,9 +109,21 @@ public class DataServlet extends HttpServlet {
         
         boolean allowStream= !stream.equals("false");
 
+        OutputStream out = response.getOutputStream();
+                
         try {
             dsiter= checkAutoplotSource( id, dr, allowStream );
             if ( dsiter==null ) {
+                File dataFileHome= new File( Util.getHapiHome(), "data" );
+                File dataFile= new File( dataFileHome, id+".csv" );
+                if ( dataFile.exists() ) {
+                    try {
+                        cachedDataCsv( out, dataFile, dr, parameters );
+                        return;
+                    } finally {
+                        out.close();
+                    }
+                }
                 if ( id.equals("0B000800408DD710.noStream") ) {
                     dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
                 } else {
@@ -121,8 +140,6 @@ public class DataServlet extends HttpServlet {
         } catch ( IllegalArgumentException ex ) {
             response.setHeader( "X-WARNING", "data is not monotonic in time, sending everything." );
         }
-        
-        OutputStream out = response.getOutputStream();
         
         if ( format.equals("binary") ) {
             if ( include.equals("header") ) throw new IllegalArgumentException("header cannot be sent with binary");
@@ -307,6 +324,35 @@ public class DataServlet extends HttpServlet {
             return dsiter;
         } else {
             return null;
+        }
+    }
+
+    /**
+     * we have the csv pre-calculated, so just read from it.
+     * @param out
+     * @param dataFile
+     * @param dr
+     * @param parameters
+     * @throws FileNotFoundException
+     * @throws IOException 
+     */
+    private void cachedDataCsv(OutputStream out, File dataFile, DatumRange dr, String parameters) throws FileNotFoundException, IOException {
+        try ( BufferedReader reader= new BufferedReader( new FileReader(dataFile) ); 
+              BufferedWriter writer= new BufferedWriter( new OutputStreamWriter(out) ) ) {
+            String line= reader.readLine();
+            while ( line!=null ) {
+                int i= line.indexOf(",");
+                try {
+                    Datum t= TimeUtil.create(line.substring(0,i));
+                    if ( dr.contains(t) ) {
+                        writer.write(line);
+                        writer.newLine();
+                    }
+                } catch (ParseException ex) {
+                    Logger.getLogger(DataServlet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                line= reader.readLine();
+            }
         }
     }
 
