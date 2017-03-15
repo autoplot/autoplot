@@ -172,9 +172,13 @@ public class HapiServerSupport {
     }
     
     private static JSONObject getCatalogNew() throws IOException, JSONException {
-        File catalogFile= new File( Util.getHapiHome(), "catalog.json" );
-        JSONObject catalog= readJSON(catalogFile);
-        return catalog;
+        try {
+            File catalogFile= new File( Util.getHapiHome(), "catalog.json" );
+            JSONObject catalog= readJSON(catalogFile);
+            return catalog;
+        } catch ( IllegalArgumentException ex ) {
+            throw new IllegalArgumentException("Util.HAPI_HOME is not set, which might be because the root (hapi/index.jsp) was never loaded.");
+        }
     }
     
     public static class ParamDescription {
