@@ -38,6 +38,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -78,32 +79,64 @@ public class HapiDataSource extends AbstractDataSource {
     }
 
     private static QDataSet getJSONBins( JSONObject binsObject ) throws JSONException {
-        JSONArray bins= binsObject.getJSONArray("values");
-        DDataSet result= DDataSet.createRank1(bins.length());
-        DDataSet max= DDataSet.createRank1(bins.length());
-        DDataSet min= DDataSet.createRank1(bins.length());
+        JSONArray bins=null;
+        if ( binsObject.has("values") ) {
+            logger.fine("using deprecated bins");
+            bins= binsObject.getJSONArray("values");
+        } else if ( binsObject.has("centers") ) {
+            bins= binsObject.getJSONArray("centers");
+        }
+        
+        JSONArray ranges= null;
+        if ( binsObject.has("ranges") ) {
+            ranges= binsObject.getJSONArray("ranges");
+        }
+        
+        int len;
+        if ( ranges==null && bins==null ) {
+            throw new IllegalArgumentException("ranges or centers must be specified");
+        } else {
+            len= ranges==null ? bins.length() : ranges.length();
+        }
+        
+        DDataSet result= DDataSet.createRank1(len);
+        DDataSet max= DDataSet.createRank1(len);
+        DDataSet min= DDataSet.createRank1(len);
         boolean hasMin= false;
         boolean hasMax= false;
-        if ( bins.length()==0 ) {
-            throw new IllegalArgumentException("bins cannot be empty");
+        boolean hasCenter= false;
+        if ( len==0 ) {
+            throw new IllegalArgumentException("bins must have ranges or centers specified");
         } else {
-            Object o= bins.get(0);
-            if ( o instanceof Number ) {
-                for ( int j=0; j<bins.length(); j++ ) {
-                    result.putValue( j, bins.getDouble(j) );
+            if ( bins!=null ) {
+                hasCenter= true;
+                Object o= bins.get(0);
+                if ( o instanceof Number ) {
+                    for ( int j=0; j<len; j++ ) {
+                        result.putValue( j, bins.getDouble(j) );
+                    }
+                } else if ( o instanceof JSONObject ) {
+                    for ( int j=0; j<len; j++ ) {       
+                        JSONObject jo= bins.getJSONObject(j);
+                        result.putValue(j,jo.getDouble("center"));
+                        if ( hasMin || jo.has("min") ) {
+                            hasMin= true;
+                            min.putValue(j,jo.getDouble("min"));
+                        }
+                        if ( hasMax || jo.has("max") ) {
+                            hasMax= true;
+                            max.putValue(j,jo.getDouble("max"));
+                        }
+                    }
                 }
-            } else if ( o instanceof JSONObject ) {
-                for ( int j=0; j<bins.length(); j++ ) {       
-                    JSONObject jo= bins.getJSONObject(j);
-                    result.putValue(j,jo.getDouble("center"));
-                    if ( hasMin || jo.has("min") ) {
-                        hasMin= true;
-                        min.putValue(j,jo.getDouble("min"));
-                    }
-                    if ( hasMax || jo.has("max") ) {
-                        hasMax= true;
-                        min.putValue(j,jo.getDouble("max"));
-                    }
+            }
+            if ( ranges!=null ) {
+                for ( int j=0; j<len; j++ ) {  
+                    JSONArray ja1= ranges.getJSONArray(j);
+                    hasMax= true;
+                    hasMin= true;
+                    min.putValue(j,ja1.getDouble(0));
+                    max.putValue(j,ja1.getDouble(1));
                 }
             }
         }
@@ -118,11 +151,16 @@ public class HapiDataSource extends AbstractDataSource {
             }
         }
         
-        if ( hasMin && hasMax ) {
-            result.putProperty( QDataSet.BIN_PLUS, Ops.subtract( max, result ) );
-            result.putProperty( QDataSet.BIN_MINUS, Ops.subtract( result, min ) );
-        } else if ( hasMin || hasMax ) {
-            logger.warning("need both min and max for bins.");
+        if ( hasCenter ) {
+            if ( hasMin && hasMax ) {
+                result.putProperty( QDataSet.BIN_MIN, min );
+                result.putProperty( QDataSet.BIN_MAX, max );
+            } else if ( hasMin || hasMax ) {
+                logger.warning("need both min and max for bins.");
+            }
+        } else {
+            result= (DDataSet)ArrayDataSet.copy( double.class, Ops.bundle( min, max ) );
+            result.putProperty( QDataSet.BINS_1, QDataSet.VALUE_BINS_MIN_MAX );
         }
         
         if ( binsObject.has("name") ) {
@@ -795,7 +833,13 @@ public class HapiDataSource extends AbstractDataSource {
                                     int n= DataSetUtil.product(pds[i].size);
                                     pds[i].depend[j]= Ops.findgen(n);
                                     pds[i].dependName[j]= bins.getString("parameter");
-                                } else if ( bins.has("values") ) {
+                                } else if ( bins.has("ranges") ) {
+                                    QDataSet dep= getJSONBins(ja.getJSONObject(j));
+                                    pds[i].depend[j]= dep;
+                                } else if ( bins.has("centers") ) {
+                                    QDataSet dep= getJSONBins(ja.getJSONObject(j));
+                                    pds[i].depend[j]= dep;
+                                } else if ( bins.has("ranges") ) {
                                     QDataSet dep= getJSONBins(ja.getJSONObject(j));
                                     pds[i].depend[j]= dep;
                                 } else {
