@@ -1005,7 +1005,7 @@ public class DataSetURI {
         File local= FileSystem.settings().getLocalCacheDir();
         //FileSystem fs = FileSystem.create( toUri(split.path) );
 
-        String id= split.path.substring(split.scheme.length()+3); // fs.getLocalRoot().toString().substring(FileSystem.settings().getLocalCacheDir().toString().length());
+        String id= split.scheme + "/" + split.path.substring(split.scheme.length()+3); // fs.getLocalRoot().toString().substring(FileSystem.settings().getLocalCacheDir().toString().length());
 
         final long tnow= System.currentTimeMillis();
 
