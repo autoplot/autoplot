@@ -65,7 +65,7 @@ public class PDSPPIDataSource extends AbstractDataSource {
         
         param= param.replaceAll("\\+"," ");
         
-        String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
+        String url= "https://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
         VOTableReader read= new VOTableReader();
         mon.setProgressMessage("downloading data");
         logger.log(Level.FINE, "getDataSet {0}", url);

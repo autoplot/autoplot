@@ -215,8 +215,8 @@ public class PDSPPIDB {
         if ( !p.matcher(constraint).matches() ) {
             throw new IllegalArgumentException("constraint doesn't match (sc=[a-zA-Z_ 0-9/]*): "+constraint);
         }
-        //http://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&facet=SPACECRAFT_NAME&title=Cassini&o=txt
-        URL url= new URL( String.format( "http://ppi.pds.nasa.gov/ditdos/inventory?%s&o=txt", constraint.replaceAll(" ","+") ) );
+        //https://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&facet=SPACECRAFT_NAME&title=Cassini&o=txt
+        URL url= new URL( String.format( "https://ppi.pds.nasa.gov/ditdos/inventory?%s&o=txt", constraint.replaceAll(" ","+") ) );
         logger.log( Level.FINE, "getIds {0}", url);
         final String[] dss= getStringArray( url, reqPrefix ); //TODO: I still don't know why I need to add this.
         return dss;
@@ -279,7 +279,7 @@ public class PDSPPIDB {
      */
     public Map<String,String> getParams( String id, ProgressMonitor mon ) throws IllegalArgumentException {
         VOTableReader read;
-        String url= "http://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
+        String url= "https://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
         
         try {
             read= new VOTableReader();

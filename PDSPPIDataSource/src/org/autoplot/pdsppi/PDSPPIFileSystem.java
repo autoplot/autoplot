@@ -53,7 +53,7 @@ public class PDSPPIFileSystem extends WebFileSystem {
     
     public PDSPPIFileSystem( String s ) throws URISyntaxException {
         // the following URI is ignored.
-        super( new URI("http://ppi.pds.nasa.gov/"+s ), new File( FileSystem.settings().getLocalCacheDir(), "/PDSPPI/tmp/") );
+        super( new URI("https://ppi.pds.nasa.gov/"+s ), new File( FileSystem.settings().getLocalCacheDir(), "/PDSPPI/tmp/") );
         if ( !s.startsWith("/") ) {
             root= root + "/" + s;
         } else {
@@ -61,10 +61,10 @@ public class PDSPPIFileSystem extends WebFileSystem {
         }
     }
     
-    //http://ppi.pds.nasa.gov/ditdos/inventory?sc=Cassini&facet=SPACECRAFT_NAME&title=Cassini&o=txt
-    //http://draft-pdsppi.igpp.ucla.edu:8080/ditdos/inventory?t=Venus&facet=TARGET_NAME&title=Venus&o=txt
-    //http://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&facet=SPACECRAFT_NAME&title=Cassini&o=txt
-    private String root= "http://ppi.pds.nasa.gov/ditdos/view?id=pds:/";
+    //https://ppi.pds.nasa.gov/ditdos/inventory?sc=Cassini&facet=SPACECRAFT_NAME&title=Cassini&o=txt
+    //https://draft-pdsppi.igpp.ucla.edu:8080/ditdos/inventory?t=Venus&facet=TARGET_NAME&title=Venus&o=txt
+    //https://ppi.pds.nasa.gov/ditdos/inventory?sc=Galileo&facet=SPACECRAFT_NAME&title=Cassini&o=txt
+    private String root= "https://ppi.pds.nasa.gov/ditdos/view?id=pds:/";
     
     @Override
     protected void downloadFile(String filename, File f, File partfile, ProgressMonitor monitor) throws IOException {
