@@ -178,8 +178,12 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
         if ( param==null ) {
             param= params.get("ds");
         }
+        if ( param==null ) problems.add("missing param");
         
-        return ( param==null || !params.containsKey("id") );
+        String id= params.get("id");
+        if ( id==null ) problems.add("missing id");
+        
+        return ( param==null || id==null );
         
     }
 
