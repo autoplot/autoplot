@@ -192,7 +192,7 @@ public class InlineDataSourceFactory extends AbstractDataSourceFactory {
             if ( checkRejectGetDataSet( surl, problems, mon.getSubtaskMonitor("getDataSet calls") ) ) {
                 return true;
             }
-            return super.reject(surl, problems, mon); //To change body of generated methods, choose Tools | Templates.
+            return super.reject(surl, problems, mon.getSubtaskMonitor("super.reject") ); //To change body of generated methods, choose Tools | Templates.
         } finally {
             mon.finished();
         }
