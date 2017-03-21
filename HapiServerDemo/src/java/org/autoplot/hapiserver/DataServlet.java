@@ -117,12 +117,8 @@ public class DataServlet extends HttpServlet {
                 File dataFileHome= new File( Util.getHapiHome(), "data" );
                 File dataFile= new File( dataFileHome, id+".csv" );
                 if ( dataFile.exists() ) {
-                    try {
-                        cachedDataCsv( out, dataFile, dr, parameters );
-                        return;
-                    } finally {
-                        out.close();
-                    }
+                    cachedDataCsv( out, dataFile, dr, parameters );
+                    return;
                 }
                 if ( id.equals("0B000800408DD710.noStream") ) {
                     dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
@@ -329,12 +325,14 @@ public class DataServlet extends HttpServlet {
 
     /**
      * we have the csv pre-calculated, so just read from it.
+     * Note the output stream is closed here!
      * @param out
      * @param dataFile
      * @param dr
      * @param parameters
      * @throws FileNotFoundException
      * @throws IOException 
+     * 
      */
     private void cachedDataCsv(OutputStream out, File dataFile, DatumRange dr, String parameters) throws FileNotFoundException, IOException {
         try ( BufferedReader reader= new BufferedReader( new FileReader(dataFile) ); 
