@@ -906,7 +906,7 @@ public class DataMashUp extends javax.swing.JPanel {
         });
         expressionPopupMenu.add(plotMenuItem);
 
-        jSplitPane1.setDividerLocation(100);
+        jSplitPane1.setDividerLocation(140);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         jSplitPane1.setResizeWeight(0.5);
 
@@ -939,7 +939,7 @@ public class DataMashUp extends javax.swing.JPanel {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addComponent(directionsLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE))
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE))
         );
 
         jSplitPane2.setRightComponent(jPanel4);
@@ -962,13 +962,13 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("mathematics", jPanel1);
 
         jList2.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "link(x,y)", "link(x,y,z)", "slice1(ds,0)", "smooth(ds,5)", "putProperty(ds,QDataSet.UNITS,'s')", "getProperty(ds,QDataSet.DEPEND_0)", "unbundle(ds,0)" };
+            String[] strings = { "link(x,y)", "link(x,y,z)", "slice1(ds,0)", "smooth(ds,5)", "putProperty(ds,QDataSet.UNITS,'s')", "getProperty(ds,QDataSet.DEPEND_0)", "unbundle(ds,0)", "bundle(t,ds1,ds2)" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
@@ -983,7 +983,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("dataset", jPanel3);
@@ -1004,7 +1004,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("filters", jPanel5);
@@ -1031,7 +1031,7 @@ public class DataMashUp extends javax.swing.JPanel {
         );
         myFunctionsPanelLayout.setVerticalGroup(
             myFunctionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+            .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("my functions", myFunctionsPanel);
@@ -1051,7 +1051,7 @@ public class DataMashUp extends javax.swing.JPanel {
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addComponent(jLabel2)
-                .addContainerGap(229, Short.MAX_VALUE))
+                .addGap(0, 272, Short.MAX_VALUE))
             .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
                     .addGap(32, 32, 32)
@@ -1062,7 +1062,8 @@ public class DataMashUp extends javax.swing.JPanel {
 
         jSplitPane1.setBottomComponent(jSplitPane2);
 
-        synchronizeCB.setText("synchronize data by timetags, interpolating data to the first dataset's time tags");
+        synchronizeCB.setText("synchronize data by time tags, interpolating data to the first dataset's time tags");
+        synchronizeCB.setToolTipText("Nearest Neighbor synchronization is used to line up the data, so that they can be combined.");
 
         namedURIListTool1.setMinimumSize(new java.awt.Dimension(100, 100));
         namedURIListTool1.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -1090,7 +1091,7 @@ public class DataMashUp extends javax.swing.JPanel {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(synchronizeCB))
         );
@@ -1203,30 +1204,6 @@ public class DataMashUp extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_expressionTreeMouseClicked
 
-    private void scratchListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMouseClicked
-        if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
-            if ( evt.isPopupTrigger() ) {
-                palettePopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );
-            }
-        }
-    }//GEN-LAST:event_scratchListMouseClicked
-
-    private void scratchListMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMousePressed
-        if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
-            if ( evt.isPopupTrigger() ) {
-                palettePopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );
-            }
-        }
-    }//GEN-LAST:event_scratchListMousePressed
-
-    private void scratchListMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMouseReleased
-        if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
-            if ( evt.isPopupTrigger() ) {
-                palettePopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );
-            }
-        }
-    }//GEN-LAST:event_scratchListMouseReleased
-
     private void addItemMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addItemMenuItemActionPerformed
         String s= JOptionPane.showInputDialog( this, "Add function" );
         if ( s!=null && !( s.trim().length()==0 ) ) {
@@ -1274,6 +1251,30 @@ public class DataMashUp extends javax.swing.JPanel {
         expressionTree.setSelectionPath(tp);
         plotExpr();
     }//GEN-LAST:event_plotMenuItemActionPerformed
+
+    private void scratchListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMouseClicked
+        if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
+            if ( evt.isPopupTrigger() ) {
+                palettePopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );
+            }
+        }
+    }//GEN-LAST:event_scratchListMouseClicked
+
+    private void scratchListMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMouseReleased
+        if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
+            if ( evt.isPopupTrigger() ) {
+                palettePopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );
+            }
+        }
+    }//GEN-LAST:event_scratchListMouseReleased
+
+    private void scratchListMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scratchListMousePressed
+        if ( jTabbedPane1.getSelectedComponent()==myFunctionsPanel ) {
+            if ( evt.isPopupTrigger() ) {
+                palettePopupMenu.show( evt.getComponent(), evt.getX(), evt.getY() );
+            }
+        }
+    }//GEN-LAST:event_scratchListMousePressed
 
     private void checkForTSB() {
         String[] suris= namedURIListTool1.getUris();
