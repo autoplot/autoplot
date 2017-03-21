@@ -659,11 +659,11 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jTable1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTable1FocusLost
-        System.err.println("table focus lost");
+        //System.err.println("table focus lost");
     }//GEN-LAST:event_jTable1FocusLost
 
     private void currentDataSetSelectorFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_currentDataSetSelectorFocusGained
-        System.err.println("dataSetSelector focus gained");        // TODO add your handling code here:
+        //System.err.println("dataSetSelector focus gained");        // TODO add your handling code here:
     }//GEN-LAST:event_currentDataSetSelectorFocusGained
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
