@@ -1339,6 +1339,11 @@ public class AutoplotUtil {
                         }
                     } else {
                         dd = new double[]{min - dcadence, max + dcadence};
+                        try {
+                            logger1.log(Level.FINEST, "range of monotonic set by min to max, extended by cadence: {0}", DatumRange.newDatumRange( dd[0], dd[1], u ));
+                        } catch ( RuntimeException ex ) {
+                            // don't muck up the production release with unforeseen runtime exception.  TODO: remove me.
+                        }
                     }
                 }
             } else if ( ds.length()==1 ) {
