@@ -109,6 +109,13 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         }
     }
     
+    private void fillWithEmpty( DefaultTableModel tm ) {
+        for ( int i=0; i<tm.getRowCount(); i++ ) {
+            for ( int j=0; j<tm.getColumnCount(); j++ ) {
+                tm.setValueAt( "", i,j );
+            }
+        }
+    }
     /**
      * populate the list.
      */
@@ -116,6 +123,7 @@ public class TimeRangeToolEventsList extends javax.swing.JPanel {
         final DefaultTableModel tm;
         if ( currentDataSet==null ) {
             tm= new DefaultTableModel( new String[] { "Range", "Label" }, 3 );        
+            fillWithEmpty( tm );
             if ( tsb==null ) {
                 tm.setValueAt( "(no intervals loaded)", 0, 0 );                
             } else {
