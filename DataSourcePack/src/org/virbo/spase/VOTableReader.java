@@ -1,12 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.spase;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,7 +20,6 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.SparseDataSetBuilder;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
@@ -76,18 +73,18 @@ public class VOTableReader {
     int ncolumn;
     QDataSet bds;
     
-    List<String> ids= new ArrayList<String>();
-    List<String> descriptions=  new ArrayList<String>(); // one-line describing the data.
-    List<Integer> dep0s= new ArrayList<Integer>();
-    List<String> datatypes= new ArrayList<String>(); // we only support double and UTC then the ucd is time.epoch.
-    List<Integer> arraysizes= new ArrayList<Integer>(); // support for 2-D arrays.  -1,0 or N  -2 means *, -1 means scalar, positive means 2-D array
-    List<String> names= new ArrayList<String>();
-    List<String> sunits= new ArrayList<String>(); // Equal to UTC for time types.  Can be null.
-    List<Units> units= new ArrayList<Units>();
-    List<String> fillValues= new ArrayList<String>(); // the fill value representation
-    List<String> minValues=  new ArrayList<String>(); // the minimum value representation
-    List<String> maxValues=  new ArrayList<String>(); // the maximum value representation
-    List<Boolean> stopEnumerations= new ArrayList<Boolean>();  // if true, don't attempt to preserve enumerations.
+    List<String> ids= new ArrayList<>();
+    List<String> descriptions=  new ArrayList<>(); // one-line describing the data.
+    List<Integer> dep0s= new ArrayList<>();
+    List<String> datatypes= new ArrayList<>(); // we only support double and UTC then the ucd is time.epoch.
+    List<Integer> arraysizes= new ArrayList<>(); // support for 2-D arrays.  -1,0 or N  -2 means *, -1 means scalar, positive means 2-D array
+    List<String> names= new ArrayList<>();
+    List<String> sunits= new ArrayList<>(); // Equal to UTC for time types.  Can be null.
+    List<Units> units= new ArrayList<>();
+    List<String> fillValues= new ArrayList<>(); // the fill value representation
+    List<String> minValues=  new ArrayList<>(); // the minimum value representation
+    List<String> maxValues=  new ArrayList<>(); // the maximum value representation
+    List<Boolean> stopEnumerations= new ArrayList<>();  // if true, don't attempt to preserve enumerations.
                     
     DataSetBuilder dataSetBuilder;
     
@@ -138,6 +135,8 @@ public class VOTableReader {
     boolean lookForCurrentDep0= true;
             
     private StringBuilder valueBuilder= new StringBuilder();
+    
+    private HashSet<String> warnings= new HashSet<>();
     
     public VOTableReader() {
         
@@ -217,21 +216,24 @@ public class VOTableReader {
                         arraysizes.add( ARRAYSIZE_SCALAR );
                         nelements+= 1;
                     }
-                    if ( sunit==null ) {
+                    if ( null==sunit ) {
                         units.add(Units.dimensionless);
                         lookForCurrentDep0= true;
-                    } else if ( sunit.equals( UNIT_UTC ) ) {
-                        units.add(Units.cdfTT2000);
-                        if ( lookForCurrentDep0==true  ) {
-                            currentDep0= descriptions.size();
-                            lookForCurrentDep0= false;
-                        }
-                    } else if ( sunit.equals( UNIT_ENUM ) ) {
-                        units.add( EnumerationUnits.create(id) );
-                        lookForCurrentDep0= true;
-                    } else {
-                        units.add( Units.lookupUnits( sunit) );
-                        lookForCurrentDep0= true;
+                    } else switch (sunit) {
+                        case UNIT_UTC:
+                            units.add(Units.cdfTT2000);
+                            if ( lookForCurrentDep0==true  ) {
+                                currentDep0= descriptions.size();
+                                lookForCurrentDep0= false;
+                            }   break;
+                        case UNIT_ENUM:
+                            units.add( EnumerationUnits.create(id) );
+                            lookForCurrentDep0= true;
+                            break;
+                        default:
+                            units.add( Units.lookupUnits( sunit) );
+                            lookForCurrentDep0= true;
+                            break;
                     }
                     
                     dep0s.add(currentDep0);
@@ -325,7 +327,10 @@ public class VOTableReader {
                                 }
                                 dataSetBuilder.putValue( -1, ielement, d.doubleValue(u) );                            
                             } catch (ParseException ex) {
-                                Logger.getLogger(VOTableReader.class.getName()).log(Level.SEVERE, null, ex);
+                                if ( !warnings.contains(ex.getMessage()) ) {
+                                    Logger.getLogger(VOTableReader.class.getName()).log(Level.SEVERE, null, ex);
+                                    warnings.add(ex.getMessage());
+                                }
                                 dataSetBuilder.putValue( -1, ielement, FILL_VALUE );
                             }
                         }
