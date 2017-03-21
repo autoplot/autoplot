@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>PNGWalk Tool used to figure out where one of the tests started failing (3 ticks instead of 5).  Happy Spring!
+        <p><small>Data Mash Up and HAPI server used for quick study of house temperatures.  Happy Spring!
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-03-14 r20522):</p>
+        <p>Bugfixes (2017-03-21 r20555):</p>
         <ul> 
+            <li>PDS/PPI uses https now.  Editor properly sets the parameter when returning to the editor GUI.
+            <li>downloadResourceAsTempFile now includes http or https (or ftp) in generated filename.
             <li>trimStrideWrapper dropped metadata.
             <li>Units.getAllUnits would return a list of strings when it's declaration indicated that it would return a list of Units.  Thanks, Jon!
             <li>RTE reports (and provide feedback) must now submit to jfaden.net:80, not jfaden.net:8080, because of firewall issues.
@@ -101,6 +103,7 @@
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Data Mash Up GUI has bundle operator so that events lists can be constructed.
             <li>Introduce high-rank trim, so you can trim on any index now.
             <li>HAPI Server bins can have either centers or ranges specified.
             <li>HAPI Server support for enumerated data (Strings) supported.
