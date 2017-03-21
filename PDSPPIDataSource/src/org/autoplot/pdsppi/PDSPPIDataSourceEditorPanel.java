@@ -81,7 +81,7 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
             }
         });
 
-        jLabel1.setText("SPACECRAFT:");
+        jLabel1.setText("Spacecraft:");
 
         inventoryScComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "voyager", "galileo", "cassini" }));
         inventoryScComboBox.addItemListener(new java.awt.event.ItemListener() {
@@ -116,37 +116,33 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(productTextField)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(pickProductButton))
+                            .addComponent(datasetComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(datasetComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel4)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel1)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(inventoryScComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(0, 0, Short.MAX_VALUE)))))
+                                .addComponent(jLabel1)
+                                .addGap(18, 18, 18)
+                                .addComponent(inventoryScComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 197, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(inventoryScComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -161,8 +157,8 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                     .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
-                .addGap(3, 3, 3)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -275,16 +271,26 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
                     paramList.setModel( getMessageModel("(No plottable parameters)") );
                     return;
                 }
+                
+                String lparam= param;
+                if ( lparam!=null ) lparam= lparam.replaceAll("\\+"," ");
+                
+                String selectedParam= null;
                 DefaultListModel lm= new DefaultListModel();
                 for ( String s: ss ) {
                     lm.addElement(s);
+                    int j= s.indexOf(":");
+                    if ( j==-1 ) j= s.length();
+                    if ( s.substring(0,j).equals(lparam) ) {
+                        selectedParam= s;
+                    }
                 }
                 paramList.setModel( lm );
                 
-                String lparam= param;
-                if ( lparam!=null ) {
-                    lparam= lparam.replaceAll("\\+"," ");
-                    paramList.setSelectedValue( lparam, true );
+                if ( selectedParam==null && lparam!=null && lparam.matches("col\\d+") ) {
+                    paramList.setSelectedIndex( Integer.parseInt( lparam.substring(3) )-1 );
+                } else if ( selectedParam!=null ) {
+                    paramList.setSelectedValue( selectedParam, true );
                 }
             }
         };
@@ -537,7 +543,8 @@ public class PDSPPIDataSourceEditorPanel extends javax.swing.JPanel implements D
         
         PDSPPIDataSourceEditorPanel test= new PDSPPIDataSourceEditorPanel();
         //test.setURI("vap+pdsppi:sc=Voyager+2&id=PPI/VG2-J-CRS-5-SUMM-FLUX-V1.0/DATA/BS2E_RATE&param=BS2E RATE2");
-        test.setURI("vap+pdsppi:sc=Cassini&id=PPI/CO-E_J_S_SW-CAPS-5-DDR-ELE-MOMENTS-V1.0/");
+        //test.setURI("vap+pdsppi:sc=Cassini&id=PPI/CO-E_J_S_SW-CAPS-5-DDR-ELE-MOMENTS-V1.0/");
+        test.setURI("vap+pdsppi:id=PPI/VG1-J-CRS-5-SUMM-FLUX-V1.0/DATA/FPHA_RATE&param=PROTON_FLUX_1&sc=Voyager+1");
         JOptionPane.showMessageDialog( null, test);
         System.err.println( test.getURI() );
                 

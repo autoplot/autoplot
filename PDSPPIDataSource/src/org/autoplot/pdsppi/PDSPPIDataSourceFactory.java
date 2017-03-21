@@ -24,7 +24,6 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.spase.VOTableReader;
 
 /**
@@ -51,14 +50,14 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
         logger.log(Level.FINE, "getDataSetCompletions {0}", url);
         File f= DataSetURI.downloadResourceAsTempFile( new URL(url), 3600, mon );
         mon.setProgressMessage("reading data");
-        QDataSet ds= read.readHeader( f.toString(), mon );
+        QDataSet ds= read.readHeader( f.toString(), mon.getSubtaskMonitor("reading data") );
 
-        List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
+        List<CompletionContext> ccresult= new ArrayList<>();
         for ( int i=0; i<ds.length(); i++ ) {
-            String n= (String) ds.property( QDataSet.NAME, i );
+            //String n= (String) ds.property( QDataSet.NAME, i );
             String l= (String) ds.property( QDataSet.LABEL, i );
             String t= (String) ds.property( QDataSet.TITLE, i );
-            CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, n, this, n, l, t, true );
+            CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, l, this, l, l, t, true );
             ccresult.add(cc1);
         }
         return ccresult;
@@ -67,7 +66,7 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
-            List<CompletionContext> ccresult= new ArrayList<CompletionContext>(10);
+            List<CompletionContext> ccresult= new ArrayList<>(10);
             ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "id=", "id=", "table id" ) );
             ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "param=", "param=", "dataset within a table" ) );
             return ccresult;
@@ -84,7 +83,7 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
                 }
             } else if ( param.equals("sc") ) {
                 String[] scs= PDSPPIDB.getInstance().getSpacecraft();
-                List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
+                List<CompletionContext> ccresult= new ArrayList<>();
                 for ( String sc: scs) {
                     CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, sc, this, null, sc, sc, false  );
                     ccresult.add(cc1);
@@ -98,7 +97,7 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
                 if ( sc!=null ) {
                     sc= sc.replaceAll("\\+"," ");
                     String[] ids= PDSPPIDB.getInstance().getIds("sc="+sc,"PPI/");
-                    List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
+                    List<CompletionContext> ccresult= new ArrayList<>();
                     String id1= params.get("id");
                     if ( id1!=null ) {
                         String[] ss= id1.split("/",-2);
@@ -141,7 +140,7 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
                         }
                     } else {
                         for ( String id : ids ) {
-                            if ( id.indexOf("\t")>-1 ) {
+                            if ( id.contains("\t") ) {
                                 logger.log(Level.FINE, "tab in id from PDSPPIDB.getInstance().getIds(sc={0})", sc);
                                 continue;
                             }
