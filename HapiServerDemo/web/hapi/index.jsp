@@ -4,6 +4,7 @@
     Author     : jbf
 --%>
 
+<%@page import="org.json.JSONException"%>
 <%@page import="java.util.Enumeration"%>
 <%@page import="java.io.File"%>
 <%@page import="org.das2.datum.DatumRange"%>
@@ -68,7 +69,11 @@
                 JSONArray parameters= info.getJSONArray("parameters");
                 for ( int j=0; j<parameters.length(); j++ ) {
                     if ( j>0 ) out.print(", ");
-                    out.print( parameters.getJSONObject(j).getString("name") );
+                    try {
+                        out.print( parameters.getJSONObject(j).getString("name") );
+                    } catch ( JSONException ex ) {
+                        out.print( "???" );
+                    }
                 }
                 
             }
@@ -113,6 +118,7 @@
             <li>2017-03-04: use web.xml to set the initial location of the servlet data.</li>
             <li>2017-03-05: recent changes to support time-varying DEPEND_1 broke old codes and there was not sufficient testing to catch the mistake.</li>
             <li>2017-03-06: fix silly mistakes in untested changes.  More silly mistakes.</li>
+            <li>2017-03-15: allow data to come from csv files in data directory.</li>
         </ul>
         </small>
     </body>
