@@ -392,6 +392,29 @@ public class DataSetURI {
     }    
 
     /**
+     * return the URI with a new time.
+     * @param value
+     * @param timeRange
+     * @return the URI with a new time.
+     */
+    public static String resetUriTsbTime( String value, DatumRange timeRange ) {
+        if ( timeRange==null ) return value;
+        try {
+            DataSourceFactory dsf= getDataSourceFactory( new URI(value), new NullProgressMonitor() );
+            TimeSeriesBrowse tsb= dsf.getCapability( TimeSeriesBrowse.class );
+            if (tsb==null ) {
+                logger.fine("Unable to update the URI because factory doesn't provide TSB");
+                return null;
+            }
+            tsb.setURI(value); //TODO: I bet we don't need to do this.
+            tsb.setTimeRange(timeRange);
+            return tsb.getURI();
+        } catch (URISyntaxException | IOException | IllegalArgumentException | ParseException ex) {
+            return null;
+        }
+    }
+    
+    /**
      * return a human-readable abbreviation of the URI, limiting to len characters.
      * @param ssuri
      * @param len

@@ -1534,8 +1534,15 @@ public class GuiSupport {
                     if ( uri.startsWith("class:org.autoplot.tca.UriTcaSource:") ) {
                         uri= uri.substring("class:org.autoplot.tca.UriTcaSource:".length());
                     }
+                    if ( UnitsUtil.isTimeLocation( axis.getController().getDasAxis().getDatumRange().getUnits() ) ) {
+                        String nuri= DataSetURI.resetUriTsbTime(uri,axis.getController().getDasAxis().getDatumRange());
+                        if ( nuri!=null && !nuri.equals(uri) ) {
+                            uri= nuri;
+                        }
+                    }
                     TcaElementDialog dia= new TcaElementDialog( (JFrame)SwingUtilities.getWindowAncestor( controller.getDasCanvas().getParent()), true );
                     dia.getPrimaryDataSetSelector().setValue(uri);
+                    dia.getPrimaryDataSetSelector().setTimeRange( axis.getController().getDasAxis().getDatumRange() );
                     dia.setTitle( "Add additional ticks" );
                     dia.setVisible(true);
                     if (dia.isCancelled()) {
