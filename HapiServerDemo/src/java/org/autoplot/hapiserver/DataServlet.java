@@ -123,7 +123,7 @@ public class DataServlet extends HttpServlet {
                 if ( id.equals("0B000800408DD710.noStream") ) {
                     dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
                 } else {
-                    throw new IllegalArgumentException("bad id: "+id);
+                    throw new IllegalArgumentException("bad id: "+id+", does not exist: "+dataFile );
                 }
             }
         } catch ( Exception ex ) {
