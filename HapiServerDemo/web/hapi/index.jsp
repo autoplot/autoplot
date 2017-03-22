@@ -119,6 +119,7 @@
             <li>2017-03-05: recent changes to support time-varying DEPEND_1 broke old codes and there was not sufficient testing to catch the mistake.</li>
             <li>2017-03-06: fix silly mistakes in untested changes.  More silly mistakes.</li>
             <li>2017-03-15: allow data to come from csv files in data directory.</li>
+            <li>2017-03-22: add experimental upload data capability.</li>
         </ul>
         </small>
     </body>
