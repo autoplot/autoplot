@@ -963,6 +963,9 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                         jLabel3.setText(range.toString());
                         Datum end = TimeUtil.prevMidnight(range.max());
                         landing = new DatumRange(end.subtract(1, Units.days), end);
+                        if ( !landing.intersects(range) ) {
+                            landing= landing.next();
+                        }
                     }
                 }
                 String currentTimeRange = timeRangeTextField.getText().trim();
