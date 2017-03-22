@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.Iterator;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -24,6 +25,7 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.TagGenDataSet;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.capability.Streaming;
 import org.virbo.datasource.capability.Updating;
 import org.virbo.dsops.Ops;
 
@@ -40,6 +42,9 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
         String sspec= (String) getParams().get("spec");
         if ( sspec!=null ) spec= Integer.parseInt(sspec);
         addCapability( Updating.class, this );
+        if ( spec==-1 ) {
+            addCapability( Streaming.class, new AudioSystemStreamingSource() );
+        }
     }
     
     ByteBuffer dataBuffer;
@@ -102,6 +107,83 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
         return ds;
     }
+    
+    class AudioSystemStreamingSource implements Streaming{
+
+        @Override
+        public Iterator<QDataSet> streamDataSet(ProgressMonitor mon) throws Exception {
+
+            double lenSeconds = Double.parseDouble( getParam( "len", "1.0") );
+
+            nsamples = (int) (lenSeconds * SAMPLE_RATE);
+            
+            nsamples= 512 * (int)( nsamples/512 );
+            
+            
+            int len = nsamples * 4;
+            int nchannels= 1;
+            int bitsPerSample= 16;
+            int frameSize= bitsPerSample / ( nchannels * 8 );
+
+            dataBuffer = ByteBuffer.allocateDirect(len);
+
+            TargetDataLine targetDataLine;
+            AudioInputStream audioInputStream;
+
+            AudioFormat audioFormat = new AudioFormat(
+                    AudioFormat.Encoding.PCM_SIGNED,
+                    SAMPLE_RATE, bitsPerSample, nchannels, frameSize, SAMPLE_RATE, false);
+            DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
+
+            targetDataLine = (TargetDataLine) AudioSystem.getLine(info);
+            targetDataLine.open(audioFormat);
+
+            audioInputStream = new AudioInputStream(targetDataLine);
+
+            targetDataLine.start();
+
+            audioChannel = Channels.newChannel(audioInputStream);
+
+            mon.setTaskSize(len);
+            mon.started();
+            mon.setProgressMessage("recording from system audio");
+            dataBuffer.limit( 2048 );
+            fillBuffer(mon);
+
+            targetDataLine.close();
+
+            dataBuffer.order( ByteOrder.LITTLE_ENDIAN );
+
+            TagGenDataSet t= new TagGenDataSet( nsamples, 1./SAMPLE_RATE, 0.0, Units.seconds );
+            t.putProperty( QDataSet.LABEL, "Seconds Offset");
+            //startUpdateTimer();
+
+            final MutablePropertyDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
+            ds.putProperty( QDataSet.DEPEND_0, t );
+
+            mon.finished();
+
+            return new Iterator<QDataSet>() {
+                int index= 0;
+                
+                @Override
+                public boolean hasNext() {
+                    return index*512 < nsamples;
+                }
+
+                @Override
+                public QDataSet next() {
+                    QDataSet result= ds.trim( index*512, index*512+512 );
+                    index++;
+                    return result;
+                }
+
+            };
+
+        }
+
+    }
+
 
     PropertyChangeSupport pcs= new PropertyChangeSupport(this);
 
