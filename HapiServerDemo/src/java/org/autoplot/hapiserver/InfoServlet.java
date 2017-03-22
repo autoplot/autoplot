@@ -155,6 +155,12 @@ public class InfoServlet extends HttpServlet {
         
         if ( id==null ) throw new ServletException("required parameter 'id' is missing from request");
         
+        String key= request.getParameter("key"); // key is authorization, not authentication
+        
+        if ( !Util.keyCanCreate(id,key) ) {
+            throw new ServletException("need key to add to catalog");
+        }
+        
         File dataFileHome= new File( Util.getHapiHome(), "info" );
         File dataFile= new File( dataFileHome, id+".json" );
         

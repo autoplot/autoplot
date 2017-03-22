@@ -1,8 +1,18 @@
 
 package org.autoplot.hapiserver;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * helpful functions.
@@ -69,4 +79,104 @@ public class Util {
     public static final String hapiVersion() {
         return "1.1";
     }
+
+    private static JSONObject readJSON( File f ) throws IOException, JSONException {
+        StringBuilder builder= new StringBuilder();
+        try ( BufferedReader in= new BufferedReader( new FileReader( f ) ) ) {
+            String line= in.readLine();
+            while ( line!=null ) {
+                builder.append(line);
+                line= in.readLine();
+            }
+        }
+        JSONObject o= new JSONObject(builder.toString());
+        return o;
+    }
+    
+    static boolean isKey(String key) {
+        Pattern p= Pattern.compile("\\d{8}+");
+        return p.matcher(key).matches();
+    }
+    
+    /**
+     * this key can create place for the data
+     * @param id
+     * @param key
+     * @return 
+     */
+    static boolean keyCanCreate(String id,String key) {
+        if ( !isKey(key) ) {
+            throw new IllegalArgumentException("is not a key: "+key);
+        }
+        File keyFile= new File( getHapiHome(), "keys" );
+        if ( !keyFile.exists() ) return false;
+        keyFile= new File( keyFile, id + ".json" );
+        if ( !keyFile.exists() ) return false;
+        try {
+            JSONObject jo= readJSON(keyFile);
+            if ( jo.has(key) ) {
+                jo= jo.getJSONObject(key);
+                return jo.getBoolean("create");
+            } else {
+                return false;
+            }
+        } catch ( IOException | JSONException ex ) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    /**
+     * this key can modify or add records to the data
+     * @param id
+     * @param key
+     * @return 
+     */
+    static boolean keyCanModify(String id,String key) {
+        if ( !isKey(key) ) {
+            throw new IllegalArgumentException("is not a key: "+key);
+        }
+        File keyFile= new File( getHapiHome(), "keys" );
+        if ( !keyFile.exists() ) return false;
+        keyFile= new File( keyFile, id + ".json" );
+        if ( !keyFile.exists() ) return false;
+        try {
+            JSONObject jo= readJSON(keyFile);
+            if ( jo.has(key) ) {
+                jo= jo.getJSONObject(key);
+                return jo.getBoolean("modify") || jo.getBoolean("create");
+            } else {
+                return false;
+            }
+        } catch ( IOException | JSONException ex ) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    /**
+     * this key can delete records from the data
+     * @param id
+     * @param key
+     * @return 
+     */
+    static boolean keyCanDelete(String id,String key) {
+        if ( !isKey(key) ) {
+            throw new IllegalArgumentException("is not a key: "+key);
+        }
+        File keyFile= new File( getHapiHome(), "keys" );
+        if ( !keyFile.exists() ) return false;
+        keyFile= new File( keyFile, id + ".json" );
+        if ( !keyFile.exists() ) return false;
+        try {
+            JSONObject jo= readJSON(keyFile);
+            if ( jo.has(key) ) {
+                jo= jo.getJSONObject(key);
+                return jo.getBoolean("delete") || jo.getBoolean("create");
+            } else {
+                return false;
+            }
+        } catch ( IOException | JSONException ex ) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
 }

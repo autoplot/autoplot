@@ -303,6 +303,11 @@ public class DataServlet extends HttpServlet {
         String include= getParam( params, "include", "", "include header at the top", Pattern.compile("(|header)") );
         String format= getParam( params, "format", "", "The desired format for the data stream.", Pattern.compile("(|csv|binary)") );
         
+        String key= request.getParameter("key"); // key is authorization, not authentication
+        if ( !Util.keyCanModify(id,key) ) {
+            throw new ServletException("need key to modify items in catalog");
+        }
+
         if ( !include.equals("") ) throw new IllegalArgumentException("include cannot be used");
         if ( !parameters.equals("") ) throw new IllegalArgumentException("parameters cannot be used");
         if ( !format.equals("") ) throw new IllegalArgumentException("format cannot be used");
