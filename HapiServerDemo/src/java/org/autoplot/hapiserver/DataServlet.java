@@ -6,7 +6,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -72,8 +75,8 @@ public class DataServlet extends HttpServlet {
         
         Map<String,String[]> params= new HashMap<>( request.getParameterMap() );
         String id= getParam( params,"id",null,"The identifier for the resource.", null );
-        String timeMin= getParam( params, "time.min", null, "The smallest value of time to include in the response.", null );
-        String timeMax= getParam( params, "time.max", null, "The largest value of time to include in the response.", null );
+        String timeMin= getParam( params, "time.min", null, "The earliest value of time to include in the response.", null );
+        String timeMax= getParam( params, "time.max", null, "The latest value of time to include in the response.", null );
         String parameters= getParam( params, "parameters", "", "The comma separated list of parameters to include in the response ", null );
         String include= getParam( params, "include", "", "include header at the top", Pattern.compile("(|header)") );
         String format= getParam( params, "format", "", "The desired format for the data stream.", Pattern.compile("(|csv|binary)") );
@@ -170,9 +173,9 @@ public class DataServlet extends HttpServlet {
                     newParameters.put( ip, jsonParameters.get(i) );
                     lengths[ip]= 1;
                     if ( jsonParameters.getJSONObject(i).has("size") ) {
-                        int[] isize= (int[])jsonParameters.getJSONObject(i).get("size");
-                        for ( int k=0; k<isize.length; k++ ) {
-                            lengths[ip]*= isize[k];
+                        JSONArray jarray1= jsonParameters.getJSONObject(i).getJSONArray("size");
+                        for ( int k=0; k<jarray1.length(); k++ ) {
+                            lengths[ip]*= jarray1.getInt(k);
                         }
                     }
                 }
@@ -287,7 +290,31 @@ public class DataServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        Map<String,String[]> params= new HashMap<>( request.getParameterMap() );
+        String id= getParam( params,"id",null,"The identifier for the resource.", null );
+        String timeMin= getParam( params, "time.min", null, "The earliest value of time to include in the response.", null );
+        String timeMax= getParam( params, "time.max", null, "The latest value of time to include in the response.", null );
+        String parameters= getParam( params, "parameters", "", "The comma separated list of parameters to include in the response ", null );
+        String include= getParam( params, "include", "", "include header at the top", Pattern.compile("(|header)") );
+        String format= getParam( params, "format", "", "The desired format for the data stream.", Pattern.compile("(|csv|binary)") );
+        
+        if ( !include.equals("") ) throw new IllegalArgumentException("include cannot be used");
+        if ( !parameters.equals("") ) throw new IllegalArgumentException("parameters cannot be used");
+        if ( !format.equals("") ) throw new IllegalArgumentException("format cannot be used");
+        if ( !timeMin.equals("") ) throw new IllegalArgumentException("time.min cannot be used");
+        if ( !timeMax.equals("") ) throw new IllegalArgumentException("time.max cannot be used");
+            
+        File dataFileHome= new File( Util.getHapiHome(), "data" );
+        File dataFile= new File( dataFileHome, id+".csv" );
+        
+        try ( BufferedReader r = new BufferedReader( new InputStreamReader( request.getInputStream() ) ); BufferedWriter fout= new BufferedWriter( new FileWriter(dataFile) ) ) { //TODO: merge
+            String s;
+            while ( (s=r.readLine())!=null ) {
+                fout.write(s);
+                fout.write("\n");
+            }
+        }
+        
     }
 
     /**
