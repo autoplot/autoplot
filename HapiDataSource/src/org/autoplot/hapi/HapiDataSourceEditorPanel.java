@@ -852,6 +852,22 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
         return s.toString();
     }
     
+    /**
+     * [yr,mon,day,hour,min,sec,nanos]
+     * @param array
+     * @return approximate seconds
+     */
+    private static Datum cadenceArrayToDatum( int[] array ) {
+        double seconds= array[6]/1e9;
+        seconds+= array[5];
+        seconds+= array[4]*60;
+        seconds+= array[3]*3600;
+        seconds+= array[2]*86400; //approx, just to get scale
+        seconds+= array[1]*86400*30; //approx, just to get scale
+        seconds+= array[0]*86400*365; // approx, just to get scale
+        return Units.seconds.createDatum(seconds);
+    }
+    
     private void resetVariable( URL server, String id ) {
         try {
             JSONObject info= HapiServer.getInfo( server, id );
@@ -946,36 +962,66 @@ public final class HapiDataSourceEditorPanel extends javax.swing.JPanel implemen
                 logger.warning("server is missing required startDate and stopDate parameters.");
                 jLabel3.setText( "range is not provided (non-compliant server)" );
             } else {
-                DatumRange landing=null;
+                DatumRange sampleRange=null;
                 if ( info.has("sampleStartDate") && info.has("sampleStopDate") ) {
                     try {
-                        landing = new DatumRange( Units.us2000.parse(info.getString("sampleStartDate")), Units.us2000.parse(info.getString("sampleStopDate")) );
+                        sampleRange = new DatumRange( Units.us2000.parse(info.getString("sampleStartDate")), Units.us2000.parse(info.getString("sampleStopDate")) );
                     } catch (JSONException | ParseException ex) {
                         logger.log(Level.SEVERE, null, ex);
                     }
                 } 
-                if ( landing==null ) {
+                if ( sampleRange==null ) {
+                    Datum cadence= Units.seconds.createDatum(60);  // assume default cadence of 1 minute results in 1 day sample range.
+                    if ( info.has("cadence") ) {
+                        try{
+                            int[] icadence= DatumRangeUtil.parseISO8601Duration(info.getString("cadence"));
+                            cadence= cadenceArrayToDatum(icadence);
+                        } catch ( ParseException ex ) {
+                            logger.log(Level.WARNING, "parse error in cadence: {0}", info.getString("cadence"));
+                        }
+                    }    
                     if (range.max().ge(myValidTime)) { // Note stopDate is required since 2017-01-17.
                         logger.warning("server is missing required stopDate parameter.");
                         jLabel3.setText(range.min().toString() + " to ?");
-                        landing = new DatumRange(range.min(), range.min().add(1, Units.days));
+                        sampleRange = new DatumRange(range.min(), range.min().add(1, Units.days));
                     } else {
                         jLabel3.setText(range.toString());
-                        Datum end = TimeUtil.prevMidnight(range.max());
-                        landing = new DatumRange(end.subtract(1, Units.days), end);
-                        if ( !landing.intersects(range) ) {
-                            landing= landing.next();
+                        if ( cadence.ge(Units.days.createDatum(1)) ) {
+                            Datum end = TimeUtil.nextMidnight(range.max());
+                            end= end.subtract( 10,Units.days );
+                            if ( range.max().subtract(end).ge( Datum.create(1,Units.days ) ) ) {
+                                sampleRange = new DatumRange( end, end.add(10,Units.days) );
+                            } else {
+                                sampleRange = new DatumRange( end.subtract(10,Units.days), end );
+                            } 
+                        } else if ( cadence.ge(Units.seconds.createDatum(1)) ) {
+                            Datum end = TimeUtil.prevMidnight(range.max());
+                            if ( range.max().subtract(end).ge( Datum.create(1,Units.hours ) ) ) {
+                                sampleRange = new DatumRange( end, end.add(1,Units.days) );
+                            } else {
+                                sampleRange = new DatumRange( end.subtract(1,Units.days), end );
+                            } 
+                        } else {
+                            Datum end = TimeUtil.prev( TimeUtil.HOUR, range.max() );
+                            if ( range.max().subtract(end).ge( Datum.create(1,Units.minutes ) ) ) {
+                                sampleRange = new DatumRange( end, end.add(1,Units.hours) );
+                            } else {
+                                sampleRange = new DatumRange( end.subtract(1,Units.hours), end );
+                            } 
+                        }
+                        if ( !sampleRange.intersects(range) ) {
+                            sampleRange= sampleRange.next();
                         }
                     }
                 }
                 String currentTimeRange = timeRangeTextField.getText().trim();
                 if (currentTimeRange.length() == 0) {
-                    timeRangeTextField.setText( landing.toString() );
+                    timeRangeTextField.setText( sampleRange.toString() );
                 } else {
                     try {
                         DatumRange current = DatumRangeUtil.parseTimeRange(currentTimeRange);
                         if ( !current.intersects(range) ) {
-                            timeRangeTextField.setText( landing.toString() );
+                            timeRangeTextField.setText( sampleRange.toString() );
                         }
                     } catch (ParseException ex) {
                         // do nothing.
