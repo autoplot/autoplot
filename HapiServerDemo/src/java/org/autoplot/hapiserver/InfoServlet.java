@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -182,6 +183,35 @@ public class InfoServlet extends HttpServlet {
             lout.write(json);
         }
         
+        File catalogFile= new File( Util.getHapiHome(), "catalog.json" );
+        try {        
+            JSONObject catalog= HapiServerSupport.readJSON(catalogFile);
+            JSONArray catalogArray= catalog.getJSONArray("catalog");
+            int index= -1;
+            for ( int i=0; i<catalogArray.length(); i++ ) {
+                if ( catalogArray.getJSONObject(i).get("id").equals(id) ) {
+                    index= i;
+                }
+            }
+            if ( index==-1 ) {
+                JSONObject item= new JSONObject();
+                item.put("id", id );
+                catalogArray.put( catalogArray.length(), item );
+                File tempCatalogFile= new File( Util.getHapiHome(), "catalog.json.t" );
+                try ( FileWriter w=new FileWriter( tempCatalogFile ) ) {
+                    String s= catalog.toString(4);
+                    w.write(s);
+                }
+                
+                tempCatalogFile.renameTo(catalogFile);
+            }
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(InfoServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JSONException ex) {
+            Logger.getLogger(InfoServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+                
     }
 
     /**
