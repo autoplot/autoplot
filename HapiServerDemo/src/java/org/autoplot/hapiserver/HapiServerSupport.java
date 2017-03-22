@@ -167,6 +167,9 @@ public class HapiServerSupport {
                 line= in.readLine();
             }
         }
+        if ( builder.length()==0 ) {
+            throw new IOException("file is empty: "+jasonFile);
+        }
         JSONObject catalog= new JSONObject(builder.toString());
         return catalog;
     }
