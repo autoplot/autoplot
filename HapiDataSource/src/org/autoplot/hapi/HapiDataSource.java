@@ -221,7 +221,8 @@ public class HapiDataSource extends AbstractDataSource {
         String type= "";
         int[] size= new int[0]; // array of scalars
         QDataSet[] depend= null;
-        String[] dependName= null;
+        String[] dependName= null; // for time-varying depend1 (not in HAPI1.1)
+        String renderType=null; // may contain hint for renderer, such as nnspectrogram
         private ParamDescription( String name ) {
             this.name= name;
         }
@@ -867,17 +868,15 @@ public class HapiDataSource extends AbstractDataSource {
                             pds[i].dependName= new String[ja.length()];
                             for ( int j=0; j<ja.length(); j++ ) {
                                 JSONObject bins= ja.getJSONObject(j);
-                                if ( bins.has("parameter") ) {  // deprecated
+                                if ( bins.has("parameter") ) {  // deprecated, see binsParameter below.  TODO: revisit this.
                                     int n= DataSetUtil.product(pds[i].size);
                                     pds[i].depend[j]= Ops.findgen(n);
                                     pds[i].dependName[j]= bins.getString("parameter");
                                 } else if ( bins.has("ranges") ) {
                                     QDataSet dep= getJSONBins(ja.getJSONObject(j));
                                     pds[i].depend[j]= dep;
+                                    pds[i].renderType= QDataSet.VALUE_RENDER_TYPE_NNSPECTROGRAM;
                                 } else if ( bins.has("centers") ) {
-                                    QDataSet dep= getJSONBins(ja.getJSONObject(j));
-                                    pds[i].depend[j]= dep;
-                                } else if ( bins.has("ranges") ) {
                                     QDataSet dep= getJSONBins(ja.getJSONObject(j));
                                     pds[i].depend[j]= dep;
                                 } else {
@@ -886,7 +885,8 @@ public class HapiDataSource extends AbstractDataSource {
                                 }
                             }
                         } else {
-                            JSONObject bins= jsonObjecti.getJSONObject("bins");
+                            logger.warning("bins should be an array");
+                            JSONObject bins= jsonObjecti.getJSONObject("bins"); 
                             if ( pds[i].depend==null ) pds[i].depend= new QDataSet[1];
                             if ( pds[i].dependName==null ) pds[i].dependName= new String[1];
                             if ( bins.has("parameter") ) { // this will be implemented later.
@@ -964,6 +964,9 @@ public class HapiDataSource extends AbstractDataSource {
                 for ( int j=0; j<pds[1].size.length; j++ ) {
                     ds= Ops.putProperty( ds, "DEPEND_"+(j+1), pds[1].depend[j] );
                 }
+            }
+            if ( pds.length==2 && QDataSet.VALUE_RENDER_TYPE_NNSPECTROGRAM.equals( pds[1].renderType ) ) {
+                ds= Ops.putProperty( ds, QDataSet.RENDER_TYPE, pds[1].renderType );
             }
         } else if ( pds.length==1 ) {
             return depend0;
