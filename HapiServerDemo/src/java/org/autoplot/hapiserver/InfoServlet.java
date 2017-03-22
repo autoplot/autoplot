@@ -2,12 +2,19 @@
 package org.autoplot.hapiserver;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.Calendar;
 import java.util.TimeZone;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -125,6 +132,12 @@ public class InfoServlet extends HttpServlet {
         processRequest(request, response);
     }
 
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doPost( req, resp );
+    }
+    
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -136,7 +149,39 @@ public class InfoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        String id= request.getParameter("id");
+        
+        if ( id==null ) throw new ServletException("required parameter 'id' is missing from request");
+        
+        File dataFileHome= new File( Util.getHapiHome(), "info" );
+        File dataFile= new File( dataFileHome, id+".json" );
+        
+        ByteArrayOutputStream out= new ByteArrayOutputStream(2000);
+        
+        try ( BufferedReader r = new BufferedReader( new InputStreamReader( request.getInputStream() ) ); BufferedWriter fout= new BufferedWriter( new OutputStreamWriter(out) ) ) {
+            String s;
+            while ( (s=r.readLine())!=null ) {
+                fout.write(s);
+                fout.write("\n");
+            }
+        }
+
+        String enc= request.getCharacterEncoding();
+        if ( enc==null ) enc= "UTF-8";
+        String json= out.toString( enc );
+        
+        try {
+            //verify that it is valid JSON
+            JSONObject jo= new JSONObject(json);
+        } catch (JSONException ex) {
+            throw new ServletException(ex);
+        }
+        
+        try ( PrintWriter lout= new PrintWriter(dataFile) ) {
+            lout.write(json);
+        }
+        
     }
 
     /**

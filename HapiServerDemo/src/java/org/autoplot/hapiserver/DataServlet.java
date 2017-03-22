@@ -279,6 +279,11 @@ public class DataServlet extends HttpServlet {
         processRequest(request, response);
     }
 
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doPost( req, resp );
+    }
+
     /**
      * Handles the HTTP <code>POST</code> method.
      *
@@ -292,8 +297,8 @@ public class DataServlet extends HttpServlet {
             throws ServletException, IOException {
         Map<String,String[]> params= new HashMap<>( request.getParameterMap() );
         String id= getParam( params,"id",null,"The identifier for the resource.", null );
-        String timeMin= getParam( params, "time.min", null, "The earliest value of time to include in the response.", null );
-        String timeMax= getParam( params, "time.max", null, "The latest value of time to include in the response.", null );
+        String timeMin= getParam( params, "time.min", "", "The earliest value of time to include in the response.", null );
+        String timeMax= getParam( params, "time.max", "", "The latest value of time to include in the response.", null );
         String parameters= getParam( params, "parameters", "", "The comma separated list of parameters to include in the response ", null );
         String include= getParam( params, "include", "", "include header at the top", Pattern.compile("(|header)") );
         String format= getParam( params, "format", "", "The desired format for the data stream.", Pattern.compile("(|csv|binary)") );
