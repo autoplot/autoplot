@@ -24,9 +24,10 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-03-23 r20575):</p>
-        <ul>  
-            <li>new cdf jar file fixes problem where unused ThreadGroups were made.
+        <p>Bugfixes (2017-03-23 r20595):</p>
+        <ul> 
+            <li>Java 8 Javadocs supported in Jython completions.
+            <li>new CDF Jar file fixes problem where unused ThreadGroups were made.
             <li>1801: dataset iterator is inordinately slow, put in optimal loops for rank 1 data.  
             <li>interpolate and interpolateNN now have single-dataset interface as well as arrays.  Thanks, Kristoff!
             <li>BufferDataSet remove redundant check of reclen which was also miscoded, using remaining() instead of limit(), producing incorrect warnings.
