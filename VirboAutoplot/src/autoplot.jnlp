@@ -25,7 +25,7 @@
    
     <information> 
         <title>Autoplot (#{tag})</title>
-        <vendor>http://virbo.org/</vendor>
+        <vendor>http://autoplot.org/</vendor>
 	<homepage href="http://autoplot.org/" />
         <description>plots data from various sources, such as opendap, cdf, and netcdf using das2</description> 
         <description kind="short">data plotter</description> 
