@@ -24,10 +24,17 @@
 
         <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
         
-        <p>Bugfixes (2017-03-21 r20555):</p>
-        <ul> 
+        <p>Bugfixes (2017-03-23 r20555):</p>
+        <ul>  
+            <li>1801: dataset iterator is inordinately slow, put in optimal loops for rank 1 data.  
+            <li>interpolate and interpolateNN now have single-dataset interface as well as arrays.  Thanks, Kristoff!
+            <li>BufferDataSet remove redundant check of reclen which was also miscoded, using remaining() instead of limit(), producing incorrect warnings.
+            <li>tca can be reset before entering the editor panel.  Thanks, Kris!
+            <li>when bins are specified with ranges, use render type hint to request Nearest Neighbor Spectrograms.
+            <li>bugfix: in the case where the HAPI dataset is just one day, the discovery range would be the day before the data range, making it a poor choice.
             <li>PDS/PPI uses https now.  Editor properly sets the parameter when returning to the editor GUI.
             <li>downloadResourceAsTempFile now includes http or https (or ftp) in generated filename.
+            <li>getConvertibleUnits replaces getConvertableUnits (spelling error), and getConvertibleUnits now sorts the units.
             <li>trimStrideWrapper dropped metadata.
             <li>Units.getAllUnits would return a list of strings when it's declaration indicated that it would return a list of Units.  Thanks, Jon!
             <li>RTE reports (and provide feedback) must now submit to jfaden.net:80, not jfaden.net:8080, because of firewall issues.
@@ -102,7 +109,7 @@
             <li>1750: ds[-1,r]=0 didn't work, where negative indeces weren't supported.  Thanks, Ivar!
         </ul>
         <p>Features:</p>
-        <ul>
+        <ul> 
             <li>Data Mash Up GUI has bundle operator so that events lists can be constructed.
             <li>Introduce high-rank trim, so you can trim on any index now.
             <li>HAPI Server bins can have either centers or ranges specified.
