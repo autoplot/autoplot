@@ -21,12 +21,11 @@ public class JavadocLookup {
         if ( instance==null ) {
             instance= new JavadocLookup();
             // note the order is important, so that org.w3c.dom
-            instance.setLinkForJavaSignature("javax","http://docs.oracle.com/javase/6/docs/api/");  // Java 7 docs look terrible in the popup, so there's work to be done.
-            instance.setLinkForJavaSignature("java","http://docs.oracle.com/javase/6/docs/api/");
-            instance.setLinkForJavaSignature("org/w3c/dom","http://docs.oracle.com/javase/6/docs/api/");
-            instance.setLinkForJavaSignature("org/xml/sax","http://docs.oracle.com/javase/6/docs/api/");
-            instance.setLinkForJavaSignature("gov/nasa/gsfc/spdf/cdfj","http://voyager.gsfc.nasa.gov/cdfj-current/docs/" );
-            instance.setLinkForJavaSignature("uk/ac/bristol/star/cdf","http://www.star.bristol.ac.uk/~mbt/jcdf/javadocs/" );
+            instance.setLinkForJavaSignature("javax","http://docs.oracle.com/javase/8/docs/api/");  // Java 7 docs look terrible in the popup, so there's work to be done.
+            instance.setLinkForJavaSignature("java","http://docs.oracle.com/javase/8/docs/api/");
+            instance.setLinkForJavaSignature("org/w3c/dom","http://docs.oracle.com/javase/8/docs/api/");
+            instance.setLinkForJavaSignature("org/xml/sax","http://docs.oracle.com/javase/8/docs/api/");
+            instance.setLinkForJavaSignature("gov/nasa/gsfc/spdf/cdfj","https://cdaweb.sci.gsfc.nasa.gov/~nand/cdfj/docs/" );
             instance.setLinkForJavaSignature("org", JythonCompletionProvider.getInstance().settings.getDocHome() );
         }
         return instance;
