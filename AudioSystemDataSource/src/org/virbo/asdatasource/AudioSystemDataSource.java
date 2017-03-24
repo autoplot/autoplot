@@ -178,6 +178,11 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
                     return result;
                 }
 
+                @Override
+                public void remove() {
+
+                }
+
             };
 
         }
