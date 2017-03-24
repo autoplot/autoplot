@@ -9,6 +9,7 @@ import static org.virbo.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.datasource.URISplit;
 
 /**
  * Server for producing images from Autoplot URIs, first requested by U. Michigan.
@@ -50,6 +51,14 @@ public class AutoplotServer {
 
         int width = Integer.parseInt(alm.getValue("width"));
         int height = Integer.parseInt(alm.getValue("height"));
+        
+        if ( width==-1 && vap.equals("") ) {
+            URISplit split= URISplit.parse(suri);
+            if ( split.ext.equals(".vap") ) {
+                logger.warning("use --vap=file.vap to preserve width and height");
+            } 
+        }
+        
         String scanvasAspect = alm.getValue("canvas.aspect");
         String format= alm.getValue("format");
         String outfile= alm.getValue("outfile");
