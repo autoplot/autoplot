@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.virbo.asdatasource;
 
 import java.beans.PropertyChangeListener;
@@ -21,6 +18,7 @@ import javax.sound.sampled.TargetDataLine;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.autoplot.bufferdataset.BufferDataSet;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.TagGenDataSet;
@@ -111,28 +109,22 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
     class AudioSystemStreamingSource implements Streaming{
 
         @Override
-        public Iterator<QDataSet> streamDataSet(ProgressMonitor mon) throws Exception {
+        public Iterator<QDataSet> streamDataSet( final ProgressMonitor mon) throws Exception {
 
-            double lenSeconds = Double.parseDouble( getParam( "len", "1.0") );
-
-            nsamples = (int) (lenSeconds * SAMPLE_RATE);
-            
-            nsamples= 512 * (int)( nsamples/512 );
-            
-            
-            int len = nsamples * 4;
+            nsamples= 2048; // this is per record now.
+            int len = nsamples * 2;
             int nchannels= 1;
             int bitsPerSample= 16;
-            int frameSize= bitsPerSample / ( nchannels * 8 );
+            int frameSizeBytes= bitsPerSample / ( nchannels * 8 );
 
             dataBuffer = ByteBuffer.allocateDirect(len);
 
-            TargetDataLine targetDataLine;
+            final TargetDataLine targetDataLine;
             AudioInputStream audioInputStream;
 
             AudioFormat audioFormat = new AudioFormat(
                     AudioFormat.Encoding.PCM_SIGNED,
-                    SAMPLE_RATE, bitsPerSample, nchannels, frameSize, SAMPLE_RATE, false);
+                    SAMPLE_RATE, bitsPerSample, nchannels, frameSizeBytes, SAMPLE_RATE, false);
             DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
 
             targetDataLine = (TargetDataLine) AudioSystem.getLine(info);
@@ -144,38 +136,52 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
             audioChannel = Channels.newChannel(audioInputStream);
 
-            mon.setTaskSize(len);
+            mon.setTaskSize(-1);
             mon.started();
             mon.setProgressMessage("recording from system audio");
-            dataBuffer.limit( 2048 );
-            fillBuffer(mon);
-
-            targetDataLine.close();
-
-            dataBuffer.order( ByteOrder.LITTLE_ENDIAN );
-
-            TagGenDataSet t= new TagGenDataSet( nsamples, 1./SAMPLE_RATE, 0.0, Units.seconds );
-            t.putProperty( QDataSet.LABEL, "Seconds Offset");
             //startUpdateTimer();
-
-            final MutablePropertyDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
-            ds.putProperty( QDataSet.DEPEND_0, t );
-
-            mon.finished();
-
+            
             return new Iterator<QDataSet>() {
-                int index= 0;
+                int length= 0;
+                
+                QDataSet result;
                 
                 @Override
                 public boolean hasNext() {
-                    return index*512 < nsamples;
+                    try {
+                        if ( mon.isCancelled() ) return false;
+                        
+                        dataBuffer.limit( nsamples*2 );
+                        fillBuffer( new NullProgressMonitor() );
+                        
+                        dataBuffer.order( ByteOrder.LITTLE_ENDIAN );
+                        
+                        TagGenDataSet t= new TagGenDataSet( nsamples, 1./SAMPLE_RATE, 0.0, Units.seconds );
+                        t.putProperty( QDataSet.LABEL, "Seconds Offset");
+                                                
+                        MutablePropertyDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
+                        ds.putProperty( QDataSet.DEPEND_0, t );
+        
+                        result= BufferDataSet.copy(ds);
+
+                        dataBuffer.flip();                        
+                        
+                        length+=ds.length();
+                        return true;
+                        
+                    } catch (IllegalArgumentException ex) {
+                        return false;
+                    } catch (IOException ex) {
+                        return false;
+                    }
+
                 }
 
                 @Override
                 public QDataSet next() {
-                    QDataSet result= ds.trim( index*512, index*512+512 );
-                    index++;
-                    return result;
+                    QDataSet r= result;
+                    result= null;
+                    return r;
                 }
 
                 @Override
