@@ -22,10 +22,13 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p>Experimental <a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac Release</a> is available.
+        <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-03-23 r20595):</p>
-        <ul> 
+        <p>Bugfixes (2017-03-23 r20575):</p>
+        <ul>  
+            <li>AutoplotServlet prints a warning when --uri=file.vap is used, because the vap will be resized.
+            <li>checkIsotropic could re-range 1x1 pixel plot that has not yet been sized.
+            <li>new cdf jar file fixes problem where unused ThreadGroups were made.
             <li>Java 8 Javadocs supported in Jython completions.
             <li>new CDF Jar file fixes problem where unused ThreadGroups were made.
             <li>1801: dataset iterator is inordinately slow, put in optimal loops for rank 1 data.  
