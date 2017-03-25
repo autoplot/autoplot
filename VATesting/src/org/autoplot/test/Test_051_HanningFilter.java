@@ -47,12 +47,16 @@ public class Test_051_HanningFilter implements Scenario {
             new JLabelOperator(mainFrame).waitText( AutoplotUI.READY_MESSAGE );
 
             new JMenuBarOperator( mainFrame ).pushMenu("Options|Enable Feature|Data Panel", "|");
+            
+            Thread.sleep(3000);
 
             JTabbedPaneOperator tabs = new JTabbedPaneOperator( app.getTabs() );
             
             //need to use different dataset for this test
             new JTextFieldOperator( app.getDataSetSelector().getEditor() ).setText("http://emfisis.physics.uiowa.edu/Flight/RBSP-A/L3/2012/12/01/rbsp-a_magnetometer_1sec-gei_emfisis-L3_20121201_v1.3.3.cdf?Magnitude");
             new JButtonOperator(app.getDataSetSelector().getGoButton()).clickMouse();
+            
+            Thread.sleep(3000);
             
             FiltersTreePicker.pickFilter( mainFrame, "Filters|Fourier Filtering|Hanning".split("\\|") );
         
