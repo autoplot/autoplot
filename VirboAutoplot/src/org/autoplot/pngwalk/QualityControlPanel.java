@@ -183,9 +183,11 @@ public class QualityControlPanel extends javax.swing.JPanel {
                         okButton.setEnabled(true);
                         loginButton.setEnabled(false);        
                     } else {
-                        JOptionPane.showMessageDialog( QualityControlPanel.this,"<html>Unable to write to File System<br>"+fs.getRootURI() );
+                        //JOptionPane.showMessageDialog( QualityControlPanel.this,"<html>Unable to write to File System<br>"+fs.getRootURI() );
                         loginButton.setEnabled(false);    
+                        loginButton.setToolTipText("<html>Unable to write to File System<br>"+fs.getRootURI());
                         okButton.setEnabled(false);
+                        sequencePropertiesHost.setText( uri.toString() + " -- " + "Unable to write to file system" );
                     }
                 } catch ( FileSystem.FileSystemOfflineException | UnknownHostException | FileNotFoundException ex) {
                     Logger.getLogger(QualityControlPanel.class.getName()).log(Level.SEVERE, null, ex);

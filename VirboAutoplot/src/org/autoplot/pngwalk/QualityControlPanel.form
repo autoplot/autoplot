@@ -172,7 +172,6 @@
       <Properties>
         <Property name="orientation" type="int" value="0"/>
         <Property name="resizeWeight" type="double" value="1.0"/>
-        <Property name="continuousLayout" type="boolean" value="true"/>
       </Properties>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JSplitPaneSupportLayout"/>
