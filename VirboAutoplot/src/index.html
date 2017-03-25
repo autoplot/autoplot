@@ -1,10 +1,10 @@
 <html>
     <head>
-        <title>Autoplot Application (#{tag})</title>
+        <title>Autoplot Application (v2016a_14)</title>
         <meta charset="UTF-8"> 
     </head>
     <body>
-        <H3>Autoplot Application (#{tag})</H3>
+        <H3>Autoplot Application (v2016a_14)</H3>
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
@@ -22,13 +22,10 @@
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.</p>
 
-        <p><a href="http://autoplot.org/data/build/mac/Autoplot-dev.dmg">Mac DMG Release</a> is available.
+        <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-03-23 r20575):</p>
-        <ul>  
-            <li>AutoplotServlet prints a warning when --uri=file.vap is used, because the vap will be resized.
-            <li>checkIsotropic could re-range 1x1 pixel plot that has not yet been sized.
-            <li>new cdf jar file fixes problem where unused ThreadGroups were made.
+        <p>Bugfixes (2017-03-23 r20595):</p>
+        <ul> 
             <li>Java 8 Javadocs supported in Jython completions.
             <li>new CDF Jar file fixes problem where unused ThreadGroups were made.
             <li>1801: dataset iterator is inordinately slow, put in optimal loops for rank 1 data.  
@@ -68,6 +65,9 @@
             <li>Experimental support for rank 2 DEPEND_1 datasets with HAPI.  HAPI uses sampleStartDate for discovery.
             <li>check for vap+internal:data_1,data_2 when switching to mash-up
             <li>1754: Correctly support http://autoplot.org/data/AMSR_E_L3_SeaIce6km_B06_20070307.hdf.gz
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>1754: Java now reuses https connections properly and garbage collection requests are not needed.
             <li>improvements to command line history. 
             <li>DownloadResourceAsTempFile never properly indicated progress, showing progress bar with incorrect position.
@@ -129,6 +129,9 @@
             <li>export-to-wav has timeScale parameter for scaling time tags, useful for auralizing B-Field data.
             <li>AutoplotServlet simpleServlet has symbolSize to support sparklines.
             <li>HAPI server allows external configuration (but it must be in /home/jbf/hapi/ for now!)
+       </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>559: screenshots tool now uses a separate thread to save images, improving responsiveness.
             <li>experimental support for high-rank datasets in HAPI servers
             <li>dom.getElementById added, to remove confusion about indeces.
@@ -145,75 +148,6 @@
             <li>logging improvements to CDF reader.
             <li>LinFit has getSlope and getIntercept methods, in anticipation of proper SI units library.
        </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>improve drawing of orbit plot ticks.
-            <li>data mashup tool ignores IDs with empty URIs.
-            <li>HAPI client was doing web interactions on the event thread, causing possible hangs
-            <li>aggregation avail=T attempted to download granule metadata when it is not used.
-            <li>render topDecorator is cleared when reset is called.
-            <li>example Jython scripts in VirboAutoplot/src/scripts updated and now work for everyone.
-            <li>Jython getParam position argument (as opposed to named argument) works again.
-            <li>remove extra rows in Events List when events list is a single file
-            <li>1740: two-columns of iso8601 do not read properly as events list.  Thanks George!
-            <li>improvements to ASCII editor, including examples and improved guessing.
-            <li>demo 14 now uses https.
-            <li>dep0units can be used to explicitly set the units, and does this correctly for times now as well.
-            <li>1743: make sure all datasets entering Autoplot are immutable.
-            <li>1746: dasPlot created off event thread would occasionally cause RTE 11148*.
-            <li>1739: include the scientist's home directory in the list of completions.  Thanks, Sarah!
-            <li>scripting had bind command, but no unbind.
-            <li>corrections to ELEMENT_DIMENSIONS property for bundles
-            <li>Jython completions detect static helper classes and don't complete to argument-less constructor, like Schemes()
-            <li>1738: sequence using ".." in URI completions, fix unstable code.
-            <li>1735: correct synchronization errors which would lead to occasional errors when loading .vap files
-            <li>1734: noisy "alarming extrapolation in findex" warning is more lax.
-            <li>1728: change color to black from custom
-            <li>1732: Bookmarks when a single plot is already plotted
-            <li>1731: get screenshot for second display.
-            <li>rte_2095724092: don't go into the completions editor when there is no extension. 
-            <li>1727: break into stack of plots reconnects time series browse to new x-axis.
-            <li>units on bin_plus and bin_minus in HAPI client.
-            <li>rte_2071759301: rename file when old file wasn't set caused NullPointerException.
-            <li>in data mash up, handle cancel in "add function" dialog.
-            <li>setXAxis of DasPlot was incorrect.  Thanks, James!
-            <li>corrections to HAPI support for CDAWeb.
-            <li>1724: autoplotapp.py is constantly rewritten, causing occasional "File not found" popups.
-            <li>IDL/Matlab interface provides access to more datasets in qstreams.
-            <li>1722: qstreams with arbitrary qdataset properties.
-            <li>1718: HDF5 supports DELTA_PLUS_VAR, DELTA_MINUS_VAR metadata.
-            <li>1718: LANL NN with log-spaced x-tags.
-            <li>test002 showed where -INFs were getting into AutoHistogram and causing unnecessary warnings.
-            <li>1714: slice function of NetCDF (and HDF) result didn't handle DEPEND meta dataset property. 
-            <li>1714: Brian showed where HDF5 variable was ISTP, but its DEPEND datasets were not.
-            <li>something changed on Mint Linux display (or java version) and get screenshot didn't work on one of the screens.
-            <li>old nbproject areas (ant build) rebuilt from scratch, reducing incremental build time from 20sec to 5sec.
-            <li>rte_1736345160: improperly-localized strings caused RTE in layout tab's "make taller" and other buttons.  Thanks, Andre!
-            <li>rte_0095613254: if the vap+cdf: was missing from the URI, Tool->"Mash Data" would fail.
-            <li>stacked histogram correctly handles data where points are more course than the resolution and a peaks plane is found, so show hourly averages.
-            <li>Help->"About this release" didn't point at the correct URL.
-            <li>1708: digitizer component fails when the first column was not time, because code assumed times with timeFormatter.
-            <li>data set selector component setValue would add "%20" when there was an extra space at the end when cut-n-paste URIs.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>mouse modules (crosshair,etc) allow up,down,right,left keys for precise control.
-            <li>add example values for depend0units and timeFormat parameters in ascii editor panel.
-            <li>ASCII table data source format supports "+" in tformat parameter, to output multiple columns
-            <li>tweaks to the ASCII editor panel, improving tooltips and providing examples.
-            <li>HAPI data source makes SPASE link and DOI links clickable.
-            <li>"run batch" feature allows jython scripts to be run for a series of inputs, and has methods for generating inputs.
-            <li>rfe 548: Das2 Renderers have a decorator object to allow additional drawing code.
-            <li>HAPI shows descriptions if available.
-            <li>data mash-up tool supports string arguments and constants like QDataSet.UNITS.  Thanks, Kristoff!
-            <li>metadata tab allows access to the metadata for each bundled dataset.
-            <li>update internal orbits, and include 2017 leap second.
-            <li>20000th SVN revision!
-            <li>layout tab has "move to top" menu item
-            <li>lookupAxis supports horizontal axis.
-            <li>543: support for time zone offsets in ISO8601 strings.
-            <li>HAPI data source supports JSON data response.
-        </ul>
 
         <p>Known issues:</p>
         <ul>
