@@ -35,7 +35,7 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&lt;html&gt;The data must be of the form: &#xa;&lt;li&gt;(m,n,4) for ARGB  &#xa;&lt;li&gt;(3,m,n) RGB. &#xa;&lt;li&gt;(m,n,3) RGB.&#xa;with values from 0 through 255.  This can be created with the &quot;bundle&quot; function in scripts."/>
+        <Property name="text" type="java.lang.String" value="&lt;html&gt;The data must be of the form:&lt;ul&gt;&lt;li&gt;(m,n,4) for ARGB   &lt;li&gt;(3,m,n) RGB.  &lt;li&gt;(m,n,3) RGB. &lt;/ul&gt;with values from 0 through 255.  This can be created with the &quot;bundle&quot; function in scripts."/>
         <Property name="verticalAlignment" type="int" value="1"/>
       </Properties>
     </Component>

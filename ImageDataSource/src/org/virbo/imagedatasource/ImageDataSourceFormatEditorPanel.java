@@ -32,7 +32,7 @@ public class ImageDataSourceFormatEditorPanel extends javax.swing.JPanel impleme
 
         jLabel1 = new javax.swing.JLabel();
 
-        jLabel1.setText("<html>The data must be of the form: \n<li>(m,n,4) for ARGB  \n<li>(3,m,n) RGB. \n<li>(m,n,3) RGB.\nwith values from 0 through 255.  This can be created with the \"bundle\" function in scripts.");
+        jLabel1.setText("<html>The data must be of the form:<ul><li>(m,n,4) for ARGB   <li>(3,m,n) RGB.  <li>(m,n,3) RGB. </ul>with values from 0 through 255.  This can be created with the \"bundle\" function in scripts.");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
