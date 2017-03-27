@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Slice GUI allows rapid browsing data from CDAWeb.
+        <p><small>Testing synchronization with Jython scripts.  Ideally the script would be run just once.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,10 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-03-23 r20595):</p>
+        <p>Bugfixes (2017-03-27 r20595):</p>
         <ul> 
+            <li>1804: trim off-by-one error corrected.
+            <li>1802: checkIsotropic could trigger before axes were sized with AutoplotServer.
             <li>Java 8 Javadocs supported in Jython completions.
             <li>new CDF Jar file fixes problem where unused ThreadGroups were made.
             <li>1801: dataset iterator is inordinately slow, put in optimal loops for rank 1 data.  
@@ -119,7 +121,7 @@
             <li>Introduce high-rank trim, so you can trim on any index now.
             <li>HAPI Server bins can have either centers or ranges specified.
             <li>HAPI Server support for enumerated data (Strings) supported.
-            <li>refactor to create action "Edit Plot"->"Replace plot with clipboard plot"
+            <li>1779: refactor to create action "Edit Plot"->"Replace plot with clipboard plot"
             <li>metadata now has "copy value" popup menu item.
             <li>support ds[:,1] as well as ds&slice1=1, so that X and Y can be components of vectors.
             <li>563: HDF and CDF support X and Y datasets.  Thanks Kris and others who have requested this.
