@@ -220,6 +220,7 @@ public class HapiDataSource extends AbstractDataSource {
         String description= "";
         String type= "";
         int[] size= new int[0]; // array of scalars
+        int length= 0; // length in bytes when transferring with binary.
         QDataSet[] depend= null;
         String[] dependName= null; // for time-varying depend1 (not in HAPI1.1)
         String renderType=null; // may contain hint for renderer, such as nnspectrogram
@@ -501,7 +502,6 @@ public class HapiDataSource extends AbstractDataSource {
         monitor.setTaskProgress(20);
         long t0 = System.currentTimeMillis() - 100; // -100 so it updates after receiving first record.
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection= (HttpURLConnection)HtmlUtil.checkRedirect(connection);
         
         connection.setRequestProperty("Accept-Encoding", "gzip");
         connection.connect();
@@ -514,6 +514,43 @@ public class HapiDataSource extends AbstractDataSource {
             if (pds[i].type.startsWith("time")) {
                 recordLengthBytes += Integer.parseInt(pds[i].type.substring(4));
                 tts[i] = TransferType.getForName(pds[i].type, Collections.singletonMap(QDataSet.UNITS, (Object)pds[i].units));
+            } else if (pds[i].type.startsWith("string")) {
+                recordLengthBytes += pds[i].length;
+                final Units u= pds[i].units;
+                final int length= pds[i].length;
+                final byte[] bytes= new byte[length];
+                tts[i] = new TransferType() {
+                    @Override
+                    public void write(double d, ByteBuffer buffer) {
+                        
+                    }
+
+                    @Override
+                    public double read(ByteBuffer buffer) {
+                        buffer.get(bytes);
+                        //buf2.get(bytes);
+                        String s= new String( bytes );
+                        Datum d= ((EnumerationUnits)u).createDatum(s);
+                        return d.doubleValue(u);
+                    }
+
+                    @Override
+                    public int sizeBytes() {
+                        return length;
+                    }
+
+                    @Override
+                    public boolean isAscii() {
+                        return false;
+                    }
+
+                    @Override
+                    public String name() {
+                        return "string"+length;
+                    }
+                    
+                };
+                
             } else {
                 Object type= pds[i].type;
                 recordLengthBytes += BufferDataSet.byteCount(type) * DataSetUtil.product(pds[i].size);
@@ -801,6 +838,7 @@ public class HapiDataSource extends AbstractDataSource {
                 pds[i].units= Units.us2000;
                 if ( jsonObjecti.has("length") ) {
                     pds[i].type= "time"+jsonObjecti.getInt("length");
+                    pds[i].length= jsonObjecti.getInt("length");
                 } else {
                     logger.log(Level.FINE, "server doesn''t report length for \"{0}\", assuming 24 characters, and that it doesn''t matter", name);
                     pds[i].type= "time24";
@@ -846,6 +884,11 @@ public class HapiDataSource extends AbstractDataSource {
                 } else {
                     pds[i].description= ""; // when a value cannot be parsed, but it is not identified.
                 }
+
+                if ( jsonObjecti.has("length") ) {
+                    pds[i].length= jsonObjecti.getInt("length");
+                }
+
                 if ( jsonObjecti.has("size") ) {
                     Object o= jsonObjecti.get("size");
                     if ( !(o instanceof JSONArray) ) {
