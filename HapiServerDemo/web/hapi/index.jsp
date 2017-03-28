@@ -120,6 +120,7 @@
             <li>2017-03-06: fix silly mistakes in untested changes.  More silly mistakes.</li>
             <li>2017-03-15: allow data to come from csv files in data directory.</li>
             <li>2017-03-22: add experimental upload data capability.</li>
+            <li>2017-03-28: finally support nominal data.</li>
         </ul>
         </small>
     </body>
