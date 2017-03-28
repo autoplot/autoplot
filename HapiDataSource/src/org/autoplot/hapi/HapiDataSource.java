@@ -829,8 +829,13 @@ public class HapiDataSource extends AbstractDataSource {
                 if ( jsonObjecti.has("fill") ) {
                     String sfill= jsonObjecti.getString("fill");
                     if ( sfill!=null ) {
-                        pds[i].fillValue= pds[i].units.parse( sfill ).doubleValue( pds[i].units );
-                        pds[i].hasFill= true;
+                        if ( type.equals("string") ) {
+                            pds[i].fillValue= ((EnumerationUnits)pds[i].units).createDatum( sfill ).doubleValue( pds[i].units );
+                            pds[i].hasFill= true;
+                        } else {
+                            pds[i].fillValue= pds[i].units.parse( sfill ).doubleValue( pds[i].units );
+                            pds[i].hasFill= true;
+                        }
                     }
                 } else {
                     pds[i].fillValue= FILL_VALUE; // when a value cannot be parsed, but it is not identified.
