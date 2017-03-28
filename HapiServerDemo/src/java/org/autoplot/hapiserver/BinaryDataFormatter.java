@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +48,44 @@ public class BinaryDataFormatter implements DataFormatter {
                 final String stype = parameter.getString("type");
                 Units u= SemanticOps.getUnits(record.slice(i));
                 if ( stype.equals("isotime") ) {
-                    tt= AsciiTimeTransferType.getForName( "time"+parameter.getInt("length"), Collections.singletonMap(QDataSet.UNITS,(Object)u) );
+                    if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing");
+                    int len= parameter.getInt("length");
+                    tt= AsciiTimeTransferType.getForName( "time"+len, Collections.singletonMap(QDataSet.UNITS,(Object)u) );
+                } else if ( stype.equals("string") ) {
+                    if ( !parameter.has("length") ) throw new RuntimeException("required tag length is missing");
+                    final int len= parameter.getInt("length");
+                    final Units units= u;
+                    final byte[] zeros= new byte[len];
+                    for ( int i2=0; i2<zeros.length; i2++ ) zeros[i2]= 0;
+                    tt= new TransferType() {
+                        @Override
+                        public void write(double d, ByteBuffer buffer) {
+                            String s= units.createDatum(d).toString();
+                            byte[] bytes= s.getBytes( Charset.forName("UTF-8" ) );  
+                            if ( bytes.length<len ) {
+                                buffer.put( bytes, 0, Math.min(bytes.length,len) );  //TODO: we could be in the middle of a letter.
+                                buffer.put( zeros, bytes.length, len-bytes.length );
+                            } else {
+                                buffer.put( bytes, 0, len );  //TODO: we could be in the middle of a UTF-8 letter.
+                            }
+                        }
+                        @Override
+                        public double read(ByteBuffer buffer) {
+                            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                        }
+                        @Override
+                        public int sizeBytes() {
+                            return len;
+                        }
+                        @Override
+                        public boolean isAscii() {
+                            return false;
+                        }
+                        @Override
+                        public String name() {
+                            return "string"+len;
+                        }   
+                    };
                 } else {
                     tt= TransferType.getForName(stype, Collections.singletonMap(QDataSet.UNITS,(Object)u) );
                 }
