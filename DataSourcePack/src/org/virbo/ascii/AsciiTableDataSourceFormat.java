@@ -120,7 +120,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 } else if (ft.startsWith("sec")) {
                     timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%SZ");
                 } else if (ft.startsWith("millisec")) {
-                    final TimeParser tp= TimeParser.create("$Y-$m-%dT$H:$M:$S.$(subsec,places=3)");
+                    final TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$S.$(subsec,places=3)");
                     timeFormatter= new DatumFormatter() {
                         @Override
                         public String format(Datum datum) {
@@ -129,7 +129,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                     };
                     //timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}Z");
                 } else if (ft.startsWith("microsec")) {
-                    final TimeParser tp= TimeParser.create("$Y-$m-%dT$H:$M:$S.$(subsec,places=6)");
+                    final TimeParser tp= TimeParser.create("$Y-$m-$dT$H:$M:$S.$(subsec,places=6)");
                     timeFormatter= new DatumFormatter() {
                         @Override
                         public String format(Datum datum) {
