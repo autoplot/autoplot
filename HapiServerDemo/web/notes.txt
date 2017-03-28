@@ -1,0 +1,3 @@
+= 2017-03-28 =
+Nominal data request:
+http://localhost:8080/HapiServerDemo/hapi/data?id=Iowa+City+Conditions&time.min=2017-03-26T00:00:00.000Z&time.max=2017-03-27T00:00:00.000Z&format=binary&parameters=Conditions
