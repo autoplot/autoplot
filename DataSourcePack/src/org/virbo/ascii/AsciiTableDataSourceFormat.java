@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import org.das2.datum.Datum;
 import org.das2.datum.EnumerationUnits;
+import org.das2.datum.TimeParser;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DatumFormatter;
 import org.das2.datum.format.DefaultDatumFormatter;
@@ -119,9 +120,23 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 } else if (ft.startsWith("sec")) {
                     timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%SZ");
                 } else if (ft.startsWith("millisec")) {
-                    timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}Z");
+                    final TimeParser tp= TimeParser.create("$Y-$m-%dT$H:$M:$S.$(subsec,places=3)");
+                    timeFormatter= new DatumFormatter() {
+                        @Override
+                        public String format(Datum datum) {
+                            return tp.format(datum);
+                        }
+                    };
+                    //timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}Z");
                 } else if (ft.startsWith("microsec")) {
-                    timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}%{micro}Z");
+                    final TimeParser tp= TimeParser.create("$Y-$m-%dT$H:$M:$S.$(subsec,places=6)");
+                    timeFormatter= new DatumFormatter() {
+                        @Override
+                        public String format(Datum datum) {
+                            return tp.format(datum);
+                        }
+                    };
+                    //timeFormatter =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}%{micro}Z");
                 } else {
                     logger.log(Level.FINE, "not implemented: {0}", ft);
                     timeFormatter = new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S");
