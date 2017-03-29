@@ -114,19 +114,21 @@ public class DataServlet extends HttpServlet {
 
         OutputStream out = response.getOutputStream();
                 
+        File[] dataFiles= null;
+        
         try {
             dsiter= checkAutoplotSource( id, dr, allowStream );
             if ( dsiter==null ) {
                 File dataFileHome= new File( Util.getHapiHome(), "data" );
                 File dataFile= new File( dataFileHome, id+".csv" );
                 if ( dataFile.exists() ) {
-                    cachedDataCsv( out, dataFile, dr, parameters );
-                    return;
-                }
-                if ( id.equals("0B000800408DD710.noStream") ) {
-                    dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
+                    dataFiles= new File[] { dataFile };
                 } else {
-                    throw new IllegalArgumentException("bad id: "+id+", does not exist: "+dataFile );
+                    if ( id.equals("0B000800408DD710.noStream") ) {
+                        dsiter= new RecordIterator( "file:/home/jbf/public_html/1wire/data/$Y/$m/$d/0B000800408DD710.$Y$m$d.d2s", dr, false ); // allow Autoplot to select
+                    } else {
+                        throw new IllegalArgumentException("bad id: "+id+", does not exist: "+dataFile );
+                    }
                 }
             }
         } catch ( Exception ex ) {
@@ -135,7 +137,7 @@ public class DataServlet extends HttpServlet {
         }
         
         try {
-            dsiter.constrainDepend0(dr);
+            if ( dsiter!=null ) dsiter.constrainDepend0(dr);
         } catch ( IllegalArgumentException ex ) {
             response.setHeader( "X-WARNING", "data is not monotonic in time, sending everything." );
         }
@@ -217,7 +219,7 @@ public class DataServlet extends HttpServlet {
                     indexMap= indexMap1;
                 }
                 
-                dsiter.resortFields( indexMap );
+                if ( dsiter!=null ) dsiter.resortFields( indexMap );
                 jsonParameters= newParameters;
                 jo.put( "parameters", jsonParameters );
             }
@@ -236,6 +238,14 @@ public class DataServlet extends HttpServlet {
                     out.write( (char)10 );
                 }
             }
+            
+            if ( dataFiles!=null ) {
+                for ( File dataFile : dataFiles ) {
+                    cachedDataCsv( out, dataFile, dr, parameters );
+                }
+                return;
+            }
+            
         } catch (JSONException ex) {
             throw new ServletException(ex);
         }
