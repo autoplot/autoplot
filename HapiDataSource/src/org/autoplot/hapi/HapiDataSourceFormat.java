@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.autoplot.hapi;
 
 import java.io.BufferedReader;
@@ -14,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.das2.datum.DatumRange;
-import org.das2.datum.DatumUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
@@ -23,7 +19,6 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
