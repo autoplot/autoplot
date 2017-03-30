@@ -468,8 +468,8 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 editorPanel= (DataSourceFormatEditorPanel)oeditorPanel;
             }
             String t=  getFilenameTF().getText();
-            if ( t.contains("/" ) ) {
-                editorPanel.setURI( getFilenameTF().getText() );
+            if ( t.contains("/" ) && t.startsWith("file:") ) {
+                editorPanel.setURI( t );
             }
         } else {
             editorPanel= null;
@@ -552,10 +552,14 @@ public class ExportDataPanel extends javax.swing.JPanel {
         URISplit split= URISplit.parse(currentFileString);
         this.filenameTF.setText(split.file);
         formatDLActionPerformed(null);
-        if ( editorPanel!=null ) {
+        if ( editorPanel!=null && currentFileString.startsWith("file:") ) {
             editorPanel.setURI(currentFileString);
         }
-        updateEditorPanel( currentFileString, true );
+        try {
+            updateEditorPanel( currentFileString, true );
+        } catch ( RuntimeException ex ) {
+            
+        }
     }
 
     /**
