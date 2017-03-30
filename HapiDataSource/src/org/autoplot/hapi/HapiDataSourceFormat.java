@@ -15,6 +15,7 @@ import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DatumFormatter;
+import org.das2.datum.format.DefaultDatumFormatterFactory;
 import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -103,6 +104,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 time.put("length", 24 );
                 time.put("name", "Time" );
                 time.put("type", "isotime" );
+                time.put("fill", "NaN" );
                 parameters.put(i,time);
             } else {
                 JSONObject j1= new JSONObject();
@@ -118,7 +120,9 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 Number f= (Number)ds.property(QDataSet.FILL_VALUE);
                 if ( f!=null ) {
                     j1.put("fill",f); //TODO: check that this is properly handled as Object.
-                }                
+                } else {
+                    j1.put("fill","NaN"); 
+                }
                 if ( ds.rank()>=2 ) {
                     j1.put("bins", getBinsFor(ds) );
                 }
@@ -163,7 +167,14 @@ public class HapiDataSourceFormat implements DataSourceFormat {
         DatumFormatter[] dfs= new DatumFormatter[dss.size()];
         for ( int ids=0; ids<dss.size(); ids++ ) {
             QDataSet ds= dss.get(ids);
-            dfs[ids]= DataSetUtil.bestFormatter(ds);
+            Units u= SemanticOps.getUnits(ds);
+            if ( UnitsUtil.isTimeLocation(u) ) {
+                dfs[ids]= DataSetUtil.bestFormatter(ds);
+            } else if ( UnitsUtil.isNominalMeasurement(u) ) {
+                dfs[ids]= DataSetUtil.bestFormatter(ds);
+            } else {
+                dfs[ids]= DefaultDatumFormatterFactory.getInstance().defaultFormatter();
+            }
         }
         int nrec= dss.get(0).length();
         try ( FileWriter fw = new FileWriter(dataFile) ) {
