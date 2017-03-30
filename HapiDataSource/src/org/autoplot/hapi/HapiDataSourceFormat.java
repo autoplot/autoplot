@@ -193,13 +193,14 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                         QubeDataSetIterator iter= new QubeDataSetIterator(ds1);
                         while ( iter.hasNext() ) {
                             iter.next();
+                            double d= iter.getValue(ds1);
                             if ( ids>0 ) fw.write( delim );
                             if ( uIsOrdinal ) {
                                 fw.write("\"");
-                                fw.write( df.format( u.createDatum(ds.value(irec)), u ) );
+                                fw.write( df.format( u.createDatum(d), u ) );
                                 fw.write("\"");
                             } else {
-                                fw.write( df.format( u.createDatum(ds.value(irec)), u ) );
+                                fw.write( df.format( u.createDatum(d), u ) );
                             }
                         }
                     }
@@ -270,7 +271,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
     }
 
     private JSONArray getBinsFor(QDataSet ds) throws JSONException {
-        if ( ds.rank()!=2 ) {
+        if ( false ) {
             throw new IllegalArgumentException("unsupported rank, must be 2");
         } else {
             JSONArray binsArray= new JSONArray();
@@ -280,7 +281,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                 if ( dep==null ) dep= Ops.findgen(qube[i]);
                 if ( dep.rank()==2 ) {
                     if ( SemanticOps.isBins( dep ) ) {
-                        String n= Ops.guessName(dep);
+                        String n= Ops.guessName(dep,"dep"+i);
                         Units u= SemanticOps.getUnits(dep);
                         JSONObject jo= new JSONObject();
                         jo.put( "name", n );
@@ -298,7 +299,7 @@ public class HapiDataSourceFormat implements DataSourceFormat {
                         throw new IllegalArgumentException("independent variable must be a simple 1-D array");
                     }
                 } else {
-                    String n= Ops.guessName(dep);
+                    String n= Ops.guessName(dep,"dep"+i);
                     Units u= SemanticOps.getUnits(dep);
                     JSONObject jo= new JSONObject();
                     jo.put( "name", n );
