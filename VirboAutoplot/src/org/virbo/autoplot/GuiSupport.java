@@ -104,7 +104,6 @@ import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
-import org.das2.util.ByteBufferInputStream;
 import org.das2.util.Entities;
 import org.das2.util.awt.PdfGraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -139,7 +138,6 @@ import org.virbo.datasource.DataSourceFormat;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.DataSourceUtil;
-import org.virbo.datasource.FileSystemUtil;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.WindowManager;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -233,32 +231,50 @@ public class GuiSupport {
      * @return the GUI controller.
      */
     public static PlotStylePanel.StylePanel getStylePanel( RenderType renderType ) { 
-            PlotStylePanel.StylePanel editorPanel;
-            if ( renderType==RenderType.spectrogram || renderType==RenderType.nnSpectrogram ) {
+        PlotStylePanel.StylePanel editorPanel;
+        if ( null == renderType ) {
+            //TODO: consider generic style panel that is based on completions of Renderer control.
+            editorPanel= new SeriesStylePanel( );
+            return editorPanel;
+        } 
+        switch (renderType) {
+            case spectrogram:
+            case nnSpectrogram:
                 editorPanel= new SpectrogramStylePanel( );
-            } else if ( renderType==RenderType.pitchAngleDistribution ) {
+                break;
+            case pitchAngleDistribution:
                 editorPanel= new PitchAngleDistributionStylePanel( );
-            } else if ( renderType==RenderType.hugeScatter ) {
+                break;
+            case hugeScatter:
                 editorPanel= new HugeScatterStylePanel( );
-            } else if ( renderType==RenderType.colorScatter ) {
+                break;
+            case colorScatter:
                 editorPanel= new ColorScatterStylePanel( );
-            } else if ( renderType==RenderType.contour ) {
+                break;
+            case contour:
                 editorPanel= new ContourStylePanel( );
-            } else if ( renderType==RenderType.digital ) {
+                break;
+            case digital:
                 editorPanel= new DigitalStylePanel( );
-            } else if ( renderType==RenderType.orbitPlot ) {
+                break;
+            case orbitPlot:
                 editorPanel= new OrbitStylePanel( );
-            } else if ( renderType==RenderType.eventsBar ) {
+                break;
+            case eventsBar:
                 editorPanel= new EventsStylePanel( );
-            } else if ( renderType==RenderType.stackedHistogram ) {
+                break;
+            case stackedHistogram:
                 editorPanel= new StackedHistogramStylePanel( );
-            } else if ( renderType==RenderType.image ) {
+                break;
+            case image:
                 editorPanel= new ImageStylePanel( );
-            } else {
+                break;
+            default:
                 //TODO: consider generic style panel that is based on completions of Renderer control.
                 editorPanel= new SeriesStylePanel( );
-            }
-            return editorPanel;
+                break;
+        }
+        return editorPanel;
     }
     
     public static void editPlotElement( ApplicationModel applicationModel, Component parent ) {
@@ -303,12 +319,16 @@ public class GuiSupport {
             selectors= new DataSetSelector[] { dia.getPrimaryDataSetSelector(),
                 dia.getSecondaryDataSetSelector(),
                 dia.getTertiaryDataSetSelector(), };
-            if ( depCount==2 ) {
-                groups= new int[] { 5,1,3 };
-            } else if (depCount==1 ) {
-                groups= new int[] { 3,1 };
-            } else {
-                groups= new int[] { 1 };
+            switch (depCount) {
+                case 2:
+                    groups= new int[] { 5,1,3 };
+                    break;
+                case 1:
+                    groups= new int[] { 3,1 };
+                    break;
+                default:
+                    groups= new int[] { 1 };
+                    break;
             }
             for ( int i=0; i<groups.length; i++ ) {
                 DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, m.group(groups[i]) );
@@ -480,28 +500,37 @@ public class GuiSupport {
             }
 
             mon= DasProgressPanel.createFramed( parent, "formatting data" );
-            if ( dscontrol.equals("plotElementTrim") ) {
-                DasPlot p= pe.getController().getDasPlot();
-                DatumRange xbounds= p.getXAxis().getDatumRange();
-                QDataSet dsout=  pe.getController().getDataSet();
-                //dsout= DataSetOps.processDataSet( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
-                long t0= System.currentTimeMillis();
-                if ( SemanticOps.isRank2Waveform(dsout) ) {
-                    dsout= DataSetOps.flattenWaveform(dsout);
-                    //dsout= ArrayDataSet.copy( dsout );
-                }
-                dsout= SemanticOps.trim( dsout, xbounds, null );
-                format.formatData( uriOut, dsout, mon );
-                logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
-            } else if ( dscontrol.equals("plotElement") ) {
-                long t0= System.currentTimeMillis();
-                QDataSet dsout=  pe.getController().getDataSet();
-                format.formatData( uriOut, dsout, mon );
-                logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
-            } else {
-                long t0= System.currentTimeMillis();
-                format.formatData( uriOut, ds, mon );
-                logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
+            switch (dscontrol) {
+                case "plotElementTrim":
+                    {
+                        DasPlot p= pe.getController().getDasPlot();
+                        DatumRange xbounds= p.getXAxis().getDatumRange();
+                        QDataSet dsout=  pe.getController().getDataSet();
+                        //dsout= DataSetOps.processDataSet( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
+                        long t0= System.currentTimeMillis();
+                        if ( SemanticOps.isRank2Waveform(dsout) ) {
+                            dsout= DataSetOps.flattenWaveform(dsout);
+                            //dsout= ArrayDataSet.copy( dsout );
+                        }       dsout= SemanticOps.trim( dsout, xbounds, null );
+                        format.formatData( uriOut, dsout, mon );
+                        logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
+                        break;
+                    }
+                case "plotElement":
+                    {
+                        long t0= System.currentTimeMillis();
+                        QDataSet dsout=  pe.getController().getDataSet();
+                        format.formatData( uriOut, dsout, mon );
+                        logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
+                        break;
+                    }
+                default:
+                    {
+                        long t0= System.currentTimeMillis();
+                        format.formatData( uriOut, ds, mon );
+                        logger.log( Level.FINE, "format in {0} millis", (System.currentTimeMillis()-t0));
+                        break;
+                    }
             }
             parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(uriOut) );
         } catch ( IllegalArgumentException ex ) {
