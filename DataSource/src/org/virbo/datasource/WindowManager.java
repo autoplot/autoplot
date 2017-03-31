@@ -152,8 +152,8 @@ public class WindowManager {
     }
     
     /**
-     * new okay/cancel dialog that is resizable and is made with a simple dialog.
-     * @param parent the parent window or dialog.
+     * New okay/cancel dialog that is resizable and is made with a simple dialog.
+     * @param parent the parent window or dialog, or null.
      * @param omessage String or Component.
      * @param title the dialog title.  
      * @param optionType.  This must be OK_CANCEL_OPTION or YES_NO_CANCEL_OPTION
@@ -169,7 +169,12 @@ public class WindowManager {
         } else {
             message= (Component)omessage;
         }
-        final Window p= ( parent instanceof Window ) ? ((Window)parent) : SwingUtilities.getWindowAncestor(parent);
+        final Window p;
+        if ( parent!=null ) {
+            p= ( parent instanceof Window ) ? ((Window)parent) : SwingUtilities.getWindowAncestor(parent); 
+        } else {
+            p= null;
+        }
         final JDialog dia= new JDialog( p, Dialog.ModalityType.APPLICATION_MODAL );
         final String name;
         if ( title.startsWith("Run Script ") ) { //small kludge to hide user-created data from injection into user prefs.
