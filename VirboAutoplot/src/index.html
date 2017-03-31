@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Testing synchronization with Jython scripts.  Ideally the script would be run just once.
+        <p><small>PNGWalkTool is used to investigate occasional failures in nightly testing.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,17 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-03-27 r20595):</p>
+        <p>Bugfixes (2017-03-31 r20629):</p>
         <ul> 
+            <li>special handling of parseDecimal("NaN").
+            <li>improve handling of space and umlaut in pngwalk file names.
+            <li>rte_0746124665: George saw path that was resulted in NullPointerException.
+            <li>one-arg join(ds) was deleted at some point, and is now replaced.  Thanks, George!
+            <li>HAPI export supports rank 3.
+            <li>bundle(ds1,ds2) correctly handles DEPEND_1 and DEPEND_2 when bundled datasets have equivalent values.
+            <li>correction to ascii formatting when microsecond resolution is used.  Thanks, Kristoff!
+            <li>slice2 and slice3 preserve NAME property.
+            <li>bugfix: LocalFileObject write capability didn't check to see if it could create a file, with the QC stuff in PNGWalk.
             <li>1804: trim off-by-one error corrected.
             <li>1802: checkIsotropic could trigger before axes were sized with AutoplotServer.
             <li>Java 8 Javadocs supported in Jython completions.
@@ -70,6 +79,7 @@
         </ul>
         <p>Older Bugfixes:</p>
         <ul>
+            <li>HAPI supports nominal data.
             <li>1754: Java now reuses https connections properly and garbage collection requests are not needed.
             <li>improvements to command line history. 
             <li>DownloadResourceAsTempFile never properly indicated progress, showing progress bar with incorrect position.
