@@ -17,6 +17,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -133,15 +134,13 @@ public class WalkUtil {
             if ( fsm!=null ) dr2= fsm.getRangeFor(ss[i]);
             if ( dr==null || dr2==null || dr.contains(dr2) ) {
                 if ( fs.getFileObject(ss[i]).isLocal() ) {
-                    //File f= fs.getFileObject(ss[i]).getFile();
-                    String suri= DataSetURI.getResourceURI( dirsuri ).toString() + ss[i] ;
-                    String[] ss1= suri.split(":",2);
-                    result.add( new URI( ss1[0], ss1[1], null ) ); // make file:/// match template. // bug 3055130 suspect
+                    File f= fs.getFileObject(ss[i]).getFile();
+                    result.add( f.toURI() );
                 } else {
                     if ( ss[i].startsWith("/") ) {
-                        result.add( fs.getRootURI().resolve(ss[i].substring(1)) );
+                        result.add( fs.getRootURI().resolve( URLEncoder.encode( ss[i].substring(1),"UTF-8") ) );
                     } else {
-                        result.add( fs.getRootURI().resolve(ss[i]) );
+                        result.add( fs.getRootURI().resolve( URLEncoder.encode( ss[i],"UTF-8") ) );
                     }
                 }
                 timeRanges.add(dr2);
