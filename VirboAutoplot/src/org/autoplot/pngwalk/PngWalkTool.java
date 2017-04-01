@@ -20,6 +20,7 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -758,8 +759,6 @@ public final class PngWalkTool extends javax.swing.JPanel {
 
         result.add(fileMenu);
 
-        BindingGroup bg= new BindingGroup();
-
         JMenu navMenu= new JMenu("Navigate");
         navMenu.add( new AbstractAction( "Go To Date..." ) {
             @Override
@@ -866,9 +865,14 @@ public final class PngWalkTool extends javax.swing.JPanel {
         navMenu.setEnabled(tool.seq!=null);
         
         final JMenu optionsMenu= new JMenu( "Options" );
-        JCheckBoxMenuItem persMi= new JCheckBoxMenuItem("Use Perspective");
-        bg.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, tool.views[4], BeanProperty.create("perspective"), persMi, BeanProperty.create("selected") ) );
-        bg.bind();
+        final JCheckBoxMenuItem persMi= new JCheckBoxMenuItem("Use Perspective",true);
+        persMi.addActionListener( new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ((CoversWalkView)tool.views[4]).setPerspective(persMi.isSelected());
+            }
+        } );
+
         optionsMenu.add(persMi);
 
         ButtonGroup buttonGroup1 = new javax.swing.ButtonGroup();
