@@ -7,7 +7,6 @@
 
 package org.virbo.datasource;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -44,7 +43,7 @@ import org.virbo.datasource.ui.PromptComboBoxEditor;
 
 /**
  * Standard control for controlling a DatumRange containing times, with
- * next/prev buttons, and a launcher into the TimeRangeTool.
+ * next and previous buttons, and a launcher into the TimeRangeTool.
  * @author jbf
  */
 public class TimeRangeEditor extends javax.swing.JPanel {
@@ -138,6 +137,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         if (oldValue != value && oldValue != null && !oldValue.equals(value)) {
             if ( !suppressRecentComboBoxActionEvents ) {
                 SwingUtilities.invokeLater( new Runnable() {
+                    @Override
                     public void run() {
                         TimeRangeEditor.super.firePropertyChange( PROP_RANGE, oldValue, value);
                     }
@@ -233,6 +233,12 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         }
     }
 
+    @Override
+    public final void revalidate() {
+        super.revalidate(); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    
     /**
      * prevent displaying same message so many times...
      */
@@ -421,7 +427,11 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         t.setSelectedRange(getRange().toString());//TODO: goofy
         if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( this, t, "Select time range", JOptionPane.OK_CANCEL_OPTION ) ) {
             String str= t.getSelectedRange();
-            setRange( DatumRangeUtil.parseTimeRangeValid(str) );
+            try {
+                setRange( DatumRangeUtil.parseTimeRangeValid(str) );
+            } catch ( IllegalArgumentException ex ) {
+                logger.log(Level.FINE, "unable to parse time/orbit: {0}", str);
+            }
             recentComboBox.actionPerformed( new ActionEvent(this,0,"triggerSaveRecent",0) );
         }
 
