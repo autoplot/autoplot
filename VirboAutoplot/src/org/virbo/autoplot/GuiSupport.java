@@ -598,7 +598,7 @@ public class GuiSupport {
                     URISplit split= URISplit.parse(currentFileString);
                     edp.getFilenameTF().setText(split.file);
                     edp.getFormatDL().setSelectedItem( "." + split.ext );
-                    if ( currentFileString.contains("/") ) {
+                    if ( currentFileString.contains("/") && currentFileString.startsWith("file:")) {
                         edp.setFile( currentFileString );
                         if ( split.params!=null && edp.getDataSourceFormatEditorPanel()!=null ) {
                             edp.getDataSourceFormatEditorPanel().setURI(currentFileString);
