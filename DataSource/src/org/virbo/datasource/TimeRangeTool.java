@@ -182,6 +182,10 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     if ( i>-1 ) orbits.append(orb.substring(0,i)); else orbits.append(orb);
                     orb= orbits.toString();
                 } else {
+                    if ( orb==null ) {
+                        orbitList.setSelectedIndex(0);
+                        orb= orbitList.getSelectedValue().toString();
+                    }
                     int i= orb.indexOf(":");
                     if ( i>-1 ) orb= orb.substring(0,i);
                 }
@@ -201,7 +205,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
     }
 
     private String[] getSpacecraft() {
-        String[] ss= new String[] { "rbspa-pp", "rbspb-pp", "crres", "cassini", "marsx" };
+        String[] ss= new String[] { "rbspa-pp", "rbspb-pp", "crres", "cassini", "marsx", "junoPJ" };
         int n= ss.length;
         String[] result= new String[ n + extraSpacecraft.length ];
         System.arraycopy(ss, 0, result, 0, n);
@@ -469,7 +473,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
+            .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -478,7 +482,7 @@ public class TimeRangeTool extends javax.swing.JPanel {
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(12, 12, 12)
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 483, Short.MAX_VALUE)
+                            .add(timeRangeTextField)
                             .add(jPanel1Layout.createSequentialGroup()
                                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(jPanel1Layout.createSequentialGroup()
@@ -534,7 +538,6 @@ public class TimeRangeTool extends javax.swing.JPanel {
         jLabel2.setText("Time Ranges by Orbit");
 
         scComboBox.setEditable(true);
-        scComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         scComboBox.setToolTipText("Id of the orbits file or URL to orbits file");
         scComboBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
