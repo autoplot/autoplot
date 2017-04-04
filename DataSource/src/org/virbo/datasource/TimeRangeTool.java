@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -39,24 +40,33 @@ public class TimeRangeTool extends javax.swing.JPanel {
     /**
      * true when the last focus on the Calendar tab was the timeRange field.
      */
-    boolean timeRangeFocus= true;
+    private boolean timeRangeFocus= true;
 
-    String orbit=""; // save the orbit so it isn't clobbered by the GUI.
-    
+    private String orbit=""; // save the orbit so it isn't clobbered by the GUI.
+        
     /**
      * datumrange where we started.
      */
     private DatumRange pendingTimeRange;
 
+    private Preferences prefs;
+    private static final String PREF_SPACECRAFT = "spacecraft";
+
+    private InputVerifier verifier=null;
+        
     /** Creates new form TimeRangeTool */
     public TimeRangeTool() {
         initComponents();
         scComboBox.setModel( new DefaultComboBoxModel(getSpacecraft()) );
-        scComboBox.setSelectedItem( "rbspa-pp" );
+
+        prefs = Preferences.userNodeForPackage( TimeRangeTool.class );
+        final String sc= prefs.get(PREF_SPACECRAFT, "rbspa-pp" );
+        
+        scComboBox.setSelectedItem( sc );
         Runnable run= new Runnable() {
             @Override
             public void run() {
-                resetSpacecraft("rbspa-pp");
+                resetSpacecraft(sc);
             }
         };
         new Thread(run,"loadOrbits").start();
@@ -238,6 +248,8 @@ public class TimeRangeTool extends javax.swing.JPanel {
         final DefaultListModel mm= new DefaultListModel();
         final Orbits finalOrbits;
         
+        prefs.put(PREF_SPACECRAFT, sc );
+        
         String focusItem= null;
         Orbits o;
         try {
@@ -301,11 +313,9 @@ public class TimeRangeTool extends javax.swing.JPanel {
                 }
             }
         } );
-
+        
     }
     
-    InputVerifier verifier=null;
-        
     private void resetRecent() {
         int RECENT_SIZE=20;
         
