@@ -32,7 +32,9 @@ import org.json.JSONObject;
  * @author jbf
  */
 public class InfoServlet extends HttpServlet {
+    
     private static final Logger logger= Logger.getLogger("hapi");    
+    
     protected static JSONObject getInfo( String id ) throws JSONException, IllegalArgumentException, IOException {
         JSONObject jo= new JSONObject();
         jo.put("HAPI",Util.hapiVersion());
@@ -63,7 +65,11 @@ public class InfoServlet extends HttpServlet {
         JSONObject o= new JSONObject(builder.toString());
         JSONArray parametersRead= o.getJSONArray("parameters");
         for ( int i=1; i<parametersRead.length(); i++ ) {
-            parameters.put( i, parametersRead.getJSONObject(i) );
+            JSONObject jo1= parametersRead.getJSONObject(i);
+            parameters.put( i,jo1  );
+            if ( jo1.has("fill") ) {
+                logger.log(Level.WARNING, "required parameter fill is missing from parameter {0}", i);
+            }
         }
         // support local features like "now-P3D", which are not hapi features.
         if ( o.has("startDate") && o.has("stopDate") ) { 
@@ -83,7 +89,15 @@ public class InfoServlet extends HttpServlet {
             } else {
                 logger.warning("non-conformant server needs to have stopDate");
             }
-        }      
+        }
+        
+        if ( o.has("sampleStartDate") && o.has("sampleStopDate") ) { 
+            String startDate= o.getString("sampleStartDate");
+            String stopDate= o.getString("sampleStopDate");
+            DatumRange tr= DatumRangeUtil.parseTimeRangeValid( startDate+"/"+stopDate );
+            jo.put( "sampleStartDate", tr.min().toString() );
+            jo.put( "sampleStopDate", tr.max().toString() );
+        }
         
         jo.put("parameters",parameters);
         return jo;
