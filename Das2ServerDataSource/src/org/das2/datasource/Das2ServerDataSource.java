@@ -60,7 +60,7 @@ import org.virbo.qstream.QDataSetStreamHandler;
  * DataSource for communicating with Das2servers.
  * @author jbf
  */
-class Das2ServerDataSource extends AbstractDataSource {
+public class Das2ServerDataSource extends AbstractDataSource {
 
     private static final Map<String,String> keys= new HashMap();
     
