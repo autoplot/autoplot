@@ -118,6 +118,13 @@ public class EditorAnnotationsSupport {
                 if ( d.getText(i,1).charAt(0)==9 ) {
                     TabPainter grey= new TabPainter( Color.LIGHT_GRAY );
                     editorPanel.getHighlighter().addHighlight( i, i+1, grey );
+                    Annotation ann = new Annotation();
+                    ann.len = 1;
+                    ann.offset = i;
+                    ann.text = "\t";
+                    ann.marker= null;
+                    ann.highlightInfo= grey;
+                    annotations.put(ann.offset, ann);
                 }
             } catch (BadLocationException ex) {
                 Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
@@ -132,6 +139,7 @@ public class EditorAnnotationsSupport {
         if ( SwingUtilities.isEventDispatchThread() ) {
             Markers.removeMarkers(editorPanel);
             editorPanel.getHighlighter().removeAllHighlights();
+            annotations= new TreeMap<>();
             annotateTabs();
         } else {
            SwingUtilities.invokeLater( new Runnable() {
@@ -139,11 +147,11 @@ public class EditorAnnotationsSupport {
                 public void run() {
                     Markers.removeMarkers(editorPanel);
                     editorPanel.getHighlighter().removeAllHighlights();
+                    annotations= new TreeMap<>();
                     annotateTabs();
                 }
             } );
         }
-        annotations= new TreeMap<Integer, Annotation>();
     }
 
     /**
@@ -173,7 +181,7 @@ public class EditorAnnotationsSupport {
         SimpleMarker marker;
         Object highlightInfo;
     }
-    SortedMap<Integer, Annotation> annotations = new TreeMap<Integer, Annotation>();
+    SortedMap<Integer, Annotation> annotations = new TreeMap<>();
 
     private Annotation annotationAt(int offset) {
 
