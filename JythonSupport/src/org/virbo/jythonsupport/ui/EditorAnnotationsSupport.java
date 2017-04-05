@@ -111,6 +111,20 @@ public class EditorAnnotationsSupport {
         editorPanel.setToolTipText("this will contain annotations");
     }
 
+    public void annotateTabs() {
+        Document d= editorPanel.getDocument();
+        for ( int i=0; i<d.getLength(); i++ ) {
+            try {
+                if ( d.getText(i,1).charAt(0)==9 ) {
+                    TabPainter grey= new TabPainter( Color.LIGHT_GRAY );
+                    editorPanel.getHighlighter().addHighlight( i, i+1, grey );
+                }
+            } catch (BadLocationException ex) {
+                Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    
     /**
      * remove all annotations
      */
@@ -118,12 +132,14 @@ public class EditorAnnotationsSupport {
         if ( SwingUtilities.isEventDispatchThread() ) {
             Markers.removeMarkers(editorPanel);
             editorPanel.getHighlighter().removeAllHighlights();
+            annotateTabs();
         } else {
            SwingUtilities.invokeLater( new Runnable() {
                 @Override
                 public void run() {
                     Markers.removeMarkers(editorPanel);
                     editorPanel.getHighlighter().removeAllHighlights();
+                    annotateTabs();
                 }
             } );
         }
