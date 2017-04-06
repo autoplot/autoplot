@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -87,14 +89,17 @@ public class EditorAnnotationsSupport {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 clearAnnotations(e.getOffset());
+                annotateTabs(e.getOffset(),e.getLength());
             }
             @Override
             public void removeUpdate(DocumentEvent e) {
                 clearAnnotations(e.getOffset());
+                annotateTabs(e.getOffset(),e.getLength());
             }
             @Override
             public void changedUpdate(DocumentEvent e) {
                 clearAnnotations(e.getOffset());
+                annotateTabs(e.getOffset(),e.getLength());
             }
         };
         editorPanel.getDocument().addDocumentListener(annoList);
@@ -111,19 +116,54 @@ public class EditorAnnotationsSupport {
         editorPanel.setToolTipText("this will contain annotations");
     }
 
+    public void annotateTabs(int i,int len) {
+        Document d= editorPanel.getDocument();
+        Collection<Annotation> ca= new ArrayList<>( annotations.values() );
+        for ( Annotation a: ca ) {
+            if ( a.offset>=i || a.offset<i+len ) {
+                try {
+                    if ( d.getText(i,1).charAt(0)!=9 ) {
+                        annotations.remove( a.offset );
+                        editorPanel.getHighlighter().removeHighlight(a.highlightInfo);
+                    }
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } 
+        }
+        try {
+            for ( int ii= 0; ii<len; ii++ ) {
+                if ( d.getText(i+ii,1).charAt(0)==9 ) {
+                    TabPainter grey= new TabPainter( Color.LIGHT_GRAY );
+                    Object o= editorPanel.getHighlighter().addHighlight( i+ii, i+ii+1, grey );
+                    Annotation ann = new Annotation();
+                    ann.len = 1;
+                    ann.offset = i+ii;
+                    ann.text = "\t";
+                    ann.marker= null;
+                    ann.highlightInfo= o;
+                    annotations.put(ann.offset, ann);
+                }
+            }
+        } catch (BadLocationException ex) {
+            Logger.getLogger(EditorAnnotationsSupport.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public void annotateTabs() {
         Document d= editorPanel.getDocument();
         for ( int i=0; i<d.getLength(); i++ ) {
             try {
                 if ( d.getText(i,1).charAt(0)==9 ) {
                     TabPainter grey= new TabPainter( Color.LIGHT_GRAY );
-                    editorPanel.getHighlighter().addHighlight( i, i+1, grey );
+                    Object o= editorPanel.getHighlighter().addHighlight( i, i+1, grey );
                     Annotation ann = new Annotation();
                     ann.len = 1;
                     ann.offset = i;
                     ann.text = "\t";
                     ann.marker= null;
                     ann.highlightInfo= grey;
+                    ann.highlightInfo= o;
                     annotations.put(ann.offset, ann);
                 }
             } catch (BadLocationException ex) {
