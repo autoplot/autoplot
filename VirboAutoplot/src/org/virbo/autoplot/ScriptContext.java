@@ -761,6 +761,7 @@ addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )
      * @param listener the PyFunction to call with new events.
      * @return the mouse module.  
      * @see org.das2.event.MouseModule#setDragRenderer(org.das2.event.DragRenderer) 
+     * @see org.das2.event.BoxSelectionEvent for the methods of the event.
      * 
      */
     public static MouseModule addMouseModule( Plot plot, String label, final PyFunction listener ) {
