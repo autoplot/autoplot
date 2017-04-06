@@ -148,6 +148,9 @@ public class ScriptContext extends PyJavaInstance {
         setView(app);        
     }
     
+    /**
+     * reset the script focus to the default application.
+     */
     public static synchronized void setDefaultApplication() {
         setApplication(defaultApp);
     }
@@ -377,8 +380,15 @@ public class ScriptContext extends PyJavaInstance {
     
     private static AutoplotUI view = null;
     
+    /**
+     * keep track of the default application.
+     */
     protected static AutoplotUI defaultApp= null; // kludge to get the first.
 
+    /**
+     * set the default application.  Jython codes should not call this.
+     * @param app
+     */
     protected static void _setDefaultApp( AutoplotUI app ) {
         defaultApp= app;
         appLookup.put( app.applicationModel, app);
@@ -738,7 +748,14 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * add code that will respond to mouse events.  This will receive an 
      * event following the mouse release when a box is dragged out.
-     * 
+     *<blockquote><pre><small>{@code
+def boxLookup( evt ):
+    showMessageDialog( "<html>start: (%s,%s)<br>finish: (%s,%s)" %
+        ( evt.getStartX(), evt.getStartY(), 
+        evt.getFinishX(), evt.getFinishY() ) )
+  
+addMouseModule( dom.plots[0], 'Box Lookup', boxLookup )   
+     *}</small></pre></blockquote>
      * @param plot the plot which will receive the events.
      * @param label a label for the mouse module.
      * @param listener the PyFunction to call with new events.
