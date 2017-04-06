@@ -1,6 +1,7 @@
 package org.virbo.jythonsupport.ui;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -41,38 +42,45 @@ public class TabPainter extends DefaultHighlighter.DefaultHighlightPainter {
      */
     @Override
     public Shape paintLayer(Graphics g1, int offs0, int offs1, Shape bounds, JTextComponent c, View view) {
-        Rectangle r = getDrawingArea(offs0, offs1, bounds, view);
+        
+        for ( int offs= offs0; offs<offs1+1; offs++ ) {
+            Rectangle r = getDrawingArea(offs, offs+1, bounds, view);
 
-        if (r == null) {
-            return null;
+            if (r == null) {
+                continue;
+            }
+
+            Graphics2D g = (Graphics2D) g1;
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            //  Do your custom painting
+            Color color = getColor();
+            g.setColor(color == null ? c.getSelectionColor() : color);
+
+            int y = r.y + r.height/2;
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+            float hx= r.x+r.width-3;
+            float hy= y;
+            float dx= 3;
+        
+            GeneralPath p= new GeneralPath();
+            p.moveTo( hx, hy );
+        
+            p.lineTo( (hx-2*dx), (hy-dx-1) );
+            p.lineTo( (hx-2*dx), (hy+dx+1) );
+            p.lineTo( hx, hy );            
+            g.fill( p );
+        
+            g.drawLine( r.x, y, (int)hx-2, y );
+            
+            g.setFont( Font.decode("sans-8") );
+            g.drawString( String.valueOf(offs), r.x, hy );
         }
-
-        Graphics2D g = (Graphics2D) g1;
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-        //  Do your custom painting
-        Color color = getColor();
-        g.setColor(color == null ? c.getSelectionColor() : color);
-
-        int y = r.y + r.height/2;
-        Graphics2D g2 = (Graphics2D) g;
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         
-        float hx= r.x+r.width-3;
-        float hy= y;
-        float dx= 3;
-        float dy= 0;
+        Rectangle r = getDrawingArea(offs0, offs1, bounds, view);
         
-        GeneralPath p= new GeneralPath();
-        p.moveTo( hx, hy );
-        
-        p.lineTo( (hx-2*dx), (hy-dx-1) );
-        p.lineTo( (hx-2*dx), (hy+dx+1) );
-        p.lineTo( hx, hy );            
-        g.fill( p );
-        
-        g.drawLine( r.x, y, (int)hx-2, y );
-
         // Return the drawing area
         return r;
     }
