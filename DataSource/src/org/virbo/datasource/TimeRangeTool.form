@@ -231,26 +231,25 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jLabel2" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="feedbackLabel" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              <Component id="jScrollPane1" min="-2" pref="450" max="-2" attributes="0"/>
+                              <Component id="jLabel4" min="-2" pref="107" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
+                              <Component id="scComboBox" max="32767" attributes="0"/>
                           </Group>
-                          <Group type="102" attributes="0">
+                          <Component id="jLabel10" alignment="0" pref="507" max="32767" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="feedbackLabel" max="32767" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="jScrollPane1" max="32767" attributes="0"/>
+                                  <Group type="102" attributes="0">
                                       <Component id="orbitFeedbackLabel" max="32767" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="orbitNumberTF" min="-2" pref="96" max="-2" attributes="0"/>
                                   </Group>
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <Component id="jLabel4" min="-2" pref="107" max="-2" attributes="0"/>
-                                      <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                                      <Component id="scComboBox" max="32767" attributes="0"/>
-                                  </Group>
-                                  <Component id="jLabel10" alignment="0" pref="495" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -275,10 +274,11 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="orbitFeedbackLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="orbitNumberTF" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" min="-2" pref="218" max="-2" attributes="0"/>
-                      <EmptySpace pref="48" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="248" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -358,6 +358,14 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="jLabel11"/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="orbitNumberTF">
+              <Properties>
+                <Property name="toolTipText" type="java.lang.String" value="Enter orbit id and press Enter key"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="orbitNumberTFActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
