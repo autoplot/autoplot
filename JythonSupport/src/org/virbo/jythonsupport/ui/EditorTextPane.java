@@ -27,7 +27,9 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -165,6 +167,12 @@ public class EditorTextPane extends JEditorPane {
                 
                 doLayout(); // kludge for DefaultSyntaxKit
                 DefaultSyntaxKit.initKit();
+                
+                if ( JythonCompletionProvider.getInstance().settings().isTabIsCompletion()==false ) {
+                    // Ed Help
+                    Action get = EditorTextPane.this.getActionMap().get(DefaultSyntaxKit.insertTabAction);
+                    EditorTextPane.this.getActionMap().remove(DefaultSyntaxKit.insertTabAction);
+                }
 
                 JPopupMenu oldPopup= EditorTextPane.this.getComponentPopupMenu();
                 EditorTextPane.this.setContentType("text/python");
