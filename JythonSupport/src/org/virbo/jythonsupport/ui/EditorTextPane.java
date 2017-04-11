@@ -40,6 +40,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
 import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.SyntaxStyles;
+import jsyntaxpane.TokenType;
 import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.jythoncompletion.CompletionContext;
@@ -173,6 +175,8 @@ public class EditorTextPane extends JEditorPane {
                     Action get = EditorTextPane.this.getActionMap().get(DefaultSyntaxKit.insertTabAction);
                     EditorTextPane.this.getActionMap().remove(DefaultSyntaxKit.insertTabAction);
                 }
+                
+                SyntaxStyles.getInstance().getStyle(TokenType.DELIMITER).isDrawTabs();
 
                 JPopupMenu oldPopup= EditorTextPane.this.getComponentPopupMenu();
                 EditorTextPane.this.setContentType("text/python");
