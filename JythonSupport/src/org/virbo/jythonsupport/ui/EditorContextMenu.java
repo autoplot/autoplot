@@ -27,6 +27,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Element;
+import jsyntaxpane.actions.ActionUtils;
+import jsyntaxpane.actions.IndentAction;
 import org.das2.jythoncompletion.CompletionSettings;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.util.LoggerManager;
@@ -60,9 +62,16 @@ public class EditorContextMenu {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getPropertyName().equals( CompletionSettings.PROP_EDITORFONT ) ) {
                     editor.setFont( Font.decode((String)evt.getNewValue() ) );
+                } else if ( evt.getPropertyName().equals( CompletionSettings.PROP_TAB_IS_COMPLETION ) ) {
+                    boolean tabIsCompletion= (Boolean)evt.getNewValue();
+                    Action get = ActionUtils.getAction( editor, IndentAction.class );
+                    if ( get==null ) {
+                        logger.warning("Expected to find IndentAction");
+                    } else {
+                        ((IndentAction)get).setInsertTab(!tabIsCompletion);
+                    }
                 }
-            }
-            
+            } 
         });
 
         editor.setComponentPopupMenu(menu); // override the default popup for the editor.
@@ -601,6 +610,7 @@ public class EditorContextMenu {
                             + "<tr><td>CTRL-S</td><td>  Save<br></td></tr>"
                             + "<tr><td>F6</td><td> Execute<br></td> </tr>"
                             + "<tr><td>SHIFT-F6</td><td> Execute with Parameters Dialog<br></td> </tr>"
+                            + "<tr><td>CTRL-SPACE</td><td> Show completions<br></td> </tr>"
                             + "</table></html>";
                             
                     JOptionPane.showMessageDialog( actionsMenu, msg );
