@@ -37,6 +37,13 @@ public class Util {
         return DataSetSelectorSupport.getPluginsText();
     }
 
+    /**
+     * In IDL, you would say:
+     * <code>Util= OBJ_NEW('IDLJavaObject$Static$Util', 'org.virbo.idlsupport.Util')
+     * print, Util.getVersions()
+     * </code>
+     * @return 
+     */
     public static String getVersions(  ) {
         return AboutUtil.getAboutHtml();
     }
