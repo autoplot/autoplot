@@ -26,6 +26,11 @@ fi
 JAVAC=${JAVA_HOME}bin/javac
 JAR=${JAVA_HOME}bin/jar
 
+if [ ! -f $JAVAC ]; then 
+    echo "Java executable does not exist.  Set, for example, \"export JAVA_HOME=/usr/local/jdk1.7.0_80/\""
+    exit -1
+fi
+
 if [ "" = "$TAG" ]; then
     if [ "" = "$AP_VERSION" ]; then
        TAG=untagged

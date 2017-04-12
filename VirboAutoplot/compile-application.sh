@@ -36,6 +36,11 @@ echo "TAG=${TAG}"
 JAVAC=${JAVA_HOME}/bin/javac
 JAR=${JAVA_HOME}/bin/jar
 
+if [ ! -f $JAVAC ]; then 
+    echo "Java executable does not exist.  Set, for example, \"export JAVA_HOME=/usr/local/jdk1.7.0_80/\""
+    exit -1
+fi
+
 # we rsync over stable jars to compile against.  Setting AP_KEEP_STABLE=T means keep the Jar files.
 if [ "" = "$AP_KEEP_STABLE" ]; then
     AP_KEEP_STABLE=F

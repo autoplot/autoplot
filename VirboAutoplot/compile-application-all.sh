@@ -26,11 +26,9 @@ echo "\${AP_VERSION}=${AP_VERSION}"
 JAVAC=$JAVA_HOME/bin/javac
 JAR=$JAVA_HOME/bin/jar
 
-if [ \! -f $JAVAC ]; then
-   echo ""
-   echo "Can't find javac in JAVA_HOME=$JAVA_HOME"
-   echo ""
-   exit -1
+if [ ! -f $JAVAC ]; then 
+    echo "Java executable does not exist.  Set for example \"export JAVA_HOME=/usr/local/jdk1.7.0_80/\""
+    exit -1
 fi
 
 rm -r -f temp-src/
