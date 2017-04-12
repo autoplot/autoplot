@@ -3,7 +3,6 @@ package org.virbo.jythonsupport.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -29,7 +28,6 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -42,6 +40,8 @@ import javax.swing.undo.UndoManager;
 import jsyntaxpane.DefaultSyntaxKit;
 import jsyntaxpane.SyntaxStyles;
 import jsyntaxpane.TokenType;
+import jsyntaxpane.actions.ActionUtils;
+import jsyntaxpane.actions.IndentAction;
 import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.jythoncompletion.CompletionContext;
@@ -55,7 +55,6 @@ import org.python.parser.SimpleNode;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSourceEditorDialog;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
 import org.virbo.datasource.WindowManager;
@@ -170,16 +169,21 @@ public class EditorTextPane extends JEditorPane {
                 doLayout(); // kludge for DefaultSyntaxKit
                 DefaultSyntaxKit.initKit();
                 
-                if ( JythonCompletionProvider.getInstance().settings().isTabIsCompletion()==false ) {
-                    // Ed Help
-                    Action get = EditorTextPane.this.getActionMap().get(DefaultSyntaxKit.insertTabAction);
-                    EditorTextPane.this.getActionMap().remove(DefaultSyntaxKit.insertTabAction);
-                }
-                
                 SyntaxStyles.getInstance().getStyle(TokenType.DELIMITER).isDrawTabs();
 
                 JPopupMenu oldPopup= EditorTextPane.this.getComponentPopupMenu();
                 EditorTextPane.this.setContentType("text/python");
+
+                if ( JythonCompletionProvider.getInstance().settings().isTabIsCompletion()==false ) {
+                    // See EditorContextMenu line 62
+                    Action get = ActionUtils.getAction( EditorTextPane.this, IndentAction.class );
+                    if ( get==null ) {
+                        logger.warning("Expected to find IndentAction");
+                    } else {
+                        ((IndentAction)get).setInsertTab(true);
+                    }
+                }
+                
                 getDocument().addUndoableEditListener(undo);
                 if ( oldPopup!=null ) EditorTextPane.this.setComponentPopupMenu(oldPopup);
 
