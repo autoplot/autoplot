@@ -8,7 +8,7 @@
         <p><a href="autoplot.jnlp"><img alt="launch" src="launch.png"></a></p>
 
         <img alt="screenshot"  src="screen.png">
-        <p><small>Two You-Tube performances of music piece are compared using FFTPower.
+        <p><small>Tabs are shown in Jython editor now, and can be used as Jython indentation character.  This was a bit painful to figure out, and the upper screenshot shows where the wrong method was used, before a GitHub version of the editor (JSyntaxPane) was modified instead.
             </small></p>
         <p>Autoplot attempts to allow plotting of data from many data sources, including remote CDF files and OpenDAP servers.
 	   Datasets are identified with URIs, and by the URI's extension, data are loaded into the internal data model.  Data are then
@@ -24,8 +24,11 @@
 
         <p><a href="http://autoplot.org/data/build/mac/Autoplot.dmg">Mac DMG Release</a> is available.
         
-        <p>Bugfixes (2017-04-04 r20643):</p>
+        <p>Bugfixes (2017-04-12 r20643):</p>
         <ul> 
+            <li>pitch angle distribution renderer finally uses curved pieces to draw, instead of trapezoids.  Thanks, Ed!
+            <li>reduce verbosity of "uh-oh, span used on ordinal like month, day" warning.  I don't see that there's a problem with this.
+            <li>1809: kludge in proper handling of signature for addMouseModule
             <li>special handling of parseDecimal("NaN").
             <li>improve handling of space and umlaut (&uml;) in pngwalk file names.
             <li>rte_0746124665: George saw path that was resulted in NullPointerException.
@@ -36,7 +39,10 @@
             <li>slice2 and slice3 preserve NAME property.
             <li>bugfix: LocalFileObject write capability didn't check to see if it could create a file, with the QC stuff in PNGWalk.
             <li>1804: trim off-by-one error corrected.
-            <li>1802: checkIsotropic could trigger before axes were sized with AutoplotServer.
+            <li>1802: checkIsotropic could trigger before axes were sized with AutoplotServer.                
+        </ul>
+        <p>Older Bugfixes:</p>
+        <ul>
             <li>Java 8 Javadocs supported in Jython completions.
             <li>new CDF Jar file fixes problem where unused ThreadGroups were made.
             <li>1801: dataset iterator is inordinately slow, put in optimal loops for rank 1 data.  
@@ -77,59 +83,17 @@
             <li>check for vap+internal:data_1,data_2 when switching to mash-up
             <li>1754: Correctly support http://autoplot.org/data/AMSR_E_L3_SeaIce6km_B06_20070307.hdf.gz
         </ul>
-        <p>Older Bugfixes:</p>
-        <ul>
-            <li>HAPI supports nominal data.
-            <li>1754: Java now reuses https connections properly and garbage collection requests are not needed.
-            <li>improvements to command line history. 
-            <li>DownloadResourceAsTempFile never properly indicated progress, showing progress bar with incorrect position.
-            <li>Script panel would ask if you want to reload script when time stamp changed, even if the contents did not change.
-            <li>1754: explicitly close Network connections, and call System.gc while interacting with CDAWeb.
-            <li>1754: cache metadata requests so that the metadata for a given file is only retrieved once every ten seconds.
-            <li>1754: corrections to 301 redirects to support old URLs pointing to CDAWeb.
-            <li>1754: Use https to access CDAWeb.  Java 1.8.0r102 is now required to access CDAWeb.
-            <li>"October 2016" now parses properly.   Thanks, Sebastian!
-            <li>995: colorbar with color scatter now appears consistently.
-            <li>corrections to labels when X,Y->Z is used.  Thanks, Babtiste!
-            <li>1191: restore mousewheel behavior to the secondary mouse module.
-            <li>1769: make sure event things happen on the event thread DataPointRecorder
-            <li>rte_1889988765: null pointer path in DataPointRecorder load
-            <li>bug 1770, catch the NullPointerException and print it to stderr
-            <li>clean up DataPointRecorder new so that it provides all the function of DataPointRecorderNew.
-            <li>rte_0809841297: Sebastian noticed this harmless runtime exception, which occurs when the last guy listening to the service was closed.
-            <li>don't warn about empty script editor which has been modified.
-            <li>Some loggers were still logging at INFO, which shows up in web logs and could cause problems.
-            <li>1765: properly handle carots in URIs.  Thanks Ivar!
-            <li>1764: vap+inline GUI with events corrected, so that you can re-enter the GUI.
-            <li>1749: GUI generated supports (kinda) positional parameters
-            <li>1763: spectrogram codes should accept X,Y->Z (rank1 X,Y,Z).  Thanks Babtiste and Chris!
-            <li>1762: add support for URL argument types.
-            <li>1760: remove "here" from rebinning code, which would hang the Mac release with stdout noise.  Thanks, Sebastian!
-            <li>corrections to scatterRebinner to support more data types.
-            <li>1730: correct code for adding label when slice1=i is used.  Thanks, Tami!
-            <li>file:///tmp/foo.zip/Chipmunks.wav wouldn't work because wav file wasn't accessed properly within the zip file.
-            <li>check that processedData checkbox is enabled before setting it because originalData is not enabled.
-            <li>1759: support rank2 DEPEND_2 in expressions like ds[r,:,:].  Thanks, Ivar!
-            <li>total supports rank 0 data.  Thanks, Ivar!
-            <li>1566: improper escaping meant that pngwalk tool may not have been using thumbs400 directory.
-            <li>rte_0064480313: index out of bounds in pngwalk tool when using limited range.  Thanks Laura!
-            <li>improvements to Orbit mode, for example when the last point is fill.
-            <li>"file not found: afile.txt.gz" when afile.txt is requested.
-            <li>POLAR_HYDRA_MOMENTS-14SEC have missing parameters in 2008 (ELECTRON_DENSITY) because v02 master files were not used.
-            <li>1753: datum/dataset now results in correct units.
-            <li>1752: renderControl property needed to be handled after the style node when loading a file, so orbit plot settings would load properly
-            <li>1752: more corrections to the orbit plot renderer, such as rounded strokes, tick positioning, and icon
-            <li>1749: correct code that handles unnamed command-line arguments for scripts, which dropped the first argument.
-            <li>spectrogram code assumed there were valid Y tags.  Thanks, Seth!
-            <li>rte_0579587635: single pipe character (|) in operations would cause RTE.  
-            <li>Hapi client had a branch that would result in class cast exception RTE popup.
-            <li>1750: ds[-1,r]=0 didn't work, where negative indeces weren't supported.  Thanks, Ivar!
-        </ul>
         <p>Features:</p>
         <ul> 
+            <li>1787: add text field so that orbit number can be entered directly.
+            <li>Jython editor now allows tabs to be used instead of spaces, when "tabIsCompletion" is false.
+            <li>Jython editor now shows tabs, which are syntactically different than spaces.
             <li>Introduce "gridIrregularY" to replace old LGrid.rebin codes.
             <li>TimeRangeEditor keeps track of last spacecraft used for orbits.
             <li>JUNO Perijove intervals added.
+       </ul>
+       <p>Less recent features:</p>
+       <ul>
             <li>Data Mash Up GUI has bundle operator so that events lists can be constructed.
             <li>Introduce high-rank trim, so you can trim on any index now.
             <li>HAPI Server bins can have either centers or ranges specified.
@@ -144,24 +108,6 @@
             <li>export-to-wav has timeScale parameter for scaling time tags, useful for auralizing B-Field data.
             <li>AutoplotServlet simpleServlet has symbolSize to support sparklines.
             <li>HAPI server allows external configuration (but it must be in /home/jbf/hapi/ for now!)
-       </ul>
-       <p>Less recent features:</p>
-       <ul>
-            <li>559: screenshots tool now uses a separate thread to save images, improving responsiveness.
-            <li>experimental support for high-rank datasets in HAPI servers
-            <li>dom.getElementById added, to remove confusion about indeces.
-            <li>provide useful record-by-record reform command that allows reforming within each record.
-            <li>getCompletions command provides completions, so that function can be tested immediately.
-            <li>annotations allow images to be used when http, https, or file URLs are used.
-            <li>x(t),y(t)->z(t) (as well as x(i),y(j)->z(i,j)) supported in spectrogram renderer.
-            <li>add method for creating zip files, from within scripts.  unzip is deprecated, and it is replaced with gunzip.
-            <li>rfe556: support semicolon in ascii files and csv files.
-            <li>Util.getBuildTime returns the build time, if available.</li>
-            <li>support apply_qflag for Timas data in CDF.</li>
-            <li>spectrogram scatter mode.  Thanks, Matt!
-            <li>cdawebHttps=true environment variable allows use of https for web transactions with CDAWeb.
-            <li>logging improvements to CDF reader.
-            <li>LinFit has getSlope and getIntercept methods, in anticipation of proper SI units library.
        </ul>
 
         <p>Known issues:</p>
