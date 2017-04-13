@@ -44,7 +44,7 @@ public class PDSPPIDataSourceFactory extends AbstractDataSourceFactory implement
     private List<CompletionContext> getDataSetCompletions( String id, ProgressMonitor mon  ) throws Exception { 
         VOTableReader read;  
         
-        String url= "https://ppi.pds.nasa.gov/ditdos/write?f=vo&id=pds://"+id;
+        String url= PDSPPIDB.PDSPPI + "ditdos/write?f=vo&id=pds://"+id;
         read= new VOTableReader();            
         mon.setProgressMessage("downloading data");
         logger.log(Level.FINE, "getDataSetCompletions {0}", url);
